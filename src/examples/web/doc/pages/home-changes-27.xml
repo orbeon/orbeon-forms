@@ -17,115 +17,162 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <header>
-        <title>Changes</title>
+        <title>Changes in Version 2.7</title>
     </header>
     <body>
         <section>
-            <title>New in Version 2.7</title>
+            <title>JBoss Support</title>
+            <p>
+                JBoss is now supported. See the <a href="intro-install">installation 
+                instruction</a> for more information on how to setup Presentation 
+                Server on JBoss.
+            </p>
+        </section>
+        <section>
+            <title>XForms</title>
             <section>
-                <title>eXist Native XML Database</title>
+                <title>Support for doc() in Model Item Properties</title>
                 <p>
-                    Presentation Server ships with the latest stable version of eXist
-                    (eXist-1.0b2-build-1107). This fixes the issue of connecting to an external
-                    eXist instance. Here is an example <code>datasource.xml</code> to connect to a
-                    standalone eXist:
+                    You can now use the XPath 2.0 <code>doc()</code> function in XPath expression in
+                    the XForms model. For instance, assuming that you have a "lookup table" defined in
+                    an XML file mapping department id to department name, you can write a model item
+                    property like:
                 </p>
-                <xml-source>
-                    <datasource>
-                        <comment> Specify the driver for the eXist database </comment>
-                        <driver-class-name>org.exist.xmldb.DatabaseImpl</driver-class-name>
-                        <comment> Example of URL for a non-embedded use </comment>
-                        <uri>xmldb:exist://localhost:8080/exist/xmlrpc</uri>
-                    </datasource>
+                <xml-source show-namespaces="false">
+                    <xforms:bind nodeset="/instance/department-name"
+                        calculate="doc('oxf:/departments.xml')/departments/department[@id = /instance/department-id]/name"/>
                 </xml-source>
             </section>
+            <section>
+                <title>Support for &lt;xforms:message></title>
+                <p>
+                    
+                </p>
+            </section>
+            <section>
+                <title>xxforms:hidden Extension Control</title>
+                <p>
+                    The XForms extension control <code>xxforms:hidden</code> is supported again
+                    and documented.
+                </p>
+            </section>
+            <section>
+                <title>Compliance Matrix</title>
+                <p>
+                    Inline with our commitment to fully support the XForms specification, we now 
+                    clearly document the level of support for each part of the specification 
+                    in the <a href="reference-xforms-compliance">compliance matrix</a>.
+                </p>
+            </section>
+            <section>
+                <title>Semantic of XForms Conditionals</title>
+                <p>
+                    The <code>&lt;xxforms:choose></code> used to run all the "true" 
+                    <code>&lt;xxforms:when></code>. Instead, it now only run the first one if any, 
+                    and the <code>&lt;xxforms:otherwise></code> otherwise. This is inline with 
+                    the behavior of the <code>&lt;xsl:choose></code>.
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>eXist Native XML Database</title>
+            <p>
+                Presentation Server ships with the latest stable version of eXist
+                (eXist-1.0b2-build-1107). This fixes the issue of connecting to an external
+                eXist instance. Here is an example <code>datasource.xml</code> to connect to a
+                standalone eXist:
+            </p>
+            <xml-source>
+                <datasource>
+                    <comment> Specify the driver for the eXist database </comment>
+                    <driver-class-name>org.exist.xmldb.DatabaseImpl</driver-class-name>
+                    <comment> Example of URL for a non-embedded use </comment>
+                    <uri>xmldb:exist://localhost:8080/exist/xmlrpc</uri>
+                </datasource>
+            </xml-source>
+        </section>
+        <section>
+            <title>Examples Setup</title>
+            <p>
+                All the examples using the SQL processor now work out of the box without
+                configuring datasources at the application server or servlet container level.
+                This includes the following examples:
+            </p>
+            <ul>
+                <li>Address Book</li>
+                <li>Employees</li>
+                <li>Data in multiple formats</li>
+                <li>XForms Upload</li>
+                <li>Email</li>
+            </ul>
+        </section>
+        <section>
+            <title>Saxon Upgraded to Version 8.1.1</title>
+            <p>
+                TODO
+            </p>
+        </section>
+        <section>
+            <title>XPath Improvements</title>
+            <p>
+                TODO
+            </p>
+        </section>
+        <section>
+            <title>User-Defined Processor Inputs</title>
+            <p>
+                User-defined processor inputs, used by several processors including the XSLT
+                processor and the Email processor, are now documented (<a
+                href="reference-xpl-pipelines#optional">XPL documentation</a>, <a
+                href="processors-xslt#user-defined">XSLT documentation</a>). The URI schemes to
+                access user-defined inputs and outputs are now <code>input:</code> and
+                <code>output:</code>, to avoid confusion with the <code>oxf:</code> scheme used
+                for the Presentation Server resource manager sandbox.
+            </p>
+        </section>
+        <section>
+            <title>Processors</title>
             <section>
                 <title>SQL Processor</title>
-                <p>
-                    The SQL processor now supports external datasource definitions using the
-                    optional <code>datasource</code> input. Those directly refer to connections
-                    without using JNDI names mapped by the container. This allows examples to work
-                    out of the box. This is an example of datasource definition:
-                </p>
-                <xml-source>
-                    <datasource>
-                        <comment> Specify the driver for the database </comment>
-                        <driver-class-name>org.hsqldb.jdbcDriver</driver-class-name>
-                        <comment> This causes the use of the embedded database </comment>
-                        <uri>jdbc:hsqldb:file:orbeondb</uri>
-                        <comment> Optional username and password </comment>
-                        <username>sa</username>
-                        <password></password>
-                    </datasource>
-                </xml-source>
-                <p>
-                    Presentation Server ships with a recent version of HSQLDB (version 1.7.2.8).
-                </p>
-                <p>
-                    The SQL processor now supports reading <code>BINARY</code>, <code>VARBINARY
-                    </code>and <code>LONGVARBINARY</code> columns in addition to <code>BLOB</code>.
-                </p>
-                <p>
-                    The SQL processor's <code>data</code> input and output are now optional. This
-                    removes the need for "dummy" input content or Null serializers with the SQL
-                    processor.
-                </p>
-            </section>
-            <section>
-                <title>Examples</title>
-                <p>
-                    All the examples using the SQL processor now work out of the box without
-                    configuring datasources at the application server or servlet container level.
-                    This includes the following examples:
-                </p>
                 <ul>
-                    <li>Address Book</li>
-                    <li>Employees</li>
-                    <li>Data in multiple formats</li>
-                    <li>XForms Upload</li>
-                    <li>Email</li>
+                    <li>
+                        <p>
+                            The SQL processor now supports external datasource definitions using the
+                            optional <code>datasource</code> input. Those directly refer to connections
+                            without using JNDI names mapped by the container. This allows examples to work
+                            out of the box. This is an example of datasource definition:
+                        </p>
+                        <xml-source>
+                            <datasource>
+                                <comment> Specify the driver for the database </comment>
+                                <driver-class-name>org.hsqldb.jdbcDriver</driver-class-name>
+                                <comment> This causes the use of the embedded database </comment>
+                                <uri>jdbc:hsqldb:file:orbeondb</uri>
+                                <comment> Optional username and password </comment>
+                                <username>sa</username>
+                                <password></password>
+                            </datasource>
+                        </xml-source>
+                    </li>
+                    <li>
+                        <p>
+                            Presentation Server ships with a recent version of HSQLDB (version 1.7.2.8).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The SQL processor now supports reading <code>BINARY</code>, <code>VARBINARY
+                            </code>and <code>LONGVARBINARY</code> columns in addition to <code>BLOB</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The SQL processor's <code>data</code> input and output are now optional. This
+                            removes the need for "dummy" input content or Null serializers with the SQL
+                            processor.
+                        </p>
+                    </li>
                 </ul>
-            </section>
-            <section>
-                <title>Saxon Upgraded to Version 8.1.1</title>
-                <p>
-                    TODO
-                </p>
-            </section>
-            <section>
-                <title>XPath Improvements</title>
-                <p>
-                    TODO
-                </p>
-            </section>
-            <section>
-                <title>JBoss Support</title>
-                <p>
-                    TODO
-                </p>
-            </section>
-            <section>
-                <title>XForms</title>
-                <section>
-                    <title>xxforms:hidden Extension Control</title>
-                    <p>
-                        The XForms extension control <code>xxforms:hidden</code> is supported again
-                        and documented.
-                    </p>
-                </section>
-                <section>
-                    <title>Compliance Matrix</title>
-                    <p>
-                        A <a href="reference-xforms-compliance">compliance matrix</a> is now
-                        available.
-                    </p>
-                </section>
-                <section>
-                    <title>Other XForms Improvements</title>
-                    <p>
-                        TODO
-                    </p>
-                </section>
             </section>
             <section>
                 <title>URL generator</title>
@@ -148,18 +195,6 @@
                         Of course, this works with other dependency scenarios as well!
                     </p>
                 </section>
-            </section>
-            <section>
-                <title>User-Defined Processor Inputs</title>
-                <p>
-                    User-defined processor inputs, used by several processors including the XSLT
-                    processor and the Email processor, are now documented (<a
-                    href="reference-xpl-pipelines#optional">XPL documentation</a>, <a
-                    href="processors-xslt#user-defined">XSLT documentation</a>). The URI schemes to
-                    access user-defined inputs and outputs are now <code>input:</code> and
-                    <code>output:</code>, to avoid confusion with the <code>oxf:</code> scheme used
-                    for the Presentation Server resource manager sandbox.
-                </p>
             </section>
             <section>
                 <title>Java Processor</title>

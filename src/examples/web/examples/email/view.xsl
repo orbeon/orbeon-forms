@@ -43,13 +43,14 @@
                 <li>A static JPEG image (related to the HTML document)</li>
                 <li>A PDF file produced dynamically from a SQL database</li>
                 <li>A chart in PNG format produced dynamically from a configuration file (related to the HTML document)</li>
+                <li>An XML document containing the XForms instance of this example</li>
             </ul>
             <p>
                 This example also illustrates XForms model features such as:
             </p>
             <ul>
-                <li><b>constraints:</b> enforce validation constraints on certain form elements</li>
-                <li><b>calculate:</b> dynamically calculate form values based on other form values</li>
+                <li><b>Constraints:</b> enforce validation constraints on certain form elements</li>
+                <li><b>Calculations:</b> dynamically calculate form values based on other form values</li>
             </ul>
             <table class="gridtable">
                 <tr>

@@ -530,7 +530,7 @@
         </exec>
     </target>
 
-    <target name="orbeon-dist" depends="orbeon-dist-packages, orbeon-dist-install"/>
+    <target name="orbeon-dist" depends="orbeon-dist-packages"/>
 
     <target name="copy-distrib" depends="orbeon-dist">
         <copy todir="/home/httpd/html/public/oxf/secret">

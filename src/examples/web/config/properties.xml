@@ -17,6 +17,7 @@
     <!-- Global properties -->
     <property as="xs:anyURI"  name="oxf.log4j-config"                                value="oxf:/config/log4j.xml"/>
     <property as="xs:integer" name="oxf.cache.size"                                  value="200"/>
+    <property as="xs:boolean" name="oxf.sax.inspection"                              value="false"/>
 
     <property as="xs:QName"   name="oxf.servlet.error.processor"                     value="oxf:pipeline"/>
     <property as="xs:string"  name="oxf.servlet.error.input.config"                  value="oxf:/config/error.xpl"/>

@@ -18,6 +18,7 @@ import org.apache.axis.client.Service;
 import org.apache.axis.message.PrefixedQName;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
+import org.apache.axis.message.MessageElement;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Text;
@@ -137,61 +138,83 @@ public class DelegationProcessor extends ProcessorImpl {
                                         Service axisService = new Service();
                                         Call call = (Call) axisService.createCall();
                                         SOAPEnvelope requestEnvelope = new SOAPEnvelope();
+
+                                        // Read all parameters in root node
+                                        final Node rootNode;
+                                        {
+                                            SAXSource saxSource = new SAXSource(new XMLFilterImpl() {
+                                                ContentHandler contentHandler;
+                                                public void setContentHandler(ContentHandler handler) {
+                                                    super.setContentHandler(handler);
+                                                    contentHandler = handler;
+                                                }
+
+                                                public void parse(InputSource input) throws SAXException {
+                                                    contentHandler.startDocument();
+                                                    contentHandler.startElement("", "dummy", "dummy", XMLUtils.EMPTY_ATTRIBUTES);
+                                                    parameters.replay(contentHandler);
+                                                    contentHandler.endElement("", "dummy", "dummy");
+                                                    contentHandler.endDocument();
+                                                }
+
+                                                public void setFeature(String name, boolean state) throws SAXNotRecognizedException, SAXNotSupportedException {
+                                                    // We allow these two features
+                                                    if (name.equals("http://xml.org/sax/features/namespaces") && state)
+                                                        return;
+                                                    if (name.equals("http://xml.org/sax/features/namespace-prefixes") && !state)
+                                                        return;
+
+                                                    // Otherwise we throw
+                                                    throw new SAXNotRecognizedException("Feature: " + name);
+                                                }
+                                            }, null);
+                                            DOMResult domResult = new DOMResult();
+                                            Transformer identityTransformer = TransformerUtils.getIdentityTransformer();
+                                            identityTransformer.transform(saxSource, domResult);
+                                            rootNode = domResult.getNode().getFirstChild();
+                                        }
+
+                                        // Populate envelope
                                         if ("document".equals(service.style)) {
-
-                                            // Read all parameters in root node
-                                            final Node rootNode;
-                                            {
-                                                SAXSource saxSource = new SAXSource(new XMLFilterImpl() {
-                                                    ContentHandler contentHandler;
-                                                    public void setContentHandler(ContentHandler handler) {
-                                                        super.setContentHandler(handler);
-                                                        contentHandler = handler;
-                                                    }
-
-                                                    public void parse(InputSource input) throws SAXException {
-                                                        contentHandler.startDocument();
-                                                        contentHandler.startElement("", "dummy", "dummy", XMLUtils.EMPTY_ATTRIBUTES);
-                                                        parameters.replay(contentHandler);
-                                                        contentHandler.endElement("", "dummy", "dummy");
-                                                        contentHandler.endDocument();
-                                                    }
-
-                                                    public void setFeature(String name, boolean state) throws SAXNotRecognizedException, SAXNotSupportedException {
-                                                        // We allow these two features
-                                                        if (name.equals("http://xml.org/sax/features/namespaces") && state)
-                                                            return;
-                                                        if (name.equals("http://xml.org/sax/features/namespace-prefixes") && !state)
-                                                            return;
-
-                                                        // Otherwise we throw
-                                                        throw new SAXNotRecognizedException("Feature: " + name);
-                                                    }
-                                                }, null);
-                                                DOMResult domResult = new DOMResult();
-                                                Transformer identityTransformer = TransformerUtils.getIdentityTransformer();
-                                                identityTransformer.transform(saxSource, domResult);
-                                                rootNode = domResult.getNode().getFirstChild();
-                                            }
-
-                                            // Add elements to body
+                                            // Add elements to directly to body
                                             for (int i = 0; i < rootNode.getChildNodes().getLength(); i++) {
                                                 Node child = rootNode.getChildNodes().item(i);
                                                 if (child instanceof org.w3c.dom.Element)
                                                     requestEnvelope.addBodyElement(new SOAPBodyElement((org.w3c.dom.Element) child));
                                             }
                                         } else {
+                                            // Create body element with operation name, and add elements as children
                                             final SOAPBodyElement requestBody = new SOAPBodyElement(new PrefixedQName(operation.nsuri, operation.name, "m"));
-                                            parameters.replay(new SOAPElementContentHandler(requestBody));
+                                            for (int i = 0; i < rootNode.getChildNodes().getLength(); i++) {
+                                                Node child = rootNode.getChildNodes().item(i);
+                                                if (child instanceof org.w3c.dom.Element) {
+                                                    requestBody.addChild(new MessageElement((org.w3c.dom.Element) child));
+                                                } else if (child instanceof org.w3c.dom.Text) {
+                                                    requestBody.addTextNode(((org.w3c.dom.Text) child).toString());
+                                                    requestEnvelope.addBodyElement(new SOAPBodyElement((org.w3c.dom.Element) child));
+                                                } else {
+                                                    throw new OXFException("Unsupported node type: " + child.getClass().getName());
+                                                }
+                                            }
                                             requestEnvelope.addBodyElement(requestBody);
                                         }
+                                        
                                         parameters = null;
                                         call.setTargetEndpointAddress(new URL(service.endpoint));
                                         if (operation != null && operation.soapAction != null) {
                                             call.setUseSOAPAction(true);
                                             call.setSOAPActionURI(operation.soapAction);
                                         }
+                                        call.setReturnClass(javax.xml.soap.SOAPMessage.class);
                                         SOAPEnvelope resultEnvelope = call.invoke(requestEnvelope);
+
+                                        // Throw exception if a fault is returned
+                                        if (resultEnvelope.getBody().getFault() != null) {
+                                            throw new OXFException("SOAP Fault. Request:\n"
+                                                    + XMLUtils.domToString(requestEnvelope.getAsDocument())
+                                                    + "\n\nResponse:\n"
+                                                    + XMLUtils.domToString(resultEnvelope.getAsDocument()));
+                                        }
 
                                         // Get body from result envelope
                                         LocationSAXContentHandler domContentHandler = new LocationSAXContentHandler();

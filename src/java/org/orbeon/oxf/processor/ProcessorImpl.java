@@ -32,6 +32,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.InspectingContentHandler;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.w3c.dom.Document;
@@ -55,6 +56,7 @@ public abstract class ProcessorImpl implements Processor {
 
     public static final String PROCESSOR_VALIDATION_FLAG = "oxf.validation.processor";
     public static final String USER_VALIDATION_FLAG = "oxf.validation.user";
+    public static final String SAX_INSPECTION_FLAG = "oxf.sax.inspection";
 
     public static final char KEY_SEPARATOR = '?';
 
@@ -960,7 +962,9 @@ public abstract class ProcessorImpl implements Processor {
                             Element configElement = debugConfigDocument.addElement("config");
                             configElement.addElement("message").addText(debugMessage);
                             if (debugLocationData != null) {
-                                configElement.addElement("system-id").addText(debugLocationData.getSystemID());
+                                Element systemIdElement = configElement.addElement("system-id");
+                                if (debugLocationData.getSystemID() != null)
+                                    systemIdElement.addText(debugLocationData.getSystemID());
                                 configElement.addElement("line").addText(Integer.toString(debugLocationData.getLine()));
                                 configElement.addElement("column").addText(Integer.toString(debugLocationData.getCol()));
                             }
@@ -976,6 +980,7 @@ public abstract class ProcessorImpl implements Processor {
             // The PropertySet can be null during properties initialization. This should be one of the
             // rare places where this should be tested on.
             OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
+
             // Create and hook-up output validation processor if needed
             Boolean isOutputValidation = (propertySet == null) ? null : propertySet.getBoolean(USER_VALIDATION_FLAG, true);
             if (isOutputValidation != null && isOutputValidation.booleanValue() && getSchema() != null) {
@@ -1006,6 +1011,26 @@ public abstract class ProcessorImpl implements Processor {
                 PipelineUtils.connect(MSVValidationProcessor.NO_DECORATION_CONFIG, OUTPUT_DATA,
                     inputValidator, INPUT_CONFIG);
                 filter = new ConcreteProcessorFilter(input, output, filter);
+            }
+
+            // Perform basic inspection of SAX events
+            Boolean isSAXInspection = (propertySet == null) ? null : propertySet.getBoolean(SAX_INSPECTION_FLAG, false);
+            if (isSAXInspection != null && isSAXInspection.booleanValue()) {
+                final ProcessorFilter previousFilter = filter;
+                filter = new ProcessorFilter() {
+                    public void read(PipelineContext context, ContentHandler contentHandler) {
+                        InspectingContentHandler inspectingContentHandler = new InspectingContentHandler(contentHandler);
+                        previousFilter.read(context, inspectingContentHandler);
+                    }
+
+                    public OutputCacheKey getKey(PipelineContext context) {
+                        return previousFilter.getKey(context);
+                    }
+
+                    public Object getValidity(PipelineContext context) {
+                        return previousFilter.getValidity(context);
+                    }
+                };
             }
 
             // Hookup inspector

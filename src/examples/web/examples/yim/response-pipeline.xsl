@@ -1,7 +1,9 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <xsl:template match="/">
         <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-                  xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                  xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                  xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:gs="urn:GoogleSearch">
 
             <p:param name="data" type="input"/>
 
@@ -16,12 +18,10 @@
                     <config>
                         <service id="google" type="webservice"
                             endpoint="http://api.google.com/search/beta2">
-                            <operation nsuri="urn:GoogleSearch" name="doGoogleSearch"/>
+                            <operation nsuri="urn:GoogleSearch" name="doGoogleSearch"
+                                select="/soap-env:Envelope/soap-env:Body/gs:doGoogleSearchResponse/return"/>
                         </service>
                     </config>
-                </p:input>
-                <p:input name="data">
-                    <dummy/>
                 </p:input>
                 <p:input name="call" href="#delegation"/>
                 <p:output name="data" id="google-response"/>
@@ -45,8 +45,7 @@
                         </password>
                     </session>
                 </p:input>
-                <p:input name="data" href="#yim">
-                </p:input>
+                <p:input name="data" href="#yim"/>
             </p:processor>
 
         </p:config>

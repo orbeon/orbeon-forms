@@ -77,6 +77,6 @@ public class StaticExternalContext {
 
     public static String setTitle(String title) {
         getStaticContext().getExternalContext().getResponse().setTitle(title);
-        return title;
+        return "";
     }
 }

@@ -126,4 +126,59 @@
         </output>
     </test>
 
+    <!-- The following tests on XPath expressions with namespaces. This is not implemented yet. -->
+    <!--
+    <test description="Reverse Params With Namespaces" name="oxf:xslt">
+        <input name="config" href="oxf:/oxf/private/page-flow/reverse-params.xsl"/>
+        <input name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>/a/([^/]*)/b</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                </parameters>
+                <parameters>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </input>
+        <input name="instance">
+            <c:form xmlns:c="http://example.org/a" xmlns:d="http://example.org/b">
+                <d:album-id>123</d:album-id>
+            </c:form>
+        </input>
+        <input name="params">
+            <params>
+                <param xmlns="http://www.orbeon.com/oxf/controller" ref="/a:form/b:album-id" xmlns:a="http://example.org/a" xmlns:b="http://example.org/b"/>
+            </params>
+        </input>
+        <output name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>/a/123/b</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                </parameters>
+                <parameters>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </output>
+    </test>
+    -->
+
 </group>

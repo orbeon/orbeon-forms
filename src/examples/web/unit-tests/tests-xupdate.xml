@@ -151,4 +151,42 @@
         </output>
     </test>
 
+    <test description="Keep unused namespace mappings in xu:copy-of" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="result"/>
+                <p:processor name="oxf:xupdate">
+                    <p:input name="data">
+                        <a/>
+                    </p:input>
+                    <p:input name="other">
+                        <b xmlns:xs="http://www.w3.org/2001/XMLSchema"
+                            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                            xsi:type="xs:string">string</b>
+                    </p:input>
+                    <p:input name="config">
+                        <xu:modifications xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                            <xu:update select="/a">
+                                <xu:copy-of select="doc('input:other')/b"/>
+                            </xu:update>
+                        </xu:modifications>
+                    </p:input>
+                    <p:output name="data" id="xupdate"/>
+                </p:processor>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#xupdate"/>
+                    <p:input name="config">
+                        <result xsl:version="2.0">
+                            <xsl:value-of select="namespace-uri-for-prefix('xs', /a/b)"/>
+                        </result>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <result>http://www.w3.org/2001/XMLSchema</result>
+        </output>
+    </test>
+
 </group>

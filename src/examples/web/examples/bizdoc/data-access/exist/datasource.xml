@@ -11,15 +11,14 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:oxf="http://www.orbeon.com/oxf/processors">
-
-    <p:param name="data" type="output" schema-href="summary-model.xsd"/>
-
-    <!-- Call the data access layer -->
-    <p:processor name="oxf:pipeline">
-        <p:input name="config" href="../data-access/exist/list-documents.xpl"/>
-        <p:output name="document-list" ref="data"/>
-    </p:processor>
-
-</p:config>
+<datasource>
+    <!-- Specify the driver for the eXist database -->
+    <driver-class-name>org.exist.xmldb.DatabaseImpl</driver-class-name>
+    <!-- This causes the use of the embedded eXist database -->
+    <uri>xmldb:exist:///</uri>
+    <!-- Example of URL for a non-embedded use -->
+<!--    <uri>xmldb:exist://localhost:8888/oxf/exist-xmlrpc</uri>-->
+    <!-- Optional username and password -->
+<!--    <username></username>-->
+<!--    <password></password>-->
+</datasource>

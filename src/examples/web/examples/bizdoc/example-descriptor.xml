@@ -29,6 +29,12 @@
     <source>detail/detail-view-header.xml</source>
     <source>detail/save-document-action.xpl</source>
     <source>detail/form-schema.xsd</source>
+    <source>data-access/exist/datasource.xml</source>
+    <source>data-access/exist/list-documents.xpl</source>
+    <source>data-access/exist/create-document.xpl</source>
+    <source>data-access/exist/read-documents.xpl</source>
+    <source>data-access/exist/update-document.xpl</source>
+    <source>data-access/exist/delete-document.xpl</source>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <p>
             BizDoc is a sample application that illustrates basic business document manipulation.

@@ -13,9 +13,7 @@
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
-          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-          xmlns:xdb="http://orbeon.org/oxf/xml/xmldb"
-          xmlns:xu="http://www.xmldb.org/xupdate">
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <!-- List of documents to import -->
     <p:processor name="oxf:identity">
@@ -51,23 +49,13 @@
                     </document>
                 </document-info>
             </p:input>
-            <p:output name="data" id="encapsulated-file"/>
+            <p:output name="data" id="document-info"/>
         </p:processor>
 
-        <!-- Dynamically generate query -->
-        <p:processor name="oxf:xslt">
-            <p:input name="data" href="current()"/>
-            <p:input name="config">
-                <xdb:insert collection="/db/oxf/adaptive-example" resource-id="{string(/)}" xsl:version="2.0"/>
-            </p:input>
-            <p:output name="data" id="query"/>
-        </p:processor>
-
-        <!-- Execute the insertion -->
-        <p:processor name="oxf:xmldb-insert">
-            <p:input name="datasource" href="../datasource.xml"/>
-            <p:input name="query" href="#query"/>
-            <p:input name="data" href="#encapsulated-file"/>
+        <!-- Call the data access layer -->
+        <p:processor name="oxf:pipeline">
+            <p:input name="config" href="../data-access/exist/create-document.xpl"/>
+            <p:input name="document-info" href="#document-info"/>
         </p:processor>
 
     </p:for-each>

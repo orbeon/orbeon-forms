@@ -13,9 +13,7 @@
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
-          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-          xmlns:xdb="http://orbeon.org/oxf/xml/xmldb"
-          xmlns:xu="http://www.xmldb.org/xupdate">
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <p:param name="instance" type="input"/>
 
@@ -34,21 +32,10 @@
 
     <!-- For each document id, delete associated document -->
     <p:for-each href="#document-ids" select="/*/document-id">
-        <p:processor name="oxf:xslt">
-            <p:input name="data" href="current()"/>
-            <p:input name="config">
-                <xdb:delete xsl:version="2.0" collection="/db/oxf/adaptive-example">
-                    <xsl:text>/document-info[document-id = '</xsl:text>
-                    <xsl:value-of select="."/>
-                    <xsl:text>']</xsl:text>
-                </xdb:delete>
-            </p:input>
-            <p:output name="data" id="query"/>
-        </p:processor>
-
-        <p:processor name="oxf:xmldb-delete">
-            <p:input name="datasource" href="../datasource.xml"/>
-            <p:input name="query" href="#query"/>
+        <!-- Call the data access layer -->
+        <p:processor name="oxf:pipeline">
+            <p:input name="config" href="../data-access/exist/delete-document.xpl"/>
+            <p:input name="document-id" href="current()"/>
         </p:processor>
     </p:for-each>
 

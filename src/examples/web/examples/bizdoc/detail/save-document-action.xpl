@@ -13,9 +13,7 @@
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
-          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-          xmlns:xdb="http://orbeon.org/oxf/xml/xmldb"
-          xmlns:xu="http://www.xmldb.org/xupdate">
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <p:param name="instance" type="input"/>
 
@@ -41,46 +39,18 @@
     <!-- Update or insert -->
     <p:choose href="#result">
         <p:when test="/document-info/document-id != ''">
-            <!-- Document exists already, update it -->
-            <p:processor name="oxf:xslt">
-                <p:input name="data" href="#stripped-instance"/>
-                <p:input name="config">
-                    <xdb:update collection="/db/oxf/adaptive-example" xsl:version="2.0">
-                        <xu:modifications version="1.0">
-                            <xu:update select="/document-info[document-id = '{/form/document-id}']/document">
-                                <xsl:copy-of select="/form/document/*[1]"/>
-                            </xu:update>
-                        </xu:modifications>
-                    </xdb:update>
-                </p:input>
-                <p:output name="data" id="query"/>
-            </p:processor>
-
-            <p:processor name="oxf:xmldb-update">
-                <p:input name="datasource" href="../datasource.xml"/>
-                <p:input name="query" href="#query"/>
+            <!-- Document exists already, call the data access layer to update it -->
+            <p:processor name="oxf:pipeline">
+                <p:input name="config" href="../data-access/exist/update-document.xpl"/>
+                <p:input name="document-info" href="aggregate('document-info', #stripped-instance#xpointer(/form/document-id | /form/document))"/>
             </p:processor>
         </p:when>
         <p:otherwise>
-            <!-- Document does not exist, insert -->
-            <p:processor name="oxf:xslt">
-                <p:input name="data" href="#stripped-instance"/>
-                <p:input name="config">
-                    <document-info xsl:version="2.0">
-                        <xsl:copy-of select="/form/(document-id|document)"/>
-                    </document-info>
-                </p:input>
-                <p:output name="data" id="document-info"/>
+            <!-- Document does not exist, call the data access layer to insert it -->
+            <p:processor name="oxf:pipeline">
+                <p:input name="config" href="../data-access/exist/create-document.xpl"/>
+                <p:input name="document-info" href="aggregate('document-info', #stripped-instance#xpointer(/form/document-id | /form/document))"/>
             </p:processor>
-
-            <p:processor name="oxf:xmldb-insert">
-                <p:input name="datasource" href="../datasource.xml"/>
-                <p:input name="query">
-                    <xdb:insert collection="/db/oxf/adaptive-example"/>
-                </p:input>
-                <p:input name="data" href="#document-info"/>
-            </p:processor>
-
         </p:otherwise>
     </p:choose>
 

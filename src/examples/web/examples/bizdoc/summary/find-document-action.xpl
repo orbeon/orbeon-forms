@@ -12,32 +12,16 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:oxf="http://www.orbeon.com/oxf/processors"
-          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-          xmlns:xdb="http://orbeon.org/oxf/xml/xmldb">
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
 
-    <!-- Dynamically build query -->
-    <p:processor name="oxf:xslt">
-        <p:input name="data" href="#instance"/>
-        <p:input name="config">
-            <xdb:query collection="/db/oxf/adaptive-example" create-collection="true" xsl:version="2.0">
-                xquery version "1.0";
-                <document-info>
-                {(/document-info[document-id = '<xsl:value-of select="/*/document-id"/>'][1])/*}
-                </document-info>
-            </xdb:query>
-        </p:input>
-        <p:output name="data" id="query"/>
-    </p:processor>
-
-    <!-- Run query -->
-    <p:processor name="oxf:xmldb-query">
-        <p:input name="datasource" href="../datasource.xml"/>
-        <p:input name="query" href="#query"/>
-        <p:output name="data" ref="data"/>
+    <!-- Call the data access layer -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../data-access/exist/read-document.xpl"/>
+        <p:input name="document-id" href="#instance#xpointer(/*/document-id)"/>
+        <p:output name="document-info" ref="data"/>
     </p:processor>
 
 </p:config>

@@ -37,8 +37,9 @@
             </p>
 
             <ul>
-                <li>Apache Tomcat 4.1.30 with JDK 1.4.x</li>
-                <li>Apache Tomcat 5.0.25 with JDK 1.4.x</li>
+                <li>Apache Tomcat 4.1.31 with JDK 1.4.2</li>
+                <li>Apache Tomcat 5.0.28 with JDK 1.4.2</li>
+                <li>Apache Tomcat 5.5.4 with JDK 1.5.0</li>
                 <li>BEA WebLogic Server 7 and 8.1</li>
                 <li>IBM WebSphere 5.1</li>
             </ul>
@@ -50,47 +51,45 @@
             <title>Installing Presentation Server on Apache Tomcat</title>
 
             <ol>
-                <li><p>Assuming that <code>TOMCAT_HOME</code> represents the
-                location of your Tomcat installation: create a new
-                <code>TOMCAT_HOME/webapps/orbeon</code> directory.</p></li>
+                <li><p>Assuming that <code>TOMCAT_HOME</code> represents the location of your
+                Tomcat installation: create a new <code>TOMCAT_HOME/webapps/orbeon</code>
+                directory.</p></li>
 
-                <li><p>Unzip <code>orbeon.war</code> in the <code>orbeon</code>
-                directory you just created.</p></li>
+                <li><p>Unzip <code>orbeon.war</code> in the <code>orbeon</code> directory you just
+                created.</p></li>
 
                 <li><p>With Tomcat 5, move <code>xercesImpl.jar</code> and
                 <code>xmlParserAPIs.jar</code> from <code>common/endoresed</code> to
                 <code>server/lib</code>. This way Xerces will be available to Tomcat, but it won't
-                override the version of Xerces and standard XML APIs that comes with Presentation Server.</p></li>
+                override the version of Xerces and standard XML APIs that comes with Presentation
+                Server.</p></li>
 
-                <li><p>You can now start Tomcat, and acess
-                <code>http://localhost:8080/orbeon/</code> to test your
-                installation (replacing <code>localhost</code> and <code>8080</code>
-                with the host name and port number of your Tomcat installation),
-                or perform one of the optional installation steps
+                <li><p>You can now start Tomcat, and access
+                <code>http://localhost:8080/orbeon/</code> to test your installation (replacing
+                <code>localhost</code> and <code>8080</code> with the host name and port number of
+                your Tomcat installation), or perform one of the optional installation steps
                 below.</p></li>
 
                 <li><p>Optionally, configure a datasource to use the SQL examples
                 using the bundled HSQLDB database:
 
                    <ol>
-                        <li>Open
-                        <code>TOMCAT_HOME/webapps/orbeon/WEB-INF/web.xml</code>
-                        and uncomment the three sections delimited with "Uncomment
-                        this for the SQL example".</li>
+                        <li>Open <code>TOMCAT_HOME/webapps/orbeon/WEB-INF/web.xml</code> and
+                        uncomment the three sections delimited with "Uncomment this for the SQL
+                        example".</li>
 
                         <li>Copy <code>hsqldb-1_7_1.jar</code> from
-                        <code>TOMCAT_HOME/webapps/orbeon/WEB-INF/lib</code>
-                        to <code>TOMCAT_HOME/common/lib</code>.</li>
+                        <code>TOMCAT_HOME/webapps/orbeon/WEB-INF/lib</code> to
+                        <code>TOMCAT_HOME/common/lib</code>.</li>
 
                         <li>If you are using Tomcat 4.1 LE, download <link
-                        href="http://jakarta.apache.org/commons/dbcp/">Jakarta
-                        Commons DBCP</link> and <link
-                        href="http://jakarta.apache.org/commons/pool/">Jakarta
-                        Commons Pool</link> and copy the JAR files to
-                        <code>TOMCAT_HOME/common/lib</code>. </li>
+                        href="http://jakarta.apache.org/commons/dbcp/">Jakarta Commons DBCP</link>
+                        and <link href="http://jakarta.apache.org/commons/pool/">Jakarta Commons
+                        Pool</link> and copy the JAR files to <code>TOMCAT_HOME/common/lib</code>.
+                        </li>
 
-                        <li>Open <code>server.xml</code> and add a new context
-                        with the following properties:
+                        <li>With Tomcat 5.0.x or earlier, open <code>server.xml</code> and add a
+                        new context with the following properties:
 
                             <xml-source>
                                 <Context path="/orbeon" docBase="orbeon" reloadable="true" override="true">
@@ -122,6 +121,21 @@
                                 </Context>
                             </xml-source>
                         </li>
+
+                        <li>
+                            With Tomcat 5.5.x, open <code>server.xml</code> and add a new context
+                            with the following properties:
+
+                            <xml-source>
+                                <Context path="/orbeon" docBase="orbeon" reloadable="true" override="true">
+                                   <Resource name="jdbc/db" auth="Container"
+                                      type="javax.sql.DataSource" driverClassName="org.hsqldb.jdbcDriver"
+                                      url="jdbc:hsqldb:http://localhost:8080/orbeon/db"
+                                      username="sa" password="" maxActive="20" maxIdle="10" maxWait="-1"/>
+                                </Context>
+                            </xml-source>
+                        </li>
+
                     </ol></p>
                 </li>
                 <li><p>Optionally, to run the authentication example:

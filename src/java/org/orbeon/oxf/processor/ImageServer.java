@@ -287,13 +287,21 @@ public class ImageServer extends ProcessorImpl {
         while (st.hasMoreElements()) {
             if (sb.length() > 0)
                 sb.append(File.separatorChar);
-            sb.append(URLEncoder.encode(st.nextToken()).replace('+', ' '));
+            try {
+                sb.append(URLEncoder.encode(st.nextToken(), "utf-8").replace('+', ' '));
+            } catch (UnsupportedEncodingException e) {
+                throw new OXFException(e);
+            }
         }
         return sb.toString();
     }
 
     private String computePathNameFlat(String path) {
-        return URLEncoder.encode(path);
+        try {
+            return URLEncoder.encode(path, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new OXFException(e);
+        }
     }
 
     private synchronized BufferedImage filter(BufferedImage img, Iterator transformIterator) {

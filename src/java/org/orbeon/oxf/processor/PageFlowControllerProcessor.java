@@ -832,7 +832,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // Pass parameters only if needed
                     when.addStatement(new ASTProcessorCall(XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
-                        addInput(new ASTInput("filter", XMLUtils.NULL_DOCUMENT));
+                        addInput(new ASTInput("filter", (paramsDocument != null) ? paramsDocument : XMLUtils.NULL_DOCUMENT));
                         addOutput(new ASTOutput("data", parametersOutput));
                     }});
                 }

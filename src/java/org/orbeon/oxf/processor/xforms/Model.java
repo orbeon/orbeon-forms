@@ -315,6 +315,16 @@ public class Model {
         
     }
     
+    private Acceptor getChildAcceptor
+    ( final org.dom4j.Element elt, final StartTagInfo si, final Acceptor acc, final StringRef sr ) {
+        Acceptor ret = acc.createChildAcceptor( si, null );
+        if ( ret == null ) {
+            ret = acc.createChildAcceptor( si, sr );
+            addSchemaError( elt, sr.str );
+        }
+        return ret;
+    }
+    
     private void validateElement( final org.dom4j.Element elt, final Acceptor acc ) {
         final String nsURI = elt.getNamespaceURI();
         final String nam = elt.getName();
@@ -332,12 +342,10 @@ public class Model {
             atts.addAttribute( auri, anam, aQNam, null, val );
         }
         final StartTagInfo si = new StartTagInfo( nsURI, nam, qnam, atts, validationContext );
-        Acceptor chldAcc = acc.createChildAcceptor( si, null );
+        
         final StringRef sr = new StringRef();
-        if ( chldAcc == null ) {
-            chldAcc = acc.createChildAcceptor( si, sr );
-            addSchemaError( elt, sr.str );
-        }
+        final Acceptor chldAcc = getChildAcceptor( elt, si, acc, sr );
+        
         final int charCare = chldAcc.getStringCareLevel();
         validateChildren( elt, chldAcc, si, charCare );
         if ( !chldAcc.isAcceptState( null ) ) {

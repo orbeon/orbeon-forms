@@ -375,12 +375,24 @@ public class ProcessorTest extends TestCase {
 }
 
 class TestServletContext implements ServletContext {
+
+    // Implement all attribute-related methods so that the application context works
+    private Map attributes = new HashMap();
+
     public Object getAttribute(String s) {
-        return null;
+        return attributes.get(s);
     }
 
     public Enumeration getAttributeNames() {
-        return null;
+        return Collections.enumeration(attributes.keySet());
+    }
+
+    public void removeAttribute(String s) {
+        attributes.remove(s);
+    }
+
+    public void setAttribute(String s, Object o) {
+        attributes.put(s, o);
     }
 
     public ServletContext getContext(String s) {
@@ -458,12 +470,6 @@ class TestServletContext implements ServletContext {
     }
 
     public void log(String s, Throwable throwable) {
-    }
-
-    public void removeAttribute(String s) {
-    }
-
-    public void setAttribute(String s, Object o) {
     }
 }
 

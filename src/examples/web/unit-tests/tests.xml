@@ -211,34 +211,34 @@
         </output>
     </test>
     
-<!--    <test description="Scope serializer and generator" name="oxf:pipeline" only="true">-->
-<!--        <input name="config">-->
-<!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">-->
-<!--                <p:param name="result" type="output"/>-->
-<!--                <p:processor name="oxf:scope-serializer">-->
-<!--                    <p:input name="data"><x/></p:input>-->
-<!--                    <p:input name="config">-->
-<!--                        <config>-->
-<!--                            <key>key</key>-->
-<!--                            <scope>application</scope>-->
-<!--                        </config>-->
-<!--                    </p:input>-->
-<!--                </p:processor>-->
-<!--                <p:processor name="oxf:scope-generator">-->
-<!--                    <p:input name="config">-->
-<!--                        <config>-->
-<!--                            <key>key</key>-->
-<!--                            <scope>application</scope>-->
-<!--                        </config>-->
-<!--                    </p:input>-->
-<!--                    <p:output name="data" ref="result"/>-->
-<!--                </p:processor>-->
-<!--            </p:config>-->
-<!--        </input>-->
-<!--        <output name="result">-->
-<!--            <x/>-->
-<!--        </output>-->
-<!--    </test>-->
+    <test description="Scope serializer and generator" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:scope-serializer">
+                    <p:input name="data"><x/></p:input>
+                    <p:input name="config">
+                        <config>
+                            <key>key</key>
+                            <scope>application</scope>
+                        </config>
+                    </p:input>
+                </p:processor>
+                <p:processor name="oxf:scope-generator">
+                    <p:input name="config">
+                        <config>
+                            <key>key</key>
+                            <scope>application</scope>
+                        </config>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <x/>
+        </output>
+    </test>
 
 <!--    <test description="URL Serializer" name="oxf:pipeline">-->
 <!--        <input name="data">-->

@@ -1018,7 +1018,7 @@
         </output>
     </test>
 
-    <test description="Knowing what bind makes a node invalid" name="oxf:pipeline" only="true">
+    <test description="Knowing what bind makes a node invalid" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="data"/>
@@ -1030,6 +1030,9 @@
                                 <instance/>
                             </xforms:instance>
                             <xforms:bind id="a" nodeset="/instance" constraint="false()"/>
+                            <xforms:bind id="b" nodeset="/instance" constraint="false()"/>
+                            <xforms:bind id="c" nodeset="/instance" constraint="true()"/>
+                            <xforms:bind id="d" nodeset="/instance" constraint="false()"/>
                         </xforms:model>
                     </p:input>
                     <p:input name="request"><request/></p:input>
@@ -1041,7 +1044,7 @@
             </p:config>
         </input>
         <output name="data">
-            <instance xxforms:invalid-bind-ids="a" xxforms:valid="false"/>
+    <instance xxforms:invalid-bind-ids="a b d" xxforms:valid="false"/>
         </output>
     </test>
     

@@ -30,15 +30,17 @@ public class XMLProcessorRegistry extends ProcessorImpl {
 
     static private Logger logger = LoggerFactory.createLogger(XMLProcessorRegistry.class);
 
+    public static final String PROCESSOR_REGISTRY_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/processor/processor-registry-config";
+
     public XMLProcessorRegistry() {
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, PROCESSOR_REGISTRY_CONFIG_NAMESPACE_URI));
     }
 
     public void start(PipelineContext context) {
         try {
             Node config = readInputAsDOM4J(context, INPUT_CONFIG);
             final Object configValidity = getInputValidity(context, getInputByName(INPUT_CONFIG));
-            for (Iterator i = XPathUtils.selectIterator(config, "/processors/processor"); i.hasNext();) {
+            for (Iterator i = XPathUtils.selectIterator(config, "/processors/processor | /processors/processors/processor"); i.hasNext();) {
                 Element processorElement = (Element) i.next();
 
                 // Extract processor name

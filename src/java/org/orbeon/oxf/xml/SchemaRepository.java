@@ -67,6 +67,7 @@ public class SchemaRepository {
         schemas.put(RequestSecurityGenerator.REQUEST_SECURITY_NAMESPACE_URI, "schemas/request-security.rng");
         schemas.put(SignatureVerifierProcessor.SIGNATURE_DATA_URI, "schemas/signature.rng");
         schemas.put(SignatureVerifierProcessor.SIGNATURE_PUBLIC_KEY_URI, "schemas/public-key.rng");
+        schemas.put(XMLProcessorRegistry.PROCESSOR_REGISTRY_CONFIG_NAMESPACE_URI, "schemas/processor-registry.rng");
 
         // Serializers schemas
         schemas.put(CachedSerializer.SERIALIZER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "serializer/legacy-serializer-config.rng");

@@ -11,7 +11,11 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<processors xmlns:oxf="http://www.orbeon.com/oxf/processors">
+<processors xmlns:oxf="http://www.orbeon.com/oxf/processors"
+            xmlns:xi="http://www.w3.org/2003/XInclude">
+
+    <!-- Include user definitions. The file must be present, even if almost empty -->
+    <xi:include href="oxf:/config/custom-processors.xml"/>
 
     <!-- These are the main processor declarations. They are defined globaly for any pipeline
     running in OXF. The uri attributes are present only for backward compatibility and is likely to
@@ -43,7 +47,7 @@
     </processor>
 
     <processor name="oxf:request" uri="oxf/processor/request">
-        <class name="org.orbeon.oxf.processor.generator.RequestGenerator"/>
+        <class name="org.orbeon.oxf.processor.generator.NewRequestGenerator"/>
     </processor>
 
     <processor name="oxf:request-security" uri="oxf/processor/request-security">
@@ -305,7 +309,7 @@
     </processor>
 
     <processor name="oxf:scope-generator" uri="oxf/processor/scope-generator">
-        <class name="org.orbeon.oxf.processor.scope.ScopeGenerator"/>
+        <class name="org.orbeon.oxf.processor.scope.NewScopeGenerator"/>
     </processor>
 
     <processor name="oxf:scope-serializer" uri="oxf/processor/scope-serializer">
@@ -365,7 +369,7 @@
         <class name="org.orbeon.oxf.processor.ErrorProcessor"/>
     </processor>
 
-    <processor name="oxf:image-server" uri="oxf/processor/image-server">>
+    <processor name="oxf:image-server" uri="oxf/processor/image-server">
         <class name="org.orbeon.oxf.processor.ImageServer"/>
     </processor>
 
@@ -378,7 +382,7 @@
     </processor>
 
     <processor name="oxf:bean-generator" uri="oxf/processor/bean-generator">
-        <class name="org.orbeon.oxf.processor.generator.BeanGenerator"/>
+        <class name="org.orbeon.oxf.processor.generator.NewBeanGenerator"/>
     </processor>
 
     <processor name="oxf:xls-generator" uri="oxf/processor/xls-generator">
@@ -465,7 +469,7 @@
     </processor>
 
     <!-- This is kept only for backward compatibility -->
-    <processor uri="oxf/processor/webapp-controller">
+    <processor name="oxf:webapp-controller" uri="oxf/processor/webapp-controller">
         <class name="org.orbeon.oxf.processor.PageFlowControllerProcessor"/>
     </processor>
 

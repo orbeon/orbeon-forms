@@ -49,7 +49,7 @@ public class PipelineReader extends ProcessorImpl {
         // Used for regexp pattern initialization
         Perl5Compiler compiler = new Perl5Compiler();
         String SEPARATOR_REGEXP = "[ \\t]*";
-        String IDENTIFIER_REGEXP = "[_A-Za-z][_A-Za-z\\-0-9.]*";
+        String IDENTIFIER_REGEXP = "[_A-Za-z][_A-Za-z\\-0-9.]*";;
 
         // Initialize regexp patterns
         try {
@@ -68,7 +68,7 @@ public class PipelineReader extends ProcessorImpl {
         }
     }
 
-    private ASTPipeline pipeline;
+    private ASTPipeline pipeline; // TODO Bug no instance variables
 
     public PipelineReader() {
         addInputInfo(new ProcessorInputOutputInfo("pipeline"));

@@ -38,6 +38,6 @@
         required="true()"/>
     <xforms:bind nodeset="/form/order:Order/cat:OrderLine/cat:Item/cat:BasePrice/cat:PriceAmount"
         type="xs:decimal"/>
-    <xforms:bind nodeset="/form/order:Order/cat:OrderLine/cat:Item/cat:BasePrice/cat:PriceAmount"
+    <xforms:bind nodeset="/form/order:Order/cat:OrderLine/cat:Item/cat:BasePrice/cat:PriceAmount[. castable as xs:decimal]"
         constraint="round(xs:decimal(.) * 100) mod 5 = 0"/>
 </xforms:model>

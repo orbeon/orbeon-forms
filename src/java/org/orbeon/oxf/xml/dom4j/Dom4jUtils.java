@@ -47,6 +47,11 @@ public class Dom4jUtils {
     public static final Namespace XSI_NAMESPACE = new Namespace
         ( XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI );
     
+    /**
+     * 03/30/2005 d : Currently DOM4J doesn't really support read only documents.  ( No real
+     * checks in place.  If/when DOM4J adds real support then NULL_DOCUMENt should be made a 
+     * read only document.
+     */
     public static final org.dom4j.Document NULL_DOCUMENT;
 
     static {

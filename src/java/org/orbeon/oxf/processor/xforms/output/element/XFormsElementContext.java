@@ -324,7 +324,9 @@ public class XFormsElementContext {
         if (repeatId != null)
             repeatIdToIndex.put(repeatId, indexObj);
 
-        variablesValue.put(variableName, indexObj);
+        // variableName is null when iterating over an xf:itemset
+        if(variableName != null)
+            variablesValue.put(variableName, indexObj);
     }
 
     public void removeRepeatId(String repeatId) {

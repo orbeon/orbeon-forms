@@ -43,7 +43,7 @@
                     <td align="right">Text area:</td>
                     <td>
                         <xforms:textarea ref="textarea">
-                            <xforms:hint>Enter at least 10 characters</xforms:hint>
+                            <xforms:hint  src="oxf:/examples/xforms/xforms-text/message.txt"/>
                             <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
                         </xforms:textarea>
                     </td>

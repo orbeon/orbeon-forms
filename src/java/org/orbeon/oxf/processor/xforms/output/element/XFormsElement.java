@@ -65,12 +65,12 @@ public class XFormsElement {
             DATA_CONTROLS.put(controlNames[i], null);
 
         String[] linkingNames =
-                {"message"};
+                {"message", "label", "help", "hint", "alert"};
         for (int i = 0; i < linkingNames.length; i++)
             LINKING_CONTROLS.put(linkingNames[i], null);
 
         String[] actionNames =
-                {"message"};
+                {"message", "label", "help", "hint", "alert"};
         for (int i = 0; i < actionNames.length; i++)
             ACTION_CONTROLS.put(actionNames[i], null);
     }

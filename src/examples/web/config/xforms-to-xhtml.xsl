@@ -114,6 +114,7 @@
         <xsl:param name="message" as="element()*"/>
         <xsl:choose>
             <xsl:when test="$message">
+                <!-- Order of preference is: binding attributes (ref, bind), linking attribute (src), inline content -->
                 <xsl:value-of>alert('<xsl:value-of select="if($message/@xxforms:value != '') then
                                                               $message/@xxforms:value
                                                            else if($message/@xxforms:src-value != '') then
@@ -326,8 +327,12 @@
 
     <!-- Display label -->
     <xsl:template match="xforms:*[xforms:label and not(local-name() = ('submit', 'item', 'itemset'))]" priority="7">
-        <xsl:value-of select="if (xforms:label/@xxforms:value != '') 
-            then xforms:label/@xxforms:value else xforms:label"/>
+        <!-- Order of preference is: binding attributes (ref, bind), linking attribute (src), inline content -->
+        <xsl:value-of select="if(xforms:label/@xxforms:value != '') then
+                                 xforms:label/@xxforms:value
+                              else if(xforms:label/@xxforms:src-value != '') then
+                                      xforms:label/@xxforms:src-value
+                                      else string(xforms:label)"/>
         <xsl:text>:</xsl:text>
         <xsl:next-match/>
     </xsl:template>
@@ -364,9 +369,14 @@
                     <xsl:for-each select="$invalid-controls">
                         <xsl:if test="xforms:alert">
                             <f:alert>
-                            <xsl:value-of select="if (xforms:alert/@xxforms:value != '') 
-                                then xforms:alert/@xxforms:value else xforms:alert"/>
-                        </f:alert>
+                                <!-- Order of preference is: binding attributes (ref, bind), linking attribute (src), inline content -->
+                                <xsl:value-of select="if (xforms:alert/@xxforms:value != '')  then
+                                                          xforms:alert/@xxforms:value
+                                                       else if (xforms:alert/@xxforms:src-value != '') then
+                                                                xforms:alert/@xxforms:src-value
+                                                            else
+                                                                string(xforms:alert)"/>
+                            </f:alert>
                         </xsl:if>
                     </xsl:for-each>
                 </f:alerts>
@@ -394,8 +404,12 @@
                                     <tr>
                                         <td valign="top"><img src="IMAGEURL"/></td>
                                         <td valign="top" style="padding-left: 1em">
-                                            <xsl:copy-of select="if (xforms:help/@xxforms:value != '') 
-                                            then string(xforms:help/@xxforms:value) else xforms:help/node()"/>
+                                            <!-- Order of preference is: binding attributes (ref, bind), linking attribute (src), inline content -->
+                                            <xsl:copy-of select="if (xforms:help/@xxforms:value != '') then
+                                                                     string(xforms:help/@xxforms:value)
+                                                                 else if(xforms:help/@xxforms:src-value) then
+                                                                         string(xforms:help/@xxforms:src-value)
+                                                                      else xforms:help/node()"/>
                                         </td>
                                     </tr>
                                     <tr>
@@ -421,8 +435,12 @@
 
     <xsl:template match="xforms:*[xforms:hint]" priority="5">
         <xsl:variable name="content"><xsl:next-match/></xsl:variable>
-        <xhtml:div title="{if (xforms:hint/@xxforms:value != '') 
-                then xforms:hint/@xxforms:value else xforms:hint}" 
+        <!-- Order of preference is: binding attributes (ref, bind), linking attribute (src), inline content -->
+        <xhtml:div title="{if(xforms:hint/@xxforms:value != '') then
+                              xforms:hint/@xxforms:value
+                           else if(xforms:hint/@xxforms:src-value != '') then
+                                   xforms:hint/@xxforms:src-value
+                                else string(xforms:hint)}"
                 style="padding: 0px; margin: 0px">
             <xsl:copy-of select="$content"/>
         </xhtml:div>

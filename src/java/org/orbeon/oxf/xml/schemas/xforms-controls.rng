@@ -428,20 +428,40 @@
         <zeroOrMore>
             <choice>
                 <element name="xf:label">
-                    <optional><attribute name="ref"/></optional>
+                    <optional>
+                        <ref name="single-node-binding"/>
+                    </optional>
+                    <optional>
+                        <ref name="linking"/>
+                    </optional>
                     <ref name="non-xforms-content"/>
                     <ref name="non-xforms-attributes"/>
                 </element>
                 <element name="xf:help">
-                    <optional><attribute name="ref"/></optional>
-                	<ref name="non-xforms-content"/>
-            	</element>
+                    <optional>
+                        <ref name="single-node-binding"/>
+                    </optional>
+                    <optional>
+                        <ref name="linking"/>
+                    </optional>
+                    <ref name="non-xforms-content"/>
+                </element>
                 <element name="xf:hint">
-                    <optional><attribute name="ref"/></optional>
-                	<ref name="non-xforms-content"/>
-            	</element>
+                    <optional>
+                        <ref name="single-node-binding"/>
+                    </optional>
+                    <optional>
+                        <ref name="linking"/>
+                    </optional>
+                    <ref name="non-xforms-content"/>
+                </element>
                 <element name="xf:alert">
-                    <optional><attribute name="ref"/></optional>
+                    <optional>
+                        <ref name="single-node-binding"/>
+                    </optional>
+                    <optional>
+                        <ref name="linking"/>
+                    </optional>
                 	<ref name="non-xforms-attributes"/>
                 	<ref name="non-xforms-content"/>
             	</element>

@@ -240,6 +240,9 @@ public class XFormsElementContext {
      * Returns the text value of the currently referenced node in the instance.
      */
   public String getRefValue(Node node) {
+        if (node instanceof Document)
+            return getRefValue(((Document)node).getRootElement());
+        
         if (node instanceof Element)
             return ((Element) node).getStringValue();
         else
@@ -261,9 +264,12 @@ public class XFormsElementContext {
     }
 
     public InstanceData getRefInstanceData(Node node) {
-        return (InstanceData) (node instanceof Element
-                ? ((Element) node).getData()
-                : ((Attribute) node).getData());
+        if(node instanceof Document)
+            return getRefInstanceData(((Document)node).getRootElement());
+        else
+            return (InstanceData) (node instanceof Element
+                    ? ((Element) node).getData()
+                    : ((Attribute) node).getData());
     }
 
     public List getRefNodeList() {

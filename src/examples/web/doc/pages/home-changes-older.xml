@@ -20,14 +20,21 @@
     xmlns:xxmlns="http://www.orbeon.com/xmlns">
 
     <header>
-        <title>Older Changes</title>
+        <title>Changes - Version 2.2 and Earlier</title>
     </header>
     <body>
         <section>
-            <title>Version 2.5 And Later</title>
+            <title>Version 2.6 And Later</title>
             <p>
-                Changes in version 2.5 and later are listed in a <a
-                href="home-changes">separate document</a>.
+                Changes in version 2.6 and later are listed in a <a href="home-changes">separate
+                document</a>.
+            </p>
+        </section>
+        <section>
+            <title>Version 2.5</title>
+            <p>
+                Changes in version 2.5 are listed in a <a href="home-changes-25">separate
+                document</a>.
             </p>
         </section>
         <section>

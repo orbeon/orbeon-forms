@@ -1098,7 +1098,8 @@
                 Extensions
             </title>
             <p>
-                These controls are not part of the XForms specification and consequently are in the XXForms namespace.
+                These controls are not part of the XForms specification and consequently are in the
+                <code>xxforms</code> namespace.
             </p>
             <section>
                 <anchor id="conditionals"/>

@@ -43,6 +43,13 @@ The source code is distributed under the terms of the GNU Lesser
 General Public License (LGPL). The full text of the license is
 available at http://www.gnu.org/copyleft/lesser.html.
 
+Some examples are distributed under the terms of the Apache License,
+Version 2.0. The full text of the license is available at:
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Please refer to file headers to identify which license governs the
+distribution of a particular file.
+
 This software is OSI Certified Open Source Software.
 OSI Certified is a certification mark of the Open Source Initiative.
 
@@ -55,7 +62,7 @@ The documentation is subject to the following terms:
 
     * For all other uses, such as selling printed copies or using
       (parts of) the manual in another publication, prior written
-      agreement from Orbeon, Inc.  is required.
+      agreement from Orbeon, Inc. is required.
 
 See section 9 for more details about the licenses of included
 third-party software.

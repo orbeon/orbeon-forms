@@ -186,8 +186,8 @@
 					<xml-source>
 <comment>The main processor that OXFServlet must execute</comment>
 <context-param>
-    <param-name>oxf.main-processor.uri</param-name>
-    <param-value>oxf/processor/page-flow</param-value>
+    <param-name>oxf.main-processor.name</param-name>
+    <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
 </context-param>
 <comment>The Page Flow Controller configuration file</comment>
 <context-param>
@@ -201,9 +201,9 @@
 					<xml-source>
 <properties>
     <comment>The main processor that OXFServlet must execute</comment>
-    <property type="string" name="oxf.main-processor.uri" value="oxf/processor/page-flow"/>
+    <property as="xs:QName" name="oxf.main-processor.main" value="oxf:page-flow"/>
     <comment>The Page Flow Controller configuration file</comment>
-    <property type="string" name="oxf.main-processor.input.controller" value="oxf:/config/page-flow.xml"/>
+    <property as="xs:anyURI" name="oxf.main-processor.input.controller" value="oxf:/config/page-flow.xml"/>
 </properties>
 					</xml-source>
                     <p>
@@ -270,8 +270,8 @@
     <servlet-class>org.orbeon.oxf.servlet.OXFServlet</servlet-class>
     <comment>The main processor that OXFServlet must execute</comment>
     <init-param>
-        <param-name>oxf.main-processor.uri</param-name>
-        <param-value>oxf/processor/page-flow</param-value>
+        <param-name>oxf.main-processor.name</param-name>
+        <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
     </init-param>
     <comment>The Page Flow Controller configuration file</comment>
     <init-param>
@@ -286,9 +286,9 @@
 					    <xml-source>
 <properties>
     <comment>The main processor that OXFServlet must execute</comment>
-    <property as="xs:string" name="oxf.main-processor.uri" value="oxf/processor/page-flow"/>
+    <property as="xs:QName" name="oxf.main-processor.name" value="oxf:page-flow"/>
     <comment>The Page Flow Controller configuration file</comment>
-    <property as="xs:string" name="oxf.main-processor.input.controller" value="oxf:/config/page-flow.xml"/>
+    <property as="xs:anyURI" name="oxf.main-processor.input.controller" value="oxf:/config/page-flow.xml"/>
 </properties>
 					    </xml-source>
                     </li>
@@ -297,8 +297,8 @@
 					    <xml-source>
 <comment>The main processor that OXFServlet must execute</comment>
 <context-param>
-    <param-name>oxf.main-processor.uri</param-name>
-    <param-value>oxf/processor/page-flow</param-value>
+    <param-name>oxf.main-processor.name</param-name>
+    <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
 </context-param>
 <comment>The Page Flow Controller configuration file</comment>
 <context-param>
@@ -309,16 +309,16 @@
                     </li>
                     <li>
                         Finally, a default is used: the processor used is
-                        <code>oxf/processor/page-flow</code>, and its <code>controller</code> input
-                        is set to <code>oxf:/config/page-flow.xml</code>.
+                        <code>oxf:page-flow</code>, and its <code>controller</code> input is set to
+                        <code>oxf:/config/page-flow.xml</code>.
                     </li>
                 </ol>
                 <p>
                     It is recommended to configure each Web component individually in the
-                    component's initialization properties, so that adding components with different
-                    configurations is facilitated. There are situations where several components
-                    need to share a configuration, but it is expected that such situations will be
-                    rare.
+                    component's initialization properties in <code>web.xml</code>, so that adding
+                    components with different configurations is facilitated. There are situations
+                    where several components need to share a configuration, but it is expected that
+                    such situations will be rare.
                 </p>
             </section>
         </section>

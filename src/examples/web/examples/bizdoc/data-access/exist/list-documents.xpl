@@ -23,7 +23,7 @@
     <p:processor name="oxf:xmldb-query">
         <p:input name="datasource" href="datasource.xml"/>
         <p:input name="query">
-            <xdb:query collection="/db/oxf/adaptive-example" create-collection="true">
+            <xdb:query collection="/db/orbeon/bizdoc-example" create-collection="true">
                 xquery version "1.0";
                 <result>
                     {/document-info/document-id}

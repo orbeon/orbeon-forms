@@ -54,8 +54,8 @@
                     </p>
                     <xsl:if test="$query-result/employee-count = 0">
                         <p>
-                            If this list is empty, log in as <code>admin</code> and select the
-                            "Import Data" button.
+                            If this list is empty, <!-- log in as <code>admin</code> and --> press
+                            the "Import Data" button to launch the import of the sample data.
                         </p>
                     </xsl:if>
 

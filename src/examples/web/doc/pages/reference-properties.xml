@@ -319,7 +319,7 @@
         <anchor id="java-processor"/>
         <section>
             <title>Java Processor Properties</title>
-            <anchor id="classpath"/>
+            <anchor id="java-classpath"/>
             <section>
                 <title>Class Path</title>
                 <p>
@@ -352,7 +352,7 @@
                     </table>
                 </p>
             </section>
-            <anchor id="jarpath"/>
+            <anchor id="java-jarpath"/>
             <section>
                 <title>JAR Path</title>
                 <p>
@@ -383,6 +383,86 @@
                         <tr>
                             <th>Default Value</th>
                             <td>None</td>
+                        </tr>
+                    </table>
+                </p>
+            </section>
+            <anchor id="java-compiler-jar"/>
+            <section>
+                <title>Compiler JAR</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Name</th>
+                            <td><code>compiler-jar</code></td>
+                        </tr>
+                        <tr>
+                            <th>Purpose</th>
+                            <td>
+                                Define a URL pointing to a JAR file containing the Java compiler to
+                                use. If this property is set, the <link href="processors-java">Java
+                                processor</link> adds the specified JAR file to the class path used
+                                to search for the main compiler class.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Processor name</th>
+                            <td><code><a href="processors-java">oxf:java</a></code></td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td><code>xs:anyURI</code></td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>
+                                If the property is not specified, the Java processor tries to load
+                                the main compiler class first using the current class loader. If
+                                this fails, it retrieves the <code>java.home</code> system property
+                                which specifies a directory on disk. If that directory is called
+                                <code>jre</code>, and there exists a JAR file relative to that
+                                directory under <code>../lib/tools.jar</code>, that JAR file is
+                                added to the class path used to search for the main compiler class.
+                                This covers most cases where the standard Sun JDK is used, so that
+                                the <code>compiler-jar</code> property does not have to be
+                                specified.
+                            </td>
+                        </tr>
+                    </table>
+                </p>
+            </section>
+            <anchor id="java-compiler-class"/>
+            <section>
+                <title>Compiler Main Class</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Name</th>
+                            <td><code>compiler-class</code></td>
+                        </tr>
+                        <tr>
+                            <th>Purpose</th>
+                            <td>
+                                Define a class name containing the Java compiler to use. The <link
+                                href="processors-java">Java processor</link> loads the corresponding
+                                class and calls a static method on this class with the following
+                                signature: <code>public static int compile(String[] commandLine,
+                                PrintWriter printWriter)</code>.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Processor name</th>
+                            <td><code><a href="processors-java">oxf:java</a></code></td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td><code>xs:string</code></td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>
+                                <code>com.sun.tools.javac.Main</code>
+                            </td>
                         </tr>
                     </table>
                 </p>

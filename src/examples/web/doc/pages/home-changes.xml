@@ -162,6 +162,14 @@
                 </p>
             </section>
             <section>
+                <title>Java Processor</title>
+                <p>
+                    The <a href="processors-java">Java processor</a> now works correctly in command
+                    line mode. It also supports relative source paths and supports specifying
+                    alternate compilers.
+                </p>
+            </section>
+            <section>
                 <title>Error Processor</title>
                 <p>
                     The error processor now follows the same configuration mechanism as the main

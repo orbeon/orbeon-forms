@@ -68,11 +68,15 @@
                 the browser (no need to compile, redeploy the
                 application).</li>
 			</ul>
-			<p>However, one should also note the drawbacks that come with the
-                Java processor. In particular, the XML code needed in the XPL file to call a
-                custom processor using the Java processor is a bit more complex than
-                the XML code used to call a processor declared in the
-                <code>processors.xml</code>.
+			<p>
+                However, one should also note the drawbacks that come with the Java processor. In
+                particular, the XML code needed in the XPL file to call a custom processor using the
+                Java processor is a bit more complex than the XML code used to call a processor
+                declared in <code>processors.xml</code>.
+            </p>
+            <p>
+                The Java processor can be used from within a web application, but also from the
+                command line.
             </p>
         </section>
 		<section>
@@ -93,31 +97,30 @@
 					<td>The <code>config</code> element has two attributes:
                         <ul>
 							<li>
-								<code>sourcepath</code> points to the directory
-                                containing the Java source in the resources.
-                                This attribute is optional. When not present,
-                                the default sourcepath is the root of the
-                                resources directory (i.e. <code>oxf:/</code>).
+								The optional <code>sourcepath</code> attribute points to the directory
+                                containing the Java source in the resources. When omitted, the
+                                default sourcepath is the directory of the pipeline calling the Java
+                                processor (i.e. <code>sourcepath="."</code>). It is possible to use
+                                the <code>file:</code> protocol and the <code>oxf:</code> protocol.
+                                It is also possible to enter URLs relative to the location of the
+                                calling pipeline, such as <code>sourcepath="."</code> (the default),
+                                <code>sourcepath="../examples/java"</code>, etc.
                             </li>
 							<li>
-								<code>class</code> is the name of the Java
-                                class. The class has to implement the
-                                <code>org.orbeon.oxf.processor.Processor</code>
-                                interface, as described in the <link href="reference-processor-api">Processors API</link>.
+								<code>class</code> is the name of the Java class. The class has to implement the
+                                <code>org.orbeon.oxf.processor.Processor</code> interface, as
+                                described in the <link href="reference-processor-api">Processors
+                                API</link>.
                             </li>
 						</ul>
 						<p>
-                            Let's assume you place your Java
-                            source files in your resources directory under the
-                            <code>java</code> subdirectory, and that the class
+                            Let's assume you place your Java source files in your resources
+                            directory under the <code>java</code> subdirectory, and that the class
                             you want to use is <code>MyProcessor</code>, in the
-                            <code>com.example</code> package. Consequently, you
-                            will have a file
-                            <code>java/com/example/MyProcessor.java</code> in
-                            your resources. To use this class, the Java
-                            processor config is: <code>&lt;config
-                            sourcepath="oxf:/java"
-                            class="com.example.MyProcessor"/&gt;</code>.
+                            <code>com.example</code> package. Consequently, you will have a file
+                            <code>java/com/example/MyProcessor.java</code> in your resources. To use
+                            this class, the Java processor config is: <code>&lt;config
+                            sourcepath="oxf:/java" class="com.example.MyProcessor"/&gt;</code>.
                         </p>
 					</td>
 				</tr>
@@ -133,7 +136,7 @@
 
 		</section>
 		<section>
-			<title>Compilation and Class Loading</title>
+			<title>Compilation</title>
 			<img print-format="pdf" src="pages/processors-java-process.png" style="float: right; margin-left: 1em"/>
 			<p>
                 Before it can run a custom processor, the Java processor must
@@ -141,95 +144,141 @@
                 from the <code>java</code> files, and load those
                 <code>class</code> files in the Java VM.
             </p>
-            <ol>
-                <li>
-                    The Java processor uses Sun's compiler
-                    (<code>com.sun.tools.javac.Main</code>) to generate the
-                    <code>class</code> files. The
-                    <code>class</code> files are stored in the temporary
-                    directory, as defined by the Java system property
-                    <code>java.io.tmpdir</code>. Since compilation is a time
-                    consuming process, it is performed only when necessary. The
-                    Java processor compiles a custom processor when one of
-                    these conditions is met:
-
-                    <p>
-						<ul>
-							<li>The source of the custom processor has never been
-                        compiled before.</li>
-							<li>The last modified date of the source file for the
-                        custom processor is prior to the last modified date
-                        of the corresponding <code>class</code> file.</li>
-						</ul>
-					</p>
-
-                    Note that <code>javac</code> automatically compiles all the
-                    files that the custom processor depends on, but that the
-                    Java processor only runs <code>javac</code> by comparing the
-                    dates of the <code>.java</code> and <code>class</code> of
-                    the custom processor itself. So if only one of the classes
-                    used by the custom processor has changed since the last
-                    compilation, the Java processor will not run the compiler.
-                    You should be aware of this limitation and "touch" the
-                    source of the custom processor when such a case occurs to
-                    force a compilation.
-                </li>
-				<li>
-                    The compiled files are loaded in a class loader created by
-                    the Java processor. The next section provides more
-                    information about the class loaders created by the Java
-                    processor.
-                </li>
-			</ol>
+            <p>
+                By default, the Java processor uses Sun's compiler
+                (<code>com.sun.tools.javac.Main</code>) to produce <code>class</code> files. See the
+                <a href="reference-properties#java-compiler-class"><code>compiler-class</code></a>
+                and <a href="reference-properties#java-compiler-jar"><code>compiler-jar</code></a>
+                properties for more information about specifying the compiler to use.
+            </p>
+            <p>
+                The <code>class</code> files are stored in the temporary directory, as defined by
+                the Java system property <code>java.io.tmpdir</code>. Since compilation is a time
+                consuming process, it is performed only when necessary. The Java processor compiles
+                a custom processor when one of these conditions is met:
+            </p>
+                <ul>
+                    <li>
+                        The source of the custom processor has never been compiled before.
+                    </li>
+                    <li>
+                        The last modified date of the source file for the custom processor is prior
+                        to the last modified date of the corresponding <code>class</code> file.
+                    </li>
+                </ul>
+            <p>
+                Note that Sun's <code>javac</code> automatically compiles all the files that the
+                custom processor depends on, but that the Java processor only runs
+                <code>javac</code> by comparing the dates of the <code>.java</code> and
+                <code>class</code> of the custom processor itself. So if only one of the classes
+                used by the custom processor has changed since the last compilation, the Java
+                processor will not run the compiler. You should be aware of this limitation and
+                "touch" the source of the custom processor when such a case occurs to force a
+                compilation.
+			</p>
 			<p style="clear: both"/>
 		</section>
         <section>
-            <title>Class Path</title>
+            <title>Compilation Class Path</title>
             <p>
                 Before invoking the Java compiler, Presentation Server builds a classpath using two
-                <link href="reference-properties">Presentation Server properties</link>. In
-                addition, if Presentation Server runs as a Web Application, all JAR and ZIP files
-                located in <code>WEB-INF/lib</code> are automatically added to the classpath. The
-                following table summaries the classpath order.
+                <link href="reference-properties#java-processor">properties</link>. The following
+                list summaries the complete classpath order.
 
                 <ol>
-                    <li><link href="reference-properties#classpath"><code>oxf.java.classpath</code></link> property</li>
-                    <li><link href="reference-properties#jarpath"><code>oxf.java.jarpath</code></link> property</li>
-                    <li><code>WEB-INF/lib</code> directory, if Presentation Server runs in an application server.</li>
+                    <li>
+                        The class path defined by the <link
+                        href="reference-properties#java-classpath"><code>classpath</code></link>
+                        property.
+                    </li>
+                    <li>
+                        The <code>WEB-INF/classes</code> directory, if found and Presentation
+                        Server runs in an application server.
+                    </li>
+                    <li>
+                        The JAR and ZIP files used by the classloader hierarchy that loaded the
+                        Java processor. This automatically puts on the compilation class path the
+                        classes that the Java processor can use.
+                    </li>
+                    <li>
+                        The JAR path defined by the <link
+                        href="reference-properties#java-jarpath"><code>jarpath</code></link>
+                        property.
+                    </li>
+                    <li>
+                        All the JAR and ZIP files under the <code>WEB-INF/lib</code> directory, if
+                        found and Presentation Server runs in an application server.
+                    </li>
+                    <li>
+                        If the <code>WEB-INF/lib</code> directory is not found, all the JAR and ZIP
+                        files in the same directory as the JAR file containing the Java processor.
+                        Typically, when running from a command line, this is the
+                        <code>orbeon.jar</code> JAR file. If <code>orbeon.jar</code> is stored in a
+                        directory with all the JAR files it depends on, those will automatically be
+                        added to the compilation class path.
+                    </li>
                 </ol>
             </p>
         </section>
 		<section>
-			<title>Class Loader Structure</title>
-			<img print-format="pdf" src="pages/processors-java-classloader.png"/>
-			<p>
-                A different class loader is created for each sourcepath, and all
-                the classes in the same source path are loaded in the same class
-                loader. For a given sourcepath, a new class loader is created
-                if one of these conditions is met:
+			<title>Runtime Class Loading</title>
+			<img print-format="pdf" src="pages/processors-java-classloader.png" style="float: right; margin-left: 1em"/>
+            <p>
+                The compiled files are loaded by a class loader created by the Java processor. A
+                different class loader is created for each source path, and all the classes in the
+                same source path are loaded in the same class loader. For a given source path, a new
+                class loader is created if one of these conditions is met:
             </p>
 			<p>
 				<ul>
-					<li>No class loader has been previously created for this
-                sourcepath.</li>
-					<li>One of the classes in this sourcepath has been compiled
-                since the class loader has been created.</li>
+					<li>No class loader has been previously created for this source path.</li>
+					<li>One of the classes in this source path has been compiled
+                    since the class loader has been created.</li>
 				</ul>
 			</p>
 			<p>
-                When a new class loader is created, the previous one, if it
-                exists, is discarded with all the loaded classes, and all the
-                classes are re-loaded in the new class loader.
+                When a new class loader is created, the previous one, if it exists, is discarded
+                with all the loaded classes, and all the classes are re-loaded in the new class
+                loader.
             </p>
 		</section>
 		<section>
-			<title>Sample Processor</title>
-			<p>The processor below declares a single output
-            <code>data</code> and no inputs. It will always send the
-            same XML content to its <code>data</code> output, namely an
-            <code>answer</code> element containing the text "42". For
-            more details on how to implement processors in Java,
-            please refer to the <link href="reference-processor-api">Processors API</link>.</p>
+			<title>Limitations</title>
+			<ul>
+				<li>A custom processor used with the Java processor cannot use
+                its <code>config</code> input, as this input is used to
+                configure the Java processor.</li>
+				<li>Java source files must be stored on the file system, i.e.
+                the resources can only be loaded with the Flat File or Web app
+                <link href="reference-resource-managers">resource
+                managers</link>. This is due to a limitation of Sun's
+                <code>javac</code> that can only compile source files stored on
+                disk.</li>
+				<li>The Java processor will recompile a custom processor only
+                if the Java source of the processor itself has changed. If only
+                one of the classes (that the custom processor depends on) has changed
+                since the last compilation, the source of the customer processor
+                must be "touched" to force a re-compilation.</li>
+				<li>The Java processor uses the JDK 1.4 compiler (or higher) and
+                so cannot be used with JDK 1.3.</li>
+			</ul>
+		</section>
+        <section>
+			<title>Properties</title>
+			<p>
+                Several global properties are relevant to the Java processor. Refer to the <a
+                href="reference-properties#java-processor">Properties</a> section for more information.
+			</p>
+		</section>
+		<section>
+			<title>Example</title>
+			<p>
+                The processor below declares a single output <code>data</code> and no inputs. It
+                will always send the same XML content to its <code>data</code> output, namely an
+                <code>answer</code> element containing the text "42". For more details on how to
+                implement processors in Java, please refer to the <link
+                href="reference-processor-api">Processors API</link>.
+            </p>
 			<source><![CDATA[import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.SimpleProcessor;
@@ -255,27 +304,6 @@ public class DeepThoughtProcessor extends SimpleProcessor {
     }
 }
 ]]></source>
-		</section>
-		<section>
-			<title>Limitations</title>
-			<ul>
-				<li>A custom processor used with the Java processor cannot use
-                its <code>config</code> input, as this input is used to
-                configure the Java processor.</li>
-				<li>Java source files must be stored on the file system, i.e.
-                the resources can only be loaded with the Flat File or Web app
-                <link href="reference-resource-managers">resource
-                managers</link>. This is due to a limitation of Sun's
-                <code>javac</code> that can only compile source files stored on
-                disk.</li>
-				<li>The Java processor will recompile a custom processor only
-                if the Java source of the processor itself has changed. If only
-                one of the classes (that the custom processor depends on) has changed
-                since the last compilation, the source of the customer processor
-                must be "touched" to force a re-compilation.</li>
-				<li>The Java processor uses the JDK 1.4 compiler (or higher) and
-                so cannot be used with JDK 1.3.</li>
-			</ul>
 		</section>
 	</body>
 </document>

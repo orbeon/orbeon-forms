@@ -52,7 +52,7 @@
                 <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
                     <script>
                         <xsl:copy-of select="@*"/>
-                        <xsl:value-of select="*"/>
+                        <xsl:value-of select="."/>
                     </script>
                 </xsl:for-each>
                 <script type="text/javascript" src="/oxf-theme/style/theme.js"/>

@@ -29,7 +29,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#weather"/>
         <p:input name="config">
-            <xsl:stylesheet version="1.0">
+            <xsl:stylesheet version="2.0">
                 <xsl:template match="/">
                     <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
                         <xhtml:head>

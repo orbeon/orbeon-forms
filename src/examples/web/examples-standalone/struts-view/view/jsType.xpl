@@ -16,13 +16,13 @@
     
     <p:param type="output" name="data"/>
 
-    <p:processor name="oxf:xalan">
+    <p:processor name="oxf:xslt">
         <p:input name="data"><dummy/></p:input>
         <p:input name="config">
-            <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+            <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:struts="http://www.orbeon.com/oxf/struts">
 
-                <xsl:include href="oxf:/oxf/struts/struts-support-xalan.xsl"/>
+                <xsl:include href="oxf:/oxf/struts/struts-support-saxon.xsl"/>
 
                 <xsl:template match="/">
                     <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">

@@ -33,12 +33,12 @@
         <p:output name="data" id="hint"/>
     </p:processor>
 
-    <p:processor name="oxf:xalan">
+    <p:processor name="oxf:xslt">
         <p:input name="data" href="aggregate('root',#guess, #errors, #hint)"/>
         <p:input name="config">
-            <xsl:stylesheet version="1.0" xmlns:struts="http://www.orbeon.com/oxf/struts">
+            <xsl:stylesheet version="2.0" xmlns:struts="http://www.orbeon.com/oxf/struts">
 
-                <xsl:import href="oxf:/oxf/struts/struts-support-xalan.xsl"/>
+                <xsl:import href="oxf:/oxf/struts/struts-support-saxon.xsl"/>
 
                 <xsl:template match="/root/beans/guess">
                     <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">

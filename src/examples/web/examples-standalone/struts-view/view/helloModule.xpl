@@ -21,9 +21,9 @@
   <p:processor name="oxf:xslt">
       <p:input name="data" href="#hello"/>
       <p:input name="config">
-          <xsl:stylesheet version="1.0">
+          <xsl:stylesheet version="2.0">
 
-              <xsl:import href="oxf:/oxf/struts/struts-support-xalan.xsl"/>
+              <xsl:import href="oxf:/oxf/struts/struts-support-saxon.xsl"/>
 
               <xsl:template match="/beans/hello">
                   <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">

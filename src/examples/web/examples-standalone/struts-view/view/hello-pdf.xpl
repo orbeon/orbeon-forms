@@ -22,7 +22,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#hello"/>
         <p:input name="config">
-            <xsl:stylesheet version="1.0">
+            <xsl:stylesheet version="2.0">
                 <xsl:template match="/beans/hello">
                     <document>
                         <header>

@@ -112,9 +112,12 @@
             <section>
                 <title>Embedding XML Documents</title>
                 <p>
-                    Because XML documents can be embedded within pipeline inputs, the Identity
-                    processor can be used to embed documents in a pipeline. This document can then
-                    be used one or more times in the pipeline.
+                    XML documents can be embedded within pipeline inputs. When you want the same
+                    document to be passed to the input of multiple processors in a pipeline, instead
+                    of duplicating it and embedding it in every input, you can use the Identity
+                    processor: embed the document in the <code>data</code> input of the Identity
+                    processor, assign an id to the output of the Identity processor, and reference
+                    that id from other inputs you want to feed with that document.
                 </p>
                 <xml-source>
                     <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline">

@@ -639,11 +639,6 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                         <th>Default</th>
                     </tr>
                     <tr>
-                        <td>method</td>
-                        <td>XSLT Output Method</td>
-                        <td>html, xml or text, depending on the serializer</td>
-                    </tr>
-                    <tr>
                         <td>content-type</td>
                         <td>content type sent to the client</td>
                         <td>Specific to each serializer</td>

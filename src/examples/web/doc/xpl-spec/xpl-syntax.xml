@@ -50,8 +50,8 @@ version = "1.0" &gt;
 &lt;p:input
 name = <emph>ncname</emph>
 id? = <emph>ncname</emph>
-schema-uri? = <emph>aaa</emph>
-schema-href? = <emph>aaa</emph> /&gt;
+schema-uri? = <emph>uri-reference</emph>
+schema-href? = <emph>uri-reference</emph> /&gt;
             </pre>
             <p>
                 The <el>p:input</el> element defines exactly one XPL program input. Zero,
@@ -78,6 +78,11 @@ schema-href? = <emph>aaa</emph> /&gt;
                 so that external users of the XPL program are aware that the input may be
                 used in a future version of the program.
             </p>
+            <p>
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
+                input.
+            </p>
         </div3>
         <div3>
             <head>The <el>p:output</el> element</head>
@@ -85,8 +90,8 @@ schema-href? = <emph>aaa</emph> /&gt;
 &lt;p:output
 name = <emph>ncname</emph>
 href = <emph>infoset-reference</emph>
-schema-uri? = <emph>aaa</emph>
-schema-href? = <emph>aaa</emph> /&gt;
+schema-uri? = <emph>uri-reference</emph>
+schema-href? = <emph>uri-reference</emph> /&gt;
             </pre>
             <p>
                 The <el>p:output</el> element within a <el>p:pipeline</el> element defines
@@ -109,6 +114,11 @@ schema-href? = <emph>aaa</emph> /&gt;
                 The Infoset reference contained by the <el>href</el> attribute may refer to
                 any XML Infoset identifier in scope after the last statement of the XPL program.
                 See <specref ref="infoset-reference"/> for the detailed syntax.
+            </p>
+            <p>
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
+                output.
             </p>
         </div3>
         <note>
@@ -160,8 +170,8 @@ name = <emph>qname</emph> &gt;
 &lt;p:input
 name = <emph>ncname</emph>
 href? = <emph>infoset-reference</emph>
-schema-uri? = <emph>aaa</emph>
-schema-href? = <emph>aaa</emph> &gt;
+schema-uri? = <emph>uri-reference</emph>
+schema-href? = <emph>uri-reference</emph> &gt;
 &lt;!-- Content: (embedded-infoset)? --&gt;
 &lt;/p:input&gt;
             </pre>
@@ -183,41 +193,9 @@ schema-href? = <emph>aaa</emph> &gt;
                 <specref ref="infoset-reference"/> for the detailed syntax.
             </p>
             <p>
-                The optional <el>schema-href</el> and <el>schema-uri</el> refer to an external
-                schema. If both attributes are present, a static error must be raised.
-            </p>
-            <p>
-                If the <el>schema-href</el> attribute is present, it must contain a URL
-                referring to either an W3C XML Schema schema, or a Relax NG schema.
-            </p>
-            <p>
-                If the <el>schema-uri</el> attribute is present, it must contain a URI
-                identifying either an W3C XML Schema schema, or a Relax NG schema. The mapping
-                between the URI and the actual schema is outside the scope of the XPL
-                specification.
-            </p>
-            <p>
-                The use of <el>schema-href</el> allows easily using schemas bundled with an XPL
-                program. The use of <el>schema-uri</el> allows using URIs, commonly used with
-                XML Schema, which provide a level of abstraction hiding the actual storage
-                location of actual schema files.
-            </p>
-            <p>
-                If the XML Infoset read on the input does not validate against the schema
-                specified, a dynamic error is raised.
-            </p>
-            <note>
-                The XPL implementation is allowed to start providing parts of the XML
-                Infoset to the XML processor while validation is being performed. The
-                constraint is that the XML Infoset must be valid according to the schema up
-                to that point, and that when the XML processor has received the entire XML
-                Infoset, it is guaranteed to have received an XML Infoset valid according to
-                the provided schema. Such streamed validation may not be possible with all
-                schema languages.
-            </note>
-            <p>
-                For both attributes, it is a dynamic error if the schema cannot be loaded
-                during execution.
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
+                input.
             </p>
             <p>
                 The embedded XML Infoset, if any, is constructed from the single element
@@ -231,8 +209,8 @@ schema-href? = <emph>aaa</emph> &gt;
 &lt;p:output
 name = <emph>ncname</emph>
 id = <emph>ncname</emph>
-schema-uri? = <emph>aaa</emph>
-schema-href? = <emph>aaa</emph> &gt;
+schema-uri? = <emph>uri-reference</emph>
+schema-href? = <emph>uri-reference</emph> &gt;
 &lt;/p:output&gt;
             </pre>
             <p>
@@ -251,19 +229,10 @@ schema-href? = <emph>aaa</emph> &gt;
                 must raise a static error if a collision is detected.
             </p>
             <p>
-                <el>p:output</el> supports the same <el>schema-href</el> and <el>schema-uri</el>
-                attributes present on the <el>p:input</el> element. If the XML Infoset produced
-                by the XML processor does not validate against the provided schema during
-                execution, a dynamic error is raised.
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
+                output.
             </p>
-            <note>
-                The XPL implementation is allowed to start receiving parts of the XML
-                Infoset from the XML processor while validation is being performed, and to
-                pass such parts to further XML processors consuming the XML Infoset. The
-                requirement is that the XML Infoset must be valid according to the schema up
-                to that point. Such streamed validation may not be possible with all schema
-                languages.
-            </note>
         </div3>
         <note>
             The <el>p:input</el> and <el>p:output</el> elements can also be used within a
@@ -309,8 +278,8 @@ href = <emph>infoset-reference</emph> &gt;
             <pre>
 &lt;p:output id = <emph>ncname</emph>
           href = <emph>infoset-reference</emph>
-          schema-uri? = <emph>aaa</emph>
-          schema-href? = <emph>aaa</emph> /&gt;
+          schema-uri? = <emph>uri-reference</emph>
+          schema-href? = <emph>uri-reference</emph> /&gt;
             </pre>
             <p>
                 The <el>p:output</el> element defines what XML Infoset identifers are exposed by the
@@ -323,6 +292,11 @@ href = <emph>infoset-reference</emph> &gt;
                 determines the XML Infoset exposed. The Infoset reference may refer to XML Infoset
                 identifiers scoped on the parent <el>p:choose</el> element as well as to XML Infoset
                 identifiers scoped in the branches of the <el>p:choose</el> statement.
+            </p>
+            <p>
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                ref="schema-references-syntax"/>. They validate the XML Infoset produced by the
+                <el>href</el> attribute.
             </p>
         </div3>
         <div3>
@@ -398,8 +372,8 @@ test = <emph>expression</emph> &gt;
 &lt;p:for-each
 href = <emph>infoset-reference</emph>
 select = <emph>expression</emph>
-schema-href? <emph>aaa</emph>
-schema-uri? <emph>aaa</emph> &gt;
+schema-href? <emph>uri-reference</emph>
+schema-uri? <emph>uri-reference</emph> &gt;
 &lt;!-- Content: (p:output?, (p:processor or p:choose or p:for-each)*) --&gt;
 &lt;/p:for-each&gt;
             </pre>
@@ -425,6 +399,11 @@ schema-uri? <emph>aaa</emph> &gt;
                 embedded sequence of statements consists of the identifiers scoped for the
                 <el>p:for-each</el> element.
             </p>
+            <p>
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
+                <el>href</el> attribute.
+            </p>
             <note>
                 The no-collision rule applies for statements within a <el>p:for-each</el>
                 element. In other words an XML Infoset identifier exposed within a
@@ -438,8 +417,8 @@ schema-uri? <emph>aaa</emph> &gt;
 &lt;p:output
 href = <emph>infoset-reference</emph>
 id = <emph>ncname</emph>
-schema-uri? = <emph>aaa</emph>
-schema-href? = <emph>aaa</emph> &gt;
+schema-uri? = <emph>uri-reference</emph>
+schema-href? = <emph>uri-reference</emph> &gt;
 &lt;/p:output&gt;
             </pre>
             <p>
@@ -468,7 +447,9 @@ schema-href? = <emph>aaa</emph> &gt;
                 <specref ref="for-each-execution"/>.
             </p>
             <p>
-                [TODO: explain when schema validation raises errors]
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                ref="schema-references-syntax"/>. They validate the XML Infoset produced by the
+                <el>href</el> attribute.
             </p>
         </div3>
         <div3>
@@ -486,5 +467,36 @@ schema-href? = <emph>aaa</emph> &gt;
                 [TODO: define?]
             </p>
         </div3>
+    </div2>
+    <div2 id="schema-references-syntax">
+        <head>Schema References</head>
+        <p>
+            Several elements support the optional <el>schema-uri</el> and <el>schema-href</el>
+            attributes. The purpose of these attributes is to refer to a schema defined outside of
+            the XPL program, and to use that schema to validate a particular XML Infoset.
+        </p>
+        <p>
+            Those attributes are associated with a particular XML Infoset, depending on the element
+            they are associated with.
+        </p>
+        <p>
+            If the <el>schema-href</el> attribute is present, it must contain a URL referring to
+            either an W3C XML Schema schema, or a Relax NG schema.
+        </p>
+        <p>
+            If the <el>schema-uri</el> attribute is present, it must contain a URI identifying
+            either an W3C XML Schema schema, or a Relax NG schema. For W3C Schemas, it should
+            specify the namespace URI that is the target namespace of the schema. The way the
+            mapping between the URI and the actual schema is done is outside the scope of XPL.
+        </p>
+        <p>
+            If both attributes are present, a static error must be raised.
+        </p>
+        <p>
+            The use of <el>schema-href</el> allows easily using schemas bundled with an XPL program.
+            The use of <el>schema-uri</el> allows the use of URIs, commonly used with XML Schema,
+            which provide a level of abstraction hiding the actual storage location of actual schema
+            files.
+        </p>
     </div2>
 </div1>

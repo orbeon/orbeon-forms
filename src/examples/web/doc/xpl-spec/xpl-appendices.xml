@@ -454,106 +454,23 @@
                         better way to construct the tracing facility.
                     </p>
                 </item>
+                <item>
+                    <p>
+                       <bibref ref="xslt-20"/> imports schemas using attributes called
+                       <el>namespace</el> and <el>schema-location</el>. Should we follow this
+                       convention? Because XSLT 2.0 is based on XML Schema, <el>namespace</el>
+                       refers to a schema for that namespace. Right now in XPL, it is just a
+                       convenient indirection.
+                    </p>
+                </item>
             </olist>
         </div2>
         <div2>
             <head>Closed Issues</head>
-            <olist>
-                <item>
-                    <p>
-                        Determine if terminology of "step" is appropriate. [REPLACED STEPS BY STATEMENTS]
-                    </p>
-                </item>
-                <item>
-                    <p>
-                        Determine whether p:config is to be renamed. [YES, DONE]
-                    </p>
-                </item>
-                <item>
-                    <p>
-                        Determine whether p:param are to be renamed and based on new use of
-                        p:input and p:output. Benefits: [PROPOSAL STILL NEEDS TO BE
-                        EXAMINED, BUT DONE IN THIS VERSION]
-                    </p>
-                    <ulist>
-                        <item>
-                            One less element name in the vocabulary.
-                        </item>
-                        <item>
-                            Brings consistency. An input always refers to something with an "id"
-                            as opposed to sometimes and "id" and sometimes a "name". An output
-                            always declare an "id" as opposed to declaring an "id" and sometimes
-                            a "ref".
-                        </item>
-                        <item>
-                            No confusion between href and ref.
-                        </item>
-                        <item>
-                            Pipeline outputs behave like regular processor inputs.
-                        </item>
-                        <item>
-                            Still covers all possible scenarios covered before, and more.
-                        </item>
-                        <item>
-                            Allows dissociating pipeline input and output names from internal ids.
-                        </item>
-                        <item>
-                            Allows using all the syntax of href on pipeline outputs.
-                        </item>
-                    </ulist>
-                    <p>
-                        Potential drawbacks:
-                    </p>
-                    <ulist>
-                        <item>
-                            Output href will refer to ids that are not yet visible. Does this
-                            violate something we care about? Practically, you can easily keep in
-                            memory the list of outputs and process them at the end of the
-                            pipeline.
-                        </item>
-                    </ulist>
-                    <note>
-                        Requires also to change p:for-each, if it is allowed to use a "ref"
-                        attribute. This is a big unknown for the moment: can we come up with a
-                        nice, light syntax consistent with the rest?
-                    </note>
-                </item>
-                <item>
-                    <p>
-                        Determine whether a p:choose with only a p:otherwise is allowed. [NO,
-                        FOR CONSISTENCY WITH XSLT, THERE MUST BE A p:when]
-                    </p>
-                </item>
-                <item>
-                    <p>
-                        Do we actually support officially multiple processor inputs or outputs
-                        with the same name? In Presentation Server, this is used internally for
-                        teeing, but do we actually have any documented processor with this
-                        feature? It would definitely make things easier if we did not have to
-                        support this. [NO, WE DON'T SUPPORT MULTIPLE INPUTS AND OUTPUTS WITH
-                        THE SAME NAME]
-                    </p>
-                </item>
-                <item>
-                    <p>
-                        Determine how to solve issue of exporting ids from p:choose branches. Should
-                        we use an attribute, or simply the p:output syntax? [CURRENT CHOICE IS
-                        USING p:output]
-                    </p>
-                </item>
-                <item>
-                    <p>
-                        Determine whether unconnected outputs are allowed. [CURRENT CHOICE IS
-                        THAT YES, THEY ARE]
-                    </p>
-                </item>
-                <item>
-                    <p>
-                        Determine wither p:pipeline/p:output should support embedded XML Infoset
-                        like p:input. [I DON'T SEE THE POINT, SO WOULD SAY NO]
-                    </p>
-                </item>
-            </olist>
+<!--            <olist>-->
+<!--                <item>-->
+<!--                </item>-->
+<!--            </olist>-->
         </div2>
     </div1>
 </back>

@@ -394,4 +394,37 @@
             [TODO]
         </p>
     </div2>
+    <div2 id="schema-references-processing">
+        <head>Schema References</head>
+        <p>
+            Several elements support the optional <el>schema-uri</el> and <el>schema-href</el>
+            attributes. The purpose of these attributes is to refer to a schema defined outside of
+            the XPL program, and to use that schema to validate a particular XML Infoset. See
+            <specref ref="schema-references-syntax"/> for information about the syntax. If none of
+            those attributes is present, the processing model is not influenced by this section.
+        </p>
+        <p>
+            The application must load the schema referred to by one of the two attributes if
+            present. It is allowed to load the schema before execution, but at the latest the
+            schema must be loaded as soon as the first parts of the XML Infoset associated with the
+            schema is available.
+        </p>
+        <p>
+            It is a dynamic error if the schema cannot be loaded during execution. Optionally, if
+            the XPL implementation loads the schema before execution, it may raise a static error
+            instead.
+        </p>
+        <p>
+            If the XML Infoset associated with the schema read on the input does not validate
+            against the schema, a dynamic error must be raised.
+        </p>
+        <note>
+            The XPL implementation is allowed to start providing parts of the XML Infoset to the
+            consumer of the XML Infoset while validation is being performed. The constraint is that
+            the XML Infoset must be valid according to the schema up to that point, and that when
+            the XML processor has received the entire XML Infoset, it is guaranteed to have received
+            an XML Infoset valid according to the provided schema. Such streamed validation may not
+            be possible with all schema languages.
+        </note>
+    </div2>
 </div1>

@@ -64,7 +64,8 @@
             <p>
                 This document is currently an internal draft note by Orbeon, Inc. It has not been
                 submitted to the W3C or any other standard body, even though it follows closely the
-                format of a W3C Note.
+                format of a W3C Note or Recommendation. Because it is a draft, it does not
+                necessarily describe the final 1.0 version of the XPL language.
             </p>
         </status>
         <sourcedesc>
@@ -714,7 +715,7 @@
             <pre>
 href              ::= ( local_reference | uri_reference | aggregation | current ) [ xpointer ]
 local_reference   ::= "#" id
-aggregation       ::= "aggregate(" root_element_name "," agg_parameter ")"
+aggregation       ::= "aggregate(" root_element_qname "," agg_parameter ")"
 current           ::= "current()"
 root_element_name ::= "'"  name "'"
 agg_parameter     ::= href [ "," agg_parameter ]
@@ -775,7 +776,7 @@ xpointer          ::= "#xpointer(" xpath_expression ")"
                     <bibref ref="data-model"/>, it can be defined as follows:
                 </p>
                 <pre>
-fn:aggregate($root as <emph>xs:QName</emph>, $included as <emph>node()*</emph>) as <emph>document-node()</emph>
+fn:aggregate($root as <emph>xs:QName</emph>, $arg1 as <emph>node()*</emph>, ...) as <emph>document-node()</emph>
                 </pre>
                 <p>
                     The resulting XML Infoset's document information item contains:
@@ -794,12 +795,12 @@ fn:aggregate($root as <emph>xs:QName</emph>, $included as <emph>node()*</emph>) 
                     </item>
                 </ulist>
                 <p>
-                    The second argument of <code>aggregate()</code> is of type <code>node()*</code>,
-                    in other words a sequence of nodes as defined by <bibref ref="xpath-20"/>, with
-                    the exception that attribute nodes and namespace nodes are not allowed. This is
-                    consistent with the acquired Infoset defined in <bibref ref="xinclude"/>. The
-                    Infoset associated with each node in the sequence is added as child information
-                    items to the document element information item.
+                    The following arguments of <code>aggregate()</code> are of type
+                    <code>node()*</code>, in other words a sequence of nodes as defined by <bibref
+                    ref="xpath-20"/>, with the exception that attribute nodes and namespace nodes
+                    are not allowed. This is consistent with the acquired Infoset defined in <bibref
+                    ref="xinclude"/>. The Infoset associated with each node in the sequence is added
+                    as child information items to the document element information item.
                 </p>
             </div2>
             <div2>

@@ -31,10 +31,6 @@
                 </xsl:choose>
             </p>
             <p>
-                <span style="color: red">NOTE: You need to configure access to a SQL database for
-                this example to work.</span>
-            </p>
-            <p>
                 Please fill-out the mandatory fields below and submit the form. An email providing
                 alternative text and HTML versions of the body specified will be sent, with several
                 attachments:

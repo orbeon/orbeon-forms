@@ -21,7 +21,7 @@
             <action/>
             <show-details>true</show-details>
             <view>form</view>
-            <errors/>
+            <global-validation/>
             <xi:include href="ubl_samp.xml"/>
         </form>
     </xforms:instance>

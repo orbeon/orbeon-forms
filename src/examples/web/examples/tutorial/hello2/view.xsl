@@ -18,6 +18,6 @@
         <title>Hello World MVC</title>
     </head>
     <body>
-     	<p><xsl:value-of select="'/&quot;/'"/>Hello <xsl:value-of select="name"/>!</p>
+     	<p>Hello <xsl:value-of select="name"/>!</p>
     </body>
 </html>

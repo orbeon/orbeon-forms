@@ -451,7 +451,7 @@
 
         <mkdir dir="${unstbl-bld-dst}/${release.number}"/>
         <copy file='${deployDir}/${release.number}/orbeon.war' todir='${unstbl-bld-dst}/${release.number}'/>
-        <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${unstbl-bld-dst}/${release.number}'/>
+        <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${unstbl-bld-dst}/${release.number}/build.log''/>
 
         <!-- 2/27/2005 d : If we don't delete this then sitecopy complains that because the -->
         <!-- the certificate is for forge.objectweb.org but has been received when accessing -->

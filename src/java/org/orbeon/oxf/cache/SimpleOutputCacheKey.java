@@ -29,13 +29,6 @@ public class SimpleOutputCacheKey extends OutputCacheKey {
         hash = tmp;
     }
 
-//    public String getOutputName() { return outputName; }
-//    public void setOutputName(String outputName) { this.outputName = outputName; }
-//    public String getKey() { return key; }
-//    public void setKey(String key) { this.key = key; }
-//    public List /* <SimpleOutputCacheKey> */ getKeys() { return keys; }
-//    public void setKeys(List /* <SimpleOutputCacheKey> */ keys) { this.keys = keys; }
-
     public boolean equals( final Object rhsObj ) {
         boolean ret = this == rhsObj;
         done : if ( !ret ) {

@@ -381,6 +381,32 @@
 
     <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${deployDir}/${release.number}/build.log' />
 
+    <!-- don't care if this fails.  do care if subsequent ssh commands fail though. -->
+    <exec executable='ssh' >
+      <arg value='orbeonbld@shell.sourceforge.net' />
+      <arg value='rmdir' />
+      <arg value='-rf' />
+      <arg value='/home/groups/o/or/orbeon/htdocs/unstable-blds/presentation-server/*' />
+    </exec>
+
+    <exec executable='ssh' failonerror='true'  >
+      <arg value='orbeonbld@shell.sourceforge.net' />
+      <arg value='mkdir' />
+      <arg value='/home/groups/o/or/orbeon/htdocs/unstable-blds/presentation-server/${release.number}' />
+    </exec>
+
+    <exec executable='scp' failonerror='true' >
+      <arg value='orbeonbld@shell.sourceforge.net' />
+      <arg value='${deployDir}/${release.number}/build.log' />
+      <arg value='/home/groups/o/or/orbeon/htdocs/unstable-blds/presentation-server/${release.number}/' />
+    </exec>
+    
+    <exec executable='scp' failonerror='true' >
+      <arg value='orbeonbld@shell.sourceforge.net' />
+      <arg value='${deployDir}/${release.number}/orbeon.war' />
+      <arg value='/home/groups/o/or/orbeon/htdocs/unstable-blds/presentation-server/${release.number}/' />
+    </exec>
+
     <delete>
       <fileset dir="${deployDir}">
         <exclude name="${release.number}/**"/>

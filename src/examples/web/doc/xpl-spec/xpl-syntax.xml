@@ -307,7 +307,10 @@ href = <emph>infoset-reference</emph> &gt;
         <div3>
             <head>The <el>p:output</el> element</head>
             <pre>
-&lt;p:output id = <emph>ncname</emph> href = <emph>infoset-reference</emph> /&gt;
+&lt;p:output id = <emph>ncname</emph>
+          href = <emph>infoset-reference</emph>
+          schema-uri? = <emph>aaa</emph>
+          schema-href? = <emph>aaa</emph> /&gt;
             </pre>
             <p>
                 The <el>p:output</el> element defines what XML Infoset identifers are exposed by the

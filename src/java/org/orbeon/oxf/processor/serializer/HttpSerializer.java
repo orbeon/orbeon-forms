@@ -83,8 +83,11 @@ public class HttpSerializer extends HttpSerializerBase {
 
                         String typePrefix = xsiType.substring(0, colonIndex);
                         String typeLocalName = xsiType.substring(colonIndex + 1);
-                        String typeNamespaceURI = (String) prefixMappings.get(typePrefix);
 
+                        if (prefixMappings == null)
+                            throw new OXFException("Undeclared prefix in xsi:type: " + typePrefix);
+
+                        String typeNamespaceURI = (String) prefixMappings.get(typePrefix);
                         if (typeNamespaceURI == null)
                             throw new OXFException("Undeclared prefix in xsi:type: " + typePrefix);
 

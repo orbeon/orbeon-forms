@@ -915,7 +915,7 @@
         </output>
     </test>
 
-    <test description="Constraint with Korean character" name="oxf:xforms-annotate" only="true">
+    <test description="Constraint with Korean character" name="oxf:xforms-annotate">
         <input name="instance">
             <instance>
                 <a>&#x1105;</a>

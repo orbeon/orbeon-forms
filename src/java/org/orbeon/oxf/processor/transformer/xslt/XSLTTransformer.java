@@ -488,7 +488,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         // doc(...) call just contains a string, record the URI
                         String uri = ((StringValue) subExpressions[0]).getStringValue();
                         // We don't need to worry here about reference to the processor inputs
-                        if (!(uri.startsWith("oxf:") && !uri.startsWith("oxf:/"))) {
+                        if (!isProcessorInputScheme(uri)) {
                             URIReference uriReference = new URIReference();
                             uriReference.context = locator.getSystemId();
                             uriReference.spec = uri;

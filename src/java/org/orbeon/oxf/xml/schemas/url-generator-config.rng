@@ -61,7 +61,15 @@
                             </element>
                         </optional>
                         <optional>
-                            <!-- This will make sense only if the source is text/xml -->
+                            <element name="ignore-connection-encoding">
+                                <choice>
+                                    <value>true</value>
+                                    <value>false</value>
+                                </choice>
+                            </element>
+                        </optional>
+                        <optional>
+                            <!-- This will make sense only if the source is XML -->
                             <element name="validating">
                                 <data type="boolean"/>
                             </element>

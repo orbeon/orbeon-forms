@@ -237,7 +237,7 @@ public class Instance {
         if (ProcessorUtils.supportedBinaryTypes.get(newType) == null)
             throw new UnsupportedOperationException("Unsupported type: " + newType);
 
-        if (currentType.equals(XMLConstants.BASE64BINARY_TYPE)) {
+        if (currentType.equals(XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName())) {
             // Convert from xs:base64Binary to xs:anyURI
             return XMLUtils.base64BinaryToAnyURI(pipelineContext, value); 
         } else {

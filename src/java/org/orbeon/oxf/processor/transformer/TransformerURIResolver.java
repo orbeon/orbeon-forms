@@ -37,11 +37,11 @@ import java.util.List;
 public class TransformerURIResolver implements URIResolver {
 
     private Processor processor;
-    private PipelineContext context;
+    private PipelineContext pipelineContext;
 
-    public TransformerURIResolver(Processor processor, PipelineContext context) {
+    public TransformerURIResolver(Processor processor, PipelineContext pipelineContext) {
         this.processor = processor;
-        this.context = context;
+        this.pipelineContext = pipelineContext;
     }
 
     public Source resolve(String href, String base) throws TransformerException {
@@ -49,23 +49,21 @@ public class TransformerURIResolver implements URIResolver {
             // Create XML reader for URI
             XMLReader xmlReader;
             {
-                boolean startsWithHash = href.startsWith("#");
-                boolean startsWithOXFScheme = href.startsWith("oxf:") && !href.startsWith("oxf:/");
-                if (startsWithHash || startsWithOXFScheme) {
+                String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
+                if (inputName != null) {
                     // Resolve to input of current processor
-                    int prefixLength = startsWithHash ? 1 : 4;
                     xmlReader = new ProcessorOutputXMLReader
-                            (context, processor.getInputByName(href.substring(prefixLength)).getOutput());
+                            (pipelineContext, processor.getInputByName(inputName).getOutput());
                 } else {
                     // Resolve to regular URI
                     Processor urlGenerator = new URLGenerator(URLFactory.createURL(base, href));
-                    xmlReader = new ProcessorOutputXMLReader(context, urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA));
+                    xmlReader = new ProcessorOutputXMLReader(pipelineContext, urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA));
                 }
             }
 
             // Also send data to listener, if there is one
             final URIResolverListener uriResolverListener = (URIResolverListener)
-                    context.getAttribute(PipelineContext.XSLT_STYLESHEET_URI_LISTENER);
+                    pipelineContext.getAttribute(PipelineContext.XSLT_STYLESHEET_URI_LISTENER);
             if (uriResolverListener != null) {
                 xmlReader = new ForwardingXMLReader(xmlReader) {
 

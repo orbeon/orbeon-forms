@@ -68,10 +68,10 @@
                 </p>
 			</section>
             <section>
-				<title>URL Generator Plain Text Mode</title>
+				<title>URL Generator Text Mode</title>
 				<p>
-                    The <a href="processors-generators#url-generator">URL generator</a>'s support
-                    for reading plain text files is now documented.
+                    The <a href="processors-generators#url-generator">URL generator</a> now
+                    supports reading text files.
                 </p>
 			</section>
             <section>

@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.*;
+import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.transform.Transformer;
@@ -44,6 +45,12 @@ import java.util.Map;
 
 /**
  * Generates SAX events from a document fetched from an URL.
+ *
+ * NOTE: For XML content-type and encoding related questions, check out the following draft
+ * document:
+ *
+ *   http://www.faqs.org/rfcs/rfc3023.html
+ *   http://www.ietf.org/internet-drafts/draft-murata-kohn-lilley-xml-00.txt
  */
 public class URLGenerator extends ProcessorImpl {
 
@@ -54,8 +61,8 @@ public class URLGenerator extends ProcessorImpl {
     private static final boolean DEFAULT_VALIDATING = false;
 
     private static final boolean DEFAULT_FORCE_CONTENT_TYPE = false;
-
     private static final boolean DEFAULT_FORCE_ENCODING = false;
+    private static final boolean DEFAULT_IGNORE_CONNECTION_ENCODING = false;
 
     private static final int CACHE_EXPIRATION_NO_CACHE = 0;
     private static final int CACHE_EXPIRATION_NO_EXPIRATION = -1;
@@ -94,12 +101,18 @@ public class URLGenerator extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    public URLGenerator(URL url, String contentType, boolean forceContentType) {
+        this.config = new Config(url, contentType, forceContentType);
+        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
+    }
+
     private static class Config {
         private URL url;
         private String contentType = ProcessorUtils.DEFAULT_CONTENT_TYPE;
         private boolean forceContentType = DEFAULT_FORCE_CONTENT_TYPE;
         private String encoding;
         private boolean forceEncoding = DEFAULT_FORCE_ENCODING;
+        private boolean ignoreConnectionEncoding = DEFAULT_IGNORE_CONNECTION_ENCODING;
         private boolean validating = DEFAULT_VALIDATING;
         private Map headers;
 
@@ -113,13 +126,22 @@ public class URLGenerator extends ProcessorImpl {
             this.url = url;
         }
 
+        public Config(URL url, String contentType, boolean forceContentType) {
+            this(url);
+            this.forceContentType = true;
+            this.contentType = contentType;
+            this.forceContentType = forceContentType;
+        }
+
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean validating, Map headers, boolean cacheUseLocalCache, boolean cacheAlwaysRevalidate, int cacheExpiration, TidyConfig tidyConfig) {
+                      boolean ignoreConnectionEncoding, boolean validating, Map headers, boolean cacheUseLocalCache,
+                      boolean cacheAlwaysRevalidate, int cacheExpiration, TidyConfig tidyConfig) {
             this.url = url;
             this.contentType = contentType;
             this.forceContentType = forceContentType;
             this.encoding = encoding;
             this.forceEncoding = forceEncoding;
+            this.ignoreConnectionEncoding = ignoreConnectionEncoding;
             this.validating = validating;
             this.headers = headers;
 
@@ -148,6 +170,10 @@ public class URLGenerator extends ProcessorImpl {
 
         public boolean isForceEncoding() {
             return forceEncoding;
+        }
+
+        public boolean isIgnoreConnectionEncoding() {
+            return ignoreConnectionEncoding;
         }
 
         public TidyConfig getTidyConfig() {
@@ -211,6 +237,7 @@ public class URLGenerator extends ProcessorImpl {
                                 // Get encoding
                                 String encoding = XPathUtils.selectStringValueNormalize(configElement, "/config/encoding");
                                 boolean forceEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/force-encoding", DEFAULT_FORCE_ENCODING);
+                                boolean ignoreConnectionEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/ignore-connection-encoding", DEFAULT_IGNORE_CONNECTION_ENCODING);
                                 if (forceEncoding && (encoding == null || encoding.equals("")))
                                     throw new OXFException("The force-encoding element requires an encoding element.");
 
@@ -238,7 +265,8 @@ public class URLGenerator extends ProcessorImpl {
                                 // Create configuration object
                                 try {
                                     Config config = new Config(URLFactory.createURL(url), contentType, forceContentType, encoding, forceEncoding,
-                                            validating, headers, cacheUseLocalCache, cacheAlwaysRevalidate, cacheExpiration, tidyConfig);
+                                            ignoreConnectionEncoding, validating, headers, cacheUseLocalCache, cacheAlwaysRevalidate, cacheExpiration,
+                                            tidyConfig);
                                     if (logger.isDebugEnabled())
                                         logger.debug("Read configuration: " + config.toString());
                                     return config;
@@ -306,12 +334,12 @@ public class URLGenerator extends ProcessorImpl {
                                 // Read resource
                                 if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType)) {
                                     handler.readHTML(output);
-                                } else if (ProcessorUtils.TEXT_CONTENT_TYPE.equals(contentType)) {
-                                    handler.readText(output);
-                                } else if (ProcessorUtils.XML_CONTENT_TYPE1.equals(contentType) || ProcessorUtils.XML_CONTENT_TYPE2.equals(contentType)) {
+                                } else if (contentType != null && contentType.startsWith(ProcessorUtils.TEXT_CONTENT_TYPE_PREFIX)) {
+                                    handler.readText(output, contentType);
+                                } else if (ProcessorUtils.isXMLContentType(contentType)) {
                                     handler.readXML(output);
                                 } else {
-                                    handler.readBinary(output);
+                                    handler.readBinary(output, contentType);
                                 }
 
                                 // Cache the resource
@@ -396,9 +424,9 @@ public class URLGenerator extends ProcessorImpl {
         public String getResourceEncoding() throws IOException;
         public void destroy() throws IOException;
         public void readHTML(ContentHandler output) throws IOException;
-        public void readText(ContentHandler output) throws IOException;
+        public void readText(ContentHandler output, String contentType) throws IOException;
         public void readXML(ContentHandler output) throws IOException;
-        public void readBinary(ContentHandler output) throws IOException;
+        public void readBinary(ContentHandler output, String contentType) throws IOException;
     }
 
     private static class OXFResourceHandler implements ResourceHandler {
@@ -417,6 +445,9 @@ public class URLGenerator extends ProcessorImpl {
 
         public String getResourceEncoding() throws IOException {
             // We generally don't know the "connection" encoding
+            // NOTE: We could know, if the underlying protocol was for example HTTP. But we may
+            // want to abstract that anyway, so that the behavior is consistent whatever the sandbox
+            // is.
             return null;
         }
 
@@ -436,38 +467,39 @@ public class URLGenerator extends ProcessorImpl {
             }
         }
 
-        private String getEncoding() throws IOException {
+        private String getExternalEncoding() throws IOException {
             if (config.isForceEncoding())
                 return config.getEncoding();
+            else if (config.isIgnoreConnectionEncoding())
+                return null;
             else
                 return getResourceEncoding();
         }
 
         public void readHTML(ContentHandler output) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-            URLResourceHandler.readHTML(inputStream, config.getTidyConfig(), getEncoding(), output);
+            URLResourceHandler.readHTML(inputStream, config.getTidyConfig(), getExternalEncoding(), output);
         }
 
-        public void readText(ContentHandler output) throws IOException {
+        public void readText(ContentHandler output, String contentType) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-            URLResourceHandler.readText(inputStream, getEncoding(), output);
+            URLResourceHandler.readText(inputStream, getExternalEncoding(), output, contentType);
         }
 
         public void readXML(ContentHandler output) throws IOException {
-            if (config.isForceEncoding()) {
-                // Special case, we force the encoding. We have to do the parsing ourselves
-                // NOTE: Possibly, some resource managers may not support getContentAsStream()
+            if (getExternalEncoding() != null) {
+                // The encoding is set externally, either force by the user, or set by the connection
                 inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-                XMLUtils.readerToSAX(new InputStreamReader(inputStream, config.getEncoding()), config.getURL().toExternalForm(), output, config.isValidating());
+                XMLUtils.readerToSAX(new InputStreamReader(inputStream, getExternalEncoding()), config.getURL().toExternalForm(), output, config.isValidating());
             } else {
                 // Regular case, the resource manager does the job and autodetects the encoding
                 ResourceManagerWrapper.instance().getContentAsSAX(getKey(), output);
             }
         }
 
-        public void readBinary(ContentHandler output) throws IOException {
+        public void readBinary(ContentHandler output, String contentType) throws IOException {
             inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-            URLResourceHandler.readBinary(inputStream, output);
+            URLResourceHandler.readBinary(inputStream, output, contentType);
         }
 
         private String getKey() {
@@ -526,26 +558,28 @@ public class URLGenerator extends ProcessorImpl {
             }
         }
 
-        private String getEncoding() throws IOException {
+        private String getExternalEncoding() throws IOException {
             if (config.isForceEncoding())
                 return config.getEncoding();
+            else if (config.isIgnoreConnectionEncoding())
+                return null;
             else
                 return getResourceEncoding();
         }
 
         public void readHTML(ContentHandler output) throws IOException {
             openConnection();
-            readHTML(urlConn.getInputStream(), config.getTidyConfig(), getEncoding(), output);
+            readHTML(urlConn.getInputStream(), config.getTidyConfig(), getExternalEncoding(), output);
         }
 
-        public void readText(ContentHandler output) throws IOException {
+        public void readText(ContentHandler output, String contentType) throws IOException {
             openConnection();
-            readText(urlConn.getInputStream(), getEncoding(), output);
+            readText(urlConn.getInputStream(), getExternalEncoding(), output, contentType);
         }
 
-        public void readBinary(ContentHandler output) throws IOException {
+        public void readBinary(ContentHandler output, String contentType) throws IOException {
             openConnection();
-            readBinary(urlConn.getInputStream(), output);
+            readBinary(urlConn.getInputStream(), output, contentType);
         }
 
         public void readXML(ContentHandler output) throws IOException {
@@ -558,10 +592,9 @@ public class URLGenerator extends ProcessorImpl {
                 reader.setEntityResolver(XMLUtils.ENTITY_RESOLVER);
                 reader.setErrorHandler(XMLUtils.ERROR_HANDLER);
                 InputSource inputSource;
-                if (config.isForceContentType()) {
-                    // This is a special case where the user wants to force an encoding on an XML file
-                    // NOTE: We do not support the case where the connection encoding is used
-                    inputSource = new InputSource(new InputStreamReader(urlConn.getInputStream(), config.getEncoding()));
+                if (getExternalEncoding() != null) {
+                    // The encoding is set externally, either force by the user, or set by the connection
+                    inputSource = new InputSource(new InputStreamReader(urlConn.getInputStream(), getExternalEncoding()));
                 } else {
                     // This is the regular case where the XML parser autodetects the encoding
                     inputSource = new InputSource(urlConn.getInputStream());
@@ -593,7 +626,7 @@ public class URLGenerator extends ProcessorImpl {
             }
         }
 
-        public static void readText(InputStream is, String encoding, ContentHandler output) throws IOException {
+        public static void readTextOld(InputStream is, String encoding, ContentHandler output) throws IOException {
             if (encoding == null)
                 encoding = DEFAULT_TEXT_ENCODING;
             BufferedReader br = new BufferedReader(new InputStreamReader(is, encoding));
@@ -612,15 +645,68 @@ public class URLGenerator extends ProcessorImpl {
             helper.endDocument();
         }
 
-        public static void readBinary(InputStream is, ContentHandler output) {
-            ContentHandlerHelper helper = new ContentHandlerHelper(output);
-            helper.startDocument();
-            helper.startElement(DEFAULT_BINARY_DOCUMENT_ELEMENT);
+        /**
+         * Generate a "standard" OXF text document.
+         *
+         * @param is
+         * @param encoding
+         * @param output
+         * @param contentType
+         * @throws IOException
+         */
+        public static void readText(InputStream is, String encoding, ContentHandler output, String contentType) throws IOException {
 
-            XMLUtils.inputStreamToBase64Characters(new BufferedInputStream(is), output);
+            if (encoding == null)
+                encoding = DEFAULT_TEXT_ENCODING;
 
-            helper.endElement();
-            helper.endDocument();
+            try {
+                // Create attributes for root element: xsi:type, and optional content-type
+                AttributesImpl attributes = new AttributesImpl();
+                output.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+                output.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+                attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_STRING_QNAME.getQualifiedName());
+                if (contentType != null)
+                    attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
+
+                // Write document
+                output.startDocument();
+                output.startElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT, attributes);
+                XMLUtils.readerToCharacters(new InputStreamReader(is, encoding), output);
+                output.endElement("", DEFAULT_TEXT_DOCUMENT_ELEMENT, DEFAULT_TEXT_DOCUMENT_ELEMENT);
+                output.endDocument();
+
+            } catch (SAXException e) {
+                throw new OXFException(e);
+            }
+        }
+
+        /**
+         * Generate a "standard" OXF binary document.
+         *
+         * @param is
+         * @param output
+         * @param contentType
+         */
+        public static void readBinary(InputStream is, ContentHandler output, String contentType) {
+            try {
+                // Create attributes for root element: xsi:type, and optional content-type
+                AttributesImpl attributes = new AttributesImpl();
+                output.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+                output.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+                attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
+                if (contentType != null)
+                    attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
+
+                // Write document
+                output.startDocument();
+                output.startElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
+                XMLUtils.inputStreamToBase64Characters(new BufferedInputStream(is), output);
+                output.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
+                output.endDocument();
+
+            } catch (SAXException e) {
+                throw new OXFException(e);
+            }
         }
     }
 }

@@ -445,11 +445,11 @@
         <section>
             <title>URL Generator</title>
             <p>
-                The URL generator fetches a document from a URL and produces an XML output
-                document. Common protocols such as <code>http</code>, <code>ftp</code>, and
-                <code>file</code> are supported as well as the Presentation Server resource protocol
-                (<code>oxf</code>). See the <link href="reference-resource-managers">Resource
-                Managers</link> for more information about the <code>oxf</code> protocol.
+                The URL generator fetches a document from a URL and produces an XML output document.
+                Common protocols such as <code>http:</code>, <code>ftp:</code>, and
+                <code>file:</code> are supported as well as the Presentation Server resource
+                protocol (<code>oxf:</code>). See <link href="reference-resource-managers">Resource
+                Managers</link> for more information about the <code>oxf:</code> protocol.
             </p>
             <section>
                 <title>Content Type</title>
@@ -460,14 +460,15 @@
                 </p>
                 <ol>
                     <li>
-                        Use the content type in the <code>content-type</code> element if
-                        <code>force-content-type</code> is set to <code>true</code>.
+                        Use the content type in the <code>content-type</code> element of the
+                        configuration if <code>force-content-type</code> is set to
+                        <code>true</code>.
                     </li>
                     <li>
                         Use the content type set by the connection (for example, the content type
-                        sent with the document by an HTTP server), if any. In particular when using
-                        the <code>oxf</code> or <code>file</code> protocol, the connection content
-                        type is never available. When using the <code>http</code> protocol, the
+                        sent with the document by an HTTP server), if any. Note that when using the
+                        <code>oxf:</code> or <code>file:</code> protocol, the connection content
+                        type is never available. When using the <code>http:</code> protocol, the
                         connection content type may or may not be available depending on the
                         configuration of the HTTP server.
                     </li>
@@ -476,17 +477,18 @@
                         specified.
                     </li>
                     <li>
-                        Use <code>text/xml</code>.
+                        Use <code>application/xml</code>.
                     </li>
                 </ol>
             </section>
             <section>
                 <title>XML Mode</title>
                 <p>
-                    The XML mode is selected when the content type is <code>text/xml</code>
-                    according to the selection algorithm above. The generator fetches the specified
-                    URL and parses the XML document. If the <code>validating</code> option is set
-                    to <code>true</code>, a validating parser is used, otherwise a non-validating
+                    The XML mode is selected when the content type is <code>text/xml</code>,
+                    <code>application/xml</code>, or ends with <code>+xml</code> according to the
+                    selection algorithm above. The generator fetches the specified URL and parses
+                    the XML document. If the <code>validating</code> option is set to
+                    <code>true</code>, a validating parser is used, otherwise a non-validating
                     parser is used. Using a validating parser allows to validate a document with a
                     DTD.
                 </p>
@@ -498,7 +500,7 @@
                         <p:input name="config">
                             <config>
                                 <url>oxf:/urlgen/note.xml</url>
-                                <content-type>text/xml</content-type>
+                                <content-type>application/xml</content-type>
                                 <validating>true</validating>
                             </config>
                         </p:input>
@@ -546,23 +548,27 @@
                     </p:processor>
                 </xml-source>
                 <note>
-                    Tidy has some tolerance for malformed HTML, but it is
-                    encouraged to access well-formed HTML whenever possible.
+                    HTML Tidy has some tolerance for malformed HTML, but it is encouraged to access
+                    well-formed HTML whenever possible.
                 </note>
             </section>
             <section>
-                <title>Plain Text Mode</title>
+                <title>Text Mode</title>
                 <p>
-                    The plain text mode is selected when the content type is <code>text/plain</code>
-                    according to the selection algorithm above. In this mode, the URL generator
-                    reads the input as a text file and produces an XML document where lines of text
-                    have been separated. A line is considered to be terminated by either:
+                    The text mode is selected when the content type according to the selection
+                    algorithm above start with <code>text/</code>, for example
+                    <code>text/plain</code>. In this mode, the URL generator reads the input as a
+                    text file and produces an XML document containing the text read. <!-- where
+                    lines of text have been separated. A line is considered to be terminated by
+                    either: -->
                 </p>
+                <!--
                 <ul>
                     <li>a line feed ('\n', ASCII character number 10)</li>
                     <li>a carriage return ('\r', ASCII character number 13)</li>
                     <li>a carriage return followed immediately by a line feed</li>
                 </ul>
+                -->
                 <p>
                     Example:
                 </p>
@@ -574,7 +580,7 @@
                                 <content-type>text/plain</content-type>
                             </config>
                         </p:input>
-                        <p:output name="data" id="image-data"/>
+                        <p:output name="data" id="text"/>
                     </p:processor>
                 </xml-source>
                 <p>
@@ -585,6 +591,7 @@
                     This is line two of the input document!<br/>
                     This is line three of the input document!
                 </code>
+                <!--
                 <p>
                     The resulting document consists of a <code>document</code> root element
                     containing a sequence of <code>line</code> elements, one for each line contained
@@ -601,13 +608,35 @@
                     The plain text mode does not allow detecting what actual end of line characters
                     (line feed or carriage return or both) is used in the input document.
                 </note>
+                -->
+                <p>
+                    The resulting document consists of a <code>document</code> root element
+                    containing the text. An <code>xsi:type</code> attribute is also present, as well
+                    as a <code>content-type</code> attribute:
+                </p>
+                <xml-source>
+<document xsi:type="xs:string" content-type="text/plain">
+    This is line one of the input document!
+    This is line two of the input document!
+    This is line three of the input document!
+</document>
+                </xml-source>
+                <note>
+                    The URL generator performs streaming. It generates a stream of short character
+                    SAX events. It is therefore possible to generate an "infinitely" long document
+                    with a constant amount of memory, assuming the generator is connected to other
+                    processors that do not require storing the entire stream of data in memory, for
+                    example the <a href="processors-sql#binary-data">SQL processor</a> (with an
+                    appropriate configuration to stream BLOBs), or the <a
+                    href="processors-serializers#binary-http-serializer">Binary HTTP serializer</a>.
+                </note>
             </section>
             <section>
                 <title>Binary Mode</title>
                 <p>
-                    The binary mode is selected when the content type is none of the
-                    <code>text/*</code> content types. In this mode, the URL generator uses a Base64
-                    encoding to transform binary content into XML.
+                    The binary mode is selected when the content type is neither one of the XML
+                    content types not one of the <code>text/*</code> content types. In this mode,
+                    the URL generator uses a Base64 encoding to transform binary content into XML.
                 </p>
                 <p>
                     Example:
@@ -617,7 +646,7 @@
                         <p:input name="config">
                             <config>
                                 <url>oxf:/my-image.jpg</url>
-                                <content-type>application/octet-stream</content-type>
+                                <content-type>image/jpeg</content-type>
                             </config>
                         </p:input>
                         <p:output name="data" id="image-data"/>
@@ -625,10 +654,11 @@
                 </xml-source>
                 <p>
                     The resulting document consists of a <code>document</code> root node containing
-                    character data encoded with Base64:
+                    character data encoded with Base64. An <code>xsi:type</code> attribute is also
+                    present, as well as a <code>content-type</code> attribute, if found:
                 </p>
                 <xml-source>
-<document>
+<document xsi:type="xs:base64Binary" content-type="image/jpeg">
 /9j/4AAQSkZJRgABAQEBygHKAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4R
 ...
 KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
@@ -645,21 +675,51 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </note>
             </section>
             <section>
-                <title>Encoding</title>
+                <title>Character Encoding</title>
+                <p>
+                    For text and XML, the character encoding is determined as follows:
+                </p>
+                <ol>
+                    <li>
+                        Use the encoding in the <code>encoding</code> element of the configuration
+                        if <code>force-encoding</code> is set to <code>true</code>.
+                    </li>
+                    <li>
+                        Use the encoding set by the connection (for example, the encoding sent with
+                        the document by an HTTP server), if any, unless
+                        <code>ignore-connection-encoding</code> is set to <code>true</code> (for XML
+                        documents, precedence is given to the connection encoding as per RFC
+                        3023). Note that when using the <code>oxf:</code> or <code>file:</code>
+                        protocol, the connection encoding is never available. When using the
+                        <code>http:</code> protocol, the connection encoding may or may not be
+                        available depending on the configuration of the HTTP server. The encoding is
+                        specified along with the content type in the <code>content-type</code>
+                        header, for example: <code>content-type: text/html;
+                        charset=iso-8859-1</code>.
+                    </li>
+                    <li>
+                        Use the encoding in the <code>encoding</code> element of the configuration,
+                        if specified.
+                    </li>
+                    <li>
+                        For XML, the character encoding is determined automatically by the XML
+                        parser.
+                    </li>
+                    <li>For text, including HTML: use the default of iso-8859</li>
+                </ol>
                 <p>
                     When reading XML documents, the preferred method of determining the character
-                    encoding is to leave the XML parser auto detect the encoding as per the XML
-                    specification. In some rare instances, it may be necessary to override the
-                    encoding. For this purpose, the <code>force-encoding</code> and
-                    <code>encoding</code> elements can be used to override this default behavior,
-                    for example:
+                    encoding is to let either the connection or the XML parser auto detect the
+                    encoding. In some instances, it may be necessary to override the encoding. For
+                    this purpose, the <code>force-encoding</code> and <code>encoding</code> elements
+                    can be used to override this default behavior, for example:
                 </p>
                 <xml-source>
                     <p:processor name="oxf:url-generator">
                         <p:input name="config">
                             <config>
-                                <url>oxf:/urlgen/note.xml</url><li>iso-8859-1</li>
-                                <content-type>text/xml</content-type>
+                                <url>oxf:/urlgen/note.xml</url>
+                                <content-type>application/xml</content-type>
                                 <encoding>iso-8859-1</encoding>
                                 <force-encoding>true</force-encoding>
                             </config>
@@ -668,41 +728,11 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     </p:processor>
                 </xml-source>
                 <p>
-                    This use is discouraged, and should be reserved for cases where it is known that
-                    a document specifies an incorrect encoding and it is not possible to modify the
-                    document. Note that it does not make sense in the case of XML to use an
-                    <code>encoding</code> element without <code>force-encoding</code> set to
-                    <code>true</code>, because the XML parser will always select an encoding, be it
-                    the default <code>utf-8</code>, and the <code>encoding</code> element will be
-                    ignored.
+                    This use should be reserved for cases where it is known that a document
+                    specifies an incorrect encoding and it is not possible to modify the document.
                 </p>
                 <p>
-                    When reading HTML documents, the following selection algorithm applies:
-                </p>
-                <ol>
-                    <li>
-                        Use the encoding in the <code>encoding</code> element if
-                        <code>force-encoding</code> is set to <code>true</code>.
-                    </li>
-                    <li>
-                        Use the encoding set by the connection (for example, the encoding sent with
-                        the document by an HTTP server), if any. In particular when using the
-                        <code>oxf</code> or <code>file</code> protocol, the connection encoding is
-                        never available. When using the <code>http</code> protocol, the connection
-                        encoding may or may not be available, and is usually specified along with
-                        the content type in the <code>content-type</code> header, for example:
-                        <code>content-type: text/html; charset=iso-8859-1</code>
-                    </li>
-                    <li>
-                        Use the content type in the <code>content-type</code> element, if
-                        specified.
-                    </li>
-                    <li>
-                        Use <code>iso-8859-1</code>.
-                    </li>
-                </ol>
-                <p>
-                    Example:
+                    HTML example:
                 </p>
                 <xml-source>
                     <p:processor name="oxf:url-generator">
@@ -717,7 +747,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     </p:processor>
                 </xml-source>
                 <p>
-                    In this version, only the following encodings are supported for HTML documents:
+                    Note that only the following encodings are supported for HTML documents:
                 </p>
                 <ul>
                     <li>iso-8859-1</li>
@@ -725,7 +755,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </ul>
                 <p>
                     Also note that use of the HTML <code>&lt;meta></code> tag to specify the
-                    encoding from within an HTML document is not supported either.
+                    encoding from within an HTML document is not supported.
                 </p>
             </section>
             <a name="http-headers"/>

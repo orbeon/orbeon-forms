@@ -69,6 +69,7 @@ public abstract class ProcessorImpl implements Processor {
 
     private String systemId;
     private LocationData locationData;
+    public static final String PROCESSOR_INPUT_SCHEME = "oxf:";
 
     public String getSystemId() {
         return systemId;
@@ -658,6 +659,28 @@ public abstract class ProcessorImpl implements Processor {
             if (list.size() == 0) {
                 i.remove();
             }
+        }
+    }
+
+    /**
+     * Check if the given URI is referring to a processor input.
+     */
+    public static boolean isProcessorInputScheme(String uri) {
+        // NOTE: The check on the hash is for backward compatibility
+        return uri.startsWith("#") || (uri.startsWith(PROCESSOR_INPUT_SCHEME) && !uri.startsWith(PROCESSOR_INPUT_SCHEME + "/"));
+    }
+
+    /**
+     * Return the input name if the URI is referring to a processor input, null otherwise.
+     */
+    public static String getProcessorInputSchemeInputName(String uri) {
+        if (uri.startsWith("#")) {
+            // NOTE: The check on the hash is for backward compatibility
+            return uri.substring(1);
+        } else if (uri.startsWith(PROCESSOR_INPUT_SCHEME) && !uri.startsWith(PROCESSOR_INPUT_SCHEME + "/")) {
+            return uri.substring(PROCESSOR_INPUT_SCHEME.length());
+        } else {
+            return null;
         }
     }
 

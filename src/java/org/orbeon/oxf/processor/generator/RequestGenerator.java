@@ -139,7 +139,7 @@ public class RequestGenerator extends ProcessorImpl {
                                     super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
                                     super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
                                     newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
-                                            useBase64(pipelineContext, fileItem) ? XMLConstants.BASE64BINARY_TYPE : XMLConstants.ANYURI_TYPE);
+                                            useBase64(pipelineContext, fileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(): XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
                                     super.startElement("", "value", "value", newAttributes);
                                     writeFileItem(pipelineContext, fileItem, getContentHandler());
                                     super.endElement("", "value", "value");
@@ -177,7 +177,7 @@ public class RequestGenerator extends ProcessorImpl {
                                 super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
                                 super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
                                 newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
-                                        useBase64(pipelineContext, context.bodyFileItem) ? XMLConstants.BASE64BINARY_TYPE : XMLConstants.ANYURI_TYPE);
+                                        useBase64(pipelineContext, context.bodyFileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(): XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
                                 super.startElement(uri, localname, qName, newAttributes);
                                 writeFileItem(pipelineContext, context.bodyFileItem, getContentHandler());
                                 super.endElement(uri, localname, qName);

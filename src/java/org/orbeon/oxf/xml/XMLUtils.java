@@ -139,6 +139,37 @@ public class XMLUtils {
             }
         }
     }
+    private static String domToString
+    ( final org.dom4j.Node n, final OutputFormat frmt ) {
+        try {
+            final StringWriter wrtr = new StringWriter();
+            // Ugh, XMLWriter doesn't accept null formatter _and_ default formatter is protected.
+            final XMLWriter xmlWrtr = frmt == null 
+                                      ? new XMLWriter( wrtr ) : new XMLWriter( wrtr, frmt );
+            xmlWrtr.write( n );
+            xmlWrtr.close();
+            return wrtr.toString();
+        } catch ( final IOException e ) {
+            throw new OXFException(e);
+        }
+    }
+    
+    private static String domToString
+    ( final org.dom4j.Branch brnch, final boolean trm, final boolean cmpct  ) {
+        final OutputFormat frmt = new OutputFormat();
+        if ( cmpct ) {
+            frmt.setIndent( false );
+            frmt.setNewlines( false );
+            frmt.setTrimText( true );
+        } else {
+            frmt.setIndentSize( 4 );
+            frmt.setNewlines( trm );
+            frmt.setTrimText( trm );
+        }
+        final String ret = domToString( brnch, frmt );
+        return ret;
+    }
+
     
     /**
      * Create a new SAX parser factory.
@@ -353,50 +384,51 @@ public class XMLUtils {
 //        });
 //        return element;
 //    }
-
-    public static String domToString(org.dom4j.Node node, boolean trim, boolean compact) {
-        try {
-            if (node instanceof org.dom4j.Text) {
-                return ((org.dom4j.Text) node).getText();
-            } else {
-                Element rootElement = node instanceof Element ? ((Element) node).createCopy()
-                        : node instanceof org.dom4j.Document ? ((org.dom4j.Document) node).getRootElement().createCopy()
-                        : null;
-
-                // HACK: in some cases it looks like the pretty printer is not displaying the
-                // content of some element. Normalizing the document fixes the issue.
-//                rootElement.normalize();
-
-                OutputFormat format = new OutputFormat();
-                if (compact) {
-                    format.setIndent(false);
-                    format.setNewlines(false);
-                    format.setTrimText(true);
-                } else {
-                    format.setIndentSize(4);
-                    format.setNewlines(trim);
-                    format.setTrimText(trim);
-                }
-
-                StringWriter writer = new StringWriter();
-                XMLWriter xmlWriter = new XMLWriter(writer, format);
-                xmlWriter.write(rootElement);
-                xmlWriter.close();
-                return writer.toString();
-            }
-        } catch (IOException e) {
-            throw new OXFException(e);
+    
+    public static String domToString
+    ( final org.dom4j.Element e, final boolean trm, final boolean cmpct ) {
+        final org.dom4j.Branch cpy = e.createCopy();
+        final String ret = domToString( cpy, trm, cmpct );
+        return ret;
+    }
+    public static String domToString( final org.dom4j.Element e ) {
+        final String ret = domToString( e, true, false );
+        return ret;
+    }
+    public static String domToString
+    ( final org.dom4j.Document d, final boolean trm, final boolean cmpct ) {
+        final org.dom4j.Element relt = d.getRootElement();
+        final String ret = domToString( relt, trm, cmpct );
+        return ret;
+    }
+    public static String domToString( final org.dom4j.Document d ) {
+        final String ret = domToString( d, true, false );
+        return ret;
+    }
+    public static String domToString( final org.dom4j.Text txt, final boolean t, final boolean c ) {
+        final String ret = txt.getText();
+        return ret;
+    }
+    public static String domToString( final org.dom4j.Text t ) {
+        return domToString( t, true, false );
+    }
+    /**
+     * Checks type of n and, if apropriate, downcasts and returns domToString( ( Type )n, t, c ).
+     * Otherwise returns domToString( n, null )
+     */
+    public static String domToString( final org.dom4j.Node n, final boolean t, final boolean c ) {
+        final String ret;
+        switch ( n.getNodeType() ) {
+            case org.dom4j.Node.DOCUMENT_NODE : ret = domToString( ( org.dom4j.Document )n, t, c ); break; 
+            case org.dom4j.Node.ELEMENT_NODE : ret = domToString( ( org.dom4j.Element )n, t, c ); break; 
+            case org.dom4j.Node.TEXT_NODE : ret = domToString( ( org.dom4j.Text )n, t, c ); break; 
+            default : ret = domToString( n, null ); break; 
         }
+        return ret;
     }
-
-    public static String domToString(org.dom4j.Node node) {
-        return domToString(node, true, false);
+    public static String domToString( final org.dom4j.Node nd ) {
+        return domToString( nd, true, false );
     }
-
-    public static String domToCompactString(org.dom4j.Node node) {
-        return domToString(node, true, true);
-    }
-
     public static void error(String message) {
         throw new OXFException(message);
     }

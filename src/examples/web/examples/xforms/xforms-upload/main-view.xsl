@@ -19,9 +19,6 @@
                             <xf:filename ref="@filename"/>
                             <xf:mediatype ref="@mediatype"/>
                             <xxf:size ref="@size"/>
-<!--                                    <xf:alert>-->
-<!--                                        <font color="red">Image must be smaller than 150K</font>-->
-<!--                                    </xf:alert>-->
                         </xf:upload>
                     </td>
                 </tr>
@@ -31,9 +28,6 @@
                             <xf:filename ref="@filename"/>
                             <xf:mediatype ref="@mediatype"/>
                             <xxf:size ref="@size"/>
-<!--                                    <xf:alert>-->
-<!--                                        <font color="red">Image must be smaller than 150K</font>-->
-<!--                                    </xf:alert>-->
                         </xf:upload>
                     </td>
                 </tr>
@@ -43,9 +37,6 @@
                             <xf:filename ref="@filename"/>
                             <xf:mediatype ref="@mediatype"/>
                             <xxf:size ref="@size"/>
-<!--                                    <xf:alert>-->
-<!--                                        <font color="red">Image must be smaller than 150K</font>-->
-<!--                                    </xf:alert>-->
                         </xf:upload>
                     </td>
                 </tr>
@@ -85,7 +76,7 @@
             </table>
             <xhtml:p>
             </xhtml:p>
-            <!-- Display uploaded image -->
+            <!-- Display uploaded images (when uploaded with Web Service) -->
             <xsl:if test="$uploaded">
                 <xsl:for-each select="/urls/url">
                     <xsl:if test=". != ''">

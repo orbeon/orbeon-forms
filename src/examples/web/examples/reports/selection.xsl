@@ -73,7 +73,7 @@
                         </xforms:submit>:
 
                         the table format transformed by the XSL export processor in <a
-                        href="/goto-source/reports/pdf.xsl" f:url-type="resource">excel.xpl</a>
+                        href="/goto-source/reports/excel.xpl" f:url-type="resource">excel.xpl</a>
                     </xhtml:li>
                 </xhtml:ul>
             </xhtml:p>

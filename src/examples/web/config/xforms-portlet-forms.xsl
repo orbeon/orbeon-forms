@@ -40,6 +40,9 @@
     <xsl:variable name="reference-xform-instance" as="element()?">
         <xsl:copy-of select="$reference-xform//xxforms:hidden[@xxforms:name = '$instance' and @xxforms:value != '']"/>
     </xsl:variable>
+    <xsl:variable name="reference-xform-key" as="element()?">
+        <xsl:copy-of select="$reference-xform//xxforms:hidden[@xxforms:name = '$key' and @xxforms:value != '']"/>
+    </xsl:variable>
 
     <!-- Main template -->
     <xsl:template match="/">
@@ -69,6 +72,9 @@
             <!-- Add hidden field with outer XForms instance data so that a non-portlet form instance can be regenerated -->
             <xsl:if test="$reference-xform-instance">
                 <xhtml:input type="hidden" name="$instance" value="{$reference-xform-instance/@xxforms:value}"/>
+            </xsl:if>
+            <xsl:if test="$reference-xform-key">
+                <xhtml:input type="hidden" name="$key" value="{$reference-xform-key/@xxforms:value}"/>
             </xsl:if>
         </xsl:copy>
     </xsl:template>

@@ -83,8 +83,8 @@
         model="/oxfmark/vms.xpl"/>
 
     <!-- Not Found and Error pages -->
-    <page id="not-found" path-info="/not-found" view="/config/notfound.xml"/>
-    <page id="error" path-info="/error" model="/config/errorx.xpl"/>
+    <page id="not-found" path-info="/not-found" view="/config/not-found.xml"/>
+    <page id="error" path-info="/error" model="/config/error.xpl"/>
 
     <epilogue url="/config/epilogue.xpl"/>
     <not-found-handler page="not-found"/>

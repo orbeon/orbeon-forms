@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor;
 
-import com.sun.tools.javac.Main;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
@@ -25,16 +24,18 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.SystemUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.ContentHandler;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -47,6 +48,10 @@ public class JavaProcessor extends ProcessorImpl {
 
     public static final String JARPATH_PROPERTY = "jarpath";
     public static final String CLASSPATH_PROPERTY = "classpath";
+    public static final String COMPILER_CLASS_PROPERTY = "compiler-class";
+    public static final String COMPILER_JAR_PROPERTY = "compiler-jar";
+
+    public static final String DEFAULT_COMPILER_MAIN = "com.sun.tools.javac.Main";
 
     public static final String JAVA_CONFIG_NAMESPACE_URI = "http://www.orbeon.org/oxf/xml/java";
 
@@ -153,15 +158,58 @@ public class JavaProcessor extends ProcessorImpl {
                     Element configElement = configDocument.getRootElement();
                     Config config = new Config();
                     config.clazz = configElement.attributeValue("class");
-                    config.sourcepath = configElement.attributeValue("sourcepath");
-                    if (config.sourcepath == null)
-                        config.sourcepath = "oxf:/";
-                    if (config.sourcepath.startsWith("oxf:"))
-                        config.sourcepath = config.sourcepath.substring(4);
-                    if (config.sourcepath.indexOf(":") != -1)
-                        throw new OXFException("Invalid sourcepath: '" + config.sourcepath
-                                + "', the Java processor only supports the oxf: protocol in sourcepath");
-                    config.sourcepath = ResourceManagerWrapper.instance().getRealPath(config.sourcepath);
+
+                    // Get source path
+                    String sourcePathElementValue = configElement.attributeValue("sourcepath");
+                    if (sourcePathElementValue == null)
+                        sourcePathElementValue = ".";
+
+                    URL sourcePathURL;
+                    {
+                        try {
+                            // Resolve relative URLs
+                            LocationData locationData = getLocationData();
+                            sourcePathURL = (locationData != null && locationData.getSystemID() != null)
+                                    ? URLFactory.createURL(locationData.getSystemID(), sourcePathElementValue)
+                                    : URLFactory.createURL(sourcePathElementValue);
+                        } catch (MalformedURLException e) {
+                            throw new OXFException("Invalid sourcepath attribute: '" + sourcePathElementValue + "'", e);
+                        }
+                    }
+
+                    // Make sure the protocol is oxf: or file:
+                    String sourcePath;
+                    {
+                        if (sourcePathURL.getProtocol().equals("file")) {
+                            String fileName = sourcePathURL.getFile();
+                            File file = new File(fileName);
+                            if (!file.isDirectory()) {
+                                // Try to decode only if we cannot find the file
+                                try {
+                                    fileName = URLDecoder.decode(fileName, "utf-8");
+                                } catch (UnsupportedEncodingException e) {
+                                    throw new OXFException(e);
+                                }
+                                file = new File(fileName);
+                                if (!file.isDirectory())
+                                    throw new OXFException("Invalid sourcepath attribute: cannot find directory for URL: " + sourcePathElementValue);
+                            }
+                            try {
+                                sourcePath = file.getCanonicalPath();
+                            } catch (IOException e) {
+                                throw new OXFException(e);
+                            }
+                        } else if (sourcePathURL.getProtocol().equals("oxf")) {
+                            // Get real path to source path
+                            String path = sourcePathURL.getFile();
+                            sourcePath = ResourceManagerWrapper.instance().getRealPath(path);
+                        } else {
+                            throw new OXFException("Invalid sourcepath attribute: '" + sourcePathElementValue
+                                    + "'. The Java processor only supports the oxf: and file: protocols for the sourcepath attribute.");
+                        }
+                    }
+                    config.sourcepath = sourcePath;
+
                     return config;
                 }
             });
@@ -176,7 +224,7 @@ public class JavaProcessor extends ProcessorImpl {
             if (!fileUpToDate) {
                 StringWriter javacOutput = new StringWriter();
 
-                final java.util.ArrayList argLst = new java.util.ArrayList();
+                final ArrayList argLst = new ArrayList();
                 final String[] cmdLine;
                 {
                     argLst.add("-g");
@@ -185,12 +233,13 @@ public class JavaProcessor extends ProcessorImpl {
                         argLst.add("-classpath");
                         argLst.add(cp);
                     }
+
                     if (config.sourcepath != null && config.sourcepath.length() > 0) {
                         argLst.add("-sourcepath");
                         argLst.add(config.sourcepath);
                     }
                     argLst.add("-d");
-                    final java.io.File tmp = SystemUtils.getTemporaryDirectory();
+                    final File tmp = SystemUtils.getTemporaryDirectory();
                     final String tmpPth = tmp.getAbsolutePath();
                     argLst.add(tmpPth);
                     final String fnam = config.sourcepath + "/"
@@ -207,7 +256,52 @@ public class JavaProcessor extends ProcessorImpl {
                 Throwable thrown = null;
                 int exitCode = 1;
                 try {
-                    exitCode = Main.compile(cmdLine, new PrintWriter(javacOutput));
+                    // Get compiler class, either user-specified or default to Sun compiler
+                    String compilerMain = getPropertySet().getString(COMPILER_CLASS_PROPERTY, DEFAULT_COMPILER_MAIN);
+
+                    ClassLoader classLoader;
+                    {
+                        URL compilerJarURL = getPropertySet().getURL(COMPILER_JAR_PROPERTY);
+                        if (compilerJarURL != null) {
+                            // 1: Always honor user-specified compiler JAR if present
+                            // Use special class loader pointing to this URL
+                            classLoader = new URLClassLoader(new URL[]{compilerJarURL}, JavaProcessor.class.getClassLoader());
+                            if (logger.isDebugEnabled())
+                                logger.debug("Java processor using user-specified compiler JAR: " + compilerJarURL.toExternalForm());
+                        } else {
+                            // 2: Try to use the class loader that loaded this class
+                            classLoader = JavaProcessor.class.getClassLoader();
+                            try {
+                                Class.forName(compilerMain, true, classLoader);
+                                logger.debug("Java processor using current class loader");
+                            } catch (ClassNotFoundException e) {
+                                // Class not found
+                                // 3: Try to get to Sun tools.jar
+                                String javaHome = System.getProperty("java.home");
+                                if (javaHome != null) {
+                                    File javaHomeFile = new File(javaHome);
+                                    if (javaHomeFile.getName().equals("jre")) {
+                                        File toolsFile = new File(javaHomeFile.getParentFile(), "lib" + File.separator + "tools.jar");
+                                        if (toolsFile.exists()) {
+                                            // JAR file exists, will use it to load compiler class
+                                            classLoader = new URLClassLoader(new URL[]{toolsFile.toURL()}, JavaProcessor.class.getClassLoader());
+                                            if (logger.isDebugEnabled())
+                                                logger.debug("Java processor using default tools.jar under " + toolsFile.toString());
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Load compiler class using class loader defined above
+                    Class compilerClass = Class.forName(compilerMain, true, classLoader);
+
+                    // Get method and run compiler
+                    Method compileMethod = compilerClass.getMethod("compile", new Class[]{String[].class, PrintWriter.class});
+                    Object result = compileMethod.invoke(null, new Object[]{cmdLine, new PrintWriter(javacOutput)});
+                    exitCode = ((Integer) result).intValue();
+
                 } catch (final Throwable t) {
                     thrown = t;
                 }
@@ -246,7 +340,7 @@ public class JavaProcessor extends ProcessorImpl {
             Thread.currentThread().setContextClassLoader(processorClass.getClassLoader());
             return (Processor) processorClass.newInstance();
 
-        } catch (final java.io.IOException e) {
+        } catch (final IOException e) {
             throw new OXFException(e);
         } catch (final IllegalAccessException e) {
             throw new OXFException(e);
@@ -258,23 +352,23 @@ public class JavaProcessor extends ProcessorImpl {
     }
 
 
-    private String buildClassPath(PipelineContext context)
-            throws java.io.UnsupportedEncodingException {
+    private String buildClassPath(PipelineContext context) throws UnsupportedEncodingException {
+
         StringBuffer classpath = new StringBuffer();
         StringBuffer jarpath = new StringBuffer();
 
         String propJarpath = getPropertySet().getString(JARPATH_PROPERTY);
         String propClasspath = getPropertySet().getString(CLASSPATH_PROPERTY);
 
-        // Add classpath for jproperties if available
+        // Add class path from properties if available
         if (propClasspath != null)
             classpath.append(propClasspath).append(PATH_SEPARATOR);
 
-        // Add jar path from properties
+        // Add JAR path from properties if available
         if (propJarpath != null)
             jarpath.append(propJarpath).append(PATH_SEPARATOR);
 
-        // Add jar path from webapp if available
+        // Add JAR path and class path from webapp if available
         ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         boolean gotLibDir = false;
         if (externalContext != null) {
@@ -288,11 +382,25 @@ public class JavaProcessor extends ProcessorImpl {
                 classpath.append(webInfClasses).append(PATH_SEPARATOR);
         }
 
-        // Try to add directory containing current JAR file if WEB-INF/lib was not found
+        // Get class path based on class loader hierarchy
+        {
+            final String pathFromLoaders = SystemUtils.pathFromLoaders(JavaProcessor.class);
+            classpath.append(pathFromLoaders);
+            if (!pathFromLoaders.endsWith(File.pathSeparator))
+                classpath.append(File.pathSeparatorChar);
+        }
+
         if (!gotLibDir) {
-            final String pth = SystemUtils.pathFromLoaders(JavaProcessor.class, "utf-8");
-            classpath.append(pth);
-            if (!pth.endsWith(java.io.File.pathSeparator)) classpath.append(java.io.File.pathSeparatorChar);
+            // WEB-INF/lib was not found, this SHOULD mean we are running from the command-line or
+            // embedded rather than in a regular web app
+
+            // Try to add directory containing current JAR file
+            String pathToCurrentJarDir = SystemUtils.getJarPath(getClass());
+            if (pathToCurrentJarDir != null) {
+                if (logger.isDebugEnabled())
+                    logger.debug("Found current JAR directory: " + pathToCurrentJarDir);
+                jarpath.append(pathToCurrentJarDir).append(PATH_SEPARATOR);
+            }
         }
 
         for (StringTokenizer tokenizer = new StringTokenizer(jarpath.toString(), PATH_SEPARATOR); tokenizer.hasMoreElements();) {

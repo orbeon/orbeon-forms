@@ -51,7 +51,7 @@ public class OXFPortlet extends GenericPortlet {
 
         // Try to obtain a local processor definition
         ProcessorDefinition mainProcessorDefinition
-                = InitUtils.getDefinitionFromMap(new PortletInitMap(), ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
+                = InitUtils.getDefinitionFromMap(new PortletInitMap( this ), ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
                         ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
         // Try to obtain a processor definition from the properties
         if (mainProcessorDefinition == null)
@@ -176,14 +176,14 @@ public class OXFPortlet extends GenericPortlet {
      * Present a read-only view of the Portlet initialization parameters as a Map.
      */
     public class PortletInitMap extends AttributesToMap {
-        public PortletInitMap() {
+        public PortletInitMap( final OXFPortlet prtlt ) {
             super(new Attributeable() {
                 public Object getAttribute(String s) {
-                    return OXFPortlet.this.getInitParameter(s);
+                    return prtlt.getInitParameter(s);
                 }
 
                 public Enumeration getAttributeNames() {
-                    return OXFPortlet.this.getInitParameterNames();
+                    return prtlt.getInitParameterNames();
                 }
 
                 public void removeAttribute(String s) {

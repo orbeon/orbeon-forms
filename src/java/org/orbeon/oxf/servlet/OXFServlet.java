@@ -65,7 +65,7 @@ public class OXFServlet extends HttpServlet {
 
             // Try to obtain a local processor definition
             ProcessorDefinition mainProcessorDefinition
-                = InitUtils.getDefinitionFromMap(new ServletInitMap(), ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
+                = InitUtils.getDefinitionFromMap(new ServletInitMap( this ), ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
                         ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
             // Try to obtain a processor definition from the properties
             if (mainProcessorDefinition == null)
@@ -110,14 +110,14 @@ public class OXFServlet extends HttpServlet {
      * Present a read-only view of the Servlet initialization parameters as a Map.
      */
     public class ServletInitMap extends AttributesToMap {
-        public ServletInitMap() {
+        public ServletInitMap( final OXFServlet srvlt ) {
             super(new AttributesToMap.Attributeable() {
                 public Object getAttribute(String s) {
-                    return OXFServlet.this.getInitParameter(s);
+                    return srvlt.getInitParameter(s);
                 }
 
                 public Enumeration getAttributeNames() {
-                    return OXFServlet.this.getInitParameterNames();
+                    return srvlt.getInitParameterNames();
                 }
 
                 public void removeAttribute(String s) {

@@ -16,12 +16,12 @@
     Please contact Orbeon at info@orbeon.com for more information.
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-	<header>
-		<title>Changes</title>
-	</header>
-	<body>
+    <header>
+        <title>Changes</title>
+    </header>
+    <body>
         <section>
-			<title>New in Version 2.6</title>
+            <title>New in Version 2.6</title>
             <section>
                 <a name="2.6-xforms"/>
                 <title>XForms</title>
@@ -123,7 +123,7 @@
             </section>
             <a name="2.6-url"/>
             <section>
-				<title>URL Generator</title>
+                <title>URL Generator</title>
                 <section>
                     <title>Binary Mode</title>
                     <p>
@@ -154,11 +154,11 @@
                         <li>content types ending with <code>+xml</code> such as <code>image/svg+xml</code></li>
                     </ul>
                 </section>
-			</section>
+            </section>
             <a name="2.6-serializer"/>
             <section>
-				<title>Serializers</title>
-				<section>
+                <title>Serializers</title>
+                <section>
                     <title>New Serializer Architecture</title>
                     <p>
                         The pre-2.6 serializer architecture did not clearly separate the following
@@ -210,7 +210,7 @@
                         serializer</a> is now documented.
                     </p>
                 </section>
-			</section>
+            </section>
             <a name="2.6-examples"/>
             <section>
                 <title>Examples</title>
@@ -330,18 +330,18 @@
             </section>
         </section>
         <section>
-			<title>Version 2.5</title>
-			<p>
+            <title>Version 2.5</title>
+            <p>
                 Changes in version 2.5 are listed in a <a href="home-changes-25">separate
                 document</a>.
             </p>
-		</section>
+        </section>
         <section>
-			<title>Version 2.2 and Earlier</title>
-			<p>
+            <title>Version 2.2 and Earlier</title>
+            <p>
                 Changes in version 2.2 and earlier are listed in a <a
                 href="home-changes-older">separate document</a>.
             </p>
-		</section>
-	</body>
+        </section>
+    </body>
 </document>

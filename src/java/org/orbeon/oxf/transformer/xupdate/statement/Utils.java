@@ -42,7 +42,8 @@ public class Utils {
      */
     public static void insert(LocationData locationData, Node parent, int position, Object toInsert) {
         List nodesToInsert = xpathObjectToDOM4JList(locationData, toInsert);
-        Collections.reverse(nodesToInsert);
+        if (parent instanceof Element)
+            Collections.reverse(nodesToInsert);
         for (Iterator j = nodesToInsert.iterator(); j.hasNext();) {
             Object object = j.next();
             Node node = object instanceof String || object instanceof Number

@@ -1459,6 +1459,26 @@
         </output>
     </test>
 
+    <test description="XUpdate: order of insertion for attribute" name="oxf:xupdate">
+        <input name="data">
+            <root/>
+        </input>
+        <input name="config">
+            <xu:modifications>
+                <xu:append select="/root">
+                    <xu:attribute name="attribute">
+                        <xu:value-of select="'a'"/>
+                        <xu:value-of select="'b'"/>
+                        <xu:value-of select="'c'"/>
+                    </xu:attribute>
+                </xu:append>
+            </xu:modifications>
+        </input>
+        <output name="data">
+            <root attribute="abc"/>
+        </output>
+    </test>
+
     <test description="XQuery: a little bit of everything" name="oxf:xquery">
         <input name="data">
             <company>

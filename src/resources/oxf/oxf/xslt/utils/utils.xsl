@@ -63,7 +63,7 @@
         <xsl:variable name="result">
             <url>
                 <xsl:text>?</xsl:text>
-                <xsl:for-each select="parameters/parameter">
+                <xsl:for-each select="$parameters/parameter">
                     <xsl:value-of select="net:encode-url(name)"/>
                     <xsl:text>=</xsl:text>
                     <xsl:value-of select="net:encode-url(value)"/>

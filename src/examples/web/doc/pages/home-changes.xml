@@ -95,15 +95,15 @@
                         this capability.
                     </p>
                 </section>
-			</section>
-            <section>
-				<title>New HTTP Serializer Configuration Parameters</title>
-				<p>
-                    The <code>omit-xml-declaration</code>, <code>standalone</code> and
-                    <code>cache-control/use-local-cache</code> configuration parameters of the <a
-                    href="processors-serializers#http-configuration">HTTP serializer</a> are now
-                    documented.
-                </p>
+                <section>
+                    <title>New Configuration Parameters</title>
+                    <p>
+                        The <code>omit-xml-declaration</code>, <code>standalone</code> and
+                        <code>cache-control/use-local-cache</code> configuration parameters of the
+                        <a href="processors-serializers#http-configuration">HTTP serializers</a>
+                        are now documented.
+                    </p>
+                </section>
 			</section>
             <section>
                 <title>WebDAV Resource Manager</title>

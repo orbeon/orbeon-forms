@@ -17,7 +17,7 @@
             xmlns:f="http://orbeon.org/oxf/xml/formatting"
             xmlns:xhtml="http://www.w3.org/1999/xhtml"
             xsl:version="2.0">
-    <xhtml:head><xhtml:title>XPL Sandbox</xhtml:title></xhtml:head>
+    <xhtml:head><xhtml:title>XSLT Sandbox</xhtml:title></xhtml:head>
     <xhtml:body>
         <xforms:group ref="/form">
             <table class="gridtable">

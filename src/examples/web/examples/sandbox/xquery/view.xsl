@@ -18,7 +18,7 @@
 
     <xsl:template match="/">
         <xhtml:html>
-            <xhtml:head><xhtml:title><xsl:value-of select="/root/document/title"/></xhtml:title></xhtml:head>
+            <xhtml:head><xhtml:title>XQuery Sandbox</xhtml:title></xhtml:head>
             <xhtml:body>
                 <xforms:group ref="form">
                     <table class="gridtable">

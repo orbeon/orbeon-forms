@@ -846,4 +846,74 @@
             </instance>
         </output>
     </test>
+
+    <test description="Nested binds" name="oxf:pipeline">
+        <input name="config" href="oxf:/unit-tests/xforms-instance-recreate.xpl"/>
+        <input name="model">
+            <xforms:model id="form">
+                <xforms:instance>
+                    <instance>
+                        <a>
+                            <b/>
+                        </a>
+                        <b>
+                            <c>
+                                <d/>
+                                <e/>
+                            </c>
+                            <c>
+                                <d/>
+                                <e/>
+                            </c>
+                        </b>
+                        <c>
+                            <d>1</d>
+                            <d>2</d>
+                            <d>3</d>
+                        </c>
+                    </instance>
+                </xforms:instance>
+
+                <xforms:bind nodeset="/instance">
+                    <xforms:bind nodeset="a">
+                        <xforms:bind nodeset="b" calculate="'1'"/>
+                    </xforms:bind>
+                    <xforms:bind nodeset="b/c">
+                        <xforms:bind nodeset="d" calculate="'2'"/>
+                        <xforms:bind nodeset="e" calculate="'3'"/>
+                    </xforms:bind>
+                    <xforms:bind nodeset="c/d" type="xs:int"/>
+                </xforms:bind>
+
+            </xforms:model>
+        </input>
+        <input name="view">
+            <xforms:group ref="/instance">
+            </xforms:group>
+        </input>
+        <output name="instance">
+            <instance>
+                <a>
+                    <b>1</b>
+                </a>
+                <b>
+                    <c>
+                        <d>2</d>
+                        <e>3</e>
+                    </c>
+                    <c>
+                        <d>2</d>
+                        <e>3</e>
+                    </c>
+                </b>
+                <c>
+                    <d xxforms:valid="true">1</d>
+                    <d xxforms:valid="true">2</d>
+                    <d xxforms:valid="true">3</d>
+                </c>
+            </instance>
+        </output>
+    </test>
+
+
 </group>

@@ -15,8 +15,12 @@ package org.orbeon.oxf.processor.xforms;
 
 import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.dom4j.Node;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Iterator;
 
 public class ModelBind {
 
@@ -31,6 +35,8 @@ public class ModelBind {
     private NamespaceContext namespaceContext;
     private Map namespaceMap;
     private LocationData locationData;
+    private List children = new ArrayList();
+    private Node currentNode;
 
     public ModelBind(String id, String nodeset, String relevant, String calculate, String type, String constraint,
                      String required, String readonly,
@@ -85,5 +91,25 @@ public class ModelBind {
 
     public LocationData getLocationData() {
         return locationData;
+    }
+
+    public void addChild(ModelBind bind) {
+        children.add(bind);
+    }
+
+    public Iterator getChildrenIterator() {
+        return children.iterator();
+    }
+
+    public Node getCurrentNode() {
+        return currentNode;
+    }
+
+    public void setCurrentNode(Node currentNode) {
+        this.currentNode = currentNode;
+    }
+
+    public String toString() {
+        return "ModelBind: id="+getId() + " nodeset="+getNodeset();
     }
 }

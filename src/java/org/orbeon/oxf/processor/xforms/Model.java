@@ -73,6 +73,7 @@ public class Model {
             private int level = 0;
             private NamespaceSupport namespaceSupport = new NamespaceSupport();
             Locator locator;
+            Stack bindStack = new Stack();
 
             public void startElement(String uri, String localname, String qName, Attributes attributes) {
                 try {
@@ -85,19 +86,25 @@ public class Model {
                         schema = attributes.getValue("schema");
                         if (schema != null)
                             schema = URLFactory.createURL(locator.getSystemId(), schema).toString();
-                    } else if (level == 2 && Constants.XFORMS_NAMESPACE_URI.equals(uri)) {
+                    } else if (level >= 2 && Constants.XFORMS_NAMESPACE_URI.equals(uri)) {
                         if ("bind".equals(localname)) {
                             Map namespaces = new HashMap();
                             for (Enumeration i = namespaceSupport.getPrefixes(); i.hasMoreElements();) {
                                 String prefix = (String) i.nextElement();
                                 namespaces.put(prefix, namespaceSupport.getURI(prefix));
                             }
-                            binds.add(new ModelBind(attributes.getValue("id"), attributes.getValue("nodeset"),
+                            ModelBind bind = new ModelBind(attributes.getValue("id"), attributes.getValue("nodeset"),
                                     attributes.getValue("relevant"),
                                     attributes.getValue("calculate"), attributes.getValue("type"),
                                     attributes.getValue("constraint"), attributes.getValue("required"),
                                     attributes.getValue("readonly"),
-                                    namespaces, new LocationData(locator)));
+                                    namespaces, new LocationData(locator));
+                            if(!bindStack.empty())
+                                ((ModelBind)bindStack.peek()).addChild(bind);
+                            else
+                                binds.add(bind);
+
+                            bindStack.push(bind);
                         } else if ("submission".equals(localname)) {
                             method = attributes.getValue("method");
                             action = attributes.getValue("action");
@@ -111,6 +118,8 @@ public class Model {
 
             public void endElement(String uri, String localname, String qName) {
                 level--;
+                if("bind".equals(localname))
+                    bindStack.pop();
             }
 
             public void startPrefixMapping(String prefix, String uri) {
@@ -137,16 +146,27 @@ public class Model {
 
     public void applyInputOutputBinds(Document instance) {
         for (Iterator i = binds.iterator(); i.hasNext();) {
-            final ModelBind modelBind = (ModelBind) i.next();
-
+            ModelBind modelBind = (ModelBind) i.next();
             try {
                 // Create XPath evaluator for this bind
                 final DocumentWrapper documentWrapper = new DocumentWrapper(instance, null);
+                applyInputOutputBinds(documentWrapper, modelBind);
 
-                // Handle relevant
-                if (modelBind.getRelevant() !=  null) {
-                    iterateNodeSet(documentWrapper, modelBind, new NodeHandler() {
-                        public void handleNode(Node node) {
+            } catch (Exception e) {
+                throw new ValidationException(e, modelBind.getLocationData());
+            }
+        }
+
+        reconciliate(instance.getRootElement());
+    }
+
+    // Worker
+    private void applyInputOutputBinds(final DocumentWrapper documentWrapper, final ModelBind modelBind)
+            throws XPathException {
+        // Handle relevant
+        if (modelBind.getRelevant() !=  null) {
+            iterateNodeSet(documentWrapper, modelBind, new NodeHandler() {
+                public void handleNode(Node node) {
                             // Evaluate "relevant" XPath expression on this node
                             String xpath = "boolean(" + modelBind.getRelevant() + ")";
                             PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
@@ -257,7 +277,7 @@ public class Model {
                                 if (XFormsUtils.getInstanceData(node).getRequired().get() || nodeStringValue.length() != 0) {
                                     try {
                                         StringValue stringValue = new StringValue(nodeStringValue);
-                                        XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration()); 
+                                        XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration());
                                         stringValue.convert(requiredType, xpContext);
                                         markValidity(true, node, modelBind.getId());
                                     } catch (XPathException e) {
@@ -265,7 +285,7 @@ public class Model {
                                     }
                                 }
                             }
-                        }   
+                        }
                     });
                 }
 
@@ -289,7 +309,7 @@ public class Model {
                                         expr.returnToPool();
                                 }
                             }
-                        }   
+                        }
                     });
                 }
 
@@ -344,14 +364,33 @@ public class Model {
                         }
                     });
                 }
-            } catch (Exception e) {
-                throw new ValidationException(e, modelBind.getLocationData());
+
+        // Handle children binds
+        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                modelBind.getCurrentNode() == null ? documentWrapper : documentWrapper.wrap(modelBind.getCurrentNode()),
+                modelBind.getNodeset(),
+                modelBind.getNamespaceMap(),
+                null, xformsFunctionLibrary);
+        try {
+            List  nodeset = expr.evaluate();
+            for (Iterator j = nodeset.iterator(); j.hasNext();) {
+                Node node = (Node) j.next();
+                for(Iterator childIterator = modelBind.getChildrenIterator(); childIterator.hasNext();) {
+                    ModelBind child = (ModelBind)childIterator.next();
+                    child.setCurrentNode(node);
+                    applyInputOutputBinds(documentWrapper, child);
+                }
             }
+        } catch (XPathException e) {
+            throw new ValidationException(e.getMessage() + " when evaluating '" + modelBind.getNodeset() + "'", modelBind.getLocationData());
+        } finally {
+            if(expr != null)
+                expr.returnToPool();
         }
 
-        reconciliate(instance.getRootElement());
-    }
 
+
+    }
 
     /**
      * Reconciliate "DOM InstanceData annotations" with "attribute annotations"
@@ -428,7 +467,7 @@ public class Model {
     private void iterateNodeSet(DocumentWrapper documentWrapper,
                                 ModelBind modelBind, NodeHandler nodeHandler) {
         PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                documentWrapper,
+                modelBind.getCurrentNode() == null ? documentWrapper : documentWrapper.wrap(modelBind.getCurrentNode()),
                 modelBind.getNodeset(),
                 modelBind.getNamespaceMap(),
                 null, xformsFunctionLibrary);

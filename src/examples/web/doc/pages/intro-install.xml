@@ -632,6 +632,38 @@
                 
                 <li>Start JBoss by running <code>JBOSS_HOME/bin/run.bat</code> (or
                 <code>run.sh</code> on UNIX).</li>
+                <li>
+                    Optionally, to run the authentication sample:
+                    <ol>
+                        <li>
+                            Open
+                            <code>JBOSS_HOME/server/default/deploy/orbeon.war/WEB-INF/web.xml</code>
+                            and uncomment the <code>security-constraint</code>,
+                           <code>login-config</code> and <code>security-role</code>
+                           declarations at the end of the file.
+                        </li>
+                        <li>
+                            Open <code>JBOSS_HOME/server/default/deploy/orbeon.war/WEB-INF/jboss-web.xml</code>
+                            and uncomment the <code>security-domain</code> element near the end of 
+                            bottom of the file.
+                        </li>
+                        <li>
+                            Open <code>JBOSS_HOME/server/default/conf/login-config.xml</code> and
+                            and the following aplication policy to the list of policies :
+                            <xml-source>
+                                <application-policy name = "orbeon-demo">
+                                   <authentication>
+                                      <login-module code="org.jboss.security.auth.spi.UsersRolesLoginModule"
+                                         flag = "required">
+                                         <module-option name="usersProperties">orbeon-demo-users.properties</module-option>
+                                         <module-option name="rolesProperties">orbeon-demo-roles.properties</module-option>
+                                      </login-module>
+                                   </authentication>
+                                </application-policy>
+                            </xml-source>
+                        </li>
+                    </ol>
+                </li>
             </ol>
         </section>
 <!--        <section>-->

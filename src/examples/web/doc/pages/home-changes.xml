@@ -42,10 +42,10 @@
             <section>
                 <title>SQL Processor</title>
                 <p>
-                    The SQL processor now supports external datasource declarations using the
-                    optional <code>datasource</code> input. Such datasources can directly refer to
-                    connections without using JNDI names mapped by the container. This allows
-                    examples to work out of the box. This is an example of datasource description:
+                    The SQL processor now supports external datasource definitions using the
+                    optional <code>datasource</code> input. Those directly refer to connections
+                    without using JNDI names mapped by the container. This allows examples to work
+                    out of the box. This is an example of datasource definition:
                 </p>
                 <xml-source>
                     <datasource>

@@ -220,10 +220,13 @@ public class SQLProcessor extends ProcessorImpl {
 
             // Check if the data input is connected
             boolean hasDataInput = getConnectedInputs().get(INPUT_DATA) != null;
+            if (!hasDataInput && config.useXPathExpressions)
+                throw new OXFException("The data input must be connected when the configuration uses XPath expressions.");
             if (!hasDataInput || !config.useXPathExpressions) {
-                // Just create an empty document
+                // Just use an empty document
                 data = EMPTY_DOCUMENT;
             } else {
+                // There is a data input connected and there are some XPath epxressions operating on it
                 boolean useXPathContentHandler = false;
                 if (config.xpathExpressions.size() > 0) {
                     // Create XPath content handler

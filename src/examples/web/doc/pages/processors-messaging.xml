@@ -19,7 +19,7 @@
         <title>Messaging</title>
     </header>
     <body>
-        <anchor id="email"/>
+        <anchor id="email-processor"/>
         <section>
             <title>Email Processor</title>
             <p>
@@ -316,6 +316,15 @@
                             <p:input name="image-content" href="#file"/>
                         </p:processor>
                     </xml-source>
+                    <p>
+                        When the content type of the input read is text, the input document is
+                        expected to be in the text format specified by the <a
+                        href="processors-serializers#text-mode">text mode</a> of the HTTP
+                        serializer. When the content type of the input read is binary, the input
+                        document is expected to be in the binary format specified by the <a
+                        href="processors-serializers#binary-mode">binary mode</a> of the HTTP
+                        serializer.
+                    </p>
                 </section>
             </section>
             <section>

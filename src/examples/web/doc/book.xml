@@ -38,6 +38,7 @@
     <menu label="Processor Reference">
         <menu-item label="Generators" href="processors-generators"/>
         <menu-item label="Serializers" href="processors-serializers"/>
+        <menu-item label="Converters" href="processors-converters"/>
         <menu-item label="XSLT and TrAX" href="processors-xslt"/>
         <menu-item label="XUpdate" href="processors-xupdate"/>
         <menu-item label="SQL" href="processors-sql"/>

@@ -25,9 +25,22 @@
             <section>
                 <title>BizDoc Application Changes</title>
                 <p>
-                    The data access layer of the BizDoc application has been refactored to allow for
-                    multiple backends, such as XML databases (currently eXist through the XML:DB
-                    processor) and SQL databases (XML stored as string or native XML format).
+                    The data access layer of the BizDoc application has been refactored to support
+                    the following backends:
+                </p>
+                <ul>
+                    <li>
+                        <b>XML databases:</b> XML documents are accessed through the XML:DB
+                        processors. Currently, the backend assumes the built-in open source eXist
+                        database.
+                    </li>
+                    <li>
+                        <b>SQL databases:</b> XML documents are accessed as a text or native XML
+                        format.
+                    </li>
+                </ul>
+                <p>
+                    It is now possible to visualize each document as XML from the user interface.
                 </p>
             </section>
             <section>
@@ -82,7 +95,27 @@
 				<section>
                     <title>New Serializer Architecture</title>
                     <p>
-                        <!-- TODO -->
+                        The pre-2.6 serializer architecture did not clearly separate the following
+                        concerns:
+                    </p>
+                    <ul>
+                        <li>Conversion of XML documents to a character or byte stream.</li>
+                        <li>
+                            Sending a character or text stream to a particular destination, such as
+                            a web browser through HTTP, or a file on disk.
+                        </li>
+                    </ul>
+                    <p>
+                        The new architecture introduces <a
+                        href="processors-converters">Converters</a> in charge of the first task,
+                        and plain <a href="processors-serializers">Serializers</a> in charge of the
+                        second task. It also standardize the mechanism to encapsulate text documents
+                        and binary documents into XML documents. This mechanism is used by the URL
+                        generator, converters, and serializers.
+                    </p>
+                    <p>
+                        Backward compatibility for existing serializers is kept, but it is
+                        recommended to use the new converters and serializers whenever possible.
                     </p>
                 </section>
                 <section>
@@ -98,10 +131,12 @@
                 <section>
                     <title>New Configuration Parameters</title>
                     <p>
-                        The <code>omit-xml-declaration</code>, <code>standalone</code> and
-                        <code>cache-control/use-local-cache</code> configuration parameters of the
-                        <a href="processors-serializers#http-configuration">HTTP serializers</a>
-                        are now documented.
+                        The <code>omit-xml-declaration</code> and <code>standalone</code>
+                        configuration parameters of the <a
+                        href="processors-converters#xml-converter">XML converter</a> are now
+                        documented. The <code>cache-control/use-local-cache</code> configuration
+                        parameter of the <a href="processors-serializers#http-serializer">HTTP
+                        serializer</a> is now documented.
                     </p>
                 </section>
 			</section>
@@ -125,7 +160,7 @@
             <section>
                 <title>Email Processor</title>
                 <p>
-                    The <a href="processors-messaging#email">Email processor</a> features the
+                    The <a href="processors-messaging#email-processor">Email processor</a> features the
                     following improvements:
                 </p>
                 <ul>
@@ -157,6 +192,13 @@
                     There is a new facility to declare custom processors that does not involve
                     modifying the original <code>processors.xml</code> file.
                     <!-- TODO -->
+                </p>
+                <p>
+                    The <code>Processor</code> API has been enhanced to provide access to the inputs
+                    and outputs actually connected (as opposed to just those that have been
+                    declared). This provides access to optional inputs and outputs. Please refer to
+                    the Javadoc for the <code>Processor</code> class for more information, as well
+                    as the <code>ListInputs</code> unit test.
                 </p>
             </section>
 <!--            <section>-->

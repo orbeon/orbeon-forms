@@ -49,4 +49,21 @@
         </output>
     </test>
 
+    <test description="Text conversion" name="oxf:text-converter">
+        <input name="data">
+            <text>
+                This is just plain text. It will be output without the <em>text</em> and <em>em</em>
+                elements.
+            </text>
+        </input>
+        <input name="config">
+            <config/>
+        </input>
+        <output name="data">
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="text/plain; charset=utf-8">
+                This is just plain text. It will be output without the text and em elements.
+            </document>
+        </output>
+    </test>
+
 </group>

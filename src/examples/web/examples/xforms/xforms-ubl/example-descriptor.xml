@@ -5,8 +5,8 @@
     <source>view.xsl</source>
     <description>
         <p>
-            When the end-user fills the form below, an XML document is created with the form data.
-            In this example, the XML document represents an order, as specified by the <a
+            When the end-user fills the form, an XML document is created with the form data. In
+            this example, the XML document represents an order, as specified by the <a
             href="http://www.oasis-open.org/committees/ubl/">OASIS Universal Business Language</a>
             (UBL) specification. You can view this document by clicking on the "View XForms
             Instance" button below.

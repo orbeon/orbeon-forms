@@ -93,7 +93,7 @@
         <property name="project.name" value="orbeon"/>
 
         <tstamp/>
-        <property name="version.number" value="2.8.0"/>
+        <property name="version.number" value="2.8.1"/>
         <tstamp>
             <format property='time' pattern='yyyyMMddHHmm' timezone='GMT'/>
         </tstamp>

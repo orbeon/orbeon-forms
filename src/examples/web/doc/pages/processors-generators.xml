@@ -531,7 +531,8 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     Base64 is returned as the value of the <code>/request/body</code> element.</li>
 
                     <li>Otherwise, the content of the <code>/request/body</code> is set as either
-                    <code>xs:anyURI</code> if the request body is large, or
+                    <code>xs:anyURI</code> if the request body is large (as set by the
+                    <code>max-upload-memory-size</code> property, by default larger than 10 KB), or
                     <code>xs:base64Binary</code> if the request body is small.</li>
                 </ul>
                 <p>

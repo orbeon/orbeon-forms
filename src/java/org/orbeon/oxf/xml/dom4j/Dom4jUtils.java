@@ -15,6 +15,9 @@ package org.orbeon.oxf.xml.dom4j;
 
 import org.dom4j.Element;
 import org.dom4j.Node;
+import org.dom4j.Attribute;
+import org.dom4j.util.UserDataElement;
+import org.dom4j.util.UserDataAttribute;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.util.Iterator;
@@ -30,7 +33,7 @@ public class Dom4jUtils {
         if (node instanceof Element) {
             Element originalElement = (Element) node;
             Map namespaceContext = XMLUtils.getNamespaceContext(originalElement);
-            Element resultElement = (Element) originalElement.clone();
+            Element resultElement = (Element) cloneNodeWorker(originalElement);
             for (Iterator i = namespaceContext.keySet().iterator(); i.hasNext();) {
                 String prefix = (String) i.next();
                 if (resultElement.getNamespaceForPrefix(prefix) == null)
@@ -38,9 +41,35 @@ public class Dom4jUtils {
             }
             return resultElement;
         } else {
-            return (Node) node.clone();
+            return cloneNodeWorker(node);
         }
     }
 
+    private static Node cloneNodeWorker(Node node) {
+        if (node instanceof UserDataElement) {
+            UserDataElement current = (UserDataElement) node;
+            UserDataElement clone = new UserDataElement(current.getQName());
+            clone.setData(current.getData());
 
+            // Copy attributes
+            for (Iterator i = current.attributes().iterator(); i.hasNext();) {
+                Attribute attribute = (Attribute) i.next();
+                clone.add(cloneNodeWorker(attribute));
+            }
+
+            // Copy content
+            for (Iterator i = current.content().iterator(); i.hasNext();) {
+                Node child = (Node) i.next();
+                clone.add(cloneNodeWorker(child));
+            }
+            return clone;
+        } else if (node instanceof UserDataAttribute) {
+            UserDataAttribute current = (UserDataAttribute) node;
+            UserDataAttribute clone = new UserDataAttribute(current.getQName(), current.getText());
+            clone.setData(current.getData());
+            return clone;
+        } else {
+            return (Node) node.clone();
+        }
+    }
 }

@@ -1425,4 +1425,32 @@
         </output>
     </test>
     
+    <test description="Insert action with validation on attribute" name="oxf:pipeline">
+        <input name="config" href="oxf:/unit-tests/xforms-instance-recreate.xpl"/>
+        <input name="model">
+            <xforms:model id="form">
+                <xforms:instance>
+                    <instance>
+                        <a b="-1"/>
+                    </instance>
+                </xforms:instance>
+                <xforms:bind nodeset="/instance/a/@b" type="xs:positiveInteger" 
+                    xmlns:xs="http://www.w3.org/2001/XMLSchema"/>
+            </xforms:model>
+        </input>
+        <input name="view">
+            <xforms:group ref="/instance">
+                <xforms:submit>
+                    <xforms:insert nodeset="a" at="last()" position="after"/>
+                </xforms:submit>
+            </xforms:group>
+        </input>
+        <output name="instance">
+            <instance>
+                <a b="-1"/>
+                <a b="-1"/>
+            </instance>
+        </output>
+    </test>
+    
 </group>

@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -104,6 +105,6 @@ public class Insert implements Action {
 
         // Actually do the insertion
         atElementSiblings.add(POSITION_BEFORE.equals(position) ? atElementIndex : atElementIndex + 1,
-                elementToDuplicate.clone());
+                Dom4jUtils.cloneNode(elementToDuplicate));
     }
 }

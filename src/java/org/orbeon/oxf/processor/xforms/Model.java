@@ -203,7 +203,7 @@ public class Model {
                                     for (Iterator k = result.iterator(); k.hasNext();) {
                                         Object resultItem = k.next();
                                         if (resultItem instanceof Node) {
-                                            elementNode.add((Node) elementNode.clone());
+                                            elementNode.add(Dom4jUtils.cloneNode(elementNode));
                                         } else if(resultItem instanceof Item) {
                                             elementNode.add(DocumentFactory.getInstance().createText(((Item)resultItem).getStringValue()));
                                         } else {

@@ -49,27 +49,27 @@
                     <tr>
                         <td>message/smtp-host</td>
                         <td>1</td>
-                        <td>The SMTP Host used to send tde message</td>
+                        <td>The SMTP Host used to send the message</td>
                     </tr>
                     <tr>
                         <td>message/from</td>
                         <td>1</td>
-                        <td>Sender of tde message. Contains an <code>email</code> element and an optionnal <code>name</code> element</td>
+                        <td>Sender of the message. Contains an <code>email</code> element and an optional <code>name</code> element</td>
                     </tr>
                     <tr>
                         <td>message/to</td>
                         <td>1..n</td>
-                        <td>Recepient(sP of tde message. Contains an <code>email</code> element and an optionnal <code>name</code> element</td>
+                        <td>Recipient(s) of the message. Contains an <code>email</code> element and an optional <code>name</code> element</td>
                     </tr>
                     <tr>
                         <td>message/subject</td>
                         <td>1</td>
-                        <td>Subject of tde message</td>
+                        <td>Subject of the message</td>
                     </tr>
                     <tr>
                         <td>message/text</td>
                         <td>1</td>
-                        <td>Text body of tde message</td>
+                        <td>Text body of the message</td>
                     </tr>
                     <tr>
                         <td colspan="3"> - or --</td>
@@ -92,7 +92,7 @@
                     <tr>
                         <td>message/body/part/@name</td>
                         <td>1</td>
-                        <td>The name of tdis body part</td>
+                        <td>The name of this body part</td>
                     </tr>
                     <tr>
                         <td>message/body/part@/content-type</td>
@@ -102,7 +102,7 @@
                     <tr>
                         <td>message/body/part/*</td>
                         <td>1</td>
-                        <td>Thr content of tde body part. Use a CDATA section for HTML</td>
+                        <td>Thr content of the body part. Use a CDATA section for HTML</td>
                     </tr>
                 </table>
             </section>

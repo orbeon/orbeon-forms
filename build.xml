@@ -19,6 +19,73 @@
 
     <!-- set global build.root to be dir containing this file. -->
     <dirname property='build.root' file='${ant.file}'/>
+    <property name="lib.dir" location="lib"/>
+
+    <fileset id='war.libs' dir="${lib.dir}">
+        <include name="dom4j-1_4_orbeon.jar"/>
+        <include name="log4j-1.3alpha0.jar"/>
+        <include name="jaxen-1_1-beta-1-dev.jar"/>
+        <include name="saxpath-dev_orbeon.jar"/>
+        <include name="resolver-xerces_2_6_2_orbeon.jar"/>
+        <include name="xalan-2_5_1_orbeon.jar"/>
+        <include name="xsltc-2_5_1_orbeon.jar"/>
+        <include name="commons-collections-2_0.jar"/>
+        <include name="commons-lang-1_0-b1.jar"/>
+        <include name="commons-cli-1_0.jar"/>
+        <include name="commons-fileupload-1.0.jar"/>
+        <include name="commons-beanutils-1_5.jar"/>
+        <include name="commons-pool-1.2.jar"/>
+        <include name="commons-discovery-0_2.jar"/>
+        <include name="axis-1_1-axis.jar"/>
+        <include name="axis-1_1-jaxrpc.jar"/>
+        <include name="axis-1_1-saaj.jar"/>
+        <include name="axis-1_1-wsdl4j.jar"/>
+        <include name="jakarta-oro-2_0_8_orbeon.jar"/>
+        <include name="msv-20031020.jar"/>
+        <include name="isorelax-20031020.jar"/>
+        <include name="xsdlib-20031020.jar"/>
+        <include name="relaxngDatatype-20031020.jar"/>
+        <include name="hsqldb-1_7_2_8_orbeon.jar"/>
+        <include name="jfreechart*"/>
+        <include name="jcommon*"/>
+        <include name="activation-1_0_2.jar"/>
+        <include name="ymsg9-v0_51.jar"/>
+        <include name="jtidy-04aug2000r7.jar"/>
+        <include name="kawa-1_7.jar"/>
+        <include name="mondrian-0_5_orbeon.jar"/>
+        <include name="junit.jar"/>
+        <include name="saxon-6_5_2.jar"/>
+        <include name="saxon-8_1_1_orbeon.jar"/>
+        <include name="joost-20030623_orbeon.jar"/>
+        <include name="batik-all-1_5.jar"/>
+        <include name="avalon*"/>
+        <include name="fop-0_20_5.jar"/>
+        <include name="jakarta-poi*"/>
+        <include name="commons-digester-1_5.jar"/>
+        <include name="metadata-extractor-2_1.jar"/>
+        <include name="jdom-b9.jar"/>
+        <include name="struts-1_1.jar"/>
+        <include name="commons-validator-1_0_2.jar"/>
+        <include name="castor-0_9_4_3-xml.jar"/>
+        <include name="antlr-2_7_4.jar"/>
+        <include name="antlr-2_7_4_orbeon.jar"/>
+        <include name="commons-httpclient-slide_2_0rc1.jar"/>
+        <include name="jakarta-slide-webdavlib-2.0rc1.jar"/>
+        <include name="portlet-api_1.0.jar"/>
+        <include name="exist-1_0b2_build_1107.jar"/>
+        <include name="exist-optional-1_0b2_build_1107.jar"/>
+        <include name="xmldb-exist_1_0b2_build_1107.jar"/>
+        <include name="xmlrpc-1_2_patched_exist_1_0b2_build_1107.jar"/>
+        <include name="jms-api-1_1.jar"/>
+        <include name="mail-1_3_2.jar"/>
+        <include name="itext-1_02b.jar"/>
+        <include name="itext-xml-1_02.jar"/>
+        <include name="xml-apis-xerces_2_6_2_orbeon.jar"/> 
+    </fileset>
+    <fileset id='war.libs.private' dir="${lib.dir}">
+      <include name='xercesImpl_2_6_2_orbeon.jar' />
+      <include name='commons-logging-1_0_4.jar' />
+    </fileset>
 
     <target name="init">
         <property name="project.name" value="orbeon"/>
@@ -38,7 +105,6 @@
         <property name="cli-examples-src.dir" value="${src.dir}/examples/cli"/>
         <property name="resources.dir" value="${src.dir}/resources"/>
         <property name="test-src.dir" value="test/src"/>
-        <property name="lib.dir" value="lib"/>
 
         <property name="build.dir" value="build"/>
         <property name="build.classes.dir" value="${build.dir}/classes"/>
@@ -48,6 +114,7 @@
         <property name="build.temp.dir" value="${build.dir}/temp"/>
         <property name="build.doc.dir" value="${build.dir}/doc"/>
         <property name="jar.file" value="${build.lib.dir}/${project.name}.jar"/>
+        <property name="cli.jar.file" value="${build.lib.dir}/cli-${project.name}.jar"/>
 
         <property name="build.portlet-classes.dir" value="${build.dir}/portlet-classes"/>
 
@@ -127,24 +194,47 @@
 
     <!-- JAR -->
     <target name="jars" depends="classes">
-        <zip zipfile="${jar.file}">
-            <fileset dir="${java-src.dir}">
-                <include name="**/*.xml"/>
-                <include name="**/*.rng"/>
-                <include name="**/*.css"/>
-                <include name="**/*.xsd"/>
-                <exclude name="org/orbeon/faces/**"/>
-            </fileset>
-            <fileset dir="${build.classes.dir}">
-                <include name="**/*.class"/>
-                <exclude name="org/orbeon/faces/**/*.class"/>
-            </fileset>
-            <fileset dir="${resources.dir}/oxf"/>
-            <zipfileset dir="descriptors/jar" prefix="META-INF"/>
-            <zipfileset dir="${java-src.dir}/org/orbeon/oxf/portlet/taglib" prefix="META-INF">
-                <include name="*.tld"/>
-            </zipfileset>
-        </zip>
+      <pathconvert dirsep='/' pathsep=' ' property='jar.mf.cp' refid='war.libs.private' >
+        <map from='${lib.dir}' to='private' />
+      </pathconvert>
+        
+      <jar destfile='${jar.file}' compress='false' >
+          <manifest>
+            <attribute name='Class-Path' value='${jar.mf.cp}' />
+          </manifest>
+          <fileset dir="${java-src.dir}">
+              <include name="**/*.xml"/>
+              <include name="**/*.rng"/>
+              <include name="**/*.css"/>
+              <include name="**/*.xsd"/>
+              <exclude name="org/orbeon/faces/**"/>
+          </fileset>
+          <fileset dir="${build.classes.dir}">
+              <include name="**/*.class"/>
+              <exclude name="org/orbeon/faces/**/*.class"/>
+          </fileset>
+          <fileset dir="${resources.dir}/oxf"/>
+          <zipfileset dir="descriptors/jar" prefix="META-INF" >
+            <exclude name='*.MF' />
+          </zipfileset>
+          <zipfileset dir="${java-src.dir}/org/orbeon/oxf/portlet/taglib" prefix="META-INF">
+              <include name="*.tld"/>
+          </zipfileset>
+        </jar>
+        
+        <tempfile property='cli.manifest' />
+
+        <pathconvert dirsep='/' pathsep=' ' property='cli.jar.mf.cp' refid='war.libs' >
+          <map from='${lib.dir}' to='lib' />
+        </pathconvert>
+
+        <basename file='${jar.file}' property='jar.name' />
+
+        <manifest file='${cli.manifest}' >
+          <attribute name='Main-Class' value='org.orbeon.oxf.main.OXF' />
+          <attribute name='Class-Path' value='lib/${jar.name} commons-cli-1_0.jar ${cli.jar.mf.cp}' />
+        </manifest>
+        <jar destfile='${cli.jar.file}' compress='false' manifest='${cli.manifest}' />
     </target>
 
     <!-- WAR -->
@@ -158,82 +248,23 @@
         <copy todir="${war.dir}/WEB-INF/classes">
             <fileset dir="${web-examples-src.dir}/examples-standalone/struts-view/src/" includes="**/*.properties"/>
         </copy>
+        
         <copy todir="${war.dir}/WEB-INF/lib">
-            <fileset dir="${lib.dir}">
-                <include name="dom4j-1_4_orbeon.jar"/>
-                <include name="log4j-1.3alpha0.jar"/>
-                <include name="jaxen-1_1-beta-1-dev.jar"/>
-                <include name="saxpath-dev_orbeon.jar"/>
-                <include name="resolver-xerces_2_6_2_orbeon.jar"/>
-                <include name="xalan-2_5_1_orbeon.jar"/>
-                <include name="xsltc-2_5_1_orbeon.jar"/>
-                <include name="commons-collections-2_0.jar"/>
-                <include name="commons-lang-1_0-b1.jar"/>
-                <include name="commons-cli-1_0.jar"/>
-                <include name="commons-fileupload-1.0.jar"/>
-                <include name="commons-beanutils-1_5.jar"/>
-                <include name="commons-pool-1.2.jar"/>
-                <include name="commons-discovery-0_2.jar"/>
-                <include name="axis-1_1-axis.jar"/>
-                <include name="axis-1_1-jaxrpc.jar"/>
-                <include name="axis-1_1-saaj.jar"/>
-                <include name="axis-1_1-wsdl4j.jar"/>
-                <include name="jakarta-oro-2_0_8_orbeon.jar"/>
-                <include name="msv-20031020.jar"/>
-                <include name="isorelax-20031020.jar"/>
-                <include name="xsdlib-20031020.jar"/>
-                <include name="relaxngDatatype-20031020.jar"/>
-                <include name="hsqldb-1_7_2_8_orbeon.jar"/>
-                <include name="jfreechart*"/>
-                <include name="jcommon*"/>
-                <include name="activation-1_0_2.jar"/>
-                <include name="ymsg9-v0_51.jar"/>
-                <include name="jtidy-04aug2000r7.jar"/>
-                <include name="kawa-1_7.jar"/>
-                <include name="mondrian-0_5_orbeon.jar"/>
-                <include name="junit.jar"/>
-                <include name="saxon-6_5_2.jar"/>
-                <include name="saxon-8_1_1_orbeon.jar"/>
-                <include name="joost-20030623_orbeon.jar"/>
-                <include name="batik-all-1_5.jar"/>
-                <include name="avalon*"/>
-                <include name="fop-0_20_5.jar"/>
-                <include name="jakarta-poi*"/>
-                <include name="commons-digester-1_5.jar"/>
-                <include name="metadata-extractor-2_1.jar"/>
-                <!--        <include name="tamino-api4j-4_1_4.jar"/>-->
-                <include name="jdom-b9.jar"/>
-                <include name="struts-1_1.jar"/>
-                <include name="commons-validator-1_0_2.jar"/>
-                <include name="castor-0_9_4_3-xml.jar"/>
-                <include name="antlr-2_7_4.jar"/>
-                <include name="antlr-2_7_4_orbeon.jar"/>
-                <include name="commons-httpclient-slide_2_0rc1.jar"/>
-                <include name="jakarta-slide-webdavlib-2.0rc1.jar"/>
-                <include name="portlet-api_1.0.jar"/>
-                <include name="exist-1_0b2_build_1107.jar"/>
-                <include name="exist-optional-1_0b2_build_1107.jar"/>
-                <include name="xmldb-exist_1_0b2_build_1107.jar"/>
-                <include name="xmlrpc-1_2_patched_exist_1_0b2_build_1107.jar"/>
-                <include name="jms-api-1_1.jar"/>
-                <include name="mail-1_3_2.jar"/>
-                <include name="itext-1_02b.jar"/>
-                <include name="itext-xml-1_02.jar"/>
-                <include name="xml-apis-xerces_2_6_2_orbeon.jar"/> 
-            </fileset>
-            <fileset dir="${build.lib.dir}">
-                <exclude name="jsf-*.jar"/>
-            </fileset>
+          <fileset refid='war.libs' />
         </copy>
-        <copy file='${lib.dir}/commons-logging-1_0_4.jar' todir="${war.dir}/WEB-INF/lib/private" />
-        <copy file='${lib.dir}/xercesImpl_2_6_2_orbeon.jar' todir="${war.dir}/WEB-INF/lib/private" />
-        <mkdir dir="${war.dir}/WEB-INF/lib/cli"/>
-        <copy todir="${war.dir}/WEB-INF/lib/cli">
+        
+        <copy file='${jar.file}' todir='${war.dir}/WEB-INF/lib' />
+        
+        <copy todir='${war.dir}/WEB-INF/lib/private' >
+          <fileset refid='war.libs.private' />
+        </copy>
+        
+        <copy todir="${war.dir}/WEB-INF">
             <fileset dir="${lib.dir}">
-                <include name="servlet*"/>
                 <include name="commons-cli-1_0.jar"/>
             </fileset>
         </copy>
+        <copy file='${cli.jar.file}' todir='${war.dir}/WEB-INF' />
     </target>
 
     <target name="war-copy-descriptors" depends="prepare">
@@ -685,7 +716,7 @@
         <unzip src="lib/isorelax-20031020.jar" dest="build/oxfmark/lib"/>
         <unzip src="lib/xsdlib-20031020.jar" dest="build/oxfmark/lib"/>
         <unzip src="lib/relaxngDatatype-20031020.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/servlet-2_3-4_0_4.jar" dest="build/oxfmark/lib"/>
+        <!-- <unzip src="lib/servlet-2_3-4_0_4.jar" dest="build/oxfmark/lib"/> -->
         <unzip src="lib/avalon-framework-cvs-20020315.jar" dest="build/oxfmark/lib"/>
         <unzip src="lib/saxon-6_5_2.jar" dest="build/oxfmark/lib"/>
         <unzip src="lib/saxon-7_9_1_orbeon.jar" dest="build/oxfmark/lib"/>

@@ -464,9 +464,13 @@
         <class name="org.orbeon.oxf.processor.xmldb.XMLDBDeleteProcessor"/>
     </processor>
 
-    <!-- Test processor -->
+    <!-- Test processors -->
     <processor name="oxf:test">
         <class name="org.orbeon.oxf.processor.test.TestProcessor"/>
+    </processor>
+
+    <processor name="oxf:sax-debugger">
+        <class name="org.orbeon.oxf.processor.SAXDebuggerProcessor"/>
     </processor>
 
     <!-- This is kept only for backward compatibility -->

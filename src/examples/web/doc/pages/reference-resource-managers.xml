@@ -316,6 +316,68 @@
                 </xml-source>
             </section>
         </section>
+        <anchor id="webdav"/>
+        <section>
+            <title>WebDAV Resource Manager</title>
+            <p>
+                <table>
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Loading resources from a WebDAV repository</td>
+                    </tr>
+                    <tr>
+                        <th>Factory</th>
+                        <td>
+                            <code>org.orbeon.oxf.resources.WebDAVResourceManagerFactory</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Properties</th>
+                        <td>
+                            <code>oxf.resources.webdav.base</code><br/>
+                            <code>oxf.resources.webdav.username</code><br/>
+                            <code>oxf.resources.webdav.password</code>
+                        </td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                This resource manager is able to load resources form a WebDAV repository through
+                HTTP. Examples of WebDAV repositories include:
+            </p>
+            <ul>
+                <li><a href="http://jakarta.apache.org/slide/">Apache Jakarta Slide</a></li>
+                <li><a href="http://subversion.tigris.org/">Subversion</a></li>
+            </ul>
+            <p>
+                For more information about WebDAV, please consult <a
+                href="http://www.webdav.org/">WebDAV Resources</a>.
+            </p>
+            <section>
+                <title>Example</title>
+                <xml-source>
+                    <context-param>
+                        <param-name>oxf.resources.factory</param-name>
+                        <param-value>org.orbeon.oxf.resources.WebDAVResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.webdav.base</param-name>
+                        <param-value>http://www.somwhere.com/base/</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.webdav.username</param-name>
+                        <param-value>joe</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.webdav.password</param-name>
+                        <param-value>password</param-value>
+                    </context-param>
+                </xml-source>
+            </section>
+            <warning>
+                The WebDAV resource manager is considered experimental.
+            </warning>
+        </section>
         <section>
             <title>Cach&#233; Database Resource Manager</title>
             <p>
@@ -333,9 +395,9 @@
                     <tr>
                         <th>Properties</th>
                         <td>
-                            <code>oxf.resources.cache.url</code>
-                            <code>oxf.resources.cache.username</code>
-                            <code>oxf.resources.cache.password</code>
+                            <code>oxf.resources.cache.url</code><br/>
+                            <code>oxf.resources.cache.username</code><br/>
+                            <code>oxf.resources.cache.password</code><br/>
                         </td>
                     </tr>
                 </table>

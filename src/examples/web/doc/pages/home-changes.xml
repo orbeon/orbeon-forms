@@ -93,6 +93,13 @@
                     documented.
                 </p>
 			</section>
+            <section>
+                <title>WebDAV Resource Manager</title>
+                <p>
+                    A <a href="reference-resource-managers#webdav">WebDAV resource manager</a> is
+                    now included. It supports basic authentication.
+                </p>
+            </section>
         </section>
         <section>
 			<title>New in Version 2.5.4</title>
@@ -1207,18 +1214,6 @@
                 </section>
             </section>
             <!--
-			<section>
-				<title>- - - - - - - - - - - - - - - - - - - - </title>
-			</section>
-            <section>
-                <title>WebDAV Resource Manager</title>
-                <p>
-                    A WebDAV resource manager is now included. It supports basic authentication.
-
-
-                    [TODO: link to doc]
-                </p>
-            </section>
 			<section>
 				<title>SQL Processor</title>
 				<p>

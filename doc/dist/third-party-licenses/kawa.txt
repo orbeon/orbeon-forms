@@ -1,0 +1,75 @@
+License for the Kawa software
+
+The license for Kawa and the packages it depends on is a "modified Gnu Public
+License". You can find it in the file COPYING in the Kawa sources, and also
+quoted here:.
+
+     The Java classes (with related files and documentation) in these packages
+     are copyright (C) 1996, 1997, 1998, 1999 Per Bothner.
+
+     These classes are distributed in the hope that they will be useful, but
+     WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+     General Public License for more details.
+
+     These classes are free software. You can use and re-distribute a class
+     without restriction (in source or binary form) as long as you use a version
+     that has not been modified in any way from a version released by Per
+     Bothner, Red Hat inc, or the Free Software Foundation. You may make and
+     distribute a modified version, provided you follow the terms of the GNU
+     General Public License; either version 2, or (at your option) any later
+     version.
+
+
+The file COPYING also contains a copy of the GNU General Public License
+version 2.
+
+People have asked what the Kawa license means in practice. Informally, you get
+to pick between these choices:
+
+   1. Use Kawa as distributed by Per Bothner, Red Hat Inc, or the Free Software
+      Foundation (or their approved agents), with no modifications. In that
+      case, you can use Kawa for any purpose you like, and distribute your
+      application with any license you like. (This basically gives you the same
+      rights as a typical commercial royalty-free re-distribution license.)
+
+   2. Obey the terms of the standard Gnu Public License. (See
+      http://www.gnu.org/copyleft/gpl.html). Informally, this means that if you
+      distribute any application that is based on Kawa, you must also make
+      available to all your recipients (customers) the source code for your
+      entire application, giving them the modification and re-distribution
+      rights they have under the GPL. In a Java context, I take "entire
+      application" to mean all classes (and native code) that run in the same
+      Java virtual machine, except for the Java runtime system itself (the
+      virtual machine, low-level run-time system, and any classes in a java or
+      javax package).
+
+   3. If you need to make a change to Kawa, you can submit them to Per Bothner,
+      and convince him to include them in future Kawa releases.
+
+   4. You can negotiate some other (commercial) license with Per Bothner.
+
+In general, if the license of Kawa or associated packages causes difficulties,
+let me know.
+
+Kawa uses some math routines from fdlib's libf77, which bear the following
+copyright:
+
+    Copyright 1990, 1991, 1992, 1993 by AT&T Bell Laboratories and Bellcore.
+
+    Permission to use, copy, modify, and distribute this software and its
+    documentation for any purpose and without fee is hereby granted, provided
+    that the above copyright notice appear in all copies and that both that the
+    copyright notice and this permission notice and warranty disclaimer appear
+    in supporting documentation, and that the names of AT&T Bell Laboratories or
+    Bellcore or any of their entities not be used in advertising or publicity
+    pertaining to distribution of the software without specific, written prior
+    permission.
+
+    AT&T and Bellcore disclaim all warranties with regard to this software,
+    including all implied warranties of merchantability and fitness. In no event
+    shall AT&T or Bellcore be liable for any special, indirect or consequential
+    damages or any damages whatsoever resulting from loss of use, data or
+    profits, whether in an action of contract, negligence or other tortious
+    action, arising out of or in connection with the use or performance of this
+    software.

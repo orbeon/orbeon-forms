@@ -203,17 +203,16 @@ In addition, this product includes the following software:
     * SAXPath (http://sourceforge.net/projects/saxpath/)
     * Sun Multi-Schema XML Validator
       (http://wwws.sun.com/software/xml/developers/multischema/)
-    * YMSG9 (http://sourceforge.net/projects/jymsg9/)
 
 This software makes use of a schema for XSLT 2.0 provided under W3C
 Software License. The schema is available at the following location:
 
     jar:orbeon.jar!/org/orbeon/oxf/xml/schemas/xslt-2_0.xsd
 
-Please consult the licenses directory for more information about
-individual licenses.
+Please consult the third-party-licenses directory for more
+information about individual licenses.
 
-Last updated: August 2004
+Last updated: October 2004
 
 Copyright 1999-2004 (C) Orbeon, Inc. All rights reserved.
 

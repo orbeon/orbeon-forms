@@ -469,7 +469,7 @@ public class URLGenerator extends ProcessorImpl {
                         if (handler != null)
                             handler.destroy();
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     // If the file no longer exists, for example, we don't want to throw, just to invalidate
                     // An exception will be thrown if necessary when the document is actually read
                     return null;

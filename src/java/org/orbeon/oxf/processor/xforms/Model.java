@@ -16,21 +16,23 @@ package org.orbeon.oxf.processor.xforms;
 import org.dom4j.*;
 import org.dom4j.util.UserDataDocumentFactory;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.output.BooleanModelItemProperty;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.PooledXPathExpression;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.type.ItemType;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.xpath.StandaloneContext;
 import org.orbeon.saxon.xpath.XPathEvaluator;
 import org.orbeon.saxon.xpath.XPathException;
-import org.orbeon.saxon.expr.XPathContextMajor;
-import org.orbeon.saxon.expr.XPathContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -46,12 +48,17 @@ public class Model {
 
     private static final String DEFAULT_MODEL_ID = "wsrp_rewrite_xforms";
 
+    private PipelineContext pipelineContext;
     private String id;
     private String schema;
     private String method;
     private String action;
     private String encoding;
     private List binds = new ArrayList();
+
+    public Model(PipelineContext pipelineContext) {
+        this.pipelineContext = pipelineContext;
+    }
 
     /**
      * The XForms model must be sent to the returned content handler.
@@ -130,55 +137,73 @@ public class Model {
 
             try {
                 // Create XPath evaluator for this bind
-                DocumentWrapper documentWrapper = new DocumentWrapper(instance, null);
-                final XPathEvaluator xpathEvaluator = new XPathEvaluator(documentWrapper);
-                StandaloneContext context = (StandaloneContext) xpathEvaluator.getStaticContext();
-                for (Iterator j = modelBind.getNamespaceMap().keySet().iterator(); j.hasNext();) {
-                    String prefix = (String) j.next();
-                    context.declareNamespace(prefix, (String) modelBind.getNamespaceMap().get(prefix));
-                }
+                final DocumentWrapper documentWrapper = new DocumentWrapper(instance, null);
 
                 // Handle relevant
                 if (modelBind.getRelevant() !=  null) {
-                    iterateNodeSet(documentWrapper, xpathEvaluator, modelBind, new NodeHandler() {
+                    iterateNodeSet(documentWrapper, modelBind, new NodeHandler() {
                         public void handleNode(Node node) {
                             // Evaluate "relevant" XPath expression on this node
-                            boolean relevant = ((Boolean) XPathUtils.evaluateSingle
-                                    (xpathEvaluator, "boolean(" + modelBind.getRelevant() + ")", 
-                                    modelBind.getLocationData())).booleanValue();
-
-                            // Mark node
-                            InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
-                            instanceData.getRelevant().set(relevant);
+                            String xpath = "boolean(" + modelBind.getRelevant() + ")";
+                            PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                                    documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap());
+                            try {
+                                boolean relevant = ((Boolean)expr.evaluateSingle()).booleanValue();
+                                // Mark node
+                                InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
+                                instanceData.getRelevant().set(relevant);
+                            } catch (XPathException e) {
+                                throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
+                            } finally {
+                                if(expr != null)
+                                    expr.returnToPool();
+                            }
                         }
                     });
                 }
 
                 // Handle calculate
                 if (modelBind.getCalculate() != null) {
-                    iterateNodeSet(documentWrapper, xpathEvaluator, modelBind, new NodeHandler() {
+                    iterateNodeSet(documentWrapper, modelBind, new NodeHandler() {
                     	public void handleNode(Node node) {
                             if (node instanceof Element) {
                                 // Compute calculated value
-                                List result = XPathUtils.evaluate(xpathEvaluator, modelBind.getCalculate(), 
-                                        modelBind.getLocationData());
-
-                                // Place in element
-                                Element elementNode = (Element) node;
-                                elementNode.clearContent();
-                                for (Iterator k = result.iterator(); k.hasNext();) {
-                                    Object resultItem = k.next();
-                                    if (resultItem instanceof Node) {
-                                        elementNode.add(((Node) elementNode.clone()));
-                                    } else {
-                                        elementNode.add(DocumentFactory.getInstance().createText(resultItem.toString()));
+                                PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                                        documentWrapper.wrap(node), modelBind.getCalculate(), modelBind.getNamespaceMap());
+                                try {
+                                    List result = expr.evaluate();
+                                    // Place in element
+                                    Element elementNode = (Element) node;
+                                    elementNode.clearContent();
+                                    for (Iterator k = result.iterator(); k.hasNext();) {
+                                        Object resultItem = k.next();
+                                        if (resultItem instanceof Node) {
+                                            elementNode.add(((Node) elementNode.clone()));
+                                        } else {
+                                            elementNode.add(DocumentFactory.getInstance().createText(resultItem.toString()));
+                                        }
                                     }
+                                } catch (XPathException e) {
+                                    throw new ValidationException(e.getMessage() + " when evaluating '" + modelBind.getCalculate() + "'", modelBind.getLocationData());
+                                } finally {
+                                    if(expr != null)
+                                        expr.returnToPool();
                                 }
 
                             } else {
                                 // Compute calculated value and place in attribute
-                                XFormsUtils.fillNode(node, (String) XPathUtils.evaluateSingle(xpathEvaluator,
-                                        "string(" + modelBind.getCalculate() + ")", modelBind.getLocationData()));
+                                String xpath =  "string(" + modelBind.getCalculate() + ")";
+                                PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                                        documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap());
+                                try {
+                                    String value = ((String)expr.evaluateSingle());
+                                    XFormsUtils.fillNode(node, value);
+                                } catch (XPathException e) {
+                                    throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
+                                } finally {
+                                    if(expr != null)
+                                        expr.returnToPool();
+                                }
                             }
                         }
                     });
@@ -186,7 +211,16 @@ public class Model {
 
                 // Handle type constraint
                 if (modelBind.getType() != null) {
-                    iterateNodeSet(documentWrapper, xpathEvaluator, modelBind, new NodeHandler() {
+
+                    // Need an evaluator to check and convet type below
+                    final XPathEvaluator xpathEvaluator = new XPathEvaluator(documentWrapper);
+                    StandaloneContext context = (StandaloneContext) xpathEvaluator.getStaticContext();
+                    for (Iterator j = modelBind.getNamespaceMap().keySet().iterator(); j.hasNext();) {
+                        String prefix = (String) j.next();
+                        context.declareNamespace(prefix, (String) modelBind.getNamespaceMap().get(prefix));
+                    }
+
+                    iterateNodeSet(documentWrapper, modelBind, new NodeHandler() {
                         public void handleNode(Node node) {
                             if (XFormsUtils.getInstanceData(node).getValid().get()) {
 
@@ -233,13 +267,23 @@ public class Model {
 
                 // Handle XPath constraint
                 if (modelBind.getConstraint() != null) {
-                    iterateNodeSet(documentWrapper, xpathEvaluator, modelBind, new NodeHandler() {
+                    iterateNodeSet(documentWrapper, modelBind, new NodeHandler() {
                         public void handleNode(Node node) {
                             if (XFormsUtils.getInstanceData(node).getValid().get()) {
                                 // Evaluate constraint
-                                Boolean valid = (Boolean) XPathUtils.evaluateSingle(xpathEvaluator, 
-                                        "boolean(" + modelBind.getConstraint() + ")", modelBind.getLocationData());
-                                markValidity(valid.booleanValue(), node, modelBind.getId());
+                                String xpath = "boolean(" + modelBind.getConstraint() + ")";
+                                PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                                        documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap());
+
+                                try {
+                                    Boolean valid = (Boolean)expr.evaluateSingle();
+                                    markValidity(valid.booleanValue(), node, modelBind.getId());
+                                } catch (XPathException e) {
+                                    throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
+                                } finally {
+                                    if(expr != null)
+                                        expr.returnToPool();
+                                }
                             }
                         }   
                     });
@@ -247,35 +291,52 @@ public class Model {
 
                 // Handle required
                 if (modelBind.getRequired() != null) {
-                    iterateNodeSet(documentWrapper, xpathEvaluator, modelBind, new NodeHandler() {
+                    iterateNodeSet(documentWrapper, modelBind, new NodeHandler() {
                         public void handleNode(Node node) {
                             // Evaluate "required" XPath expression on this node
-                            boolean required = ((Boolean) (XPathUtils.evaluateSingle
-                                    (xpathEvaluator, "boolean(" + modelBind.getRequired() + ")", 
-                                            modelBind.getLocationData()))).booleanValue();
+                            String xpath = "boolean(" + modelBind.getRequired() + ")";
+                            PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                                    documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap());
 
-                            // Mark node
-                            InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
-                            instanceData.getRequired().set(required);
+                            try {
+                                boolean required = ((Boolean)expr.evaluateSingle()).booleanValue();
+                                // Mark node
+                                InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
+                                instanceData.getRequired().set(required);
 
-                            // If required, check the string value is not empty
-                            markValidity(!required || node.getStringValue().length() > 0, node, modelBind.getId());
+                                // If required, check the string value is not empty
+                                markValidity(!required || node.getStringValue().length() > 0, node, modelBind.getId());
+                            } catch (XPathException e) {
+                                throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
+                            } finally {
+                                if(expr != null)
+                                    expr.returnToPool();;
+                            }
                         }
                     });
                 }
 
                 // Handle read only
                 if (modelBind.getReadonly() != null) {
-                    iterateNodeSet(documentWrapper, xpathEvaluator, modelBind, new NodeHandler() {
+                    iterateNodeSet(documentWrapper, modelBind, new NodeHandler() {
                         public void handleNode(Node node) {
                             // Evaluate "readonly" XPath expression on this node
-                            boolean readonly = ((Boolean) (XPathUtils.evaluateSingle
-                                    (xpathEvaluator, "boolean(" + modelBind.getReadonly() + ")", 
-                                            modelBind.getLocationData()))).booleanValue();
+                            String xpath = "boolean(" + modelBind.getReadonly() + ")";
+                            PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                                    documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap());
 
-                            // Mark node
-                            InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
-                            instanceData.getReadonly().set(readonly);
+                            try {
+                                boolean readonly = ((Boolean)expr.evaluateSingle()).booleanValue();
+
+                                // Mark node
+                                InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
+                                instanceData.getReadonly().set(readonly);
+                            } catch (XPathException e) {
+                                throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
+                            } finally {
+                                if(expr != null)
+                                    expr.returnToPool();
+                            }
                         }
                     });
                 }
@@ -360,14 +421,26 @@ public class Model {
         }
     }
 
-    private void iterateNodeSet(DocumentWrapper documentWrapper, XPathEvaluator xpathEvaluator,
+    private void iterateNodeSet(DocumentWrapper documentWrapper,
                                 ModelBind modelBind, NodeHandler nodeHandler) {
-        List nodeset = XPathUtils.evaluate(xpathEvaluator, modelBind.getNodeset(), modelBind.getLocationData());
-        for (Iterator j = nodeset.iterator(); j.hasNext();) {
-            Node node = (Node) j.next();
-            xpathEvaluator.setContextNode(documentWrapper.wrap(node));
-            nodeHandler.handleNode(node);
+//        List nodeset = XPathUtils.evaluate(xpathEvaluator, modelBind.getNodeset(), modelBind.getLocationData());
+        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                documentWrapper,
+                modelBind.getNodeset(),
+                modelBind.getNamespaceMap());
+        try {
+            List  nodeset = expr.evaluate();
+            for (Iterator j = nodeset.iterator(); j.hasNext();) {
+                Node node = (Node) j.next();
+                nodeHandler.handleNode(node);
+            }
+        } catch (XPathException e) {
+            throw new ValidationException(e.getMessage() + " when evaluating '" + modelBind.getNodeset() + "'", modelBind.getLocationData());
+        } finally {
+            if(expr != null)
+                expr.returnToPool();
         }
+
     }
     
     private interface NodeHandler {

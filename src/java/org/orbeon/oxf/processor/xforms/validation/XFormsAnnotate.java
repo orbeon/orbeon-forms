@@ -44,7 +44,7 @@ public class XFormsAnnotate extends ProcessorImpl {
                     // Extract info from model
                     final Model model = (Model) readCacheInputAsObject(context,  getInputByName(INPUT_MODEL), new CacheableInputReader(){
                         public Object read(PipelineContext context, ProcessorInput input) {
-                            Model model = new Model();
+                            Model model = new Model(context);
                             readInputAsSAX(context, input, model.getContentHandlerForModel());
                             return model;
                         }

@@ -534,19 +534,4 @@ public class XPathUtils {
         return resultDocument;
     }
 
-    public static List evaluate(XPathEvaluator xpathEvaluator, String xpath, LocationData locationData) {
-        try {
-            return xpathEvaluator.evaluate(xpath);
-        } catch (XPathException e) {
-            throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", locationData);
-        }
-    }
-
-    public static Object evaluateSingle(XPathEvaluator xpathEvaluator, String xpath, LocationData locationData) {
-        try {
-            return xpathEvaluator.evaluateSingle(xpath);
-        } catch (XPathException e) {
-            throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", locationData);
-        }
-    }
 }

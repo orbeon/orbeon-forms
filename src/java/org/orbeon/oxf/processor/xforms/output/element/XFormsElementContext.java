@@ -124,7 +124,7 @@ public class XFormsElementContext {
         if (!(current instanceof List))
             throw new ValidationException("Current context is a node, a nodelist is expected",
                     new LocationData(locator));
-        return (List) nodesetStack.peek();
+        return (List) current;
     }
 
     public Map getCurrentPrefixToURIMap() {

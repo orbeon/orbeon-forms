@@ -23,7 +23,8 @@
     </p:processor>
 
     <p:choose href="aggregate('root', #instance, #balance)">
-        <p:when test="/root/balance >= /root/amount">
+        <p:when test="if(/root/balance castable as xs:int and /root/ammount castable as xs:int) then
+              (xs:int(/root/balance) >= xs:int(/root/amount)) else false()">
             <!-- Use the Scope serializer to store the "balance" document into the session -->
             <p:processor name="oxf:scope-serializer">
                 <p:input name="config">

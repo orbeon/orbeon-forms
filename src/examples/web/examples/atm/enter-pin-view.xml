@@ -17,7 +17,6 @@
             xmlns:xhtml="http://www.w3.org/1999/xhtml"
             xmlns:xforms="http://www.w3.org/2002/xforms"
             xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-    <xsl:message><xsl:copy-of select="/*"/></xsl:message>
     <xhtml:head>
         <xhtml:title>Enter PIN</xhtml:title>
     </xhtml:head>

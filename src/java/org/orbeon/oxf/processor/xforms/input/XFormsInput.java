@@ -70,12 +70,12 @@ public class XFormsInput extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
 
                 // Extract information from XForms model
                 Model model = (Model) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
                     public Object read(PipelineContext context, ProcessorInput input) {
-                        Model model = new Model();
+                        Model model = new Model(pipelineContext);
                         readInputAsSAX(context, input, model.getContentHandlerForModel());
                         return model;
                     }

@@ -325,9 +325,19 @@
     </target>
 
     <target name="test" depends="jars, test-classes, debug-enabled, debug-disabled">
+    	<!-- 11/14/2004 d : Found Processor was sorta invalid cause once it ran successully 
+    	     				it would leave behind .class files in java.io.tmpdir.  This
+    	     				meant that on subsequent runs of the test it wouldn't try to
+    	     				compile anything.  
+    	     				
+    	     				So now we delete,create,and specify a specific dir as the temp
+    	     				dir so that compiles always occur.
+    	 -->
+    	<property name="test.tmp.dir" location="${build.temp.dir}/test" />
+    	<delete dir="${test.tmp.dir}"/>
+    	<mkdir dir="${test.tmp.dir}"/>
         <junit fork="yes" haltonerror="yes" haltonfailure="yes">
 <!--            <test name="org.orbeon.oxf.test.ProcessorTest"/>-->
-
             <batchtest>
                 <fileset dir="${test-src.dir}">
                     <include name="org/orbeon/oxf/test/*Test*.java"/>
@@ -340,6 +350,7 @@
             <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FlatFileResourceManagerFactory"/>
             <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
             <sysproperty key="oxf.test.config" value="unit-tests/tests.xml"/>
+        	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}" />
             <!--            <arg line="-class org.orbeon.oxf.test.ProcessorTest"/>-->
             <classpath>
                 <path refid="class.path"/>
@@ -351,6 +362,17 @@
     </target>
 
     <target name="anthill-release" depends="clean, orbeon-dist, test-classes, debug-enabled, debug-disabled">
+    	<!-- 11/14/2004 d : Found Processor was sorta invalid cause once it ran successully 
+    	     				it would leave behind .class files in java.io.tmpdir.  This
+    	     				meant that on subsequent runs of the test it wouldn't try to
+    	     				compile anything.  
+    	     				
+    	     				So now we delete,create,and specify a specific dir as the temp
+    	     				dir so that compiles always occur.
+    	 -->
+    	<property name="test.tmp.dir" location="${build.temp.dir}/test" />
+    	<delete dir="${test.tmp.dir}"/>
+    	<mkdir dir="${test.tmp.dir}"/>
         <junit fork="yes" haltonerror="yes" haltonfailure="yes">
 <!--            <test name="org.orbeon.oxf.test.ProcessorTest"/>-->
 
@@ -366,6 +388,7 @@
             <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FlatFileResourceManagerFactory"/>
             <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
             <sysproperty key="oxf.test.config" value="unit-tests/tests.xml"/>
+        	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}" />
             <!--            <arg line="-class org.orbeon.oxf.test.ProcessorTest"/>-->
             <classpath>
                 <path refid="class.path"/>

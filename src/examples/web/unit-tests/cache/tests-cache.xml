@@ -664,7 +664,7 @@
                 <!-- Set a request because the Scope processors need an external context -->
                 <set-request href="cache/request1.xml"/>
 
-                <!-- First, store a JavaBean into the application scope -->
+                <!-- First, store a JavaBean into the request scope -->
                 <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="config">
                         <config sourcepath="oxf:/unit-tests/cache" class="StoreBean"/>
@@ -683,7 +683,7 @@
                     <input name="config">
                         <config>
                             <key>house1</key>
-                            <scope>application</scope>
+                            <scope>request</scope>
                         </config>
                     </input>
                 </processor>
@@ -703,7 +703,7 @@
                     </house>
                 </assert>
 
-                <!-- Store again the same JavaBean into the application scope -->
+                <!-- Store again the same JavaBean into the request scope -->
                 <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="config">
                         <config sourcepath="oxf:/unit-tests/cache" class="StoreBean"/>
@@ -720,7 +720,7 @@
                     <input name="config">
                         <config>
                             <key>house1</key>
-                            <scope>application</scope>
+                            <scope>request</scope>
                         </config>
                     </input>
                 </processor>
@@ -738,7 +738,7 @@
                     </house>
                 </assert>
 
-                <!-- Store a different JavaBean into the application scope -->
+                <!-- Store a different JavaBean into the request scope -->
                 <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="config">
                         <config sourcepath="oxf:/unit-tests/cache" class="StoreBean"/>
@@ -755,7 +755,7 @@
                     <input name="config">
                         <config>
                             <key>house1</key>
-                            <scope>application</scope>
+                            <scope>request</scope>
                         </config>
                     </input>
                 </processor>
@@ -775,7 +775,7 @@
                     </house>
                 </assert>
 
-                <!-- Store again the first JavaBean into the application scope -->
+                <!-- Store again the first JavaBean into the request scope -->
                 <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="config">
                         <config sourcepath="oxf:/unit-tests/cache" class="StoreBean"/>
@@ -792,7 +792,7 @@
                     <input name="config">
                         <config>
                             <key>house1</key>
-                            <scope>application</scope>
+                            <scope>request</scope>
                         </config>
                     </input>
                 </processor>
@@ -815,7 +815,7 @@
                     <input name="config">
                         <config>
                             <key>non-existant-bean</key>
-                            <scope>application</scope>
+                            <scope>request</scope>
                         </config>
                     </input>
                 </processor>
@@ -826,7 +826,7 @@
                     <input name="config">
                         <config>
                             <key>house1</key>
-                            <scope>request</scope>
+                            <scope>application</scope>
                         </config>
                     </input>
                 </processor>
@@ -837,7 +837,7 @@
                     <input name="config">
                         <config>
                             <key>house1</key>
-                            <scope>application</scope>
+                            <scope>request</scope>
                         </config>
                     </input>
                 </processor>
@@ -860,7 +860,7 @@
                     <input name="config">
                         <config>
                             <key>house2</key>
-                            <scope>application</scope>
+                            <scope>request</scope>
                         </config>
                     </input>
                 </processor>
@@ -885,7 +885,7 @@
                     <input name="config">
                         <config>
                             <key>house1</key>
-                            <scope>application</scope>
+                            <scope>request</scope>
                         </config>
                     </input>
                 </processor>
@@ -896,7 +896,7 @@
                     <input name="config">
                         <config>
                             <key>house1</key>
-                            <scope>application</scope>
+                            <scope>request</scope>
                         </config>
                     </input>
                     <input name="mapping">
@@ -936,12 +936,341 @@
                     <input name="config">
                         <config>
                             <key>house1</key>
-                            <scope>application</scope>
+                            <scope>request</scope>
                         </config>
                     </input>
                 </processor>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
 
+            </script>
+        </input>
+    </test>
+
+    <test description="Bean Generator" name="oxf:test">
+        <input name="config">
+            <script>
+                <!-- Set a request because the Bean generator needs an external context -->
+                <set-request href="cache/request1.xml"/>
+
+                <!-- First, store a JavaBean into the request scope -->
+                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config sourcepath="oxf:/unit-tests/cache" class="StoreBean"/>
+                    </input>
+                    <input name="bean-config">
+                        <bean-config>
+                            <key>house1</key>
+                            <house-name>House 1</house-name>
+                        </bean-config>
+                    </input>
+                </processor>
+                <run-processor/>
+
+                <!-- Now read the bean -->
+                <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <attribute>house1</attribute>
+                            <source>request</source>
+                        </config>
+                    </input>
+                    <input name="mapping">
+                        <mapping/>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v1"/>
+                <assert output-name="data" condition="cached-value-equal" value="v1"/>
+                <assert output-name="data" condition="output-equals">
+                    <beans>
+                        <house1 stories="3" condo="false">
+                            <address>10 Mountain Side Street</address>
+                            <name>House 1</name>
+                            <windows>
+                                <orientation>East</orientation>
+                            </windows>
+                            <windows>
+                                <orientation>South</orientation>
+                            </windows>
+                        </house1>
+                    </beans>
+                </assert>
+
+                <!-- Store again the same JavaBean into the request scope -->
+                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config sourcepath="oxf:/unit-tests/cache" class="StoreBean"/>
+                    </input>
+                    <input name="bean-config">
+                        <bean-config>
+                            <key>house1</key>
+                            <house-name>House 1</house-name>
+                        </bean-config>
+                    </input>
+                </processor>
+                <run-processor/>
+                <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <attribute>house1</attribute>
+                            <source>request</source>
+                        </config>
+                    </input>
+                    <input name="mapping">
+                        <mapping/>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="cached-value-equal" value="v1"/>
+                <assert output-name="data" condition="output-equals">
+                    <beans>
+                        <house1 stories="3" condo="false">
+                            <address>10 Mountain Side Street</address>
+                            <name>House 1</name>
+                            <windows>
+                                <orientation>East</orientation>
+                            </windows>
+                            <windows>
+                                <orientation>South</orientation>
+                            </windows>
+                        </house1>
+                    </beans>
+                </assert>
+
+                <!-- Store a different JavaBean into the request scope -->
+                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config sourcepath="oxf:/unit-tests/cache" class="StoreBean"/>
+                    </input>
+                    <input name="bean-config">
+                        <bean-config>
+                            <key>house1</key>
+                            <house-name>House I</house-name>
+                        </bean-config>
+                    </input>
+                </processor>
+                <run-processor/>
+                <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <attribute>house1</attribute>
+                            <source>request</source>
+                        </config>
+                    </input>
+                    <input name="mapping">
+                        <mapping/>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v2"/>
+                <assert output-name="data" condition="cached-value-equal" value="v2"/>
+                <assert output-name="data" condition="output-equals">
+                    <beans>
+                        <house1 stories="3" condo="false">
+                            <address>10 Mountain Side Street</address>
+                            <name>House I</name>
+                            <windows>
+                                <orientation>East</orientation>
+                            </windows>
+                            <windows>
+                                <orientation>South</orientation>
+                            </windows>
+                        </house1>
+                    </beans>
+                </assert>
+
+                <!-- Store again the first JavaBean into the request scope -->
+                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config sourcepath="oxf:/unit-tests/cache" class="StoreBean"/>
+                    </input>
+                    <input name="bean-config">
+                        <bean-config>
+                            <key>house1</key>
+                            <house-name>House 1</house-name>
+                        </bean-config>
+                    </input>
+                </processor>
+                <run-processor/>
+                <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <attribute>house1</attribute>
+                            <source>request</source>
+                        </config>
+                    </input>
+                    <input name="mapping">
+                        <mapping/>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="cached-value-equal" value="v1"/>
+                <assert output-name="data" condition="output-equals">
+                    <beans>
+                        <house1 stories="3" condo="false">
+                            <address>10 Mountain Side Street</address>
+                            <name>House 1</name>
+                            <windows>
+                                <orientation>East</orientation>
+                            </windows>
+                            <windows>
+                                <orientation>South</orientation>
+                            </windows>
+                        </house1>
+                    </beans>
+                </assert>
+
+                <!-- Check that other beans don't cache -->
+                <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <attribute>non-existant-bean</attribute>
+                            <source>request</source>
+                        </config>
+                    </input>
+                    <input name="mapping">
+                        <mapping/>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+
+                <!-- Check that other scopes don't cache -->
+<!--                <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">-->
+<!--                    <input name="config">-->
+<!--                        <config>-->
+<!--                            <attribute>house1</attribute>-->
+<!--                            <source>session</source>-->
+<!--                        </config>-->
+<!--                    </input>-->
+<!--                    <input name="mapping">-->
+<!--                        <mapping/>-->
+<!--                    </input>-->
+<!--                </processor>-->
+<!--                <assert output-name="data" condition="output-not-cached"/>-->
+
+                <!-- Check that we still cache our bean in the app context -->
+                <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <attribute>house1</attribute>
+                            <source>request</source>
+                        </config>
+                    </input>
+                    <input name="mapping">
+                        <mapping/>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="cached-value-equal" value="v1"/>
+
+                <!-- Check with different key -->
+                <processor name="oxf:java" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config sourcepath="oxf:/unit-tests/cache" class="StoreBean"/>
+                    </input>
+                    <input name="bean-config">
+                        <bean-config>
+                            <key>house2</key>
+                            <house-name>House 2</house-name>
+                        </bean-config>
+                    </input>
+                </processor>
+                <run-processor/>
+                <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <attribute>house2</attribute>
+                            <source>request</source>
+                        </config>
+                    </input>
+                    <input name="mapping">
+                        <mapping/>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v3"/>
+                <assert output-name="data" condition="cached-value-equal" value="v3"/>
+                <assert output-name="data" condition="output-equals">
+                    <beans>
+                        <house2 stories="3" condo="false">
+                            <address>10 Mountain Side Street</address>
+                            <name>House 2</name>
+                            <windows>
+                                <orientation>East</orientation>
+                            </windows>
+                            <windows>
+                                <orientation>South</orientation>
+                            </windows>
+                        </house2>
+                    </beans>
+                </assert>
+
+                <!-- Check that we still cache our first bean in the app context -->
+                <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <attribute>house1</attribute>
+                            <source>request</source>
+                        </config>
+                    </input>
+                    <input name="mapping">
+                        <mapping/>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="cached-value-equal" value="v1"/>
+
+                <!-- Try mapping -->
+                <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <attribute>house1</attribute>
+                            <source>request</source>
+                        </config>
+                    </input>
+                    <input name="mapping">
+                        <mapping>
+                            <class name="org.orbeon.oxf.test.beans.House">
+                                <map-to xml="XMLHouse"/>
+                                <field name="stories">
+                                    <bind-xml name="stories" node="element"/>
+                                </field>
+                                <field name="address">
+                                    <bind-xml name="xml-address" node="attribute"/>
+                                </field>
+                                <field name="windows"/>
+                            </class>
+                            <class name="org.orbeon.oxf.test.beans.Window">
+                                <map-to xml="XMLWindow"/>
+                                <field name="orientation">
+                                    <bind-xml name="orientation" node="attribute"/>
+                                </field>
+                            </class>
+                        </mapping>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v4"/>
+                <assert output-name="data" condition="cached-value-equal" value="v4"/>
+                <assert output-name="data" condition="output-equals">
+                    <beans>
+                        <house1 xml-address="10 Mountain Side Street">
+                            <stories>3</stories>
+                            <windows orientation="East"/>
+                            <windows orientation="South"/>
+                        </house1>
+                    </beans>
+                </assert>
+
+                <!-- Check that we still cache our first bean in the app context -->
+                <processor name="oxf:bean-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <attribute>house1</attribute>
+                            <source>request</source>
+                        </config>
+                    </input>
+                    <input name="mapping">
+                        <mapping/>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="cached-value-equal" value="v1"/>
             </script>
         </input>
     </test>

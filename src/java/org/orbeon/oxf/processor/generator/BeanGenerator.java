@@ -18,7 +18,6 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Marshaller;
-import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -39,15 +38,18 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * The Bean generator generates an XML document based on:
+ *
+ * o a JavaBean
+ * o a configuration (config and mapping inputs)
+ */
 public class BeanGenerator extends ProcessorImpl {
 
     public static final String BEAN_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/bean";
     public static final String INPUT_MAPPING = "mapping";
 
     private static Logger logger = LoggerFactory.createLogger(BeanGenerator.class);
-
-    private static Long DEFAULT_VALIDITY = new Long(0);
-    private InternalCacheKey DEFAULT_LOCAL_KEY = new InternalCacheKey(this, "constant", "constant");
 
     public BeanGenerator() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, BEAN_CONFIG_NAMESPACE_URI));
@@ -118,7 +120,7 @@ public class BeanGenerator extends ProcessorImpl {
             String rootElementName = "beans";
             contentHandler.startElement("", rootElementName, rootElementName, XMLUtils.EMPTY_ATTRIBUTES);
 
-            // Initialize castor
+            // Initialize Castor
             ParserAdapter adapter = new ParserAdapter(XMLUtils.newSAXParser().getParser());
             adapter.setContentHandler(contentHandler);
             Marshaller marshaller = new Marshaller(adapter);
@@ -158,61 +160,37 @@ public class BeanGenerator extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+        ProcessorOutput output = new ProcessorImpl.DigestTransformerOutputImpl(getClass(), name) {
+            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
                 try {
-                    State state = (State) getState(context);
-                    if (state.beanStore == null)
-                        computeState(context, state);
-
+                    State state = (State) getFilledOutState(pipelineContext);
                     state.beanStore.replay(contentHandler);
                 } catch (SAXException e) {
                     throw new OXFException(e);
                 }
             }
 
-            protected boolean supportsLocalKeyValidity() {
+            protected byte[] computeDigest(PipelineContext pipelineContext, DigestState digestState) {
+                if (digestState.digest == null) {
+                    fillOutState(pipelineContext, digestState);
+                }
+                return digestState.digest;
+            }
+
+            protected boolean fillOutState(PipelineContext pipelineContext, DigestState digestState) {
+                State state = (State) digestState;
+                if (state.beanStore == null) {
+                    state.beanStore = new SAXStore();
+                    XMLUtils.DigestContentHandler dch = new XMLUtils.DigestContentHandler("MD5");
+                    TeeContentHandler tee = new TeeContentHandler(Arrays.asList(new Object[]{state.beanStore, dch}));
+                    readBean(pipelineContext, getConfig(pipelineContext), getMapping(pipelineContext), tee);
+                    state.digest = dch.getResult();
+                }
                 return true;
             }
-
-            protected CacheKey getLocalKey(PipelineContext context) {
-                return DEFAULT_LOCAL_KEY;
-            }
-
-            protected Object getLocalValidity(PipelineContext context) {
-                State state = (State) getState(context);
-                if (state.beanStore == null)
-                    computeState(context, state);
-
-                return state.validity;
-            }
-
-            private void computeState(PipelineContext context, State state) {
-                state.beanStore = new SAXStore();
-                XMLUtils.DigestContentHandler dch = new XMLUtils.DigestContentHandler("MD5");
-                TeeContentHandler tee = new TeeContentHandler(Arrays.asList(new Object[]{state.beanStore, dch}));
-                readBean(context, getConfig(context), getMapping(context), tee);
-                state.digest = dch.getResult();
-
-                // Compute validity if possible
-                OutputCacheKey outputCacheKey = getKeyImpl(context);
-                if (outputCacheKey != null) {
-                    Cache cache = ObjectCache.instance();
-                    DigestValidity digestValidity = (DigestValidity) cache.findValid(context, outputCacheKey, DEFAULT_VALIDITY);
-                    if (digestValidity != null && state.digest.equals(digestValidity.digest)) {
-                        state.validity = digestValidity.lastModified;
-                    } else {
-                        Long currentValidity = new Long(System.currentTimeMillis());
-                        cache.add(context, outputCacheKey, DEFAULT_VALIDITY, new DigestValidity(state.digest, currentValidity));
-                        state.validity = currentValidity;
-                    }
-                }
-            }
-
         };
         addOutput(name, output);
         return output;
-
     }
 
     private Object getBean(String name, Iterator sources, ExternalContext externalContext) {
@@ -277,24 +255,7 @@ public class BeanGenerator extends ProcessorImpl {
         setState(context, new State());
     }
 
-    /**
-     * We store in the state the request document (output of this processor) and
-     * its key. This information is stored to be reused by readImpl() after a
-     * getKeyImpl() in the same pipeline context, or vice versa.
-     */
-    private static class State {
+    private static class State extends DigestState {
         public SAXStore beanStore;
-        public byte[] digest;
-        public Object validity;
-    }
-
-    private static class DigestValidity {
-        public DigestValidity(byte[] digest, Long lastModified) {
-            this.digest = digest;
-            this.lastModified = lastModified;
-        }
-
-        public byte[] digest;
-        public Long lastModified;
     }
 }

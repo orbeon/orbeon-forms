@@ -76,9 +76,15 @@
                             <optional>
                                 <attribute name="content-disposition"/>
                             </optional>
+                            <!-- Allow either an "src" attribute, or body content -->
                             <choice>
-                                <ref name="anyElement"/>
-                                <text/>
+                                <attribute name="src">
+                                    <data type="anyURI"/>
+                                </attribute>
+                                <choice>
+                                    <ref name="anyElement"/>
+                                    <text/><!-- Why do we need this here? -->
+                                </choice>
                             </choice>
                         </element>
                     </oneOrMore>

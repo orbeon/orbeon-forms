@@ -43,6 +43,10 @@ public class ProcessorUtils {
                 || contentType.endsWith(XML_CONTENT_TYPE3_SUFFIX);
     }
 
+    public static boolean isTextContentType(String contentType) {
+        return contentType != null && contentType.startsWith(TEXT_CONTENT_TYPE_PREFIX);
+    }
+
     public static boolean selectBooleanValue(Node node, String expr, boolean defaultValue) {
         String result = XPathUtils.selectStringValueNormalize(node, expr);
         return (result == null) ? defaultValue : "true".equals(result);

@@ -334,10 +334,10 @@ public class URLGenerator extends ProcessorImpl {
                                 // Read resource
                                 if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType)) {
                                     handler.readHTML(output);
-                                } else if (contentType != null && contentType.startsWith(ProcessorUtils.TEXT_CONTENT_TYPE_PREFIX)) {
-                                    handler.readText(output, contentType);
                                 } else if (ProcessorUtils.isXMLContentType(contentType)) {
                                     handler.readXML(output);
+                                } else if (ProcessorUtils.isTextContentType(contentType)) {
+                                    handler.readText(output, contentType);
                                 } else {
                                     handler.readBinary(output, contentType);
                                 }

@@ -13,17 +13,30 @@
  */
 package org.orbeon.oxf.processor;
 
+import org.apache.commons.fileupload.DefaultFileItemFactory;
+import org.apache.commons.fileupload.FileItem;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.generator.RequestGenerator;
+import org.orbeon.oxf.processor.generator.URLGenerator;
+import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.SystemUtils;
+import org.orbeon.oxf.util.Base64;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.ProcessorOutputXMLReader;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
@@ -33,63 +46,110 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.*;
 import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.Iterator;
 import java.util.Properties;
 
+/**
+ * This processor allows sending emails. It supports multipart messages and attachments.
+ *
+ * See also: http://java.sun.com/products/javamail/FAQ.html
+ *
+ * TODO:
+ * o build message with SAX, not DOM, so streaming of input is possible (P2)
+ * o revise support of text/html
+ * o support text/xml
+ */
 public class EmailProcessor extends ProcessorImpl {
 
-    public static final String EMAIL_FORCE_TO = "forceto";
-    public static final String EMAIL_HOST = "host";
+    // Properties for this processor
+    public static final String EMAIL_SMTP_HOST = "smtp-host";
+    public static final String EMAIL_TEST_TO = "test-to";
+    public static final String EMAIL_TEST_SMTP_HOST = "test-smtp-host";
+
+    public static final String EMAIL_FORCE_TO_DEPRECATED = "forceto"; // deprecated
+    public static final String EMAIL_HOST_DEPRECATED = "host"; // deprecated
 
     public static final String EMAIL_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/email";
-    public static final String DEFAULT_MULTIPART = "mixed";
+
+    private static final String DEFAULT_MULTIPART = "mixed";
+    private static final String DEFAULT_TEXT_ENCODING = "iso-8859-1";
 
     public EmailProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA, EMAIL_CONFIG_NAMESPACE_URI));
     }
 
-    public void start(org.orbeon.oxf.pipeline.api.PipelineContext context) {
+    public void start(PipelineContext pipelineContext) {
         try {
-            Document dataDocument = readInputAsDOM4J(context, INPUT_DATA);
+            Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
             Element messageElement = dataDocument.getRootElement();
 
-            // Create message
+            // Set SMTP host
             Properties properties = new Properties();
-            String propHost = getPropertySet().getString(EMAIL_HOST);
-            // SMTP Host from OXFProperties override the local configuration
-            if (propHost != null)
-                properties.setProperty("mail.smtp.host", propHost);
-            else {
+            String testSmtpHostProperty = getPropertySet().getString(EMAIL_TEST_SMTP_HOST);
+
+            if (testSmtpHostProperty != null) {
+                // Test SMTP Host from properties overrides the local configuration
+                properties.setProperty("mail.smtp.host", testSmtpHostProperty);
+            } else {
+                // Try regular config parameter and property
                 String host = messageElement.element("smtp-host").getTextTrim();
-                if (host != null)
+                if (host != null && !host.equals("")) {
+                    // Precedence goes to the local config parameter
                     properties.setProperty("mail.smtp.host", host);
+                } else {
+                    // Otherwise try to use a property
+                    host = getPropertySet().getString(EMAIL_SMTP_HOST);
+                    if (host == null)
+                        host = getPropertySet().getString(EMAIL_HOST_DEPRECATED);
+                    if (host == null)
+                        throw new OXFException("Could not find SMTP host in configuration or in properties");
+                    properties.setProperty("mail.smtp.host", host);
+
+                }
             }
+
+            // Create message
             Session session = Session.getInstance(properties);
             Message message = new MimeMessage(session);
 
-            // Set from/to
+            // Set From
             message.setFrom(createAddress(messageElement.element("from")));
-            for (Iterator i = messageElement.elements("to").iterator(); i.hasNext();) {
-                Element toElement = (Element) i.next();
-                InternetAddress address = createAddress(toElement);
-                String forceToEMail = getPropertySet().getString(EMAIL_FORCE_TO);
-                if (forceToEMail != null)
-                    address.setAddress(forceToEMail);
-                message.addRecipient(Message.RecipientType.TO, address);
+
+            // Set To
+            String testToProperty = getPropertySet().getString(EMAIL_TEST_TO);
+            if (testToProperty == null)
+                testToProperty = getPropertySet().getString(EMAIL_FORCE_TO_DEPRECATED);
+
+            if (testToProperty != null) {
+                // Test To from properties overrides local configuration
+                message.addRecipient(Message.RecipientType.TO, new InternetAddress(testToProperty));
+            } else {
+                // Regular list of To elements
+                for (Iterator i = messageElement.elements("to").iterator(); i.hasNext();) {
+                    Element toElement = (Element) i.next();
+                    InternetAddress address = createAddress(toElement);
+                    message.addRecipient(Message.RecipientType.TO, address);
+                }
             }
 
             // Set subject
             message.setSubject(messageElement.element("subject").getStringValue());
 
+            // Handle body
             Element textElement = messageElement.element("text");
             Element bodyElement = messageElement.element("body");
-            // simple body
-            if (textElement != null)
+
+            if (textElement != null) {
+                // Old deprecated mechanism (simple body)
                 message.setText(textElement.getStringValue());
-            else if (bodyElement != null) {
+            } else if (bodyElement != null) {
                 // MIME parts
                 String multipart = bodyElement.attributeValue("mime-multipart");
                 if (multipart == null)
@@ -97,42 +157,96 @@ public class EmailProcessor extends ProcessorImpl {
                 MimeMultipart mimeMultipart = new MimeMultipart(multipart);
                 for (Iterator i = bodyElement.elementIterator("part"); i.hasNext();) {
                     Element partElement = (Element) i.next();
-                    String name = partElement.attributeValue("name");
-                    String contentType = partElement.attributeValue("content-type");
+                    final String name = partElement.attributeValue("name");
+                    String contentTypeAttribute = partElement.attributeValue("content-type");
+                    final String contentType = NetUtils.getContentTypeContentType(contentTypeAttribute);
+                    final String charset;
+                    {
+                        String c = NetUtils.getContentTypeCharset(contentTypeAttribute);
+                        charset = (c != null) ? c : DEFAULT_TEXT_ENCODING;
+                    }
+                    final String contentTypeWithCharset = contentType + "; charset=" + charset;
+                    final String src = partElement.attributeValue("src");
 
-                    final String content;
-                    if ("text/html".equals(contentType)) {
-                        if (partElement.elements().size() != 1)
-                            throw new ValidationException("<part> must contain one element",
-                                    (LocationData) partElement.getData());
-                        final StringWriter writer;
-                        {
-                            writer = new StringWriter();
-                            TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-                            identity.getTransformer().setOutputProperty(OutputKeys.METHOD, "html");
-                            identity.setResult(new StreamResult(writer));
-                            LocationSAXWriter saxw = new LocationSAXWriter();
-                            saxw.setContentHandler(identity);
-                            Document partDocument = DocumentHelper.createDocument();
-                            partDocument.setRootElement((Element) Dom4jUtils.cloneNode((Element) partElement.elements().get(0)));
-                            saxw.write(partDocument);
-                        }
-                        content = writer.toString();
+                    // Either a String or a FileItem
+                    final Object content;
+                    if (src != null) {
+                        // Content of the part is not inline
+
+                        // Generate a Document from the source
+                        SAXSource source = getSAXSource(EmailProcessor.this, pipelineContext, src, null, contentType);
+                        content = handleStreamedPartContent(pipelineContext, source, contentType, charset);
                     } else {
-                        content = partElement.getStringValue();
+                        // Content of the part is inline
+
+                        // In the cases of text/html and XML, there must be exactly one root element
+                        boolean needsRootElement = "text/html".equals(contentType) || ProcessorUtils.isXMLContentType(contentType);
+                        if (needsRootElement && partElement.elements().size() != 1)
+                            throw new ValidationException("The <part> element must contain exactly one element for text/html and XML",
+                                    (LocationData) partElement.getData());
+
+                        // Create Document and convert it into a String
+                        Element rootElement = (Element)(needsRootElement ? partElement.elements().get(0) : partElement);
+                        Document partDocument = DocumentHelper.createDocument();
+                        partDocument.setRootElement((Element) Dom4jUtils.cloneNode(rootElement));
+                        content = handlePartContent(partDocument, contentType);
                     }
 
                     MimeBodyPart part = new MimeBodyPart();
-                    if (contentType != null && !contentType.startsWith("text/")) {
-                        // This is not text content
-                        byte[] data = XMLUtils.base64StringToByteArray(content);
-                        part.setDataHandler(new DataHandler(new SimpleBinaryDataSource(name, contentType, data)));
-                        mimeMultipart.addBodyPart(part);
+                    if (!ProcessorUtils.isTextContentType(contentType)) {
+                        // This is binary content
+                        if (content instanceof FileItem) {
+                            final FileItem fileItem = (FileItem) content;
+                            part.setDataHandler(new DataHandler(new DataSource() {
+                                public String getContentType() {
+                                    return contentType;
+                                }
+
+                                public InputStream getInputStream() throws IOException {
+                                    return fileItem.getInputStream();
+                                }
+
+                                public String getName() {
+                                    return name;
+                                }
+
+                                public OutputStream getOutputStream() throws IOException {
+                                    throw new IOException("Write operation not supported");
+                                }
+                            }));
+                        } else {
+                            byte[] data = XMLUtils.base64StringToByteArray((String) content);
+                            part.setDataHandler(new DataHandler(new SimpleBinaryDataSource(name, contentType, data)));
+                        }
                     } else {
                         // This is text content
-                        part.setDataHandler(new DataHandler(new SimpleTextDataSource(name, contentType, content)));
-                        mimeMultipart.addBodyPart(part);
+                        if (content instanceof FileItem) {
+                            // The text content was encoded when written to the FileItem
+                            final FileItem fileItem = (FileItem) content;
+                            part.setDataHandler(new DataHandler(new DataSource() {
+                                public String getContentType() {
+                                    // This always contains a charset
+                                    return contentTypeWithCharset;
+                                }
+
+                                public InputStream getInputStream() throws IOException {
+                                    // This is encoded with the appropriate charset (user-defined, or the default)
+                                    return fileItem.getInputStream();
+                                }
+
+                                public String getName() {
+                                    return name;
+                                }
+
+                                public OutputStream getOutputStream() throws IOException {
+                                    throw new IOException("Write operation not supported");
+                                }
+                            }));
+                        } else {
+                            part.setDataHandler(new DataHandler(new SimpleTextDataSource(name, contentTypeWithCharset, (String) content)));
+                        }
                     }
+                    mimeMultipart.addBodyPart(part);
 
                     // Set content-disposition header
                     String contentDisposition = partElement.attributeValue("content-disposition");
@@ -148,13 +262,89 @@ public class EmailProcessor extends ProcessorImpl {
             Transport transport = session.getTransport("smtp");
             Transport.send(message);
             transport.close();
+        } catch (IOException e) {
+            throw new OXFException(e);
         } catch (MessagingException e) {
             throw new OXFException(e);
-        } catch (UnsupportedEncodingException e) {
+        } catch (TransformerException e) {
             throw new OXFException(e);
         } catch (SAXException e) {
             throw new OXFException(e);
         }
+    }
+
+    private String handlePartContent(Document document, String contentType) throws SAXException {
+        if ("text/html".equals(contentType)) {
+            // Convert XHTML into an HTML String
+            StringWriter writer = new StringWriter();
+            TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+            identity.getTransformer().setOutputProperty(OutputKeys.METHOD, "html");
+            identity.setResult(new StreamResult(writer));
+            LocationSAXWriter saxw = new LocationSAXWriter();
+            saxw.setContentHandler(identity);
+            saxw.write(document);
+
+            return writer.toString();
+        } else {
+            // For other types, just return the text nodes
+            return document.getStringValue();
+        }
+    }
+
+    private FileItem handleStreamedPartContent(PipelineContext pipelineContext, SAXSource source, String contentType, String encoding)
+            throws IOException, TransformerException {
+
+        final FileItem fileItem = new DefaultFileItemFactory(RequestGenerator.getMaxMemorySizeProperty(), SystemUtils.getTemporaryDirectory())
+                .createItem("dummy", "dummy", false, null);
+        // Make sure the file is deleted when the context is destroyed
+        pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
+            public void contextDestroyed(boolean success) {
+                fileItem.delete();
+            }
+        });
+        // Write character content to the FileItem instance
+        Writer writer = null;
+        OutputStream os = null;
+
+        final boolean useWriter = ProcessorUtils.isTextContentType(contentType);
+
+        try {
+            os = fileItem.getOutputStream();
+            writer = new BufferedWriter(new OutputStreamWriter(os, encoding));
+            final OutputStream _os = os;
+            final Writer _writer = writer;
+            Transformer identity = TransformerUtils.getIdentityTransformer();
+            identity.transform(source, new SAXResult(new ForwardingContentHandler() {
+                public void characters(char[] chars, int start, int length) {
+                    try {
+                        if (useWriter)
+                            _writer.write(chars, start, length);
+                        else
+                            _os.write(Base64.decode(new String(chars, start, length)));
+
+                    } catch (IOException e) {
+                        throw new OXFException(e);
+                    }
+                }
+            }));
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    throw new OXFException(e);
+                }
+            }
+            if (os != null) {
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    throw new OXFException(e);
+                }
+            }
+        }
+
+        return fileItem;
     }
 
     private InternetAddress createAddress(Element addressElement) throws AddressException, UnsupportedEncodingException {
@@ -217,6 +407,44 @@ public class EmailProcessor extends ProcessorImpl {
 
         public OutputStream getOutputStream() throws IOException {
             throw new IOException("Write operation not supported");
+        }
+    }
+
+    private SAXSource getSAXSource(Processor processor, PipelineContext pipelineContext, String href, String base, String contentType) {
+        try {
+            // There are two cases:
+            // 1. We read the source as SAX
+            //    o This is required when reading from a processor input; in this case, we behave like
+            //      the inline case
+            //    o When reading from another type of URI, the resource could be in theory any type
+            //      of file.
+            // 2. We don't read the source as SAX
+            //    o It is particularly useful to support this when resources are to be used as binary
+            //      attachments such as images.
+            //    o Here, we consider that the source can be XML, text/html, text/plain,
+            //      or binary. We do not handle reading Base64-encoded files. We leverage the URL
+            //      generator to obtain the content in XML format.
+            XMLReader xmlReader;
+            {
+                String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
+                if (inputName != null) {
+                    // Resolve to input of current processor
+                    xmlReader = new ProcessorOutputXMLReader(pipelineContext, processor.getInputByName(inputName).getOutput());
+                } else {
+                    // Resolve to regular URI
+                    Processor urlGenerator = (contentType == null)
+                            ? new URLGenerator(URLFactory.createURL(base, href))
+                            : new URLGenerator(URLFactory.createURL(base, href), contentType, true);
+                    xmlReader = new ProcessorOutputXMLReader(pipelineContext, urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA));
+                }
+            }
+
+            // Return SAX Source based on XML Reader
+            SAXSource saxSource = new SAXSource(xmlReader, new InputSource());
+            saxSource.setSystemId(href);
+            return saxSource;
+        } catch (IOException e) {
+            throw new OXFException(e);
         }
     }
 }

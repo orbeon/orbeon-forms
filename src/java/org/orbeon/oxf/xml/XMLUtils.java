@@ -859,7 +859,7 @@ public class XMLUtils {
             os = fileItem.getOutputStream();
             NetUtils.copyStream(inputStream, os);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new OXFException(e);
         } finally {
             if (os != null) {
                 try {

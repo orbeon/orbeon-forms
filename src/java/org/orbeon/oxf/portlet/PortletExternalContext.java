@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
+import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
@@ -489,7 +490,7 @@ public class PortletExternalContext implements ExternalContext {
         }
 
         public void write(RenderResponse response) throws IOException {
-            if (NetUtils.getContentTypeContentType(contentType).startsWith("text/")) {
+            if (ProcessorUtils.isTextContentType(contentType)) {
                 // We are dealing with text content that may need rewriting
                 // CHECK: Is this check on the content-type going to cover the relevant cases?
                 if (stringWriter != null) {

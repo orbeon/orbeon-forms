@@ -22,7 +22,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xu="http://www.xmldb.org/xupdate"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
-    
+
     <test description="saxon-parse" name="oxf:xslt">
         <input name="config">
             <xsl:stylesheet xmlns:saxon="http://saxon.sf.net/" version="2.0">
@@ -656,8 +656,8 @@
     <test description="URL Generator (oxf: protocol): XML document" name="oxf:url-generator">
         <input name="config">
             <config>
-                <url>oxf:/unit-tests/company.xml</url>
-             </config>
+               <url>oxf:/unit-tests/company.xml</url>
+            </config>
         </input>
         <output name="data">
             <company>

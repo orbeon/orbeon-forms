@@ -78,7 +78,7 @@
                 used in a future version of the program.
             </p>
             <p>
-                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
                 input.
             </p>
@@ -115,7 +115,7 @@
                 See <specref ref="infoset-reference"/> for the detailed syntax.
             </p>
             <p>
-                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
                 output.
             </p>
@@ -192,7 +192,7 @@
                 <specref ref="infoset-reference"/> for the detailed syntax.
             </p>
             <p>
-                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
                 input.
             </p>
@@ -228,7 +228,7 @@
                 must raise a static error if a collision is detected.
             </p>
             <p>
-                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
                 output.
             </p>
@@ -293,7 +293,7 @@
                 branches of the <el>p:choose</el> statement.
             </p>
             <p>
-                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset produced by the
                 <el>href</el> attribute.
             </p>
@@ -398,7 +398,7 @@
                 <el>p:for-each</el> element.
             </p>
             <p>
-                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
                 <el>href</el> attribute.
             </p>
@@ -445,7 +445,7 @@
                 <specref ref="for-each-execution"/>.
             </p>
             <p>
-                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
+                The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset produced by the
                 <el>href</el> attribute.
             </p>

@@ -239,6 +239,43 @@
             <x/>
         </output>
     </test>
+    
+    <test description="Element around result of delegation processor" name="oxf:pipeline" only="true">
+        <input name="call">
+            <root>
+                <delegation:execute service="string" operation="indexOf">
+                    <str xsi:type="xs:string">dummy</str>
+                </delegation:execute>
+            </root>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="call" type="input"/>
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:delegation">
+                    <p:input name="interface">
+                        <config>
+                            <service id="string" type="javabean" class="java.lang.String"/>
+                        </config>
+                    </p:input>
+                    <p:input name="call" href="#call"/>
+                    <p:output name="data" id="delegation-out"/>
+                </p:processor>
+                <p:processor name="oxf:xml-converter">
+                    <p:input name="config">
+                        <config>
+                            <omit-xml-declaration>true</omit-xml-declaration>
+                        </config>
+                    </p:input>
+                    <p:input name="data" href="#delegation-out"/>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="application/xml; charset=utf-8">&lt;root&gt; -1 &lt;/root&gt;</document>
+        </output>
+    </test>
 
 <!--    <test description="URL Serializer" name="oxf:pipeline">-->
 <!--        <input name="data">-->

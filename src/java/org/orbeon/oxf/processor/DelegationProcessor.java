@@ -299,6 +299,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                         parameters.replay(parametersWellFormed);
                                         parametersWellFormed.endElement("", "parameters", "parameters");
                                         parametersWellFormed.endDocument();
+                                        parameters = null;
 
                                         // Put parameters in DOM
                                         SAXStoreGenerator saxGenerator = new SAXStoreGenerator(parametersWellFormed);

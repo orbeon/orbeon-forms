@@ -143,7 +143,8 @@
                 <title>Text Mode</title>
                 <p>
                     The text mode is selected when the content type according to the selection
-                    algorithm above starts with <code>text/</code>, for example
+                    algorithm above starts with <code>text/</code> and is different from
+                    <code>text/html</code> or <code>text/xml</code>, for example
                     <code>text/plain</code>. In this mode, the URL generator reads the input as a
                     text file and produces an XML document containing the text read.
                 </p>

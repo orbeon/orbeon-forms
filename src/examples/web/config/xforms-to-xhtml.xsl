@@ -346,6 +346,10 @@
             <!-- Hidden field set by JavaScript when the form is submitted -->
             <xhtml:input type="hidden" id="wsrp_rewrite_action_{$form-id}" name="" value=""/>
             <xhtml:input type="hidden" name="$submitted" value="true"/>
+            <!-- Generate hidden fields for alert, hint, help, and label with a ref -->
+            <xsl:for-each select=".//xforms:alert[@ref] | .//xforms:hint[@ref] | .//xforms:help[@ref] | .//xforms:label[@ref]">
+	        <xhtml:input type="hidden" name="{@xxforms:name}" value="{@xxforms:value}"/>
+            </xsl:for-each>
             <xsl:apply-templates>
                 <xsl:with-param name="show-errors" select="@xxforms:show-errors" tunnel="yes"/>
             </xsl:apply-templates>

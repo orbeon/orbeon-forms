@@ -33,6 +33,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Base class for all HTTP serializers.
+ */
 public abstract class HttpSerializerBase extends CachedSerializer {
 
     protected static final int DEFAULT_STATUS_CODE = ExternalContext.SC_OK;
@@ -186,6 +189,8 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                             config.ignoreDocumentContentType = ProcessorUtils.selectBooleanValue(configElement, "/config/ignore-document-content-type", DEFAULT_IGNORE_DOCUMENT_CONTENT_TYPE);
                             config.encoding = encoding;
                             config.forceEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/force-encoding", DEFAULT_FORCE_ENCODING);
+                            if (config.forceEncoding && (encoding == null || encoding.equals("")))
+                                throw new OXFException("The force-encoding element requires an encoding element.");
                             config.ignoreDocumentEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/ignore-document-encoding", DEFAULT_IGNORE_DOCUMENT_ENCODING);
                             // Headers
                             for(Iterator i = XPathUtils.selectIterator(configElement, "/config/header"); i.hasNext();) {
@@ -218,6 +223,9 @@ public abstract class HttpSerializerBase extends CachedSerializer {
         return config;
     }
 
+    /**
+     * Represent the complete serializer configuration.
+     */
     protected static class Config {
         // HTTP-specific configuration
         int statusCode = DEFAULT_STATUS_CODE;
@@ -249,6 +257,14 @@ public abstract class HttpSerializerBase extends CachedSerializer {
         }
     }
 
+    /**
+     * Implement the content type determination algorithm.
+     *
+     * @param config                current HTTP serializer configuration
+     * @param contentTypeAttribute  content type and encoding from the input XML document, or null
+     * @param defaultContentType    content type to return if none can be found
+     * @return                      content type determined
+     */
     protected static String getContentType(Config config, String contentTypeAttribute, String defaultContentType) {
         if (config.forceContentType)
             return config.contentType;
@@ -264,6 +280,14 @@ public abstract class HttpSerializerBase extends CachedSerializer {
         return defaultContentType;
     }
 
+    /**
+     * Implement the encoding determination algorithm.
+     *
+     * @param config                current HTTP serializer configuration
+     * @param contentTypeAttribute  content type and encoding from the input XML document, or null
+     * @param defaultEncoding       encoding to return if none can be found
+     * @return                      encoding determined
+     */
     protected static String getEncoding(Config config, String contentTypeAttribute, String defaultEncoding) {
         if (config.forceEncoding)
             return config.encoding;

@@ -78,14 +78,23 @@
                 </section>
 			</section>
             <section>
-				<title>HTTP Serializer</title>
-				<p>
-                    A new serializer, the <a href="processors-serializers#http-serializer">HTTP
-                    serializer</a>, supports decoding of binary or text data, and sending the
-                    resulting stream to an HTTP client. The <a
-                    href="/goto-example/xforms-upload">XForms Upload example</a> illustrates this
-                    capability.
-                </p>
+				<title>Serializers</title>
+				<section>
+                    <title>New Serializer Architecture</title>
+                    <p>
+                        <!-- TODO -->
+                    </p>
+                </section>
+                <section>
+                    <title>HTTP Serializer</title>
+                    <p>
+                        A new serializer, the <a href="processors-serializers#http-serializer">HTTP
+                        serializer</a>, supports decoding of binary or text data, and sending the
+                        resulting stream to an HTTP client. The <a
+                        href="/goto-example/xforms-upload">XForms Upload example</a> illustrates
+                        this capability.
+                    </p>
+                </section>
 			</section>
             <section>
 				<title>New HTTP Serializer Configuration Parameters</title>

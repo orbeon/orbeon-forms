@@ -42,7 +42,7 @@
     <root>
         <priority value="info"/>
         <appender-ref ref="ConsoleAppender"/>
-        <!--<appender-ref ref="StudioAppender"/>-->
+        <appender-ref ref="StudioAppender"/>
         <!--<appender-ref ref="FileAppender"/>-->
     </root>
 

@@ -1,0 +1,13 @@
+<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+    <xforms:instance>
+        <form>
+            <action/>
+            <ws-account/>
+            <ws-password/>
+            <user-account/>
+            <user-password/>
+            <friend-account/>
+            <message/>
+        </form>
+    </xforms:instance>
+</xforms:model>

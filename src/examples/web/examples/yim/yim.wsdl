@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<definitions xmlns:tns="http://www.orbeon.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.orbeon.org/" name="YIM Service">
+    <message name="null"/>
+    <message name="message">
+        <part name="login" type="xsd:string"/>
+        <part name="password" type="xsd:string"/>
+        <part name="to" type="xsd:string"/>
+        <part name="body" type="xsd:string"/>
+    </message>
+    <portType name="orbeonPortType">
+        <operation name="sendYIM">
+            <input message="tns:message"/>
+            <output message="tns:null"/>
+        </operation>
+    </portType>
+    <binding name="orbeonBinding" type="tns:orbeonPortType">
+        <soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <operation name="sendYIM">
+            <soap:operation/>
+            <input>
+                <soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:orbeon.com"/>
+            </input>
+            <output>
+                <soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:orbeon.com"/>
+            </output>
+        </operation>
+    </binding>
+    <service name="orbeonService">
+        <port name="orbeonPort" binding="tns:orbeonBinding">
+            <soap:address location="http://www.orbeon.com/oxf/example-resources/yim/im"/>
+        </port>
+    </service>
+</definitions>

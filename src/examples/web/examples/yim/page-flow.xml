@@ -1,0 +1,13 @@
+<config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:xu="http://www.xmldb.org/xupdate">
+
+    <page path-info="/yim" xforms="form.xml" view="view.xsl">
+        <action when="/form/action = 'register'" action="register.xpl"/>
+        <action when="/form/action = 'send'" action="send.xpl"/>
+    </page>
+
+    <page path-info="/example-resources/yim/im" model="yim-webservice.xpl"/>
+
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</config>

@@ -1,0 +1,62 @@
+<example-descriptor>
+    <title>Instant Messaging and WebServices</title>
+    <source>form.xml</source>
+    <source>view.xsl</source>
+    <source>register.xpl</source>
+    <source>send.xpl</source>
+    <description>
+        <p>
+            This page illustrates how the <a href="/doc/processors-messaging#yim">Instant Messenger
+            processor</a> can be used, and shows some capabilities of the <a
+            href="/doc/integration-webservices">Web services support</a> provided by OXF.
+        </p>
+        <h2>How to Use This Page?</h2>
+        <ol>
+            <li>
+                With the regular Yahoo! Messenger client connect yourself using a first Yahoo!
+                account (the <i>user</i> account).
+            </li>
+            <li>
+                Enter the Yahoo! ID and password of a second account on the first line of the form
+                below. Also enter the Yahoo! ID of the user account on the second line and click on
+                the <i>register</i> button.
+            </li>
+            <li>
+                Now, click on the <i>register</i> button you will receive a message on your Yahoo!
+                Messenger client. Try to type some text in the Yahoo! Messenger window and you will
+                receive a response with the top three pages that match your query according to
+                Google.
+            </li>
+        </ol>
+        <p>
+            With the second form at the bottom of this page, you can send a message to an arbitrary
+            user. This will go through a Web service that you can also access using any Web service
+            client that understands the <a href="/im/yim.wsdl">WDSL for this service</a>.
+        </p>
+        <h2>How does it Work?</h2>
+        <ol>
+            <li>
+                When you click on <i>register</i>, <a
+                href="/examples/source?src=im%2Fregister.xpl">register.xpl</a> is executed. It will
+                use the <a href="/doc/processors-messaging#yim">IM processor</a> to send the "OXF
+                Google is ready" message and to trigger the execution of the pipeline created by <a
+                href="/examples/source?src=im%2Fresponse-pipeline.xsl">response-pipeline.xsl</a>
+                when a message is received.
+            </li>
+            <li>
+                When a message is sent, the pipeline created by <a
+                href="/examples/source?src=im%2Fresponse-pipeline.xsl">response-pipeline.xsl</a>
+                calls the <a href="http://www.google.com/apis/">Google Web service</a> with the <a
+                href="/doc/processors-delegation">delegation processor</a> and sends the result to
+                the Yahoo! Messenger client with the <a href="../doc/processors-messaging#yim">IM
+                processor</a>.
+            </li>
+            <li>
+                After you fill the second form at the bottom of the page and hit the <i>send</i>
+                button, <a href="/examples/source?src=im%2Fsend.xpl">send.xpl</a> is executed. This
+                will send a message through the Web service declared in <a
+                href="/examples/source?src=im%2Fyim-webservice.xpl">yim-webservice.xpl</a>.
+            </li>
+        </ol>
+    </description>
+</example-descriptor>

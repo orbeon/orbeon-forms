@@ -17,6 +17,7 @@
             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
             xsl:version="2.0">
+    <xhtml:head><xhtml:title>XForms Upload</xhtml:title></xhtml:head>
     <xhtml:body>
         <xsl:variable name="uploaded" select="/urls/url != ''" as="xs:boolean"/>
         <xf:group ref="form">

@@ -496,7 +496,7 @@
                             <emph>Change of control.</emph> The XPL implementation may give control
                             to an XML processor instance, in association with exactly zero or one
                             connected output. If the XML processor instance has at least one
-                            connected output, the XPL implementation will always give control to the
+                            declared output, the XPL implementation will always give control to the
                             XML processor in association with an output. If the XPL implementation
                             gives control the XML processor instance in association with an output,
                             while in control the XML processor instance must "produce" an XML

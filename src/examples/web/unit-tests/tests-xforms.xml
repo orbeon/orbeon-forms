@@ -1101,5 +1101,29 @@
             </instance>
         </output>
     </test>
-    
+
+<!--    <test description="Linking attribute in XForms model" name="oxf:pipeline" only="true">-->
+<!--        <input name="model">-->
+<!--            <xforms:model xmlns:a="a" xmlns:b="b">-->
+<!--                <xforms:instance src="oxf:/unit-tests/company.xml"/>-->
+<!--            </xforms:model>-->
+<!--        </input>-->
+<!--        <input name="config">-->
+<!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:a="a" xmlns:b="b">-->
+<!--                <p:param type="input" name="model"/>-->
+<!--                <p:param type="output" name="instance"/>-->
+<!--                -->
+<!--                <p:processor name="oxf:xforms-input">-->
+<!--                    <p:input name="model" href="#model"/>-->
+<!--                    <p:input name="request"><request/></p:input>-->
+<!--                    <p:input name="filter"><params/></p:input>-->
+<!--                    <p:input name="matcher-result"><result/></p:input>-->
+<!--                    <p:output name="data" ref="instance"/>-->
+<!--                </p:processor>-->
+<!--                -->
+<!--            </p:config>-->
+<!--        </input>-->
+<!--        <output name="instance" href="company.xml"/>-->
+<!--    </test>-->
+
 </group>

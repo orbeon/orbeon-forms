@@ -111,7 +111,7 @@
 
                 <!-- Merge original text with corrections -->
                 <p:processor name="oxf:xslt">
-                    <p:input name="data" href="aggregate('root', current(), aggregate('correction', #html#xpointer((//p[contains(font, 'Did you mean:')])[1]/a)))"/>
+                    <p:input name="data" href="aggregate('root', current(), aggregate('correction', #html#xpointer((//p[contains(string(font), 'Did you mean:')])[1]/a)))"/>
                     <p:input name="config">
                         <xsl:stylesheet version="2.0">
                             <xsl:template match="/">

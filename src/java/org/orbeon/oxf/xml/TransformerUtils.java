@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ *  Copyright (C) 2004-2005 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -17,6 +17,7 @@ import orbeon.apache.xalan.processor.StylesheetHandler;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXTransformerFactory;
@@ -25,7 +26,11 @@ import javax.xml.transform.sax.TransformerHandler;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
+/**
+ * Utility class for XSLT and identity transformations.
+ */
 public class TransformerUtils {
 
     public static final String DEFAULT_OUTPUT_ENCODING = "utf-8";
@@ -35,12 +40,12 @@ public class TransformerUtils {
     public static final String IDENTITY_TYPE = SAXON_BUILTIN_TRANSFORMER_TYPE;
     public static final String DEFAULT_TYPE = SAXON_BUILTIN_TRANSFORMER_TYPE;
 
-//    private static final String XALAN_INDENT_AMOUNT = "{http://xml.apache.org/xslt}indent-amount";
-//    private static final String XALAN_CONTENT_HANDLER = "{http://xml.apache.org/xslt}content-handler";
+    /**
+     * Property name to use for choosing the amount of indentation.
+     */
+    public static final String INDENT_AMOUNT_PROPERTY = "{http://orbeon.org/oxf/}indent-spaces";
 
-    public static final String SAXON_INDENT_AMOUNT = "{http://saxon.sf.net/}indent-spaces";
-
-    public static final String INDENT_AMOUNT = SAXON_INDENT_AMOUNT;
+    private static final String SAXON_INDENT_AMOUNT_PROPERTY = "{http://saxon.sf.net/}indent-spaces";
 
     private static Map transformerFactories = new HashMap();
 
@@ -148,18 +153,32 @@ public class TransformerUtils {
 
     public static Transformer getXMLIdentityTransformer() {
         try {
-            Transformer transformer = getFactory(IDENTITY_TYPE).newTransformer();
+            Transformer transformer = getIdentityTransformer();
             transformer.setOutputProperty(OutputKeys.ENCODING, DEFAULT_OUTPUT_ENCODING);
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(OutputKeys.VERSION, "1.0");
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(INDENT_AMOUNT, "1");
+            transformer.setOutputProperty(INDENT_AMOUNT_PROPERTY, "1");
             return transformer;
         } catch (Exception e) {
             throw new OXFException(e);
         }
     }
 
+    /**
+     * Apply output properties on a Transformer.
+     *
+     * @param transformer           transformer to apply properties on
+     * @param method                output method
+     * @param version               HTML or XML version
+     * @param publicDoctype         public doctype
+     * @param systemDoctype         system doctype
+     * @param encoding              character encoding
+     * @param omitXMLDeclaration    whether XML declaration must be omitted
+     * @param standalone            wether a standalone declartion must be set and to what value
+     * @param indent                whether the HTML or XML must be indented
+     * @param indentAmount          amount of indenting for the markup
+     */
     public static void applyOutputProperties(Transformer transformer,
                                              String method,
                                              String version,
@@ -182,21 +201,34 @@ public class TransformerUtils {
             transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
         transformer.setOutputProperty(OutputKeys.INDENT, indent ? "yes" : "no");
         if (indent)
-            transformer.setOutputProperty(INDENT_AMOUNT, String.valueOf(indentAmount));
+            transformer.setOutputProperty(INDENT_AMOUNT_PROPERTY, String.valueOf(indentAmount));
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, omitXMLDeclaration ? "yes" : "no");
         if (standalone != null)
             transformer.setOutputProperty(OutputKeys.STANDALONE, standalone.booleanValue() ? "yes" : "no");
     }
 
-
+    /**
+     * Return a new identity transformer object.
+     *
+     * @return  a new identity Transformer object
+     * @throws TransformerConfigurationException
+     */
     public static Transformer getIdentityTransformer() throws TransformerConfigurationException {
         Transformer transformer = getFactory(IDENTITY_TYPE).newTransformer();
-        return transformer;
+        // Wrap Transformer for properties
+        return new TransformerWrapper(transformer, INDENT_AMOUNT_PROPERTY, SAXON_INDENT_AMOUNT_PROPERTY);
     }
 
+    /**
+     * Return a new identity TransformerHandler object.
+     *
+     * @return  a new identity TransformerHandler object
+     */
     public static TransformerHandler getIdentityTransformerHandler() {
         try {
-            return getFactory(IDENTITY_TYPE).newTransformerHandler();
+            TransformerHandler transformerHandler = getFactory(IDENTITY_TYPE).newTransformerHandler();
+            // Wrap TransformerHandler for properties
+            return new TransformerHandlerWrapper(transformerHandler, INDENT_AMOUNT_PROPERTY, SAXON_INDENT_AMOUNT_PROPERTY);
         } catch (TransformerException e) {
             throw new OXFException(e);
         }
@@ -217,5 +249,168 @@ public class TransformerUtils {
         factory.setErrorListener(errorListener);
         factory.setURIResolver(uriResolver);
         return factory.newTemplates(source);
+    }
+
+    public static Transformer testCreateTransformerWrapper(Transformer transformer, String publicProperty, String privateProperty) {
+        return new TransformerWrapper(transformer, publicProperty, privateProperty);
+    }
+
+    public static TransformerHandler testCreateTransformerHandlerWrapper(TransformerHandler transformerHandler, String publicProperty, String privateProperty) {
+        return new TransformerHandlerWrapper(transformerHandler, publicProperty, privateProperty);
+    }
+}
+
+class TransformerWrapper extends Transformer {
+
+    private Transformer transformer;
+    private String publicProperty;
+    private String privateProperty;
+
+    public TransformerWrapper(Transformer transformer, String publicProperty, String privateProperty) {
+        this.transformer = transformer;
+        this.publicProperty = publicProperty;
+        this.privateProperty = privateProperty;
+    }
+
+    public void clearParameters() {
+        transformer.clearParameters();
+    }
+
+    public ErrorListener getErrorListener() {
+        return transformer.getErrorListener();
+    }
+
+    public Properties getOutputProperties() {
+        Properties properties = transformer.getOutputProperties();
+
+        if (properties.get(privateProperty) == null) {
+            // Optimize case where we don't need to map
+            return properties;
+        } else {
+            // Switch property
+            properties.put(publicProperty, properties.get(privateProperty));
+            properties.remove(privateProperty);
+
+            return properties;
+        }
+    }
+
+    public String getOutputProperty(String name) throws IllegalArgumentException {
+        if (publicProperty.equals(name))
+            return transformer.getOutputProperty(privateProperty);
+        else
+            return transformer.getOutputProperty(name);
+    }
+
+    public Object getParameter(String name) {
+        return transformer.getParameter(name);
+    }
+
+    public URIResolver getURIResolver() {
+        return transformer.getURIResolver();
+    }
+
+    public void setErrorListener(ErrorListener listener) throws IllegalArgumentException {
+        transformer.setErrorListener(listener);
+    }
+
+    public void setOutputProperties(Properties oformat) throws IllegalArgumentException {
+
+        if (oformat.get(publicProperty) == null) {
+            // Optimize case where we don't need to map
+            transformer.setOutputProperties(oformat);
+        } else {
+            Properties newProperties = (Properties) oformat.clone();
+
+            newProperties.put(privateProperty, oformat.get(publicProperty));
+            newProperties.remove(publicProperty);
+
+            transformer.setOutputProperties(newProperties);
+        }
+    }
+
+    public void setOutputProperty(String name, String value) throws IllegalArgumentException {
+        if (publicProperty.equals(name))
+            transformer.setOutputProperty(privateProperty, value);
+        else
+            transformer.setOutputProperty(name, value);;
+    }
+
+    public void setParameter(String name, Object value) {
+        transformer.setParameter(name, value);
+    }
+
+    public void setURIResolver(URIResolver resolver) {
+        transformer.setURIResolver(resolver);
+    }
+
+    public void transform(Source xmlSource, Result outputTarget) throws TransformerException {
+        transformer.transform(xmlSource, outputTarget);
+    }
+}
+
+class TransformerHandlerWrapper extends ForwardingContentHandler implements TransformerHandler {
+
+    private TransformerHandler transformerHandler;
+    private String publicProperty;
+    private String privateProperty;
+
+    public TransformerHandlerWrapper(TransformerHandler transformerHandler, String publicProperty, String privateProperty) {
+        super(transformerHandler);
+        this.transformerHandler = transformerHandler;
+        this.publicProperty = publicProperty;
+        this.privateProperty = privateProperty;
+    }
+
+    public String getSystemId() {
+        return transformerHandler.getSystemId();
+    }
+
+    public Transformer getTransformer() {
+        return new TransformerWrapper(transformerHandler.getTransformer(), publicProperty, privateProperty);
+    }
+
+    public void setResult(Result result) throws IllegalArgumentException {
+        transformerHandler.setResult(result);
+    }
+
+    public void setSystemId(String systemID) {
+        transformerHandler.setSystemId(systemID);
+    }
+
+    public void comment(char ch[], int start, int length) throws SAXException {
+        transformerHandler.comment(ch, start, length);
+    }
+
+    public void endCDATA() throws SAXException {
+        transformerHandler.endCDATA();
+    }
+
+    public void endDTD() throws SAXException {
+        transformerHandler.endDTD();
+    }
+
+    public void endEntity(String name) throws SAXException {
+        transformerHandler.endEntity(name);
+    }
+
+    public void startCDATA() throws SAXException {
+        transformerHandler.startCDATA();
+    }
+
+    public void startDTD(String name, String publicId, String systemId) throws SAXException {
+        transformerHandler.startDTD(name, publicId, systemId);
+    }
+
+    public void startEntity(String name) throws SAXException {
+        transformerHandler.startEntity(name);
+    }
+
+    public void notationDecl(String name, String publicId, String systemId) throws SAXException {
+        transformerHandler.notationDecl(name, publicId, systemId);
+    }
+
+    public void unparsedEntityDecl(String name, String publicId, String systemId, String notationName) throws SAXException {
+        transformerHandler.unparsedEntityDecl(name, publicId, systemId, notationName);
     }
 }

@@ -240,7 +240,7 @@
         </output>
     </test>
     
-    <test description="Element around result of delegation processor" name="oxf:pipeline" only="true">
+    <test description="Element around result of delegation processor" name="oxf:pipeline">
         <input name="call">
             <root>
                 <delegation:execute service="string" operation="indexOf">

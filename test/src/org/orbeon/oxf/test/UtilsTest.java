@@ -32,8 +32,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
+import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.InputStream;
@@ -53,6 +52,7 @@ public class UtilsTest extends TestCase {
 
         suite.addTest(new UtilsTest("testNumberUtils"));
         suite.addTest(new UtilsTest("testLocationDocumentSourceResult"));
+        suite.addTest(new UtilsTest("testTransformerWrapper"));
 
         return suite;
     }
@@ -139,4 +139,75 @@ public class UtilsTest extends TestCase {
         }
     }
 
+    public void testTransformerWrapper() {
+
+        final String publicProperty = "[public]";
+        final String privateProperty = "[private]";
+
+        final Properties[] privateOutputProperties = new Properties[] { new Properties() };
+
+        Transformer transformer = TransformerUtils.testCreateTransformerWrapper(new Transformer() {
+
+            public void clearParameters() {
+            }
+
+            public ErrorListener getErrorListener() {
+                return null;
+            }
+
+            public Properties getOutputProperties() {
+                return privateOutputProperties[0];
+            }
+
+            public String getOutputProperty(String name) throws IllegalArgumentException {
+                return (String) privateOutputProperties[0].get(name);
+            }
+
+            public Object getParameter(String name) {
+                return null;
+            }
+
+            public URIResolver getURIResolver() {
+                return null;
+            }
+
+            public void setErrorListener(ErrorListener listener) throws IllegalArgumentException {
+            }
+
+            public void setOutputProperties(Properties oformat) throws IllegalArgumentException {
+                privateOutputProperties[0] = oformat;
+            }
+
+            public void setOutputProperty(String name, String value) throws IllegalArgumentException {
+                privateOutputProperties[0].put(name, value);
+            }
+
+            public void setParameter(String name, Object value) {
+            }
+
+            public void setURIResolver(URIResolver resolver) {
+            }
+
+            public void transform(Source xmlSource, Result outputTarget) {
+            }
+        }, publicProperty, privateProperty);
+
+        // Set individual property
+        transformer.setOutputProperty(publicProperty, "3");
+
+        assertEquals(transformer.getOutputProperty(publicProperty), "3");
+        assertEquals(transformer.getOutputProperties().get(publicProperty), "3");
+
+        assertEquals(transformer.getOutputProperty(publicProperty), privateOutputProperties[0].get(privateProperty));
+
+        // Set all properties
+        Properties p2 = new Properties();
+        p2.put(publicProperty, "2");
+        transformer.setOutputProperties(p2);
+
+        assertEquals(transformer.getOutputProperty(publicProperty), "2");
+        assertEquals(transformer.getOutputProperties().get(publicProperty), "2");
+
+        assertEquals(transformer.getOutputProperty(publicProperty), privateOutputProperties[0].get(privateProperty));
+    }
 }

@@ -154,7 +154,7 @@ public class RequestParameters {
 
                     // Image submit. If .y: ignore. If .x: remove .x at the end of name.
                     if (name.startsWith("$actionImg^")) {
-                        if (name.endsWith(".y")) return;
+                        if (name.endsWith(".y")) continue;
                         name = name.substring(0, name.length() - 2);
                     }
 

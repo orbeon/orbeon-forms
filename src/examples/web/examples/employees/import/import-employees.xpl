@@ -26,7 +26,7 @@
                 <content-type>text/plain</content-type>
             </config>
         </p:input>
-        <p:output name="data" id="file" debug="xxx"/>
+        <p:output name="data" id="file"/>
     </p:processor>
 
     <p:processor name="oxf:java">

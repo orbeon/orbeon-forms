@@ -108,7 +108,9 @@
                 <p>
                     XSLT views in <a href="reference-controller">Page Flow</a> can now access the
                     XForms instance using <code>document('oxf:instance')</code> or
-                    <code>doc('oxf:instance')</code>.
+                    <code>doc('oxf:instance')</code>. In the past, it was often necessary for the
+                    model to aggregate its output with the XForms instance to make both documents
+                    accessible from the view.
                 </p>
             </section>
             <section>
@@ -119,6 +121,12 @@
                     dynamically generated.
                 </p>
             </section>
+<!--            <section>-->
+<!--                <title>J2SE 5.0 Support</title>-->
+<!--                <p>-->
+<!--                    TODO -->
+<!--                </p>-->
+<!--            </section>-->
         </section>
         <section>
 			<title>New in Version 2.5.4</title>

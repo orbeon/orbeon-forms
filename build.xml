@@ -21,7 +21,7 @@
     <dirname property='build.root' file='${ant.file}'/>
     <property name="lib.dir" location="lib"/>
     <property name='forge-ssh-id' value='orbeonbld2@shell.forge.objectweb.org' />
-    <property name='unstbl-bld-dst' value='/var/lib/gforge/nightlybuilds/pres-server/pres-server/' />
+    <property name='unstbl-bld-dst' value='/var/lib/gforge/nightlybuilds/ops/ops/' />
     <property name='local-repos' value=':local:/home/cvs/objectweb-src' />
 
     <fileset id='war.libs' dir="${lib.dir}">

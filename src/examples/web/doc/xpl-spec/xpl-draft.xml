@@ -1943,7 +1943,7 @@ xpointer          ::= "#xpointer(" xpath_expression ")"
                     XQuery 1.0 and XPath 2.0 Data Model, it can be defined as follows:
                 </p>
                 <pre>
-fn:aggregate($root as <emph>xs:QName</emph>, $included as <emph>item()*</emph>) as <emph>document-node()</emph>
+fn:aggregate($root as <emph>xs:QName</emph>, $included as <emph>node()*</emph>) as <emph>document-node()</emph>
                 </pre>
                 <p>
                     The resulting XML Infoset's document information item contains:
@@ -1962,11 +1962,11 @@ fn:aggregate($root as <emph>xs:QName</emph>, $included as <emph>item()*</emph>) 
                     </item>
                 </ulist>
                 <p>
-                    The second argument of <code>aggregate()</code> is of type <code>item()*</code>,
-                    in other words a sequence of items as defined by <bibref ref="xpath-20"/>, with
+                    The second argument of <code>aggregate()</code> is of type <code>node()*</code>,
+                    in other words a sequence of nodes as defined by <bibref ref="xpath-20"/>, with
                     the exception that attribute nodes and namespace nodes are not allowed. This is
                     consistent with the acquired infoset defined in <bibref ref="xinclude"/>. The
-                    Infoset associated with each item of the sequence is added as child information
+                    Infoset associated with each node in the sequence is added as child information
                     items to the document element information item.
                 </p>
             </div2>

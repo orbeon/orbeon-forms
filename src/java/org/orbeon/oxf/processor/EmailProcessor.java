@@ -220,3 +220,21 @@ public class EmailProcessor extends ProcessorImpl {
         }
     }
 }
+
+                    // Set content-transfer-encoding header
+//                    final String contentTransferEncoding = partElement.attributeValue("content-transfer-encoding");
+//
+//                    MimeBodyPart part = new MimeBodyPart() {
+//                        protected void updateHeaders() throws MessagingException {
+//                            super.updateHeaders();
+//                            if (contentTransferEncoding != null)
+//                                setHeader("Content-Transfer-Encoding", contentTransferEncoding);
+//                        }
+//                    };
+//                    // Set content-disposition header
+//                    String contentDisposition = partElement.attributeValue("content-disposition");
+//                    if (contentDisposition != null)
+//                        part.setDisposition(contentDisposition);
+//
+//                    part.setDataHandler(new DataHandler(new SimpleTextDataSource(name, contentType, content)));
+//                    mimeMultipart.addBodyPart(part);

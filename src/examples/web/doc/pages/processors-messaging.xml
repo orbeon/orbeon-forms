@@ -97,7 +97,12 @@
                     <tr>
                         <td>message/body/part@/content-type</td>
                         <td>1</td>
-                        <td>The MIME type of tdis body part</td>
+                        <td>The MIME type of this body part</td>
+                    </tr>
+                    <tr>
+                        <td>message/body/part@/content-disposition</td>
+                        <td>0..1</td>
+                        <td>The optional Content-Disposition header of this body part</td>
                     </tr>
                     <tr>
                         <td>message/body/part/*</td>
@@ -105,14 +110,19 @@
                         <td>Thr content of the body part. Use a CDATA section for HTML</td>
                     </tr>
                 </table>
+                <p>
+                    If the <code>content-type</code> attribute of a part is not a text type (i.e. it
+                    does not start with "<code>text/</code>"), then the body of the part must
+                    contain Base64-encoded binary data. This allows sending binary attachments such
+                    as images.
+                </p>
             </section>
             <section>
                 <title>Example</title>
                 <p>
-                The following example illustrates the use of the Email
-                Processor. Note that the
-                    <code>name</code> element is optional
-                and that multiple recipients are allowed.
+                    The following example illustrates the use of the Email Processor. Note that
+                    the <code>name</code> element is optional and that multiple recipients are
+                    allowed.
                 </p>
                 <xml-source>
                     <p:processor name="oxf:email">

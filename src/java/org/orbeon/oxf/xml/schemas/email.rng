@@ -56,47 +56,83 @@
                 <element name="text">
                     <data type="string"/>
                 </element>
-            </group> 
-            <!-- New style, MIME multipart -->
+            </group>
+            <!-- New style, MIME multipart support -->
             <group>
                 <element name="body">
-                    <optional>
-                        <attribute name="mime-multipart">
-                            <choice>
-                                <!-- default -->
-                                <value>mixed</value>
-                                <value>alternative</value>
-                                <value>related</value>
-                            </choice>
-                        </attribute>
-                    </optional>
-                    <oneOrMore>
-                        <element name="part">
-                            <attribute name="name"/>
-                            <attribute name="content-type"/>
+                    <choice>
+                        <group>
+                            <!-- Body contains parts -->
                             <optional>
-                                <attribute name="content-disposition"/>
-                            </optional>
-                            <optional>
-                                <attribute name="content-id"/>
-                            </optional>
-                            <!-- Allow either an "src" attribute, or body content -->
-                            <choice>
-                                <attribute name="src">
-                                    <data type="anyURI"/>
+                                <attribute name="mime-multipart">
+                                    <choice>
+                                        <value>mixed</value><!-- The default -->
+                                        <value>alternative</value>
+                                        <value>related</value>
+                                    </choice>
                                 </attribute>
-                                <choice>
-                                    <ref name="anyElement"/>
-                                    <text/><!-- Why do we need this here? -->
-                                </choice>
-                            </choice>
-                        </element>
-                    </oneOrMore>
+                            </optional>
+                            <oneOrMore>
+                                <ref name="part"/>
+                            </oneOrMore>
+                        </group>
+                        <group>
+                            <!-- Body doesn't contain parts -->
+                            <ref name="bodyOrPartContent"/>
+                        </group>
+                    </choice>
                 </element>
             </group>
         </choice>
     </define>
 
+    <define name="part">
+        <element name="part">
+            <choice>
+                <group>
+                    <!-- Multipart part content -->
+                    <attribute name="name"/>
+                    <attribute name="content-type">
+                        <data type="string">
+                            <param name="pattern">multipart/.+</param>
+                        </data>
+                    </attribute>
+                    <optional>
+                        <attribute name="content-id"/>
+                    </optional>
+                    <oneOrMore>
+                        <ref name="part"/>
+                    </oneOrMore>
+                </group>
+                <group>
+                    <!-- Regular part content -->
+                    <attribute name="name"/>
+                    <attribute name="content-type"/>
+                    <optional>
+                        <attribute name="content-disposition"/>
+                    </optional>
+                    <optional>
+                        <attribute name="content-id"/>
+                    </optional>
+                    <ref name="bodyOrPartContent"/>
+                </group>
+            </choice>
+        </element>
+    </define>
+    
+    <define name="bodyOrPartContent">
+        <choice>
+            <!-- Out of line content -->
+            <attribute name="src">
+                <data type="anyURI"/>
+            </attribute>
+            <!-- Inline content -->
+            <choice>
+                <ref name="anyElement"/>
+                <text/><!-- Why do we need this here? -->
+            </choice>
+        </choice>
+    </define>
 
     <define name="anyElement">
         <element>

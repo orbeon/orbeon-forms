@@ -24,29 +24,34 @@
                 <name/>
             </to>
             <subject/>
-            <body mime-multipart="related">
-                <part name="main" content-type="text/html">
-                    <html>
-                        <head>
-                            <title>Presentation Server Email Example</title>
-                        </head>
-                        <body>
-                            <p/>
-                            <p>
-                                This is an image:
-                            </p>
-                            <img src="cid:id1"/>
-                            <p>
-                                This is a chart:
-                            </p>
-                            <img src="cid:id2"/>
-                        </body>
-                    </html>
+            <body mime-multipart="alternative">
+                <!-- Provide simple text alternative -->
+                <part name="text" content-type="text/plain">Your email client does not support displaying HTML messages.</part>
+                <!-- HTML alternative -->
+                <part name="html" content-type="multipart/related">
+                    <part name="main" content-type="text/html">
+                        <html>
+                            <head>
+                                <title>Presentation Server Email Example</title>
+                            </head>
+                            <body>
+                                <p style="border: dotted 1px gray"/>
+                                <p>
+                                    This is an image:
+                                </p>
+                                <img src="cid:id1"/>
+                                <p>
+                                    This is a chart:
+                                </p>
+                                <img src="cid:id2"/>
+                            </body>
+                        </html>
+                    </part>
+                    <!-- Attachments -->
+                    <part name="image" content-type="image/gif" content-disposition="inline; filename=&quot;logo.gif&quot;" content-id="id1" src="oxf:/oxf-theme/images/oxf-powered-80.gif"/>
+                    <part name="pdf" content-type="application/pdf" content-disposition="inline; filename=&quot;report.pdf&quot;" src="oxf:pdf-document"/>
+                    <part name="chart" content-type="image/png" content-disposition="inline; filename=&quot;chart.png&quot;" content-id="id2" src="oxf:png-document"/>
                 </part>
-                <!-- Attachments -->
-                <part name="image" content-type="image/gif" content-disposition="inline; filename=&quot;logo.gif&quot;" content-id="id1" src="oxf:/oxf-theme/images/oxf-powered-80.gif"/>
-                <part name="pdf" content-type="application/pdf" content-disposition="inline; filename=&quot;report.pdf&quot;" src="oxf:pdf-document"/>
-                <part name="chart" content-type="image/png" content-disposition="inline; filename=&quot;chart.png&quot;" content-id="id2" src="oxf:png-document"/>
             </body>
         </message>
     </xforms:instance>
@@ -55,5 +60,7 @@
     <xforms:bind nodeset="/message/from/email" constraint="normalize-space(.) != ''"/>
     <xforms:bind nodeset="/message/to/email" constraint="normalize-space(.) != ''"/>
     <xforms:bind nodeset="/message/subject" constraint="normalize-space(.) != ''"/>
-    <xforms:bind nodeset="/message/body/part/html/body" constraint="normalize-space(.) != ''"/>
+    <xforms:bind nodeset="/message/body/part[2]/part/html/body/p[1]" constraint="normalize-space(.) != ''"/>
+    <!-- Calculation to create the plain text version  -->
+    <xforms:bind nodeset="/message/body/part[1]" calculate="string(/message/body/part[2]/part/html/body/p[1])"/>
 </xforms:model>

@@ -41,7 +41,7 @@ import org.xml.sax.XMLReader;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.Message;
-import javax.mail.MessagingException;
+import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.*;
@@ -66,7 +66,6 @@ import java.util.Properties;
  * o revise support of text/html
  *   o built-in support for HTML could handle src="cid:*" with part/message ids
  * o support text/xml? or XHTML?
- * o support non-multipart body!
  * o build message with SAX, not DOM, so streaming of input is possible
  */
 public class EmailProcessor extends ProcessorImpl {
@@ -154,137 +153,161 @@ public class EmailProcessor extends ProcessorImpl {
             Element bodyElement = messageElement.element("body");
 
             if (textElement != null) {
-                // Old deprecated mechanism (simple body)
+                // Old deprecated mechanism (simple text body)
                 message.setText(textElement.getStringValue());
             } else if (bodyElement != null) {
-                // MIME parts
-                String multipart = bodyElement.attributeValue("mime-multipart");
-                if (multipart == null)
-                    multipart = DEFAULT_MULTIPART;
-                MimeMultipart mimeMultipart = new MimeMultipart(multipart);
-                for (Iterator i = bodyElement.elementIterator("part"); i.hasNext();) {
-                    Element partElement = (Element) i.next();
-                    final String name = partElement.attributeValue("name");
-                    String contentTypeAttribute = partElement.attributeValue("content-type");
-                    final String contentType = NetUtils.getContentTypeContentType(contentTypeAttribute);
-                    final String charset;
-                    {
-                        String c = NetUtils.getContentTypeCharset(contentTypeAttribute);
-                        charset = (c != null) ? c : DEFAULT_TEXT_ENCODING;
-                    }
-                    final String contentTypeWithCharset = contentType + "; charset=" + charset;
-                    final String src = partElement.attributeValue("src");
-
-                    // Either a String or a FileItem
-                    final Object content;
-                    if (src != null) {
-                        // Content of the part is not inline
-
-                        // Generate a Document from the source
-
-                        SAXSource source = getSAXSource(EmailProcessor.this, pipelineContext, src, dataInputSystemId, contentType);
-                        content = handleStreamedPartContent(pipelineContext, source, contentType, charset);
-                    } else {
-                        // Content of the part is inline
-
-                        // In the cases of text/html and XML, there must be exactly one root element
-                        boolean needsRootElement = "text/html".equals(contentType) || ProcessorUtils.isXMLContentType(contentType);
-                        if (needsRootElement && partElement.elements().size() != 1)
-                            throw new ValidationException("The <part> element must contain exactly one element for text/html and XML",
-                                    (LocationData) partElement.getData());
-
-                        // Create Document and convert it into a String
-                        Element rootElement = (Element)(needsRootElement ? partElement.elements().get(0) : partElement);
-                        Document partDocument = DocumentHelper.createDocument();
-                        partDocument.setRootElement((Element) Dom4jUtils.cloneNode(rootElement));
-                        content = handlePartContent(partDocument, contentType);
-                    }
-
-                    MimeBodyPart part = new MimeBodyPart();
-                    if (!ProcessorUtils.isTextContentType(contentType)) {
-                        // This is binary content
-                        if (content instanceof FileItem) {
-                            final FileItem fileItem = (FileItem) content;
-                            part.setDataHandler(new DataHandler(new DataSource() {
-                                public String getContentType() {
-                                    return contentType;
-                                }
-
-                                public InputStream getInputStream() throws IOException {
-                                    return fileItem.getInputStream();
-                                }
-
-                                public String getName() {
-                                    return name;
-                                }
-
-                                public OutputStream getOutputStream() throws IOException {
-                                    throw new IOException("Write operation not supported");
-                                }
-                            }));
-                        } else {
-                            byte[] data = XMLUtils.base64StringToByteArray((String) content);
-                            part.setDataHandler(new DataHandler(new SimpleBinaryDataSource(name, contentType, data)));
-                        }
-                    } else {
-                        // This is text content
-                        if (content instanceof FileItem) {
-                            // The text content was encoded when written to the FileItem
-                            final FileItem fileItem = (FileItem) content;
-                            part.setDataHandler(new DataHandler(new DataSource() {
-                                public String getContentType() {
-                                    // This always contains a charset
-                                    return contentTypeWithCharset;
-                                }
-
-                                public InputStream getInputStream() throws IOException {
-                                    // This is encoded with the appropriate charset (user-defined, or the default)
-                                    return fileItem.getInputStream();
-                                }
-
-                                public String getName() {
-                                    return name;
-                                }
-
-                                public OutputStream getOutputStream() throws IOException {
-                                    throw new IOException("Write operation not supported");
-                                }
-                            }));
-                        } else {
-                            part.setDataHandler(new DataHandler(new SimpleTextDataSource(name, contentTypeWithCharset, (String) content)));
-                        }
-                    }
-                    mimeMultipart.addBodyPart(part);
-
-                    // Set content-disposition header
-                    String contentDisposition = partElement.attributeValue("content-disposition");
-                    if (contentDisposition != null)
-                        part.setDisposition(contentDisposition);
-
-                    // Set content-id header
-                    String contentId = partElement.attributeValue("content-id");
-                    if (contentId != null)
-                        part.setHeader("content-id", "<" + contentId + ">");
-                        //part.setContentID(contentId);
-                }
-                message.setContent(mimeMultipart);
+                // New mechanism with body and parts
+                handleBody(pipelineContext, dataInputSystemId, message, bodyElement);
             } else {
-                throw new OXFException("text or body element not found");
+                throw new OXFException("Main text or body element not found");// TODO: location info
             }
 
             // Send message
             Transport transport = session.getTransport("smtp");
             Transport.send(message);
             transport.close();
-        } catch (IOException e) {
-            throw new OXFException(e);
-        } catch (MessagingException e) {
-            throw new OXFException(e);
-        } catch (TransformerException e) {
-            throw new OXFException(e);
-        } catch (SAXException e) {
+        } catch (Exception e) {
             throw new OXFException(e);
         }
+    }
+
+    private void handleBody(PipelineContext pipelineContext, String dataInputSystemId, Part parentPart, Element bodyElement) throws Exception {
+
+        // Find out if there are embedded parts
+        Iterator parts = bodyElement.elementIterator("part");
+        String multipart;
+        if (bodyElement.getName().equals("body")) {
+            multipart = bodyElement.attributeValue("mime-multipart");
+            if (multipart != null && !parts.hasNext())
+                throw new OXFException("mime-multipart attribute on body element requires part children elements");
+            if (parts.hasNext() && multipart == null)
+                multipart = DEFAULT_MULTIPART;
+        } else {
+            String contentTypeAttribute = NetUtils.getContentTypeContentType(bodyElement.attributeValue("content-type"));
+            multipart = (contentTypeAttribute != null && contentTypeAttribute.startsWith("multipart/")) ? contentTypeAttribute.substring("multipart/".length()) : null;
+        }
+
+        if (multipart != null) {
+            // Multipart content is requested
+            MimeMultipart mimeMultipart = new MimeMultipart(multipart);
+
+            // Iterate through parts
+            for (Iterator i = parts; i.hasNext();) {
+                Element partElement = (Element) i.next();
+
+                MimeBodyPart mimeBodyPart = new MimeBodyPart();
+                handleBody(pipelineContext, dataInputSystemId, mimeBodyPart, partElement);
+                mimeMultipart.addBodyPart(mimeBodyPart);
+            }
+
+            // Set content on parent part
+            parentPart.setContent(mimeMultipart);
+        } else {
+            // No multipart, just use the content of the element and add to the current part (which can be the main message)
+            handlePart(pipelineContext, dataInputSystemId, parentPart, bodyElement);
+        }
+    }
+
+    private void handlePart(PipelineContext pipelineContext, String dataInputSystemId, Part parentPart, Element partOrBodyElement) throws Exception {
+        final String name = partOrBodyElement.attributeValue("name");
+        String contentTypeAttribute = partOrBodyElement.attributeValue("content-type");
+        final String contentType = NetUtils.getContentTypeContentType(contentTypeAttribute);
+        final String charset;
+        {
+            String c = NetUtils.getContentTypeCharset(contentTypeAttribute);
+            charset = (c != null) ? c : DEFAULT_TEXT_ENCODING;
+        }
+        final String contentTypeWithCharset = contentType + "; charset=" + charset;
+        final String src = partOrBodyElement.attributeValue("src");
+
+        // Either a String or a FileItem
+        final Object content;
+        if (src != null) {
+            // Content of the part is not inline
+
+            // Generate a Document from the source
+            SAXSource source = getSAXSource(EmailProcessor.this, pipelineContext, src, dataInputSystemId, contentType);
+            content = handleStreamedPartContent(pipelineContext, source, contentType, charset);
+        } else {
+            // Content of the part is inline
+
+            // In the cases of text/html and XML, there must be exactly one root element
+            boolean needsRootElement = "text/html".equals(contentType) || ProcessorUtils.isXMLContentType(contentType);
+            if (needsRootElement && partOrBodyElement.elements().size() != 1)
+                throw new ValidationException("The <part> element must contain exactly one element for text/html and XML",
+                        (LocationData) partOrBodyElement.getData());
+
+            // Create Document and convert it into a String
+            Element rootElement = (Element)(needsRootElement ? partOrBodyElement.elements().get(0) : partOrBodyElement);
+            Document partDocument = DocumentHelper.createDocument();
+            partDocument.setRootElement((Element) Dom4jUtils.cloneNode(rootElement));
+            content = handlePartContent(partDocument, contentType);
+        }
+
+        if (!ProcessorUtils.isTextContentType(contentType)) {
+            // This is binary content
+            if (content instanceof FileItem) {
+                final FileItem fileItem = (FileItem) content;
+                parentPart.setDataHandler(new DataHandler(new DataSource() {
+                    public String getContentType() {
+                        return contentType;
+                    }
+
+                    public InputStream getInputStream() throws IOException {
+                        return fileItem.getInputStream();
+                    }
+
+                    public String getName() {
+                        return name;
+                    }
+
+                    public OutputStream getOutputStream() throws IOException {
+                        throw new IOException("Write operation not supported");
+                    }
+                }));
+            } else {
+                byte[] data = XMLUtils.base64StringToByteArray((String) content);
+                parentPart.setDataHandler(new DataHandler(new SimpleBinaryDataSource(name, contentType, data)));
+            }
+        } else {
+            // This is text content
+            if (content instanceof FileItem) {
+                // The text content was encoded when written to the FileItem
+                final FileItem fileItem = (FileItem) content;
+                parentPart.setDataHandler(new DataHandler(new DataSource() {
+                    public String getContentType() {
+                        // This always contains a charset
+                        return contentTypeWithCharset;
+                    }
+
+                    public InputStream getInputStream() throws IOException {
+                        // This is encoded with the appropriate charset (user-defined, or the default)
+                        return fileItem.getInputStream();
+                    }
+
+                    public String getName() {
+                        return name;
+                    }
+
+                    public OutputStream getOutputStream() throws IOException {
+                        throw new IOException("Write operation not supported");
+                    }
+                }));
+            } else {
+                parentPart.setDataHandler(new DataHandler(new SimpleTextDataSource(name, contentTypeWithCharset, (String) content)));
+            }
+        }
+
+        // Set content-disposition header
+        String contentDisposition = partOrBodyElement.attributeValue("content-disposition");
+        if (contentDisposition != null)
+            parentPart.setDisposition(contentDisposition);
+
+        // Set content-id header
+        String contentId = partOrBodyElement.attributeValue("content-id");
+        if (contentId != null)
+            parentPart.setHeader("content-id", "<" + contentId + ">");
+            //part.setContentID(contentId);
     }
 
     private String handlePartContent(Document document, String contentType) throws SAXException {

@@ -34,13 +34,18 @@
                 </xsl:choose>
             </p>
             <p>
-                Please fill-out the mandatory fields below and submit the form. An email will be
-                send will the body specified, as well as several attachments:
+                <span style="color: red">NOTE: You need to configure access to a SQL database for
+                this example to work.</span>
+            </p>
+            <p>
+                Please fill-out the mandatory fields below and submit the form. An email providing
+                alternative text and HTML versions of the body specified will be sent, with several
+                attachments:
             </p>
             <ul>
-                <li>A static JPEG image</li>
+                <li>A static JPEG image (related to the HTML document)</li>
                 <li>A PDF file produced dynamically from a SQL database</li>
-                <li>A chart in PNG format produced dynamically from a configuration file</li>
+                <li>A chart in PNG format produced dynamically from a configuration file (related to the HTML document)</li>
             </ul>
             <table class="gridtable">
                 <tr>
@@ -78,7 +83,7 @@
                 <tr>
                     <th>Body *</th>
                     <td colspan="3">
-                        <xforms:textarea ref="message/body/part/html/body/p[1]" xhtml:style="width: 100%" xhtml:rows="20"/>
+                        <xforms:textarea ref="message/body/part[2]/part/html/body/p[1]" xhtml:style="width: 100%" xhtml:rows="20"/>
                     </td>
                 </tr>
             </table>

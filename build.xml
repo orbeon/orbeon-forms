@@ -331,7 +331,7 @@
             <test name="org.orbeon.oxf.test.ProcessorTest"/>
             <formatter type="plain" usefile="false"/>
             <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
-            <sysproperty key="oxf.resources.flatfile.rootdir" value="/usr/local/anthill/work/orbeon/projects/OXF/${web-examples-src.dir}"/>
+            <sysproperty key="oxf.resources.flatfile.rootdir" value="/usr/local/anthill/work/orbeon/${web-examples-src.dir}"/>
             <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FlatFileResourceManagerFactory"/>
             <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
             <sysproperty key="oxf.test.config" value="unit-tests/tests.xml"/>

@@ -65,7 +65,7 @@
 
     <test description="W3C" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="result"/>
                 <p:processor name="oxf:validation">
                     <p:input name="config">

@@ -152,7 +152,7 @@
             </a>
         </input>
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="input" name="data"/>
                 <p:param type="output" name="data"/>
 
@@ -226,7 +226,7 @@
 <!--            </numbers>-->
 <!--        </input>-->
 <!--        <input name="config">-->
-<!--            <p:config>-->
+<!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">-->
 <!--                <p:param type="input" name="data"/>-->
 <!--                <p:param type="output" name="data"/>-->
 <!--                <p:processor name="oxf:url-serializer">-->

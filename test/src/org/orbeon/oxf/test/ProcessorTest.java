@@ -32,7 +32,11 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
+import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.xml.sax.SAXException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -41,6 +45,8 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -141,8 +147,12 @@ public class ProcessorTest extends TestCase {
                     String name = XPathUtils.selectStringValue(inputNode, "@name");
                     if (XPathUtils.selectStringValue(inputNode, "@href") == null) {
                         // Case of embedded XML
-                        Node data = (Node) ((Element) inputNode).elementIterator().next();
-                        DOMGenerator domGenerator = new DOMGenerator(Dom4jUtils.cloneNode(data));
+                        Element originalElement = (Element) ((Element) inputNode).elementIterator().next();
+                        if (originalElement == null)
+                            throw new OXFException("Input content is mandatory");
+                        Element copiedElement = originalElement.createCopy();
+                        addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
+                        DOMGenerator domGenerator = new DOMGenerator(copiedElement);
                         PipelineUtils.connect(domGenerator, "data", processor, name);
                     } else {
                         // Href
@@ -163,11 +173,13 @@ public class ProcessorTest extends TestCase {
                     Document doc;
                     if (XPathUtils.selectStringValue(outputNode, "@href") == null) {
                         // Case of embedded XML
-                        Element expectedNode = (Element) ((Element) outputNode).elementIterator().next();
-                        doc = XMLUtils.createDOM4JDocument();
-                        doc.add(expectedNode.createCopy());
-                        if (expectedNode == null)
+                        Element originalElement = (Element) ((Element) outputNode).elementIterator().next();
+                        if (originalElement == null)
                             throw new OXFException("Output content is mandatory");
+                        Element copiedElement = originalElement.createCopy();
+                        addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
+                        doc = XMLUtils.createDOM4JDocument();
+                        doc.add(copiedElement);
                     } else {
                         // Href
                         URLGenerator urlGenerator = new URLGenerator(XPathUtils.selectStringValue(outputNode, "@href"));
@@ -350,6 +362,8 @@ public class ProcessorTest extends TestCase {
                                 // Compare converting to strings
                                 expectedDataString = XMLUtils.domToString(expectedData);
                                 actualDataString = XMLUtils.domToString(actualData);
+//                                expectedDataString = domToString(expectedData);
+//                                actualDataString = domToString(actualData);
                                 boolean outputPassed = expectedDataString.equals(actualDataString);
 
                                 // Display if test not passed
@@ -387,6 +401,57 @@ public class ProcessorTest extends TestCase {
             return actualDataString;
         }
     }
+
+    private static void addNeededNamespaceDeclarations(Element originalElement, Element copyElement, Set alreadyDeclaredPrefixes) {
+        Set newAlreadyDeclaredPrefixes = new HashSet(alreadyDeclaredPrefixes);
+
+        // Add namespaces declared on this element
+        for (Iterator i = copyElement.declaredNamespaces().iterator(); i.hasNext();) {
+            Namespace namespace = (Namespace) i.next();
+            newAlreadyDeclaredPrefixes.add(namespace.getPrefix());
+        }
+
+        // Add element prefix if needed
+        String elementPrefix = copyElement.getNamespace().getPrefix();
+        if (elementPrefix != null && !newAlreadyDeclaredPrefixes.contains(elementPrefix)) {
+            copyElement.addNamespace(elementPrefix, originalElement.getNamespaceForPrefix(elementPrefix).getURI());;
+            newAlreadyDeclaredPrefixes.add(elementPrefix);
+        }
+
+        // Add attribute prefixes if needed
+        for (Iterator i = copyElement.attributes().iterator(); i.hasNext();) {
+            Attribute attribute = (Attribute) i.next();
+            String attributePrefix = attribute.getNamespace().getPrefix();
+            if (attributePrefix != null && !newAlreadyDeclaredPrefixes.contains(attribute.getNamespace().getPrefix())) {
+                copyElement.addNamespace(attributePrefix, originalElement.getNamespaceForPrefix(attributePrefix).getURI());
+                newAlreadyDeclaredPrefixes.add(attributePrefix);
+            }
+        }
+
+        // Get needed namespace declarations for children
+        for (Iterator i = copyElement.elements().iterator(); i.hasNext();) {
+            Element child = (Element) i.next();
+            addNeededNamespaceDeclarations(originalElement, child, newAlreadyDeclaredPrefixes);
+        }
+    }
+
+    /*
+    private String domToString(Document document) {
+        try {
+            StringWriter outputWriter = new StringWriter();
+            TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
+            TransformerUtils.applyOutputProperties(identity.getTransformer(), "xml", "1.0", null, null,
+                    TransformerUtils.DEFAULT_OUTPUT_ENCODING, true, Boolean.TRUE, true, 4);
+            identity.setResult(new StreamResult(outputWriter));
+            LocationSAXWriter saxWriter = new LocationSAXWriter();
+            saxWriter.setContentHandler(identity);
+            saxWriter.write(document);
+            return outputWriter.toString();
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+    }
+    */
 }
 
 class TestServletContext implements ServletContext {

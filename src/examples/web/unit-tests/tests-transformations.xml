@@ -119,7 +119,7 @@
     <!--    <disable reason="STX doesn't support multi treading">-->
     <test description="STX Transformation on a request-like document" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline"
                 xmlns:d="http://orbeon.org/oxf/xml/document">
                 <p:processor name="oxf:identity">
                     <p:input name="data">
@@ -157,7 +157,7 @@
 
     <test description="XSLT Transformation on a request-like document" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline"
                 xmlns:d="http://orbeon.org/oxf/xml/document">
                 <p:processor name="oxf:identity">
                     <p:input name="data">
@@ -283,7 +283,7 @@
             </root>
         </input>
         <input name="config">
-            <xsl:stylesheet version="2.0">
+            <xsl:stylesheet version="2.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xsl:template match="/">
                     <root>
                         <xsl:variable name="a" select="/root/a" as="xs:int"/>
@@ -310,7 +310,7 @@
             </root>
         </input>
         <input name="config">
-            <xsl:stylesheet version="2.0" xmlns:function="http://www.orbeon.com/xslt-function">
+            <xsl:stylesheet version="2.0" xmlns:function="http://www.orbeon.com/xslt-function" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xsl:import href="/oxf/xslt/utils/evaluate.xsl"/>
 
                 <xsl:template match="/">
@@ -367,7 +367,7 @@
             </root>
         </input>
         <input name="config">
-            <xsl:stylesheet version="2.0">
+            <xsl:stylesheet version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
                 <xsl:template match="xhtml:*">
                     <xsl:element name="{local-name()}">

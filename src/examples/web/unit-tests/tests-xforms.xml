@@ -38,14 +38,13 @@
             </d:form>
         </input>
         <input name="model">
-            <xforms:model>
+            <xforms:model xmlns:d="http://orbeon.org/oxf/xml/document" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xforms:bind nodeset="/d:form/d:id" type="xs:integer"/>
                 <xforms:bind nodeset="/d:form/d:zip" type="xs:integer"/>
             </xforms:model>
         </input>
         <output name="instance">
-            
-            <d:form xmlns:d="http://orbeon.org/oxf/xml/document" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <d:form>
                 <d:id xxforms:valid="true">42</d:id>
                 <d:id xxforms:valid="false">4x</d:id>
                 <d:firstname>John</d:firstname>
@@ -58,7 +57,7 @@
 
     <test description="Conditionals: if" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <p:param type="output" name="data"/>
 
                 <p:processor uri="oxf/processor/identity">
@@ -128,7 +127,7 @@
 
     <test description="Conditionals: choose" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <p:param type="output" name="data"/>
 
                 <p:processor uri="oxf/processor/identity">
@@ -219,7 +218,7 @@
 
     <test description="Keep namespace prefixes" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="out"/>
                 <p:processor uri="oxf/processor/pipeline">
                     <p:input name="config" href="xforms-instance-recreate.xpl"/>
@@ -278,7 +277,9 @@
 
     <test description="xforms-repeat-speed-test" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" 
+                    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                    xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <p:param name="result" type="output"/>
     
                 <p:processor uri="oxf/processor/xslt-2.0">
@@ -606,9 +607,11 @@
         </output>
     </test>
     
-    <test description="Ref attribute pointing to mulitple nodes" name="oxf:pipeline">
+    <test description="Ref attribute pointing to multiple nodes" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                    xmlns:xforms="http://www.w3.org/2002/xforms"
+                    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:xforms-output">
                     <p:input name="model">
@@ -837,7 +840,7 @@
     <test description="Nested binds" name="oxf:pipeline">
         <input name="config" href="oxf:/unit-tests/xforms-instance-recreate.xpl"/>
         <input name="model">
-            <xforms:model id="form">
+            <xforms:model id="form" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xforms:instance>
                     <instance>
                         <a>
@@ -915,7 +918,7 @@
             </xforms:model>
         </input>
         <output name="instance">
-            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <instance>
                 <a xxforms:valid="true">&#x1105;</a>
                 <b xxforms:valid="false">&#x1200;</b>
             </instance>
@@ -1007,12 +1010,39 @@
         <output name="instance">
             <instance>
                 <a>Orbeon</a>
-                <b xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="true"/>
-                <c xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:required="true" xxforms:valid="false"/>
-                <d xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true"/>
-                <e xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:relevant="true"/>
+                <b xxforms:valid="true"/>
+                <c xxforms:required="true" xxforms:valid="false"/>
+                <d xxforms:readonly="true"/>
+                <e xxforms:relevant="true"/>
             </instance>
         </output>
     </test>
 
+    <test description="Knowing what bind makes a node invalid" name="oxf:pipeline" only="true">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                
+                <p:processor name="oxf:xforms-input">
+                    <p:input name="model">
+                        <xforms:model>
+                            <xforms:instance>
+                                <instance/>
+                            </xforms:instance>
+                            <xforms:bind id="a" nodeset="/instance" constraint="false()"/>
+                        </xforms:model>
+                    </p:input>
+                    <p:input name="request"><request/></p:input>
+                    <p:input name="filter"><params/></p:input>
+                    <p:input name="instance"><instance/></p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+                
+            </p:config>
+        </input>
+        <output name="data">
+            <instance xxforms:invalid-bind-ids="a" xxforms:valid="false"/>
+        </output>
+    </test>
+    
 </group>

@@ -12,7 +12,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<group description="XPL" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+<group description="XPL" 
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <test description="Empty output, loop simulation, multiple pipelines with same config but different data" name="oxf:pipeline">
         <input name="numbers">
@@ -25,7 +27,7 @@
             </numbers>
         </input>
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="input" name="numbers"/>
                 <p:param type="output" name="data"/>
 
@@ -89,7 +91,7 @@
             </letters>
         </input>
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="input" name="data"/>
                 <p:param type="output" name="data"/>
 
@@ -171,7 +173,7 @@
             <letter>a</letter>
         </input>
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="input" name="in"/>
                 <p:param type="output" name="out"/>
                 <p:choose href="#in">
@@ -196,7 +198,7 @@
             <letter>a</letter>
         </input>
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="input" name="a"/>
                 <p:param type="output" name="data"/>
                 <p:choose href="#a">
@@ -228,7 +230,7 @@
 
     <test description="Serial pipelines with same config" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:identity">
                     <p:input name="data">
@@ -277,7 +279,7 @@
 
     <test description="Embedded pipelines with same config" name="oxf:pipeline">
         <input name="config">
-            <p:config id="top">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" id="top">
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:pipeline" id="first-call">
                     <p:input name="config" href="oxf:/unit-tests/recurse.xml"/>
@@ -295,7 +297,7 @@
 
     <test description="Use of namespace in p:when" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:identity">
                     <p:input name="data">
@@ -325,7 +327,7 @@
 
     <test description="Use of namespace in p:when with attribute" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:identity">
                     <p:input name="data">
@@ -366,7 +368,7 @@
             <gaga/>
         </input>
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="input" name="data"/>
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:aggregator">
@@ -400,7 +402,7 @@
             </a>
         </input>
         <input name="config">
-            <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
                 <p:param type="input" name="data"/>
@@ -419,7 +421,7 @@
 
     <test description="Detection of id in p:choose with NullSerialisers (bug 861)" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:processor name="oxf:identity">
                     <p:input name="data">
                         <gaga/>
@@ -442,7 +444,7 @@
             <ns1:element xmlns:ns1="http://www.example.com/ns">gaga</ns1:element>
         </input>
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="input" name="data"/>
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:xslt">
@@ -467,7 +469,7 @@
 
     <test description="Support for both red and id on outputs (bug 875)" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="first"/>
                 <p:param type="output" name="second"/>
                 <p:processor name="oxf:identity">
@@ -497,7 +499,7 @@
             </ns1:element>
         </input>
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="input" name="data"/>
                 <p:param type="output" name="data"/>
                 <p:choose href="#data" xmlns:ns2="http://www.example.com/ns">
@@ -522,7 +524,7 @@
             </ns1:element>
         </input>
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="input" name="data"/>
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:identity">
@@ -542,7 +544,7 @@
             <addressBook/>
         </input>
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="input" name="data" schema-href="oxf:/unit-tests/address-book-schema.xml"/>
                 <p:param type="output" name="data" schema-uri="urn://adress-book"/>
                 <p:processor name="oxf:identity">
@@ -569,7 +571,7 @@
             </x:company>
         </input>
         <input name="config">
-            <p:config xmlns:y="http://localhost/company">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:y="http://localhost/company">
                 <p:param type="input" name="data"/>
                 <p:param type="output" name="data"/>
                 <p:for-each href="#data" select="/y:company/y:department" root="emps" ref="data">
@@ -597,7 +599,7 @@
 
     <test description="Input and Output validation" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:identity">
                     <p:input name="data" schema-href="oxf:/unit-tests/address-book-schema.xml">
@@ -632,7 +634,7 @@
 
     <test description="W3C Schema import" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:identity">
                     <p:input name="data" schema-href="oxf:/unit-tests/chapter03env.xsd">
@@ -677,7 +679,7 @@
 
     <test description="RNG Schema Import" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:identity">
                     <p:input name="data" schema-href="oxf:/unit-tests/note.rng">
@@ -708,7 +710,7 @@
             <dupond/>
         </input>
         <input name="config">
-            <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
                 <p:param type="input" name="data-1"/>
@@ -736,7 +738,7 @@
 
     <test description="Docbase" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="data"/>
 
                 <p:processor name="oxf:pipeline">
@@ -755,7 +757,7 @@
 
     <test description="oxf: protocol in a pipeline input" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="data"/>
                 <p:processor id="identity" name="oxf:identity">
                     <p:input name="data" href="oxf:/unit-tests/company.xml"/>
@@ -782,7 +784,7 @@
             <dupond/>
         </input>
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="input" name="first"/>
                 <p:param type="input" name="second"/>
                 <p:param type="output" name="data"/>
@@ -802,7 +804,7 @@
 
     <test description="Namespace preservation" name="oxf:pipeline">
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:xslt">
                     <p:input name="data">

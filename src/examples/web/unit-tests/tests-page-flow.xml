@@ -134,7 +134,7 @@
             </instance>
         </input>
         <input name="config">
-            <p:config>
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="input" name="instance"/>
                 <p:param type="output" name="data"/>
 
@@ -190,7 +190,13 @@
             </root>
         </output>
     </test>
-        
+    
+<!--    <test description="XForms Input extracting parameters from URL">-->
+<!--        <input type="config">-->
+<!--            -->
+<!--        </input>-->
+<!--    </test>-->
+
     <!-- The following tests on XPath expressions with namespaces. This is not implemented yet. -->
     <!--
     <test description="Reverse Params With Namespaces" name="oxf:xslt">

@@ -440,6 +440,12 @@
         <cvs command='tag TAG_OPS_${ops-version}'
             cvsRoot='${local-repos}' failonerror='true'/>
 
+        <!-- 2/27/2005 d : This pair of operations trigger the taginfo synch script. -->
+        <cvs command='tag -F TAG_Dummy_For_OW_Sync'
+            cvsRoot='${local-repos}' failonerror='true'/>
+        <cvs command='tag -d TAG_Dummy_For_OW_Sync'
+            cvsRoot='${local-repos}' failonerror='true'/>
+
         <echo message="Deploying to ${deployDir}/${release.number}"/>
 
         <mkdir dir="${deployDir}/${release.number}"/>

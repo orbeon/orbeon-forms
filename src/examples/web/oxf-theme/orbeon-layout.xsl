@@ -48,44 +48,28 @@ textarea {
 }
 
 #main {
-    border-right: 1px solid &dark-color;;
-    border-left: 1px solid &dark-color;;
     border-bottom:1px solid &dark-color;;
 }
 
 #main1 {
     margin: 0;
     padding:0;
-    background:white url("images/left-column-white.png") top left repeat-y;
 }
 
 #main #leftcontent {
-    float:left;
+    border-left: 1px solid &dark-color;;
     width:230px;
-    margin:0; padding:0;
+    margin:0; 
+    padding-right: .5em;
     line-height: 15pt;
-}
-
-#main #rightcontent {
-    float:right;
-    width:190px;
-    margin:0; padding:0;
-}
-
-<!-- Prevent applying the main maincontent settings twice if two are embedded -->
-#main #maincontent #maincontent {
-    margin:0px;
-    background: white;
-}
-
-#main #maincontent {
-    margin:0px 0px 0px 235px;
-    background: white;
+    background-color: &xlight-color;;
 }
 
 #maincontent {
     margin:0px;
     background: white;
+    border-left: 1px solid &light-color;;
+    border-right: 1px solid &dark-color;;
 }
 
 .cleaner {
@@ -123,7 +107,7 @@ h1 {
 }
 
 .tabs {
-    background-image:  url('<xsl:value-of select="context:rewriteRenderURL('/oxf-theme/images/tabbar-blue.png')"/>');
+    background-image:  url('images/tabbar-blue.png');
     background-repeat: repeat-x;
     height: 23px;
     text-align: center;
@@ -183,7 +167,7 @@ h1 {
     top: 3px;
     margin: 0 0 0 0;
     padding: 1px 1em 0em .5em;
-    background-image:  url('<xsl:value-of select="context:rewriteRenderURL('/oxf-theme/images/tab-shadow-top.png')"/>');
+    background-image:  url('images/tab-shadow-top.png');
     background-repeat: repeat-x;
     background-color: #FFF;
 }
@@ -193,7 +177,7 @@ h1 {
     top: 3px;
     margin: 0 0 0 0;
     padding: 1px 0em 0em 0em;
-    background-image:  url('<xsl:value-of select="context:rewriteRenderURL('/oxf-theme/images/tab-shadow-left.png')"/>');
+    background-image:  url('images/tab-shadow-left.png');
     background-repeat: no-repeat;
     background-color: #FFF;
 }
@@ -224,7 +208,7 @@ h1 {
     text-decoration: none;
 }
 
-a[href] {
+a {
     color: &medium-color;;
     text-decoration: none;
 }
@@ -250,12 +234,13 @@ a:hover {
     color: &dark-color;;
     font-weight: bolder;
     text-align: left;
-    padding: .2em .5em .2em .5em;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: .2em;
+    padding-bottom: .2em;
     margin-top: 0;
     margin-bottom: 2em;
-    margin-left: -.8em;
-    margin-right: -.8em;
-    border-bottom: solid 1px &dark-color;;
+    border-bottom: solid 1px &light-color;;
     font-size: 10pt;
     line-height: 180%;
 }
@@ -318,7 +303,7 @@ a:hover {
 }
 
 .box-header {
-    background: url('<xsl:value-of select="context:rewriteRenderURL('/oxf-theme/images/box-header.png')"/>' top left no-repeat;
+    background: url('images/box-header.png') top left no-repeat;
     text-align: center;
     color: white;
     font-size: x-small;
@@ -326,13 +311,13 @@ a:hover {
 }
 
 .box-middle {
-    background: url('<xsl:value-of select="context:rewriteRenderURL('/oxf-theme/images/box-middle.png')"/>' top left repeat-y;
+    background: url('images/box-middle.png') top left repeat-y;
     color: #666699;
     padding: 10px;
 }
 
 .box-footer {
-    background: url('<xsl:value-of select="context:rewriteRenderURL('/oxf-theme/images/box-footer.png')"/>' top left no-repeat;
+    background: url('images/box-footer.png') top left no-repeat;
 }
 
 .tree-sections {
@@ -366,6 +351,7 @@ a:hover {
     color: black;
     font-weight: normal;
     font-style: normal;
+    white-space: nowrap;
 }
 
 .tree-items a {

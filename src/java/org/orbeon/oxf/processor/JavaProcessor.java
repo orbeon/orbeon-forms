@@ -214,6 +214,16 @@ public class JavaProcessor extends ProcessorImpl {
                 if (exitCode != 0) {
                     String javacOutputString = "\n" + javacOutput.toString();
                     javacOutputString = StringUtils.replace(javacOutputString, "\n", "\n    ");
+                    System.err.println( "javac-1: " + argLst.toString() );
+                    if ( thrown != null )
+                    {
+                    	thrown.printStackTrace();
+                    }
+                    else
+                    {
+                    	System.out.println( "args: " + argLst.toString() );
+                    	System.out.println( "javac-out: " + javacOutput );
+                    }
                     throw new OXFException("Error compiling '" + argLst.toString() + "'" + javacOutputString, thrown );
                 }
             }
@@ -246,7 +256,13 @@ public class JavaProcessor extends ProcessorImpl {
             Thread.currentThread().setContextClassLoader(processorClass.getClassLoader());
             return (Processor) processorClass.newInstance();
 
-        } catch (Exception e) {
+        } catch ( final java.io.IOException e ) {
+            throw new OXFException(e);
+        } catch ( final IllegalAccessException e ) {
+            throw new OXFException(e);
+        } catch ( final InstantiationException e ) {
+            throw new OXFException(e);
+        } catch ( final ClassNotFoundException e ) {
             throw new OXFException(e);
         }
     }

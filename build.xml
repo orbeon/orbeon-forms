@@ -172,7 +172,7 @@
     <copy todir="${war.dir}/WEB-INF/lib">
       <fileset dir="${lib.dir}">
         <include name="dom4j-1_4_orbeon.jar"/>
-        <include name="log4j-1_2_8.jar"/>
+        <include name="log4j-1.3alpha0.jar"/>
         <include name="jaxen-1_1-beta-1-dev.jar"/>
         <include name="saxpath-dev_orbeon.jar"/>
         <include name="xercesImpl_2_6_2_orbeon.jar"/>
@@ -629,7 +629,7 @@
     <mkdir dir="build/oxfmark/lib"/>
     <unzip src="lib/looks-1_1_2.jar" dest="build/oxfmark/lib"/>
     <unzip src="lib/dom4j-1_4_orbeon.jar" dest="build/oxfmark/lib"/>
-    <unzip src="lib/log4j-1_2_8.jar" dest="build/oxfmark/lib"/>
+    <unzip src="lib/log4j-1.3alpha0.jar" dest="build/oxfmark/lib"/>
     <unzip src="lib/jaxen-1_1-beta-1-dev.jar" dest="build/oxfmark/lib"/>
     <unzip src="lib/saxpath-dev_orbeon.jar" dest="build/oxfmark/lib"/>
     <unzip src="lib/xercesImpl-2_2_1_orbeon.jar" dest="build/oxfmark/lib"/>

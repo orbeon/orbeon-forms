@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Main-Class: org.orbeon.oxf.main.OXF
-Class-Path: cli/commons-cli-1.0.jar dom4j-1_4_orbeon.jar log4j-1_2_8.jar
+Class-Path: cli/commons-cli-1.0.jar dom4j-1_4_orbeon.jar log4j-1.3alpha0.jar
   jaxen-1_1-beta-1-dev.jar saxpath-dev_orbeon.jar xalan-2_5_1_orbeon.jar
   xsltc-2_5_1_orbeon.jar
   commons-collections-2_0.jar commons-lang-1_0-b1.jar xercesImpl_2_6_2_orbeon.jar

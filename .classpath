@@ -40,7 +40,6 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/jtidy-04aug2000r7.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/junit.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/kawa-1_7.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/log4j-1_2_8.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/metadata-extractor-2_1.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/mondrian-0_5_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/msv-20031020.jar"/>
@@ -72,5 +71,6 @@
 	<classpathentry kind="lib" path="lib/ejb-2_0.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/mailapi-1_3_2.jar"/>
 	<classpathentry kind="lib" path="lib/TaminoAPI4J.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/log4j-1.3alpha0.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>

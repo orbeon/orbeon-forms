@@ -42,6 +42,7 @@
                 <li>Apache Tomcat 5.5.4 with JDK 1.5.0</li>
                 <li>BEA WebLogic Server 7 and 8.1</li>
                 <li>IBM WebSphere 5.1</li>
+                <li>JBoss 3.2.6 and 4.0.0</li>
             </ul>
 
             <p>Please contact us if you have questions about support for other application servers
@@ -602,22 +603,22 @@
 <!--                </li>-->
 <!--            </ol>-->
 <!--        </section>-->
-<!--        <section>-->
-<!--            <title>Installing OXF on JBoss 3.2.1 with Tomcat 4.1.24</title>-->
-<!--            <ol>-->
-<!--                <li>Assuming that <code>JBOSS_HOME</code> represents the location of your JBoss-->
-<!--                installation: create a new <code>JBOSS_HOME/server/default/deploy/oxf.war</code>-->
-<!--                directory.</li>-->
-<!---->
-<!--                <li>Unzip <code>oxf.war</code> in the <code>oxf.war</code> directory you just-->
-<!--                created.</li>-->
-<!---->
-<!--                <li>Edit <code>JBOSS_HOME/bin/run.bat</code> (or <code>run.sh</code> on UNIX).-->
-<!--                Look for the line that starts with <code>set JAVA_OPTS</code>. Add at the end of-->
-<!--                this line the following option:-->
-<!--                <code>-Dorg.jboss.logging.Log4jService.catchSystemOut=false</code></li>-->
-<!--            </ol>-->
-<!--        </section>-->
+        <section>
+            <title>Installing OXF on JBoss 3.2.6 and 4.0.0</title>
+            <ol>
+                <li>Assuming that <code>JBOSS_HOME</code> represents the location of your JBoss
+                installation: create a new <code>JBOSS_HOME/server/default/deploy/orbeon.war</code>
+                directory.</li>
+
+                <li>Unzip <code>orbeon.war</code> in the <code>orbeon.war</code> directory you just
+                created.</li>
+
+                <li>Edit <code>JBOSS_HOME/bin/run.bat</code> (or <code>run.sh</code> on UNIX).
+                Look for the line that starts with <code>set JAVA_OPTS</code>. Add at the end of
+                this line the following option:
+                <code>-Dorg.jboss.logging.Log4jService.catchSystemOut=false</code></li>
+            </ol>
+        </section>
 <!--        <section>-->
 <!--            <title>Installing OXF on Netscape Enterprise Server 6.1 SP4</title>-->
 <!--            <ol>-->

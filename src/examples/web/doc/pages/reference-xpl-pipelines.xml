@@ -806,7 +806,7 @@
                 <p>
                     For concrete examples, please refer to the <a
                     href="processors-xslt#user-defined">XSLT processor</a> or the <a
-                    href="processors-messaging#out-of-line-parts">Email processor</a>
+                    href="processors-messaging-email#out-of-line-parts">Email processor</a>
                     documentation.
                 </p>
                 <p>

@@ -6,7 +6,7 @@
     <source>send.xpl</source>
     <description>
         <p>
-            This page illustrates how the <a href="/doc/processors-messaging#yim">Instant Messenger
+            This page illustrates how the <a href="/doc/processors-messaging-im">Instant Messenger
             processor</a> can be used, and shows some capabilities of the <a
             href="/doc/integration-webservices">Web services support</a> provided by Presentation
             Server.
@@ -40,7 +40,7 @@
             <li>
                 When you click on <i>register</i>, <a
                 href="/examples/source?src=im%2Fregister.xpl">register.xpl</a> is executed. It will
-                use the <a href="/doc/processors-messaging#yim">IM processor</a> to send the "OXF
+                use the <a href="/doc/processors-messaging-im">IM processor</a> to send the "OXF
                 Google is ready" message and to trigger the execution of the pipeline created by <a
                 href="/examples/source?src=im%2Fresponse-pipeline.xsl">response-pipeline.xsl</a>
                 when a message is received.
@@ -50,7 +50,7 @@
                 href="/examples/source?src=im%2Fresponse-pipeline.xsl">response-pipeline.xsl</a>
                 calls the <a href="http://www.google.com/apis/">Google Web service</a> with the <a
                 href="/doc/processors-delegation">delegation processor</a> and sends the result to
-                the Yahoo! Messenger client with the <a href="../doc/processors-messaging#yim">IM
+                the Yahoo! Messenger client with the <a href="../doc/processors-messaging-im">IM
                 processor</a>.
             </li>
             <li>

@@ -253,7 +253,7 @@
                     These document formats are widely used by processors such as the <a
                     href="processors-generators-url">URL generator</a>, the <a
                     href="processors-serializers-http">HTTP serializer</a>, the <a
-                    href="processors-messaging#email-processor">Email processor</a>, and <a
+                    href="processors-messaging-email">Email processor</a>, and <a
                     href="processors-converters">converters</a>.
                 </p>
             </section>
@@ -429,7 +429,7 @@
             <section>
                 <title>Email Processor</title>
                 <p>
-                    The <a href="processors-messaging#email-processor">Email processor</a> features the
+                    The <a href="processors-messaging-email">Email processor</a> features the
                     following improvements:
                 </p>
                 <ul>

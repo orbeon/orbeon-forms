@@ -74,7 +74,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 href="processors-generators-url">URL generator</a> and <a
                 href="processors-converters">converters</a>. They are consumed by processors like
                 the <a href="processors-serializers-http">HTTP serializer</a>, the <a
-                href="processors-messaging#email-processor">Email processor</a>, and <a
+                href="processors-messaging-email">Email processor</a>, and <a
                 href="processors-converters">converters</a>.
             </p>
         </section>
@@ -130,7 +130,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 the <a href="processors-generators-url">URL generator</a> and <a
                 href="processors-converters">converters</a>. They are consumed by processors like
                 the <a href="processors-serializers-http">HTTP serializer</a>, the <a
-                href="processors-messaging#email-processor">Email processor</a>, and <a
+                href="processors-messaging-email">Email processor</a>, and <a
                 href="processors-converters">converters</a>.
             </p>
         </section>

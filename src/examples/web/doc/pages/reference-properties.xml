@@ -412,7 +412,7 @@
                         </tr>
                         <tr>
                             <th>Processor name</th>
-                            <td><code><a href="processors-messaging">oxf:email</a></code></td>
+                            <td><code><a href="processors-messaging-email">oxf:email</a></code></td>
                         </tr>
                         <tr>
                             <th>Type</th>
@@ -447,7 +447,7 @@
                         </tr>
                         <tr>
                             <th>Processor name</th>
-                            <td><code><a href="processors-messaging">oxf:email</a></code></td>
+                            <td><code><a href="processors-messaging-email">oxf:email</a></code></td>
                         </tr>
                         <tr>
                             <th>Type</th>
@@ -481,7 +481,7 @@
                         </tr>
                         <tr>
                             <th>Processor name</th>
-                            <td><code><a href="processors-messaging">oxf:email</a></code></td>
+                            <td><code><a href="processors-messaging-email">oxf:email</a></code></td>
                         </tr>
                         <tr>
                             <th>Type</th>

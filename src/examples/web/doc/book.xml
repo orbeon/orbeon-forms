@@ -49,18 +49,29 @@
             <menu-item label="HTTP Serializers" href="processors-serializers-http"/>
             <menu-item label="Other Serializers" href="processors-serializers"/>
         </menu>
-        <menu-item label="Converters" href="processors-converters"/>
-        <menu-item label="XSLT and TrAX" href="processors-xslt"/>
-        <menu-item label="XUpdate" href="processors-xupdate"/>
-        <menu-item label="SQL" href="processors-sql"/>
-        <menu-item label="XML Databases" href="processors-xmldb"/>
-        <menu-item label="LDAP" href="processors-ldap"/>
-        <menu-item label="Delegation" href="processors-delegation"/>
-        <menu-item label="Java" href="processors-java"/>
+        <menu label="Transforming XML">
+            <menu-item label="Converters" href="processors-converters"/>
+            <menu-item label="XSLT and TrAX" href="processors-xslt"/>
+            <menu-item label="XUpdate" href="processors-xupdate"/>
+        </menu>
+        <menu label="Querying Data">
+            <menu-item label="SQL" href="processors-sql"/>
+            <menu-item label="XML Databases" href="processors-xmldb"/>
+            <menu-item label="LDAP" href="processors-ldap"/>
+        </menu>
+        <menu label="Interoperability">
+            <menu-item label="Delegation" href="processors-delegation"/>
+            <menu-item label="Java" href="processors-java"/>
+        </menu>
+        <menu label="Document Formats">
+            <menu-item label="Image Server" href="processors-image"/>
+            <menu-item label="Charts and Spreadsheets" href="processors-charts-spreadsheets"/>
+        </menu>
+        <menu label="Messaging">
+            <menu-item label="Email" href="processors-messaging-email"/>
+            <menu-item label="Instant Messaging" href="processors-messaging-im"/>
+        </menu>
         <menu-item label="Validation" href="processors-validation"/>
-        <menu-item label="Image Server" href="processors-image"/>
-        <menu-item label="Charts and Spreadsheets" href="processors-charts-spreadsheets"/>
-        <menu-item label="Messaging" href="processors-messaging"/>
         <menu-item label="Scheduler" href="processors-scheduler"/>
         <menu-item label="Struts" href="processors-struts"/>
         <menu-item label="Other Processors" href="processors-other"/>

@@ -22,12 +22,11 @@
         <section>
             <title>Introduction</title>
             <p>
-                Most Web applications require some sort of authentication,
-                either just to access an "administrative" section, or for the
-                whole application. Presentation Server Web applications use the standard
-                authentication mechanism provided by your J2EE application
-                server. This section provides an overview of the standard
-                J2EE authentication mechanism.
+                Most Web applications require some sort of authentication, either just to access an
+                "administrative" section, or for the whole application. Presentation Server Web
+                applications use the standard authentication mechanism provided by your J2EE
+                application server. This section provides an overview of the standard J2EE
+                authentication mechanism.
             </p>
         </section>
         <section>
@@ -38,10 +37,9 @@
             </p>
             <ul>
                 <li>
-                    <p>In <code>&lt;security-constraint&gt;</code> you define
-                    which role (with <code>&lt;role-name&gt;</code>) is
-                    required to access which part of the application (with
-                    <code>&lt;url-pattern&gt;</code>).</p>
+                    <p>In <code>&lt;security-constraint&gt;</code> you define which role (with
+                    <code>&lt;role-name&gt;</code>) is required to access which part of the
+                    application (with <code>&lt;url-pattern&gt;</code>).</p>
 
                     <xml-source>
                         <security-constraint>
@@ -57,15 +55,13 @@
                     </xml-source>
                 </li>
                 <li>
-                    <p>In <code>&lt;login-config&gt;</code> you define how the
-                    user will authenticate himself. In other words, what method
-                    is used to get the user name and password. This can be done
-                    either with a form in an HTML page or with standard HTTP
-                    authentication. The names of those methods are:
-                    <code>FORM</code> and <code>BASIC</code>. In the example
-                    below, the form mechanism is demonstrated.
-                    <code>&lt;form-login-page&gt;</code> must point to a page
-                    with an HTML form where:</p>
+                    <p>In <code>&lt;login-config&gt;</code> you define how the user will
+                    authenticate himself. In other words, what method is used to get the user name
+                    and password. This can be done either with a form in an HTML page or with
+                    standard HTTP authentication. The names of those methods are: <code>FORM</code>
+                    and <code>BASIC</code>. In the example below, the form mechanism is
+                    demonstrated. <code>&lt;form-login-page&gt;</code> must point to a page with an
+                    HTML form where:</p>
 
                     <ul>
                         <li>The form action is set to
@@ -102,24 +98,29 @@
         </section>
         <section>
             <title>Mapping Roles to Users</title>
-            <p>In the <code>web.xml</code> file, the example declared that to
-            access the page <code>/admin</code> the user needs to have the
-            <code>administrator</code> role. But how do you declare users and how
-            are those users mapped to roles? This is application server
-            dependent, so you won't find an exact answer to this question in the
-            Presentation Server User Guide and you should refer to your application server
-            documentation. </p>
-            <p>Usually the process is straightforward. For example, with Tomcat
-            using the memory realm, you can declare the users and their
-            role in <code>conf/tomcat-users.xml</code>: </p>
+            <p>
+                In the <code>web.xml</code> file, the example declared that to access the page
+                <code>/admin</code> the user needs to have the <code>administrator</code> role. But
+                how do you declare users and how are those users mapped to roles? This is
+                application server dependent, so you won't find an exact answer to this question in
+                the Presentation Server User Guide and you should refer to your application server
+                documentation.
+            </p>
+            <p>
+                Usually the process is straightforward. For example, with Tomcat using the memory
+                realm, you can declare the users and their role in
+                <code>conf/tomcat-users.xml</code>:
+            </p>
             <xml-source>
                 <tomcat-users>
                     <user name="root" password="olleh" roles="administrator"/>
                     <user name="jdoh" password="olleh" roles="administrator"/>
                 </tomcat-users>
             </xml-source>
-            <p>For more information on how to setup users and assign roles to
-            users, see your application server documentation. Links are provided below for Tomcat and WebLogic.</p>
+            <p>
+                For more information on how to setup users and assign roles to users, see your
+                application server documentation. Links are provided below for Tomcat and WebLogic.
+            </p>
             <ul>
                 <li>
                     <link href="http://jakarta.apache.org/tomcat/tomcat-4.0-doc/realm-howto.html">Tomcat 4.0</link>
@@ -135,24 +136,58 @@
                 </li>
             </ul>
         </section>
+        <anchor id="request-security-processor"/>
         <section>
             <title>Accessing Security Information From the Application</title>
-            <p>The RequestSecurityGenerator
-            is used to extracts information about the currently logged user from the HTTP
-            request. For more information, see the
-            <link href="processors-generators#N101C6">RequestSecurityGenerator</link>
-            documentation.</p>
+            <p>
+                The Request Security processor extracts information about the currently logged user
+                from the client request. Its configuration contains a list of roles the application
+                developer is interested in. Only those roles will be listed in the processor's
+                output if the role is present. For instance, the output of the Request Security
+                processor could be:
+            </p>
+            <xml-source>
+                <request-security>
+                    <auth-type>FORM</auth-type>
+                    <secure>true</secure>
+                    <remote-user>scott</remote-user>
+                    <role>user</role>
+                </request-security>
+            </xml-source>
+            <p>
+                The <code>auth-type</code> element contains either <code>BASIC</code>,
+                <code>FORM</code>, <code>CLIENT_CERT</code>, or <code>DIGEST</code>. The
+                <code>secure</code> element is true if the request was made using a secure channel,
+                such as HTTPS. See the <link
+                href="http://jakarta.apache.org/tomcat/tomcat-4.1-doc/servletapi/index.html">Servlet
+                API</link> for more information.
+            </p>
+            <xml-source>
+                <p:processor name="oxf:request-security">
+                    <p:input name="config">
+                        <config>
+                            <role>user</role>
+                            <role>admin</role>
+                        </config>
+                    </p:input>
+                    <p:output name="data" id="request-security"/>
+                </p:processor>
+            </xml-source>
         </section>
         <section>
             <title>Logout</title>
-            <p>In order to log the current user out, the SessionInvalidator processor must
-            be used:</p>
+            <p>
+                In order to log the current user out, the Session Invalidator processor must be
+                used:
+            </p>
             <xml-source>
                 <p:processor name="oxf:session-invalidator"/>
             </xml-source>
-            <p>The SessionInvalidator does not take any configuration. It must
-            be included in a pipeline or branch of pipeline executed when the
-            action of logging out the user is requested.</p>
+            <p>
+                The Session Invalidator processor does not take any configuration or other inputs
+                and outputs. It must be included in a pipeline or branch of pipeline executed when
+                the action of logging out the user is requested.
+            </p>
         </section>
     </body>
 </document>

@@ -23,18 +23,20 @@
             <title>Introduction</title>
             <p>
                 The resource manager is the Presentation Server component responsible for reading
-                and writing XML and binary resources. The resource manager abstracts the actual
-                mechanisms used to store resources. For instance, resources could be stored in:</p>
+                and writing XML and other resources like binary and text documents. The resource
+                manager abstracts the actual mechanisms used to store resources. An important
+                benefit of using such an abstraction is that it is possible to store all your
+                application files in a sandbox which can be moved at will within a filesystem or
+                between storage mechanisms. For instance, resources can be stored in:</p>
             <ul>
-                <li>flat files (using the regular file system)</li>
+                <li>files on disk (using your operating system's file system)</li>
                 <li>a WAR file</li>
+                <li>a WebDAV server</li>
             </ul>
             <p>The resource manager is both used:</p>
             <ul>
                 <li>internally by Presentation Server</li>
-                <li>in Presentation Server applications through URLs with the
-                    <code>oxf:/</code> protocol
-                </li>
+                <li>in Presentation Server applications through URLs with the <code>oxf:</code> protocol</li>
             </ul>
             <p>
                 This section describes the different types of resource managers and explains their
@@ -379,6 +381,66 @@
             </warning>
         </section>
         <section>
+            <title>Priority Resource Manager</title>
+            <p>
+                <table ca="|p{0.2\textwidth}|p{0.8\textwidth}|">
+                    <tr>
+                        <th>Purpose</th>
+                        <td>Chains several resource managers in order</td>
+                    </tr>
+                    <tr>
+                        <th>Factory</th>
+                        <td>
+                            <code>org.orbeon.oxf.resources.PriorityResourceManagerFactory</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Properties</th>
+                        <td>
+                            <code>
+                                oxf.resources.priority.1<br/>
+                                oxf.resources.priority.2<br/>
+                                oxf.resources.priority.n
+                            </code>
+                        </td>
+                    </tr>
+                </table>
+            </p>
+            <p>
+                With the priority resource manager you can chain several resource managers. It is
+                crucial to be able to load resources from multiple sources since some resources are
+                bundled in the Presentation Server JAR file. Thus, the class loader resource
+                manager must always be in the priority chain. It usually has the lowest priority so
+                the application developer can override system resources.
+            </p>
+            <p>
+                There can be any number of chained resource managers. They are configured by adding
+                a <code>oxf.resources.priority.n</code> property, where <code>n</code> is an
+                integer.
+            </p>
+            <section>
+                <title>Example</title>
+                <xml-source>
+                    <context-param>
+                        <param-name>oxf.resources.factory</param-name>
+                        <param-value>org.orbeon.oxf.resources.PriorityResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.webapp.rootdir</param-name>
+                        <param-value>/WEB-INF/resources</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.priority.1</param-name>
+                        <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
+                    </context-param>
+                    <context-param>
+                        <param-name>oxf.resources.priority.2</param-name>
+                        <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
+                    </context-param>
+                </xml-source>
+            </section>
+        </section>
+        <section>
             <title>Cach&#233; Database Resource Manager</title>
             <p>
                 <table>
@@ -467,8 +529,8 @@
                     </table>
                 </p>
                 <p>
-                    You run <code>CacheImport</code> with the following command: <source>java
-                    org.orbeon.oxf.resources.CacheImport</source>
+                    You run <code>CacheImport</code> with the following command:
+                    <source>java org.orbeon.oxf.resources.CacheImport</source>
                 </p>
             </section>
             <section>
@@ -489,64 +551,6 @@
                     <context-param>
                         <param-name>oxf.resources.cache.password</param-name>
                         <param-value>sys</param-value>
-                    </context-param>
-                </xml-source>
-            </section>
-        </section>
-        <section>
-            <title>Priority Resource Manager</title>
-            <p>
-                <table ca="|p{0.2\textwidth}|p{0.8\textwidth}|">
-                    <tr>
-                        <th>Purpose</th>
-                        <td>Chains several resource managers in order</td>
-                    </tr>
-                    <tr>
-                        <th>Factory</th>
-                        <td>
-                            <code>org.orbeon.oxf.resources.PriorityResourceManagerFactory</code>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Properties</th>
-                        <td>
-                            <code> oxf.resources.priority.1
-                                oxf.resources.priority.2 oxf.resources.priority.n
-                            </code>
-                        </td>
-                    </tr>
-                </table>
-            </p>
-            <p>
-                With the priority resource manager you can chain several resource managers. It is
-                crucial to be able to load resources from multiple sources since some resources are
-                bundled in the Presentation Server JAR file. Thus, the class loader resource
-                manager must always be in the priority chain. It usually has the lowest priority so
-                the application developer can override system resources.
-            </p>
-            <p>
-                There can be any number of chained resource managers. They are configured by adding
-                a <code>oxf.resources.priority.n</code> property, where <code>n</code> is an
-                integer.
-            </p>
-            <section>
-                <title>Example</title>
-                <xml-source>
-                    <context-param>
-                        <param-name>oxf.resources.factory</param-name>
-                        <param-value>org.orbeon.oxf.resources.PriorityResourceManagerFactory</param-value>
-                    </context-param>
-                    <context-param>
-                        <param-name>oxf.resources.webapp.rootdir</param-name>
-                        <param-value>/WEB-INF/resources</param-value>
-                    </context-param>
-                    <context-param>
-                        <param-name>oxf.resources.priority.1</param-name>
-                        <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
-                    </context-param>
-                    <context-param>
-                        <param-name>oxf.resources.priority.2</param-name>
-                        <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
                     </context-param>
                 </xml-source>
             </section>

@@ -1496,13 +1496,10 @@ select * from ps_book
 
             <section>
                 <title>New Request Security Processor</title>
-
-                <p>A new
-                    <link
-                        href="processors-generators#RequestSecurityGenerator">Request
-                        Security Processor</link> is available, allowing access to
-                    security-related information, such as the logged-in user, or the
-                    transport mechanism.
+                <p>
+                    A new <link href="reference-authentication#request-security-processor">Request
+                    Security processor</link> is available, allowing access to security-related
+                    information, such as the logged-in user, or the transport mechanism.
                 </p>
             </section>
 

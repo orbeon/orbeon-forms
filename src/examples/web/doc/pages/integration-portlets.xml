@@ -259,8 +259,9 @@
             <title>Security</title>
             <p>
                 Portlet security can be configured in <code>portlet.xml</code> as per the Portlet
-                specification. The <a href="processors-generators#RequestSecurityGenerator">Request
-                Security Processor</a> provides security information like in the case of Servlets.
+                specification. The <a
+                href="reference-authentication#request-security-processor">Request Security
+                processor</a> provides security information like in the case of Servlets.
             </p>
 
         </section>

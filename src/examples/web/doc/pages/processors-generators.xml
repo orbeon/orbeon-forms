@@ -770,51 +770,6 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </xml-source>
             </section>
         </section>
-        <anchor id="RequestSecurityGenerator"/>
-        <section>
-            <title>Request Security Generator</title>
-            <p>
-                The Request Security generator extracts information about the currently logged user
-                from the HTTP request. Its optional configuration contains a list of roles the
-                application developer is interested in. Only those roles will be listed in the
-                generator's output if the role is present. For instance, the output of the request
-                security generator could be:
-            </p>
-            <xml-source>
-                <request-security>
-                    <auth-type>FORM</auth-type>
-                    <secure>true</secure>
-                    <remote-user>scott</remote-user>
-                    <role>user</role>
-                </request-security>
-            </xml-source>
-
-            <p>
-                The
-                <code>auth-type</code> element contains either
-                <code>BASIC</code>,
-                <code>FORM</code>,
-                <code>CLIENT_CERT</code>, or
-                <code>DIGEST</code>. The
-                <code>secure</code> element is true if the request was made
-                using a secure channel, such as HTTPS. See the
-                <link
-                    href="http://jakarta.apache.org/tomcat/tomcat-4.1-doc/servletapi/index.html">Servlet
-                    API</link> for more information.
-            </p>
-            <xml-source>
-                <p:processor name="oxf:request-security">
-                    <p:input name="config">
-                        <config>
-                            <role>user</role>
-                            <role>admin</role>
-                        </config>
-                    </p:input>
-                    <p:output name="data" id="request-security"/>
-                </p:processor>
-            </xml-source>
-        </section>
-
         <anchor id="servletinclude"/>
         <section>
             <title>Servlet Include Generator</title>

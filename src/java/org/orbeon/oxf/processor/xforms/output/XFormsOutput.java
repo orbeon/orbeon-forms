@@ -110,9 +110,10 @@ public class XFormsOutput extends ProcessorImpl {
                             // Get ref
                             String ref = attributes.getValue("ref");
                             if (ref == null) ref = attributes.getValue("nodeset");
+                            String bind = attributes.getValue("bind");
 
                             // New method where relative XPath is pushed
-                            elementContext.pushRelativeXPath(ref, attributes.getValue("ref") != null);
+                            elementContext.pushRelativeXPath(ref, bind);
 
                             // Old method where expanded XPath is pushed
                             if (ref != null) {

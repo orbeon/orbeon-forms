@@ -26,8 +26,8 @@ public class Set implements Action {
 
     public void setParameters(Map parameters) {
         Map setValueParameters = new HashMap();
-        setValueParameters.put("ref", parameters.get("ref"));
-        setValueParameters.put("content", parameters.get("value"));
+        setValueParameters.put(NODESET_ATTRIBUTE_NAME, parameters.get(NODESET_ATTRIBUTE_NAME));
+        setValueParameters.put("content", parameters.get(VALUE_ATTRIBUTE_NAME));
         setValue.setParameters(setValueParameters);
     }
 

@@ -21,6 +21,12 @@ import java.util.Map;
 
 public interface Action {
 
+    public final String NODESET_ATTRIBUTE_NAME = "node-ids";
+    public final String AT_ATTRIBUTE_NAME = "at";
+    public final String POSITION_ATTRIBUTE_NAME = "position";
+    public final String VALUE_ATTRIBUTE_NAME = "value";
+    public final String CONTENT_ATTRIBUTE_NAME = "content";
+
     public void setParameters(Map parameters);
     public void run(PipelineContext context, FunctionContext functionContext, Document instance);
 

@@ -916,4 +916,66 @@
     </test>
 
 
+
+    <test description="Bind And Ref on Controls" name="oxf:pipeline">
+        <input name="config" href="oxf:/unit-tests/xforms-instance-recreate.xpl"/>
+        <input name="model">
+            <xforms:model id="form">
+                <xforms:instance>
+                    <instance>
+                        <a>
+                            <b>1</b>
+                            <c>2</c>
+                            <d>3</d>
+                            <e>
+                                <f>4</f>
+                            </e>
+                            <g/>
+                            <g/>
+                            <h/>
+                        </a>
+                    </instance>
+                </xforms:instance>
+
+                <xforms:bind nodeset="/instance/a">
+                    <xforms:bind nodeset="b" id="b"/>
+                    <xforms:bind nodeset="g" id="g"/>
+                </xforms:bind>
+                <xforms:bind nodeset="/instance/a/c" id="c"/>
+                <xforms:bind nodeset="/instance/a/e" id="e"/>
+                <xforms:bind nodeset="/instance/a/h" id="h"/>
+
+            </xforms:model>
+        </input>
+        <input name="view">
+            <xforms:group ref="/instance">
+                <xforms:input bind="b"/>
+                <xforms:input bind="c"/>
+                <xforms:input ref="a/d"/>
+                <xforms:group bind="e">
+                    <xforms:input ref="f"/>
+                </xforms:group>
+                <xforms:submit>
+                    <xforms:delete bind="g" at="1"/>
+                    <xforms:setvalue bind="h">5</xforms:setvalue>
+                </xforms:submit>
+            </xforms:group>
+        </input>
+        <output name="instance">
+            <instance>
+                <a>
+                    <b>1</b>
+                    <c>2</c>
+                    <d>3</d>
+                    <e>
+                        <f>4</f>
+                    </e>
+                    <g/>
+                    <h>5</h>
+                </a>
+            </instance>
+        </output>
+    </test>
+
+
 </group>

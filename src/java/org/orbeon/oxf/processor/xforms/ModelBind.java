@@ -35,8 +35,16 @@ public class ModelBind {
     private NamespaceContext namespaceContext;
     private Map namespaceMap;
     private LocationData locationData;
+    private ModelBind parent;
     private List children = new ArrayList();
     private Node currentNode;
+
+    public ModelBind(String id, String nodeset, String relevant, String calculate, String type, String constraint,
+                     String required, String readonly,
+                     Map namespaceMap, LocationData locationData, ModelBind parent) {
+        this(id, nodeset, relevant, calculate, type, constraint, required, readonly, namespaceMap, locationData);
+        this.parent = parent;
+    }
 
     public ModelBind(String id, String nodeset, String relevant, String calculate, String type, String constraint,
                      String required, String readonly,
@@ -107,6 +115,14 @@ public class ModelBind {
 
     public void setCurrentNode(Node currentNode) {
         this.currentNode = currentNode;
+    }
+
+    public ModelBind getParent() {
+        return parent;
+    }
+
+    public void setParent(ModelBind parent) {
+        this.parent = parent;
     }
 
     public String toString() {

@@ -457,14 +457,12 @@
 
     <xsl:function name="xxforms:submit-name">
         <xsl:param name="submit-control" as="element()"/>
-
+        
         <xsl:variable name="action-strings" as="xs:string*">
             <xsl:for-each select="$submit-control/(xforms:setvalue | xforms:insert | xforms:delete)">
                 <!-- Optional parameters -->
-                <xsl:variable name="ref-param"
-                    select="if (@ref) then ('ref', escape-uri(@xxforms:ref-id, true())) else ()"/>
-                <xsl:variable name="nodeset-param"
-                    select="if (@nodeset) then ('nodeset', escape-uri(@xxforms:nodeset-ids, true())) else ()"/>
+                <xsl:variable name="node-ids-param"
+                    select="if (@ref or @bind or @nodeset) then ('node-ids', escape-uri(@xxforms:node-ids, true())) else ()"/>
                 <xsl:variable name="at-param"
                     select="if (@at) then ('at', escape-uri(@xxforms:at-value, true())) else ()"/>
                 <xsl:variable name="value-param"
@@ -474,7 +472,7 @@
                 <xsl:variable name="content-param" select="('content', escape-uri(string(.), true()))"/>
                 <!-- Join parameters -->
                 <xsl:sequence
-                    select="escape-uri(string-join((local-name(), $ref-param, $value-param, $nodeset-param,
+                    select="escape-uri(string-join((local-name(), $value-param, $node-ids-param,
                         $at-param, $position-param, $content-param), '&amp;'), true())"/>
             </xsl:for-each>
         </xsl:variable>

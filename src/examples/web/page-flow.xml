@@ -88,6 +88,6 @@
 
     <epilogue url="/config/epilogue.xpl"/>
     <not-found-handler page="not-found"/>
-    <error-handler page="error"/>
+<!--    <error-handler page="error"/>-->
 
 </config>

@@ -35,9 +35,9 @@ public class Insert implements Action {
     private String position;
 
     public void setParameters(Map parameters) {
-        nodeset = (String) parameters.get("nodeset");
-        at = (String) parameters.get("at");
-        position = (String) parameters.get("position");
+        nodeset = (String) parameters.get(NODESET_ATTRIBUTE_NAME);
+        at = (String) parameters.get(AT_ATTRIBUTE_NAME);
+        position = (String) parameters.get(POSITION_ATTRIBUTE_NAME);
     }
 
     public void run(PipelineContext context, FunctionContext functionContext, Document instance) {

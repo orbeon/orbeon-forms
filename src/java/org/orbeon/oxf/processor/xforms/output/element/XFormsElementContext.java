@@ -24,6 +24,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.Model;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
+import org.orbeon.oxf.processor.xforms.ModelBind;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.processor.xforms.output.XFormsFunctionLibrary;
 import org.orbeon.oxf.processor.xforms.output.XFormsOutputConfig;
@@ -31,11 +32,9 @@ import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.xpath.Variable;
 import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -74,29 +73,30 @@ public class XFormsElementContext {
         this.documentWrapper = new DocumentWrapper(instance, null);
     }
 
-    public void pushRelativeXPath(String xpath, boolean single) {
+    public void pushRelativeXPath(String ref, String bind) {
         PooledXPathExpression expr = null;
         try {
-            if (xpath == null) {
-                // No change to current node
-                nodesetStack.push(getCurrentNode());
+            if (ref == null) {
+                if(bind == null) {
+                    // No change to current node
+                    if(nodesetStack.empty())
+                        // no binding: push a dummy element
+                        nodesetStack.push(new ArrayList());
+                    else
+                        nodesetStack.push(getCurrentNodeset());
+                }else{
+                    // Resolve the bind id to a node
+                    nodesetStack.push(model.getBindNodeset(pipelineContext, model.getModelBindById(bind), documentWrapper, instance));
+                }
             } else {
                 // Evaluate new xpath in context of current node
                 expr = XPathCache.getXPathExpression(pipelineContext,
                         documentWrapper.wrap(getCurrentNode()),
-                        xpath,
+                        ref,
                         getCurrentPrefixToURIMap(),
                         null,
                         functionLibrary);
-                if (single) {
-                    Node node = (Node) expr.evaluateSingle();
-                    if (node == null)
-                        throw new ValidationException("Single binding expression '" + xpath
-                                + "' must return at least one node", new LocationData(locator));
-                    nodesetStack.push(node);
-                } else {
-                    nodesetStack.push(expr.evaluate());
-                }
+                nodesetStack.push(expr.evaluate());
             }
         } catch (XPathException e) {
             throw new OXFException(e);
@@ -104,33 +104,33 @@ public class XFormsElementContext {
             if(expr != null)
                 expr.returnToPool();
         }
-
     }
 
     public Node getCurrentNode() {
         if (nodesetStack.isEmpty()) {
             return instance;
         } else {
-            Object current = nodesetStack.peek();
-            if (!(current instanceof Node))
-                throw new ValidationException("Current context is a nodelist, a node is expected",
-                        new LocationData(locator));
-            return (Node) nodesetStack.peek();
+            List nodeset = getCurrentNodeset();
+            if(nodeset.size() == 0)
+                return instance;
+            else
+                return (Node)nodeset.get(0);
         }
     }
 
     public List getCurrentNodeset() {
-        Object current = nodesetStack.peek();
-        if (!(current instanceof List)) {
-            // We have a node if we are in a repeat. In this case look one level deeper in the stack.
-            if (nodesetStack.size() > 1 && nodesetStack.get(1) instanceof List) {
-                current = nodesetStack.get(1);
-            } else {
-                throw new ValidationException("Current context is a node, a nodelist is expected",
-                        new LocationData(locator));
-            }
-        }
-        return (List) current;
+//        Object current = nodesetStack.peek();
+//        if (!(current instanceof List)) {
+//            // We have a node if we are in a repeat. In this case look one level deeper in the stack.
+//            if (nodesetStack.size() > 1 && nodesetStack.get(1) instanceof List) {
+//                current = nodesetStack.get(1);
+//            } else {
+//                throw new ValidationException("Current context is a node, a nodelist is expected",
+//                        new LocationData(locator));
+//            }
+//        }
+//        return (List) current;
+        return (List)nodesetStack.peek();
     }
 
     public Map getCurrentPrefixToURIMap() {
@@ -227,6 +227,7 @@ public class XFormsElementContext {
      * Returns an XPath expression that can used on the instance to return the
      * current context node.
      */
+
     public String getRefXPath() {
         if (refStack.isEmpty()) {
             return "";
@@ -238,11 +239,7 @@ public class XFormsElementContext {
     /**
      * Returns the text value of the currently referenced node in the instance.
      */
-    public String getRefValue() {
-        return getRefValue(getRefXPath());
-    }
-
-    public String getRefValue(Node node) {
+  public String getRefValue(Node node) {
         if (node instanceof Element)
             return ((Element) node).getStringValue();
         else
@@ -308,7 +305,11 @@ public class XFormsElementContext {
     }
 
     public Node getRefNode() {
-        List refNodeList = getRefNodeList();
+        return getRefNode(getRefXPath());
+    }
+
+    public Node getRefNode(String refXPath) {
+        List refNodeList = getRefNodeList(refXPath);
         Node node = refNodeList.size() == 0 ? null :
                 refNodeList.get(0) instanceof Node ? (Node) refNodeList.get(0) : null;
         if (node == null)
@@ -323,7 +324,9 @@ public class XFormsElementContext {
     public void setRepeatIdIndex(String repeatId, String variableName, int index) {
         // Update current element of nodeset in stack
         nodesetStack.pop();
-        nodesetStack.push(((List) nodesetStack.peek()).get(index - 1));
+        List newNodeset = new ArrayList();
+        newNodeset.add(getCurrentNodeset().get(index - 1));
+        nodesetStack.push(newNodeset);
 
         Integer indexObj = new Integer(index);
         if (repeatId != null)

@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.xforms;
 import org.dom4j.*;
 import org.dom4j.util.UserDataDocumentFactory;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.output.BooleanModelItemProperty;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
@@ -99,9 +100,11 @@ public class Model {
                                     attributes.getValue("constraint"), attributes.getValue("required"),
                                     attributes.getValue("readonly"),
                                     namespaces, new LocationData(locator));
-                            if(!bindStack.empty())
-                                ((ModelBind)bindStack.peek()).addChild(bind);
-                            else
+                            if(!bindStack.empty()) {
+                                ModelBind parent = (ModelBind)bindStack.peek();
+                                parent.addChild(bind);
+                                bind.setParent(parent);
+                            } else
                                 binds.add(bind);
 
                             bindStack.push(bind);
@@ -529,5 +532,70 @@ public class Model {
 
     public String getEncoding() {
         return encoding;
+    }
+
+    public List getBindNodeset(PipelineContext context, ModelBind bind, DocumentWrapper wrapper, Document instance) {
+        // get a list of parents, orderd by grand father first
+        List parents = new ArrayList();
+        parents.add(bind);
+        ModelBind parent = bind;
+        while( (parent = parent.getParent()) != null) {
+            parents.add(parent);
+        }
+        Collections.reverse(parents);
+
+        // find the final node
+        List nodeset = new ArrayList();
+        nodeset.add(instance);
+        for(Iterator i = parents.iterator(); i.hasNext();) {
+            ModelBind current = (ModelBind)i.next();
+            List currentModelBindResults = new ArrayList();
+            for(Iterator j = nodeset.iterator(); j.hasNext();) {
+                Node node = (Node)j.next();
+                PooledXPathExpression expr = XPathCache.getXPathExpression(context, wrapper.wrap(node),
+                        current.getNodeset(), current.getNamespaceMap(), null, xformsFunctionLibrary);
+                try {
+                    currentModelBindResults.addAll(expr.evaluate());
+                }catch(XPathException e) {
+                    throw new OXFException(e);
+                }finally{
+                    if(expr != null)
+                        expr.returnToPool();
+                }
+            }
+            nodeset.addAll(currentModelBindResults);
+            // last iteration of i: remove all except last
+            if(!i.hasNext())
+                nodeset.retainAll(currentModelBindResults);
+
+        }
+        return nodeset;
+    }
+
+    private void getBindNodesetWorker(PipelineContext context, List nodeset, DocumentWrapper wrapper, Node currentNode) {
+
+    }
+
+    public ModelBind getModelBindById(String id) {
+        for(Iterator i = binds.iterator(); i.hasNext();) {
+            ModelBind bind = (ModelBind)i.next();
+            ModelBind result = getModelBindByIdWorker(bind, id);
+            if(result != null)
+                return result;
+        }
+        return null;
+    }
+
+    private ModelBind getModelBindByIdWorker(ModelBind parent, String id) {
+        if(id.equals(parent.getId()))
+            return parent;
+        // Look in children
+        for(Iterator j = parent.getChildrenIterator(); j.hasNext();) {
+            ModelBind child = (ModelBind)j.next();
+            ModelBind bind = getModelBindByIdWorker(child, id);
+            if(bind != null)
+                return bind;
+        }
+        return null;
     }
 }

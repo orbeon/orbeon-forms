@@ -27,12 +27,12 @@ import java.util.Map;
 
 public class SetValue implements Action {
 
-    private String ref;
+    private String nodeset;
     private String value;
     private String content;
 
     public void setParameters(Map parameters) {
-        ref = (String) parameters.get("ref");
+        nodeset = (String) parameters.get(NODESET_ATTRIBUTE_NAME);
         value = (String) parameters.get("value");
         content = (String) parameters.get("content");
     }
@@ -40,10 +40,15 @@ public class SetValue implements Action {
     public void run(PipelineContext context, FunctionContext functionContext, Document instance) {
 
         // Fill the instance
-        Integer id = new Integer(ref);
-        Node node = (Node) ((InstanceData) instance.getRootElement().getData()).getIdToNodeMap().get(id);
-        String newValue = value != null ? value
-                : content == null ? "" : content;
-        XFormsUtils.fillNode(node, newValue);
+        String[] ids = nodeset.split(" ");
+        try {
+            Integer id = new Integer(Integer.parseInt(ids[0]));
+            Node node = (Node) ((InstanceData) instance.getRootElement().getData()).getIdToNodeMap().get(id);
+            String newValue = value != null ? value
+                    : content == null ? "" : content;
+            XFormsUtils.fillNode(node, newValue);
+        } catch (NumberFormatException e) {
+            throw new OXFException("Invalid node-id in setvalue action", e);
+        }
     }
 }

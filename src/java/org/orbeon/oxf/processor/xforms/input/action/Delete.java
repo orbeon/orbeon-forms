@@ -29,8 +29,8 @@ public class Delete implements Action {
     private String at;
 
     public void setParameters(Map parameters) {
-        nodeset = (String) parameters.get("nodeset");
-        at = (String) parameters.get("at");
+        nodeset = (String) parameters.get(NODESET_ATTRIBUTE_NAME);
+        at = (String) parameters.get(AT_ATTRIBUTE_NAME);
     }
 
     public void run(PipelineContext context, FunctionContext functionContext, Document instance) {

@@ -114,42 +114,46 @@ public class XFormsElement {
             }
         } else {
             // Add annotations about referenced element
-            if (attributes.getIndex("", "ref") != -1
-                    || attributes.getIndex(Constants.XXFORMS_NAMESPACE_URI, "position") != -1) {
-                Node refNode = context.getRefNode();
+            boolean bindPresent = attributes.getIndex("", "bind") != -1;
+            boolean refPresent = attributes.getIndex("", "ref") != -1;
+            boolean nodesetPresent = attributes.getIndex("", "nodeset") != -1;
+            boolean positionPresent = attributes.getIndex(Constants.XXFORMS_NAMESPACE_URI, "position") != -1;
+            if ( refPresent || bindPresent || nodesetPresent || positionPresent) {
+                Node refNode = context.getCurrentNode();
+
                 InstanceData instanceData = context.getRefInstanceData(refNode);
-                addExtensionAttribute(newAttributes, Constants.XXFORMS_READONLY_ATTRIBUTE_NAME, Boolean.toString(instanceData.getReadonly().get()));
-                addExtensionAttribute(newAttributes, Constants.XXFORMS_RELEVANT_ATTRIBUTE_NAME, Boolean.toString(instanceData.getRelevant().get()));
-                addExtensionAttribute(newAttributes, Constants.XXFORMS_REQUIRED_ATTRIBUTE_NAME, Boolean.toString(instanceData.getRequired().get()));
-                addExtensionAttribute(newAttributes, Constants.XXFORMS_VALID_ATTRIBUTE_NAME, Boolean.toString(instanceData.getValid().get()));
+                addExtensionAttribute(newAttributes, Constants.XXFORMS_READONLY_ATTRIBUTE_NAME,
+                        Boolean.toString(instanceData.getReadonly().get()));
+                addExtensionAttribute(newAttributes, Constants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                        Boolean.toString(instanceData.getRelevant().get()));
+                addExtensionAttribute(newAttributes, Constants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
+                        Boolean.toString(instanceData.getRequired().get()));
+                addExtensionAttribute(newAttributes, Constants.XXFORMS_VALID_ATTRIBUTE_NAME,
+                        Boolean.toString(instanceData.getValid().get()));
                 if (instanceData.getInvalidBindIds() != null)
                     addExtensionAttribute(newAttributes, Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME, instanceData.getInvalidBindIds());
-                addExtensionAttribute(newAttributes, "ref-xpath", context.getRefXPath());
                 if (DATA_CONTROLS.containsKey(localname)) {
                     addExtensionAttribute(newAttributes, "name", context.getRefName(refNode, true));
                     addExtensionAttribute(newAttributes, "value", context.getRefValue(refNode));
                 } else  if (ACTION_CONTROLS.containsKey(localname)) {
                     addExtensionAttribute(newAttributes, "value", context.getRefValue(refNode));
-                } 
+                }
+
+                if(!positionPresent) {
+                    // Get ids of node
+                    StringBuffer ids = new StringBuffer();
+                    boolean first = true;
+                    for (Iterator i = context.getCurrentNodeset().iterator(); i.hasNext();) {
+                        Node node = (Node) i.next();
+                        if (!first) ids.append(' '); else first = false;
+                        ids.append(XFormsUtils.getInstanceData(node).getId());
+                    }
+                    addExtensionAttribute(newAttributes, Constants.XXFORMS_NODE_IDS_ATTRIBUTE_NAME, ids.toString());
+
+                }
+
             }
 
-            // Handle attributes used by XForms actions
-            if (attributes.getIndex("", "ref") != -1) {
-                // Get id of referenced node
-                addExtensionAttribute(newAttributes, "ref-id",
-                        Integer.toString(XFormsUtils.getInstanceData(context.getCurrentNode()).getId()));
-            }
-            if (attributes.getIndex("", "nodeset") != -1) {
-                // Get ids of node in "nodeset"
-                StringBuffer ids = new StringBuffer();
-                boolean first = true;
-                for (Iterator i = context.getCurrentNodeset().iterator(); i.hasNext();) {
-                    Node node = (Node) i.next();
-                    if (!first) ids.append(' '); else first = false;
-                    ids.append(XFormsUtils.getInstanceData(node).getId());
-                }
-                addExtensionAttribute(newAttributes, "nodeset-ids", ids.toString());
-            }
             if (attributes.getIndex("", "at") != -1) {
                 // Evaluate "at" as a number
                 NodeInfo contextNode = context.getDocumentWrapper().wrap((Node) context.getRefNodeList().get(0));

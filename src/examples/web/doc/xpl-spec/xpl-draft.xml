@@ -294,8 +294,9 @@
                 </p>
                 <ulist>
                     <item>
-                        <p><emph>An interface</emph>, defining how the XML processor interfaces
-                        with an XPL program. See <specref ref="processor-interface"/>.</p>
+                        <p><emph>A set of inputs and outputs</emph>, defining how the XML processor
+                        interfaces with an XPL program. See <specref
+                        ref="processor-interface"/>.</p>
                     </item>
                     <item>
                         <p><emph>A behavior</emph>, defining tasks performed by the XML processor
@@ -342,80 +343,117 @@
                     implementation is outside the scope of XPL.
                 </p>
             </div2>
-            <div2 id="processor-interface">
-                <head>Interface</head>
+            <div2 id="processor-instance">
+                <head>Instances</head>
                 <p>
-                    The interface of an XML processor interface consists of:
+                    <termdef id="xml-processor-instance" term="XML processor instance">
+                        An <term>XML processor instance</term> designate a specific use of a
+                        processor in a pipeline.
+                    </termdef>
+                </p>
+                <p>
+                    An XML processor used in an XPL program is always <emph>instantiated</emph>.
+                    Multiple instances of the same XML processor may occur in an XPL program.
+                </p>
+                <p>
+                    XPL does not specify if or how an XML processor is instantiated or keeps state
+                    information during an XPL program execution.
+                </p>
+            </div2>
+            <div2 id="processor-interface">
+                <head>Inputs and Outputs</head>
+                <p>
+                    Inputs and outputs connect an XML processor instance to the rest of the
+                    pipeline. Each input may provide an XML Infoset to the XML processor instance.
+                    Each output may provide an XML Infoset produced by the processor instance.
+                </p>
+                <p>
+                    <termdef id="static-input-output" term="static input or output">
+                        A <term>static input or output</term> designate an input or output defined by an
+                        <termref def="xml-processor">XML processor</termref> before the execution of
+                        the <termref def="xpl-program">XPL program</termref>.
+                    </termdef>
+                </p>
+                <p>
+                    <termdef id="connected-input-output" term="connected input of output">
+                        A <term>connected input or output</term> designate an input or output of an XML
+                        processor instance declared in an <termref def="xpl-program">XPL
+                        program</termref>.
+                    </termdef>
+                </p>
+                <p>
+                    <termdef id="dynamic-input-output" term="dynamic input of output">
+                        A <term>dynamic input or output</term> designate a connected input or output of
+                        an XML processor instance which is not defined by the XML processor before the
+                        execution of the <termref def="xpl-program">XPL program</termref>
+                    </termdef>
+                </p>
+                <p>
+                    Each XML processor instance has:
                 </p>
                 <ulist>
                     <item>
                         <p>
                             <emph>A set of inputs each identified by a name.</emph> No two inputs
-                            input may have the same name. Each input may provide a particular XML
-                            Infoset to the XML processor. The set of inputs may be empty.
+                            input may have the same name. The set of inputs may be empty.
                         </p>
                     </item>
                     <item>
                         <p>
                             <emph>A set of outputs each identified by a name.</emph> No two outputs
-                            output may have the same name. Each output may provide an XML Infoset
-                            produced by the processor. The set of outputs may be empty.
+                            output may have the same name. The set of outputs may be empty.
                         </p>
                     </item>
                 </ulist>
                 <p>
-                    An input name uniquely identifies a processor input, and an output name uniquely
-                    identifies a processor output.
-                </p>
-                <p>
-                    The interface of a processor can include the following types of inputs and
-                    outputs:
+                    For each static input or output, the XML processor defines if the input or
+                    output is:
                 </p>
                 <ulist>
                     <item>
                         <p>
-                            <emph>Mandatory inputs and outputs.</emph> Such inputs and outputs must
-                            be connected in an XPL program.
+                            <emph>Mandatory.</emph> Such input or output must be connected in an XPL
+                            program. The XPL implementation should raise a static error if a
+                            statically defined mandatory input or output is not connected for a
+                            given XML processor instance.
                         </p>
                     </item>
                     <item>
                         <p>
-                            <emph>Optional inputs and outputs.</emph> Such inputs and outputs may or
-                            may not be connected in an XPL program.
+                            <emph>Optional.</emph> Such input or output may or may not be connected
+                            in an XPL program.
                         </p>
                     </item>
                 </ulist>
                 <p>
-                    Inputs and outputs parts of the interface of a processor may be defined:
+                    <table border="1" align="center">
+                        <tr>
+                            <td rowspan="2"/>
+                            <th colspan="2">Static</th>
+                            <th rowspan="2">Dynamic</th>
+                        </tr>
+                        <tr>
+                            <th>Mandatory</th>
+                            <th>Optional</th>
+                        </tr>
+                        <tr>
+                            <th>Connected</th>
+                            <td>OK</td>
+                            <td>OK</td>
+                            <td>OK</td>
+                        </tr>
+                        <tr>
+                            <th>Not connected</th>
+                            <td>Invalid</td>
+                            <td>OK</td>
+                            <td>Inexistent by definition</td>
+                        </tr>
+                    </table>
                 </p>
-                <ulist>
-                    <item>
-                        <p>
-                            <emph>Statically.</emph> This means that the XML processor exposes such
-                            inputs and outputs to the XPL implementation before the execution of the
-                            XPL program. The XPL implementation should raise a static error if a
-                            statically defined mandatory input or output is exposed but not
-                            connected.
-                        </p>
-                    </item>
-                    <item>
-                        <p>
-                            <emph>Dynamically.</emph> This means that the XML processor exposes such
-                            inputs and outputs to the XPL implementation only during the execution
-                            of the XPL program. It may do so at different times during execution for
-                            different inputs and outputs. The XPL implementation should raise a
-                            dynamic error if a dynamically defined mandatory input or output is
-                            exposed but is not connected. The XPL implementation must raise a
-                            dynamic error if an XML Infoset associated with any such output is
-                            requested during execution and the XML processor has not exposed that
-                            output to the XPL implementation.
-                        </p>
-                    </item>
-                </ulist>
                 <note>
-                    The mechanism by which an XPL processor exposes inputs and outputs to the XPL
-                    implementation, and whether they are mandatory or optional, is outside the
-                    scope of this specification.
+                    The mechanism by which an XPL processor exposes inputs and outputs, and whether
+                    they are mandatory or optional to the XPL implementation is outside the scope
+                    of this specification.
                 </note>
             </div2>
             <div2 id="processor-behavior">
@@ -428,40 +466,23 @@
                     <item>
                         <p>
                             <emph>Change of control.</emph> The XPL implementation may give control
-                            to the XML processor, in association with exactly zero or one processor
-                            output. If the XML processor interface has at least one connected
-                            output, the XPL implementation will always give control to the XML
-                            processor in association with an output.
+                            to an XML processor instance, in association with exactly zero or one
+                            connected output. If the XML processor instance has at least one
+                            connected output, the XPL implementation will always give control to the
+                            XML processor in association with an output. If the XPL implementation
+                            gives control the XML processor instance in association with an output,
+                            while in control the XML processor instance must "produce" an XML
+                            Infoset associated with that output. If the XPL implementation did not
+                            associate an output, the XML processor does not generate an XML Infoset.
                         </p>
                     </item>
                     <item>
                         <p>
-                            <emph>Reading inputs.</emph> The XML processor, when having control, may
-                            read one or more of its inputs. "Reading an input" means that the XML
-                            processor asks the XPL implementation to produce the XML Infoset
-                            associated with that particular input.
-                        </p>
-                    </item>
-                    <item>
-                        <p>
-                            <emph>Producing resulting XML Infosets.</emph> The XML processor, when
-                            returning control to the XPL implementation, must "produce" an XML
-                            Infoset associated with the output associated when the XPL
-                            implementation gave control to the XML processor. If the XPL
-                            implementation did not associate an output because the XML processor
-                            does not have any, the XML processor does not generate an XML Infoset.
-                            If the XML processor has not exposed the output that the XPL
-                            implementation is associating, the XPL implementation must raise a
-                            dynamic error.
-                        </p>
-                    </item>
-                    <item>
-                        <p>
-                            <emph>Generating an error.</emph> The XML processor, when having
-                            control, may generate an error that is propagated to the XPL
+                            <emph>Generating an error.</emph> The XML processor instance, when
+                            having control, may generate an error that is propagated to the XPL
                             implementation. The XPL implementation then raises a dynamic error.
-                            Even if the XPL implementation is expecting a resulting XML Infoset,
-                            no such XML Infoset is provided by the XML processor. With the exception
+                            Even if the XPL implementation is expecting a resulting XML Infoset, no
+                            such XML Infoset is provided by the XML processor. With the exception
                             module, the error is considered an exception and may be a recoverable
                             dynamic error. This means that if an exception handler is available for
                             that exception, it can be caught and processing may resume. Otherwise,
@@ -480,10 +501,30 @@
                             with other software reports an error.
                         </p>
                     </item>
+                    <item>
+                        <p>
+                            <emph>Reading inputs.</emph> The XML processor instance, when having
+                            control, may read one or more of its connected inputs. "Reading an
+                            input" means that the XML processor instance asks the XPL implementation
+                            to produce the XML Infoset associated with that particular connected
+                            input.
+                        </p>
+                    </item>
+                    <item>
+                        <p>
+                            <emph>Reading outputs.</emph> "Reading an output" means that the XML
+                            implementation gives control to an XML processor instance in association
+                            with an output. When in control, the XML processor instance must produce
+                            the XML Infoset associated with that particular output. If the XML
+                            implementation reads a dynamic output, the XML processor instance may
+                            generate an error if it does not support that output.
+                        </p>
+                    </item>
                 </ulist>
                 <p>
-                    An XML processor may perform other tasks, like interacting with other software.
-                    Such tasks are outside the scope of the present specification.
+                    While in control, an XML processor instance may perform other tasks, like
+                    interacting with other software. Such tasks are outside the scope of the present
+                    specification.
                 </p>
                 <p>
                     XPL does not specify the format or API used by the XPL implementation to
@@ -491,27 +532,241 @@
                     Infosets to the XPL implementation.
                 </p>
             </div2>
-            <div2 id="processor-instance">
-                <head>Instances</head>
-                <p>
-                    <termdef id="xml-processor-instance" term="XML processor instance">
-                        An <term>XML processor instance</term> consists of an XML processor
-                        identified by a QName, a set of inputs and outputs connected to that
-                        processor within an XPL program, and an optional implementation-dependent
-                        execution state.
-                    </termdef>
-                </p>
-                <p>
-                    An XML processor used in an XPL program is always <emph>instanciated</emph>.
-                    Multiple instances of the same XML processor may occur in an XPL program.
-                </p>
-                <p>
-                    XPL does not specify if or how an XML processor is instanciated or keeps state
-                    information during an XPL program execution.
-                </p>
-            </div2>
         </div1>
-        <div1 id="pipelines">
+<!--        <div1 id="processors">-->
+<!--            <head>XML Processors</head>-->
+<!--            <div2>-->
+<!--                <head>Definition</head>-->
+<!--                <p>-->
+<!--                    <termdef id="xml-processor" term="XPL processor">-->
+<!--                        An <term>XML processor</term> is a component used in an <termref-->
+<!--                        def="xpl-program">XPL program</termref> and identified by a <termref-->
+<!--                        def="qname">QName</termref>.-->
+<!--                    </termdef>-->
+<!--                </p>-->
+<!--                <p>-->
+<!--                    An XML processor is composed of:-->
+<!--                </p>-->
+<!--                <ulist>-->
+<!--                    <item>-->
+<!--                        <p><emph>An interface</emph>, defining how the XML processor interfaces-->
+<!--                        with an XPL program. See <specref ref="processor-interface"/>.</p>-->
+<!--                    </item>-->
+<!--                    <item>-->
+<!--                        <p><emph>A behavior</emph>, defining tasks performed by the XML processor-->
+<!--                        during the execution of an XPL program. See <specref-->
+<!--                        ref="processor-behavior"/>.</p>-->
+<!--                    </item>-->
+<!--                </ulist>-->
+<!--                <p>-->
+<!--                    A small set of XML processors must be provided by the XPL implementations. See-->
+<!--                    <specref ref="standardprocessors"/>. However most of the XML processors provided-->
+<!--                    by an XPL implementations are implementation-defined. XPL implementations may-->
+<!--                    also choose to be extensible and allow users of the implementation to provide-->
+<!--                    their own XML processors.-->
+<!--                </p>-->
+<!--                <p>-->
+<!--                    The use of a <termref def="qname">QName</termref> to identify an XML processor-->
+<!--                    has the following benefits:-->
+<!--                </p>-->
+<!--                <ulist>-->
+<!--                    <item>-->
+<!--                        <p>-->
+<!--                            <emph>Shorter to write by hand than full URIs.</emph> Once an XML-->
+<!--                            namespace prefix mapping is done, a qualified name only requires typing-->
+<!--                            a prefix, which can be as short as one character, and a local name.-->
+<!--                        </p>-->
+<!--                    </item>-->
+<!--                    <item>-->
+<!--                        <p>-->
+<!--                            <emph>Allows for logical grouping of processors.</emph> A single URI-->
+<!--                            regroups the XML processors in a certain category, for example the XML-->
+<!--                            processors implemented by a certain company.-->
+<!--                        </p>-->
+<!--                    </item>-->
+<!--                    <item>-->
+<!--                        <p>-->
+<!--                            <emph>Consistency with other specifications.</emph> <bibref-->
+<!--                            ref="xslt-20"/> for example, uses qualified names to identify-->
+<!--                            stylesheet-defined objects such as functions.-->
+<!--                        </p>-->
+<!--                    </item>-->
+<!--                </ulist>-->
+<!--                <p>-->
+<!--                    The definition of the mapping between a particular QName and an XML processor-->
+<!--                    implementation is outside the scope of XPL.-->
+<!--                </p>-->
+<!--            </div2>-->
+<!--            <div2 id="processor-interface">-->
+<!--                <head>Interface</head>-->
+<!--                <p>-->
+<!--                    The interface of an XML processor interface consists of:-->
+<!--                </p>-->
+<!--                <ulist>-->
+<!--                    <item>-->
+<!--                        <p>-->
+<!--                            <emph>A set of inputs each identified by a name.</emph> No two inputs-->
+<!--                            input may have the same name. Each input may provide a particular XML-->
+<!--                            Infoset to the XML processor. The set of inputs may be empty.-->
+<!--                        </p>-->
+<!--                    </item>-->
+<!--                    <item>-->
+<!--                        <p>-->
+<!--                            <emph>A set of outputs each identified by a name.</emph> No two outputs-->
+<!--                            output may have the same name. Each output may provide an XML Infoset-->
+<!--                            produced by the processor. The set of outputs may be empty.-->
+<!--                        </p>-->
+<!--                    </item>-->
+<!--                </ulist>-->
+<!--                <p>-->
+<!--                    An input name uniquely identifies a processor input, and an output name uniquely-->
+<!--                    identifies a processor output.-->
+<!--                </p>-->
+<!--                <p>-->
+<!--                    The interface of a processor can include the following types of inputs and-->
+<!--                    outputs:-->
+<!--                </p>-->
+<!--                <ulist>-->
+<!--                    <item>-->
+<!--                        <p>-->
+<!--                            <emph>Mandatory inputs and outputs.</emph> Such inputs and outputs must-->
+<!--                            be connected in an XPL program.-->
+<!--                        </p>-->
+<!--                    </item>-->
+<!--                    <item>-->
+<!--                        <p>-->
+<!--                            <emph>Optional inputs and outputs.</emph> Such inputs and outputs may or-->
+<!--                            may not be connected in an XPL program.-->
+<!--                        </p>-->
+<!--                    </item>-->
+<!--                </ulist>-->
+<!--                <p>-->
+<!--                    Inputs and outputs parts of the interface of a processor may be defined:-->
+<!--                </p>-->
+<!--                <ulist>-->
+<!--                    <item>-->
+<!--                        <p>-->
+<!--                            <emph>Statically.</emph> This means that the XML processor exposes such-->
+<!--                            inputs and outputs to the XPL implementation before the execution of the-->
+<!--                            XPL program. The XPL implementation should raise a static error if a-->
+<!--                            statically defined mandatory input or output is exposed but not-->
+<!--                            connected.-->
+<!--                        </p>-->
+<!--                    </item>-->
+<!--                    <item>-->
+<!--                        <p>-->
+<!--                            <emph>Dynamically.</emph> This means that the XML processor exposes such-->
+<!--                            inputs and outputs to the XPL implementation only during the execution-->
+<!--                            of the XPL program. It may do so at different times during execution for-->
+<!--                            different inputs and outputs. The XPL implementation should raise a-->
+<!--                            dynamic error if a dynamically defined mandatory input or output is-->
+<!--                            exposed but is not connected. The XPL implementation must raise a-->
+<!--                            dynamic error if an XML Infoset associated with any such output is-->
+<!--                            requested during execution and the XML processor has not exposed that-->
+<!--                            output to the XPL implementation.-->
+<!--                        </p>-->
+<!--                    </item>-->
+<!--                </ulist>-->
+<!--                <note>-->
+<!--                    The mechanism by which an XPL processor exposes inputs and outputs to the XPL-->
+<!--                    implementation, and whether they are mandatory or optional, is outside the-->
+<!--                    scope of this specification.-->
+<!--                </note>-->
+<!--            </div2>-->
+<!--            <div2 id="processor-behavior">-->
+<!--                <head>Behavior</head>-->
+<!--                <p>-->
+<!--                    The behavior of an XML processor is for the most part outside the scope of this-->
+<!--                    specification, with the exception of the following aspects:-->
+<!--                </p>-->
+<!--                <ulist>-->
+<!--                    <item>-->
+<!--                        <p>-->
+<!--                            <emph>Change of control.</emph> The XPL implementation may give control-->
+<!--                            to the XML processor, in association with exactly zero or one processor-->
+<!--                            output. If the XML processor interface has at least one connected-->
+<!--                            output, the XPL implementation will always give control to the XML-->
+<!--                            processor in association with an output.-->
+<!--                        </p>-->
+<!--                    </item>-->
+<!--                    <item>-->
+<!--                        <p>-->
+<!--                            <emph>Reading inputs.</emph> The XML processor, when having control, may-->
+<!--                            read one or more of its inputs. "Reading an input" means that the XML-->
+<!--                            processor asks the XPL implementation to produce the XML Infoset-->
+<!--                            associated with that particular input.-->
+<!--                        </p>-->
+<!--                    </item>-->
+<!--                    <item>-->
+<!--                        <p>-->
+<!--                            <emph>Producing resulting XML Infosets.</emph> The XML processor, when-->
+<!--                            returning control to the XPL implementation, must "produce" an XML-->
+<!--                            Infoset associated with the output associated when the XPL-->
+<!--                            implementation gave control to the XML processor. If the XPL-->
+<!--                            implementation did not associate an output because the XML processor-->
+<!--                            does not have any, the XML processor does not generate an XML Infoset.-->
+<!--                            If the XML processor has not exposed the output that the XPL-->
+<!--                            implementation is associating, the XPL implementation must raise a-->
+<!--                            dynamic error.-->
+<!--                        </p>-->
+<!--                    </item>-->
+<!--                    <item>-->
+<!--                        <p>-->
+<!--                            <emph>Generating an error.</emph> The XML processor, when having-->
+<!--                            control, may generate an error that is propagated to the XPL-->
+<!--                            implementation. The XPL implementation then raises a dynamic error.-->
+<!--                            Even if the XPL implementation is expecting a resulting XML Infoset,-->
+<!--                            no such XML Infoset is provided by the XML processor. With the exception-->
+<!--                            module, the error is considered an exception and may be a recoverable-->
+<!--                            dynamic error. This means that if an exception handler is available for-->
+<!--                            that exception, it can be caught and processing may resume. Otherwise,-->
+<!--                            the error is a non-recoverable dynamic error. With the basic profile,-->
+<!--                            all errors raised by an XML processor are non-recoverable dynamic-->
+<!--                            errors.-->
+<!--                        </p>-->
+<!--                        <p>-->
+<!--                            Example 1: An XML processor may generate an error if an XML Infosets-->
+<!--                            read on any of its inputs does not conform to a format expected by the-->
+<!--                            XML processor. Similarly, the interaction with other software may cause-->
+<!--                            the XML processor to report errors.-->
+<!--                        </p>-->
+<!--                        <p>-->
+<!--                            Example 2: An XML processor may generate an error if the interaction-->
+<!--                            with other software reports an error.-->
+<!--                        </p>-->
+<!--                    </item>-->
+<!--                </ulist>-->
+<!--                <p>-->
+<!--                    An XML processor may perform other tasks, like interacting with other software.-->
+<!--                    Such tasks are outside the scope of the present specification.-->
+<!--                </p>-->
+<!--                <p>-->
+<!--                    XPL does not specify the format or API used by the XPL implementation to-->
+<!--                    provide XML Infosets to an XML processor, or how an XML processor returns XML-->
+<!--                    Infosets to the XPL implementation.-->
+<!--                </p>-->
+<!--            </div2>-->
+<!--            <div2 id="processor-instance">-->
+<!--                <head>Instances</head>-->
+<!--                <p>-->
+<!--                    <termdef id="xml-processor-instance" term="XML processor instance">-->
+<!--                        An <term>XML processor instance</term> consists of an XML processor-->
+<!--                        identified by a QName, a set of inputs and outputs connected to that-->
+<!--                        processor within an XPL program, and an optional implementation-dependent-->
+<!--                        execution state.-->
+<!--                    </termdef>-->
+<!--                </p>-->
+<!--                <p>-->
+<!--                    An XML processor used in an XPL program is always <emph>instanciated</emph>.-->
+<!--                    Multiple instances of the same XML processor may occur in an XPL program.-->
+<!--                </p>-->
+<!--                <p>-->
+<!--                    XPL does not specify if or how an XML processor is instanciated or keeps state-->
+<!--                    information during an XPL program execution.-->
+<!--                </p>-->
+<!--            </div2>-->
+<!--        </div1>-->
+        <div1 id="xpl-program">
             <head>XPL Program</head>
             <div2>
                 <head>Structure</head>
@@ -521,9 +776,10 @@
                 <ulist>
                     <item>
                         <p>
-                            <emph>Optional input and output parameters.</emph> Each input or output
-                            has a name, and may either provide the XPL program with an XML Infoset
-                            (case of an input), or produces an XML Infoset (case of an output).
+                            <emph>Input and output parameters.</emph> Each input or output has a
+                            name, and may either provide the XPL program with an XML Infoset (case
+                            of an input), or produces an XML Infoset (case of an output). The XPL
+                            program may have no input or outputs.
                         </p>
                     </item>
                     <item>
@@ -539,7 +795,7 @@
                     is important to note that information, whether in the form or XML Infosets or
                     other forms, is not necessarily exchanged with XPL programs through pipeline
                     inputs and outputs, but possibly with other means. For example, an XML processor
-                    can access information by connect to a relational database and return an XML
+                    can access information by connecting to a relational database and return an XML
                     Infoset to the XPL program.
                 </note>
             </div2>
@@ -809,7 +1065,7 @@
                     </pre>
                     <p>
                         The <el>p:processor</el> element declares a statement that consists of a
-                        single XML processor instance identified with the <el>name</el> attribute.
+                        single XML processor instance.
                     </p>
                     <p>
                         The set of XML Infoset identifiers exposed by a <el>p:processor</el>

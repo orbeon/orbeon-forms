@@ -72,5 +72,7 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/mailapi-1_3_2.jar"/>
 	<classpathentry kind="lib" path="lib/TaminoAPI4J.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/log4j-1.3alpha0.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/itext-1_02b.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/itext-xml-1_02.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>

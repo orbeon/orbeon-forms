@@ -2,8 +2,6 @@
 <classpath>
 	<classpathentry excluding="org/orbeon/faces/|org/orbeon/faces11/|org/orbeon/oxf/common/Version.java|org/orbeon/oxf/resources/Cache*|org/orbeon/oxf/resources/XMLDB*" kind="src" path="src/java"/>
 	<classpathentry sourcepath="JRE_SRC" kind="var" path="JRE_LIB"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/antlr-2_7_4.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/antlr-2_7_4-orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/avalon-framework-cvs-20020315.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/axis-1_1-axis.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/axis-1_1-jaxrpc.jar"/>
@@ -18,13 +16,9 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-fileupload-1.0.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-httpclient-slide_2_0rc1.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-lang-1_0-b1.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/commons-pool-1.1.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-validator-1_0_2.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/dom4j-1_4_orbeon.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/exist-cvs.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/exist-optional-cvs.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/fop-0_20_5.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/hsqldb-1_7_1.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/isorelax-20031020.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/jakarta-oro-2_0_8_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/jakarta-poi-1.11.0-dev-20030610.jar"/>
@@ -51,8 +45,6 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/xalan-2_5_1_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/xercesImpl_2_6_2_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/xml-apis-xerces_2_6_2_orbeon.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/xmldb-eXist_20040510.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/xmlrpc-1_2_eXist_20041005_patched.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/xsdlib-20031020.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/xsltc-2_5_1_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/ymsg9-v0_51.jar"/>
@@ -75,5 +67,13 @@
 	<classpathentry kind="lib" path="lib/saxon-8_1_1_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/private/commons-logging-1_0_4.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/cli/commons-cli-1_0.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/commons-pool-1.2.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/exist-1_0b2_build_1107.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/exist-optional-1_0b2_build_1107.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/hsqldb-1_7_2_8_orbeon.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/xmlrpc-1_2_patched_exist_1_0b2_build_1107.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/xmldb-exist_1_0b2_build_1107.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/antlr-2_7_4_orbeon.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/antlr-2_7_4.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>

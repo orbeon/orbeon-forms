@@ -176,11 +176,17 @@ public class JavaProcessor extends ProcessorImpl {
                 if (logger.isDebugEnabled())
                     logger.debug("Compiling class '" + config.clazz + "'");
                 StringWriter javacOutput = new StringWriter();
-                int success = Main.compile(new String[]
-                        {"-g", "-classpath", buildClassPath(context),
-                         "-sourcepath", config.sourcepath,
-                         "-d", SystemUtils.getTemporaryDirectory().getAbsolutePath(),
-                         config.sourcepath + "/" + config.clazz.replace('.', '/') + ".java" },
+                final String[] cmdLine = new String[]
+                { "-g", "-classpath", buildClassPath(context), "-sourcepath", 
+                  config.sourcepath, "-d", 
+				  SystemUtils.getTemporaryDirectory().getAbsolutePath(),
+				  config.sourcepath + "/" + config.clazz.replace('.', '/') + ".java" 
+				};
+                for ( int i = 0; i < cmdLine.length; i++ )
+                {
+                	if ( cmdLine[ i ] == null ) throw new IllegalArgumentException( "arg[ " + i + " ]" );
+                }
+                int success = Main.compile( cmdLine,
                         new PrintWriter(javacOutput));
                 if (success != 0) {
                     String javacOutputString = "\n" + javacOutput.toString();

@@ -24,12 +24,7 @@
         </p:input>
         <p:input name="data" href="#instance"/>
         <p:input name="chart" href="#instance#xpointer(/form/chart)"/>
-        <p:output name="data" id="chart-info" />
-    </p:processor>
-
-    <p:processor name="oxf:identity">
-        <p:input name="data" href="aggregate('root', #instance, #chart-info)" />
-        <p:output name="data" ref="data"/>
+        <p:output name="data" ref="data" />
     </p:processor>
 
 </p:config>

@@ -18,7 +18,8 @@
     xmlns:str="http://exslt.org/strings"
     xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-    <xsl:variable name="display-column" select="str:tokenize(/root/form/display-column)"/>
+    <xsl:variable name="display-column" select="str:tokenize(document('oxf:instance')/form/display-column)"/>
+
     <xsl:template match="/">
         <xhtml:html>
             <xhtml:head><xhtml:title>XForms Sortable Table</xhtml:title></xhtml:head>
@@ -83,7 +84,7 @@
                                         <xsl:with-param name="column">gdp</xsl:with-param>
                                         <xsl:with-param name="data-type">number</xsl:with-param>
                                     </xsl:call-template>
-                                    <xsl:for-each select="/root/countries/country">
+                                    <xsl:for-each select="/countries/country">
                                         <xhtml:tr>
                                             <xsl:if test="$display-column[string(.) = 'name']">
                                                 <xhtml:td><xsl:value-of select="name"/></xhtml:td>
@@ -110,7 +111,7 @@
                                     <xhtml:p>XForms instance:</xhtml:p>
                                     <xhtml:p>
                                         <f:xml-source>
-                                            <xsl:copy-of select="/root/form"/>
+                                            <xsl:copy-of select="document('oxf:instance')/form"/>
                                         </f:xml-source>
                                     </xhtml:p>
                                 </td>

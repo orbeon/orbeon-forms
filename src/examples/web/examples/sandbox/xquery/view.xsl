@@ -35,7 +35,7 @@
                             <td style="padding: 1em">
                                 <xsl:variable name="input-lines">
                                     <xsl:call-template name="lines">
-                                        <xsl:with-param name="text" select="string(/root/form/xquery)"/>
+                                        <xsl:with-param name="text" select="string(document('oxf:instance')/form/xquery)"/>
                                     </xsl:call-template>
                                 </xsl:variable>
                                 <xsl:variable name="lines">

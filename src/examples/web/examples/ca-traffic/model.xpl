@@ -26,7 +26,7 @@
                 <p:input name="data">
                     <return>You didn't enter a valid highway number. Please try again.</return>
                 </p:input>
-                <p:output name="data" id="traffic"/>
+                <p:output name="data" ref="data"/>
             </p:processor>
         </p:when>
         <p:otherwise>
@@ -50,14 +50,9 @@
                 </p:input>
                 <p:input name="data"><dummy/></p:input>
                 <p:input name="call" href="#call"/>
-                <p:output name="data" id="traffic"/>
+                <p:output name="data" ref="data"/>
             </p:processor>
         </p:otherwise>
     </p:choose>
-
-    <p:processor name="oxf:identity">
-        <p:input name="data" href="aggregate('root', #traffic, #instance)"/>
-        <p:output name="data" ref="data"/>
-    </p:processor>
 
 </p:config>

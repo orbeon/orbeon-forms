@@ -1063,12 +1063,13 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                         addStatement(new ASTChoose(new ASTHrefId(content)) {
 
-                            private void addDataWhen(final ASTChoose astChoose, final String condition, final QName processorQName, final ASTParam input) {
+                            private void addDataWhen(final ASTChoose astChoose, final String condition, final QName processorQName, final ASTParam input1, final ASTParam input2) {
                                 astChoose.addWhen(new ASTWhen(condition) {{
                                     setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
                                     addStatement(new ASTProcessorCall(processorQName) {{
                                         addInput(new ASTInput("config", new ASTHrefId(content)));
-                                        addInput(new ASTInput("data", new ASTHrefId(input)));
+                                        addInput(new ASTInput("data", new ASTHrefId(input1)));
+                                        addInput(new ASTInput("instance", new ASTHrefId(input2)));
                                         addOutput(new ASTOutput("data", resultData));
                                     }});
                                 }});
@@ -1078,8 +1079,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 addWhen(new ASTWhen(condition) {{
                                     setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
                                     addStatement(new ASTChoose(new ASTHrefId(dataInput)) {{
-                                        addDataWhen(this, "not(/*/@xsi:nil = 'true')", processorQName, dataInput);
-                                        addDataWhen(this, "/*/@xsi:nil = 'true'", processorQName, instanceInput);
+                                        addDataWhen(this, "not(/*/@xsi:nil = 'true')", processorQName, dataInput, instanceInput);
+                                        addDataWhen(this, "/*/@xsi:nil = 'true'", processorQName, instanceInput, instanceInput);
                                     }});
                                 }});
                             }

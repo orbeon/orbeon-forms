@@ -37,8 +37,7 @@
     </p:processor>
 
     <p:processor name="oxf:identity">
-        <p:input name="data" href="aggregate('root', aggregate('input', input.xml),
-            aggregate('output', #output), #instance)"/>
+        <p:input name="data" href="aggregate('root', aggregate('input', input.xml), aggregate('output', #output))"/>
         <p:output name="data" ref="data"/>
     </p:processor>
 

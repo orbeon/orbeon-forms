@@ -258,8 +258,8 @@
              <xhtml:tr>
                  <xhtml:td>
                      <center>
-                         <img src="/chartDisplay?filename={/root/chart-info/file}" usemap="#fruits" border="0" width="400" height="300"/>
-                         <xsl:copy-of select="/root/chart-info/map"/>
+                         <img src="/chartDisplay?filename={/chart-info/file}" usemap="#fruits" border="0" width="400" height="300"/>
+                         <xsl:copy-of select="/chart-info/map"/>
                      </center>
                  </xhtml:td>
              </xhtml:tr>
@@ -271,7 +271,7 @@
              <xhtml:tr>
                  <xhtml:td style="white-space: normal">
                      <f:xml-source>
-                         <xsl:copy-of select="/root/form/chart"/>
+                         <xsl:copy-of select="document('oxf:instance')/form/chart"/>
                      </f:xml-source>
                  </xhtml:td>
              </xhtml:tr>
@@ -283,7 +283,7 @@
              <xhtml:tr>
                  <xhtml:td>
                      <f:xml-source>
-                         <xsl:copy-of select="/root/form/data"/>
+                         <xsl:copy-of select="document('oxf:instance')/form/data"/>
                      </f:xml-source>
                  </xhtml:td>
              </xhtml:tr>

@@ -35,7 +35,7 @@ public class DocumentWrapper extends NodeWrapper implements DocumentInfo {
         nodeKind = Type.DOCUMENT;
 
         // Extract the location info is available
-        if(baseURI == null) {
+        if(baseURI == null && doc.getRootElement() != null) {
             Object data = doc.getRootElement().getData();
             if(data instanceof LocationData)   {
                 this.baseURI = ((LocationData)data).getSystemID();

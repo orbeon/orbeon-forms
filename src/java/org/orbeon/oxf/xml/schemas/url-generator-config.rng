@@ -33,6 +33,7 @@
                         <optional>
                             <element name="content-type">
                                 <data type="string">
+                                    <!-- See: http://www.faqs.org/rfcs/rfc2045.html -->
                                     <param name="pattern">[\p{IsBasicLatin}-[&#09;- ()&lt;>@,;:\\"/\[\]=?]]+/[\p{IsBasicLatin}-[&#09;- ()&lt;>@,;:\\"/\[\]=?]]+</param>
                                 </data>
                             </element>

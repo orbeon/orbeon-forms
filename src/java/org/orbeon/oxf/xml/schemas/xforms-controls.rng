@@ -66,11 +66,17 @@
             <!-- Submit controls -->
             <element name="xf:submit">
                 <ref name="submit-trigger-content"/>
+                <optional>
+	                <attribute name="ref"/>
+                </optional>
             </element>
 
             <!-- Trigger -->
             <element name="xf:trigger">
                 <ref name="submit-trigger-content"/>
+                <optional>
+	                <attribute name="ref"/>
+                </optional>
             </element>
 
             <!-- Upload controls -->
@@ -315,10 +321,6 @@
                 <element name="xf:item">
                     <interleave>
                         <ref name="xforms-common"/>
-<!--                        <element name="xf:label">-->
-<!--                            <ref name="xforms-common"/>-->
-<!--                            <text/>-->
-<!--                        </element>-->
                         <element name="xf:value">
                             <ref name="xforms-common"/>
                             <text/>
@@ -326,14 +328,10 @@
                     </interleave>
                 </element>
                 <element name="xf:itemset">
+                    <attribute name="nodeset"/>
                     <interleave>
                         <ref name="xforms-common"/>
-                        <attribute name="nodeset"/>
-                        <element name="xf:label">
-                            <ref name="xforms-common"/>
-                            <attribute name="ref"/>
-                        </element>
-                        <element name="xf:value">
+                        <element name="xf:copy">
                             <ref name="xforms-common"/>
                             <attribute name="ref"/>
                         </element>
@@ -409,9 +407,19 @@
                     <ref name="non-xforms-content"/>
                     <ref name="non-xforms-attributes"/>
                 </element>
-                <element name="xf:help"><ref name="non-xforms-content"/></element>
-                <element name="xf:hint"><ref name="non-xforms-content"/></element>
-                <element name="xf:alert"><ref name="non-xforms-attributes"/><ref name="non-xforms-content"/></element>
+                <element name="xf:help">
+                    <optional><attribute name="ref"/></optional>
+                	<ref name="non-xforms-content"/>
+            	</element>
+                <element name="xf:hint">
+                    <optional><attribute name="ref"/></optional>
+                	<ref name="non-xforms-content"/>
+            	</element>
+                <element name="xf:alert">
+                    <optional><attribute name="ref"/></optional>
+                	<ref name="non-xforms-attributes"/>
+                	<ref name="non-xforms-content"/>
+            	</element>
                 <element name="xxf:control"><empty/></element>
                 <element>
                     <anyName>

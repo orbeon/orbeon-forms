@@ -150,6 +150,20 @@ h1 {
     clear: both;
 }
 
+.subtabs {
+    background-image:  url('<xsl:value-of select="context:rewriteRenderURL('/oxf-theme/images/tabbar-blue.png')"/>');
+    background-repeat: repeat-x;
+    height: 23px;
+    text-align: left;
+    font-weight: normal;
+    font-size: 8pt;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    font-weight: bold;
+    margin-left: -1em;
+    margin-right: -1em;
+}
+
 .tab {
     color: #000;
     margin: 0 0 0 0;

@@ -51,6 +51,7 @@
         <menu-item label="Image Server" href="processors-image"/>
         <menu-item label="Charts and Spreadsheets" href="processors-charts-spreadsheets"/>
         <menu-item label="Messaging" href="processors-messaging"/>
+        <menu-item label="Scheduler" href="processors-scheduler"/>
         <menu-item label="Struts" href="processors-struts"/>
         <menu-item label="Other Processors" href="processors-other"/>
     </menu>

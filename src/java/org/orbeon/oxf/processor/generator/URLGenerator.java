@@ -201,7 +201,8 @@ public class URLGenerator extends ProcessorImpl {
 //        }
 
         public String toString() {
-            return "[" + getURL().toExternalForm() + "|" + getContentType() + "|" + isValidating() + "|" + tidyConfig + "]";
+            return "[" + getURL().toExternalForm() + "|" + getContentType() + "|" + getEncoding() + "|"  + isValidating() + "|" + isForceContentType()
+                    + "|" + isForceEncoding() + "|" + isIgnoreConnectionEncoding() + "|" + tidyConfig + "]";
         }
     }
 

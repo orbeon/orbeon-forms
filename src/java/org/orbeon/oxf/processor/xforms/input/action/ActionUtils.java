@@ -20,6 +20,7 @@ import org.dom4j.XPath;
 import org.jaxen.FunctionContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.util.Collections;
 import java.util.List;
@@ -29,8 +30,8 @@ public class ActionUtils {
     /**
      * Gets a nodeset from the instance. Nodeset is a list of elements.
      */
-    public static List getNodeset(FunctionContext functionContext, Document instance, String nodeset) {
-        XPath nodesetXPath = XPathUtils.xpathWithFullURI(instance, nodeset);
+    public static List getNodeset(PipelineContext context, FunctionContext functionContext, Document instance, String nodeset) {
+        XPath nodesetXPath = XPathUtils.xpathWithFullURI(context, instance, nodeset);
         nodesetXPath.setFunctionContext(functionContext);
         Object nodesetObject = nodesetXPath.evaluate(instance);
         if (nodesetObject instanceof List) {

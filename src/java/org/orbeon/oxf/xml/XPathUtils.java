@@ -19,8 +19,13 @@ import org.jaxen.dom.DOMXPath;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.xpath.XPathEvaluator;
 import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.xpath.StandaloneContext;
+import org.orbeon.saxon.xpath.XPathExpression;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.helpers.NamespaceSupport;
@@ -236,22 +241,9 @@ public class XPathUtils {
         }
     }
 
-    /**
-     * Returns an XPath object based on an XPath expression and a node. The XPath expression can
-     * have have encoded namespaces, for instance:
-     *
-     *     /{http://www.example.com/x}a/{http://www.example.com/y}b
-     *
-     * The expression may or may not have prefixes. If it does, prefixes are used. This is not
-     * strictly necessary, but using the existing prefixes will yield better error messages.
-     * Otherwise, prefixes are automatically generated.
-     *
-     *     /{http://www.example.com/x}x:a/{http://www.example.com/y}y:b
-     */
-    public static org.dom4j.XPath xpathWithFullURI(org.dom4j.Node node, String xpath) {
+    private static String xpathWithFullURIString(String xpath, Map prefixToURIMap) {
         // Replace URI by prefix in XPath expression
         Map uriToPrefixMap = new HashMap();
-        Map prefixToURIMap = new HashMap();
         int namespaceIndex = 0;
         StringBuffer prefixedXPath = new StringBuffer();
         {
@@ -313,11 +305,49 @@ public class XPathUtils {
             }
         }
 
-        // Evaluate XPath expression
-        org.dom4j.XPath path = node.createXPath(prefixedXPath.toString());
+        return prefixedXPath.toString();
+    }
+
+    /**
+     * Returns an XPath object based on an XPath expression and a node. The XPath expression can
+     * have have encoded namespaces, for instance:
+     *
+     *     /{http://www.example.com/x}a/{http://www.example.com/y}b
+     *
+     * The expression may or may not have prefixes. If it does, prefixes are used. This is not
+     * strictly necessary, but using the existing prefixes will yield better error messages.
+     * Otherwise, prefixes are automatically generated.
+     *
+     *     /{http://www.example.com/x}x:a/{http://www.example.com/y}y:b
+     */
+    public static org.dom4j.XPath xpathWithFullURI(PipelineContext context, org.dom4j.Node node, String xpath) {
+        Map prefixToURIMap = new HashMap();
+        org.dom4j.XPath path = XPathCache.createCacheXPath(context, xpathWithFullURIString(xpath, prefixToURIMap));
         path.setNamespaceContext(new SimpleNamespaceContext(prefixToURIMap));
         return path;
     }
+
+    public static Object xpath2WithFullURI(DocumentWrapper documentWrapper, String xpath) {
+        try {
+            // Create String XPath expression
+            Map prefixToURIMap = new HashMap();
+            String xpathExpression = xpathWithFullURIString(xpath, prefixToURIMap);
+
+            // Create Saxon XPath expression
+            final XPathEvaluator xpathEvaluator;
+            xpathEvaluator = new XPathEvaluator(documentWrapper);
+            StandaloneContext standaloneContext = (StandaloneContext) xpathEvaluator.getStaticContext();
+            for (Iterator j = prefixToURIMap.keySet().iterator(); j.hasNext();) {
+                String prefix = (String) j.next();
+                standaloneContext.declareNamespace(prefix, (String) prefixToURIMap.get(prefix));
+            }
+
+            return xpathEvaluator.evaluateSingle(xpathExpression);
+        } catch (XPathException e) {
+            throw new OXFException(e);
+        }
+    }
+
 
     /**
      * Example:

@@ -18,6 +18,7 @@ import org.jaxen.FunctionContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.util.Iterator;
 import java.util.List;
@@ -35,20 +36,20 @@ public class SetValue implements Action {
         content = (String) parameters.get("content");
     }
 
-    public void run(FunctionContext functionContext, Document instance) {
+    public void run(PipelineContext context, FunctionContext functionContext, Document instance) {
 
         // Compute value
         String newValue;
         if (value == null) {
             newValue = content == null ? "" : content;
         } else {
-            XPath valueXPath = XPathUtils.xpathWithFullURI(instance, "string(" + value + ")");
+            XPath valueXPath = XPathUtils.xpathWithFullURI(context, instance, "string(" + value + ")");
             valueXPath.setFunctionContext(functionContext);
             newValue = (String) valueXPath.evaluate(instance);
         }
 
         // Get referenced part of the instance
-        XPath refXPath = XPathUtils.xpathWithFullURI(instance, ref);
+        XPath refXPath = XPathUtils.xpathWithFullURI(context, instance, ref);
         refXPath.setFunctionContext(functionContext);
         Object refObject = refXPath.evaluate(instance);
 

@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.xforms.input.action;
 
 import org.dom4j.Document;
 import org.jaxen.FunctionContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class Set implements Action {
         setValue.setParameters(setValueParameters);
     }
 
-    public void run(FunctionContext functionContext, Document instance) {
-        setValue.run(functionContext, instance);
+    public void run(PipelineContext context, FunctionContext functionContext, Document instance) {
+        setValue.run(context, functionContext, instance);
     }
 }

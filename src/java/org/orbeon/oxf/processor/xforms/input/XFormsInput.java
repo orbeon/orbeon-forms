@@ -149,7 +149,7 @@ public class XFormsInput extends ProcessorImpl {
                     Action[] actions = requestParameters.getActions();
                     for (int i = 0; i < actions.length; i++) {
                         Action action = actions[i];
-                        action.run(new ActionFunctionContext(), instance.getDocument());
+                        action.run(pipelineContext, new ActionFunctionContext(), instance.getDocument());
                     }
                     if (logger.isDebugEnabled())
                         logger.debug("2) Instance with actions applied:\n"

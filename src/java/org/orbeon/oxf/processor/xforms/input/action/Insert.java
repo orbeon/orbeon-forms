@@ -17,6 +17,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.jaxen.FunctionContext;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.util.Iterator;
 import java.util.List;
@@ -37,10 +38,10 @@ public class Insert implements Action {
         position = (String) parameters.get("position");
     }
 
-    public void run(FunctionContext functionContext, Document instance) {
+    public void run(PipelineContext context, FunctionContext functionContext, Document instance) {
 
         // Get nodeset and element to duplicate
-        List nodesetList = ActionUtils.getNodeset(functionContext, instance, nodeset);
+        List nodesetList = ActionUtils.getNodeset(context, functionContext, instance, nodeset);
         if (nodesetList.size() == 0)
             throw new OXFException("nodeset attribute '" + nodeset + "' in insert action must return a non-empty nodeset");
         Object lastNode = nodesetList.get(nodesetList.size() - 1);

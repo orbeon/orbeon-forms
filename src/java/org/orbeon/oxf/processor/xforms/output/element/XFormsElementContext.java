@@ -29,6 +29,9 @@ import org.orbeon.oxf.processor.xforms.output.XFormsOutputConfig;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.xpath.XPathEvaluator;
+import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 
@@ -50,6 +53,7 @@ public class XFormsElementContext {
     private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
     private Map repeatIdToIndex = new HashMap();
     private PipelineContext pipelineContext;
+    private DocumentWrapper documentWrapper;
 
     public XFormsElementContext(PipelineContext pipelineContext, Model model, Document instance,
                                 XFormsOutputConfig config, ContentHandler contentHandler) {
@@ -59,6 +63,7 @@ public class XFormsElementContext {
         this.config = config;
         this.contentHandler = contentHandler;
         this.contentHandlerHelper = new ContentHandlerHelper(contentHandler);
+        this.documentWrapper = new DocumentWrapper(instance, null);
     }
 
     public void pushGroupRef(String ref) {
@@ -75,7 +80,8 @@ public class XFormsElementContext {
      * @param annotateElement
      */
     public String getRefName(boolean annotateElement) {
-        Object value = XPathUtils.xpathWithFullURI(instance, getRefXPath()).evaluate(instance);
+        Object value = null;
+        value = XPathUtils.xpath2WithFullURI(documentWrapper, getRefXPath());
         if (!(value instanceof Element) && !(value instanceof Attribute))
             throw new OXFException("Expression '" + getRefXPath() + "' must reference an element or an attribute");
         return XFormsUtils.getNameForNode((Node) value, annotateElement);
@@ -159,7 +165,7 @@ public class XFormsElementContext {
     }
 
     private List getRefNodeList(String refXPath) {
-        Object value = XPathUtils.xpathWithFullURI(instance, refXPath).evaluate(instance);
+        Object value = XPathUtils.xpath2WithFullURI(documentWrapper, refXPath);
         List result = value instanceof List
                 ? (List) value : value instanceof Element || value instanceof Attribute
                 ? Collections.singletonList(value) : null;

@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.xforms.input.action;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.jaxen.FunctionContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.util.List;
 import java.util.Map;
@@ -30,10 +31,10 @@ public class Delete implements Action {
         at = (String) parameters.get("at");
     }
 
-    public void run(FunctionContext functionContext, Document instance) {
+    public void run(PipelineContext context, FunctionContext functionContext, Document instance) {
 
         // Get nodelist and position of element to remove in nodelist
-        List nodesetList = ActionUtils.getNodeset(functionContext, instance, nodeset);
+        List nodesetList = ActionUtils.getNodeset(context, functionContext, instance, nodeset);
         if (nodesetList.isEmpty()) return;
         int atValue = ActionUtils.getAtValue(functionContext, nodesetList, at);
 

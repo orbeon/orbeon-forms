@@ -15,12 +15,13 @@ package org.orbeon.oxf.processor.xforms.input.action;
 
 import org.dom4j.Document;
 import org.jaxen.FunctionContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.util.Map;
 
 public interface Action {
 
     public void setParameters(Map parameters);
-    public void run(FunctionContext functionContext, Document instance);
+    public void run(PipelineContext context, FunctionContext functionContext, Document instance);
 
 }

@@ -1102,6 +1102,34 @@
         </output>
     </test>
 
+    <test description="Readonly and non-relevent controls are kept" name="oxf:pipeline">
+        <input name="config" href="oxf:/unit-tests/xforms-instance-recreate.xpl"/>
+        <input name="model">
+            <xforms:model id="form">
+                <xforms:instance>
+                    <instance>
+                        <a>a</a>
+                        <b>b</b>
+                    </instance>
+                </xforms:instance>
+                <xforms:bind nodeset="/instance/a" readonly="true()"/>
+                <xforms:bind nodeset="/instance/b" relevant="false()"/>
+            </xforms:model>
+        </input>
+        <input name="view">
+            <xforms:group ref="/instance">
+                <xforms:input ref="a"/>
+                <xforms:input ref="b"/>
+            </xforms:group>
+        </input>
+        <output name="instance">
+            <instance>
+                <a xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">a</a>
+                <b xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:relevant="false">b</b>
+            </instance>
+        </output>
+    </test>
+    
 <!--    <test description="Linking attribute in XForms model" name="oxf:pipeline" only="true">-->
 <!--        <input name="model">-->
 <!--            <xforms:model xmlns:a="a" xmlns:b="b">-->
@@ -1125,5 +1153,7 @@
 <!--        </input>-->
 <!--        <output name="instance" href="company.xml"/>-->
 <!--    </test>-->
+
+
 
 </group>

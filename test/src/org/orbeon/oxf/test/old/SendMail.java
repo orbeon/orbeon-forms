@@ -38,14 +38,14 @@ public class SendMail {
 
             MimeMultipart multi = new MimeMultipart("alternative");
 
-            DataSource textDS = new FileDataSource("C:\\orbeon\\projects\\OXF\\25.txt");
+            DataSource textDS = new FileDataSource("C:\\orbeon\\OIS\\orbeon\\27.txt");
             MimeBodyPart text = new MimeBodyPart();
             text.setDataHandler(new DataHandler(textDS));
             multi.addBodyPart(text);
 
 
 
-            DataSource htmlDS = new FileDataSource("C:\\orbeon\\projects\\OXF\\25.html");
+            DataSource htmlDS = new FileDataSource("C:\\orbeon\\OIS\\orbeon\\27.html");
             MimeBodyPart html = new MimeBodyPart();
             html.setDataHandler(new DataHandler(htmlDS));
 
@@ -59,10 +59,11 @@ public class SendMail {
             message.addFrom(from);
 
 
-            Address to = new InternetAddress("oxf-announce@orbeon.com");
+            Address to = new InternetAddress("orbeon-team@orbeon.com");
+//            Address to = new InternetAddress("oxf-announce@orbeon.com");
             message.addRecipient(Message.RecipientType.TO, to);
 
-            message.setSubject("Orbeon Announces Presentation Server Server 2.5 and Presentation Server Studio");
+            message.setSubject("PLEASE REVIEW : Orbeon Announces Presentation Server Server 2.7 and Presentation Server Studio 1.2");
             message.setSentDate(new Date());
 
             Transport transport = session.getTransport("smtp");

@@ -271,6 +271,7 @@
                     <xsl:otherwise>
                         <!-- Check box -->
                         <xhtml:input type="checkbox" name="{$name}" value="{xforms:value}">
+                            <xsl:copy-of select="ancestor::xforms:select/@* except (@xxforms:* | @*[namespace-uri() = ''])"/>
                             <xsl:call-template name="copy-other-attributes"/>
                             <xsl:if test="$values = xs:string(xforms:value)">
                                 <xsl:attribute name="checked" select="'checked'"/>
@@ -321,6 +322,7 @@
                                     getElementById('<xsl:value-of select="$name"/>_OTHER').disabled = true
                                 </xsl:attribute> 
                             </xsl:if>
+                            <xsl:copy-of select="ancestor::xforms:select/@* except (@xxforms:* | @*[namespace-uri() = ''])"/>
                             <xsl:call-template name="copy-other-attributes"/>
                             <xsl:if test="$value = xs:string(xforms:value)">
                                 <xsl:attribute name="checked" select="'checked'"/>
@@ -524,7 +526,9 @@
     </xsl:template>
 
     <!-- Do not render if non-relevant -->
-    <xsl:template match="xforms:*[@xxforms:relevant = 'false']" priority="6"/>
+    <xsl:template match="xforms:*[@xxforms:relevant = 'false']" priority="6">
+        <xsl:apply-templates select="." mode="no-rendering"/>
+    </xsl:template>
 
     <!-- Just display value if readonly -->
     <xsl:template match="xforms:*[@xxforms:readonly = 'true']" priority="2">
@@ -540,7 +544,16 @@
                 <xsl:value-of select="@xxforms:value"/>
             </xsl:otherwise>
         </xsl:choose>
+        <xsl:apply-templates select="." mode="no-rendering"/>
     </xsl:template>
+
+    <!-- If we do not render a control, we need to output a hidden field instead -->
+    <xsl:template match="xforms:input | xforms:secret | xforms:textarea
+            | xforms:upload | xforms:filename | xforms:mediatype | xxforms:size
+            | xforms:range | xforms:select | xforms:select1 | xforms:output" mode="no-rendering">
+        <xhtml:input type="hidden" name="{@xxforms:name}" value="{@xxforms:value}"/>
+    </xsl:template>
+    <xsl:template match="text()" mode="no-rendering"/>
 
     <!-- If those have not been processed, ignore them -->
     <xsl:template match="xforms:hint|xforms:help"/>

@@ -163,16 +163,16 @@
                 <filter token="RELEASE" value="${release.number}"/>
             </filterset>
         </copy>
-        <javac destdir="${build.classes.dir}"
-            classpathref="class.path"
-            debug="${build.debug}" optimize="off" target="1.3" source="1.3">
-            <src path="${build.dir}/src"/>
-            <src path="${java-src.dir}"/>
-            <exclude name="org/orbeon/oxf/common/Version.java"/>
-            <exclude name="org/orbeon/oxf/resources/XMLDB*"/>
-            <exclude name="org/orbeon/faces/**/*.java"/>
-            <exclude name="org/orbeon/faces11/**/*.java"/>
-            <exclude name="org/orbeon/oxf/resources/Cache*"/>
+<!--        <javac destdir="${build.classes.dir}"-->
+<!--            classpathref="class.path"-->
+<!--            debug="${build.debug}" optimize="off" target="1.3" source="1.3">-->
+<!--            <src path="${build.dir}/src"/>-->
+<!--            <src path="${java-src.dir}"/>-->
+<!--            <exclude name="org/orbeon/oxf/common/Version.java"/>-->
+<!--            <exclude name="org/orbeon/oxf/resources/XMLDB*"/>-->
+<!--            <exclude name="org/orbeon/faces/**/*.java"/>-->
+<!--            <exclude name="org/orbeon/faces11/**/*.java"/>-->
+<!--            <exclude name="org/orbeon/oxf/resources/Cache*"/>-->
             <!--      <exclude name="org/orbeon/oxf/resources/Tamino*"/>-->
             <!--      <exclude name="org/orbeon/oxf/processor/tamino/**/*.java"/>-->
             <!--            <exclude name="org/orbeon/oxf/processor/xmldb/**"/>-->
@@ -183,7 +183,7 @@
             <!--            <exclude name="org/orbeon/oxf/pipeline/processors/XLS*"/>-->
             <!--            <exclude name="org/orbeon/oxf/pipeline/processors/Email*"/>-->
             <!--            <exclude name="org/orbeon/oxf/pipeline/processors/Batik*"/>-->
-        </javac>
+<!--        </javac>-->
     </target>
 
     <!-- Compile test source -->

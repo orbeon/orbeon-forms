@@ -21,7 +21,14 @@
                 <xs:element name="param" minOccurs="0" maxOccurs="unbounded">
                     <xs:complexType>
                         <xs:attribute name="name" type="xs:string" use="required"/>
-                        <xs:attribute name="type" type="xs:string" use="required"/>
+                        <xs:attribute name="type" use="required">
+                            <xs:simpleType>
+                                <xs:restriction base="xs:token">
+                                    <xs:enumeration value="input"/>
+                                    <xs:enumeration value="output"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:attribute>
                         <xs:attributeGroup ref="p:debug-schema-attributes"/>
                     </xs:complexType>
                 </xs:element>

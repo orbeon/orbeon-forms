@@ -32,7 +32,12 @@
         <zeroOrMore>
             <element name="p:param">
                 <attribute name="name"/>
-                <attribute name="type"/>
+                <attribute name="type">
+                    <choice>
+                        <value>input</value>
+                        <value>output</value>
+                    </choice>
+                </attribute>
                 <ref name="debug"/>
                 <ref name="schemas"/>
             </element>

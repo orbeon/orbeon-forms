@@ -121,10 +121,10 @@
                 <section>
                     <title>Binary Mode</title>
                     <p>
-                        The <a href="processors-generators#url-generator">URL generator</a>'s
-                        support for streaming binary files encoded with Base64 is now documented.
-                        The <a href="/goto-example/xforms-upload">XForms Upload example</a>
-                        illustrates this capability.
+                        The <a href="processors-generators#url-generator">URL generator</a> now
+                        supports streaming binary files encoded with Base64. The <a
+                        href="/goto-example/xforms-upload">XForms Upload example</a> illustrates
+                        this capability.
                     </p>
                 </section>
                 <section>

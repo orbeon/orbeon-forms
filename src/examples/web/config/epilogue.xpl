@@ -166,6 +166,8 @@
             <p:processor name="oxf:xml-serializer">
                 <p:input name="config">
                     <config>
+                        <!-- Not necessary to indent at this point -->
+                        <indent>false</indent>
                         <!-- Disable caching, so that the title is always generated -->
                         <cache-control>
                             <use-local-cache>false</use-local-cache>

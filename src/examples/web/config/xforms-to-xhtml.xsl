@@ -28,19 +28,19 @@
     <!-- Form Controls -->
 
     <xsl:template match="xforms:input">
-        <xhtml:input type="text" name="{xxforms:encrypt-name(@xxforms:name)}" value="{@xxforms:value}">
+        <xhtml:input type="text" name="{@xxforms:name}" value="{@xxforms:value}">
             <xsl:call-template name="copy-other-attributes"/>
         </xhtml:input>
     </xsl:template>
 
     <xsl:template match="xforms:secret">
-        <xhtml:input type="password" name="{xxforms:encrypt-name(@xxforms:name)}" value="{@xxforms:value}">
+        <xhtml:input type="password" name="{@xxforms:name}" value="{@xxforms:value}">
             <xsl:call-template name="copy-other-attributes"/>
         </xhtml:input>
     </xsl:template>
 
     <xsl:template match="xforms:textarea">
-        <xhtml:textarea name="{xxforms:encrypt-name(@xxforms:name)}">
+        <xhtml:textarea name="{@xxforms:name}">
             <xsl:call-template name="copy-other-attributes"/>
             <xsl:value-of select="@xxforms:value"/>
         </xhtml:textarea>
@@ -124,7 +124,7 @@
     </xsl:function>
 
     <xsl:template match="xforms:select">
-        <xsl:variable name="name" as="xs:string" select="xxforms:encrypt-name(@xxforms:name)"/>
+        <xsl:variable name="name" as="xs:string" select="@xxforms:name"/>
         <xsl:variable name="values" as="xs:string*" select="tokenize(@xxforms:value, '\s+')"/>
 
         <xsl:variable name="open" select="@selection = 'open'" as="xs:boolean"/>
@@ -165,7 +165,7 @@
     </xsl:template>
 
     <xsl:template match="xforms:select1">
-        <xsl:variable name="name" as="xs:string" select="xxforms:encrypt-name(@xxforms:name)"/>
+        <xsl:variable name="name" as="xs:string" select="@xxforms:name"/>
         <xsl:variable name="value" as="xs:string" select="@xxforms:value"/>
 
         <xsl:variable name="open" select="@selection = 'open'" as="xs:boolean"/>
@@ -443,7 +443,7 @@
 
     <!-- Want to generate HTML hidden field -->
     <xsl:template match="xxforms:hidden">
-        <xhtml:input type="hidden" name="{xxforms:encrypt-name(@xxforms:name)}" value="{@xxforms:value}">
+        <xhtml:input type="hidden" name="{@xxforms:name}" value="{@xxforms:value}">
             <xsl:call-template name="copy-other-attributes"/>
         </xhtml:input>
     </xsl:template>
@@ -565,12 +565,6 @@
         <xsl:variable name="prefix" as="xs:string"
             select="if ($submit-control/@xxforms:appearance = 'image') then '$actionImg^' else '$action^'"/>
         <xsl:sequence select="concat($prefix, string-join($action-strings, '&amp;'))"/>
-    </xsl:function>
-
-    <xsl:function name="xxforms:encrypt-name" as="xs:string">
-        <xsl:param name="name" as="xs:string"/>
-        <xsl:value-of select="if (xforms-utils:is-name-encryption-enabled())
-            then xforms-utils:encrypt($name) else $name"/>
     </xsl:function>
 
 </xsl:stylesheet>

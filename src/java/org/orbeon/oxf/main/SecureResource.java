@@ -51,7 +51,7 @@ public class SecureResource {
             FileOutputStream archiveFile = new FileOutputStream(archiveName);
 
             ZipOutputStream zip = new ZipOutputStream(new CipherOutputStream(archiveFile,
-                    SecureUtils.getEncryptingCipher(SecureResourceManagerImpl.getPassword())));
+                    SecureUtils.getEncryptingCipher(SecureResourceManagerImpl.getPassword(), true)));
             File rr = new File(resourceRoot);
             archiveAndEncrypt(rr, zip);
             zip.finish();
@@ -65,7 +65,7 @@ public class SecureResource {
         try {
             FileInputStream archiveFile = new FileInputStream(archiveName);
             ZipInputStream zip = new ZipInputStream(new CipherInputStream
-                    (archiveFile, SecureUtils.getDecryptingCipher(SecureResourceManagerImpl.getPassword())));
+                    (archiveFile, SecureUtils.getDecryptingCipher(SecureResourceManagerImpl.getPassword(), true)));
             ZipEntry ze;
             while ((ze = zip.getNextEntry()) != null) {
                 System.out.println("entry: " + ze.getName());

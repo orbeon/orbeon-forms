@@ -61,7 +61,7 @@ public class SecureResourceManagerImpl extends ResourceManagerImpl {
             resources = new HashMap();
             FileInputStream archiveFile = new FileInputStream(archive);
             ZipInputStream zip = new ZipInputStream(new CipherInputStream(archiveFile, 
-                    SecureUtils.getDecryptingCipher(password)));
+                    SecureUtils.getDecryptingCipher(password, true)));
 
             ZipEntry ze;
             while ((ze = zip.getNextEntry()) != null) {

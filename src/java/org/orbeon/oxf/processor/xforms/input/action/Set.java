@@ -31,7 +31,7 @@ public class Set implements Action {
         setValue.setParameters(setValueParameters);
     }
 
-    public void run(PipelineContext context, FunctionContext functionContext, Document instance) {
-        setValue.run(context, functionContext, instance);
+    public void run(PipelineContext context, FunctionContext functionContext, String encryptionPassword, Document instance) {
+        setValue.run(context, functionContext, encryptionPassword, instance);
     }
 }

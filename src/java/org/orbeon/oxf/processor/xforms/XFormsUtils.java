@@ -23,6 +23,7 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -110,26 +111,17 @@ public class XFormsUtils {
             (Constants.XFORMS_ENCRYPT_HIDDEN, false).booleanValue();
     }
 
-    public static String encrypt(String text) {
-        try {
-            final Cipher cipher = SecureUtils.getEncryptingCipher
-                (OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD));
-            return Base64.encode(cipher.doFinal(text.toString().getBytes())).trim();
-        } catch (IllegalBlockSizeException e) {
-            throw new OXFException(e);
-        } catch (BadPaddingException e) {
-            throw new OXFException(e);
-        }
-    }
-
-    public static String instanceToString(Document instance) {
+    public static String instanceToString(PipelineContext pipelineContext, String password, Document instance) {
         try {
             ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
             GZIPOutputStream gzipOutputStream = null;
             gzipOutputStream = new GZIPOutputStream(gzipByteArray);
             gzipOutputStream.write(XMLUtils.domToString(instance).getBytes());
             gzipOutputStream.close();
-            return Base64.encode(gzipByteArray.toByteArray());
+            String compressed = Base64.encode(gzipByteArray.toByteArray());
+            return XFormsUtils.isHiddenEncryptionEnabled()
+                ? SecureUtils.encrypt(pipelineContext, password, compressed)
+                : compressed;
         } catch (IOException e) {
             throw new OXFException(e);
         }

@@ -15,13 +15,15 @@ package org.orbeon.oxf.processor.xforms.input;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.processor.xforms.input.action.Action;
 import org.orbeon.oxf.processor.xforms.input.action.Delete;
 import org.orbeon.oxf.processor.xforms.input.action.Insert;
+import org.orbeon.oxf.processor.xforms.input.action.Set;
 import org.orbeon.oxf.processor.xforms.input.action.SetIndex;
 import org.orbeon.oxf.processor.xforms.input.action.SetValue;
-import org.orbeon.oxf.processor.xforms.input.action.Set;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.NetUtils;
@@ -33,7 +35,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.AttributesImpl;
 
-import javax.crypto.Cipher;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -50,6 +51,11 @@ import java.util.zip.GZIPInputStream;
 public class RequestParameters {
 
     private static final Map actionClasses = new HashMap();
+    private PipelineContext pipelineContext;
+
+    public RequestParameters(PipelineContext pipelineContext) {
+        this.pipelineContext = pipelineContext;
+    }
 
     static {
         actionClasses.put("insert", Insert.class);
@@ -63,29 +69,7 @@ public class RequestParameters {
     private Map idToType = new HashMap();
     private List actions = new ArrayList();
     private Document instance;
-
-    private final boolean encryptNames = OXFProperties.instance().getPropertySet().getBoolean
-            (Constants.XFORMS_ENCRYPT_NAMES, false).booleanValue();
-    private final boolean encryptHiddenValues = OXFProperties.instance().getPropertySet().getBoolean
-            (Constants.XFORMS_ENCRYPT_HIDDEN, false).booleanValue();
-    private final Cipher cipher = encryptNames || encryptHiddenValues ? SecureUtils.getDecryptingCipher
-            (OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD)) : null;
-
-    /**
-     * Adds (id -> value) in idToValue. If there is already a value for this id,
-     * concatenates the two values by adding a space.
-     *
-     * Also store the value type in idToType if present.
-     */
-    private void addValue(String name, String value, String type) {
-        Integer idObject = new Integer(name.substring("$node^".length()));
-        String currentValue = (String) idToValue.get(idObject);
-        idToValue.put(idObject,
-                currentValue == null || "".equals(currentValue) ? value :
-                "".equals(value) ? currentValue : currentValue + ' ' + value);
-        if (type != null)
-            idToType.put(idObject, type);
-    }
+    private String encryptionPassword;
 
     public ContentHandler getContentHandlerForRequest() {
         // NOTE: We do this "by hand" as the apache digester has problems including namespace
@@ -169,12 +153,18 @@ public class RequestParameters {
              */
             private void value(String value, String type) {
                 try {
-                    if ("$instance".equals(name)) {
+                    if ("$key".equals(name)) {
+                        String serverPassword = OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD);
+                        encryptionPassword = SecureUtils.decrypt(pipelineContext, serverPassword, value);
+                    } else if ("$instance".equals(name)) {
 
                         // Un-base64, uncompress to get XML as text
-                        final String xmlText;
+                        String xmlText;
                         {
-                            ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(value));
+                            String compressed = value;
+                            if (XFormsUtils.isHiddenEncryptionEnabled())
+                                compressed = SecureUtils.decrypt(pipelineContext, encryptionPassword, compressed);
+                            ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(compressed));
                             StringBuffer xml = new StringBuffer();
                             byte[] buffer = new byte[1024];
                             GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
@@ -265,6 +255,25 @@ public class RequestParameters {
                     addValue(sizeName, contentLength, null);
                 }
             }
+
+            /**
+             * Adds (id -> value) in idToValue. If there is already a value for this id,
+             * concatenates the two values by adding a space.
+             *
+             * Also store the value type in idToType if present.
+             */
+            private void addValue(String name, String value, String type) {
+                String idString = name.substring("$node^".length());
+                if (XFormsUtils.isNameEncryptionEnabled())
+                    idString = SecureUtils.decrypt(pipelineContext, encryptionPassword, idString);
+                Integer idObject = new Integer(idString);
+                String currentValue = (String) idToValue.get(idObject);
+                idToValue.put(idObject,
+                        currentValue == null || "".equals(currentValue) ? value :
+                        "".equals(value) ? currentValue : currentValue + ' ' + value);
+                if (type != null)
+                    idToType.put(idObject, type);
+            }
         };
     }
 
@@ -292,5 +301,9 @@ public class RequestParameters {
 
     public Document getInstance() {
         return instance;
+    }
+
+    public String getEncryptionPassword() {
+        return encryptionPassword;
     }
 }

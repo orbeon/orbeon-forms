@@ -24,6 +24,7 @@ import org.orbeon.oxf.processor.xforms.Model;
 import org.orbeon.oxf.processor.xforms.output.XFormsFunctionLibrary;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -49,13 +50,16 @@ public class XFormsElementContext {
     private PipelineContext pipelineContext;
     private DocumentWrapper documentWrapper;
     private FunctionLibrary functionLibrary = new XFormsFunctionLibrary(this);
+    private String encryptionPassword;
 
-    public XFormsElementContext(PipelineContext pipelineContext, ContentHandler contentHandler, Model model, Document instance) {
+    public XFormsElementContext(PipelineContext pipelineContext, ContentHandler contentHandler,
+                                Model model, Document instance) {
         this.pipelineContext = pipelineContext;
         this.contentHandler = contentHandler;
         this.model = model;
         this.instance = instance;
         this.documentWrapper = new DocumentWrapper(instance, null);
+        this.encryptionPassword = SecureUtils.generateRandomPassword();
     }
 
     public void pushRelativeXPath(String bind, String ref, String nodeset) {
@@ -206,5 +210,9 @@ public class XFormsElementContext {
 
     public Document getInstance() {
         return instance;
+    }
+
+    public String getEncryptionPassword() {
+        return encryptionPassword;
     }
 }

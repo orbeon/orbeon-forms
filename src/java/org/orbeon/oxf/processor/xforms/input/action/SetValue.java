@@ -20,6 +20,7 @@ import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.util.SecureUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -37,15 +38,17 @@ public class SetValue implements Action {
         content = (String) parameters.get("content");
     }
 
-    public void run(PipelineContext context, FunctionContext functionContext, Document instance) {
+    public void run(PipelineContext context, FunctionContext functionContext, String encryptionPassword, Document instance) {
 
         // Fill the instance
         String[] ids = nodeset.split(" ");
         try {
-            Integer id = new Integer(Integer.parseInt(ids[0]));
-            Node node = (Node) ((InstanceData) instance.getRootElement().getData()).getIdToNodeMap().get(id);
-            String newValue = value != null ? value
-                    : content == null ? "" : content;
+            String id = ids[0];
+            if (XFormsUtils.isNameEncryptionEnabled())
+                id = SecureUtils.decrypt(context, encryptionPassword, id);
+            Integer idInteger = new Integer(Integer.parseInt(id));
+            Node node = (Node) ((InstanceData) instance.getRootElement().getData()).getIdToNodeMap().get(idInteger);
+            String newValue = value != null ? value : content == null ? "" : content;
             XFormsUtils.fillNode(node, newValue);
         } catch (NumberFormatException e) {
             throw new OXFException("Invalid node-id in setvalue action", e);

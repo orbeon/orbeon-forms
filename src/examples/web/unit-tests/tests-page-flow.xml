@@ -169,7 +169,7 @@
                     <p:input name="config">
                         <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                             <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-                            <xsl:template match="value[../name = '$instance']">
+                            <xsl:template match="value[../name = '$instance' or ../name = '$key']">
                                 <xsl:copy/>
                             </xsl:template>
                         </xsl:stylesheet>
@@ -182,6 +182,10 @@
             <root>
                 <parameters/>
                 <parameters>
+                    <parameter>
+                        <name>$key</name>
+                        <value/>
+                    </parameter>
                     <parameter>
                         <name>$instance</name>
                         <value/>

@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.xforms.input;
 
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
+import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
@@ -84,7 +85,8 @@ public class XFormsInput extends ProcessorImpl {
                 // Extract parameters from request
                 RequestParameters requestParameters = (RequestParameters) readCacheInputAsObject(pipelineContext,  getInputByName(INPUT_REQUEST), new CacheableInputReader(){
                     public Object read(PipelineContext context, ProcessorInput input) {
-                        RequestParameters requestParameters = new RequestParameters();
+                        Document request = readInputAsDOM4J(context, input);
+                        RequestParameters requestParameters = new RequestParameters(pipelineContext);
                         readInputAsSAX(context, input, requestParameters.getContentHandlerForRequest());
                         return requestParameters;
                     }
@@ -133,7 +135,8 @@ public class XFormsInput extends ProcessorImpl {
                     Action[] actions = requestParameters.getActions();
                     for (int i = 0; i < actions.length; i++) {
                         Action action = actions[i];
-                        action.run(pipelineContext, new ActionFunctionContext(), instance.getDocument());
+                        action.run(pipelineContext, new ActionFunctionContext(),
+                                requestParameters.getEncryptionPassword(), instance.getDocument());
                     }
                     if (logger.isDebugEnabled())
                         logger.debug("2) Instance with actions applied:\n"

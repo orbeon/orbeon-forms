@@ -24,6 +24,6 @@ public class SetIndex implements Action {
     public void setParameters(Map parameters) {
     }
 
-    public void run(PipelineContext context, FunctionContext functionContext, Document instance) {
+    public void run(PipelineContext context, FunctionContext functionContext, String encryptionPassword, Document instance) {
     }
 }

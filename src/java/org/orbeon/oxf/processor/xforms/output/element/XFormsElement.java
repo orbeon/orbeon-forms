@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.xpath.XPathException;
@@ -129,7 +130,10 @@ public class XFormsElement {
                     addExtensionAttribute(newAttributes, Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME, currentNodeInstanceData.getInvalidBindIds());
                 if (DATA_CONTROLS.containsKey(localname)) {
                     currentNodeInstanceData.setGenerated(true);
-                    addExtensionAttribute(newAttributes, "name", "$node^" + Integer.toString(currentNodeInstanceData.getId()));
+                    String id = Integer.toString(currentNodeInstanceData.getId());
+                    if (XFormsUtils.isNameEncryptionEnabled())
+                        id = SecureUtils.encrypt(context.getPipelineContext(), context.getEncryptionPassword(), id);
+                    addExtensionAttribute(newAttributes, "name", "$node^" + id);
                     addExtensionAttribute(newAttributes, "value", context.getRefValue());
                 } else  if (ACTION_CONTROLS.containsKey(localname)) {
                     addExtensionAttribute(newAttributes, "value", context.getRefValue());
@@ -142,7 +146,10 @@ public class XFormsElement {
                     for (Iterator i = context.getCurrentNodeset().iterator(); i.hasNext();) {
                         Node node = (Node) i.next();
                         if (!first) ids.append(' '); else first = false;
-                        ids.append(XFormsUtils.getInstanceData(node).getId());
+                        String id = Integer.toString(XFormsUtils.getInstanceData(node).getId());
+                        if (XFormsUtils.isNameEncryptionEnabled())
+                            id = SecureUtils.encrypt(context.getPipelineContext(), context.getEncryptionPassword(), id);
+                        ids.append(id);
                     }
                     addExtensionAttribute(newAttributes, Constants.XXFORMS_NODE_IDS_ATTRIBUTE_NAME, ids.toString());
 
@@ -163,7 +170,11 @@ public class XFormsElement {
                     if (!(at instanceof Number))
                         throw new ValidationException("'at' expression must return a number",
                                 new LocationData(context.getLocator()));
-                    addExtensionAttribute(newAttributes, "at-value", at.toString());
+                    String atString = at.toString();
+                    if (XFormsUtils.isNameEncryptionEnabled())
+                        atString = SecureUtils.encrypt(context.getPipelineContext(),
+                                context.getEncryptionPassword(), atString);
+                    addExtensionAttribute(newAttributes, "at-value", atString);
                 } catch (XPathException e) {
                     throw new OXFException(e);
                 } finally {
@@ -197,7 +208,6 @@ public class XFormsElement {
             if(attributes.getIndex("", "src") != -1 && LINKING_CONTROLS.containsKey(localname)) {
                 try {
                     String src = attributes.getValue("src");
-                    // TODO: We don't support relative URL here because the locator is often null after an XSL transformation
                     URL url = URLFactory.createURL(src);
 
                     // Load file into buffer
@@ -206,7 +216,7 @@ public class XFormsElement {
                     char[] buff = new char[BUFFER_SIZE];
                     int c = 0;
                     while( (c = stream.read(buff, 0, BUFFER_SIZE-1)) != -1)
-                        value.append(buff);
+                        value.append(buff, 0, c);
 
                     addExtensionAttribute(newAttributes, "src-value", value.toString());
                 } catch (MalformedURLException e) {

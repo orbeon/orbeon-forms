@@ -20,6 +20,8 @@ import org.jaxen.FunctionContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
+import org.orbeon.oxf.processor.xforms.XFormsUtils;
+import org.orbeon.oxf.util.SecureUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -40,7 +42,7 @@ public class Insert implements Action {
         position = (String) parameters.get(POSITION_ATTRIBUTE_NAME);
     }
 
-    public void run(PipelineContext context, FunctionContext functionContext, Document instance) {
+    public void run(PipelineContext context, FunctionContext functionContext, String encryptionPassword, Document instance) {
 
         String[] ids = nodeset.split(" ");
         Map idToNodeMap = ((InstanceData) instance.getRootElement().getData()).getIdToNodeMap();
@@ -57,15 +59,19 @@ public class Insert implements Action {
         }
 
         // Determine where to insert the duplicated element
-        int atValue;
-        atValue = Integer.parseInt(at) - 1;
+        if (XFormsUtils.isNameEncryptionEnabled())
+            at = SecureUtils.decrypt(context, encryptionPassword, at);
+        int atValue = Integer.parseInt(at) - 1;
         if (atValue < 0) atValue = 0;
         if (atValue >= ids.length) atValue = ids.length - 1;
 
         // Get element at "at" position
         final Element atElement;
         {
-            Object atNode = idToNodeMap.get(new Integer(ids[atValue]));
+            String id = ids[atValue];
+            if (XFormsUtils.isNameEncryptionEnabled())
+                id = SecureUtils.decrypt(context, encryptionPassword, id);
+            Object atNode = idToNodeMap.get(new Integer(id));
             if (!(atNode instanceof Element))
                 throw new OXFException("node pointed by 'at' position in nodeset attribute from"
                         + " insert action must must be an element");

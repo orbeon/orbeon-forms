@@ -28,6 +28,6 @@ public interface Action {
     String CONTENT_ATTRIBUTE_NAME = "content";
 
     void setParameters(Map parameters);
-    void run(PipelineContext context, FunctionContext functionContext, Document instance);
+    void run(PipelineContext context, FunctionContext functionContext, String encryptionPassword, Document instance);
 
 }

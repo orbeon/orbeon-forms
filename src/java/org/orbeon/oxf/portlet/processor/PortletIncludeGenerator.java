@@ -51,9 +51,9 @@ public class PortletIncludeGenerator extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
                 // Read config
-                final Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+                final Config config = (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                     public Object read(PipelineContext context, ProcessorInput input) {
                         Document configNode = readInputAsDOM4J(context, input);
 
@@ -92,7 +92,7 @@ public class PortletIncludeGenerator extends ProcessorImpl {
                     }
                 });
 
-                ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 if (externalContext == null)
                     throw new OXFException("Can't find external context in pipeline context");
 
@@ -109,7 +109,7 @@ public class PortletIncludeGenerator extends ProcessorImpl {
                         int portletId = config.getPortletIds()[i];
 
                         StreamInterceptor streamInterceptor = new StreamInterceptor();
-                        portletContainer.renderPortlet(portletId, externalContext, streamInterceptor, config.getRenderParameters(), config.getWindowState(), config.getPortletMode());
+                        portletContainer.renderPortlet(pipelineContext, portletId, externalContext, streamInterceptor, config.getRenderParameters(), config.getWindowState(), config.getPortletMode());
 
                         PortletContainer.PortletState portletState = portletContainer.getPortletState(externalContext, portletId);
                         WindowState windowState = portletState.getWindowState();

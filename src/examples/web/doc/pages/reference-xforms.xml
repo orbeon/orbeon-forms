@@ -820,7 +820,7 @@
                     <code>xs:base64Binary</code>:
                 </p>
                 <xml-source>
-                    <file filename="photo.jpg" mediatype="image/jpeg" size="2345" xsi:type="xs:anyURI">
+                    <file filename="photo.jpg" mediatype="image/jpeg" size="2345" xsi:type="xs:base64Binary">
                         /9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4RERAO
                         EA8SFBoWEhMYEw8QFh8XGBsbHR0dERYgIh8cIhocHRz/2wBDAQUFBQcGBw0HBw0cEhASHBwcHBwc
                         ...

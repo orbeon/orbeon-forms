@@ -53,14 +53,14 @@ public class PortletContainerProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
 
-                final ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
                 if (externalContext == null)
                     throw new OXFException("Can't find external context in pipeline context");
 
                 // Read the portal configuration
-                Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_PORTAL_CONFIG), new CacheableInputReader() {
+                Config config = (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_PORTAL_CONFIG), new CacheableInputReader() {
                     public Object read(PipelineContext context, ProcessorInput input) {
                         Document configNode = readInputAsDOM4J(context, input);
 
@@ -174,7 +174,7 @@ public class PortletContainerProcessor extends ProcessorImpl {
                 }
 
                 // Process the action if any
-                boolean redirected = portletContainer.processPortletAction(externalContext, context);
+                boolean redirected = portletContainer.processPortletAction(pipelineContext, externalContext);
 
                 // Generate portal status output
                 ContentHandlerHelper helper = new ContentHandlerHelper(contentHandler);

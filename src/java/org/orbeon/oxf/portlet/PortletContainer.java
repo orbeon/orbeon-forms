@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.StreamInterceptor;
+import org.orbeon.oxf.processor.generator.RequestGenerator;
 
 import javax.portlet.*;
 import java.io.Serializable;
@@ -126,7 +127,7 @@ public class PortletContainer implements Serializable {
      * The renderParameters Map is optional. If non-null, the parameters override the parameters of
      * the request.
      */
-    public void renderPortlet(int portletId, ExternalContext externalContext, StreamInterceptor streamInterceptor, Map renderParameters, String windowState, String portletMode) {
+    public void renderPortlet(PipelineContext pipelineContext, int portletId, ExternalContext externalContext, StreamInterceptor streamInterceptor, Map renderParameters, String windowState, String portletMode) {
 
         ExternalContext.Request request = externalContext.getRequest();
         PortletURLImpl.RequestParameters requestParameters = getRequestParameters(request);
@@ -223,7 +224,7 @@ public class PortletContainer implements Serializable {
      * Execute a portlet action, if any.
      * @return true if a redirect was sent
      */
-    public boolean processPortletAction(ExternalContext externalContext, PipelineContext pipelineContext) {
+    public boolean processPortletAction(PipelineContext pipelineContext, ExternalContext externalContext) {
 
         PortletURLImpl.RequestParameters requestParameters = getRequestParameters(externalContext.getRequest());
 
@@ -285,7 +286,7 @@ public class PortletContainer implements Serializable {
         PortletURLImpl.RequestParameters requestParameters = (PortletURLImpl.RequestParameters) requestAttributes.get(PORTLET_PARAMETERS_ATTRIBUTE);
         if (requestParameters == null) {
             // Retrieve and store parameters in pipeline context so that somebody else may retrieve them later
-            requestParameters = PortletURLImpl.extractParameters(request);
+            requestParameters = PortletURLImpl.extractParameters(request.getParameterMap());
             requestAttributes.put(PORTLET_PARAMETERS_ATTRIBUTE, requestParameters);
         }
         return requestParameters;

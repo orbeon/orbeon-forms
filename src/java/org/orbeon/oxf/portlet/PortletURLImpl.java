@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.portlet;
 
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-
 import javax.portlet.*;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -145,9 +143,9 @@ public class PortletURLImpl implements PortletURL {
      * Return a Map, indexed by portlet id, of parameter Maps. A parameter Map
      * is indexed by parameter name and contains values of type String[];
      */
-    public static RequestParameters extractParameters(ExternalContext.Request request) {
+    public static RequestParameters extractParameters(Map parameterMap) {
         RequestParameters requestParameters = new RequestParameters();
-        Map parameterMap = request.getParameterMap();
+
         Map extraParameters = null;
         for (Iterator i = parameterMap.keySet().iterator(); i.hasNext();) {
             try {
@@ -185,7 +183,7 @@ public class PortletURLImpl implements PortletURL {
                 }
             } catch (Exception ex) {
                 // Ignore invalid parameters
-                ex.printStackTrace();// TEMP
+                //ex.printStackTrace();
                 continue;
             }
         }

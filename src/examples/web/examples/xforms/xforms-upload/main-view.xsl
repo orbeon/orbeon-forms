@@ -53,37 +53,53 @@
                         </xf:upload>
                     </td>
                 </tr>
+            </table>
+            <table class="gridtable">
                 <tr>
-                    <td>
+                    <th>
                         Simple file upload
-                    </td>
+                    </th>
                     <td>
                         <xf:submit>
                             <xf:label>Upload</xf:label>
                             <xf:setvalue ref="action">simple-upload</xf:setvalue>
                         </xf:submit>
                     </td>
+                    <td>
+                        NOTE: Only outside of the portal. Click
+                        <xf:submit xxf:appearance="link">
+                            <xf:label>here</xf:label>
+                            <xf:setvalue ref="action">goto-simple-upload</xf:setvalue>
+                        </xf:submit>
+                        to try.
+                    </td>
                 </tr>
                 <tr>
-                    <td>
-                        Web Service file upload (image must be smaller than 150K)
-                    </td>
+                    <th>
+                        Web Service file upload
+                    </th>
                     <td>
                         <xf:submit>
-                    <xf:label>Upload</xf:label>
-                    <xf:setvalue ref="action">ws-upload</xf:setvalue>
-                </xf:submit>
+                            <xf:label>Upload</xf:label>
+                            <xf:setvalue ref="action">ws-upload</xf:setvalue>
+                        </xf:submit>
+                    </td>
+                    <td>
+                        NOTE: Image must be smaller than 150K.
                     </td>
                 </tr>
                 <tr>
-                    <td>
-                        Database file upload (requires setup)
-                    </td>
+                    <th>
+                        Database file upload
+                    </th>
                     <td>
                         <xf:submit>
                             <xf:label>Upload</xf:label>
                             <xf:setvalue ref="action">db-upload</xf:setvalue>
                         </xf:submit>
+                    </td>
+                    <td>
+                        NOTE: Requires database setup.
                     </td>
                 </tr>
             </table>

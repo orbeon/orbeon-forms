@@ -14,12 +14,14 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <page path-info="/xforms-upload"
+    <page id="main"
+          path-info="/xforms-upload"
           xforms="main-xforms-model.xml"
           model="main-model.xpl"
           view="main-view.xsl">
         <action when="/form/action = 'ws-upload' and /form/files/file != ''" action="do-ws-upload.xpl"/>
         <action when="/form/action = 'db-upload' and /form/files/file != ''" action="do-db-upload.xpl"/>
+        <action when="/form/action = 'goto-simple-upload'"><result page="main" instance-passing="redirect-exit-portal"/></action>
     </page>
 
     <page path-info="/xforms-uploaded-image"

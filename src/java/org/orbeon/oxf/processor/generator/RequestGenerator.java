@@ -13,7 +13,9 @@
  */
 package org.orbeon.oxf.processor.generator;
 
-import org.apache.commons.fileupload.*;
+import org.apache.commons.fileupload.DefaultFileItem;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.cache.OutputCacheKey;
@@ -25,9 +27,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.XMLConstants;
-import org.orbeon.oxf.util.HttpServletRequestStub;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.SystemUtils;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -37,8 +37,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.HttpServletRequest;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXResult;
@@ -76,16 +74,22 @@ import java.util.*;
  */
 public class RequestGenerator extends ProcessorImpl {
 
+    static Logger logger = LoggerFactory.createLogger(RequestGenerator.class);
+
     public static final String REQUEST_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/request-config";
     private static final String REQUEST_PRIVATE_NAMESPACE_URI = "http://orbeon.org/oxf/xml/request-private";
 
     // Maximum upload size
-    private static final int DEFAULT_MAX_UPLOAD_SIZE = 1024 * 1024;
-    private static final String MAX_UPLOAD_SIZE_PROPERTY = "max-upload-size";
+    public static final int DEFAULT_MAX_UPLOAD_SIZE = 1024 * 1024;
+    public static final String MAX_UPLOAD_SIZE_PROPERTY = "max-upload-size";
 
     // Maximum size kept in memory
-    private static final int DEFAULT_MAX_UPLOAD_MEMORY_SIZE = 10 * 1024;
-    private static final String MAX_UPLOAD_MEMORY_SIZE_PROPERTY = "max-upload-memory-size";
+    public static final int DEFAULT_MAX_UPLOAD_MEMORY_SIZE = 10 * 1024;
+    public static final String MAX_UPLOAD_MEMORY_SIZE_PROPERTY = "max-upload-memory-size";
+
+    // Enable saving input stream
+    public static final boolean DEFAULT_ENABLE_INPUT_STREAM_SAVING = true;
+    public static final String ENABLE_INPUT_STREAM_SAVING_PROPERTY = "enable-input-stream-saving";
 
     private static final Long VALIDITY = new Long(0);
 
@@ -114,7 +118,6 @@ public class RequestGenerator extends ProcessorImpl {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
                 try {
                     final State state = getFilledOutState(pipelineContext);
-                    final Context context = getContext(pipelineContext);
                     // Transform the resulting document into SAX
                     Transformer identity = TransformerUtils.getIdentityTransformer();
                     identity.transform(new DocumentSource(state.requestDocument), new SAXResult(new ForwardingContentHandler(contentHandler) {
@@ -123,7 +126,7 @@ public class RequestGenerator extends ProcessorImpl {
                                 // Special treatment for this element
                                 if (FILE_ITEM_ELEMENT.equals(qName)) {
                                     String parameterName = attributes.getValue(PARAMETER_NAME_ATTRIBUTE);
-                                    FileItem fileItem = (FileItem) context.parameters.get(parameterName);
+                                    FileItem fileItem = (FileItem) getRequest(pipelineContext).getParameterMap().get(parameterName);
                                     if (fileItem.getSize() > 0) {
                                         if (fileItem.isInMemory()) {
                                             // The content of the file is streamed to the output (xs:base64Binary)
@@ -419,102 +422,17 @@ public class RequestGenerator extends ProcessorImpl {
      * also FileItem objects.
      */
     protected void addParameters(PipelineContext pipelineContext, Element requestElement, final ExternalContext.Request request) {
-        try {
-            Context context = getContext(pipelineContext);
-            Map parametersMap = context.parameters;
-            if (parametersMap == null) {
-                // No two Request generators can work on the same request at the same time
-                // We don't really have concurrency within the same pipeline, but it may be coming soon
-                synchronized (RequestGenerator.class) {
-                    if (parametersMap == null) { // need to recheck within synchronized block
-
-                        if (request.getContentType() != null && request.getContentType().startsWith("multipart/form-data")) {
-                            // Special handling for multipart/form-data
-
-                            // Setup commons upload
-                            DiskFileUpload upload = new DiskFileUpload();
-                            Integer maxSizeProperty = getPropertySet().getInteger(MAX_UPLOAD_SIZE_PROPERTY);
-                            int maxSize = (maxSizeProperty != null) ? maxSizeProperty.intValue() : DEFAULT_MAX_UPLOAD_SIZE;
-
-                            Integer maxMemorySizeProperty = getPropertySet().getInteger(MAX_UPLOAD_MEMORY_SIZE_PROPERTY);
-                            int maxMemorySize = (maxMemorySizeProperty != null) ? maxMemorySizeProperty.intValue() : DEFAULT_MAX_UPLOAD_MEMORY_SIZE;
-
-                            parametersMap = new HashMap();
-                            final Map _parametersMap = parametersMap;
-
-                            // Add a listener to destroy file items when the pipeline context is destroyed
-                            pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
-                                public void contextDestroyed(boolean success) {
-                                    if (_parametersMap != null) {
-                                        for (Iterator i = _parametersMap.keySet().iterator(); i.hasNext();) {
-                                            String name = (String) i.next();
-                                            Object value = _parametersMap.get(name);
-                                            if (value instanceof FileItem) {
-                                                FileItem fileItem = (FileItem) value;
-                                                fileItem.delete();
-                                            }
-                                        }
-                                    }
-                                }
-                            });
-
-                            // Wrap and implement just the required methods for the upload code
-                            HttpServletRequest wrapper = new HttpServletRequestStub() {
-
-                                public String getHeader(String s) {
-                                    return ("content-type".equalsIgnoreCase(s)) ? request.getContentType() : null;
-                                }
-
-                                public int getContentLength() {
-                                    return request.getContentLength();
-                                }
-
-                                public ServletInputStream getInputStream() throws IOException {
-                                    // NOTE: The upload code does not actually check that it
-                                    // doesn't read more than the content-length sent by the client!
-                                    // Maybe here would be a good place to put an interceptor and
-                                    // make sure we don't read too much.
-                                    final InputStream is = request.getInputStream();
-                                    return new ServletInputStream() {
-                                        public int read() throws IOException {
-                                            return is.read();
-                                        }
-                                    };
-                                }
-                            };
-
-                            // Parse the request and add file information
-                            try {
-                                for (Iterator i = upload.parseRequest(wrapper, maxMemorySize, maxSize, SystemUtils.getTemporaryDirectory().getPath()).iterator(); i.hasNext();) {
-                                    FileItem fileItem = (FileItem) i.next();
-                                    if (fileItem.isFormField()) {
-                                        // Simple form filled: add value to existing values, if any
-                                        NetUtils.addValueToStringArrayMap(parametersMap, fileItem.getFieldName(), fileItem.getString());
-                                    } else {
-                                        // It is a file, store the FileItem object
-                                        parametersMap.put(fileItem.getFieldName(), fileItem);
-                                        context.hasUpload = true;
-                                    }
-                                }
-                            } catch (FileUploadBase.SizeLimitExceededException e) {
-                                // Should we do something smart so we can use the Presentation
-                                // Server error page anyway? Right now, this is going to fail
-                                // miserably with an error.
-                                throw e;
-                            }
-
-                        } else {
-                            // Just use request parameters
-                            parametersMap = request.getParameterMap();
-                        }
-                        context.parameters = parametersMap;
-                    }
-                }
+        // Obtain parameters from external context
+        Map parametersMap = request.getParameterMap();
+        // Check if there is at least one file upload and set this information in the pipeline context
+        for (Iterator i = parametersMap.values().iterator(); i.hasNext();) {
+            if (i.next() instanceof FileItem) {
+                getContext(pipelineContext).hasUpload = true;
+                break;
             }
-            addElements(pipelineContext, requestElement, parametersMap, "parameters", "parameter");
-        } catch (FileUploadException e) {
-            throw new OXFException(e);
         }
+        // Add parameters elements
+        addElements(pipelineContext, requestElement, parametersMap, "parameters", "parameter");
     }
 
     protected void addHeaders(PipelineContext pipelineContext, Element requestElement, ExternalContext.Request request) {
@@ -565,15 +483,6 @@ public class RequestGenerator extends ProcessorImpl {
         setState(context, new State());
     }
 
-    private Context getContext(PipelineContext pipelineContext) {
-        Context context = (Context) pipelineContext.getAttribute(PipelineContext.REQUEST_GENERATOR_CONTEXT);
-        if (context == null) {
-            context = new Context();
-            pipelineContext.setAttribute(PipelineContext.REQUEST_GENERATOR_CONTEXT, context);
-        }
-        return context;
-    }
-
     /**
      * We store in the state the request document (output of this processor) and
      * its key. This information is stored to be reused by readImpl() after a
@@ -585,9 +494,17 @@ public class RequestGenerator extends ProcessorImpl {
         //public String fileUploadType;
     }
 
-    private static class Context {
+    public static Context getContext(PipelineContext pipelineContext) {
+        Context context = (Context) pipelineContext.getAttribute(PipelineContext.REQUEST_GENERATOR_CONTEXT);
+        if (context == null) {
+            context = new Context();
+            pipelineContext.setAttribute(PipelineContext.REQUEST_GENERATOR_CONTEXT, context);
+        }
+        return context;
+    }
+
+    public static class Context {
         public Document wholeRequest;
-        public Map parameters;
         public boolean hasUpload;
     }
 }

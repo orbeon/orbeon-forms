@@ -46,6 +46,9 @@
     <!-- Standalone BizDoc example -->
     <page path-info="/bizdoc*" model="/examples/bizdoc/page-flow.xpl"/>
 
+    <!-- Standalone XForms Upload example -->
+    <page path-info="/xforms-upload*" model="/examples/xforms/xforms-upload/page-flow.xpl"/>
+
     <!-- Struts and JSF -->
     <page path-info="/faces/*" model="/jsf/config/model.xpl"/>
     <page path-info="/examples/jsf*" model="/jsf/config/model.xpl"/>
@@ -75,9 +78,6 @@
         model="/oxfmark/machines.xpl"/>
     <page path-info="/examples/oxfmark-vms"
         model="/oxfmark/vms.xpl"/>
-
-    <!-- TEST -->
-    <page path-info="/test/oracle" model="/erik/oracle/model1.xpl"/>
 
     <!-- Not Found and Error pages -->
     <page id="not-found" path-info="/not-found" view="/config/notfound.xml"/>

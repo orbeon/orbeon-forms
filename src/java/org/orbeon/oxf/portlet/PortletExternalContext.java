@@ -15,9 +15,14 @@ package org.orbeon.oxf.portlet;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
+import org.orbeon.oxf.processor.XMLConstants;
+import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.servlet.ServletExternalContext;
 
 import javax.portlet.*;
 import java.io.*;
@@ -129,9 +134,32 @@ public class PortletExternalContext implements ExternalContext {
 
         public synchronized Map getParameterMap() {
             if (parameterMap == null) {
-                parameterMap = new HashMap(portletRequest.getParameterMap());
-                parameterMap.remove(PATH_PARAMETER_NAME);
-                parameterMap = Collections.unmodifiableMap(parameterMap);
+                // Two conditions: file upload ("multipart/form-data") or not
+                if (getContentType() != null && getContentType().startsWith("multipart/form-data")) {
+                    // Special handling for multipart/form-data
+
+                    // Decode the multipart data
+                    parameterMap = ServletExternalContext.getParameterMapMultipart(pipelineContext, request, null);
+
+                    // HACK HACK for testing
+                    Map tempMap = new HashMap();
+                    for (Iterator i = parameterMap.keySet().iterator(); i.hasNext();) {
+                        String key = (String) i.next();
+                        Object value = parameterMap.get(key);
+                        if (key.startsWith("$portlet$p") || key.startsWith("$portlet$a")) {
+                            String newKey = key.substring(key.indexOf('.') + 1);
+                            tempMap.put(newKey, value);
+                            i.remove();
+                        }
+                    }
+                    parameterMap.putAll(tempMap);
+
+                } else {
+                    // Just use native request parameters
+                    parameterMap = new HashMap(portletRequest.getParameterMap());
+                    parameterMap.remove(PATH_PARAMETER_NAME);
+                    parameterMap = Collections.unmodifiableMap(parameterMap);
+                }
             }
             return parameterMap;
         }
@@ -579,15 +607,17 @@ public class PortletExternalContext implements ExternalContext {
     private Response response;
     private Session session;
 
+    private PipelineContext pipelineContext;
     private PortletContext portletContext;
     private Map attributesMap;
     private Map initAttributesMap;
 
-    PortletExternalContext(PortletContext context, Map initAttributesMap, PortletRequest request) {
-        this(context, initAttributesMap, request, null);
+    PortletExternalContext(PipelineContext pipelineContext, PortletContext context, Map initAttributesMap, PortletRequest request) {
+        this(pipelineContext, context, initAttributesMap, request, null);
     }
 
-    PortletExternalContext(PortletContext portletContext, Map initAttributesMap, PortletRequest portletRequest, RenderResponse renderResponse) {
+    PortletExternalContext(PipelineContext pipelineContext, PortletContext portletContext, Map initAttributesMap, PortletRequest portletRequest, RenderResponse renderResponse) {
+        this.pipelineContext = pipelineContext;
         this.portletContext = portletContext;
         this.initAttributesMap = initAttributesMap;
         this.portletRequest = portletRequest;

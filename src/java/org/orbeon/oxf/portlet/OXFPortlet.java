@@ -71,21 +71,20 @@ public class OXFPortlet extends GenericPortlet {
         }
     }
 
-    public void processAction(ActionRequest request, ActionResponse response) throws PortletException, IOException {
+    public void processAction(ActionRequest actionRequest, ActionResponse response) throws PortletException, IOException {
         // If we get a request for an action, we run the service without a
         // response. The result, if any, is stored into a buffer. Otherwise it
         // must be a redirect.
         try {
-            PortletExternalContext externalContext = new PortletExternalContext(getPortletContext(), contextInitParameters, request);
-
             // Make sure the previously cached output is cleared, if there is
             // any. We potentially keep the result of only one action.
-            request.getPortletSession().removeAttribute(OXF_PORTLET_OUTPUT);
-            request.getPortletSession().removeAttribute(OXF_PORTLET_OUTPUT_PARAMS);
+            actionRequest.getPortletSession().removeAttribute(OXF_PORTLET_OUTPUT);
+            actionRequest.getPortletSession().removeAttribute(OXF_PORTLET_OUTPUT_PARAMS);
 
             // Call service
             PipelineContext pipelineContext = new PipelineContext();
             pipelineContext.setAttribute(PipelineContext.PORTLET_CONFIG, getPortletConfig());
+            PortletExternalContext externalContext = new PortletExternalContext(pipelineContext, getPortletContext(), contextInitParameters, actionRequest);
             processorService.service(true, externalContext, pipelineContext);
 
             // Check whether a redirect was issued, or some output was generated
@@ -109,9 +108,9 @@ public class OXFPortlet extends GenericPortlet {
                 // Content was written, keep it in the session for subsequent
                 // render requests with the current action parameters.
 
-                Map actionParameters = request.getParameterMap();
+                Map actionParameters = actionRequest.getParameterMap();
                 response.setRenderParameters(actionParameters);
-                PortletSession session = request.getPortletSession();
+                PortletSession session = actionRequest.getPortletSession();
 
                 session.setAttribute(OXF_PORTLET_OUTPUT, bufferedResponse);
                 session.setAttribute(OXF_PORTLET_OUTPUT_PARAMS, actionParameters);
@@ -140,9 +139,9 @@ public class OXFPortlet extends GenericPortlet {
                 bufferedResponse.write(response);
             } else {
                 // Call service
-                ExternalContext externalContext = new PortletExternalContext(getPortletContext(), contextInitParameters, request, response);
                 PipelineContext pipelineContext = new PipelineContext();
                 pipelineContext.setAttribute(PipelineContext.PORTLET_CONFIG, getPortletConfig());
+                ExternalContext externalContext = new PortletExternalContext(pipelineContext, getPortletContext(), contextInitParameters, request, response);
                 processorService.service(true, externalContext, pipelineContext);
                 // TEMP: The response is also buffered, because our
                 // rewriting algorithm only operates on Strings for now.

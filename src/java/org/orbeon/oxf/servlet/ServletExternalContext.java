@@ -13,15 +13,26 @@
  */
 package org.orbeon.oxf.servlet;
 
+import org.apache.commons.fileupload.DiskFileUpload;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload.FileUploadException;
+import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.XMLConstants;
+import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.util.HttpServletRequestStub;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.SystemUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -35,6 +46,8 @@ import java.util.*;
  */
 public class ServletExternalContext implements ExternalContext {
 
+    static Logger logger = LoggerFactory.createLogger(ServletExternalContext.class);
+
     private class Request implements ExternalContext.Request {
 
         private Map attributesMap;
@@ -42,6 +55,7 @@ public class ServletExternalContext implements ExternalContext {
         private Map headerValuesMap;
         private Map sessionMap;
         private Map parameterMap;
+        private ServletInputStreamRepeater repeater;
 
         public String getContainerType() {
             return "servlet";
@@ -90,24 +104,48 @@ public class ServletExternalContext implements ExternalContext {
 
         public synchronized Map getParameterMap() {
             if (parameterMap == null) {
-                parameterMap = new HashMap();
-                if (OXFServlet.supportsServlet23) {
+                // Two conditions: file upload ("multipart/form-data") or not
+                if (getContentType() != null && getContentType().startsWith("multipart/form-data")) {
+                    // Special handling for multipart/form-data
+
+                    // If needed, instanciate the repeater that may take care of temporarily storing the input stream
+                    // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
+                    OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
+                    boolean enableInputStreamSaving = propertySet.getBoolean(RequestGenerator.ENABLE_INPUT_STREAM_SAVING_PROPERTY, RequestGenerator.DEFAULT_ENABLE_INPUT_STREAM_SAVING).booleanValue();
+                    ServletInputStreamRepeater localRepeater = null;
                     try {
-                        // Try to set an appropriate encoding for forms and parameters
-//                        String acceptCharset = nativeRequest.getHeader("accept-charset");
-//                        if (acceptCharset != null && acceptCharset.toLowerCase().indexOf("utf-8") != -1)
-//                            nativeRequest.setCharacterEncoding("utf-8");
-                        String formCharset = OXFProperties.instance().getPropertySet().getString(OXFServlet.DEFAULT_FORM_CHARSET_PROPERTY);
-                        if (formCharset == null)
-                            formCharset = OXFServlet.DEFAULT_FORM_CHARSET;
-                        nativeRequest.setCharacterEncoding(formCharset);
-                    } catch (UnsupportedEncodingException e) {
+                        if (enableInputStreamSaving)
+                            localRepeater = new ServletInputStreamRepeater(request);
+
+                        // Decode the multipart data
+                        parameterMap = getParameterMapMultipart(pipelineContext, request, localRepeater);
+
+                        if (enableInputStreamSaving)
+                            repeater = localRepeater;
+                    } catch (IOException e) {
                         throw new OXFException(e);
                     }
-                }
-                for (Enumeration e = nativeRequest.getParameterNames(); e.hasMoreElements();) {
-                    String name = (String) e.nextElement();
-                    parameterMap.put(name, nativeRequest.getParameterValues(name));
+                } else {
+                    // Try to set an appropriate encoding for forms and parameters
+                    if (OXFServlet.supportsServlet23) {
+                        try {
+    //                        String acceptCharset = nativeRequest.getHeader("accept-charset");
+    //                        if (acceptCharset != null && acceptCharset.toLowerCase().indexOf("utf-8") != -1)
+    //                            nativeRequest.setCharacterEncoding("utf-8");
+                            String formCharset = OXFProperties.instance().getPropertySet().getString(OXFServlet.DEFAULT_FORM_CHARSET_PROPERTY);
+                            if (formCharset == null)
+                                formCharset = OXFServlet.DEFAULT_FORM_CHARSET;
+                            nativeRequest.setCharacterEncoding(formCharset);
+                        } catch (UnsupportedEncodingException e) {
+                            throw new OXFException(e);
+                        }
+                    }
+                    // Just use native request parameters
+                    parameterMap = new HashMap();
+                    for (Enumeration e = nativeRequest.getParameterNames(); e.hasMoreElements();) {
+                        String name = (String) e.nextElement();
+                        parameterMap.put(name, nativeRequest.getParameterValues(name));
+                    }
                 }
             }
             return parameterMap;
@@ -145,15 +183,24 @@ public class ServletExternalContext implements ExternalContext {
         }
 
         public String getCharacterEncoding() {
-            return nativeRequest.getCharacterEncoding();
+            if (repeater != null)
+                return repeater.getCharacterEncoding();
+            else
+                return nativeRequest.getCharacterEncoding();
         }
 
         public int getContentLength() {
-            return nativeRequest.getContentLength();
+            if (repeater != null)
+                return repeater.getContentLength();
+            else
+                return nativeRequest.getContentLength();
         }
 
         public String getContentType() {
-            return nativeRequest.getContentType();
+            if (repeater != null)
+                return repeater.getContentType();
+            else
+                return nativeRequest.getContentType();
         }
 
         public String getServerName() {
@@ -209,7 +256,10 @@ public class ServletExternalContext implements ExternalContext {
         }
 
         public InputStream getInputStream() throws IOException {
-            return nativeRequest.getInputStream();
+            if (repeater != null)
+                return repeater.getSavedInputStream();
+            else
+                return nativeRequest.getInputStream();
         }
 
         public Locale getLocale() {
@@ -230,6 +280,111 @@ public class ServletExternalContext implements ExternalContext {
 
         public ServletExternalContext getServletExternalContext() {
             return ServletExternalContext.this;
+        }
+    }
+
+    public static Map getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, final ServletInputStreamRepeater repeater) {
+
+        final Map uploadParameterMap = new HashMap();
+        try {
+            // Setup commons upload
+            DiskFileUpload upload = new DiskFileUpload();
+
+            // Read properties
+            // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
+            OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
+            Integer maxSizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_SIZE_PROPERTY);
+            int maxSize = (maxSizeProperty != null) ? maxSizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_SIZE;
+
+            Integer maxMemorySizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_MEMORY_SIZE_PROPERTY);
+            int maxMemorySize = (maxMemorySizeProperty != null) ? maxMemorySizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE;
+
+            if (repeater != null)
+                repeater.setMaxMemorySize(maxMemorySize);
+
+            // Add a listener to destroy file items when the pipeline context is destroyed
+            pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
+                public void contextDestroyed(boolean success) {
+                    if (uploadParameterMap != null) {
+                        for (Iterator i = uploadParameterMap.keySet().iterator(); i.hasNext();) {
+                            String name = (String) i.next();
+                            Object value = uploadParameterMap.get(name);
+                            if (value instanceof FileItem) {
+                                FileItem fileItem = (FileItem) value;
+                                fileItem.delete();
+                            }
+                        }
+                    }
+                    // Also cleanup repeater
+                    if (repeater != null)
+                        repeater.delete();
+                }
+            });
+
+            // Wrap and implement just the required methods for the upload code
+            HttpServletRequest wrapper = new HttpServletRequestStub() {
+
+                public String getHeader(String s) {
+                    if ("content-type".equalsIgnoreCase(s)) {
+                        if (repeater != null)
+                            return repeater.getContentType();
+                        else
+                            return request.getContentType();
+                    }
+                    return null;
+                }
+
+                public int getContentLength() {
+                    if (repeater != null)
+                        return repeater.getContentLength();
+                    else
+                        return request.getContentLength();
+                }
+
+                public ServletInputStream getInputStream() throws IOException {
+                    // NOTE: The upload code does not actually check that it
+                    // doesn't read more than the content-length sent by the client!
+                    // Maybe here would be a good place to put an interceptor and
+                    // make sure we don't read too much.
+                    final InputStream is = (repeater != null) ? repeater.getInputStream() : request.getInputStream();
+                    return new ServletInputStream() {
+                        public int read() throws IOException {
+                            return is.read();
+                        }
+                    };
+                }
+            };
+
+            // Parse the request and add file information
+            try {
+                for (Iterator i = upload.parseRequest(wrapper, maxMemorySize, maxSize, SystemUtils.getTemporaryDirectory().getPath()).iterator(); i.hasNext();) {
+                    FileItem fileItem = (FileItem) i.next();
+                    if (fileItem.isFormField()) {
+                        // Simple form filled: add value to existing values, if any
+                        NetUtils.addValueToStringArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString());
+                    } else {
+                        // It is a file, store the FileItem object
+                        uploadParameterMap.put(fileItem.getFieldName(), fileItem);
+                    }
+                }
+            } catch (FileUploadBase.SizeLimitExceededException e) {
+                // Should we do something smart so we can use the Presentation
+                // Server error page anyway? Right now, this is going to fail
+                // miserably with an error.
+                throw e;
+            }
+
+            // Make sure repeater finishes its job
+            if (repeater != null) {
+                repeater.finishReading();
+                logger.debug("Finished reading InputStream repeater (announced content length "
+                        + repeater.getContentLength() + " bytes, actual read "
+                        + repeater.getActualByteCount() + " bytes)");
+            }
+
+            return uploadParameterMap;
+        } catch (FileUploadException e) {
+            throw new OXFException(e);
         }
     }
 

@@ -16,7 +16,6 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <!-- Initialialize database when necessary -->
-
     <p:processor name="oxf:java">
         <p:input name="config">
             <config sourcepath="oxf:/init-database" class="IsDatabaseIntialized"/>

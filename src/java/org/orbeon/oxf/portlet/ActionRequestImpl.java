@@ -16,40 +16,70 @@ package org.orbeon.oxf.portlet;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 
 import javax.portlet.ActionRequest;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.Collections;
 import java.util.Map;
 
 public class ActionRequestImpl extends PortletRequestImpl implements ActionRequest {
 
-    public ActionRequestImpl(ExternalContext externalContext, PortletConfigImpl portletConfig, int portletId, ExternalContext.Request request, PortletContainer.PortletState portletStatus) {
+    private String characterEncoding;
+    private InputStream portletInputStream;
+    private BufferedReader portletBufferedReader;
+
+    public ActionRequestImpl(ExternalContext externalContext, PortletConfigImpl portletConfig, int portletId,
+                             ExternalContext.Request request, PortletContainer.PortletState portletStatus) {
         super(externalContext, portletConfig, portletId, request, portletStatus);
     }
 
     public String getCharacterEncoding() {
-        return null;
+        return (characterEncoding != null) ? characterEncoding : request.getCharacterEncoding();
     }
 
     public int getContentLength() {
-        return 0;
+        return request.getContentLength();
     }
 
     public String getContentType() {
-        return null;
+        return request.getContentType();
     }
 
     public InputStream getPortletInputStream() throws IOException {
-        return null;
+        // Return existing input stream if present
+        if (portletInputStream != null)
+            return portletInputStream;
+
+        // PLT.11.2.1
+        if (portletBufferedReader != null)
+            throw new IllegalStateException("getPortletInputStream() cannot be called if getReader() already called");
+
+        portletInputStream = request.getInputStream();
+
+        return portletInputStream;
     }
 
     public BufferedReader getReader() throws UnsupportedEncodingException, IOException {
-        return null;
+        // Return existing reader if present
+        if (portletBufferedReader != null)
+            return portletBufferedReader;
+
+        // PLT.11.2.1
+        if (portletInputStream != null)
+            throw new IllegalStateException("getReader() cannot be called if getPortletInputStream() already called");
+
+        // This gets either the caller-set encoding, or the one set by the HTTP client
+        String encoding = getCharacterEncoding();
+        // However, this can be null if not set by either, BUT Servlet 2.4 says (SRV.4.9) that the
+        // default should be iso-8859-1
+        if (encoding == null)
+            encoding = "iso-8859-1";
+
+        portletBufferedReader = new BufferedReader(new InputStreamReader(request.getInputStream(), encoding));
+
+        return portletBufferedReader;
     }
 
-    public void setCharacterEncoding(String enc) throws UnsupportedEncodingException {
+    public void setCharacterEncoding(String characterEncoding) throws UnsupportedEncodingException {
+        this.characterEncoding = characterEncoding;
     }
 
     public Map getParameterMap() {

@@ -52,7 +52,14 @@ public class Insert implements Action {
         {
             if (ids.length == 0)
                 throw new OXFException("nodeset attribute in insert action must return a non-empty nodeset");
-            Object lastNode = idToNodeMap.get(new Integer(ids[ids.length - 1]));
+            String lastIndex = ids[ids.length - 1];
+            Integer lastIndexInt;
+            if(XFormsUtils.isNameEncryptionEnabled())
+                lastIndexInt = new Integer(SecureUtils.decrypt(context, encryptionPassword, lastIndex));
+            else
+                lastIndexInt = new Integer(lastIndex);
+
+            Object lastNode = idToNodeMap.get(lastIndexInt);
             if (!(lastNode instanceof Element))
                 throw new OXFException("last node in nodeset attribute from insert action must must be an element");
             elementToDuplicate = (Element) lastNode;

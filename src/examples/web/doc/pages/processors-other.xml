@@ -153,7 +153,7 @@
             <section>
                 <title>Aggregating and Modifying Documents</title>
                 <p>
-                    Pipeline inputs support aggregation with the <code>aggregate()</code> funcation,
+                    Pipeline inputs support aggregation with the <code>aggregate()</code> function,
                     as well as the XPointer syntax. The Identity processor can then be used to
                     aggregate or otherwise modify existing documents in a pipeline, for example
                     before sending a result to a pipeline output.

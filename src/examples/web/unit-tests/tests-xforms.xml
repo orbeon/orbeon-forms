@@ -1048,9 +1048,9 @@
         </output>
     </test>
     
-    <test description="" name="oxf:pipeline">
+    <test description="Populating the instance from params" name="oxf:pipeline">
         <input name="model">
-            <xforms:model xmlns:a="a" xmlns:b="b" >
+            <xforms:model xmlns:a="a" xmlns:b="b">
                 <xforms:instance>
                     <instance>
                         <a:a>A</a:a>
@@ -1066,7 +1066,16 @@
                 
                 <p:processor name="oxf:xforms-input">
                     <p:input name="model" href="#model"/>
-                    <p:input name="request"><request/></p:input>
+                    <p:input name="request">
+                        <request>
+                            <parameters>
+                                <parameter>
+                                    <name>$key</name>
+                                    <value/>
+                                </parameter>
+                            </parameters>
+                        </request>
+                    </p:input>
                     <p:input name="filter">
                         <params>
                             <param ref="/instance/a:a"/>

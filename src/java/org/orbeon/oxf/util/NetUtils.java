@@ -109,7 +109,17 @@ public class NetUtils {
 
         return requestPath;
     }
-
+    
+    public static long getLastModified( java.net.URL u ) throws java.io.IOException {
+        final java.net.URLConnection uc = u.openConnection();
+        final long ret = getLastModified( uc );
+        return ret;
+    }
+    public static Long getLastModified( java.net.URL u, Long notUsed ) throws java.io.IOException {
+        final long modTim = getLastModified( u );
+        final Long ret = new Long( modTim );
+        return ret;
+    }
     /**
      * Get the last modification date of an open URLConnection.
      *

@@ -61,10 +61,8 @@
     <page path-info="/examples/doc" view="/doc/stub-view.xml"/>
     <page path-info="/doc/book" model="/doc/book/model.xpl"/>
 
-    <page path-info="/doc/(.*)"
-        xforms="/doc/xforms.xml"
-        matcher="oxf:perl5-matcher"
-        model="/doc/model.xpl">
+    <page path-info="/doc/(.*)" matcher="oxf:perl5-matcher" 
+            xforms="/doc/xforms.xml" model="/doc/model.xpl">
         <param ref="/form/page"/>
     </page>
 

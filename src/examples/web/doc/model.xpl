@@ -39,7 +39,7 @@
             <p:input name="config" >
                <config>
                  <url>oxf:/doc/pages/reference-xforms.xml</url>
-				 <content-type>text/xml</content-type>                 
+                 <content-type>text/xml</content-type>                 
                </config>
             </p:input>
             <p:output name="data" id="body"/>

@@ -57,7 +57,14 @@
         <ulist>
             <item>
                 <p>
-                    It exposes an XML Infoset identifier <emph>i</emph>.
+                    The corresponding <el>p:processor</el> element contains an embedded
+                    <el>p:output</el> element with an attribute <el>name</el> with value
+                    <emph>n</emph>.
+                </p>
+            </item>
+            <item>
+                <p>
+                    The <el>p:output</el> element exposes an XML Infoset identifier <emph>i</emph>.
                 </p>
             </item>
             <item>

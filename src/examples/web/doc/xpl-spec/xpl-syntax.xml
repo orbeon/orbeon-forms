@@ -126,7 +126,7 @@ schema-href? = <emph>uri-reference</emph> /&gt;
             attributes and content.
         </note>
     </div2>
-    <div2>
+    <div2 id="processor-module">
         <head>Processor Module</head>
         <div3>
             <head>The <el>p:processor</el> Element</head>

@@ -383,8 +383,17 @@
                     </termdef>
                 </p>
                 <p>
+                    <termdef id="declared-input-output" term="declared input of output">
+                        A <term>declared input or output</term> of an XML processor instance is an
+                        input or output with name <emph>n</emph> where a <el>p:input</el> or
+                        <el>p:output</el> element with name <emph>n</emph> is a child of the
+                        processor instance's <el>p:processor</el> element. See <specref
+                        ref="processor-module"/>.
+                    </termdef>
+                </p>
+                <p>
                     <termdef id="dynamic-input-output" term="dynamic input of output">
-                        A <term>dynamic input or output</term> is a connected input or output of an
+                        A <term>dynamic input or output</term> is a declared input or output of an
                         XML processor instance which is not exposed by the XML processor before the
                         execution of the <termref def="xpl-program">XPL program</termref>.
                     </termdef>
@@ -413,16 +422,16 @@
                 <ulist>
                     <item>
                         <p>
-                            <emph>Mandatory.</emph> Such an input or output must be connected in an
+                            <emph>Mandatory.</emph> Such an input or output must be declared in an
                             XPL program. The XPL implementation should raise a static error if a
-                            statically defined mandatory input or output is not connected for a
+                            statically defined mandatory input or output is not declared for a
                             given XML processor instance.
                         </p>
                     </item>
                     <item>
                         <p>
-                            <emph>Optional.</emph> Such an input or output may or may not be connected
-                            in an XPL program.
+                            <emph>Optional.</emph> Such an input or output may or may not be
+                            declared in an XPL program.
                         </p>
                     </item>
                 </ulist>
@@ -438,13 +447,13 @@
                             <th>Optional</th>
                         </tr>
                         <tr>
-                            <th>Connected</th>
+                            <th>Declared</th>
                             <td>OK</td>
                             <td>OK</td>
                             <td>OK</td>
                         </tr>
                         <tr>
-                            <th>Not connected</th>
+                            <th>Not Declared</th>
                             <td>Invalid</td>
                             <td>OK</td>
                             <td>Inexistent by definition</td>

@@ -500,6 +500,15 @@
                 </item>
                 <item>
                     <p>
+                       Pipeline inputs could provide a default XML Infoset using the <el>href</el>
+                       attribute. This would implicitly define such pipeline inputs as optional
+                       static inputs. If connected from outside, the XML Infoset referred to by the
+                       <el>href</el> attribute is ignored. If not connected, the XML Infoset
+                       referred to internally is used.
+                    </p>
+                </item>
+                <item>
+                    <p>
                        Should the Pipeline processor be renamed the XPL processor?
                     </p>
                 </item>

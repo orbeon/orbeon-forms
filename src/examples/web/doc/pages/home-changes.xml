@@ -77,17 +77,6 @@
                     illustrates this capability.
                 </p>
 			</section>
-<!--            <section>-->
-<!--				<title>Better Base64 Support and Binary Serializer</title>-->
-<!--				<p>-->
-<!--                    The URL generator now supports reading binary files. Those are converted into-->
-<!--                    XML text using the Base64 encoding. [TODO: Document, content-types, etc.]-->
-<!--                </p>-->
-<!--				<p>Base64 support in OXF-->
-<!--                    has been improved, with upgrades to the SQL processor and the Request generator.-->
-<!--                    [TODO: Example with the two processors.]-->
-<!--                </p>-->
-<!--			</section>-->
         </section>
         <section>
 			<title>New in Version 2.5.4</title>
@@ -1221,19 +1210,6 @@
                     Oracle <code>XMLType</code> data type. CLOB, BLOB and <code>XMLType</code>
                     support is better documented and comes with examples. [TODO: Document, mention
                     streaming, etc.]
-                </p>
-			</section>
-			<section>
-				<title>Better Base64 Support and Binary Serializer</title>
-				<p>
-                    The URL generator now supports reading binary files. Those are converted into
-                    XML text using the Base64 encoding. [TODO: Document, content-types, etc.]
-                </p>
-				<p>
-                    A new serializer, the Binary serializer, supports decoding of Base64-encoded
-                    data and sending the resulting binary stream to a client. Base64 support in OXF
-                    has been improved, with upgrades to the SQL processor and the Request generator.
-                    [TODO: Example with the two processors.]
                 </p>
 			</section>
 			<section>

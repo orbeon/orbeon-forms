@@ -152,8 +152,8 @@ public class SchedulerProcessor extends ProcessorImpl {
 
 
     private static class ProcessorTask extends Task {
-        private final static String RUNNING ="running";
-        private final static String WAITING ="waiting";
+        private final static String RUNNING = "running";
+        private final static String WAITING = "waiting";
 
         private Processor processor;
         private ExternalContext externalContext;
@@ -177,7 +177,7 @@ public class SchedulerProcessor extends ProcessorImpl {
         }
 
         synchronized public void setStatus(boolean running) {
-            if(running)
+            if (running)
                 status = RUNNING;
             else
                 status = WAITING;
@@ -185,10 +185,10 @@ public class SchedulerProcessor extends ProcessorImpl {
 
         public void run() {
             try {
-                if(sync && getStatus().equals(RUNNING)) {
-                    if(logger.isInfoEnabled())
-                        logger.info("Task: "+getName()+" won't run since it is already running");
-                }else{
+                if (sync && getStatus().equals(RUNNING)) {
+                    if (logger.isInfoEnabled())
+                        logger.info("Task: " + getName() + " won't run since it is already running");
+                } else {
                     setStatus(true);
                     InitUtils.runProcessor(processor, externalContext, new PipelineContext());
                     setStatus(false);

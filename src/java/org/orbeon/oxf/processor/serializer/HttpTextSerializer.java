@@ -67,7 +67,7 @@ public abstract class HttpTextSerializer extends HttpSerializerBase {
     protected abstract void readInput(PipelineContext context, ProcessorInput input, Config config, Writer writer);
 
     /**
-     * This method is use when the legacy serializer is used in the new converter mode. In this
+     * This method is used when the legacy serializer is used in the new converter mode. In this
      * case, the converter exposes a "data" output, and the processor's start() method is not
      * called.
      */

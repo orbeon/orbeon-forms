@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -30,7 +31,10 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import java.util.Enumeration;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -41,11 +45,16 @@ import java.util.Map;
  */
 public class XFormsElement {
 
+    private static final int BUFFER_SIZE = 1024;
+
     /**
      * Controls that contain the referenced value (which means that we won't
      * have to generate hidden fields for those).
      */
     static final Map DATA_CONTROLS = new HashMap();
+    static final Map LINKING_CONTROLS = new HashMap();
+    static final Map ACTION_CONTROLS = new HashMap();
+
     static final Map CONTROLS_ANNOTATIONS = new HashMap();
 
     static {
@@ -54,6 +63,16 @@ public class XFormsElement {
                  "range", "select", "select1", "output", "hidden"};
         for (int i = 0; i < controlNames.length; i++)
             DATA_CONTROLS.put(controlNames[i], null);
+
+        String[] linkingNames =
+                {"message"};
+        for (int i = 0; i < linkingNames.length; i++)
+            LINKING_CONTROLS.put(linkingNames[i], null);
+
+        String[] actionNames =
+                {"message"};
+        for (int i = 0; i < actionNames.length; i++)
+            ACTION_CONTROLS.put(actionNames[i], null);
     }
 
     public boolean repeatChildren() {
@@ -107,10 +126,11 @@ public class XFormsElement {
                     addExtensionAttribute(newAttributes, Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME, instanceData.getInvalidBindIds());
                 addExtensionAttribute(newAttributes, "ref-xpath", context.getRefXPath());
                 if (DATA_CONTROLS.containsKey(localname)) {
-
                     addExtensionAttribute(newAttributes, "name", context.getRefName(refNode, true));
                     addExtensionAttribute(newAttributes, "value", context.getRefValue(refNode));
-                }
+                } else  if (ACTION_CONTROLS.containsKey(localname)) {
+                    addExtensionAttribute(newAttributes, "value", context.getRefValue(refNode));
+                } 
             }
 
             // Handle attributes used by XForms actions
@@ -172,6 +192,28 @@ public class XFormsElement {
                 } finally {
                     if(expr != null)
                         expr.returnToPool();
+                }
+            }
+            // Linking attribute: load content to xxforms:src-value
+            if(attributes.getIndex("", "src") != -1 && LINKING_CONTROLS.containsKey(localname)) {
+                try {
+                    String src = attributes.getValue("src");
+                    // TODO: We don't support relative URL here because the locator is often null after an XSL transformation
+                    URL url = URLFactory.createURL(src);
+
+                    // Load file into buffer
+                    InputStreamReader stream = new InputStreamReader(url.openStream());
+                    StringBuffer value = new StringBuffer();
+                    char[] buff = new char[BUFFER_SIZE];
+                    int c = 0;
+                    while( (c = stream.read(buff, 0, BUFFER_SIZE-1)) != -1)
+                        value.append(buff);
+
+                    addExtensionAttribute(newAttributes, "src-value", value.toString());
+                } catch (MalformedURLException e) {
+                    throw new OXFException(e);
+                } catch (IOException ioe) {
+                    throw new OXFException(ioe);
                 }
             }
         }

@@ -86,6 +86,7 @@
                         event.returnValue=false;
                         return false">
                     <xsl:copy-of select="@* except (@xhtml:onclick | @xxforms:* | @*[namespace-uri() = ''])"/>
+                    <xsl:apply-templates select="xforms:message"/>
                     <xsl:value-of select="xforms:label"/>
                 </xhtml:a>
             </xsl:when>
@@ -93,14 +94,25 @@
                 <xhtml:input type="image" name="{$name}" src="{xxforms:img/@src}" alt="{xforms:label}">
                     <xsl:call-template name="copy-other-attributes"/>
                     <xsl:copy-of select="xxforms:img/@* except xxforms:img/@src"/>
+                    <xsl:apply-templates select="xforms:message"/>
                 </xhtml:input>
             </xsl:when>
             <xsl:otherwise>
                 <xhtml:input type="submit" name="{$name}" value="{xforms:label}">
                     <xsl:call-template name="copy-other-attributes"/>
+                    <xsl:apply-templates select="xforms:message"/>
                 </xhtml:input>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="xforms:message">
+        <xsl:variable name="message" select="if(@xxforms:value != '') then
+                                                @xxforms:value
+                                             else if(@xxforms:src-value != '') then  
+                                                     @xxforms:src-value
+                                                   else string(.)" as="xs:string"/>
+        <xsl:attribute name="onclick">alert('<xsl:value-of select="$message"/>'); return false;</xsl:attribute>
     </xsl:template>
 
     <xsl:template match="xforms:select">

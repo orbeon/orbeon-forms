@@ -275,6 +275,23 @@
                     <attribute name="ref"/>
                     <attribute name="value"/>
                 </element>
+                <!-- Message -->
+                <element name="xf:message">
+                    <optional>
+                        <ref name="single-node-binding"/>
+                    </optional>
+                    <optional>
+                        <attribute name="level">
+                            <value>modal</value>
+                        </attribute>
+                    </optional>
+                    <optional>
+                        <ref name="linking"/>
+                    </optional>
+                    <optional>
+                        <data type="string"/>
+                    </optional>
+                </element>
             </choice>
         </zeroOrMore>
     </define>
@@ -439,6 +456,17 @@
                 </element>
             </choice>
         </zeroOrMore>
+    </define>
+
+    <define name="single-node-binding">
+        <choice>
+            <attribute name="ref"/>
+            <attribute name="bind"/>
+        </choice>
+    </define>
+
+    <define name="linking">
+        <attribute name="src"/>
     </define>
 
 </grammar>

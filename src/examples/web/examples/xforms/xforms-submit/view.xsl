@@ -55,6 +55,72 @@
                     </td>
                 </tr>
                 <tr>
+                    <td align="right">Message From Binding Attribute:</td>
+                    <td>
+                        <xforms:submit>
+                            <xforms:label>Alert!</xforms:label>
+                            <xforms:message ref="taste">This is an alert!</xforms:message>
+                        </xforms:submit>
+                        &#160;
+                        <xforms:submit xxforms:appearance="link">
+                            <xforms:label>Alert!</xforms:label>
+                            <xforms:message ref="taste">This is an alert!</xforms:message>
+                        </xforms:submit>
+                        &#160;
+                        <xforms:submit xxforms:appearance="image">
+                            <xxforms:img src="images/submit.gif"/>
+                            <xforms:label>Alert!</xforms:label>
+                            <xforms:message ref="taste">This is an alert!</xforms:message>
+                        </xforms:submit>
+                        &#160;
+                        (display an alert window with the selected taste)
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">Message From Inline Text:</td>
+                    <td>
+                        <xforms:submit>
+                            <xforms:label>Alert!</xforms:label>
+                            <xforms:message>This is an inline alert!</xforms:message>
+                        </xforms:submit>
+                        &#160;
+                        <xforms:submit xxforms:appearance="link">
+                            <xforms:label>Alert!</xforms:label>
+                            <xforms:message>This is an inline alert!</xforms:message>
+                        </xforms:submit>
+                        &#160;
+                        <xforms:submit xxforms:appearance="image">
+                            <xxforms:img src="images/submit.gif"/>
+                            <xforms:label>Alert!</xforms:label>
+                            <xforms:message>This is an inline alert!</xforms:message>
+                        </xforms:submit>
+                        &#160;
+                        (display an alert window with the content of the xforms:message)
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">Message From Linking Attribute:</td>
+                    <td>
+                        <xforms:submit>
+                            <xforms:label>Alert!</xforms:label>
+                            <xforms:message src="oxf:/examples/xforms/xforms-submit/message.txt"/>
+                        </xforms:submit>
+                        &#160;
+                        <xforms:submit xxforms:appearance="link">
+                            <xforms:label>Alert!</xforms:label>
+                            <xforms:message src="oxf:/examples/xforms/xforms-submit/message.txt"/>
+                        </xforms:submit>
+                        &#160;
+                        <xforms:submit xxforms:appearance="image">
+                            <xxforms:img src="images/submit.gif"/>
+                            <xforms:label>Alert!</xforms:label>
+                            <xforms:message src="oxf:/examples/xforms/xforms-submit/message.txt"/>
+                        </xforms:submit>
+                        &#160;
+                        (display an alert window with the content an URI)
+                    </td>
+                </tr>
+                <tr>
                     <td align="right">XForms instance:</td>
                     <td>
                         <f:xml-source>

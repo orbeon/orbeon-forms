@@ -41,7 +41,22 @@
                 </a>
             </xsl:for-each>
 
+            <table style="border: 1px solid #ccc; margin-top: 10px; margin-bottom: 10px; width: 100%" cellpadding="5">
+                <tr>
+                    <td>
+                        <ol>
+                            <xsl:for-each select="$posts/post[published = 'true']">
+                                <li>
+                                    <a href="#post-{post-id}"><xsl:value-of select="title"/></a>
+                                </li>
+                            </xsl:for-each>
+                        </ol>
+                    </td>
+                </tr>
+            </table>
+
             <xsl:for-each select="$posts/post[published = 'true']">
+                <a name="post-{post-id}"/>
                 <div>
                     <h2>
                         <a href="/blog/{doc('input:instance')/*/username}/post/{post-id}">

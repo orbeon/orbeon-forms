@@ -14,8 +14,8 @@
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.SimpleProcessor;
-import org.orbeon.oxf.processor.pipeline.PipelineContext;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 

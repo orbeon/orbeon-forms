@@ -123,11 +123,7 @@
                                                                         <img src="/images/new-window.gif" align="middle"/>
                                                                     </xsl:when>
                                                                     <xsl:otherwise>
-                                                                        <xf:submit xxf:appearance="link">
-                                                                            <xf:label><xsl:value-of select="@label"/></xf:label>
-                                                                            <xf:setvalue ref="action">show-example</xf:setvalue>
-                                                                            <xf:setvalue ref="example-id"><xsl:value-of select="@id"/></xf:setvalue>
-                                                                        </xf:submit>
+                                                                        <a href="/goto-example/{@id}"><xsl:value-of select="@label"/></a>
                                                                     </xsl:otherwise>
                                                                 </xsl:choose>
                                                             </li>

@@ -386,17 +386,16 @@
             <xsl:if test="exists($invalid-controls) and not((.//xforms:group)[1]/@xxforms:show-errors = 'false')">
                 <f:alerts>
                     <xsl:for-each select="$invalid-controls">
-                        <xsl:if test="xforms:alert">
-                            <f:alert>
-                                <!-- Order of preference is: binding attributes (ref, bind), linking attribute (src), inline content -->
-                                <xsl:value-of select="if (xforms:alert/@xxforms:value != '')  then
-                                                          xforms:alert/@xxforms:value
-                                                       else if (xforms:alert/@xxforms:src-value != '') then
-                                                                xforms:alert/@xxforms:src-value
-                                                            else
-                                                                string(xforms:alert)"/>
-                            </f:alert>
-                        </xsl:if>
+                        <xsl:for-each select='xforms:alert' >
+                                <f:alert>
+                                    <xsl:value-of select="if (@xxforms:value != '')  then
+                                                              @xxforms:value
+                                                           else if (@xxforms:src-value != '') then
+                                                                    @xxforms:src-value
+                                                                else
+                                                                    string()"/>
+                                </f:alert>
+                        </xsl:for-each>
                     </xsl:for-each>
                 </f:alerts>
             </xsl:if>

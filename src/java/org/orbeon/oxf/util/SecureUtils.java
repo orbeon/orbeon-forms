@@ -127,7 +127,9 @@ public class SecureUtils {
                 cipher.init(Cipher.ENCRYPT_MODE, getSecretKey(password), pbeParamSpec);
                 cache.add(pipelineContext, key, validity, cipher);
             }
-            return Base64.encode(cipher.doFinal(text.toString().getBytes()));
+            synchronized(cipher) {
+                return Base64.encode(cipher.doFinal(text.toString().getBytes()));
+            }
         } catch (IllegalBlockSizeException e) {
             throw new OXFException(e);
         } catch (BadPaddingException e) {
@@ -154,7 +156,9 @@ public class SecureUtils {
                 cipher.init(Cipher.DECRYPT_MODE, getSecretKey(password), pbeParamSpec);
                 cache.add(pipelineContext, key, validity, cipher);
             }
-            return new String(cipher.doFinal(Base64.decode(text)));
+            synchronized(cipher) {
+                return new String(cipher.doFinal(Base64.decode(text)));
+            }
         } catch (IllegalBlockSizeException e) {
             throw new OXFException(e);
         } catch (BadPaddingException e) {

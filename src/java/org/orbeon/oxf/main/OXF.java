@@ -75,7 +75,7 @@ public class OXF {
         LoggerFactory.initBasicLogger();
 
         // Signal that we are starting
-        logger.info("Starting Orbeon Server " + Version.getVersion());
+        logger.info("Starting Orbeon XML Server " + Version.getVersion());
 
         // 2. Initialize resource manager
         // Resources are first searched in a file hierarchy, then from the classloader

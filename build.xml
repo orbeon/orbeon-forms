@@ -19,9 +19,9 @@
         <property name="project.name" value="orbeon"/>
 
         <tstamp/>
-        <property name="version.number" value="2.5.3"/>
+        <property name="version.number" value="2.5.3+"/>
         <loadfile property="release.number" srcFile="oxf.version"/>
-        <echo message="Building Orbeon ${release.number}"/>
+        <echo message="Building Orbeon Presentation Server ${release.number}"/>
 
         <property name="src.dir" value="src"/>
         <property name="java-src.dir" value="${src.dir}/java"/>
@@ -259,12 +259,12 @@
     <!-- WAR file -->
     <target name="orbeon-war" depends="classes" description="Create uncompressed WAR file">
         <antcall target="war">
-            <param name="application.name" value="orbeon-server"/>
+            <param name="application.name" value="orbeon-presentation-server"/>
             <param name="descriptors.dir" value="descriptors/examples/web"/>
         </antcall>
 
         <antcall target="war-copy-descriptors">
-            <param name="application.name" value="orbeon-server"/>
+            <param name="application.name" value="orbeon-presentation-server"/>
             <param name="descriptors.dir" value="descriptors/examples/web"/>
             <param name="target" value="devel"/>
             <param name="build.root" value="${build.root}"/>
@@ -370,17 +370,17 @@
         <mkdir dir="${build.distrib.dir}"/>
 
         <antcall target="war">
-            <param name="application.name" value="orbeon-server"/>
+            <param name="application.name" value="orbeon-presentation-server"/>
             <param name="descriptors.dir" value="descriptors/examples/web"/>
         </antcall>
         <antcall target="war-copy-descriptors">
-            <param name="application.name" value="orbeon-server"/>
+            <param name="application.name" value="orbeon-presentation-server"/>
             <param name="descriptors.dir" value="descriptors/examples/web"/>
             <param name="target" value="war"/>
             <param name="build.root" value="${build.root}"/>
         </antcall>
         <zip zipfile="${build.distrib.dir}/orbeon.war">
-            <fileset dir="${build.dir}/orbeon-server-war"/>
+            <fileset dir="${build.dir}/orbeon-presentation-server-war"/>
             <zipfileset dir="${web-examples-src.dir}" prefix="WEB-INF/resources">
                 <exclude name="**/*.eps"/>
                 <exclude name="**/*.pdf"/>
@@ -430,7 +430,7 @@
         </zip>
     </target>
 
-    <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-bizdoc-war, orbeon-doc, orbeon-javadoc">
+    <target name="orbeon-dist" depends="orbeon-dist-war, orbeon-bizdoc-war, orbeon-doc, orbeon-javadoc">
         <property name="prefix" value="orbeon-${version.number}"/>
         <!-- Create temporary zip file -->
         <property name="tmp-zip" value="${build.distrib.dir}/orbeon-${version.number}-tmp.zip"/>
@@ -459,7 +459,7 @@
             <include name="**/*.css"/>
             <include name="**/*.java"/>
         </fixcrlf>
-        <zip zipfile="${build.distrib.dir}/orbeon-mvc-framework-${version.number}.zip" basedir="${build.temp.dir}/distrib"/>
+        <zip zipfile="${build.distrib.dir}/orbeon-presentation-server-${version.number}.zip" basedir="${build.temp.dir}/distrib"/>
         <!-- Fix EOL for Unix platform -->
         <fixcrlf srcDir="${build.temp.dir}/distrib" eol="lf">
             <include name="**/*.txt"/>
@@ -473,7 +473,7 @@
             <include name="**/*.css"/>
             <include name="**/*.java"/>
         </fixcrlf>
-        <tar tarfile="${build.distrib.dir}/orbeon-mvc-framework-${version.number}.tar.gz" compression="gzip" basedir="${build.temp.dir}/distrib"/>
+        <tar tarfile="${build.distrib.dir}/orbeon-presentation-server-${version.number}.tar.gz" compression="gzip" basedir="${build.temp.dir}/distrib"/>
         <delete file="${tmp-zip}"/>
     </target>
 
@@ -530,7 +530,7 @@
         </exec>
     </target>
 
-    <target name="orbeon-dist" depends="orbeon-dist-packages, orbeon-dist-install"/>
+    <target name="orbeon-dist" depends="orbeon-dist, orbeon-dist-install"/>
 
     <target name="copy-distrib" depends="orbeon-dist">
         <copy todir="/home/httpd/html/public/oxf/secret">
@@ -607,7 +607,7 @@
 
     </target>
 
-    <target name="anthill" depends="clean, orbeon-dist-packages">
+    <target name="anthill" depends="clean, orbeon-dist">
         <echo message="Deploying to ${deployDir}/${version}"/>
         <mkdir dir="${deployDir}/${version}"/>
         <copy todir="${deployDir}/${version}">

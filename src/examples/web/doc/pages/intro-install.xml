@@ -83,9 +83,9 @@
                         to <code>TOMCAT_HOME/common/lib</code>.</li>
 
                         <li>If you are using Tomcat 4.1 LE, download <link
-                        href="http://jakarta.apache.org/commons/dbcp.html">Jakarta
+                        href="http://jakarta.apache.org/commons/dbcp/">Jakarta
                         Commons DBCP</link> and <link
-                        href="http://jakarta.apache.org/commons/pool.html">Jakarta
+                        href="http://jakarta.apache.org/commons/pool/">Jakarta
                         Commons Pool</link> and copy the JAR files to
                         <code>TOMCAT_HOME/common/lib</code>. </li>
 

@@ -1154,6 +1154,23 @@
 <!--        <output name="instance" href="company.xml"/>-->
 <!--    </test>-->
 
-
-
+    <test description="Hidden control" name="oxf:pipeline">
+        <input name="config" href="oxf:/unit-tests/xforms-instance-recreate.xpl"/>
+        <input name="model">
+            <xforms:model id="form">
+                <xforms:instance>
+                    <instance>gaga</instance>
+                </xforms:instance>
+            </xforms:model>
+        </input>
+        <input name="view">
+            <xforms:group>
+                <xxforms:hidden ref="/instance"/>
+            </xforms:group>
+        </input>
+        <output name="instance">
+            <instance>gaga</instance>
+        </output>
+    </test>
+    
 </group>

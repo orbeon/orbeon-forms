@@ -37,24 +37,24 @@
             </p>
         </section>
         <section>
-        	<title>Introduction to XForms</title>
-        	<section>
-        		<title>Origin, Today, and Tomorrow</title>
-        		<p>
-					XForms has been designed by the W3C based on experience with HTML forms. It was only promoted
-					to the rank of W3C Recommendation quite recently, in October 2003. Mainstream browsers
-					(Internet Explorer, Mozilla / Firefox, Opera, Safari) do not yet support XForms natively.
-					However you can already leverage the benefits of XForms today by using a server-side XForms
-					engine like the one provided in Presentation Server. Until browsers natively support XForms,
-					the Presentation Server XForms engine will transparently generate HTML forms and perform the
-					work that would be done by an XForms-compliant browser. This way you can start leveraging
-					XForms today, be ready for upcoming XForms-compliant browsers, and work smoothly with the
-					mainstream browsers that are deployed in the marketplace.
-    			</p>
-        	</section>
-        	<section>
-        		<title>Benefits</title>
-        		<p>
+            <title>Introduction to XForms</title>
+            <section>
+                <title>Origin, Today, and Tomorrow</title>
+                <p>
+                    XForms has been designed by the W3C based on experience with HTML forms. It was only promoted
+                    to the rank of W3C Recommendation quite recently, in October 2003. Mainstream browsers
+                    (Internet Explorer, Mozilla / Firefox, Opera, Safari) do not yet support XForms natively.
+                    However you can already leverage the benefits of XForms today by using a server-side XForms
+                    engine like the one provided in Presentation Server. Until browsers natively support XForms,
+                    the Presentation Server XForms engine will transparently generate HTML forms and perform the
+                    work that would be done by an XForms-compliant browser. This way you can start leveraging
+                    XForms today, be ready for upcoming XForms-compliant browsers, and work smoothly with the
+                    mainstream browsers that are deployed in the marketplace.
+                </p>
+            </section>
+            <section>
+                <title>Benefits</title>
+                <p>
                     Compared to HTML forms, XForms offers a higher level approach to forms. The
                     benefits are that less programming is needed (less JavaScript, and less
                     server-side programming), so forms are easier to create and modify. As an
@@ -122,12 +122,12 @@
                         </p>
                     </li>
                 </ol>
-        	</section>
-        	<section>
-        		<title>Processing Model</title>
+            </section>
+            <section>
+                <title>Processing Model</title>
                 <img print-format="pdf" src="pages/reference-xforms-model-controls.png"
                     style="clear: both; float: right"/>
-        		<p>
+                <p>
                     XForms exposes two main components that are distinct but designed to closely
                     work with one another:
                 </p>
@@ -179,7 +179,7 @@
                     href="reference-controller">Page Flow Controller</a> documentation details how
                     this is done.
                 </p>
-        	</section>
+            </section>
         </section>
         <section>
             <title>XForms Model</title>
@@ -870,6 +870,36 @@
                     In this case, the uploaded file is encoded an directly embedded into the XML
                     instance. This is a good method to handle small files only, because the entire
                     file is converted and stored in memory.
+                </p>
+            </section>
+            <section>
+                <title>Hidden Field</title>
+                <p>
+                    In certain situation, you want to generate a hidden field. Typically this means
+                    a <code>&lt;input type="hidden"></code> in HTML. A hidden field is not visible
+                    to the end user, but its value can be set by some JavaScript that you embed in
+                    the page. Since there is no XForms control for hidden fields, we
+                    provide an XForms extension: <code>&lt;xxforms:hidden ref="..."/></code>.
+                </p>
+                <p>
+                    To set the value of a hidden field from your own JavaScript, you need to be able
+                    to reference the hidden form element. Presentation Server assigns a name to each
+                    form element. When the end user submits the form, this name is used by
+                    Presentation Server to populate the right node in the instance with the value
+                    entered by the user. So to refer to the hidden field in JavaScript, you should
+                    not use the field's name. Instead you should assign an id to the field, and
+                    reference the field in JavaScript by that id. You can assign an id to the hidden
+                    XForms control with:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xxforms:hidden ref="..." xhtml:id="my-id"/>
+                </xml-source>
+
+                <p>
+                    Then you can reference the form control in JavaScript with
+                    <code>document.getElementById('my-id')</code> (<a href="
+                    http://www.mozilla.org/docs/dom/domref/dom_doc_ref48.html">more information on
+                    getElementById</a>).
                 </p>
             </section>
             <section>

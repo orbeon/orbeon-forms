@@ -18,6 +18,5 @@ package org.orbeon.oxf.processor.sql;
  */
 public class SQLOutputProcessor extends SQLProcessor {
     public SQLOutputProcessor() {
-        super(false, true);
     }
 }

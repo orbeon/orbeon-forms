@@ -19,7 +19,7 @@
     <p:param name="document-list" type="output" schema-href="../../summary/summary-model.xsd"/>
 
     <!-- Return the ids of all the documents -->
-    <p:processor name="oxf:sql-output">
+    <p:processor name="oxf:sql">
         <p:input name="config">
             <sql:config>
                 <sql:connection>

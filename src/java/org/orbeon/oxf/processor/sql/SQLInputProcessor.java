@@ -13,18 +13,10 @@
  */
 package org.orbeon.oxf.processor.sql;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.NullSerializer;
-
 /**
  * This version of the SQL processor does not have any output.
  */
 public class SQLInputProcessor extends SQLProcessor {
     public SQLInputProcessor() {
-        super(true, false);
-    }
-
-    public void start(PipelineContext context) {
-        execute(context, new NullSerializer.NullContentHandler());
     }
 }

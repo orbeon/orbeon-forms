@@ -211,14 +211,6 @@
         <class name="org.orbeon.oxf.processor.sql.SQLProcessor"/>
     </processor>
 
-    <processor name="oxf:sql-input" uri="oxf/processor/sql-input">
-        <class name="org.orbeon.oxf.processor.sql.SQLInputProcessor"/>
-    </processor>
-
-    <processor name="oxf:sql-output" uri="oxf/processor/sql-output">
-        <class name="org.orbeon.oxf.processor.sql.SQLOutputProcessor"/>
-    </processor>
-
     <processor name="oxf:ldap" uri="oxf/processor/ldap">
         <class name="org.orbeon.oxf.processor.LDAPProcessor"/>
     </processor>
@@ -479,6 +471,14 @@
 
     <processor name="oxf:pdf-serializer" uri="oxf/processor/pdf-serializer">
         <class name="org.orbeon.oxf.processor.serializer.legacy.XSLFOSerializer"/>
+    </processor>
+
+    <processor name="oxf:sql-input" uri="oxf/processor/sql-input">
+        <class name="org.orbeon.oxf.processor.sql.SQLInputProcessor"/>
+    </processor>
+
+    <processor name="oxf:sql-output" uri="oxf/processor/sql-output">
+        <class name="org.orbeon.oxf.processor.sql.SQLOutputProcessor"/>
     </processor>
 
     <!-- Scratchpad -->

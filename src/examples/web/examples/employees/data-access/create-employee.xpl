@@ -24,7 +24,7 @@
         <p:input name="config" href="initialization/init-database.xpl"/>
     </p:processor>
 
-    <p:processor name="oxf:sql-input">
+    <p:processor name="oxf:sql">
         <p:input name="data" href="#employee"/>
         <p:input name="datasource" href="../../datasource-sql.xml"/>
         <p:input name="config">

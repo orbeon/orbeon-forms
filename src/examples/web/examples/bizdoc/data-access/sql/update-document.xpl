@@ -18,7 +18,7 @@
 
     <p:param name="document-info" type="input" schema-href="../document-info.rng"/>
 
-    <p:processor name="oxf:sql-input">
+    <p:processor name="oxf:sql">
         <p:input name="data" href="#document-info"/>
         <p:input name="config">
             <sql:config>

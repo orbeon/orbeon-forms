@@ -20,7 +20,7 @@
 
     <p:param type="input" name="query" schema-href="find-employee-query.rng"/>
 
-    <p:processor name="oxf:sql-input">
+    <p:processor name="oxf:sql">
         <p:input name="data" href="#query"/>
         <p:input name="datasource" href="../../datasource-sql.xml"/>
         <p:input name="config">

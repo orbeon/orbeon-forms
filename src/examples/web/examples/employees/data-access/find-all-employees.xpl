@@ -20,7 +20,7 @@
 
     <p:param type="output" name="data"/>
 
-    <p:processor name="oxf:sql-output">
+    <p:processor name="oxf:sql">
         <p:input name="datasource" href="../../datasource-sql.xml"/>
         <p:input name="config">
             <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">

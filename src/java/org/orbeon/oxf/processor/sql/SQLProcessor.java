@@ -91,31 +91,21 @@ public class SQLProcessor extends ProcessorImpl {
 
     private static final Document EMPTY_DOCUMENT = XMLUtils.createDOM4JDocument();
 
-    private boolean hasInput;
-    private boolean hasOutput;
-
     public SQLProcessor() {
-        this(true, true);
-    }
-
-    protected SQLProcessor(boolean hasInput, boolean hasOutput) {
-        this.hasInput = hasInput;
-        this.hasOutput = hasOutput;
+        // Mandatory config input
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SQL_NAMESPACE_URI));
 
         // Optional datasource input
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATASOURCE, SQL_DATASOURCE_URI));
 
-        // Mandatory config input
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SQL_NAMESPACE_URI));
-
-        // Data input and output
-        if (hasInput)
-            addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
-        if (hasOutput)
-            addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
+        // Optional data input and output
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
+        // For now don't declare it, because it causes problems
+//        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
     public ProcessorOutput createOutput(String name) {
+        // This will be called only if there is an output
         ProcessorOutput output = new ProcessorOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext context, ContentHandler contentHandler) {
                 execute(context, contentHandler);
@@ -123,6 +113,11 @@ public class SQLProcessor extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
+    }
+
+    public void start(PipelineContext context) {
+        // This will be called only if no output is connected
+        execute(context, new NullSerializer.NullContentHandler());
     }
 
     private static class Config {
@@ -223,7 +218,9 @@ public class SQLProcessor extends ProcessorImpl {
             Node data = null;
             XPathContentHandler xpathContentHandler = null;
 
-            if (!hasInput || !config.useXPathExpressions) {
+            // Check if the data input is connected
+            boolean hasDataInput = getConnectedInputs().get(INPUT_DATA) != null;
+            if (!hasDataInput || !config.useXPathExpressions) {
                 // Just create an empty document
                 data = EMPTY_DOCUMENT;
             } else {

@@ -165,11 +165,6 @@
                 </sql:connection>
             </sql:config>
         </p:input>
-        <p:output name="output" id="dummy"/>
-    </p:processor>
-
-    <p:processor name="oxf:null-serializer">
-        <p:input name="data" href="#dummy"/>
     </p:processor>
 
 </p:config>

@@ -18,7 +18,7 @@
           xmlns:sql="http://orbeon.org/oxf/xml/sql"
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <p:processor name="oxf:sql-output">
+    <p:processor name="oxf:sql">
         <p:input name="datasource" href="../../../datasource-sql.xml"/>
         <p:input name="config">
             <sql:config>
@@ -40,11 +40,6 @@
                 </sql:connection>
             </sql:config>
         </p:input>
-        <p:output name="output" id="dummy"/>
-    </p:processor>
-
-    <p:processor name="oxf:null-serializer">
-        <p:input name="data" href="#dummy"/>
     </p:processor>
 
 </p:config>

@@ -1136,7 +1136,7 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     /**
-     * Subclasses can use this utility method when inmplementing the getKey
+     * Subclasses can use this utility method when implementing the getKey
      * and getValidity methods to make sure that they don't read the whole
      * config (if we don't already have it) just to return a key/validity.
      */
@@ -1144,9 +1144,24 @@ public abstract class ProcessorImpl implements Processor {
         OutputCacheKey outputCacheKey = getInputKey(context, getInputByName(inputName));
         if (outputCacheKey == null) return false;
         InputCacheKey inputCacheKey = new InputCacheKey(getInputByName(inputName), outputCacheKey);
-        Object configValidity = getInputValidity(context, getInputByName(inputName));
-        if (configValidity == null) return false;
-        return ObjectCache.instance().findValid(context, inputCacheKey, configValidity) != null;
+        Object inputValidity = getInputValidity(context, getInputByName(inputName));
+        if (inputValidity == null) return false;
+        return ObjectCache.instance().findValid(context, inputCacheKey, inputValidity) != null;
+    }
+
+    /**
+     * Subclasses can use this utility method to obtain the key and validity associated with an
+     * input when implementing the getKey and getValidity methods.
+     *
+     * @return  a KeyValidity object containing non-null key and validity, or null
+     */
+    protected KeyValidity getInputKeyValidity(PipelineContext context, String inputName) {
+        OutputCacheKey outputCacheKey = getInputKey(context, getInputByName(inputName));
+        if (outputCacheKey == null) return null;
+        InputCacheKey inputCacheKey = new InputCacheKey(getInputByName(inputName), outputCacheKey);
+        Object inputValidity = getInputValidity(context, getInputByName(inputName));
+        if (inputValidity == null) return null;
+        return new KeyValidity(inputCacheKey, inputValidity);
     }
 
     /**
@@ -1342,6 +1357,15 @@ public abstract class ProcessorImpl implements Processor {
 
     protected static class DigestState {
         public byte[] digest;
+        public CacheKey key;
+        public Object validity;
+    }
+
+    public static class KeyValidity {
+        public KeyValidity(CacheKey key, Object validity) {
+            this.key = key;
+            this.validity = validity;
+        }
         public CacheKey key;
         public Object validity;
     }

@@ -26,7 +26,7 @@ public interface Cache {
     public void add(PipelineContext context, CacheKey key, Object validity, Object object);
     public void remove(PipelineContext context, CacheKey key);
     public Object findValid(PipelineContext context, CacheKey key, Object validity);
-    public Object findValidWithExpiration(PipelineContext context, CacheKey key, long expiration);
+//    public Object findValidWithExpiration(PipelineContext context, CacheKey key, long expiration);
     public Iterator iterateCacheKeys(PipelineContext context);
     public Iterator iterateCacheObjects(PipelineContext context);
     public void setMaxSize(PipelineContext context, int maxSize);

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.cache;
 
+import org.orbeon.oxf.processor.ProcessorInput;
 
 public class InputCacheKey extends CacheKey {
 
@@ -20,7 +21,7 @@ public class InputCacheKey extends CacheKey {
     private OutputCacheKey outputKey;
     private int hash;
 
-    public InputCacheKey(org.orbeon.oxf.processor.ProcessorInput input, OutputCacheKey outputKey) {
+    public InputCacheKey(ProcessorInput input, OutputCacheKey outputKey) {
         setClazz(input.getProcessorClass());
         setInputName(input.getName());
         setOutputKey(outputKey);

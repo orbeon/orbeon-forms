@@ -85,7 +85,7 @@ public class XMLUtils {
         try {
             // Enable XInclude
             System.setProperty("orbeon.apache.xerces.xni.parser.XMLParserConfiguration",
-                    "orbeon.apache.xerces.parsers.XIncludeParserConfiguration");
+                    "org.orbeon.oxf.xml.XIncludeParserConfiguration");
 
             // Create factory
             documentBuilderFactory = (DocumentBuilderFactory) Class.forName

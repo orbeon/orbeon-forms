@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.cache;
 
-
-
 /**
  * Factory for the cache object
  */

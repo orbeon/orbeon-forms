@@ -154,7 +154,7 @@
     </xsl:template>
 
     <!-- Just copy other "xhtml" elements removing the namespace -->
-   <xsl:template match="xhtml:*">
+    <xsl:template match="xhtml:*">
         <xsl:element name="{local-name()}">
             <xsl:apply-templates select="@*|node()"/>
         </xsl:element>

@@ -311,7 +311,7 @@ public class FileSerializer extends CachedSerializer {
                 config.isIndent(), config.getIndentAmount());
 
         identity.setResult(new StreamResult(writer));
-        readInputAsSAX(context, input, new SerializerContentHandler(identity, writer));
+        readInputAsSAX(context, input, new SerializerContentHandler(identity, writer, getPropertySet().getBoolean("serialize-xml-11", false).booleanValue()));
     }
 
     protected Writer getWriter(OutputStream outputStream, Config config) {

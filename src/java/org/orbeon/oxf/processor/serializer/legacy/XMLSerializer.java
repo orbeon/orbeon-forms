@@ -55,6 +55,6 @@ public class XMLSerializer extends HttpTextSerializer {
                 config.indentAmount);
 
         identity.setResult(new StreamResult(writer));
-        ProcessorImpl.readInputAsSAX(context, input, new SerializerContentHandler(identity, writer));
+        ProcessorImpl.readInputAsSAX(context, input, new SerializerContentHandler(identity, writer, isSerializeXML11()));
     }
 }

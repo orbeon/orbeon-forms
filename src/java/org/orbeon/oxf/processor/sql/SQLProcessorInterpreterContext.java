@@ -22,6 +22,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XPathContentHandler;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.helpers.NamespaceSupport;
@@ -35,6 +36,9 @@ import java.util.*;
  * Interpreter context for the SQL processor.
  */
 class SQLProcessorInterpreterContext {
+
+    private OXFProperties.PropertySet propertySet;
+
     private PipelineContext pipelineContext;
     private Node input;
     private XPathContentHandler xpathContentHandler;
@@ -46,6 +50,14 @@ class SQLProcessorInterpreterContext {
     private List executionContextStack;
     private List currentNodes;
     private List currentFunctions = new ArrayList();
+
+    public SQLProcessorInterpreterContext(OXFProperties.PropertySet propertySet) {
+        this.propertySet = propertySet;
+    }
+
+    public OXFProperties.PropertySet getPropertySet() {
+        return propertySet;
+    }
 
     private static class ExecutionContext {
         public ResultSet resultSet;

@@ -116,9 +116,9 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
 //        readInputAsSAX(pipelineContext, INPUT_CONFIG, new SAXDebuggerProcessor.DebugContentHandler(new ForwardingContentHandler(null, false)));
          return (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_QUERY), new CacheableInputReader() {
             public Object read(PipelineContext context, ProcessorInput input) {
-                // Use readInputAsSAX so that we can filter namespaces
+                // Use readInputAsSAX so that we can filter namespaces if needed
                 LocationSAXContentHandler ch = new LocationSAXContentHandler();
-                readInputAsSAX(context, input, new NamespaceCleanupContentHandler(ch, false));
+                readInputAsSAX(context, input, new NamespaceCleanupContentHandler(ch, isSerializeXML11()));
                 return readConfig(ch.getDocument());
             }
         });
@@ -324,13 +324,17 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
 
             // Write to the resource
             ContentHandler contentHandler = xmlResource.setContentAsSAX();
-            readInputAsSAX(pipelineContext, input, new NamespaceCleanupContentHandler(contentHandler, false));
+            readInputAsSAX(pipelineContext, input, new NamespaceCleanupContentHandler(contentHandler, isSerializeXML11()));
 
             // Store resource
             collection.storeResource(xmlResource);
         } catch (XMLDBException e) {
             throw new OXFException(e);
         }
+    }
+
+    private boolean isSerializeXML11() {
+        return getPropertySet().getBoolean("serialize-xml-11", false).booleanValue();
     }
 
     private Collection createCollection(PipelineContext pipelineContext, Datasource datasource, String collectionName) throws XMLDBException {

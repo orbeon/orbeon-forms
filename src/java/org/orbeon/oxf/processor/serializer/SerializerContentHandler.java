@@ -26,23 +26,23 @@ import java.io.Writer;
  * A forwarding content handler that flushed the output when receiving a
  * given processing instruction.
  *
- * Also clean invalid XML 1.0 namespace declarations.
+ * Also clean invalid XML 1.0 namespace declarations if needed.
  */
 public class SerializerContentHandler extends NamespaceCleanupContentHandler {
     private Writer writer;
     private OutputStream os;
 
-    public SerializerContentHandler(ContentHandler contentHandler) {
-        super(contentHandler, false);
+    public SerializerContentHandler(ContentHandler contentHandler, boolean serializeXML11) {
+        super(contentHandler, serializeXML11);
     }
 
-    public SerializerContentHandler(ContentHandler contentHandler, Writer writer) {
-        this(contentHandler);
+    public SerializerContentHandler(ContentHandler contentHandler, Writer writer, boolean serializeXML11) {
+        this(contentHandler, serializeXML11);
         this.writer = writer;
     }
 
-    public SerializerContentHandler(ContentHandler contentHandler, OutputStream os) {
-        this(contentHandler);
+    public SerializerContentHandler(ContentHandler contentHandler, OutputStream os, boolean serializeXML11) {
+        this(contentHandler, serializeXML11);
         this.os = os;
     }
 

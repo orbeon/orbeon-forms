@@ -51,12 +51,12 @@ public class HTMLSerializer extends HttpTextSerializer {
                 config.indentAmount);
 
         identity.setResult(new StreamResult(writer));
-        ProcessorImpl.readInputAsSAX(context, input, new StripNamespaceContentHandler(identity, writer));
+        ProcessorImpl.readInputAsSAX(context, input, new StripNamespaceContentHandler(identity, writer, isSerializeXML11()));
     }
 
     protected static class StripNamespaceContentHandler extends SerializerContentHandler {
-        public StripNamespaceContentHandler(ContentHandler contentHandler, Writer writer) {
-            super(contentHandler, writer);
+        public StripNamespaceContentHandler(ContentHandler contentHandler, Writer writer, boolean serializeXML11) {
+            super(contentHandler, writer, serializeXML11);
         }
 
         public void startPrefixMapping(String s, String s1) throws SAXException {

@@ -22,6 +22,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.Base64ContentHandler;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -248,7 +249,7 @@ public class SQLProcessor extends ProcessorImpl {
             }
 
             // Replay the config SAX store through the interpreter
-            config.configInput.replay(new RootInterpreter(context, data, xpathContentHandler, contentHandler));
+            config.configInput.replay(new RootInterpreter(context, getPropertySet(), data, xpathContentHandler, contentHandler));
         } catch (OXFException e) {
             throw e;
         } catch (Exception e) {
@@ -1086,8 +1087,8 @@ public class SQLProcessor extends ProcessorImpl {
 
     private static class QueryInterpreter extends InterpreterContentHandler {
 
-        public static int QUERY = 0;
-        public static int UPDATE = 1;
+        public static final int QUERY = 0;
+        public static final int UPDATE = 1;
 
         private int type;
 
@@ -1446,10 +1447,14 @@ public class SQLProcessor extends ProcessorImpl {
                                                 } else if (value instanceof String || value instanceof Element) {
                                                     // Make sure we create a Document from the Element if we have one
                                                     Document xmlFragmentDocument = (value instanceof Element) ? DocumentHelper.createDocument(((Element) value).createCopy()) : null;
+
+                                                    // Retrieve serialization property
+                                                    boolean serializeXML11 = getInterpreterContext().getPropertySet().getBoolean("serialize-xml-11", false).booleanValue();
+
                                                     // Convert document into an XML String if necessary
                                                     if (value instanceof Element && !SQL_TYPE_XMLTYPE.equals(sqlType)) {
                                                         // Convert Document into a String
-                                                        value = XMLUtils.domToString(XMLUtils.adjustNamespaces(xmlFragmentDocument, false), false, false);
+                                                        value = XMLUtils.domToString(XMLUtils.adjustNamespaces(xmlFragmentDocument, serializeXML11), false, false);
                                                     }
                                                     if (SQL_TYPE_XMLTYPE.equals(sqlType)) {
                                                         // Set DOM using native XML type
@@ -1462,7 +1467,7 @@ public class SQLProcessor extends ProcessorImpl {
 //                                                            TransformerUtils.getIdentityTransformer().transform(new DocumentSource(xmlFragmentDocument), domResult);xxx
 //                                                            org.w3c.dom.Node node = domResult.getNode();
 
-                                                            String stringValue = XMLUtils.domToString(XMLUtils.adjustNamespaces(xmlFragmentDocument, false), false, false);
+                                                            String stringValue = XMLUtils.domToString(XMLUtils.adjustNamespaces(xmlFragmentDocument, serializeXML11), false, false);
 
                                                             // TEMP HACK: Oracle seems to have a problem with XMLType instanciated from a DOM, so we pass a String
 //                                                            org.w3c.dom.Node node = XMLUtils.stringToDOM(stringValue);
@@ -1715,11 +1720,12 @@ public class SQLProcessor extends ProcessorImpl {
     }
 
     private static class RootInterpreter extends InterpreterContentHandler {
-        private SQLProcessorInterpreterContext interpreterContext = new SQLProcessorInterpreterContext();
+        private SQLProcessorInterpreterContext interpreterContext;
         private NamespaceSupport namespaceSupport = new NamespaceSupport();
 
-        public RootInterpreter(PipelineContext context, Node input, XPathContentHandler xpathContentHandler, ContentHandler output) {
+        public RootInterpreter(PipelineContext context, OXFProperties.PropertySet propertySet, Node input, XPathContentHandler xpathContentHandler, ContentHandler output) {
             super(null, false);
+            interpreterContext = new SQLProcessorInterpreterContext(propertySet);
             interpreterContext.setPipelineContext(context);
             interpreterContext.setInput(input);
             interpreterContext.setXPathContentHandler(xpathContentHandler);

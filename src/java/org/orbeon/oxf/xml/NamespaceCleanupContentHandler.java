@@ -14,9 +14,9 @@ public class NamespaceCleanupContentHandler extends ForwardingContentHandler {
 
     private boolean filterNamespaceEvents;
 
-    public NamespaceCleanupContentHandler(ContentHandler contentHandler, boolean xml11) {
+    public NamespaceCleanupContentHandler(ContentHandler contentHandler, boolean serializeXML11) {
         super(contentHandler);
-        this.filterNamespaceEvents = !xml11;
+        this.filterNamespaceEvents = !serializeXML11;
     }
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {

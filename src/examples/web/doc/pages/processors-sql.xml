@@ -111,7 +111,7 @@
                 </p>
                 <p>
                     Alternatively, the <code>sql:datasource</code> element can be omitted. In that
-                    case, the <code>datasource</code> input of tyhe SQL processor must be connected
+                    case, the <code>datasource</code> input of the SQL processor must be connected
                     to an external datasource definition, which describes database connections
                     without using JNDI names mapped by the container. This is an example of
                     datasource definition:

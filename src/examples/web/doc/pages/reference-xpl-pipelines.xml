@@ -41,7 +41,7 @@
                 the way Java code “orchestrates” method calls within a Java object.
             </p>
             <p>
-                For an step-by-step introduction to pipelines, see <link href="Tutorial.pdf">Orbeon
+                For a step-by-step introduction to pipelines, see <link href="Tutorial.pdf">Orbeon
                 Presentation Server Tutorial</link>.
             </p>
         </section>

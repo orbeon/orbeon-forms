@@ -135,21 +135,6 @@
         </output>
     </test>
 
-    <test description="oxf: protocol with URL Generator" name="oxf:url-generator">
-        <input name="config">
-            <config>oxf:/unit-tests/company.xml</config>
-        </input>
-        <output name="data">
-            <company>
-                <name>Orbeon</name>
-                <employee>
-                    <firstname>Omar</firstname>
-                    <lastname>Tazi</lastname>
-                </employee>
-            </company>
-        </output>
-    </test>
-
     <test description="oxf: protocol in a pipeline input" name="oxf:pipeline">
         <input name="config">
             <p:config>
@@ -668,9 +653,68 @@
         </output>
     </test>
 
+    <test description="URL Generator (oxf: protocol): XML document" name="oxf:url-generator">
+        <input name="config">
+            <config>
+                <url>oxf:/unit-tests/company.xml</url>
+             </config>
+        </input>
+        <output name="data">
+            <company>
+                <name>Orbeon</name>
+                <employee>
+                    <firstname>Omar</firstname>
+                    <lastname>Tazi</lastname>
+                </employee>
+            </company>
+        </output>
+    </test>
+
+    <test description="URL Generator (oxf: protocol): XML document converted to text" name="oxf:url-generator">
+        <input name="config">
+            <config>
+                <url>oxf:/unit-tests/company.xml</url>
+                <content-type>text/plain</content-type>
+             </config>
+        </input>
+        <output name="data">
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string" content-type="text/plain">&lt;!-- Copyright (C) 2004 Orbeon, Inc. This program is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details. The full text of the license is available at http://www.gnu.org/copyleft/lesser.html --&gt; &lt;company&gt; &lt;name&gt;Orbeon&lt;/name&gt; &lt;employee&gt; &lt;firstname&gt;Omar&lt;/firstname&gt; &lt;lastname&gt;Tazi&lt;/lastname&gt; &lt;/employee&gt; &lt;/company&gt;</document>
+        </output>
+    </test>
+
+    <test description="URL Generator (oxf: protocol): XML document converted to binary" name="oxf:url-generator">
+        <input name="config">
+            <config>
+                <url>oxf:/unit-tests/company.xml</url>
+                <content-type>application/octet-stream</content-type>
+             </config>
+        </input>
+        <output name="data">
+            <document xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:base64Binary" content-type="application/octet-stream">
+                PCEtLQ0KICAgIENvcHlyaWdodCAoQykgMjAwNCBPcmJlb24sIEluYy4NCiAgDQogICAgVGhpcyBw
+                cm9ncmFtIGlzIGZyZWUgc29mdHdhcmU7IHlvdSBjYW4gcmVkaXN0cmlidXRlIGl0IGFuZC9vciBt
+                b2RpZnkgaXQgdW5kZXIgdGhlIHRlcm1zIG9mIHRoZQ0KICAgIEdOVSBMZXNzZXIgR2VuZXJhbCBQ
+                dWJsaWMgTGljZW5zZSBhcyBwdWJsaXNoZWQgYnkgdGhlIEZyZWUgU29mdHdhcmUgRm91bmRhdGlv
+                bjsgZWl0aGVyIHZlcnNpb24NCiAgICAyLjEgb2YgdGhlIExpY2Vuc2UsIG9yIChhdCB5b3VyIG9w
+                dGlvbikgYW55IGxhdGVyIHZlcnNpb24uDQogIA0KICAgIFRoaXMgcHJvZ3JhbSBpcyBkaXN0cmli
+                dXRlZCBpbiB0aGUgaG9wZSB0aGF0IGl0IHdpbGwgYmUgdXNlZnVsLCBidXQgV0lUSE9VVCBBTlkg
+                V0FSUkFOVFk7DQogICAgd2l0aG91dCBldmVuIHRoZSBpbXBsaWVkIHdhcnJhbnR5IG9mIE1FUkNI
+                QU5UQUJJTElUWSBvciBGSVRORVNTIEZPUiBBIFBBUlRJQ1VMQVIgUFVSUE9TRS4NCiAgICBTZWUg
+                dGhlIEdOVSBMZXNzZXIgR2VuZXJhbCBQdWJsaWMgTGljZW5zZSBmb3IgbW9yZSBkZXRhaWxzLg0K
+                ICANCiAgICBUaGUgZnVsbCB0ZXh0IG9mIHRoZSBsaWNlbnNlIGlzIGF2YWlsYWJsZSBhdCBodHRw
+                Oi8vd3d3LmdudS5vcmcvY29weWxlZnQvbGVzc2VyLmh0bWwNCi0tPg0KPGNvbXBhbnk+DQogICAg
+                PG5hbWU+T3JiZW9uPC9uYW1lPg0KICAgIDxlbXBsb3llZT4NCiAgICAgICAgPGZpcnN0bmFtZT5P
+                bWFyPC9maXJzdG5hbWU+DQogICAgICAgIDxsYXN0bmFtZT5UYXppPC9sYXN0bmFtZT4NCiAgICA8
+                L2VtcGxveWVlPg0KPC9jb21wYW55Pg0K
+            </document>
+        </output>
+    </test>
+
     <test description="URL Generator" name="oxf:url-generator">
         <input name="config">
-            <config>http://www.scdi.org/~avernet/try/orbeon.xml</config>
+            <config>
+                <url>http://www.scdi.org/~avernet/try/orbeon.xml</url>
+            </config>
         </input>
         <output name="data">
             <orbeon>

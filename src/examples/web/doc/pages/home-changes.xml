@@ -23,9 +23,9 @@
         <section>
 			<title>New in Version 2.6</title>
             <section>
+                <a name="2.6-xforms"/>
                 <title>XForms</title>
                 <section>
-                    <a name="2.6-xforms"/>
                     <title>XForms Upload</title>
                     <p>
                         The XForms Upload control has been fixed. It comes with an <a
@@ -78,8 +78,8 @@
                     </p>
                 </section>
             </section>
+            <a name="2.6-binary"/>
             <section>
-                <a name="2.6-binary"/>
                 <title>Standard Representation of Binary and Text Documents</title>
                 <p>
                     In Presentation Server <a href="reference-xpl-pipelines">XPL and pipelines</a>
@@ -98,8 +98,8 @@
                     href="processors-converters">converters</a>.
                 </p>
             </section>
+            <a name="2.6-body"/>
             <section>
-                <a name="2.6-body"/>
                 <title>Improved Request Body and Uploaded Files Support</title>
                 <p>
                     It was possible in the past with the <a
@@ -121,8 +121,8 @@
                     as <code>xs:anyURI</code> or <code>xs:base64Binary</code>.
                 </p>
             </section>
+            <a name="2.6-url"/>
             <section>
-                <a name="2.6-url"/>
 				<title>URL Generator</title>
                 <section>
                     <title>Binary Mode</title>
@@ -155,8 +155,8 @@
                     </ul>
                 </section>
 			</section>
+            <a name="2.6-serializer"/>
             <section>
-                <a name="2.6-serializer"/>
 				<title>Serializers</title>
 				<section>
                     <title>New Serializer Architecture</title>
@@ -211,8 +211,8 @@
                     </p>
                 </section>
 			</section>
+            <a name="2.6-examples"/>
             <section>
-                <a name="2.6-examples"/>
                 <title>Examples</title>
                 <section>
                     <title>BizDoc Application Changes</title>
@@ -255,8 +255,8 @@
                     </ul>
                 </section>
             </section>
+            <a name="2.6-pageflow"/>
             <section>
-                <a name="2.6-pageflow"/>
                 <title>Page Flow</title>
                 <p>
                     XSLT views in <a href="reference-controller">Page Flow</a> can now access the
@@ -266,8 +266,8 @@
                     accessible from the view.
                 </p>
             </section>
+            <a name="2.6-email"/>
             <section>
-                <a name="2.6-email"/>
                 <title>Email Processor</title>
                 <p>
                     The <a href="processors-messaging#email-processor">Email processor</a> features the
@@ -296,8 +296,8 @@
                     <code>forceto</code> properties.
                 </p>
             </section>
+            <a name="2.6-custom"/>
             <section>
-                <a name="2.6-custom"/>
                 <title>Custom Processors</title>
                 <p>
                     There is a new facility to declare custom processors that does not involve
@@ -313,16 +313,16 @@
                     as the <code>ListInputs</code> unit test.
                 </p>
             </section>
+            <a name="2.6-webdav"/>
             <section>
-                <a name="2.6-webdav"/>
                 <title>WebDAV Resource Manager</title>
                 <p>
                     A <a href="reference-resource-managers#webdav">WebDAV resource manager</a> is
                     now included. It supports basic authentication.
                 </p>
             </section>
+            <a name="2.6-java5"/>
             <section>
-                <a name="2.6-java5"/>
                 <title>J2SE 5.0 Support</title>
                 <p>
                     The source code of Presentation Server now compiles with Java 5.

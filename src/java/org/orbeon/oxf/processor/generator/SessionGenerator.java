@@ -19,7 +19,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.ContentHandler;
@@ -80,7 +80,7 @@ public class SessionGenerator extends ProcessorImpl {
         ch.startDocument();
 
         AttributesImpl attr = new AttributesImpl();
-        attr.addAttribute(XMLUtils.XSI_NAMESPACE_URI, XMLUtils.XSI_NIL_ATTRIBUTE, XMLUtils.XSI_PREFIX + ":" + XMLUtils.XSI_NIL_ATTRIBUTE, "CDATA", "true");
+        attr.addAttribute(XMLConstants.XSI_URI, XMLConstants.XSI_NIL_ATTRIBUTE, XMLConstants.XSI_PREFIX + ":" + XMLConstants.XSI_NIL_ATTRIBUTE, "CDATA", "true");
 
         ch.startElement("", key, key, attr);
         ch.endElement("", key, key);

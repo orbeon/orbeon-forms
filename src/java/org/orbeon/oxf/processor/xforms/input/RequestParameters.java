@@ -31,6 +31,7 @@ import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 
 import java.io.ByteArrayInputStream;
@@ -90,7 +91,7 @@ public class RequestParameters {
                     values.add( ((Element)elementIterator.next()).getStringValue() );
 
                 String type = parameterElement.element("value").attributeValue
-                        (new QName("type", XMLUtils.XSI_NAMESPACE));
+                        (new QName("type", Dom4jUtils.XSI_NAMESPACE));
 
                 if ("$instance".equals(name)) {
                     // Un-base64, uncompress to get XML as text

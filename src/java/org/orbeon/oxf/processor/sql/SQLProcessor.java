@@ -25,6 +25,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -221,7 +222,7 @@ public class SQLProcessor extends ProcessorImpl {
                 throw new OXFException("The data input must be connected when the configuration uses XPath expressions.");
             if (!hasDataInput || !config.useXPathExpressions) {
                 // Just use an empty document
-                data = XMLUtils.NULL_DOCUMENT;
+                data = Dom4jUtils.NULL_DOCUMENT;
             } else {
                 // There is a data input connected and there are some XPath epxressions operating on it
                 boolean useXPathContentHandler = false;

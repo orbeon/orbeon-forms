@@ -13,10 +13,15 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.Namespace;
+import org.dom4j.QName;
 import org.dom4j.io.SAXReader;
 import org.dom4j.util.UserDataElement;
 import org.dom4j.util.UserDataAttribute;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -27,6 +32,20 @@ import java.util.Map;
 import javax.xml.parsers.SAXParser;
 
 public class Dom4jUtils {
+    
+    public static final Namespace XSI_NAMESPACE = new Namespace
+        ( XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI );
+    
+    public static final org.dom4j.Document NULL_DOCUMENT;
+
+    static {
+        NULL_DOCUMENT = DocumentHelper.createDocument();
+        Element nullElement = DocumentHelper.createElement("null");
+        final org.dom4j.QName attNm = new QName
+            ( XMLConstants.XSI_NIL_ATTRIBUTE, XSI_NAMESPACE ); 
+        nullElement.addAttribute( attNm, "true" );
+        NULL_DOCUMENT.setRootElement( nullElement );
+    }
 
     /**
      * Clone a node, making sure that we copy all the declared namespace of

@@ -31,6 +31,7 @@ import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.ContentHandler;
 
@@ -322,7 +323,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                             // Connect data input (for now, a null document)
                             ProcessorInput dataInput = templateProcessor.createInput(INPUT_DATA);
                             Processor nullGenerator = PipelineUtils.createDOMGenerator
-                                ( XMLUtils.NULL_DOCUMENT, "null input", DOMGenerator.ZeroValidity
+                                ( Dom4jUtils.NULL_DOCUMENT, "null input", DOMGenerator.ZeroValidity
                                   , DOMGenerator.DefaultContext );
                             ProcessorOutput nullGeneratorOutput = nullGenerator.createOutput(OUTPUT_DATA);
                             nullGeneratorOutput.setInput(dataInput);

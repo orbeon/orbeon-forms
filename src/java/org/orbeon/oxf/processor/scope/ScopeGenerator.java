@@ -24,6 +24,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
@@ -139,7 +140,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                             if (nullDocumentSAXStore == null) {
                                 nullDocumentSAXStore = new SAXStore();
                                 Transformer identity = TransformerUtils.getIdentityTransformer();
-                                identity.transform(new DocumentSource(XMLUtils.NULL_DOCUMENT), new SAXResult(nullDocumentSAXStore));
+                                identity.transform(new DocumentSource(Dom4jUtils.NULL_DOCUMENT), new SAXResult(nullDocumentSAXStore));
                             }
                             state.saxStore = nullDocumentSAXStore;
                         }

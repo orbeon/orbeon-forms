@@ -54,27 +54,10 @@ import java.util.*;
 
 public class XMLUtils {
 
-    public static final String XSI_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema-instance";
-    public static final String XSI_NAMESPACE_PREFIX = "xsi";
-    public static final Namespace XSI_NAMESPACE = new Namespace(XSI_NAMESPACE_PREFIX, XSI_NAMESPACE_URI);
-    public static final String XSI_PREFIX = "xsi";
-    public static final String XSI_NIL_ATTRIBUTE = "nil";
-
-    public static final String XSLT_NAMESPACE = "http://www.w3.org/1999/XSL/Transform";
-    public static final String XSLT_PREFIX = "xsl";
 
     public static final Attributes EMPTY_ATTRIBUTES = new AttributesImpl();
     public static final EntityResolver ENTITY_RESOLVER = new EntityResolver();
     public static final ErrorHandler ERROR_HANDLER = new ErrorHandler();
-
-    public static final org.dom4j.Document NULL_DOCUMENT;
-    static {
-        NULL_DOCUMENT = DocumentHelper.createDocument();
-        Element nullElement = DocumentHelper.createElement("null");
-        nullElement.addAttribute(new QName(XMLUtils.XSI_NIL_ATTRIBUTE,
-                new Namespace(XMLUtils.XSI_PREFIX, XMLUtils.XSI_NAMESPACE_URI)), "true");
-        NULL_DOCUMENT.setRootElement(nullElement);
-    }
 
     private static DocumentBuilderFactory documentBuilderFactory;
     private static Map documentBuilders = null;
@@ -1054,8 +1037,8 @@ public class XMLUtils {
     public static org.dom4j.Document createNullDocument() {
         org.dom4j.Document result = DocumentHelper.createDocument();
         Element nullElement = DocumentHelper.createElement("null");
-        nullElement.addAttribute(new QName(XMLUtils.XSI_NIL_ATTRIBUTE,
-                new Namespace(XMLUtils.XSI_PREFIX, XMLUtils.XSI_NAMESPACE_URI)), "true");
+        nullElement.addAttribute(new QName(XMLConstants.XSI_NIL_ATTRIBUTE,
+                new Namespace(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI)), "true");
         result.setRootElement(nullElement);
         return result;
     }

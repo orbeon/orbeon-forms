@@ -71,8 +71,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         falseConfigElement.setText("false");
         FALSE_DOCUMENT.setRootElement(falseConfigElement);
 
-        NAMESPACES_WITH_XSI_AND_XSLT.put(XMLUtils.XSI_PREFIX, XMLUtils.XSI_NAMESPACE_URI);
-        NAMESPACES_WITH_XSI_AND_XSLT.put(XMLUtils.XSLT_PREFIX, XMLUtils.XSLT_NAMESPACE);
+        NAMESPACES_WITH_XSI_AND_XSLT.put(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+        NAMESPACES_WITH_XSI_AND_XSLT.put(XMLConstants.XSLT_PREFIX, XMLConstants.XSLT_NAMESPACE);
     }
 
     public PageFlowControllerProcessor() {
@@ -181,7 +181,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // Dummy matcher output
                     final ASTOutput dummyMatcherOutput = new ASTOutput("data", "dummy-matcher");
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                        addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                        addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                         addOutput(dummyMatcherOutput);
                     }});
 
@@ -338,10 +338,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             // [BACKWARD COMPATIBILITY] - Execute simple "not-found" page
                             final ASTOutput notFoundHTML = new ASTOutput(null, "not-found-html");
                             statementsList.add(new StepProcessorCall(stepProcessorContext, controllerContext, notFoundPipeline) {{
-                                addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
-                                addInput(new ASTInput("instance", XMLUtils.NULL_DOCUMENT));
-                                addInput(new ASTInput("xforms-model", XMLUtils.NULL_DOCUMENT));
-                                addInput(new ASTInput("matcher", XMLUtils.NULL_DOCUMENT));
+                                addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
+                                addInput(new ASTInput("instance", Dom4jUtils.NULL_DOCUMENT));
+                                addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
+                                addInput(new ASTInput("matcher", Dom4jUtils.NULL_DOCUMENT));
                                 addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                                 addOutput(new ASTOutput("data", notFoundHTML));
                             }});
@@ -351,15 +351,15 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                             // Notify final epilogue that there is nothing to send
                             statementsList.add(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                                addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                                addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                                 addOutput(new ASTOutput("data", html));
                             }});
                             statementsList.add(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                                addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                                addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                                 addOutput(new ASTOutput("data", epilogueInstance));
                             }});
                             statementsList.add(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                                addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                                addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                                 addOutput(new ASTOutput("data", epilogueXFormsModel));
                             }});
                         }
@@ -402,7 +402,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 addInput(new ASTInput("data", new ASTHrefId(html)));
                 addInput(new ASTInput("instance", new ASTHrefId(epilogueInstance)));
                 addInput(new ASTInput("xforms-model", new ASTHrefId(epilogueXFormsModel)));
-                addInput(new ASTInput("matcher", XMLUtils.NULL_DOCUMENT));
+                addInput(new ASTInput("matcher", Dom4jUtils.NULL_DOCUMENT));
                 addInput(new ASTInput("can-be-serializer", TRUE_DOCUMENT));
                 addOutput(epilogueOutput);
             }});
@@ -463,9 +463,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
             // Get XForms model
             statementsList.add(new StepProcessorCall(stepProcessorContext, controllerContext, xformsAttribute) {{
-                addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
-                addInput(new ASTInput("instance", XMLUtils.NULL_DOCUMENT));
-                addInput(new ASTInput("xforms-model", XMLUtils.NULL_DOCUMENT));
+                addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
+                addInput(new ASTInput("instance", Dom4jUtils.NULL_DOCUMENT));
+                addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
                 addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
                 addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                 addOutput(xformsModel);
@@ -486,8 +486,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addInput(new ASTInput("filter", paramsDocument));
                     addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));
                 } else {
-                    addInput(new ASTInput("filter", XMLUtils.NULL_DOCUMENT));
-                    addInput(new ASTInput("matcher-result", XMLUtils.NULL_DOCUMENT));
+                    addInput(new ASTInput("filter", Dom4jUtils.NULL_DOCUMENT));
+                    addInput(new ASTInput("matcher-result", Dom4jUtils.NULL_DOCUMENT));
                 }
                 addInput(new ASTInput("request", new ASTHrefId(requestWithParameters)));
                 addOutput(xformedInstance[0]);
@@ -496,7 +496,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         } else {
             xformedInstance[0] = new ASTOutput("data", "paramed-instance");
             statementsList.add(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                 addOutput(xformedInstance[0]);
             }});
         }
@@ -540,9 +540,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             new ASTOutput(null, "internal-action-data-" + pageNumber + "-" + actionNumber);
                     if (actionAttribute != null) {
                         addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, actionAttribute) {{
-                            addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                            addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                             addInput(new ASTInput("instance", new ASTHrefId(xformedInstance[0])));
-                            addInput(new ASTInput("xforms-model", XMLUtils.NULL_DOCUMENT));
+                            addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
                             addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
                             addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                             addOutput(new ASTOutput("data", internalActionData));
@@ -562,7 +562,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         }});
                     } else {
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                            addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                            addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                             addOutput(new ASTOutput("data", actionData));
                         }});
                     }
@@ -631,7 +631,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         addOutput(new ASTOutput("data", isRedirect));
                     }});
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                        addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                        addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                         addOutput(new ASTOutput("data", actionData));
                     }});
                 }});
@@ -649,7 +649,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, modelAttribute) {{
                         addInput(new ASTInput("data", new ASTHrefId(actionData)));
                         addInput(new ASTInput("instance", new ASTHrefId(xupdatedInstance)));
-                        addInput(new ASTInput("xforms-model", XMLUtils.NULL_DOCUMENT));
+                        addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
                         addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
                         addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                         addOutput(new ASTOutput("data", modelData));
@@ -671,7 +671,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, viewAttribute) {{
                         addInput(new ASTInput("data", new ASTHrefId(modelData)));
                         addInput(new ASTInput("instance", new ASTHrefId(modelInstance)));
-                        addInput(new ASTInput("xforms-model", XMLUtils.NULL_DOCUMENT));
+                        addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
                         addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
                         addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                         addOutput(new ASTOutput("data", html));
@@ -680,11 +680,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     }});
                     if (xformsAttribute == null) {
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                            addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                            addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                             addOutput(new ASTOutput("data", epilogueInstance));
                         }});
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                            addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                            addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                             addOutput(new ASTOutput("data", epilogueXFormsModel));
                         }});
                     } else {
@@ -696,15 +696,15 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 } else {
                     // Send nothing to prologue
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                        addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                        addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                         addOutput(new ASTOutput("data", html));
                     }});
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                        addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                        addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                         addOutput(new ASTOutput("data", epilogueInstance));
                     }});
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                        addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                        addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                         addOutput(new ASTOutput("data", epilogueXFormsModel));
                     }});
                 }
@@ -727,15 +727,15 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addInput(new ASTInput("data", new ASTHrefId(actionData)));
                 }});
                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                    addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                     addOutput(new ASTOutput("data", html));
                 }});
                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                    addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                     addOutput(new ASTOutput("data", epilogueInstance));
                 }});
                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                    addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                     addOutput(new ASTOutput("data", epilogueXFormsModel));
                 }});
             }});
@@ -759,10 +759,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         if (!useCurrentPageInstance) {
             final ASTOutput otherPageXFormsModel = new ASTOutput("data", "other-page-model");
             when.addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, otherXForms) {{
-                addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
-                addInput(new ASTInput("instance", XMLUtils.NULL_DOCUMENT));
-                addInput(new ASTInput("xforms-model", XMLUtils.NULL_DOCUMENT));
-                addInput(new ASTInput("matcher", XMLUtils.NULL_DOCUMENT));
+                addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
+                addInput(new ASTInput("instance", Dom4jUtils.NULL_DOCUMENT));
+                addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
+                addInput(new ASTInput("matcher", Dom4jUtils.NULL_DOCUMENT));
                 addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                 addOutput(new ASTOutput("data", otherPageXFormsModel));
             }});
@@ -823,7 +823,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // Pass parameters only if needed
                     when.addStatement(new ASTProcessorCall(XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
-                        addInput(new ASTInput("filter", (paramsDocument != null) ? paramsDocument : XMLUtils.NULL_DOCUMENT));
+                        addInput(new ASTInput("filter", (paramsDocument != null) ? paramsDocument : Dom4jUtils.NULL_DOCUMENT));
                         addOutput(new ASTOutput("data", parametersOutput));
                     }});
                 }
@@ -935,15 +935,15 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             }
         }});
         when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-            addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+            addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
             addOutput(new ASTOutput("data", html));
         }});
         when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-            addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+            addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
             addOutput(new ASTOutput("data", epilogueInstance));
         }});
         when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-            addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+            addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
             addOutput(new ASTOutput("data", epilogueXFormsModel));
         }});
     }
@@ -1139,7 +1139,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             statements.add(new ASTChoose(new ASTHrefId(canBeSerializerInput)) {{
                 addWhen(new ASTWhen("/config = 'true'") {{
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                        addInput(new ASTInput("data", XMLUtils.NULL_DOCUMENT));
+                        addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                         addOutput(new ASTOutput("data", resultData));
                     }});
                 }});

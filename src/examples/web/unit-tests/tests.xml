@@ -1753,13 +1753,158 @@
         </output>
     </test>
 
+    <test description="XForms Conditionals: if" name="oxf:pipeline">
+        <input name="config">
+            <p:config>
+                <p:param type="output" name="data"/>
+
+                <p:processor uri="oxf/processor/identity">
+                    <p:input name="data">
+                        <xforms:model id="form">
+                            <xforms:submission method="post"/>
+                            <xforms:instance>
+                                <form>
+                                    <a/>
+                                    <b/>
+                                    <c/>
+                                </form>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="xforms-model"/>
+                </p:processor>
+
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="instance">
+                        <form>
+                            <a>1</a>
+                            <b>2</b>
+                            <c>3</c>
+                        </form>
+                    </p:input>
+                    <p:input name="data">
+                        <html>
+                            <body>
+                                <xforms:group ref="/form">
+                                    <xxforms:if test="a = '1'">
+                                        <xforms:input ref="b"/>
+                                    </xxforms:if>
+                                    <xforms:input ref="c"/>
+                                </xforms:group>
+                            </body>
+                        </html>
+                    </p:input>
+                    <p:output name="data" id="annotated-data"/>
+                </p:processor>
+                <!-- Transform annotated XForms to XHTML -->
+                <p:processor name="oxf:xslt"><!-- saxon1 -->
+                    <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="data" href="#annotated-data"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <body>
+                    <xhtml:form xmlns:xhtml="http://www.w3.org/1999/xhtml" id="wsrp_rewrite_form_1" xxforms:contains-hidden="true" method="post">
+                        <xhtml:input type="hidden" id="wsrp_rewrite_action_1" name="" value=""/>
+                        <xhtml:input type="hidden" name="$submitted" value="true"/>
+                        <xhtml:input type="text" name="b[2]" value="2"/>
+                        <xhtml:input type="text" name="c[3]" value="3"/>
+                        <xxforms:hidden xxforms:name="a[1]" xxforms:value="1"/>
+                    </xhtml:form>
+                </body>
+            </html>
+        </output>
+    </test>
+
+    <test description="XForms Conditionals: choose" name="oxf:pipeline">
+        <input name="config">
+            <p:config>
+                <p:param type="output" name="data"/>
+
+                <p:processor uri="oxf/processor/identity">
+                    <p:input name="data">
+                        <xforms:model id="form">
+                            <xforms:submission method="post"/>
+                            <xforms:instance>
+                                <form>
+                                    <a/>
+                                    <b/>
+                                    <c/>
+                                    <d/>
+                                </form>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="xforms-model"/>
+                </p:processor>
+
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="instance">
+                        <form>
+                            <a>1</a>
+                            <b>2</b>
+                            <c>3</c>
+                            <d>4</d>
+                        </form>
+                    </p:input>
+                    <p:input name="data">
+                        <html>
+                            <body>
+                                <xforms:group ref="/form">
+                                    <xxforms:choose>
+                                        <xxforms:when test="a = '1'">
+                                            <xforms:input ref="b"/>
+                                        </xxforms:when>
+                                        <xxforms:when test="b = '2'">
+                                            <xforms:input ref="c"/>
+                                        </xxforms:when>
+                                        <xxforms:otherwise>
+                                            <xforms:input ref="d"/>
+                                        </xxforms:otherwise>
+                                    </xxforms:choose>
+                                </xforms:group>
+                            </body>
+                        </html>
+                    </p:input>
+                    <p:output name="data" id="annotated-data"/>
+                </p:processor>
+                <!-- Transform annotated XForms to XHTML -->
+                <p:processor name="oxf:xslt"><!-- saxon1 -->
+                    <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="data" href="#annotated-data"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <body>
+                    <xhtml:form xmlns:xhtml="http://www.w3.org/1999/xhtml" id="wsrp_rewrite_form_1" xxforms:contains-hidden="true" method="post">
+                        <xhtml:input type="hidden" id="wsrp_rewrite_action_1" name="" value=""/>
+                        <xhtml:input type="hidden" name="$submitted" value="true"/>
+                        <xhtml:input type="text" name="b[2]" value="2"/>
+                        <xhtml:input type="text" name="c[3]" value="3"/>
+                        <xxforms:hidden xxforms:name="a[1]" xxforms:value="1"/>
+                    </xhtml:form>
+                </body>
+            </html>
+        </output>
+    </test>
+
     <!-- these tests need Tamino to run
     <test description="Tamino Simple Query" name="oxf:tamino-query">
-        <input name="config">
-            <config>
-                <url>http://localhost/tamino/welcome_4_1_4</url>
-                <username>tamino</username>
-                <password>password</password>
+    <input name="config">
+    <config>
+    <url>http://localhost/tamino/welcome_4_1_4</url>
+    <username>tamino</username>
+    <password>password</password>
                 <collection>encyclopedia</collection>
             </config>
         </input>

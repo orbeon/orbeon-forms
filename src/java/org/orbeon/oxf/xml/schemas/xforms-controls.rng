@@ -121,6 +121,42 @@
                 </zeroOrMore>
             </element>
 
+            <!-- XXForms: If -->
+            <element name="xxf:if">
+                <attribute name="test"/>
+                <zeroOrMore>
+                    <choice>
+                        <ref name="any-element"/>
+                        <text/>
+                    </choice>
+                </zeroOrMore>
+            </element>
+
+            <!-- XXForms: Choose -->
+            <element name="xxf:choose">
+                <oneOrMore>
+                    <element name="xxf:when">
+                        <attribute name="test"/>
+                        <zeroOrMore>
+                            <choice>
+                                <ref name="any-element"/>
+                                <text/>
+                            </choice>
+                        </zeroOrMore>
+                    </element>
+                </oneOrMore>
+                <optional>
+                    <element name="xxf:otherwise">
+                        <zeroOrMore>
+                            <choice>
+                                <ref name="any-element"/>
+                                <text/>
+                            </choice>
+                        </zeroOrMore>
+                    </element>
+                </optional>
+            </element>
+
             <!-- Other elements -->
             <element>
                 <anyName>

@@ -946,5 +946,73 @@
                 </xml-source>
             </section>
         </section>
+        <section>
+            <title>
+                Extensions
+            </title>
+            <p>
+                These controls are not part of the XForms specification and consequently are in the XXForms namespace.
+            </p>
+            <section>
+                <title>Conditionals</title>
+                <p>
+                    Two controls provide a mechanism to selectively enable markup and other XForms controls depending of
+                    the values stored in the XForms instance. The syntax is modeled after the XSLT language:
+                    <code>if</code> and <code>choose/when/otherwise</code>.
+                </p>
+                <note>
+                    The <code>test</code> attribute must contain an XPath expression to be evaluated against the current instance.
+                    Expressions  not starting with a '/' are considered relative to the nearest <code>xforms:group</code>.
+                </note>
+                <p>
+                    <ul>
+                        <li>
+                            <p>
+                                <code>xxforms:if</code> — Enables the content if, and only if the XPath expression contained
+                                in the <code>test</code> attribute evaluates to true.
+                            </p>
+                            <p>
+                                In the following example, the input control is rendered only if the expression <code>/form/a = '1'</code>
+                                is true.
+                                <xml-source>
+                                    <xforms:group ref="/form">
+                                        <xxforms:if test="a = '1'">
+                                            <xforms:input ref="b"/>
+                                        </xxforms:if>
+                                    </xforms:group>
+                                </xml-source>
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <code>xxforms:choose</code> — Contains a sequence of at least one <code>xxforms:when</code>
+                                element, optionnally followed by a <code>xxforms:otherwise</code>. Each <code>xxforms:when</code>
+                                which <code>test</code> attribute evaluate to true is enabled. If all evaluate to false, the
+                                <code>xxforms:otherwise</code> content is enabled.
+                            </p>
+                            <p>
+                                In the following example show a simple <code>xxforms:choose</code> to render a different XForms control
+                                depending of the value of the <code>/form/a</code> instance element.
+                                <xml-source>
+                                    <xforms:group ref="/form">
+                                        <xxforms:choose>
+                                            <xxforms:when test="a = '1'">
+                                                <xforms:input ref="b"/>
+                                            </xxforms:when>
+                                            <xxforms:when test="b = '2'">
+                                                <xforms:input ref="c"/>
+                                            </xxforms:when>
+                                            <xxforms:otherwise>
+                                                <xforms:input ref="d"/>
+                                            </xxforms:otherwise>
+                                        </xxforms:choose>
+                                    </xforms:group>
+                                </xml-source>
+                            </p>
+                        </li>
+                    </ul>
+                </p>
+            </section>
+        </section>
     </body>
 </document>

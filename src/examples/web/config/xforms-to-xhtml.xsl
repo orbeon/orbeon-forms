@@ -295,6 +295,23 @@
         </xhtml:div>
     </xsl:template>
 
+    <!-- XForms Conditionals -->
+    <xsl:template match="xxforms:if">
+         <xsl:if test="@xxforms:value = 'true'">
+             <xsl:apply-templates/>
+         </xsl:if>
+     </xsl:template>
+
+    <xsl:template match="xxforms:choose">
+        <xsl:variable name="when-true" select="xxforms:when[@xxforms:value = 'true']"/>
+        <xsl:for-each select="$when-true">
+            <xsl:apply-templates select="node()"/>
+        </xsl:for-each>
+        <xsl:if test="count($when-true) = 0">
+            <xsl:apply-templates select="xxforms:otherwise/node()"/>
+        </xsl:if>
+    </xsl:template>
+
     <!-- Root Group Module -->
     <xsl:template match="xforms:group[not(ancestor::xforms:group)]">
         <xsl:variable name="form-id" as="xs:string" select="xxforms:form-id(.)"/>

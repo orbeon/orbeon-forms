@@ -23,10 +23,12 @@ import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.xml.JaxenXPathRewrite;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import org.dom4j.Node;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -56,33 +58,40 @@ public class XFormsElement {
                       String qname, Attributes attributes) throws SAXException {
         final AttributesImpl newAttributes = new AttributesImpl(attributes);
 
-        // Add annotations about referenced element
-        if (attributes.getIndex("", "ref") != -1
-                || attributes.getIndex(Constants.XXFORMS_NAMESPACE_URI, "position") != -1) {
-            InstanceData instanceData  = context.getRefInstanceData();
-            addExtensionAttribute(newAttributes, Constants.XXFORMS_READONLY_ATTRIBUTE_NAME, Boolean.toString(instanceData.getReadonly().get()));
-            addExtensionAttribute(newAttributes, Constants.XXFORMS_RELEVANT_ATTRIBUTE_NAME, Boolean.toString(instanceData.getRelevant().get()));
-            addExtensionAttribute(newAttributes, Constants.XXFORMS_REQUIRED_ATTRIBUTE_NAME, Boolean.toString(instanceData.getRequired().get()));
-            addExtensionAttribute(newAttributes, Constants.XXFORMS_VALID_ATTRIBUTE_NAME, Boolean.toString(instanceData.getValid().get()));
-            if (instanceData.getInvalidBindIds() != null)
-                addExtensionAttribute(newAttributes, Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME, instanceData.getInvalidBindIds());
-            addExtensionAttribute(newAttributes, "ref-xpath", context.getRefXPath());
-            if (DATA_CONTROLS.containsKey(localname)) {
-                addExtensionAttribute(newAttributes, "name", context.getRefName(true));
-                addExtensionAttribute(newAttributes, "value", context.getRefValue());
+        if(("if".equals(localname) || "when".equals(localname)) && Constants.XXFORMS_NAMESPACE_URI.equals(uri)) {
+            String test = attributes.getValue("test");
+            if(!test.startsWith("/"))
+                test = context.getRefXPath() + "/" + test;
+            String value = XPathUtils.selectBooleanValue(context.getInstance(), test).toString();
+            addExtensionAttribute(newAttributes, "value", value);
+        } else {
+            // Add annotations about referenced element
+            if (attributes.getIndex("", "ref") != -1
+                    || attributes.getIndex(Constants.XXFORMS_NAMESPACE_URI, "position") != -1) {
+                InstanceData instanceData  = context.getRefInstanceData();
+                addExtensionAttribute(newAttributes, Constants.XXFORMS_READONLY_ATTRIBUTE_NAME, Boolean.toString(instanceData.getReadonly().get()));
+                addExtensionAttribute(newAttributes, Constants.XXFORMS_RELEVANT_ATTRIBUTE_NAME, Boolean.toString(instanceData.getRelevant().get()));
+                addExtensionAttribute(newAttributes, Constants.XXFORMS_REQUIRED_ATTRIBUTE_NAME, Boolean.toString(instanceData.getRequired().get()));
+                addExtensionAttribute(newAttributes, Constants.XXFORMS_VALID_ATTRIBUTE_NAME, Boolean.toString(instanceData.getValid().get()));
+                if (instanceData.getInvalidBindIds() != null)
+                    addExtensionAttribute(newAttributes, Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME, instanceData.getInvalidBindIds());
+                addExtensionAttribute(newAttributes, "ref-xpath", context.getRefXPath());
+                if (DATA_CONTROLS.containsKey(localname)) {
+                    addExtensionAttribute(newAttributes, "name", context.getRefName(true));
+                    addExtensionAttribute(newAttributes, "value", context.getRefValue());
+                }
             }
+
+            // Rewrite XPath attributes into full XPath expressions
+            if (attributes.getIndex("", "ref") != -1)
+                addExtensionAttribute(newAttributes, "ref-xpath", rewriteXPath(context, attributes.getValue("ref")));
+            if (attributes.getIndex("", "nodeset") != -1)
+                addExtensionAttribute(newAttributes, "nodeset-xpath", rewriteXPath(context, attributes.getValue("nodeset")));
+            if (attributes.getIndex("", "at") != -1)
+                addExtensionAttribute(newAttributes, "at-xpath", rewriteXPath(context, attributes.getValue("at")));
+            if (attributes.getIndex("", "value") != -1)
+                addExtensionAttribute(newAttributes, "value-xpath", rewriteXPath(context, attributes.getValue("value")));
         }
-
-        // Rewrite XPath attributes into full XPath expressions
-        if (attributes.getIndex("", "ref") != -1)
-            addExtensionAttribute(newAttributes, "ref-xpath", rewriteXPath(context, attributes.getValue("ref")));
-        if (attributes.getIndex("", "nodeset") != -1)
-            addExtensionAttribute(newAttributes, "nodeset-xpath", rewriteXPath(context, attributes.getValue("nodeset")));
-        if (attributes.getIndex("", "at") != -1)
-            addExtensionAttribute(newAttributes, "at-xpath", rewriteXPath(context, attributes.getValue("at")));
-        if (attributes.getIndex("", "value") != -1)
-            addExtensionAttribute(newAttributes, "value-xpath", rewriteXPath(context, attributes.getValue("value")));
-
         context.getContentHandler().startElement(uri, localname, qname, newAttributes);
     }
 

@@ -35,8 +35,8 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -318,8 +318,8 @@ public class ProcessorTest extends TestCase {
                                 removeUnusedNamespaceDeclarations(actualData.getRootElement());
 
                                 // Compare converting to strings
-                                expectedDataString = XMLUtils.domToString(expectedData);
-                                actualDataString = XMLUtils.domToString(actualData);
+                                expectedDataString = Dom4jUtils.domToString(expectedData);
+                                actualDataString = Dom4jUtils.domToString(actualData);
                                 boolean outputPassed = expectedDataString.equals(actualDataString);
 
                                 // Display if test not passed

@@ -50,7 +50,7 @@ public class Instance {
 
     public Instance(PipelineContext pipelineContext, Document template) {
         this.pipelineContext = pipelineContext;
-        instance = XMLUtils.createDOM4JDocument();
+        instance = Dom4jUtils.createDOM4JDocument();
         instance.add(template.getRootElement().createCopy());
         instanceNodeInfo = new DocumentWrapper(instance, null).wrap(instance);
 

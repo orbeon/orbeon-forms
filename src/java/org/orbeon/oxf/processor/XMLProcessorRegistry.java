@@ -22,7 +22,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -52,7 +51,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                     throw new OXFException("Missing or empty processor name!");
 
                 if (processorQName != null)
-                    logger.debug("Binding name: " + XMLUtils.qNameToexplodedQName(processorQName));
+                    logger.debug("Binding name: " + Dom4jUtils.qNameToexplodedQName(processorQName));
                 if (processorURI != null)
                     logger.debug("Binding name: " + processorURI);
 
@@ -63,7 +62,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                     if (logger.isDebugEnabled())
                         logger.debug("To class: " + className);
 
-                    final String defaultName = (processorQName != null) ? XMLUtils.qNameToexplodedQName(processorQName) : processorURI;
+                    final String defaultName = (processorQName != null) ? Dom4jUtils.qNameToexplodedQName(processorQName) : processorURI;
                     final QName defaultQName = (processorQName != null) ? processorQName : new QName(processorURI);
 
                     ProcessorFactory processorFactory = new ProcessorFactory() {
@@ -106,7 +105,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                                     throw new OXFException("Missing or empty processor name!");
 
                                 if (processorQName != null)
-                                    logger.debug("Binding name: " + XMLUtils.qNameToexplodedQName(processorQName));
+                                    logger.debug("Binding name: " + Dom4jUtils.qNameToexplodedQName(processorQName));
                                 if (processorURI != null)
                                     logger.debug("Binding name: " + processorURI);
 
@@ -158,7 +157,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
     }
 
     public static QName extractProcessorQName(Element processorElement) {
-        return XMLUtils.extractAttributeValueQName(processorElement, "name");
+        return Dom4jUtils.extractAttributeValueQName(processorElement, "name");
     }
 
     public static String extractProcessorURI(Element processorElement) {

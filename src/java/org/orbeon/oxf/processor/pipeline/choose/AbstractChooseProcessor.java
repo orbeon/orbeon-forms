@@ -23,7 +23,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.*;
 
@@ -170,7 +170,7 @@ public class AbstractChooseProcessor extends ProcessorImpl implements AbstractPr
 //                    ? XMLUtils.getNamespaceContext((Element) astWhen.getNode())
 //                    : astWhen.getNamespaces()));
             branchNamespaces.add(astWhen.getNode() != null
-                    ? XMLUtils.getNamespaceContext((Element) astWhen.getNode())
+                    ? Dom4jUtils.getNamespaceContext((Element) astWhen.getNode())
                     : astWhen.getNamespaces());
 
             // Add an identity processor to connect the output of the branch to

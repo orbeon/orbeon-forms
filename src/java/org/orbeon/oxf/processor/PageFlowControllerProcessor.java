@@ -27,7 +27,6 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.transformer.xupdate.Constants;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.DocumentDelegate;
 import org.orbeon.oxf.xml.dom4j.ElementDelegate;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -204,7 +203,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             // heuristic to detect whether a QName is present.
                             String matcherURI = element.attributeValue("matcher");
                             QName matcherQName = (matcherURI != null && matcherURI.indexOf(':') != -1)
-                                ? XMLUtils.extractAttributeValueQName(element, "matcher") : null;
+                                ? Dom4jUtils.extractAttributeValueQName(element, "matcher") : null;
                             if (matcherQName != null)
                                 matcherURI = null;
 
@@ -381,7 +380,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     ASTDocumentHandler astDocumentHandler = new ASTDocumentHandler();
                     astPipeline.walk(astDocumentHandler);
                     logger.debug("Page Flow Controller pipeline:\n"
-                            + XMLUtils.domToString(astDocumentHandler.getDocument()));
+                            + Dom4jUtils.domToString(astDocumentHandler.getDocument()));
                 }
 
                 return new PipelineProcessor(astPipeline);
@@ -524,7 +523,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         if (foundActionWithoutWhen[0])
                             throw new ValidationException("Unreachable <action>", (LocationData) actionElement.getData());
                         setTest(whenAttribute);
-                        setNamespaces(XMLUtils.getNamespaceContext(actionElement));
+                        setNamespaces(Dom4jUtils.getNamespaceContext(actionElement));
                         setLocationData((LocationData) actionElement.getData());
                     } else {
                         foundActionWithoutWhen[0] = true;
@@ -582,7 +581,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 addWhen(new ASTWhen() {{
                                     if (resultWhenAttribute != null) {
                                         setTest(resultWhenAttribute);
-                                        setNamespaces(XMLUtils.getNamespaceContext(resultElement));
+                                        setNamespaces(Dom4jUtils.getNamespaceContext(resultElement));
                                         setLocationData((LocationData) resultElement.getData());
                                     }
                                     executeResult(stepProcessorContext, controllerContext, this, pageIdToXFormsModel,
@@ -782,7 +781,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             final Element modificationsElement = DocumentHelper.createElement
                     (new QName("modifications", new Namespace
                             (Constants.XUPDATE_PREFIX, Constants.XUPDATE_NAMESPACE_URI)));
-            final Map namespacesOnResult = XMLUtils.getNamespaceContext(resultElement);
+            final Map namespacesOnResult = Dom4jUtils.getNamespaceContext(resultElement);
             for (Iterator i = namespacesOnResult.keySet().iterator(); i.hasNext();) {
                 String prefix = (String) i.next();
                 if (prefix.length() > 0)

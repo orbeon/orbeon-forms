@@ -125,7 +125,7 @@ public class XFormsUtils {
             ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
             GZIPOutputStream gzipOutputStream = null;
             gzipOutputStream = new GZIPOutputStream(gzipByteArray);
-            gzipOutputStream.write(XMLUtils.domToString(instance).getBytes());
+            gzipOutputStream.write(Dom4jUtils.domToString(instance).getBytes());
             gzipOutputStream.close();
             String compressed = Base64.encode(gzipByteArray.toByteArray());
             return XFormsUtils.isHiddenEncryptionEnabled()

@@ -30,6 +30,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.*;
 
 import java.util.Iterator;
@@ -57,7 +58,7 @@ public class TaminoQueryProcessor extends TaminoProcessor {
                     // Read data
                     Document queryDocument = readCacheInputAsDOM4J(context, INPUT_DATA);
                     String query = XPathUtils.selectStringValueNormalize(queryDocument, "/query");
-                    String xquery = XMLUtils.objectToString(XPathUtils.selectObjectValue(queryDocument, "/xquery/node()"));
+                    String xquery = Dom4jUtils.objectToString(XPathUtils.selectObjectValue(queryDocument, "/xquery/node()"));
                     TConnection connection = getConnection(context, config);
 
                     TaminoElementHandler handler = new TaminoElementHandler(contentHandler);

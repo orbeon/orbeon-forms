@@ -23,7 +23,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.transformer.xupdate.Closure;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.InputSource;
@@ -340,7 +340,7 @@ public class Utils {
         StringBuffer buffer = new StringBuffer();
         for (Iterator i = list.iterator(); i.hasNext();) {
             Object object = i.next();
-            buffer.append(object instanceof Node ? XMLUtils.domToString((Node) object) : object.toString());
+            buffer.append(object instanceof Node ? Dom4jUtils.domToString((Node) object) : object.toString());
         }
         return buffer.toString();
     }

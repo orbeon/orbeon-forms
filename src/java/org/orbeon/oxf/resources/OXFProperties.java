@@ -24,7 +24,7 @@ import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.net.MalformedURLException;
@@ -175,7 +175,7 @@ public class OXFProperties {
                        "boolean".equals(type) ? (Object) new Boolean(value) :
                        "integer".equals(type) ? (Object) new Integer(value) :
                        ("date".equals(type) || "dateTime".equals(type)) ? (Object) ISODateUtils.parseDate(value) :
-                       "QName".equals(type) ? (Object) XMLUtils.extractAttributeValueQName(element, "value") :
+                       "QName".equals(type) ? (Object) Dom4jUtils.extractAttributeValueQName(element, "value") :
                        "anyURI".equals(type) ? (Object) URLFactory.createURL(value) :
                        null;
             } catch (MalformedURLException e) {

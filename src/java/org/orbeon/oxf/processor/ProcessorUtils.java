@@ -22,7 +22,6 @@ import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -127,7 +126,7 @@ public class ProcessorUtils {
                 throw new OXFException("Content for element '" + element.getName() + "' is mandatory");
             Element copiedElement = originalElement.createCopy();
             addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
-            result = XMLUtils.createDOM4JDocument();
+            result = Dom4jUtils.createDOM4JDocument();
             result.add(copiedElement);
         } else {
             // Href

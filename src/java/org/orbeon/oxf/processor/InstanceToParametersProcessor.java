@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -83,7 +84,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                         String excludeRef = refAttribute.getValue();
                         PooledXPathExpression xpath = XPathCache.getXPathExpression(pipelineContext,
                                 instanceWrapper.wrap(instance), excludeRef,
-                                XMLUtils.getNamespaceContext(paramElement));
+                                Dom4jUtils.getNamespaceContext(paramElement));
                         try {
                             markedNodes.add(xpath.evaluateSingle());
                         } finally {

@@ -31,6 +31,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
@@ -107,7 +108,7 @@ public class XFormsValidationProcessor extends ProcessorImpl {
                                             }
                                         });
                                         verifierFactory.setFeature( Const.PANIC_MODE_FEATURE, false );
-                                        InputSource is = new InputSource(new StringReader(XMLUtils.domToString(schemaDoc)));
+                                        InputSource is = new InputSource(new StringReader(Dom4jUtils.domToString(schemaDoc)));
                                         is.setSystemId(schemaSystemId);
 
                                         // Just a precaution, as the factory is not thread-safe. Does this makes sense?

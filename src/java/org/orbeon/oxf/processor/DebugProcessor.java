@@ -20,7 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.ContentHandler;
@@ -70,7 +70,7 @@ public class DebugProcessor extends ProcessorImpl {
                         // Send to log4j
                         logger.info(debugMessage + ":\n"
                                 + (debugLocationData != null ? debugLocationData.toString() + "\n" : "")
-                                + XMLUtils.domToString(loggedDocument));
+                                + Dom4jUtils.domToString(loggedDocument));
 
                         // Set to output
                         saxStore.replay(contentHandler);

@@ -29,8 +29,8 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.NumberUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -266,13 +266,13 @@ public class ImageServer extends ProcessorImpl {
 
     private String computeCacheFileName(String type, String path, List nodes) {
         // Create digest document and digest
-        Document document = XMLUtils.createDOM4JDocument();
+        Document document = Dom4jUtils.createDOM4JDocument();
         Element rootElement = document.addElement("image");
         for (Iterator i = nodes.iterator(); i.hasNext();) {
             Element element = (Element) i.next();
             rootElement.add(element.createCopy());
         }
-        String digest = NumberUtils.toHexString(XMLUtils.getDigest(document));
+        String digest = NumberUtils.toHexString(Dom4jUtils.getDigest(document));
 
         // Create file name
         if ("flat".equals(type))

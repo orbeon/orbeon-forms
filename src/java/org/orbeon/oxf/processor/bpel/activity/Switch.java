@@ -22,7 +22,7 @@ import org.orbeon.oxf.processor.bpel.Variables;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.xml.JaxenXPathRewrite;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.saxpath.Axis;
 
@@ -54,7 +54,7 @@ public class Switch implements Activity {
             String condition = caseElement.attributeValue("condition");
             if (condition != null)
                 condition = rewriteCondition(condition, (LocationData) caseElement.getData(),
-                        XMLUtils.getNamespaceContext(caseElement), caseInputs);
+                        Dom4jUtils.getNamespaceContext(caseElement), caseInputs);
 
             // Create <p:when>
             ASTWhen astWhen = new ASTWhen(condition);

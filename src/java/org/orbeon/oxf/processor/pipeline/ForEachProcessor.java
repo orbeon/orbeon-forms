@@ -28,7 +28,6 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.xpath.XPathException;
@@ -89,7 +88,7 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                 if (logger.isDebugEnabled()) {
                     ASTDocumentHandler astDocumentHandler = new ASTDocumentHandler();
                     astPipeline.walk(astDocumentHandler);
-                    logger.debug("Iteration pipeline:\n" + XMLUtils.domToString(astDocumentHandler.getDocument()));
+                    logger.debug("Iteration pipeline:\n" + Dom4jUtils.domToString(astDocumentHandler.getDocument()));
                 }
                 iterationProcessor = new PipelineProcessor(astPipeline);
             }
@@ -110,7 +109,7 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
             iterationOutput = iterationProcessor.createOutput(idOrRef);
 
             select = forEachAST.getSelect();
-            namespaceContext = XMLUtils.getNamespaceContext((Element) forEachAST.getNode());
+            namespaceContext = Dom4jUtils.getNamespaceContext((Element) forEachAST.getNode());
             if (forEachAST.getRoot() != null) {
                 rootQName = forEachAST.getRoot();
                 int columnPosition = rootQName.indexOf(':');

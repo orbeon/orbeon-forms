@@ -27,7 +27,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 
 /**
@@ -74,7 +74,7 @@ public final class DOMGenerator extends ProcessorImpl {
         }
         
         Source makeDOMSource() {
-            final Source ret = XMLUtils.getDocumentSource( doc );
+            final Source ret = Dom4jUtils.getDocumentSource( doc );
             return ret;
         }
     }

@@ -25,8 +25,8 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.HttpBinarySerializer;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.io.OutputStream;
 import java.util.Iterator;
@@ -82,7 +82,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                 for (Iterator i = XPathUtils.selectIterator(configDocument, xPath); i.hasNext();) {
                     Element e = (Element) i.next();
 
-                    Map namespaceMap = XMLUtils.getNamespaceContext(e);
+                    Map namespaceMap = Dom4jUtils.getNamespaceContext(e);
 
                     String leftPosition = e.attributeValue("left-position");
                     String topPosition = e.attributeValue("top-position");

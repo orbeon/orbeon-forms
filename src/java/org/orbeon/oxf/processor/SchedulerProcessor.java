@@ -28,7 +28,6 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.task.Task;
 import org.orbeon.oxf.util.task.TaskScheduler;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.ArrayList;
@@ -63,7 +62,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                         Element processorNameElement = startTaskElement.element(new QName("processor-name"));
                         if (processorNameElement != null) {
                             // Use processor QName
-                            QName processorQName = XMLUtils.extractTextValueQName(processorNameElement);
+                            QName processorQName = Dom4jUtils.extractTextValueQName(processorNameElement);
                             processorDefinition.setName(processorQName);
                         } else {
                             // Deprecated use of processor URI

@@ -34,7 +34,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.webapp.ServletContextExternalContext;
 import org.orbeon.oxf.webapp.WebAppContext;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.servlet.ServletContext;
@@ -272,7 +272,7 @@ public class InitUtils {
             processorDefinition = new ProcessorDefinition();
             processorDefinition.setUri(processorURI);
             // Support both xs:string or xs:QName for processor name
-            processorDefinition.setName((processorName instanceof String) ? XMLUtils.explodedQNameToQName((String) processorName) : (QName) processorName);
+            processorDefinition.setName((processorName instanceof String) ? Dom4jUtils.explodedQNameToQName((String) processorName) : (QName) processorName);
             for (java.util.Iterator i = map.keySet().iterator(); i.hasNext();) {
                 String name = (String) i.next();
                 if (name.startsWith(inputPropertyPrefix)) {

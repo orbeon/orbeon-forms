@@ -31,7 +31,7 @@ import org.orbeon.oxf.processor.xforms.input.action.ActionFunctionContext;
 import org.orbeon.oxf.processor.xforms.Model;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 
 /**
@@ -117,13 +117,13 @@ public class XFormsInput extends ProcessorImpl {
                             String value = groupElement.getStringValue();
                             if (!"".equals(value))
                                 instance.setValueForParam(pipelineContext, paramElement.attributeValue("ref"),
-                                        XMLUtils.getNamespaceContext(paramElement), value);
+                                        Dom4jUtils.getNamespaceContext(paramElement), value);
                         }
                     }
 
                     if (logger.isDebugEnabled())
                         logger.debug("1) Instance recontructed from request:\n"
-                                + XMLUtils.domToString(instance.getDocument()));
+                                + Dom4jUtils.domToString(instance.getDocument()));
 
 
                     // Run actions
@@ -135,7 +135,7 @@ public class XFormsInput extends ProcessorImpl {
                     }
                     if (logger.isDebugEnabled())
                         logger.debug("2) Instance with actions applied:\n"
-                                + XMLUtils.domToString(instance.getDocument()));
+                                + Dom4jUtils.domToString(instance.getDocument()));
 
                     // Run model item properties
                     final org.dom4j.Document d = instance.getDocument();
@@ -148,7 +148,7 @@ public class XFormsInput extends ProcessorImpl {
                     model.applyInputOutputBinds( d, pipelineContext, schmVldat );  
                     if (logger.isDebugEnabled())
                         logger.debug("3) Instance with model item properties applied:\n"
-                                + XMLUtils.domToString(instance.getDocument()));
+                                + Dom4jUtils.domToString(instance.getDocument()));
                 }
 
                 instance.read(contentHandler);

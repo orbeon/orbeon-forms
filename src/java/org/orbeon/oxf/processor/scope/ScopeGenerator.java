@@ -189,7 +189,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                     try {
                         Document mappingDocument = readInputAsDOM4J(context, input);
                         Mapping mapping = new Mapping();
-                        mapping.loadMapping(new InputSource(new StringReader(XMLUtils.domToString(mappingDocument))));
+                        mapping.loadMapping(new InputSource(new StringReader(Dom4jUtils.domToString(mappingDocument))));
                         return mapping;
                     } catch (Exception e) {
                         throw new OXFException(e);

@@ -21,8 +21,8 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.util.HashMap;
@@ -71,7 +71,7 @@ public class OXFPropertiesSerializer extends ProcessorImpl {
 
                             if (as != null) {
                                 // We only support one namespace for types for now
-                                QName typeQName = XMLUtils.extractAttributeValueQName(propertyElement, "as");
+                                QName typeQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "as");
                                 if (!typeQName.getNamespaceURI().equals(SUPPORTED_TYPES_URI))
                                     throw new ValidationException("Invalid as attribute: " + typeQName.getQualifiedName(), (LocationData) propertyElement.getData());
 
@@ -80,7 +80,7 @@ public class OXFPropertiesSerializer extends ProcessorImpl {
 
                                 if (processorName != null) {
                                     // Processor-specific property
-                                    QName processorQName = XMLUtils.extractAttributeValueQName(propertyElement, "processor-name");
+                                    QName processorQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "processor-name");
                                     propertyStore.setProperty(propertyElement, processorQName, name, typeQName, value);
                                 } else {
                                     // Global property

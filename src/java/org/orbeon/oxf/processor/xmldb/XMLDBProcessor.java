@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -76,8 +77,8 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         config.setCreateCollection(rootElement.attributeValue("create-collection"));
         config.setResourceId(rootElement.attributeValue("resource-id"));
 
-        config.setQuery(XMLUtils.objectToString(XPathUtils.selectObjectValue(configDocument, "/*/node()")));
-        config.setNamespaceContext(XMLUtils.getNamespaceContext(configDocument.getRootElement()));
+        config.setQuery(Dom4jUtils.objectToString(XPathUtils.selectObjectValue(configDocument, "/*/node()")));
+        config.setNamespaceContext(Dom4jUtils.getNamespaceContext(configDocument.getRootElement()));
 
         return config;
     }

@@ -17,8 +17,8 @@ import org.dom4j.Document;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.Base64;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.xml.sax.ContentHandler;
 
@@ -60,10 +60,10 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
                     String sig = XPathUtils.selectStringValueNormalize(data, "/signed-data/signature");
 
                     sigDataNode.detach();
-                    Document sigData = XMLUtils.createDOM4JDocument();
+                    Document sigData = Dom4jUtils.createDOM4JDocument();
                     sigData.add(sigDataNode);
 
-                    dsa.update(XMLUtils.domToString(sigData).getBytes());
+                    dsa.update(Dom4jUtils.domToString(sigData).getBytes());
 
 
                     if (!dsa.verify(Base64.decode(sig)))

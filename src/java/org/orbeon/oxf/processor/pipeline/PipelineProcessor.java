@@ -29,7 +29,6 @@ import org.orbeon.oxf.processor.pipeline.choose.ConcreteChooseProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -206,7 +205,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                             processorFactory = ProcessorFactoryRegistry.lookup(processorCall.getURI());
                         if (processorFactory == null) {
                             throw new ValidationException("Cannot find processor factory with name \""
-                                    + (processorCall.getName() != null ? XMLUtils.qNameToexplodedQName(processorCall.getName()) :  processorCall.getURI()) + "\"", processorLocationData);
+                                    + (processorCall.getName() != null ? Dom4jUtils.qNameToexplodedQName(processorCall.getName()) :  processorCall.getURI()) + "\"", processorLocationData);
                         }
                         processor = processorFactory.createInstance(context);
                     } else {
@@ -271,7 +270,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                             // Make sure the parent namespaces are copied over
                             final org.dom4j.Element prntElt = elt.getParent();
                             final java.util.Map parentNamespaceContext 
-                                = XMLUtils.getNamespaceContext( prntElt );
+                                = Dom4jUtils.getNamespaceContext( prntElt );
                             final Element rtElt = doc.getRootElement();
                             for (Iterator k = parentNamespaceContext.keySet().iterator(); k.hasNext();) {
                                 String prefix = (String) k.next();

@@ -28,7 +28,7 @@ import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.transformer.XPathProcessor;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.net.MalformedURLException;
@@ -192,7 +192,7 @@ public class PipelineBlock {
 
     private void addNamespaces(Element configElement, Node node) {
         if (node != null) {
-            Map namespaces = XMLUtils.getNamespaceContext((Element) node);
+            Map namespaces = Dom4jUtils.getNamespaceContext((Element) node);
             for (Iterator i = namespaces.keySet().iterator(); i.hasNext();) {
                 String prefix = (String) i.next();
                 String uri = (String) namespaces.get(prefix);

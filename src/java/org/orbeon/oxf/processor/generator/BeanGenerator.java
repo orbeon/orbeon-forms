@@ -24,6 +24,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -101,7 +102,7 @@ public class BeanGenerator extends ProcessorImpl {
                             Document dom = readInputAsDOM4J(context, input);
 
                             Mapping mapping = new Mapping();
-                            mapping.loadMapping(new InputSource(new StringReader(XMLUtils.domToString(dom))));
+                            mapping.loadMapping(new InputSource(new StringReader(Dom4jUtils.domToString(dom))));
 
                             return mapping;
                         } catch (Exception e) {

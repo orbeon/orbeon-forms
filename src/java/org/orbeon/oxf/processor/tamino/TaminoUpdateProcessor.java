@@ -25,8 +25,8 @@ import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.tamino.dom4j.TDOM4JObjectModel;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 public class TaminoUpdateProcessor extends TaminoProcessor {
 
@@ -54,7 +54,7 @@ public class TaminoUpdateProcessor extends TaminoProcessor {
             TConnection connection = getConnection(context, config);
             TXMLObjectAccessor accessor = connection.newXMLObjectAccessor(config.getCollection(), TDOM4JObjectModel.getInstance());
 
-            TXQuery xquery = TXQuery.newInstance(XMLUtils.objectToString(XPathUtils.selectObjectValue(queryDocument, "/xquery/node()")));
+            TXQuery xquery = TXQuery.newInstance(Dom4jUtils.objectToString(XPathUtils.selectObjectValue(queryDocument, "/xquery/node()")));
             System.out.println(xquery.getExpression());
             TResponse response = accessor.xquery(xquery);
             System.out.println("result: "+response.getQueryContentAsString());

@@ -35,6 +35,7 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -200,7 +201,7 @@ public class RequestGenerator extends ProcessorImpl {
                     Document config = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
 
                     // Try to find stream-type attribute
-                    QName streamTypeQName = XMLUtils.extractAttributeValueQName(config.getRootElement(), "stream-type");
+                    QName streamTypeQName = Dom4jUtils.extractAttributeValueQName(config.getRootElement(), "stream-type");
                     if (streamTypeQName != null && !(streamTypeQName.equals(XMLConstants.XS_BASE64BINARY_QNAME) || streamTypeQName.equals(XMLConstants.XS_ANYURI_QNAME)))
                         throw new OXFException("Invalid value for stream-type attribute: " + streamTypeQName.getQualifiedName());
                     state.requestedStreamType = streamTypeQName;
@@ -311,7 +312,7 @@ public class RequestGenerator extends ProcessorImpl {
     private Document readRequestAsDOM4J(PipelineContext context, Node config, boolean all) {
         ExternalContext.Request request = getRequest(context);
 
-        Document document = XMLUtils.createDOM4JDocument();
+        Document document = Dom4jUtils.createDOM4JDocument();
         Element requestElement = document.addElement("request");
         if (all || XPathUtils.selectSingleNode(config, "/config/container-type") != null)
             addTextElement(requestElement, "container-type", request.getContainerType());

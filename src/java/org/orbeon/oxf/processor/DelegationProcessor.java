@@ -37,6 +37,7 @@ import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -430,7 +431,7 @@ public class DelegationProcessor extends ProcessorImpl {
                 String select = operationElement.attributeValue("select");
                 if (select != null) {
                     operation.select = select;
-                    operation.selectNamespaceContext = XMLUtils.getNamespaceContext(operationElement);
+                    operation.selectNamespaceContext = Dom4jUtils.getNamespaceContext(operationElement);
                 }
             }
         }

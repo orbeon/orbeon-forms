@@ -23,7 +23,7 @@ import org.orbeon.oxf.transformer.xupdate.statement.Attribute;
 import org.orbeon.oxf.transformer.xupdate.statement.Error;
 import org.orbeon.oxf.transformer.xupdate.statement.Namespace;
 import org.orbeon.oxf.transformer.xupdate.statement.Text;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 
@@ -55,7 +55,7 @@ public class TemplatesHandlerImpl extends LocationSAXContentHandler implements T
                     statements.add(new Text(node.getText().trim()));
             } else if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
-                NamespaceContext namespaceContext = new SimpleNamespaceContext(XMLUtils.getNamespaceContext(element));
+                NamespaceContext namespaceContext = new SimpleNamespaceContext(Dom4jUtils.getNamespaceContext(element));
                 if (Constants.XUPDATE_NAMESPACE_URI.equals(element.getNamespaceURI())) {
                     if (element.getName().equals("remove")) {
                         statements.add(new Remove((LocationData) element.getData(), element.attributeValue("select"), namespaceContext));
@@ -101,7 +101,7 @@ public class TemplatesHandlerImpl extends LocationSAXContentHandler implements T
                         for (Iterator j = element.elements("when").iterator(); j.hasNext();) {
                             Element whenElement = (Element) j.next();
                             whenTests.add(whenElement.attributeValue("test"));
-                            whenNamespaceContext.add(new SimpleNamespaceContext(XMLUtils.getNamespaceContext(whenElement)));
+                            whenNamespaceContext.add(new SimpleNamespaceContext(Dom4jUtils.getNamespaceContext(whenElement)));
                             whenStatements.add(parseStatements(whenElement.content()));
                         }
                         Element otherwiseElement = element.element("otherwise");
@@ -172,7 +172,7 @@ public class TemplatesHandlerImpl extends LocationSAXContentHandler implements T
         } else  if (columnPosition != -1 && namespace == null) {
             // Qualified name using namespace declaration in context
             String prefix = name.substring(0, columnPosition);
-            String namespaceFromContext = (String) XMLUtils.getNamespaceContext(element).get(prefix);
+            String namespaceFromContext = (String) Dom4jUtils.getNamespaceContext(element).get(prefix);
             if (namespaceFromContext == null)
                 throw new ValidationException("No namespace declared for prefix '" + prefix + "'",
                         (LocationData) element.getData());

@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.TeeContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.DocumentDelegate;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.ElementDelegate;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.*;
@@ -134,7 +135,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
                                             }
                                         });
                                         verifierFactory.setFeature( Const.PANIC_MODE_FEATURE, false );
-                                        InputSource is = new InputSource(new StringReader(XMLUtils.domToString(schemaDoc)));
+                                        InputSource is = new InputSource(new StringReader(Dom4jUtils.domToString(schemaDoc)));
                                         is.setSystemId(schemaSystemId);
 
                                         // Just a precaution, as the factory is not thread-safe. Does this makes sense?

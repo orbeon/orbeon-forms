@@ -282,7 +282,7 @@ public class Model {
             ModelBind modelBind = new ModelBind(bind.attributeValue("id"), bind.attributeValue("nodeset"),
                     bind.attributeValue("relevant"), bind.attributeValue("calculate"), bind.attributeValue("type"),
                     bind.attributeValue("constraint"), bind.attributeValue("required"), bind.attributeValue("readonly"),
-                    XMLUtils.getNamespaceContext(bind), (LocationData) bind.getData());
+                    Dom4jUtils.getNamespaceContext(bind), (LocationData) bind.getData());
             if (parent != null) {
                 parent.addChild(modelBind);
                 modelBind.setParent(parent);

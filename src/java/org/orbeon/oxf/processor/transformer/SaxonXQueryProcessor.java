@@ -23,7 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.query.DynamicQueryContext;
 import org.orbeon.saxon.query.StaticQueryContext;
@@ -74,7 +74,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     Document dataDocument = readInputAsDOM4J(context, INPUT_DATA);
 
                     // Read XQuery into String
-                    String xqueryBody = XMLUtils.domToString(xqueryDocument);
+                    String xqueryBody = Dom4jUtils.domToString(xqueryDocument);
                     xqueryBody = xqueryBody.substring(xqueryBody.indexOf(">") + 1);
                     xqueryBody = xqueryBody.substring(0, xqueryBody.lastIndexOf("<"));
 

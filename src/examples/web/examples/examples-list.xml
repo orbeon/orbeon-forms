@@ -82,6 +82,7 @@
         <example id="xupdate" path="sandbox/xupdate" label="XUpdate Sandbox"/>
         <example id="xpath" path="sandbox/xpath" label="XPath Sandbox"/>
         <example id="xpl" path="sandbox/xpl" label="XPL Sandbox"/>
+        <example id="xslt" path="sandbox/xslt" label="XSLT Sandbox"/>
         <example id="knight" label="Computations using XSLT"/>
         <example id="stx" label="Streaming Transformations"/>
     </section>

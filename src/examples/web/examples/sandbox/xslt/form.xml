@@ -11,15 +11,17 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<example-descriptor>
-    <title>XPath Sandbox</title>
-    <source>model.xpl</source>
-    <source>form.xml</source>
-    <source>view.xsl</source>
-    <source>input.xml</source>
-    <description>
-        <p>
-            This example demonstrates the use of XPath 2.0. 
-        </p>
-    </description>
-</example-descriptor>
+<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+    <xforms:instance>
+        <form>
+<xslt>
+&lt;!-- Return year(s) with max sale --&gt;
+&lt;xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0">
+	&lt;xsl:template match="/">
+	    &lt;xsl:variable name="max" as="xs:integer" select="max(for $y in /company/year return sum($y/quarter/@sales))"/>
+	    &lt;xsl:copy-of select="/company/year[sum(quarter/@sales) = $max]"/>
+    &lt;/xsl:template>
+&lt;/xsl:transform></xslt>
+        </form>
+    </xforms:instance>
+</xforms:model>

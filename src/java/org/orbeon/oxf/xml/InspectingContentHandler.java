@@ -49,6 +49,9 @@ public class InspectingContentHandler extends ForwardingContentHandler {
         if (error != null)
             throw new OXFException(error + ": element " + qname);
         elementDepth++;
+        checkName(uri, localname, qname);
+        for (int i = 0; i < attributes.getLength(); i++)
+             checkName(attributes.getURI(i), attributes.getLocalName(i), attributes.getQName(i));
         super.startElement(uri, localname, qname, attributes);
     }
 
@@ -57,6 +60,7 @@ public class InspectingContentHandler extends ForwardingContentHandler {
         if (error != null)
             throw new OXFException(error + ": element " + qname);
         elementDepth--;
+        checkName(uri, localname, qname);
         super.endElement(uri, localname, qname);
     }
 
@@ -86,5 +90,12 @@ public class InspectingContentHandler extends ForwardingContentHandler {
         } else {
             return null;
         }
+    }
+
+    private void checkName(String uri, String localname, String qname) {
+        if (localname == null || "".equals(localname))
+            throw new OXFException("Empty local name in SAX event");
+        if (qname == null || "".equals(qname))
+            throw new OXFException("Empty qualified name in SAX event");
     }
 }

@@ -82,8 +82,8 @@ public class Model {
                     level++;
                     if (level == 1) {
                         if (!Constants.XFORMS_NAMESPACE_URI.equals(uri))
-                            throw new ValidationException("Root element of XForms model must be in namespace "
-                                    + Constants.XFORMS_NAMESPACE_URI, new LocationData(locator));
+                            throw new ValidationException("Root element of XForms model must be in namespace '"
+                                    + Constants.XFORMS_NAMESPACE_URI + "'. Found instead: '" + uri + "'", new LocationData(locator));
                         id = attributes.getValue("id");
                         schema = attributes.getValue("schema");
                         if (schema != null)

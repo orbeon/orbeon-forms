@@ -303,10 +303,17 @@
 
     <!-- XForms Conditionals -->
     <xsl:template match="xxforms:if">
-         <xsl:if test="@xxforms:value = 'true'">
-             <xsl:apply-templates/>
-         </xsl:if>
-     </xsl:template>
+        <xsl:choose>
+            <xsl:when test="@xxforms:value = 'true'">
+                <xsl:apply-templates/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:for-each select="descendant::xforms:*">
+                    <xxforms:hidden xxforms:name="{@xxforms:name}" xxforms:value="{@xxforms:value}"/>
+                </xsl:for-each>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
 
     <xsl:template match="xxforms:choose">
         <xsl:variable name="when-true" select="xxforms:when[@xxforms:value = 'true']"/>

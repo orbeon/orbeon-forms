@@ -128,6 +128,18 @@
                     absolute URLs.
                 </p>
             </section>
+            <section>
+                <title>User-Defined Processor Inputs</title>
+                <p>
+                    User-defined processor inputs, used by several processors including the XSLT
+                    processor and the Email processor, are now documented (<a
+                    href="reference-xpl-pipelines#optional">XPL documentation</a>, <a
+                    href="processors-xslt#user-defined">XSLT documentation</a>). The URI schemes to
+                    access user-defined inputs and outputs are now <code>input:</code> and
+                    <code>output:</code>, to avoid confusion with the <code>oxf:</code> scheme used
+                    for the Presentation Server resource manager sandbox.
+                </p>
+            </section>
         </section>
         <section>
             <title>New in Version 2.6</title>

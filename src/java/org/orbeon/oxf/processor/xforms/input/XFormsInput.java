@@ -100,25 +100,6 @@ public class XFormsInput extends ProcessorImpl {
                     instance = new Instance(pipelineContext, requestParameters.getInstance() != null
                             ? requestParameters.getInstance() : model.getInitialInstance());
 
-                    // Schema-validate if necessary
-                    Boolean enabled = getPropertySet().getBoolean(XFORMS_VALIDATION_FLAG, true);
-                    if (enabled != null && enabled.booleanValue() && model.getSchema() != null) {
-
-                        Processor validator = new XFormsValidationProcessor(model.getSchema());
-                        Processor resourceGenerator = PipelineUtils.createURLGenerator(model.getSchema());
-                        PipelineUtils.connect(resourceGenerator, ProcessorImpl.OUTPUT_DATA, validator, XFormsValidationProcessor.INPUT_SCHEMA);
-                        PipelineUtils.connect(XFormsValidationProcessor.DECORATION_CONFIG, ProcessorImpl.OUTPUT_DATA,
-                                validator, ProcessorImpl.INPUT_CONFIG);
-                        DOMGenerator domGenerator = new DOMGenerator(instance.getDocument());
-                        PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, validator, ProcessorImpl.INPUT_DATA);
-                        DOMSerializer serializer = new DOMSerializer();
-                        PipelineUtils.connect(validator, ProcessorImpl.OUTPUT_DATA, serializer, ProcessorImpl.INPUT_DATA);
-
-                        serializer.reset(pipelineContext);
-                        serializer.start(pipelineContext);
-                        instance.setDocument(serializer.getDocument(pipelineContext));
-                    }
-
                     // Fill-out instance from request
                     XFormsUtils.setInitialDecoration(instance.getDocument());
                     int[] ids = requestParameters.getIds();
@@ -149,6 +130,30 @@ public class XFormsInput extends ProcessorImpl {
                     if (logger.isDebugEnabled())
                         logger.debug("1) Instance recontructed from request:\n"
                                 + XMLUtils.domToString(instance.getDocument()));
+
+                    // Schema-validate if necessary
+                    Boolean enabled = getPropertySet().getBoolean(XFORMS_VALIDATION_FLAG, true);
+                    if (enabled != null && enabled.booleanValue() && model.getSchema() != null) {
+
+                        Processor validator = new XFormsValidationProcessor(model.getSchema());
+                        Processor resourceGenerator = PipelineUtils.createURLGenerator(model.getSchema());
+                        PipelineUtils.connect(resourceGenerator, ProcessorImpl.OUTPUT_DATA, validator, XFormsValidationProcessor.INPUT_SCHEMA);
+                        PipelineUtils.connect(XFormsValidationProcessor.DECORATION_CONFIG, ProcessorImpl.OUTPUT_DATA,
+                                validator, ProcessorImpl.INPUT_CONFIG);
+                        DOMGenerator domGenerator = new DOMGenerator(instance.getDocument());
+                        PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, validator, ProcessorImpl.INPUT_DATA);
+                        DOMSerializer serializer = new DOMSerializer();
+                        PipelineUtils.connect(validator, ProcessorImpl.OUTPUT_DATA, serializer, ProcessorImpl.INPUT_DATA);
+
+                        serializer.reset(pipelineContext);
+                        serializer.start(pipelineContext);
+                        instance.setDocument(serializer.getDocument(pipelineContext));
+
+                        // Validator removes decoration; need to re-set.
+                        XFormsUtils.setInitialDecoration(instance.getDocument());
+                    }
+
+
 
                     // Run actions
                     Action[] actions = requestParameters.getActions();

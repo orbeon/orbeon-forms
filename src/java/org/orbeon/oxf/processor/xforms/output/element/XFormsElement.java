@@ -47,9 +47,11 @@ public class XFormsElement {
      * have to generate hidden fields for those).
      */
     static final Map DATA_CONTROLS = new HashMap();
+    static final Map CONTROLS_ANNOTATIONS = new HashMap();
     static {
-        String[] controlNames = {"input", "secret", "textarea", "upload", "filename", "mediatype", "size",
-                                 "range", "select", "select1", "output", "alert", "help", "hint"};
+        String[] controlNames =
+                {"input", "secret", "textarea", "upload", "filename", "mediatype", "size",
+                 "range", "select", "select1", "output"};
         for (int i = 0; i < controlNames.length; i++)
             DATA_CONTROLS.put(controlNames[i], null);
     }

@@ -783,10 +783,13 @@
             <section>
                 <title>Referring to Inputs and Outputs with URIs</title>
                 <p>
-                    In certain cases, the user must refer from a processor configuration to
-                    particular processor inputs and outputs. It is recommended to support the
-                    <code>input:</code> and <code>output:</code> URI schemes for this purpose, for
-                    example:
+                    In certain cases, the user of a processor must refer, from a processor
+                    configuration, to particular processor inputs and outputs. If you implement a
+                    new processor, you should support the <code>input:</code> and
+                    <code>output:</code> URI schemes for this purpose. On the other hand, if you are
+                    using a standard Presentation Server processor supporting such references to
+                    processor inputs and outputs, you can count on the <code>input:</code> and
+                    <code>output:</code> URI schemes being used. For example:
                 </p>
                 <ul>
                     <li>To refer to a processor input named <code>my-input</code>, use the URI: <code>input:my-input</code></li>

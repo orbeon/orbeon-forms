@@ -43,7 +43,7 @@
                     <tr>
                         <td align="center">Input</td>
                         <td><code>config</code></td>
-                        <td>Configuration in OXF-SQL</td>
+                        <td>Configuration in XML-SQL</td>
                         <td align="center">Yes</td>
                     </tr>
                     <tr>
@@ -82,13 +82,13 @@
         </section>
 
         <section>
-            <title>OXF-SQL</title>
+            <title>XML-SQL</title>
             <section>
                 <title>Configuration</title>
                 <p>
-                    OXF-SQL is a simple set of XML tags that allow you to integrate SQL queries and
-                    XML. OXF-SQL lives in the <code>http://orbeon.org/oxf/xml/sql</code> namespace,
-                    which is usually mapped to the <code>sql</code> prefix. An OXF-SQL configuration
+                    XML-SQL is a simple set of XML tags that allow you to integrate SQL queries and
+                    XML. XML-SQL lives in the <code>http://orbeon.org/oxf/xml/sql</code> namespace,
+                    which is usually mapped to the <code>sql</code> prefix. An XML-SQL configuration
                     input has the following format:
                 </p>
                 <xml-source>
@@ -1103,7 +1103,7 @@ insert into employee (first_name, last_name)
 </result>
                 </xml-source>
 
-                <p>There are two ways of generating such results with OXF-SQL.
+                <p>There are two ways of generating such results with XML-SQL.
                 The first way is to use nested queries. A first query returns all the
                 rows in the level1 table. Then, for each row returned, a second query
                 returns all rows in the level2 table referencing the current row's
@@ -1209,7 +1209,7 @@ select level3.value value
                     For every group, a header is output only once. Then, the content under the
                     <code>sql:member</code> element is output for each row. Finally, the footer is
                     output. The header and the footer can access columns There is no limit in
-                    OXF-SQL as to how deep grouping can be done.
+                    XML-SQL as to how deep grouping can be done.
                 </p>
 
                 <p>
@@ -1281,7 +1281,7 @@ select level1.value v1, level2.value v2, level3.value v3
             <section>
                 <title>Text and Whitespace Handling</title>
 
-                <p>Like in XSLT 1.0, text nodes in the OXF-SQL document containing
+                <p>Like in XSLT 1.0, text nodes in the XML-SQL document containing
                 only whitespace characters are stripped. Text nodes that contain
                 at least one non-whitespace character are not stripped and copied
                 to the output.</p>

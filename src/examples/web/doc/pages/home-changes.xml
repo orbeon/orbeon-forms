@@ -59,20 +59,23 @@
                 </p>
             </section>
             <section>
-				<title>URL Generator Binary Mode</title>
-				<p>
-                    The <a href="processors-generators#url-generator">URL generator</a>'s support
-                    for streaming binary files encoded with Base64 is now documented. The <a
-                    href="/goto-example/xforms-upload">XForms Upload example</a> illustrates this
-                    capability.
-                </p>
-			</section>
-            <section>
-				<title>URL Generator Text Mode</title>
-				<p>
-                    The <a href="processors-generators#url-generator">URL generator</a> now
-                    supports reading text files.
-                </p>
+				<title>URL Generator</title>
+                <section>
+                    <title>Binary Mode</title>
+                    <p>
+                        The <a href="processors-generators#url-generator">URL generator</a>'s
+                        support for streaming binary files encoded with Base64 is now documented.
+                        The <a href="/goto-example/xforms-upload">XForms Upload example</a>
+                        illustrates this capability.
+                    </p>
+                </section>
+                <section>
+                    <title>Text Mode</title>
+                    <p>
+                        The <a href="processors-generators#url-generator">URL generator</a> now
+                        supports reading text files.
+                    </p>
+                </section>
 			</section>
             <section>
 				<title>Binary HTTP Serializer</title>
@@ -98,6 +101,14 @@
                 <p>
                     A <a href="reference-resource-managers#webdav">WebDAV resource manager</a> is
                     now included. It supports basic authentication.
+                </p>
+            </section>
+            <section>
+                <title>Email Processor</title>
+                <p>
+                    The <a href="processors-messaging#email">Email processor</a> now supports
+                    binary attachments and controlling character encodings. All MIME parts can be
+                    dynamically generated.
                 </p>
             </section>
         </section>
@@ -1168,13 +1179,6 @@
 				<p>
                     The <a href="processors-charts-spreadsheets#chart">Chart processor</a>
                     supports more chart types, such as horizontal bar and 3D stacked bar.
-                </p>
-			</section>
-			<section>
-				<title>Email Processor</title>
-				<p>
-                    The <a href="processor-messaging#email">EMail processor</a> suports MIME
-                    multipart email messages.
                 </p>
 			</section>
 			<section>

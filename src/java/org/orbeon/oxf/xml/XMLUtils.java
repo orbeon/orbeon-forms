@@ -83,6 +83,26 @@ public class XMLUtils {
     private static SAXParserFactory validatingSAXParserFactory;
 
     private static FileItemFactory fileItemFactory;
+    
+    public static final org.xml.sax.ErrorHandler errorHandler = new ErrorHandler()
+    {
+        public void error( final org.xml.sax.SAXParseException e )
+        {
+            System.err.print( "Error: " );
+            e.printStackTrace();
+        }
+        public void fatalError( final org.xml.sax.SAXParseException e ) throws org.xml.sax.SAXParseException
+        {
+            System.err.print( "Fatal Error: " );
+            e.printStackTrace();
+            throw e;
+        }
+        public void warning( final org.xml.sax.SAXParseException e )
+        {
+            System.err.print( "Warning: " );
+            e.printStackTrace();
+        }
+    };
 
     static {
         try {
@@ -419,8 +439,47 @@ public class XMLUtils {
         return getDigest(new DOMSource(node));
     }
 
+    public static DocumentSource getDocumentSource( final org.dom4j.Document d ) {
+        /*
+         * Saxon's error handler is expensive for the service it provides so we just use our 
+         * singeton intead. 
+         * 
+         * Wrt expensive, delta in heap dump info below is amount of bytes allocated during the 
+         * handling of a single request to '/' in the examples app. i.e. The trace below was 
+         * responsible for creating 200k of garbage during the handing of a single request to '/'.
+         * 
+         * delta: 213408 live: 853632 alloc: 4497984 trace: 380739 class: byte[]
+         * 
+         * TRACE 380739:
+         * java.nio.HeapByteBuffer.<init>(HeapByteBuffer.java:39)
+         * java.nio.ByteBuffer.allocate(ByteBuffer.java:312)
+         * sun.nio.cs.StreamEncoder$CharsetSE.<init>(StreamEncoder.java:310)
+         * sun.nio.cs.StreamEncoder$CharsetSE.<init>(StreamEncoder.java:290)
+         * sun.nio.cs.StreamEncoder$CharsetSE.<init>(StreamEncoder.java:274)
+         * sun.nio.cs.StreamEncoder.forOutputStreamWriter(StreamEncoder.java:69)
+         * java.io.OutputStreamWriter.<init>(OutputStreamWriter.java:93)
+         * java.io.PrintWriter.<init>(PrintWriter.java:109)
+         * java.io.PrintWriter.<init>(PrintWriter.java:92)
+         * org.orbeon.saxon.StandardErrorHandler.<init>(StandardErrorHandler.java:22)
+         * org.orbeon.saxon.event.Sender.sendSAXSource(Sender.java:165)
+         * org.orbeon.saxon.event.Sender.send(Sender.java:94)
+         * org.orbeon.saxon.IdentityTransformer.transform(IdentityTransformer.java:31)
+         * org.orbeon.oxf.xml.XMLUtils.getDigest(XMLUtils.java:453)
+         * org.orbeon.oxf.xml.XMLUtils.getDigest(XMLUtils.java:423)
+         * org.orbeon.oxf.processor.generator.DOMGenerator.<init>(DOMGenerator.java:93)         
+         * This mod brings gc time/app time ratio down from 1.5751878434169833 to 
+         * 0.13878730787644344.
+         * ( 1500 samples, 50 threads, 512M, jdk 1.4.2.06, TC 4.1.30, ops 2.7.2 )
+         */
+        final DocumentSource ds = new DocumentSource( d );
+        final XMLReader rdr = ds.getXMLReader();
+        rdr.setErrorHandler( errorHandler );
+        return ds;
+    }
+
     public static byte[] getDigest(org.dom4j.Document document) {
-        return getDigest(new DocumentSource(document));
+        final DocumentSource ds = getDocumentSource( document );
+        return getDigest( ds );
     }
 
     // Necessary for Saxon

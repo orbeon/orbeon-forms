@@ -17,6 +17,8 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.portlet.processor.PortletContainerProcessor;
 import org.orbeon.oxf.portlet.processor.PortletIncludeGenerator;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.converter.XMLConverter;
+import org.orbeon.oxf.processor.converter.JFreeChartConverter;
 import org.orbeon.oxf.processor.tamino.TaminoProcessor;
 import org.orbeon.oxf.processor.tamino.TaminoQueryProcessor;
 import org.orbeon.oxf.processor.generator.*;
@@ -66,10 +68,14 @@ public class SchemaRepository {
         schemas.put(SignatureVerifierProcessor.SIGNATURE_PUBLIC_KEY_URI, "schemas/public-key.rng");
 
         // Serializers schemas
-        schemas.put(CachedSerializer.SERIALIZER_CONFIG_NAMESPACE_URI, "schemas/serializer-config.rng");
-        schemas.put(HttpSerializer.HTTP_SERIALIZER_CONFIG_NAMESPACE_URI, "schemas/http-serializer-config.rng");
-        schemas.put(JFreeChartSerializer.JFCHART_SERIALIZER_CONFIG_NAMESPACE_URI, "schemas/chart-config.rng");
+        schemas.put(CachedSerializer.SERIALIZER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "serializer/legacy-serializer-config.rng");
+        schemas.put(HttpSerializer.HTTP_SERIALIZER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "serializer/http-serializer-config.rng");
         schemas.put(FileSerializer.FILE_SERIALIZER_CONFIG_NAMESPACE_URI, "schemas/file-serializer-config.rng");
+
+        // Converter schemas
+        schemas.put(XMLConverter.STANDARD_TEXT_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/standard-text-converter-config.rng");
+        schemas.put(JFreeChartSerializer.CHART_CONVERTER_CHART_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/chart-converter-chart.rng");
+        schemas.put(JFreeChartConverter.CHART_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/chart-converter-config.rng");
 
         schemas.put(EmailProcessor.EMAIL_CONFIG_NAMESPACE_URI, "schemas/email.rng");
         schemas.put(BeanGenerator.BEAN_CONFIG_NAMESPACE_URI, "schemas/bean-generator-config.rng");

@@ -11,67 +11,82 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-            xmlns:xforms="http://www.w3.org/2002/xforms"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-            xmlns:f="http://orbeon.org/oxf/xml/formatting"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xsl:version="2.0">
-    <xhtml:head>
-        <xhtml:title>Email</xhtml:title>
-    </xhtml:head>
-    <xhtml:body>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xsl:version="2.0">
+    <head>
+        <title>Email</title>
+    </head>
+    <body>
         <xforms:group>
-            <xhtml:p>
-                <xhtml:table class="gridtable">
-                    <xhtml:tr>
-                        <xhtml:th>SMTP Host</xhtml:th>
-                        <xhtml:td colspan="3">
-                            <xforms:input ref="message/smtp-host"/>
-                        </xhtml:td>
-                    </xhtml:tr>
-                    <xhtml:tr>
-                        <xhtml:th>From Email</xhtml:th>
-                        <xhtml:td>
-                            <xforms:input ref="message/from/email"/>
-                        </xhtml:td>
-                        <xhtml:th>From Name</xhtml:th>
-                        <xhtml:td>
-                            <xforms:input ref="message/from/name"/>
-                        </xhtml:td>
-                    </xhtml:tr>
-                    <xhtml:tr>
-                        <xhtml:th>To Email</xhtml:th>
-                        <xhtml:td>
-                            <xforms:input ref="message/to/email"/>
-                        </xhtml:td>
-                        <xhtml:th>To Name</xhtml:th>
-                        <xhtml:td>
-                            <xforms:input ref="message/to/name"/>
-                        </xhtml:td>
-                    </xhtml:tr>
-                    <xhtml:tr>
-                        <xhtml:th>Subject</xhtml:th>
-                        <xhtml:td colspan="3">
-                            <xforms:input ref="message/subject"/>
-                        </xhtml:td>
-                    </xhtml:tr>
-                    <xhtml:tr>
-                        <xhtml:th>Body</xhtml:th>
-                        <xhtml:td colspan="3">
-                            <xforms:textarea ref="message/body/part/html/body" xhtml:style="width: 100%" xhtml:rows="20"/>
-                        </xhtml:td>
-                    </xhtml:tr>
-                </xhtml:table>
-            </xhtml:p>
-            <xhtml:p>
+            <p>
+                Please fill-out the mandatory fields below and submit the form. An email will be
+                send will the body specified, as well as several attachments:
+            </p>
+            <ul>
+                <li>A static JPEG image</li>
+                <li>A PDF file produced dynamically from a SQL database</li>
+                <li>A chart in PNG format produced dynamically from a configuration file</li>
+            </ul>
+            <table class="gridtable">
+                <tr>
+                    <th>SMTP Host *</th>
+                    <td colspan="3">
+                        <xforms:input ref="message/smtp-host"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>From Email *</th>
+                    <td>
+                        <xforms:input ref="message/from/email"/>
+                    </td>
+                    <th>From Name</th>
+                    <td>
+                        <xforms:input ref="message/from/name"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>To Email *</th>
+                    <td>
+                        <xforms:input ref="message/to/email"/>
+                    </td>
+                    <th>To Name</th>
+                    <td>
+                        <xforms:input ref="message/to/name"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Subject *</th>
+                    <td colspan="3">
+                        <xforms:input ref="message/subject" xhtml:style="width: 100%"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Body *</th>
+                    <td colspan="3">
+                        <xforms:textarea ref="message/body/part/html/body/p[1]" xhtml:style="width: 100%" xhtml:rows="20"/>
+                    </td>
+                </tr>
+            </table>
+            <p>
                 <xforms:submit xxforms:appearance="button">
                     <xforms:label>Send an Email!</xforms:label>
                 </xforms:submit>
-            </xhtml:p>
-            <xhtml:p>
-                <xsl:value-of select="message"/>
-            </xhtml:p>
+            </p>
+            <p>
+                <xsl:choose>
+                    <xsl:when test="status = 'success'">
+                        <span style="color: green">Email sent!</span>
+                    </xsl:when>
+                    <xsl:when test="status = 'failure'">
+                        <span style="color: red">Please correct the validation errors before submitting the form.</span>
+                    </xsl:when>
+                </xsl:choose>
+            </p>
         </xforms:group>
-    </xhtml:body>
-</xhtml:html>
+    </body>
+</html>

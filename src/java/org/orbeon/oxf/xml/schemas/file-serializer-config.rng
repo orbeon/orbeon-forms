@@ -26,6 +26,7 @@
             <element name="content-type">
                 <choice>
                     <value>text/xml</value>
+                    <value>application/xml</value>
                     <value>text/html</value>
                     <value>text/plain</value>
                 </choice>

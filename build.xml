@@ -229,6 +229,7 @@
         <include name="xmldb-eXist_20040510.jar"/>
         <include name="xmlrpc-1_2_eXist_20041005_patched.jar"/>
         <include name="jms-api-1_1.jar"/>
+        <include name="mailapi-1_3_2.jar"/>
       </fileset>
       <fileset dir="${build.lib.dir}">
         <exclude name="jsf-*.jar"/>
@@ -332,7 +333,7 @@
       <classpath>
         <path refid="class.path"/>
         <pathelement location="${build.test-classes.dir}"/>
-        <pathelement location="${tomcat.dir}/common/lib/mail.jar"/>
+        <pathelement location="${tomcat.dir}/common/lib/mailapi-1_3_2.jar"/>
       </classpath>
     </junit>
   </target>
@@ -350,7 +351,7 @@
       <classpath>
         <path refid="class.path"/>
         <pathelement location="${build.test-classes.dir}"/>
-        <pathelement location="${tomcat.dir}/common/lib/mail.jar"/>
+        <pathelement location="${tomcat.dir}/common/lib/mailapi-1_3_2.jar"/>
       </classpath>
     </junit>
 

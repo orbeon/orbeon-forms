@@ -62,7 +62,7 @@
                 <p:input name="config" href="skin/xslt/fo/document2fo.xsl"/>
                 <p:output name="data" id="fo"/>
             </p:processor>
-            <p:processor name="oxf:pdf-serializer">
+            <p:processor name="oxf:xslfo-serializer">
                 <p:input name="config">
                     <config>
                         <header>

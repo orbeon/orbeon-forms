@@ -67,9 +67,10 @@ public abstract class HttpSerializerBase extends CachedSerializer {
 
     public void start(PipelineContext pipelineContext) {
         try {
-
+            // Read configuration input
             final Config config = readConfig(pipelineContext);
 
+            // Get data input information
             ProcessorInput dataInput = getInputByName(INPUT_DATA);
 
             ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
@@ -161,7 +162,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
         }
     }
 
-    private Config readConfig(PipelineContext context) {
+    protected Config readConfig(PipelineContext context) {
         final Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
                 new CacheableInputReader() {
                     public Object read(PipelineContext context, ProcessorInput input) {

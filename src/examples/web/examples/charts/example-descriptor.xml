@@ -13,7 +13,8 @@
 -->
 <example-descriptor>
     <title>Charts</title>
-    <source>form.xml</source>
+    <source>page-flow.xml</source>
+    <source>xforms-model.xml</source>
     <source>model.xpl</source>
     <source>view.xsl</source>
     <description>

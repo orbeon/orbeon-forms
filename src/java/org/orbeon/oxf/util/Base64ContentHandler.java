@@ -81,4 +81,16 @@ public class Base64ContentHandler extends ContentHandlerAdapter {
         }
         return i - start + 1;
     }
+
+    public int getByteCount() {
+        return byteCount;
+    }
+
+    public int getCharCount() {
+        return charCount;
+    }
+
+    public int getInputCharCount() {
+        return inputCharCount;
+    }
 }

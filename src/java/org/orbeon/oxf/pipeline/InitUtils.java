@@ -70,7 +70,9 @@ public class InitUtils {
         // Set ExternalContext
         if (externalContext != null) {
             if (logger.isInfoEnabled()) {
-                logger.info(externalContext.getStartLoggerString());
+                String startLoggerString = externalContext.getStartLoggerString();
+                if (startLoggerString != null && startLoggerString.length() > 0)
+                    logger.info(startLoggerString);
             }
             pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, externalContext);
         }

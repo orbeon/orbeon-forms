@@ -490,7 +490,7 @@ public class PortletExternalContext implements ExternalContext {
         }
 
         public void write(RenderResponse response) throws IOException {
-            if (ProcessorUtils.isTextContentType(contentType)) {
+            if (ProcessorUtils.isTextContentType(contentType) || ProcessorUtils.isXMLContentType(contentType)) {
                 // We are dealing with text content that may need rewriting
                 // CHECK: Is this check on the content-type going to cover the relevant cases?
                 if (stringWriter != null) {

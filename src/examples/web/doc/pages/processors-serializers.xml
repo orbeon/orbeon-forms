@@ -622,7 +622,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </p>
                 <p>Using the PDF plugin:</p>
                 <xml-source>
-                    <p:processor name="oxf:pdf-serializer">
+                    <p:processor name="oxf:xslfo-serializer">
                         <p:input name="config">
                             <config>
                                 <header>
@@ -636,7 +636,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </xml-source>
                 <p>Saving the PDF file to disk:</p>
                 <xml-source>
-                    <p:processor name="oxf:pdf-serializer">
+                    <p:processor name="oxf:xslfo-serializer">
                         <p:input name="config">
                             <config>
                                 <header>

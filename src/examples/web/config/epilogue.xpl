@@ -86,12 +86,12 @@
             <p:choose href="#xformed-data">
                 <!-- Auto-detected XSL-FO. Use the FOP Serializer -->
                 <p:when test="/fo:root">
-                    <p:processor name="oxf:pdf-serializer">
+                    <p:processor name="oxf:xslfo-serializer">
                         <p:input name="config">
                             <config>
                                 <header>
                                    <name>Content-Disposition</name>
-                                    <value>attachment; filename=document.pdf;</value>
+                                    <value>attachment; filename=document.pdf</value>
                                 </header>
                             </config>
                         </p:input>

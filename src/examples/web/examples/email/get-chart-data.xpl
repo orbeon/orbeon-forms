@@ -1,21 +1,27 @@
 <!--
     Copyright (C) 2004 Orbeon, Inc.
-  
+
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
     2.1 of the License, or (at your option) any later version.
-  
+
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU Lesser General Public License for more details.
-  
+
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:xu="http://www.xmldb.org/xupdate">
+<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <page path-info="*" xforms="xforms-model.xml" model="model.xpl" view="view.xsl"/>
+    <p:param name="data" type="output"/>
 
-    <epilogue url="oxf:/config/epilogue.xpl"/>
+    <!-- Get data from the "Charts" example -->
+    <p:processor name="oxf:chart-converter">
+        <p:input name="config"><config/></p:input>
+        <p:input name="data" href="oxf:/examples/charts/xforms-model.xml#xpointer(/*/*/form)"/>
+        <p:input name="chart" href="oxf:/examples/charts/xforms-model.xml#xpointer(/*/*/form/chart)"/>
+        <p:output name="data" ref="data"/>
+    </p:processor>
 
-</config>
+</p:config>

@@ -174,7 +174,7 @@ public class EmailProcessor extends ProcessorImpl {
                         // Content of the part is not inline
 
                         // Generate a Document from the source
-                        SAXSource source = getSAXSource(EmailProcessor.this, pipelineContext, src, null, contentType);
+                        SAXSource source = getSAXSource(EmailProcessor.this, pipelineContext, src, null, contentType);// TODO: Set base URL
                         content = handleStreamedPartContent(pipelineContext, source, contentType, charset);
                     } else {
                         // Content of the part is inline
@@ -252,6 +252,12 @@ public class EmailProcessor extends ProcessorImpl {
                     String contentDisposition = partElement.attributeValue("content-disposition");
                     if (contentDisposition != null)
                         part.setDisposition(contentDisposition);
+
+                    // Set content-id header
+                    String contentId = partElement.attributeValue("content-id");
+                    if (contentId != null)
+                        part.setHeader("content-id", "<" + contentId + ">");
+                        //part.setContentID(contentId);
                 }
                 message.setContent(mimeMultipart);
             } else {

@@ -1,14 +1,14 @@
 <!--
     Copyright (C) 2004 Orbeon, Inc.
-  
+
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
     2.1 of the License, or (at your option) any later version.
-  
+
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU Lesser General Public License for more details.
-  
+
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -346,7 +346,7 @@
     <xsl:template match="xforms:*[@xxforms:relevant = 'false']" priority="6">
         <xsl:apply-templates select="." mode="no-rendering"/>
     </xsl:template>
-    
+
     <!-- Just display value if readonly -->
     <xsl:template match="xforms:*[@xxforms:readonly = 'true']" priority="2">
     	<xsl:variable name="value" select="@xxforms:value"/>
@@ -381,7 +381,7 @@
     <xsl:template name="copy-other-attributes">
         <xsl:copy-of select="@* except (@xxforms:* | @*[namespace-uri() = ''])"/>
     </xsl:template>
-    
+
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <!-- Generates a unique id for the given form. The id is equal to the position of the form

@@ -13,11 +13,14 @@
 -->
 <example-descriptor>
     <title>Email</title>
-    <source>form.xml</source>
+    <source>page-flow.xml</source>
+    <source>xforms-model.xml</source>
     <source>model.xpl</source>
     <source>view.xsl</source>
+    <source>get-pdf-data.xpl</source>
+    <source>get-chart-data.xpl</source>
     <description>
-        This example illustrates the use of the Email processor. You have to set the SMTP host to
-        a valid mail server.
+        This example illustrates the use of the Email processor. You have to set the SMTP host to a
+        valid mail server.
     </description>
 </example-descriptor>

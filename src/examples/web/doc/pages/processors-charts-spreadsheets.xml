@@ -558,15 +558,13 @@
             <section>
                 <title>Import</title>
                 <p>
-                    The XLS Generator works in a similar way. It typically
-                    takes a file uploaded by a user, finds the special markup
-                    cells and reconstructs an XML document. The generator has no
-                    inputs, and a
-                    <code>data</code> output containing the
-                    generated XML document. You must include a form within the
-                    HTML code with an
-                    <code>xls</code> file upload control. The
-                    following code can be used to perform this task:
+                    The XLS Generator works in a similar way. It typically takes a file uploaded by
+                    a user, finds the special markup cells and reconstructs an XML document. The
+                    generator has one input <code>request</code> which must be connected to the
+                    output of the <a href="processors-generators#RequestGenerator">request
+                    generator</a>, and a <code>data</code> output containing the generated XML
+                    document. You must include a form within the HTML code with an <code>xls</code>
+                    file upload control. The following code can be used to perform this task:
                 </p>
                 <p>
                     <xml-source>
@@ -581,6 +579,7 @@
                 <p>
                     <xml-source>
                         <p:processor name="oxf:xls-generator">
+                            <p:input name="request" href="#request"/>
                             <p:output name="data" id="xls"/>
                         </p:processor>
                     </xml-source>

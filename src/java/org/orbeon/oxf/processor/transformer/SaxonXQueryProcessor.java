@@ -74,7 +74,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     Document dataDocument = readInputAsDOM4J(context, INPUT_DATA);
 
                     // Read XQuery into String
-                    String xqueryBody = Dom4jUtils.domToString(xqueryDocument);
+                    String xqueryBody = XMLUtils.domToString(xqueryDocument);
                     xqueryBody = xqueryBody.substring(xqueryBody.indexOf(">") + 1);
                     xqueryBody = xqueryBody.substring(0, xqueryBody.lastIndexOf("<"));
 

@@ -80,36 +80,36 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
                 Transformer transformer = null;
                 TransformerHandler transformerHandler = null;
                 try {
                     // Get URI references from cache
-                    KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
-                    URIReferences uriReferences = getURIReferences(context, configKeyValidity);
+                    KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
+                    URIReferences uriReferences = getURIReferences(pipelineContext, configKeyValidity);
 
                     // Get transformer from cache
                     if (uriReferences != null) {
-                        KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(context, configKeyValidity, uriReferences);
+                        KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(pipelineContext, configKeyValidity, uriReferences);
                         if (stylesheetKeyValidity != null)
                             transformer = (Transformer) ObjectCache.instance()
-                                    .findValid(context, stylesheetKeyValidity.key, stylesheetKeyValidity.validity);
+                                    .findValid(pipelineContext, stylesheetKeyValidity.key, stylesheetKeyValidity.validity);
                     }
 
                     // Create transformer if we did not find one in cache
                     if (transformer == null) {
                         // Get transformer configuration
-                        Node config = readCacheInputAsDOM4J(context, INPUT_TRANSFORMER_CONFIG);
+                        Node config = readCacheInputAsDOM4J(pipelineContext, INPUT_TRANSFORMER_CONFIG);
                         String transformerClass = XPathUtils.selectStringValueNormalize(config, "/config/class");
                         // Create transformer
-                        transformer = createTransformer(context, transformerClass);
+                        transformer = createTransformer(pipelineContext, transformerClass);
                     }
 
                     // Create transformer handler and set output writer for Saxon
                     StringWriter saxonStringWriter = null;
                     StringErrorListener errorListener = new StringErrorListener(logger);
                     transformerHandler = TransformerUtils.getTransformerHandler(transformer.templates, transformer.transformerType);
-                    transformerHandler.getTransformer().setURIResolver(new TransformerURIResolver(XSLTTransformer.this, context));
+                    transformerHandler.getTransformer().setURIResolver(new TransformerURIResolver(XSLTTransformer.this, pipelineContext));
                     transformerHandler.getTransformer().setErrorListener(errorListener);
                     String transformerClassName = transformerHandler.getTransformer().getClass().getName();
                     if (transformerClassName.equals("net.sf.saxon.Controller") || transformerClassName.equals("org.orbeon.saxon.Controller")) {
@@ -150,10 +150,10 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             // our processing model. So in this case, we first
                             // read the data in a SAX store.
                             SAXStore dataSaxStore = new SAXStore();
-                            readInputAsSAX(context, INPUT_DATA, dataSaxStore);
+                            readInputAsSAX(pipelineContext, INPUT_DATA, dataSaxStore);
                             dataSaxStore.replay(transformerHandler);
                         } else {
-                            readInputAsSAX(context, INPUT_DATA, transformerHandler);
+                            readInputAsSAX(pipelineContext, INPUT_DATA, transformerHandler);
                         }
                     } finally {
                         // Log message from Saxon

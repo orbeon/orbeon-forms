@@ -48,7 +48,6 @@
         </interleave>
     </define>
 
-
     <define name="body">
         <choice>
             <group>
@@ -63,21 +62,25 @@
                     <choice>
                         <group>
                             <!-- Body contains parts -->
-                            <optional>
-                                <attribute name="mime-multipart">
-                                    <choice>
-                                        <value>mixed</value><!-- The default -->
-                                        <value>alternative</value>
-                                        <value>related</value>
-                                    </choice>
-                                </attribute>
-                            </optional>
+                            <choice>
+                                <optional>
+                                    <attribute name="mime-multipart">
+                                        <choice>
+                                            <value>mixed</value>
+                                            <value>alternative</value>
+                                            <value>related</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                                <ref name="multipartContenTypeAttribute"/>
+                            </choice>
                             <oneOrMore>
                                 <ref name="part"/>
                             </oneOrMore>
                         </group>
                         <group>
                             <!-- Body doesn't contain parts -->
+                            <ref name="nonMultipartContenTypeAttribute"/>
                             <ref name="bodyOrPartContent"/>
                         </group>
                     </choice>
@@ -92,11 +95,7 @@
                 <group>
                     <!-- Multipart part content -->
                     <attribute name="name"/>
-                    <attribute name="content-type">
-                        <data type="string">
-                            <param name="pattern">multipart/.+</param>
-                        </data>
-                    </attribute>
+                    <ref name="multipartContenTypeAttribute"/>
                     <optional>
                         <attribute name="content-id"/>
                     </optional>
@@ -107,7 +106,7 @@
                 <group>
                     <!-- Regular part content -->
                     <attribute name="name"/>
-                    <attribute name="content-type"/>
+                    <ref name="nonMultipartContenTypeAttribute"/>
                     <optional>
                         <attribute name="content-disposition"/>
                     </optional>
@@ -120,6 +119,28 @@
         </element>
     </define>
     
+    <define name="multipartContenTypeAttribute">
+        <attribute name="content-type">
+            <choice>
+                <value>multipart/mixed</value>
+                <value>multipart/alternative</value>
+                <value>multipart/related</value>
+            </choice>
+        </attribute>
+    </define>
+
+    <define name="nonMultipartContenTypeAttribute">
+        <attribute name="content-type">
+            <data type="string">
+                <except>
+                    <data type="string">
+                        <param name="pattern">multipart/.+</param>
+                    </data>
+                </except>
+            </data>
+        </attribute>
+    </define>
+
     <define name="bodyOrPartContent">
         <choice>
             <!-- Out of line content -->
@@ -129,7 +150,7 @@
             <!-- Inline content -->
             <choice>
                 <ref name="anyElement"/>
-                <text/><!-- Why do we need this here? -->
+                <text/>
             </choice>
         </choice>
     </define>

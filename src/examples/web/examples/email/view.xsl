@@ -90,7 +90,7 @@
                 <tr>
                     <th>Body *</th>
                     <td colspan="3">
-                        <xforms:textarea ref="message/body/part[2]/part/html/body/p[1]" xhtml:style="width: 100%" xhtml:rows="20"/>
+                        <xforms:textarea ref="message/body/part[2]/part/html/body/p[2]" xhtml:style="width: 100%" xhtml:rows="20"/>
                     </td>
                 </tr>
             </table>

@@ -65,7 +65,7 @@ import java.util.Properties;
  * TODO:
  * o revise support of text/html
  *   o built-in support for HTML could handle src="cid:*" with part/message ids
- * o support text/xml? or XHTML?
+ * o support text/xml? or just XHTML?
  * o build message with SAX, not DOM, so streaming of input is possible
  */
 public class EmailProcessor extends ProcessorImpl {
@@ -180,6 +180,9 @@ public class EmailProcessor extends ProcessorImpl {
             multipart = bodyElement.attributeValue("mime-multipart");
             if (multipart != null && !parts.hasNext())
                 throw new OXFException("mime-multipart attribute on body element requires part children elements");
+            String contentTypeFromAttribute = NetUtils.getContentTypeContentType(bodyElement.attributeValue("content-type"));
+            if (contentTypeFromAttribute != null && contentTypeFromAttribute.startsWith("multipart/"))
+                contentTypeFromAttribute.substring("multipart/".length());
             if (parts.hasNext() && multipart == null)
                 multipart = DEFAULT_MULTIPART;
         } else {

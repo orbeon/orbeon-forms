@@ -14,51 +14,162 @@
 -->
 <group description="Email" xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
-    <test description="Send simple email" name="oxf:email">
-        <input name="data">
-            <message>
-                <smtp-host>athlon.orbeon.com</smtp-host>
-                <from>
-                    <email>john@orbeon.com</email>
-                    <name>John</name>
-                </from>
-                <to>
-                    <email>jmercay@orbeon.com</email>
-                    <name>Julien Mercay</name>
-                </to>
-                <subject>Simple Email Test</subject>
-                <text>This is a test</text>
-            </message>
+    <test description="Positive Validation 1" name="oxf:validation">
+        <input name="schema" href="oxf:/org/orbeon/oxf/xml/schemas/email.rng"/>
+        <input name="config">
+            <config><decorate>false</decorate></config>
         </input>
+        <input name="data" href="oxf:/unit-tests/email/example-1.xml"/>
+        <output name="data" href="oxf:/unit-tests/email/example-1.xml"/>
     </test>
 
-    <test description="Send MIME email" name="oxf:email">
+    <test description="Positive Validation 2" name="oxf:validation">
+        <input name="schema" href="oxf:/org/orbeon/oxf/xml/schemas/email.rng"/>
+        <input name="config">
+            <config><decorate>false</decorate></config>
+        </input>
+        <input name="data" href="oxf:/unit-tests/email/example-2.xml"/>
+        <output name="data" href="oxf:/unit-tests/email/example-2.xml"/>
+    </test>
+
+    <test description="Positive Validation 3" name="oxf:validation">
+        <input name="schema" href="oxf:/org/orbeon/oxf/xml/schemas/email.rng"/>
+        <input name="config">
+            <config><decorate>false</decorate></config>
+        </input>
+        <input name="data" href="oxf:/unit-tests/email/example-3.xml"/>
+        <output name="data" href="oxf:/unit-tests/email/example-3.xml"/>
+    </test>
+
+    <!-- Check that if multipart/* is used, the body contains at least one part -->
+    <test description="Negative Validation 1" name="oxf:validation">
+        <input name="schema" href="oxf:/org/orbeon/oxf/xml/schemas/email.rng"/>
+        <input name="config">
+            <config><decorate>true</decorate></config>
+        </input>
         <input name="data">
             <message>
-                <smtp-host>athlon.orbeon.com</smtp-host>
+                <smtp-host>mail.example.org</smtp-host>
                 <from>
-                    <email>john@orbeon.com</email>
-                    <name>John</name>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
                 </from>
                 <to>
-                    <email>avernet@orbeon.com</email>
-                    <name>Alessandro Vernet</name>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
                 </to>
-                <subject>MIME Email Test</subject>
-                <body mime-multipart="alternative">
-                    <part name="part1" content-type="text/plain">
-                        This is part 1
-                    </part>
-                    <part name="part2" content-type="text/html">
-                        <html>
-                            <body>
-                                This is part 2
-                            </body>
-                        </html>
-                    </part>
+                <subject>Hello</subject>
+                <body content-type="multipart/alternative">This is simple body content</body>
+            </message>
+        </input>
+        <output name="data">
+            <message>
+                <smtp-host>mail.example.org</smtp-host>
+                <from>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </from>
+                <to>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </to>
+                <subject>Hello</subject>
+                <body content-type="multipart/alternative">This is simple body content
+                    <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error unexpected character literal(schema: null)" system-id="oxf:unit-tests/tests.xml" line="38" column="41"/>
+                </body>
+            </message>
+        </output>
+    </test>
+
+    <!-- Check that if multipart/* is used, a part contains at least one part -->
+    <test description="Negative Validation 2" name="oxf:validation">
+        <input name="schema" href="oxf:/org/orbeon/oxf/xml/schemas/email.rng"/>
+        <input name="config">
+            <config><decorate>true</decorate></config>
+        </input>
+        <input name="data">
+            <message>
+                <smtp-host>mail.example.org</smtp-host>
+                <from>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </from>
+                <to>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </to>
+                <subject>Hello</subject>
+                <body content-type="multipart/alternative">
+                    <part name="text" content-type="multipart/related">This is simple body content</part>
                 </body>
             </message>
         </input>
+        <output name="data">
+            <message>
+                <smtp-host>mail.example.org</smtp-host>
+                <from>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </from>
+                <to>
+                    <email>joe@example.org</email>
+                    <name>Joe</name>
+                </to>
+                <subject>Hello</subject>
+                <body content-type="multipart/alternative">
+                    <part name="text" content-type="multipart/related">This is simple body content
+                        <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error unexpected character literal(schema: null)" system-id="oxf:unit-tests/tests.xml" line="38" column="41"/>
+                    </part>
+                </body>
+            </message>
+        </output>
     </test>
+
+<!--    <test description="Send simple email" name="oxf:email">-->
+<!--        <input name="data">-->
+<!--            <message>-->
+<!--                <smtp-host>athlon.orbeon.com</smtp-host>-->
+<!--                <from>-->
+<!--                    <email>john@orbeon.com</email>-->
+<!--                    <name>John</name>-->
+<!--                </from>-->
+<!--                <to>-->
+<!--                    <email>jmercay@orbeon.com</email>-->
+<!--                    <name>Julien Mercay</name>-->
+<!--                </to>-->
+<!--                <subject>Simple Email Test</subject>-->
+<!--                <text>This is a test</text>-->
+<!--            </message>-->
+<!--        </input>-->
+<!--    </test>-->
+<!---->
+<!--    <test description="Send MIME email" name="oxf:email">-->
+<!--        <input name="data">-->
+<!--            <message>-->
+<!--                <smtp-host>athlon.orbeon.com</smtp-host>-->
+<!--                <from>-->
+<!--                    <email>john@orbeon.com</email>-->
+<!--                    <name>John</name>-->
+<!--                </from>-->
+<!--                <to>-->
+<!--                    <email>avernet@orbeon.com</email>-->
+<!--                    <name>Alessandro Vernet</name>-->
+<!--                </to>-->
+<!--                <subject>MIME Email Test</subject>-->
+<!--                <body mime-multipart="alternative">-->
+<!--                    <part name="part1" content-type="text/plain">-->
+<!--                        This is part 1-->
+<!--                    </part>-->
+<!--                    <part name="part2" content-type="text/html">-->
+<!--                        <html>-->
+<!--                            <body>-->
+<!--                                This is part 2-->
+<!--                            </body>-->
+<!--                        </html>-->
+<!--                    </part>-->
+<!--                </body>-->
+<!--            </message>-->
+<!--        </input>-->
+<!--    </test>-->
 
 </group>

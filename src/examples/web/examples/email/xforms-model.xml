@@ -32,18 +32,25 @@
                     <part name="main" content-type="text/html">
                         <html>
                             <head>
-                                <title>Presentation Server Email Example</title>
+                                <title/>
                             </head>
                             <body>
+                                <p>
+                                    This is text entered in Presentation Server's Email example form:
+                                </p>
                                 <p style="border: dotted 1px gray; padding: 5px">Orbeon Presentation Server is a J2EE-based MVC framework for building Web applications that present and capture XML using XForms, XSLT, and Web Services. Presentation Server benefits from standardized forms processing using XForms, rich controller semantics, and full-featured XML pipelines. Presentation Server is in fact built around Orbeon's optimized XML pipeline engine, a mature, high-performance engine for pipeline processing of XML. Presentation Server is ideal for building Composite Applications in a Service Oriented Architecture (SOA), an can be used on its own, or within the OIS suite.</p>
                                 <p>
-                                    This is an image:
+                                    This is a static image attached to the email and referred to by the HTML version:
                                 </p>
-                                <img src="cid:id1"/>
+                                <div style="border: dotted 1px gray; padding: 5px">
+                                    <img src="cid:id1"/>
+                                </div>
                                 <p>
-                                    This is a chart:
+                                    This is an dynamic chart image attached to the email and referred to by the HTML version:
                                 </p>
-                                <img src="cid:id2"/>
+                                <div style="border: dotted 1px gray; padding: 5px">
+                                    <img src="cid:id2"/>
+                                </div>
                             </body>
                         </html>
                     </part>
@@ -60,7 +67,8 @@
     <xforms:bind nodeset="/message/from/email" constraint="normalize-space(.) != ''"/>
     <xforms:bind nodeset="/message/to/email" constraint="normalize-space(.) != ''"/>
     <xforms:bind nodeset="/message/subject" constraint="normalize-space(.) != ''"/>
-    <xforms:bind nodeset="/message/body/part[2]/part/html/body/p[1]" constraint="normalize-space(.) != ''"/>
-    <!-- Calculation to create the plain text version  -->
+    <xforms:bind nodeset="/message/body/part[2]/part/html/body/p[2]" constraint="normalize-space(.) != ''"/>
+    <!-- Calculation to create the plain text version and HTML title -->
     <xforms:bind nodeset="/message/body/part[1]" calculate="string(/message/body/part[2]/part/html/body/p[1])"/>
+    <xforms:bind nodeset="/message/body/part[2]/part/html/head/title" calculate="string(/message/subject)"/>
 </xforms:model>

@@ -35,7 +35,7 @@
 <!--    <xi:include href="tests-java.xml"/>-->
 <!--    <xi:include href="tests-tamino.xml"/>-->
 <!--    <xi:include href="tests-ldap.xml"/>-->
-<!--    <xi:include href="tests-email.xml"/>-->
+    <xi:include href="tests-email.xml"/>
     <xi:include href="oxf-rewrite/tests.xml"/>
     <xi:include href="url-generator/tests.xml"/>
 

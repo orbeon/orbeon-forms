@@ -78,7 +78,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
     }
 
     public PipelineProcessor(ASTPipeline astPipeline) {
-        configFromAST = createConfigFromAST(astPipeline);
+        this(createConfigFromAST(astPipeline));
     }
 
     public ProcessorOutput createOutput(final String name) {
@@ -428,6 +428,16 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             }
         }
 
+        // Check that all bottom inputs are connected
+        for (Iterator i = astPipeline.getParams().iterator(); i.hasNext();) {
+            ASTParam param = (ASTParam) i.next();
+            if (param.getType() == ASTParam.OUTPUT) {
+                if (! block.isBottomInputConnected(param.getName()))
+                    throw new ValidationException("No processor in pipeline is connected to pipeline output '"
+                            + param.getName() + "'", param.getLocationData());
+            }
+        }
+        
         // Add processors created for connection reasons
         for (Iterator i = block.getCreatedProcessors().iterator(); i.hasNext();)
             config.addProcessor((Processor) i.next());
@@ -623,7 +633,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
         // nop
     }
 
-    public static class State {
+    private static class State {
         public Map nameToBottomInputMap = new HashMap();
         public boolean started = false;
         public Map pipelineInputs = new HashMap();

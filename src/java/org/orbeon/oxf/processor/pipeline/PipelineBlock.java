@@ -203,6 +203,11 @@ public class PipelineBlock {
         idToInputMap.put(id, input);
     }
 
+    public boolean isBottomInputConnected(String id) {
+        ProcessorInput bottomInput = (ProcessorInput) idToInputMap.get(id);
+        return bottomInput.getOutput() != null;
+    }
+
     public ProcessorOutput connectProcessorToBottomInput(Node node, Processor processor, String outputName, String referencedId) {
         if (!idToInputMap.containsKey(referencedId)) {
             LocationData locationData = node == null ? null : (LocationData) ((Element) node).getData();

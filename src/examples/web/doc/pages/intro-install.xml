@@ -31,9 +31,9 @@
             <title>System Requirements</title>
 
             <p>
-                To install Presentation Server you need an application server that runs on Java version 1.4.1 (or
-                later) and implements the Servlet API 2.3 (or later). Presentation Server is supported on the
-                following application servers:
+                To install Presentation Server you need an application server that runs on Java
+                version 1.4.1 (or later) and implements the Servlet API 2.3 (or later). Presentation
+                Server is supported on the following application servers:
             </p>
 
             <ul>

@@ -19,14 +19,20 @@
             xsl:version="2.0">
     <xhtml:head><xhtml:title>XForms Upload</xhtml:title></xhtml:head>
     <xhtml:body>
-        <xsl:variable name="uploaded" select="/urls/url != ''" as="xs:boolean"/>
+        <xsl:variable name="uploaded" select="/result/urls/url != ''" as="xs:boolean"/>
+        <xsl:variable name="container-type" select="/result/request/container-type" as="xs:string"/>
+        <xsl:if test="/result/message">
+            <p style="color: red">
+                <xsl:value-of select="/result/message"/>
+            </p>
+        </xsl:if>
         <xf:group ref="form">
             <table>
                 <tr>
                     <td rowspan="3">
                         <xsl:text>Please select up to three</xsl:text>
                         <xsl:if test="$uploaded"> other</xsl:if>
-                        <xsl:text> images to upload:</xsl:text>
+                        <xsl:text> JPEG images to upload:</xsl:text>
                     </td>
                     <td>
                         <xf:upload ref="files/file[1]">
@@ -61,13 +67,17 @@
                         Simple file upload
                     </th>
                     <td>
+
                         <xf:submit>
+                            <xsl:if test="$container-type = 'portlet'">
+                                <xsl:attribute name="xhtml:disabled">true</xsl:attribute>
+                            </xsl:if>
                             <xf:label>Upload</xf:label>
                             <xf:setvalue ref="action">simple-upload</xf:setvalue>
                         </xf:submit>
                     </td>
                     <td>
-                        NOTE: Only outside of the portal. Click
+                        This works only outside of the portal. Click
                         <xf:submit xxf:appearance="link">
                             <xf:label>here</xf:label>
                             <xf:setvalue ref="action">goto-simple-upload</xf:setvalue>
@@ -86,7 +96,7 @@
                         </xf:submit>
                     </td>
                     <td>
-                        NOTE: Image must be smaller than 150K.
+                        The uploaded image must be smaller than 150K.
                     </td>
                 </tr>
                 <tr>
@@ -100,7 +110,7 @@
                         </xf:submit>
                     </td>
                     <td>
-                        NOTE: Requires database setup.
+                        This requires database setup.
                     </td>
                 </tr>
             </table>
@@ -108,7 +118,7 @@
             </xhtml:p>
             <!-- Display uploaded images (when uploaded with Web Service) -->
             <xsl:if test="$uploaded">
-                <xsl:for-each select="/urls/url">
+                <xsl:for-each select="/result/urls/url">
                     <xsl:if test=". != ''">
                         <xhtml:p>Uploaded image (<xf:output ref="files/file[{position()}]/@size"/> bytes):</xhtml:p>
                         <xhtml:p>

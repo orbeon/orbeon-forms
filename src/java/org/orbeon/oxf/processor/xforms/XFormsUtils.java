@@ -30,6 +30,9 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import java.util.*;
+import java.util.zip.GZIPOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 public class XFormsUtils {
 
@@ -207,6 +210,19 @@ public class XFormsUtils {
         } catch (IllegalBlockSizeException e) {
             throw new OXFException(e);
         } catch (BadPaddingException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public static String instanceToString(Document instance) {
+        try {
+            ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
+            GZIPOutputStream gzipOutputStream = null;
+            gzipOutputStream = new GZIPOutputStream(gzipByteArray);
+            gzipOutputStream.write(XMLUtils.domToString(instance).getBytes());
+            gzipOutputStream.close();
+            return Base64.encode(gzipByteArray.toByteArray());
+        } catch (IOException e) {
             throw new OXFException(e);
         }
     }

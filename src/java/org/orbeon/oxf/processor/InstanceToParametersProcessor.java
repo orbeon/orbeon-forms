@@ -13,21 +13,19 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.Attribute;
-import org.dom4j.Element;
-import org.dom4j.Node;
+import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
-import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.PooledXPathExpression;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.*;
+import java.util.Iterator;
 
 /**
  * Convert an XForms instance into a list of parameters.
@@ -36,10 +34,10 @@ import java.util.*;
  * the result. The format of the filter comes directly from the native document created in the WAC,
  * for example:
  *
- * <params>
- *    <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/x"/>
- *    <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/y"/>
- *    <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/z"/>
+ * <params xmlns="http://www.orbeon.com/oxf/controller">
+ *    <param ref="/form/x"/>
+ *    <param ref="/form/y"/>
+ *    <param ref="/form/z"/>
  * </params>
  */
 public class InstanceToParametersProcessor extends ProcessorImpl {
@@ -62,65 +60,54 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext pipelineContext, final ContentHandler contentHandler) {
                 try {
-                    // Get parameters from instance
-                    List mapping = (List) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_INSTANCE), new CacheableInputReader() {
-                        public Object read(PipelineContext context, ProcessorInput input) {
-                            try {
-                                Element instanceElement = readInputAsDOM4J(context, INPUT_INSTANCE).getRootElement();
-                                Element filterElement = readInputAsDOM4J(context, INPUT_FILTER).getRootElement();
+                    Element filterElement = readInputAsDOM4J(pipelineContext, INPUT_FILTER).getRootElement();
+                    Document instance = DocumentHelper.createDocument
+                            (readInputAsDOM4J(pipelineContext, INPUT_INSTANCE).getRootElement().createCopy());
+                    DocumentWrapper instanceWrapper = new DocumentWrapper(instance,
+                            ((LocationData) instance.getRootElement().getData()).getSystemID());
 
-                                Map excludes = null;
-                                for (Iterator i = XPathUtils.selectIterator(filterElement, "/*/*/@ref"); i.hasNext();) {
-                                    Attribute attribute = (Attribute) i.next();
-                                    String excludeRef = attribute.getValue();
-                                    // FIXME: Argh, we don't handle namespaces correctly here!
-                                    // If the param element in the WAC contains namespaces, this won't work!
-                                    Node excludedNode = XPathUtils.selectSingleNode(instanceElement, excludeRef);
-                                    if (excludedNode != null) {
-                                        if (excludes == null)
-                                            excludes = new HashMap();
-                                        excludes.put(excludedNode, excludeRef);
-                                    }
-                                }
+                    // Mark all nodes referenced by XPath expressions
+                    final Object MARKER = new Object();
+                    for (Iterator i = filterElement.elements().iterator(); i.hasNext();) {
+                        Element paramElement = (Element) i.next();
+                        Attribute refAttribute = paramElement.attribute("ref");
+                        String excludeRef = refAttribute.getValue();
+                        PooledXPathExpression xpath = XPathCache.getXPathExpression(pipelineContext,
+                                instanceWrapper.wrap(instance), excludeRef,
+                                XMLUtils.getNamespaceContext(paramElement));
+                        try {
+                            Node node = (Node) xpath.evaluateSingle();
+                            // Mark node
+                            if (node instanceof Attribute)
+                                ((Attribute) node).setData(MARKER);
+                            else if (node instanceof Element)
+                                ((Element) node).setData(MARKER);
+                        } finally {
+                            if (xpath != null) xpath.returnToPool();
+                        }
+                    }
 
-                                final String hidden;
-                                {
-                                    // Get names/values from instance
-                                    List instanceMapping = new ArrayList();
-                                    if (instanceElement != null)
-                                        handleElement(instanceElement, excludes, instanceMapping);
+                    // See if all nodes are marked
+                    final boolean[] allMarked = { true };
+                    instance.accept(new VisitorSupport() {
+                        public void visit(Element node) {
+                            super.visit(node);
+                            if (node.elements().size() == 0 && node.getData() != MARKER)
+                                allMarked[0] = false;
+                        }
 
-                                    // Encode names/values in a string
-                                    StringBuffer hiddenBuffer = new StringBuffer();
-                                    boolean first = true;
-                                    for (Iterator i = instanceMapping.iterator(); i.hasNext();) {
-                                        NameValue nameValue = (NameValue) i.next();
-                                        if (first) first = false; else hiddenBuffer.append('^');
-                                        hiddenBuffer.append(XFormsUtils.isNameEncryptionEnabled() && !XFormsUtils.isHiddenEncryptionEnabled()
-                                            ? XFormsUtils.encrypt(nameValue.getName()): nameValue.getName());
-                                        hiddenBuffer.append('^');
-                                        hiddenBuffer.append(URLEncoder.encode(nameValue.getValue(), NetUtils.DEFAULT_URL_ENCODING));
-                                    }
-                                    hidden = XFormsUtils.isHiddenEncryptionEnabled() 
-                                            ? XFormsUtils.encrypt(hiddenBuffer.toString()) : hiddenBuffer.toString();
-                                }
-
-                                List mapping = new ArrayList();
-                                mapping.add(new NameValue("$submitted", "true"));
-                                mapping.add(new NameValue("$hidden", hidden));
-                                return mapping;
-                            } catch (UnsupportedEncodingException e) {
-                                throw new OXFException(e);
-                            }
+                        public void visit(Attribute node) {
+                            super.visit(node);
+                            if (node.getData() != MARKER)
+                                allMarked[0] = false;
                         }
                     });
 
                     // Output as SAX
                     contentHandler.startDocument();
                     contentHandler.startElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
-                    for (Iterator i = mapping.iterator(); i.hasNext();) {
-                        NameValue nameValue = (NameValue) i.next();
-                        outputParameter(nameValue.getName(), nameValue.getValue(), contentHandler);
+                    if (!allMarked[0]) {
+                        outputParameter("$instance", XFormsUtils.instanceToString(instance), contentHandler);
                     }
                     contentHandler.endElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT);
                     contentHandler.endDocument();
@@ -134,30 +121,6 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
         return output;
     }
 
-    private static void handleElement(Element element, Map excludes, List mapping) {
-
-        // Handle attributes
-        for (Iterator i = element.attributes().iterator(); i.hasNext();) {
-            Attribute attribute = (Attribute) i.next();
-            if (excludes == null || excludes.get(attribute) == null)
-                mapping.add(new NameValue(XFormsUtils.getNameForNode(attribute, false), attribute.getValue()));
-        }
-
-        List children = element.elements();
-        if (children.isEmpty()) {
-            // Add parameter for text
-            if (excludes == null || excludes.get(element) == null)
-                mapping.add(new NameValue(XFormsUtils.getNameForNode(element, false), element.getText()));
-        } else {
-
-            // Handle children
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                Element child = (Element) i.next();
-                handleElement(child, excludes, mapping);
-            }
-        }
-    }
-
     private static void outputParameter(String name, String value, ContentHandler contentHandler) throws SAXException {
         contentHandler.startElement("", PARAMETER_ELEMENT, PARAMETER_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
         outputElement(NAME_ELEMENT, name, contentHandler);
@@ -169,24 +132,6 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
         contentHandler.startElement("", name, name, XMLUtils.EMPTY_ATTRIBUTES);
         contentHandler.characters(content.toCharArray(), 0, content.length());
         contentHandler.endElement("", name, name);
-    }
-
-    private static class NameValue {
-        private String name;
-        private String value;
-
-        public NameValue(String name, String value) {
-            this.name = name;
-            this.value = value;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public String getValue() {
-            return value;
-        }
     }
 }
 

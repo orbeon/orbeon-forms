@@ -13,17 +13,11 @@
  */
 package org.orbeon.oxf.processor.xforms.output.element;
 
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.xforms.Constants;
-import org.orbeon.oxf.util.Base64;
-import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.zip.GZIPOutputStream;
 
 public class Group extends XFormsElement {
 
@@ -35,39 +29,23 @@ public class Group extends XFormsElement {
     }
 
     public void end(XFormsElementContext context, String uri, String localname, String qname) throws SAXException {
-        try {
-            if (isFirstGroup) {
-
-                // Encode instance in a string
-                final String instanceString;
-                {
-                    ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
-                    GZIPOutputStream gzipOutputStream = new GZIPOutputStream(gzipByteArray);
-                    gzipOutputStream.write(XMLUtils.domToString(context.getInstance()).getBytes());
-                    gzipOutputStream.close();
-                    instanceString = Base64.encode(gzipByteArray.toByteArray());
-                }
-
-                // Generate hidden field with instance
-                {
-                    AttributesImpl attributes = new AttributesImpl();
-                    attributes.addAttribute(Constants.XXFORMS_NAMESPACE_URI, "name",
-                            Constants.XXFORMS_PREFIX + ":name", "CDATA", "$instance");
-                    attributes.addAttribute(Constants.XXFORMS_NAMESPACE_URI, "value",
-                            Constants.XXFORMS_PREFIX + ":value", "CDATA", instanceString);
-                    String elementLocalName = "hidden";
-                    String elementQName = Constants.XXFORMS_PREFIX + ":" + elementLocalName;
-                    context.getContentHandler().startElement(Constants.XXFORMS_NAMESPACE_URI,
-                            elementLocalName, elementQName, attributes);
-                    context.getContentHandler().endElement(Constants.XXFORMS_NAMESPACE_URI,
-                            elementLocalName, elementQName);
-                }
-            }
-
-            // Close form
-            super.end(context, uri, localname, qname);
-        } catch (IOException e) {
-            throw new OXFException(e);
+        if (isFirstGroup) {
+            // Encode instance in a string and put in hidden field
+            final String instanceString = XFormsUtils.instanceToString(context.getInstance());
+            AttributesImpl attributes = new AttributesImpl();
+            attributes.addAttribute(Constants.XXFORMS_NAMESPACE_URI, "name",
+                    Constants.XXFORMS_PREFIX + ":name", "CDATA", "$instance");
+            attributes.addAttribute(Constants.XXFORMS_NAMESPACE_URI, "value",
+                    Constants.XXFORMS_PREFIX + ":value", "CDATA", instanceString);
+            String elementLocalName = "hidden";
+            String elementQName = Constants.XXFORMS_PREFIX + ":" + elementLocalName;
+            context.getContentHandler().startElement(Constants.XXFORMS_NAMESPACE_URI,
+                    elementLocalName, elementQName, attributes);
+            context.getContentHandler().endElement(Constants.XXFORMS_NAMESPACE_URI,
+                    elementLocalName, elementQName);
         }
+
+        // Close form
+        super.end(context, uri, localname, qname);
     }
 }

@@ -492,10 +492,6 @@
                             <xsl:template match="/">
                                 <request>
                                     <parameters>
-                                        <parameter>
-                                            <name>$submitted</name>
-                                            <value>true</value>
-                                        </parameter>
                                         <xsl:for-each select="//*[@xxforms:name and @xxforms:value]">
                                             <parameter>
                                                 <name>

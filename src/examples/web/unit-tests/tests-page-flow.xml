@@ -125,7 +125,72 @@
             </url-rewrite>
         </output>
     </test>
+    
+    <test description="Instance to parameters" name="oxf:pipeline">
+        <input name="instance">
+            <instance xmlns:a="a">
+                <a:a/>
+                <a:b c=""/>
+            </instance>
+        </input>
+        <input name="config">
+            <p:config>
+                <p:param type="input" name="instance"/>
+                <p:param type="output" name="data"/>
 
+                <!-- All the nodes are references from parameters -->
+                <p:processor name="oxf:instance-to-parameters">
+                    <p:input name="instance" href="#instance"/>
+                    <p:input name="filter">
+                        <params xmlns:a="a">
+                            <param ref="/instance/a:a"/>
+                            <param ref="/instance/a:b"/>
+                            <param ref="/instance/a:b/@c"/>
+                        </params>
+                    </p:input>
+                    <p:output name="data" id="all-referenced"/>
+                </p:processor>
+                
+                <!-- Attribute is not referenced -->
+                <p:processor name="oxf:instance-to-parameters">
+                    <p:input name="instance" href="#instance"/>
+                    <p:input name="filter">
+                        <params xmlns:a="a">
+                            <param ref="/instance/a:a"/>
+                            <param ref="/instance/a:b"/>
+                        </params>
+                    </p:input>
+                    <p:output name="data" id="attribute-not-referenced"/>
+                </p:processor>
+                
+                <!-- Empty $instance as the encoding might change -->
+                <p:processor name="oxf:xslt-2.0">
+                    <p:input name="data" href="aggregate('root', #all-referenced, #attribute-not-referenced)"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                            <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                            <xsl:template match="value[../name = '$instance']">
+                                <xsl:copy/>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <root>
+                <parameters/>
+                <parameters>
+                    <parameter>
+                        <name>$instance</name>
+                        <value/>
+                    </parameter>
+                </parameters>
+            </root>
+        </output>
+    </test>
+        
     <!-- The following tests on XPath expressions with namespaces. This is not implemented yet. -->
     <!--
     <test description="Reverse Params With Namespaces" name="oxf:xslt">

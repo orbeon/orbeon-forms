@@ -36,10 +36,6 @@
                 <xsl:template match="/">
                     <request>
                         <parameters>
-                            <parameter>
-                                <name>$submitted</name>
-                                <value>true</value>
-                            </parameter>
                             <xsl:for-each select="//xhtml:input">
                                 <parameter>
                                     <name>

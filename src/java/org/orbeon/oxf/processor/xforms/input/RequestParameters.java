@@ -50,7 +50,6 @@ public class RequestParameters {
         actionClasses.put("set", org.orbeon.oxf.processor.xforms.input.action.Set.class);
     }
 
-    private boolean submitted = false;
     private Map idToValue = new HashMap();
     private Map idToType = new HashMap();
     private List actions = new ArrayList();
@@ -176,9 +175,7 @@ public class RequestParameters {
              */
             private void value(String value, String type) {
                 try {
-                    if ("$submitted".equals(name)) {
-                        submitted = true;
-                    } else if ("$instance".equals(name)) {
+                    if ("$instance".equals(name)) {
 
                         // Un-base64, uncompress to get XML as text
                         final String xmlText;
@@ -345,10 +342,6 @@ public class RequestParameters {
 
     public String getType(int id) {
         return (String) idToType.get(new Integer(id));
-    }
-
-    public boolean isSubmitted() {
-        return submitted;
     }
 
     public Action[] getActions() {

@@ -96,7 +96,7 @@ public class XFormsInput extends ProcessorImpl {
 
                 if (instance == null) {
                     // Get instance from input or from request
-                    if (requestParameters.isSubmitted()) {
+                    if (requestParameters.getInstance() != null) {
                         instance = new Instance(pipelineContext, requestParameters.getInstance());
                     } else {
                         // Get instance from input and create copy as we don't want the copy from the cache

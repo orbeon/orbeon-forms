@@ -123,6 +123,7 @@
         <!-- Save the current document and documemnt is invalid -->
         <action when="/form/action = 'save' and /form/document//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])]">
             <result>
+                <xu:message><xu:copy-of select="/*"/></xu:message>
                 <xu:update select="/form/message">save-failure</xu:update>
                 <xu:update select="/form/show-errors">true</xu:update>
                 <xu:remove select="/form/document//@*[local-name() = 'error']"/>

@@ -50,13 +50,11 @@
         
         <xhtml:input type="text" size="2" maxlength="2" id="{$hour}"
             xhtml:onKeyUp="checkHour(this); 
-                                        movebox(this, document.getElementById('{$minute}'),2);
                                         updateTimeField(document.getElementById('{$id}'), document.getElementById('{$hour}'), document.getElementById('{$minute}'), document.getElementById('{$second}'));">:
             <xsl:copy-of select="$input/@* except ($input/@xxforms:* | $input/@*[namespace-uri() = ''])"/>
         </xhtml:input>
         <xhtml:input type="text" size="2" maxlength="2" id="{$minute}"
             xhtml:onKeyUp="checkMinute(this); 
-                                        movebox(this, document.getElementById('{$second}'),2);
                                         updateTimeField(document.getElementById('{$id}'), document.getElementById('{$hour}'), document.getElementById('{$minute}'), document.getElementById('{$second}'));">:
             <xsl:copy-of select="$input/@* except ($input/@xxforms:* | $input/@*[namespace-uri() = ''])"/>
         </xhtml:input>

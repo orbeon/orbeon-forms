@@ -149,9 +149,9 @@
                         <td>
                             The content of the body part. This can contain embedded
                             <code>part</code> elements if the content is multipart. It can be XHTML
-                            if the content-type is text/html. Finally, it can be any text content,
-                            including just plain HTML (which can be embedded in a CDATA section for
-                            convenience).
+                            if the content-type is <code>text/html</code>. Finally, it can be any
+                            text content, including just plain HTML (which can be embedded in a
+                            CDATA section for convenience).
                         </td>
                     </tr>
                 </table>
@@ -337,11 +337,13 @@
                         </p:processor>
                     </xml-source>
                     <p>
-                        When the content type of the input read is text, the input document is
-                        expected to be in the text format specified by the <a
+                        When the content type of the input read is text (starts with
+                        <code>text/</code>) or XML (<code>text/xml</code>,
+                        <code>application/xml</code>, or ends with <code>+xml</code>), the input
+                        document is expected to be in the text format specified by the <a
                         href="reference-formats#text-documents">text document format</a>. When the
-                        content type of the input read is binary, the input document is expected to
-                        be in the binary format specified by the <a
+                        content type of the input read is binary (all the other cases), the input
+                        document is expected to be in the binary format specified by the <a
                         href="reference-formats#binary-documents">binary document format</a>.
                     </p>
                 </section>

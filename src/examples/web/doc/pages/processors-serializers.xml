@@ -36,7 +36,9 @@
             <title>HTTP Serializer</title>
             <p>
                 The HTTP serializer supports decoding binary or text data encapsulated in XML
-                documents and sending it into a binary HTTP stream.
+                documents and sending it into an HTTP response. Typically, this means sending data
+                back to a client web browser. This can be done in a Servlet environment or a Portlet
+                environment.
              </p>
             <section>
                 <title>Configuration</title>
@@ -258,14 +260,6 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                         </p:processor>
                     </xml-source>
                 </section>
-                <note>
-                    The HTTP serializer performs streaming. If its input data consists of a stream
-                    of short character SAX events, such as those produced by the <a
-                    href="processors-generators#request-generator">Request generator</a> the <a
-                    href="processors-generators#url-generator">URL generator</a>, or the <a
-                    href="processors-sql#binary-data">SQL processor</a>, it is possible to serialize
-                    an "infinitely" long document.
-                </note>
             </section>
             <section>
                 <title>Text Mode</title>
@@ -358,6 +352,20 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     </xml-source>
                 </section>
             </section>
+            <note>
+                The HTTP serializer performs streaming. If its input data consists of a stream of
+                short character SAX events, such as those produced by the <a
+                href="processors-generators#request-generator">Request generator</a> the <a
+                href="processors-generators#url-generator">URL generator</a>, the <a
+                href="processors-sql#binary-data">SQL processor</a>, or converter processors, it is
+                possible to serialize an "infinitely" long document.
+            </note>
+            <note>
+                When using the command-line mode, instead of sending the output through HTTP, the
+                HTTP serializer sends its output to the standard console output. In such a case,
+                the parameters that do not affect the content of the data, such as content-type,
+                status-code, etc. are ignored.
+            </note>
         </section>
 
         <anchor id="http-serializers"/>

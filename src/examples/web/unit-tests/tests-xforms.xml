@@ -1053,8 +1053,8 @@
             <xforms:model xmlns:a="a" xmlns:b="b" >
                 <xforms:instance>
                     <instance>
-                        <a:a/>
-                        <b:b/>
+                        <a:a>A</a:a>
+                        <b:b>B</b:b>
                     </instance>
                 </xforms:instance>
             </xforms:model>
@@ -1077,7 +1077,7 @@
                         <result>
                             <matches>true</matches>
                             <group>1</group>
-                            <group>2</group>
+                            <group/> <!-- Keep default value when match is empty -->
                         </result>
                     </p:input>
                     <p:output name="data" ref="data"/>
@@ -1088,7 +1088,7 @@
         <output name="data">
             <instance xmlns:a="a" xmlns:b="b" xmlns:xforms="http://www.w3.org/2002/xforms">
                 <a:a>1</a:a>
-                <b:b>2</b:b>
+                <b:b>B</b:b>
             </instance>
         </output>
     </test>

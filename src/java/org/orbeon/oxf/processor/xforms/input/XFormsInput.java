@@ -76,7 +76,6 @@ public class XFormsInput extends ProcessorImpl {
                 Model model = (Model) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
                     public Object read(PipelineContext context, ProcessorInput input) {
                         Model model = new Model(pipelineContext, readInputAsDOM4J(context, input));
-                        readInputAsSAX(context, input, model.getContentHandlerForModel());
                         return model;
                     }
                 });
@@ -116,8 +115,10 @@ public class XFormsInput extends ProcessorImpl {
                                 groupIterator = groupElements.iterator(); paramIterator.hasNext();) {
                             Element paramElement = (Element) paramIterator.next();
                             Element groupElement = (Element) groupIterator.next();
-                            instance.setValueForParam(pipelineContext, paramElement.attributeValue("ref"),
-                                    XMLUtils.getNamespaceContext(paramElement), groupElement.getStringValue());
+                            String value = groupElement.getStringValue();
+                            if (!"".equals(value))
+                                instance.setValueForParam(pipelineContext, paramElement.attributeValue("ref"),
+                                        XMLUtils.getNamespaceContext(paramElement), value);
                         }
                     }
 

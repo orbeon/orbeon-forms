@@ -27,11 +27,10 @@ public class Closure {
     private VariableContextImpl variableContext;
     private Statement[] statements;
 
-    public Closure(URIResolver uriResolver, Object context, Statement[] statements) {
-        this.uriResolver = uriResolver;
-        this.context = context;
-        this.variableContext = variableContext;
-        this.statements = statements;
+    public Closure(URIResolver uriRes, Object ctxt, Statement[] stmnts) {
+        uriResolver = uriRes;
+        context = ctxt;
+        statements = stmnts;
     }
 
     public void setVariableContext(VariableContextImpl variableContext) {

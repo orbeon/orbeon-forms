@@ -15,29 +15,22 @@ package org.orbeon.oxf.processor.test;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.Node;
 import org.orbeon.oxf.cache.Cacheable;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.generator.DOMGenerator;
-import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.resources.URLFactory;
 
 import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
-import java.net.URL;
-import java.net.MalformedURLException;
 
 /**
  *
@@ -99,6 +92,7 @@ public class TestProcessor extends ProcessorImpl {
         mainProcessor.setLocationData((LocationData) commandElement.getData());
         mainProcessor.setId("Main Test Processor");
         executionContext.mainProcessor = mainProcessor;
+        executionContext.outputProcessor = null;
     }
 
     private void handleCacheValueCommand(ExecutionContext executionContext, Element commandElement) {
@@ -155,6 +149,17 @@ public class TestProcessor extends ProcessorImpl {
             Object result = executionContext.outputProcessor.getCachedValue(pipelineContext, outputName);
             if (value.equals(result))
                 throw new OXFException("Assertion failed: output '" + outputName + "' caches '" + result +  " ', but was expected to be different.");
+        } else if (condition.equals("output-equals")) {
+
+            Document actualDocument = executionContext.outputProcessor.readInputAsDOM4J(pipelineContext, outputName);
+            Document expectedDocument = ProcessorUtils.createDocumentFromEmbeddedOrHref(commandElement, XPathUtils.selectStringValue(commandElement, "@href"));
+
+            String expectedDataString = XMLUtils.domToString(expectedDocument);
+            String actualDataString = XMLUtils.domToString(actualDocument);
+
+            if (!expectedDataString.equals(actualDataString))
+                throw new OXFException("Assertion failed: output '" + outputName + "' got '" + actualDataString +  " ', but expected '" + expectedDataString + "'.");
+
         } else {
             throw new IllegalArgumentException("Not implemented yet.");
         }
@@ -234,6 +239,10 @@ public class TestProcessor extends ProcessorImpl {
             if (keyValidity == null)
                 return null;
             return ObjectCache.instance().findValid(pipelineContext, keyValidity.key, keyValidity.validity);
+        }
+
+        public Document readInputAsDOM4J(PipelineContext context, String inputName) {
+            return super.readInputAsDOM4J(context, inputName);
         }
     }
 }

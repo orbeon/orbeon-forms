@@ -122,8 +122,77 @@
         </input>
     </test>
 
+    <test description="Request with Parameters" name="oxf:test">
+        <input name="config">
+            <script>
+                <processor name="oxf:request" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <include>/request/path-info</include>
+                            <include>/request/parameters</include>
+                        </config>
+                    </input>
+                </processor>
+                <set-request href="cache/request1.xml"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v1"/>
+                <assert output-name="data" condition="output-cached"/>
+                <set-request href="cache/request1.xml"/>
+                <assert output-name="data" condition="output-cached"/>
+                <assert output-name="data" condition="cached-value-equal" value="v1"/>
+                <set-request href="cache/request3.xml"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <!-- Test different request -->
+                <assert output-name="data" condition="output-equals">
+                    <request>
+                        <parameters>
+                            <parameter>
+                                <name>print</name>
+                                <value>false</value>
+                            </parameter>
+                            <parameter>
+                                <name>id</name>
+                                <value>13</value>
+                            </parameter>
+                        </parameters>
+                        <path-info>/doc/home-welcome</path-info>
+                    </request>
+                </assert>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v2"/>
+                <assert output-name="data" condition="output-cached"/>
+                <assert output-name="data" condition="cached-value-equal" value="v2"/>
+                <!-- Test different config -->
+                <processor name="oxf:request" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <include>/request/parameters</include>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v1"/>
+                <assert output-name="data" condition="cached-value-equal" value="v1"/>
+                <assert output-name="data" condition="output-equals">
+                    <request>
+                        <parameters>
+                            <parameter>
+                                <name>print</name>
+                                <value>false</value>
+                            </parameter>
+                            <parameter>
+                                <name>id</name>
+                                <value>13</value>
+                            </parameter>
+                        </parameters>
+                    </request>
+                </assert>
+            </script>
+        </input>
+    </test>
+
     <!-- TODO: XSLT with imports, doc(), document(), what about doc() w/ XInclude? -->
     <!-- TODO: URL gen: modify config -->
-    <!-- TODO: Request gen when supported -->
+    <!-- TODO: Request gen: upload + body -->
     <!-- TODO: Scope gen when supported -->
 </group>

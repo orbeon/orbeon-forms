@@ -30,20 +30,20 @@ public class DOMSerializer extends ProcessorImpl {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
     }
 
-    public Document getNode(PipelineContext context) {
-        return (Document) context.getAttribute(this);
+    public Document getDocument(PipelineContext pipelineContext) {
+        return (Document) pipelineContext.getAttribute(this);
     }
 
-    public org.w3c.dom.Document getW3CDocument(PipelineContext context) {
+    public org.w3c.dom.Document getW3CDocument(PipelineContext pipelineContext) {
         DOMWriter writer = new DOMWriter(XMLUtils.createDocument().getClass());
         try {
-            return writer.write(getNode(context));
+            return writer.write(getDocument(pipelineContext));
         } catch (DocumentException e) {
             throw new OXFException(e);
         }
     }
 
-    public void start(org.orbeon.oxf.pipeline.api.PipelineContext context) {
-        context.setAttribute(this, readCacheInputAsDOM4J(context, INPUT_DATA));
+    public void start(PipelineContext pipelineContext) {
+        pipelineContext.setAttribute(this, readCacheInputAsDOM4J(pipelineContext, INPUT_DATA));
     }
 }

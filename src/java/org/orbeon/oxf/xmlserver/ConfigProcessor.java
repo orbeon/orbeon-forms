@@ -49,7 +49,7 @@ public class ConfigProcessor extends ProcessorImpl {
                     DOMSerializer pipelineDOMSerializer = new DOMSerializer();
                     PipelineUtils.connect(pipelineURLGenerator, OUTPUT_DATA, pipelineDOMSerializer, INPUT_DATA);
                     pipelineDOMSerializer.start(context);
-                    pipelineDocument = pipelineDOMSerializer.getNode(context);
+                    pipelineDocument = pipelineDOMSerializer.getDocument(context);
                 }
 
                 // Retrieve input and output names

@@ -306,7 +306,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                         PipelineUtils.connect(saxGenerator, "data", domSerializer, "data");
                                         org.orbeon.oxf.pipeline.api.PipelineContext context = new org.orbeon.oxf.pipeline.api.PipelineContext();
                                         domSerializer.start(context);
-                                        org.dom4j.Document parametersDocument = domSerializer.getNode(context);
+                                        org.dom4j.Document parametersDocument = domSerializer.getDocument(context);
                                         // Get parameter values and types
                                         java.util.List parameterTypes = new java.util.ArrayList();
                                         java.util.List parameterValues = new java.util.ArrayList();

@@ -19,7 +19,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
-import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -50,7 +49,7 @@ import java.net.MalformedURLException;
 import java.util.*;
 
 /**
- * The request generator works like this:
+ * The Request generator works like this:
  *
  * o Read config DOM (or obtain it from state cache)
  * o Obtain request DOM
@@ -68,13 +67,12 @@ import java.util.*;
  *       o Small files are serialized, and the xs:base64Binary type is set
  *       o Large files are referenced, and the xs:anyURI type is set
  *
- *   o FIXME: The upload code checks that the total request body is not larger than the maximum
- *     upload size specified. But If many small files are uploaded, can we potentially use a lot
- *     of memory?
+ *   NOTE: The Request generator attempts to cache based on the content of the request, but it
+ *   never caches if there is an upload or if a request body is requested.
  *
- *   o NOTE: In theory, it should be possible to stream without going through
- *     the disk, but it would be harder to implement (especially dealing with XPath
- *     expressions parameter selection, if any).
+ *   FIXME: The upload code checks that the total request body is not larger than the maximum
+ *   upload size specified. But If many small files are uploaded, can we potentially use a lot of
+ *   memory?
  */
 public class RequestGenerator extends ProcessorImpl {
 
@@ -95,8 +93,6 @@ public class RequestGenerator extends ProcessorImpl {
 //    private static final boolean DEFAULT_ENABLE_INPUT_STREAM_SAVING = true;
 //    private static final String ENABLE_INPUT_STREAM_SAVING_PROPERTY = "enable-input-stream-saving";
 
-    private static final Long VALIDITY = new Long(0);
-
     private static final String INCLUDE_ELEMENT = "include";
     private static final String EXCLUDE_ELEMENT = "exclude";
 
@@ -109,19 +105,16 @@ public class RequestGenerator extends ProcessorImpl {
         prefixes.put("request", REQUEST_PRIVATE_NAMESPACE_URI);
     }
 
-    //private static final String FILE_UPLOAD_TYPE_ANYURI = "xs:anyURI";
-    //private static final String DEFAULT_FILE_UPLOAD_TYPE = FILE_UPLOAD_TYPE_ANYURI;
-
     public RequestGenerator() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, REQUEST_CONFIG_NAMESPACE_URI));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+        ProcessorOutput output = new ProcessorImpl.DigestTransformerOutputImpl(getClass(), name) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
                 try {
-                    final State state = getFilledOutState(pipelineContext);
+                    final State state = (State) getFilledOutState(pipelineContext);
                     // Transform the resulting document into SAX
                     Transformer identity = TransformerUtils.getIdentityTransformer();
                     identity.transform(new DocumentSource(state.requestDocument), new SAXResult(new ForwardingContentHandler(contentHandler) {
@@ -200,27 +193,8 @@ public class RequestGenerator extends ProcessorImpl {
                 }
             }
 
-            protected Object getValidityImpl(PipelineContext context) {
-                return VALIDITY;
-            }
-
-            protected OutputCacheKey getKeyImpl(PipelineContext context) {
-                if (isInputInCache(context, INPUT_CONFIG)) {
-                    return getFilledOutState(context).outputCacheKey;
-                } else {
-                    return null;
-                }
-            }
-
-            /*
-             * This is called from both readImpl and getKeyImpl. Based on the assumption that a
-             * getKeyImpl will be followed soon by a readImpl if it fails, we compute the key here
-             * and cache the config input and its derivatives.
-             */
-            private State getFilledOutState(PipelineContext pipelineContext) {
-                State state = (State) getState(pipelineContext);
-
-                // Set request document
+            protected boolean fillOutState(PipelineContext pipelineContext, DigestState digestState) {
+                State state = (State) digestState;
                 if (state.requestDocument == null) {
                     // Read config document
                     Document config = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
@@ -233,15 +207,24 @@ public class RequestGenerator extends ProcessorImpl {
 
                     // Read and store request
                     state.requestDocument = readRequestAsDOM4J(pipelineContext, config);
-                }
 
-                // Set cache key, unless there is at least one upload or unless the body is read
-                Context context = getContext(pipelineContext);
-                if (state.outputCacheKey == null && !context.hasUpload || context.bodyFileItem != null) {
-                    // NOTE: In theory, we could cache by digesting the uploaded files as well
-                    state.outputCacheKey = new OutputCacheKey(getOutputByName(OUTPUT_DATA), new String(XMLUtils.getDigest(state.requestDocument)));
+                    // Check if the body was requestd
+                    state.bodyRequested = XPathUtils.selectSingleNode(state.requestDocument, "/*/body") != null;
                 }
-                return state;
+                Context context = getContext(pipelineContext);
+                return !context.hasUpload && !state.bodyRequested;
+            }
+
+            protected byte[] computeDigest(PipelineContext pipelineContext, DigestState digestState) {
+                State state = (State) digestState;
+                XMLUtils.DigestContentHandler dch = new XMLUtils.DigestContentHandler("MD5");
+                try {
+                    Transformer identityTransformer = TransformerUtils.getIdentityTransformer();
+                    identityTransformer.transform(new DocumentSource(state.requestDocument), new SAXResult(dch));
+                } catch (TransformerException e) {
+                    throw new OXFException(e);
+                }
+                return dch.getResult();
             }
         };
         addOutput(name, output);
@@ -544,15 +527,10 @@ public class RequestGenerator extends ProcessorImpl {
         setState(context, new State());
     }
 
-    /**
-     * We store in the state the request document (output of this processor) and its key. This
-     * information is stored to be reused by readImpl() after a getKeyImpl() in the same pipeline
-     * context, or vice versa.
-     */
-    private static class State {
-        public OutputCacheKey outputCacheKey;
-        public Document requestDocument;
+    private static class State extends DigestState {
         public QName requestedStreamType;
+        public boolean bodyRequested;
+        public Document requestDocument;
     }
 
     private static Context getContext(PipelineContext pipelineContext) {

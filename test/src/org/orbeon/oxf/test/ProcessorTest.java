@@ -310,7 +310,7 @@ public class ProcessorTest extends TestCase {
                                 domSerializer.start(pipelineContext);
 
                                 // Get actual data
-                                Document actualData = domSerializer.getNode(pipelineContext);
+                                Document actualData = domSerializer.getDocument(pipelineContext);
                                 // TODO: we want to remove that (avernet 2004-12-14)
                                 removeUnusedNamespaceDeclarations(actualData.getRootElement());
 

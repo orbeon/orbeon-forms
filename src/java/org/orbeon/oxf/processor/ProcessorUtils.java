@@ -137,7 +137,7 @@ public class ProcessorUtils {
 
             PipelineContext domSerializerPipelineContext = new PipelineContext();
             domSerializer.start(domSerializerPipelineContext);
-            result = domSerializer.getNode(domSerializerPipelineContext);
+            result = domSerializer.getDocument(domSerializerPipelineContext);
         }
         return result;
     }

@@ -16,22 +16,13 @@
 
     <start>
         <element name="script">
-            <element name="processor">
-                <attribute name="name"/>
-                <zeroOrMore>
-                    <element name="input">
-                        <attribute name="name"/>
-                        <choice>
-                            <!-- TODO: There MUST be an element. anyElement below allows text + optional element... -->
-                            <attribute name="href"/>
-                            <ref name="anyElement"/>
-                        </choice>
-                    </element>
-                </zeroOrMore>
-            </element>
+            <ref name="processor"/>
 
             <zeroOrMore>
                 <interleave>
+                    <optional>
+                        <ref name="processor"/>
+                    </optional>
                     <optional>
                         <element name="touch">
                             <attribute name="url"/>
@@ -74,6 +65,16 @@
                                     </attribute>
                                     <attribute name="value"/>
                                 </group>
+                                <group>
+                                    <attribute name="condition">
+                                        <value>output-equals</value>
+                                    </attribute>
+                                    <choice>
+                                        <attribute name="href"/>
+                                        <!-- TODO: Use schema for request -->
+                                        <ref name="anyElement"/>
+                                    </choice>
+                                </group>
                             </choice>
                         </element>
                     </optional>
@@ -110,6 +111,22 @@
                 </element>
             </optional>
         </interleave>
+    </define>
+
+    <define name="processor">
+        <element name="processor">
+            <attribute name="name"/>
+            <zeroOrMore>
+                <element name="input">
+                    <attribute name="name"/>
+                    <choice>
+                        <!-- TODO: There MUST be an element. anyElement below allows text + optional element... -->
+                        <attribute name="href"/>
+                        <ref name="anyElement"/>
+                    </choice>
+                </element>
+            </zeroOrMore>
+        </element>
     </define>
 
 </grammar>

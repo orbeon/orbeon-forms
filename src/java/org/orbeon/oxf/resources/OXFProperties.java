@@ -20,10 +20,10 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.OXFPropertiesSerializer;
 import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.XMLConstants;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 

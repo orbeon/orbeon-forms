@@ -20,9 +20,9 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.AbstractProcessor;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.XMLConstants;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 
 import java.util.*;

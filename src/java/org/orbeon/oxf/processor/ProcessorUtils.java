@@ -21,6 +21,7 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;

@@ -23,11 +23,11 @@ import org.orbeon.oxf.pipeline.CommandLineExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.PipelineEngineFactory;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
-import org.orbeon.oxf.processor.XMLConstants;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.naming.Context;

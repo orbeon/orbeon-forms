@@ -26,6 +26,7 @@ import org.orbeon.oxf.processor.xforms.input.Instance;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.transformer.xupdate.Constants;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.DocumentDelegate;
 import org.orbeon.oxf.xml.dom4j.ElementDelegate;

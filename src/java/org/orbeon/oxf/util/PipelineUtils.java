@@ -17,9 +17,9 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.XMLConstants;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
+import org.orbeon.oxf.xml.XMLConstants;
 
 public class PipelineUtils {
     

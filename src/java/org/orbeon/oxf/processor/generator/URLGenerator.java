@@ -25,6 +25,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.oxf.Handler;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;

@@ -14,12 +14,12 @@
 package org.orbeon.oxf.processor.bpel.activity;
 
 import org.dom4j.*;
-import org.orbeon.oxf.processor.XMLConstants;
 import org.orbeon.oxf.processor.bpel.BPELConstants;
 import org.orbeon.oxf.processor.bpel.Variables;
 import org.orbeon.oxf.processor.pipeline.ast.ASTInput;
 import org.orbeon.oxf.processor.pipeline.ast.ASTOutput;
 import org.orbeon.oxf.processor.pipeline.ast.ASTProcessorCall;
+import org.orbeon.oxf.xml.XMLConstants;
 
 import java.util.List;
 

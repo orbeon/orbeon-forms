@@ -79,11 +79,11 @@
         <xsl:variable name="form-id" as="xs:string" select="xxforms:form-id(ancestor::xforms:group[last()])"/>
         <xsl:choose>
             <xsl:when test="@xxforms:appearance = 'link'">
-                <xhtml:a href="" onclick="document.getElementById('wsrp_rewrite_action_{$form-id}').name += '{$name-javascript}';
+                <xhtml:a href="" onclick="{@xhtml:onclick}; document.getElementById('wsrp_rewrite_action_{$form-id}').name += '{$name-javascript}';
                         document.forms['wsrp_rewrite_form_{$form-id}'].submit();
                         event.returnValue=false;
                         return false">
-                    <xsl:call-template name="copy-other-attributes"/>
+        	        <xsl:copy-of select="@* except (@xhtml:onclick | @xxforms:* | @*[namespace-uri() = ''])"/>
                     <xsl:value-of select="xforms:label"/>
                 </xhtml:a>
             </xsl:when>
@@ -244,7 +244,10 @@
                 <f:alerts>
                     <xsl:for-each select="$invalid-controls">
                         <xsl:if test="xforms:alert">
-                            <f:alert><xsl:copy-of select="xforms:alert/node()"/></f:alert>
+                            <f:alert>
+                        	<xsl:value-of select="if (xforms:alert/@xxforms:value != '') 
+                    		    then xforms:alert/@xxforms:value else xforms:alert"/>
+                	    </f:alert>
                         </xsl:if>
                     </xsl:for-each>
                 </f:alerts>
@@ -271,7 +274,10 @@
                                 <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                     <tr>
                                         <td valign="top"><img src="IMAGEURL"/></td>
-                                        <td valign="top" style="padding-left: 1em"><xsl:copy-of select="xforms:help"/></td>
+                                        <td valign="top" style="padding-left: 1em">
+                                    	    <xsl:copy-of select="if (xforms:help/@xxforms:value != '') 
+                                        	then string(xforms:help/@xxforms:value) else xforms:help/node()"/>
+                                    	</td>
                                     </tr>
                                     <tr>
                                         <td colspan="2" align="right" style="padding-top: .5em">
@@ -296,7 +302,9 @@
 
     <xsl:template match="xforms:*[xforms:hint]" priority="5">
         <xsl:variable name="content"><xsl:next-match/></xsl:variable>
-        <xhtml:div title="{xforms:hint}" style="padding: 0px; margin: 0px">
+        <xhtml:div title="{if (xforms:hint/@xxforms:value != '') 
+                then xforms:hint/@xxforms:value else xforms:hint}" 
+                style="padding: 0px; margin: 0px">
             <xsl:copy-of select="$content"/>
         </xhtml:div>
     </xsl:template>
@@ -368,6 +376,7 @@
 				<xsl:value-of select="@xxforms:value"/>
 			</xsl:otherwise>
     	</xsl:choose>
+    	<xsl:apply-templates select="." mode="no-rendering"/>
     </xsl:template>
 
     <!-- If we do not render a control, we need to output a hidden field instead -->
@@ -388,7 +397,7 @@
     <xsl:template name="copy-other-attributes">
         <xsl:copy-of select="@* except (@xxforms:* | @*[namespace-uri() = ''])"/>
     </xsl:template>
-
+    
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <!-- Generates a unique id for the given form. The id is equal to the position of the form

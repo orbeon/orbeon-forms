@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!DOCTYPE document [
     <!ENTITY full "<td style='background: #66FF99'>Fully supported</td>">
-    <!ENTITY partial "<td style='background: #FFFF66'>Partially supported</td>">
+    <!ENTITY partial "<td style='background: #99FFCC'>Partially supported</td>">
     <!ENTITY future "<td style='background: #FFCC99'>Not supported yet</td>">
     <!ELEMENT document (ANY)>
 ]>
@@ -1357,94 +1357,183 @@
                         elements but not on XForms controls. For details on support for individual
                         model item properties, see section 6.1.
                         
-                        <p>
-                            [RFE <a href="http://tinyurl.com/4fvy3">1076359</a>]
-                        </p>
+                        <p>[RFE <a href="http://tinyurl.com/4fvy3">1076359</a>]</p>
                     </td>
                     &partial;
                 </tr>
                 <tr>
                     <td rowspan="4"><a href="http://www.w3.org/TR/xforms/slice3.html#structure-abstract">3.3 The XForms Core Module</a></td>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-model">3.3.1 The model Element</a></td>
-                    <td/>
+                    <td>
+                        The <code>&lt;xforms:model></code> element cannot be used in a view, 
+                        the <code>functions</code> attribute is not supported and it is not possible 
+                        to reference multiple schemas with the <code>schema</code> attribute (only
+                        one schema is supported.
+                        
+                        <p>
+                            [RFE <a href="http://tinyurl.com/3py3m">1076217</a>]<br/>
+                            [RFE <a href="http://tinyurl.com/5vnrw">1076372</a>]<br/>
+                            [RFE <a href="http://tinyurl.com/6dws7">1076373</a>]
+                        </p>
+                    </td>
                     &partial;
                 </tr>
                 <tr>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-model-instance">3.3.2 The instance Element</a></td>
                     <td/>
-                    &partial;
+                    &full;
                 </tr>
                 <tr>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-model-submission">3.3.3 The submission Element</a></td>
-                    <td/>
+                    <td>
+                        Only the <code>method</code>, <code>action</code>, and 
+                        <code>encoding</code> attributes are supported. See section 11
+                        for more details on the submission mechanism.
+                        
+                        <p>
+                            [RFE <a href="http://tinyurl.com/3py3m">1076217</a>]<br/>
+                            [RFE <a href="http://tinyurl.com/45mh6">1076380</a>]<br/>
+                            [RFE <a href="http://tinyurl.com/4qljg">1076381</a>]
+                        </p>
+                    </td>
                     &partial;
                 </tr>
                 <tr>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-bind-element">3.3.4 The bind Element</a></td>
-                    <td/>
+                    <td>
+                        The <code>id</code> attribute on <code>&lt;xforms:bind></code> is
+                        not supported.
+                        
+                        <p>[RFE <a href="http://tinyurl.com/6k68e">1059115</a>]</p>
+                    </td>
                     &partial;
                 </tr>
                 <tr>
                     <td colspan="2"><a href="http://www.w3.org/TR/xforms/slice3.html#module-mustUnderstand">3.4 The XForms MustUnderstand Module</a></td>
-                    <td/>
-                    &partial;
+                    <td>
+                        <p>[RFE <a href="http://tinyurl.com/6exyy">1076389</a>]</p>
+                    </td>
+                    &future;
                 </tr>
                 <tr>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#module-extension">3.5 The XForms Extension Module</a></td>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-extension">3.5.1 The extension Element</a></td>
-                    <td/>
+                    <td>
+                        The <code>&lt;extension></code> element can be used by a host language.
+                        Presentation Server does not have any contraint on the host language
+                        and since no language levarages this element, its use is forbidden at
+                        this point. To adhere more closely to specification, the RFE below
+                        asks for this element to be authorized and just ignored. 
+                        
+                        <p>[RFE <a href="http://tinyurl.com/4sxtp">1076393</a>]</p>
+                    </td>
                     &partial;
                 </tr>
                 <tr>
-                    <td colspan="3">4 Processing Model</td>
+                    <td colspan="3"><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice4.html">4 Processing Model</a></td>
+                    <td>
+                        <p>
+                            Events are not supported. This means that it is not possible to
+                            trigger the execution of an action (e.g. display a message dialog, or
+                            set the value of a node in the instance to a certain value) when a
+                            certain event occurs (e.g. the user changes the selected item in a combo
+                            box, or enters an invalid value in a text field).
+                        </p>
+                        <p>
+                            Even though events are not supported, it is still possible to
+                            implement the same functionality on the server-side with Presentation
+                            Server. The main drawback is that a round-trip to the server is then
+                            required.
+                        </p>
+                        <p>
+                            Let's look at an example. Consider a page with 2 controls: a combo box
+                            and a text field. You want to display or hide a text field depending on
+                            the value selected by the end-user in the combo box. When the end-user
+                            changes the selection through the combo box, the instance gets updated
+                            with the newly selected value. A <code>relevant</code> model item
+                            property determines if the text field is to be displayed based the value
+                            selected in the combo box.
+                        </p>
+                        <p>
+                            With events, you can generate an <code>xforms-refresh</code> event when
+                            the combo box selected value changes, which will reevaluate the
+                            <code>relevant</code> model item property and appropriately hide or
+                            display the text field.
+                        </p>
+                        <p>
+                            Without event (in the current version of Presentation Server), you
+                            attach to the combo box JavaScript that submits the form when the
+                            selected value changes. On the server-side the instance gets updated and
+                            the text field gets displayed or not accordingly. The main drawback here
+                            is that a round-trip to the server is required.
+                        </p>
+                    </td>
+                    &future;
+                </tr>
+                <tr>
+                    <td rowspan="5"><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice5.html">5 Datatypes</a></td>
+                    <td colspan="2"><a href="5.1 XML Schema Built-in Datatypes">5.1 XML Schema Built-in Datatypes</a></td>
                     <td/>
                     &future;
                 </tr>
                 <tr>
-                    <td colspan="3">5 Datatypes</td>
-                    <td/>
+                    <td rowspan="4"><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice5.html#datatypes-xforms">5.2 XForms Datatypes</a></td>
+                    <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice5.html#dt-listItem">5.2.1 xforms:listItem</a></td>
+                    <td rowspan="4"></td>
                     &future;
                 </tr>
                 <tr>
-                    <td rowspan="8">6 Model Item Properties</td>
-                    <td rowspan="7">6.1 Model Item Property Definitions</td>
-                    <td>6.1.1 The type Property</td>
+                    <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice5.html#dt-listItems">5.2.2 xforms:listItems</a></td>
+                    &future;
+                </tr>
+                <tr>
+                    <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice5.html#dt-dayTimeDuration">5.2.3 xforms:dayTimeDuration</a></td>
+                    &future;
+                </tr>
+                <tr>
+                    <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice5.html#dt-yearMonthDuration">5.2.4 xforms:yearMonthDuration</a></td>
+                    &future;
+                </tr>
+                <tr>
+                    <td rowspan="8"><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html">6 Model Item Properties</a></td>
+                    <td rowspan="7"><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-xformsconstraints">6.1 Model Item Property Definitions</a></td>
+                    <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-prop-type">6.1.1 The type Property</a></td>
                     <td/>
                     &partial;
                 </tr>
                 <tr>
-                    <td>6.1.2 The readonly Property</td>
+                    <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-prop-readOnly">6.1.2 The readonly Property</a></td>
                     <td/>
                     &partial;
                 </tr>
                 <tr>
-                    <td>6.1.3 The required Property</td>
+                    <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-prop-required">6.1.3 The required Property</a></td>
                     <td/>
                     &partial;
                 </tr>
                 <tr>
-                    <td>6.1.4 The relevant Property</td>
+                    <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-prop-relevant">6.1.4 The relevant Property</a></td>
                     <td/>
                     &partial;
                 </tr>
                 <tr>
-                    <td>6.1.5 The calculate Property</td>
+                    <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-prop-calculate">6.1.5 The calculate Property</a></td>
                     <td/>
                     &partial;
                 </tr>
                 <tr>
-                    <td>6.1.6 The constraint Property</td>
+                    <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-prop-validate">6.1.6 The constraint Property</a></td>
                     <td/>
                     &partial;
                 </tr>
                 <tr>
-                    <td>6.1.7 The p3ptype Property</td>
+                    <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-prop-p3ptype">6.1.7 The p3ptype Property</a></td>
                     <td/>
                     &partial;
                 </tr>
                 <tr>
-                    <td>6.2 Schema Constraints</td>
-                    <td>6.2.1 Atomic Datatype</td>
+                    <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-using">6.2 Schema Constraints</a></td>
+                    <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-using-atomic">6.2.1 Atomic Datatype</a></td>
                     <td/>
                     &partial;
                 </tr>

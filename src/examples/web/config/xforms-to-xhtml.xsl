@@ -380,7 +380,7 @@
     <xsl:template match="xhtml:body">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <xsl:variable name="invalid-controls" as="element()*" select=".//xforms:*[@xxforms:valid = 'false'
+            <xsl:variable name="invalid-controls" as="element()*" select="(.//xforms:*|.//xxforms:hidden)[@xxforms:valid = 'false'
                 and not(ancestor-or-self::xforms:*[@xxforms:relevant = 'false'])]"/>
             <!-- FIXME: this test will probably not be very efficient on large documents -->
             <xsl:if test="exists($invalid-controls) and not((.//xforms:group)[1]/@xxforms:show-errors = 'false')">

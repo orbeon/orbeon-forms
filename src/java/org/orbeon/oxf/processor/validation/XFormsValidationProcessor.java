@@ -25,15 +25,12 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.DocumentDelegate;
-import org.orbeon.oxf.xml.dom4j.ElementDelegate;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
@@ -52,34 +49,11 @@ public class XFormsValidationProcessor extends ProcessorImpl {
 
     private Logger logger = LoggerFactory.createLogger(MSVValidationProcessor.class);
 
-    public static final String ORBEON_ERROR_NS = "http://orbeon.org/oxf/xml/validation";
-    public static final String ORBEON_ERROR_PREFIX = "v";
-    public static final String ERROR_ELEMENT = "error";
-    public static final String MESSAGE_ATTRIBUTE = "message";
-    public static final String SYSTEMID_ATTRIBUTE = "system-id";
-    public static final String LINE_ATTRIBUTE = "line";
-    public static final String COLUMN_ATTRIBUTE = "column";
+    public static final String XXFORMS_ERROR_ATTRIBUTE_NAME = "error";
     public static final String INPUT_SCHEMA = "schema";
 
 
     private String schemaId;
-
-    public static DOMGenerator NO_DECORATION_CONFIG;
-    public static DOMGenerator DECORATION_CONFIG;
-
-    static {
-        NO_DECORATION_CONFIG = new DOMGenerator(new DocumentDelegate(new ElementDelegate("config") {{
-            add(new ElementDelegate("decorate") {{
-                setText("false");
-            }});
-        }}));
-        DECORATION_CONFIG = new DOMGenerator(new DocumentDelegate(new ElementDelegate("config") {{
-            add(new ElementDelegate("decorate") {{
-                setText("true");
-            }});
-        }}));
-    }
-
 
     public XFormsValidationProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
@@ -305,7 +279,7 @@ public class XFormsValidationProcessor extends ProcessorImpl {
                                 // Annotate attributes on enclosing element
                                 // We only annotate if we are in a relevant element
                                 AttributesImpl newAttributes = new AttributesImpl(attributes);
-                                newAttributes.addAttribute(Constants.XXFORMS_NAMESPACE_URI, Constants.XXFORMS_ERROR_ATTRIBUTE_NAME, Constants.XXFORMS_PREFIX + ":" + Constants.XXFORMS_ERROR_ATTRIBUTE_NAME, "CDATA", exception.getMessage());
+                                newAttributes.addAttribute(Constants.XXFORMS_NAMESPACE_URI, XXFORMS_ERROR_ATTRIBUTE_NAME, Constants.XXFORMS_PREFIX + ":" + XXFORMS_ERROR_ATTRIBUTE_NAME, "CDATA", exception.getMessage());
                                 newAttributes.addAttribute(Constants.XXFORMS_NAMESPACE_URI, Constants.XXFORMS_VALID_ATTRIBUTE_NAME, Constants.XXFORMS_PREFIX + ":" + Constants.XXFORMS_VALID_ATTRIBUTE_NAME, "CDATA", "false");
                                 attributes = newAttributes;
                             }

@@ -67,7 +67,9 @@
         <param ref="/form/page"/>
     </page>
 
-    <page path-info="/xpl-spec" model="/doc/xpl-spec/model.xpl"/>
+    <!-- XPL specification -->
+    <page path-info="/2005/SUBM-xpl-20050222/" model="/doc/xpl-spec/model.xpl"/>
+    <page path-info="/2005/xpl/" model="/doc/xpl-spec/model.xpl"/>
 
     <!-- Source code -->
     <page path-info="/examples/source"

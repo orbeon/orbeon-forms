@@ -7,7 +7,7 @@
 <!-- ====================================================================== -->
 <!-- xmlspec.xsl: An HTML XSL[1] Stylesheet for XML Spec V2.1[2] markup
 
-     Version: $Id: xmlspec.xsl,v 1.3 2005/02/14 14:29:33 ebruchez Exp $
+     Version: $Id: xmlspec.xsl,v 1.4 2005/02/28 21:10:21 ebruchez Exp $
 
      URI:     http://dev.w3.org/cvsweb/spec-prod/html/xmlspec.xsl
 
@@ -18,7 +18,7 @@
               Henry S. Thompson (ht@cogsci.ed.ac.uk)
 
      Date:    Created 07 September 1999
-              Last updated $Date: 2005/02/14 14:29:33 $ by $Author: ebruchez $
+              Last updated $Date: 2005/02/28 21:10:21 $ by $Author: ebruchez $
 
      Copyright (C) 2000, 2001, 2002 Sun Microsystems, Inc. All Rights Reserved.
      This document is governed by the W3C Software License[3] as
@@ -1014,12 +1014,13 @@
     <div class="head">
       <xsl:if test="not(/spec/@role='editors-copy')">
         <p>
-          <a href="http://www.w3.org/">
+          <a href="http://www.orbeon.com/">
 <!--            <img src="http://www.w3.org/Icons/w3c_home"-->
 <!--              alt="W3C" height="48" width="72"/>-->
-<!--              <img src="doc/xpl-spec/orbeon-small-blueorange.gif" alt="Orbeon Logo" height="42" width="199"/>-->
-              <img src="doc/xpl-spec/w3c_home.png" alt="W3C Home" height="48" width="72"/>
-              <img src="doc/xpl-spec/member_subm.png" alt="Member Submission" height="48" width="211"/>
+              <img src="../../doc/xpl-spec/orbeon-small-blueorange.gif" alt="Orbeon Logo" height="42" width="199"/>
+              <!-- Below the official images for W3C submission -->
+<!--              <img src="doc/xpl-spec/w3c_home.png" alt="W3C Home" height="48" width="72"/>-->
+<!--              <img src="doc/xpl-spec/member_subm.png" alt="Member Submission" height="48" width="211"/>-->
           </a>
 	  <xsl:choose>
 	    <xsl:when test="/spec/@w3c-doctype='memsub'">
@@ -2727,7 +2728,7 @@ div.exampleHeader { font-weight: bold;
     <link rel="stylesheet" type="text/css">
       <xsl:attribute name="href">
 <!--        <xsl:text>http://www.w3.org/StyleSheets/TR/</xsl:text>-->
-          <xsl:text>doc/xpl-spec/</xsl:text>
+          <xsl:text>../../doc/xpl-spec/</xsl:text>
         <xsl:choose>
           <xsl:when test="/spec/@role='editors-copy'">base</xsl:when>
           <xsl:otherwise>

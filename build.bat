@@ -19,7 +19,7 @@ if defined JAVA_HOME (
     echo .
   )
 
-  @rem set CLASSPATH=%bld_root%lib\junit.jar
+  set CLASSPATH=%bld_root%lib\junit.jar
   set PATH=%JAVA_HOME%\bin;%PATH%
   set ANT_HOME=%bld_root%tools\ant
   echo "!ANT_HOME!\bin\ant.bat" "-Djava.home=!JAVA_HOME!" "-Dant.home=!ANT_HOME!" "-Ddebug.enabled=!DEBUG_ENABLED!" "-Dweblogic.home=!WEBLOGIC_HOME!" !target! %2 %3 %4 %5 %6 %7 %8 %9

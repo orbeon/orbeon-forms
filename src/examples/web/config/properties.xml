@@ -24,8 +24,8 @@
     <property as="xs:string"  processor-name="oxf:page-flow" name="instance-passing" value="redirect"/>
 
     <!-- Encryption of hidden fields and field names -->
-    <property as="xs:boolean" name="oxf.xforms.encrypt-hidden"                       value="false"/>
-    <property as="xs:boolean" name="oxf.xforms.encrypt-names"                        value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.encrypt-hidden"                       value="true"/>
+    <property as="xs:boolean" name="oxf.xforms.encrypt-names"                        value="true"/>
     <property as="xs:string"  name="oxf.xforms.password"                             value="Password used for encryption"/>
 
 </properties>

@@ -33,11 +33,11 @@
                         be displayed. The default theme displays all the alerts.
                     </p>
                     <p>
-                        You can use multiple <code>&lt;xforms:alert></code> for internatinalization
+                        You can use multiple <code>&lt;xforms:alert></code> for internationalization
                         by adding on each <code>&lt;xforms:alert></code> an <code>xml:lang</code>
                         attribute (e.g. <code>xml:lang="en"</code>, <code>xml:lang="fr"</code>) and
                         selecting in your theme the appropriate message to display for the current
-                        user based on his prefered language.
+                        user based on his preferred language.
                     </p>
                 </li>
                 <li>
@@ -51,10 +51,10 @@
                 </li>
                 <li>
                     <p>
-                        Instance node of type <code>xs:date</code> and <code>xs:time</code> bound to
-                        an XForms input control are rendered with an <a
-                        href="http://tinyurl.com/6wu6p">approriate date or time widget</a>. You set
-                        the type of an instance node with a <code>&lt;xforms:bind
+                        Instance nodes of type <code>xs:date</code> and <code>xs:time</code> bound
+                        to an XForms input control are rendered with an <a
+                        href="http://tinyurl.com/6wu6p">appropriate date or time widget</a>. You
+                        set the type of an instance node with a <code>&lt;xforms:bind
                         nodeset="/path/to/your/node" type="xs:date"/></code> in your XForms model.
                     </p>
                 </li>
@@ -76,7 +76,7 @@
                         content of the element was modified in the MVC model or view and the error
                         corrected (in which case the element should be considered valid), or if the
                         <code>xxforms:valid="false"</code> was added by the MVC model or view to
-                        tell the XForms engine that this elemet is invalid (in which case the
+                        tell the XForms engine that this element is invalid (in which case the
                         element should be considered invalid).
                     </p>
                     <p>
@@ -108,14 +108,14 @@
         <section>
             <title>Performance Improvements</title>
             <p>
-                Memory usages has been improved, which leads to significant performance improvements
+                Memory usage has been improved, which leads to significant performance improvements
                 under heavy load or when the JVM is running with a relatively small heap, as the JVM
-                spends less time doing garbage collection. Our testing show performance improvement
-                that range from 5% to 20%.
+                spends less time doing garbage collection. Our testing shows performance
+                improvement that range from 5% to 20% over version 2.7.
             </p>
         </section>
         <section>
-            <title>Misc Bug Fixes</title>
+            <title>Miscellaneous Bug Fixes</title>
             <ul>
                 <li>
                     <a href="http://tinyurl.com/5eq9d">XUpdate removing attributes and namespace
@@ -130,6 +130,10 @@
                 <li>
                     <a href="http://tinyurl.com/5hqzy">Rendering issues of the documentation under
                     Safari</a> &#8213; Those issues have been solved.
+                </li>
+                <li>
+                    Other bugs have been fixed relative to the URL generator, Request generator,
+                    HTTP serializer, and server-side forwards following a file upload.
                 </li>
             </ul>
         </section>

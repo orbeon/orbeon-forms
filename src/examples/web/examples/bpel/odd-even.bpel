@@ -1,0 +1,50 @@
+<bpws:process name="purchaseOrderProcess"
+    targetNamespace="http://www.orbeon.com/odd-even"
+    xmlns:bpws="http://schemas.xmlsoap.org/ws/2003/03/business-process/"
+    xmlns:processor="http://www.orbeon.com/oxf/processor">
+
+    <bpws:variables>
+        <bpws:variable name="input"/>
+        <bpws:variable name="result"/>
+    </bpws:variables>
+
+    <bpws:sequence>
+
+        <bpws:receive partnerLink="input" portType="processor:inputPT" operation="run"
+            variable="input"/>
+
+        <bpws:switch>
+            <bpws:case condition="bpws:getVariableData
+                    ('input', 'instance', '/form/number') mod 2 = 0">
+                <bpws:assign>
+                    <bpws:copy>
+                        <bpws:from>
+                            <result>even</result>
+                        </bpws:from>
+                        <bpws:to variable="result" part="data"/>
+                    </bpws:copy>
+                </bpws:assign>
+                <bpws:assign>
+                    <bpws:copy>
+                        <bpws:from variable="result" part="data"/>
+                        <bpws:to variable="result" part="data"/>
+                    </bpws:copy>
+                </bpws:assign>
+            </bpws:case>
+            <bpws:otherwise>
+                <bpws:assign>
+                    <bpws:copy>
+                        <bpws:from>
+                            <result>odd</result>
+                        </bpws:from>
+                        <bpws:to variable="result" part="data"/>
+                    </bpws:copy>
+                </bpws:assign>
+            </bpws:otherwise>
+        </bpws:switch>
+
+        <bpws:reply partnerLink="output" portType="processor:outputPT" operation="run" variable="result"/>
+
+    </bpws:sequence>
+
+</bpws:process>

@@ -1,0 +1,53 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<i18n locale="ja_JP">
+    <text key="welcome">ようこそ</text>
+    <text key="pets">ペット</text>
+    <text key="fish">魚</text>
+    <text key="dogs">犬</text>
+    <text key="reptiles">爬虫類</text>
+    <text key="birds">鳥</text>
+    <text key="cats">猫</text>
+    <text key="home">﻿ホーム</text>
+    <text key="web">﻿ウェブ</text>
+    <text key="pda">﻿パーム</text>
+    <text key="cart-empty">ショッピングカートには何も入ってません。</text>
+    <text key="your-cart">ショッピングカート</text>
+    <text key="category-title">このカテゴリの商品</text>
+    <text key="items-title">この商品に相当するアイテム</text>
+    <text key="add-to-cart">カートに追加</text>
+    <text key="list-price">今日の値段</text>
+    <text key="search">検索</text>
+    <text key="cart">カート</text>
+    <text key="update-cart">カートを更新</text>
+    <text key="remove">削除</text>
+    <text key="subtotal">総合計:</text>
+    <text key="proceed-checkout">チェクアウトへ</text>
+    <text key="sign-off">ログアウト</text>
+    <text key="sign-in">ログイン</text>
+    <text key="returning-customer">お店に戻りますか ? </text>
+    <text key="yes">はい。</text>
+    <text key="username">ユーザ ID:</text>
+    <text key="password">パスワード:</text>
+    <text key="login-failed">入力された情報で認証できませんでした。 <br/>
+    ユーザ名とパスワードのご確認をお願いします。</text>
+    <text key="order-complete">注文が完了しました</text>
+    <text key="currency">￥</text>
+    <text key="petstore-fictional">
+Java ペット屋さんでもは
+J2EE BluePrints のサンプルアプリケーションです。詳細情報は、
+J2EE BluePrints のウェブサイト <a
+href="http://java.sun.com/j2ee/blueprints/"><code>http://java.sun.com/j2ee/blueprints/</code></a>をご覧ください。
+    </text>
+</i18n>

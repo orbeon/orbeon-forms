@@ -1,0 +1,50 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<table bgcolor="#FFFFFF" cellspacing="0" cellpadding="0" width="100%"
+        xmlns:i18n="http://www.example.com/i18n">
+    <tr>
+        <td>
+            <hr noshade="noshade" size="1"/>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <hr noshade="noshade" size="1"/>
+        </td>
+    </tr>
+    <tr>
+        <td align="center" class="petstore_footer">
+            <i18n:text key="petstore-fictional"/><br/>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <hr noshade="noshade" size="1"/>
+        </td>
+    </tr>
+    <tr>
+        <td align="center" class="petstore_footer">
+            <a href="/">Back to OXF</a> |
+            <a href="http://java.sun.com/j2ee/blueprints/">J2EE BluePrints</a> |
+            <a href="http://java.sun.com">Java Software</a> |
+            <a href="http://sun.com">Sun Microsystems</a>
+            <br/>&#169; 2001 Sun Microsystems Inc. All rights reserved. Use is subject to license terms.
+            <br/>
+            <br/>
+            <a href="http://www.orbeon.com/oxf/">
+                <img src="http://www.orbeon.com/pics/oxf-powered-80.gif" width="80" height="22" border="0"/>
+            </a>
+        </td>
+    </tr>
+</table>

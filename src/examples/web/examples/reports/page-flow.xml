@@ -1,0 +1,33 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:xu="http://www.xmldb.org/xupdate">
+
+    <page path-info="/reports" xforms="selection-xforms.xml" view="selection.xsl">
+        <action when="/action = 'report-xml-hierarchy'"><result page="report-xml-hierarchy"/></action>
+        <action when="/action = 'report-xml-table'"><result page="report-xml-table"/></action>
+        <action when="/action = 'report-html'"><result page="report-html"/></action>
+        <action when="/action = 'report-pdf'"><result page="report-pdf" instance-passing="redirect-exit-portal"/></action>
+        <action when="/action = 'report-excel'"><result page="report-excel" instance-passing="redirect-exit-portal"/></action>
+    </page>
+
+    <page id="report-xml-hierarchy" path-info="/reports/report-xml-hierarchy" model="model.xpl" view="xml-hierarchy.xsl"/>
+    <page id="report-xml-table" path-info="/reports/report-xml-table" model="xml-table.xpl" view="xml-table.xsl"/>
+    <page id="report-html" path-info="/reports/report-html" model="model.xpl" view="generic-table.xsl"/>
+    <page id="report-pdf" path-info="/example-resources/reports/report-pdf" model="model.xpl" view="pdf.xpl"/>
+    <page id="report-excel" path-info="/example-resources/reports/report-excel" model="excel.xpl"/>
+
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</config>

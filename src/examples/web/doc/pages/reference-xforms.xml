@@ -1,0 +1,948 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+    <header>
+        <title>XForms</title>
+    </header>
+    <body>
+        <section>
+            <title>Scope</title>
+            <p>
+                Web applications use forms to collect data from users. OXF form handling is based on
+                <link href="http://www.w3.org/MarkUp/Forms/">XForms</link>, namely the <a
+                href="http://www.w3.org/TR/xforms/">XForms 1.0 W3C Recommendation</a>. This section
+                provides an introduction to XForms concepts and explains how to use XForms in your
+                OXF application.
+            </p>
+        </section>
+        <section>
+        	<title>Introduction to XForms</title>
+        	<section>
+        		<title>Origin, Today, and Tomorrow</title>
+        		<p>
+					XForms has been designed by the W3C based on experience with HTML forms. It was only promoted
+					to the rank of W3C Recommendation quite recently, in October 2003. Mainstream browsers
+					(Internet Explorer, Mozilla / Firefox, Opera, Safari) do not yet support XForms natively.
+					However you can already leverage the benefits of XForms today by using a server-side XForms
+					engine like the one provided in OXF. Until browsers natively support XForms, the OXF XForms
+					engine will transparently generate HTML forms and perform the work that would be done by an
+					XForms-compliant browser. This way you can start leveraging XForms today, be ready for upcoming
+					XForms-compliant browsers, and work smoothly with the mainstream browsers that are deployed
+					in the marketplace.
+    			</p>
+        	</section>
+        	<section>
+        		<title>Benefits</title>
+        		<p>
+                    Compared to HTML forms, XForms offers a higher level approach to forms. The
+                    benefits are that less programming is needed (less JavaScript, and less
+                    server-side programming), so forms are easier to create and modify. As an
+                    illustration, let's consider two facets of XForms:
+                </p>
+                <ol>
+                    <li>
+                        <p>
+                            XForms clearly defines how data entered by the end-user is collected: it
+                            is stored in an XML document called the XForms <i>instance</i>, an
+                            initially empty, "skeletal" XML instance document that defines the
+                            structure of the data you wish to collect from the user, which is
+                            afterwards filled out with information collected from the user. For
+                            example, credit card information collected on a web site can be
+                            structured as follows:
+                        </p>
+                        <xml-source>
+                            <credit-card>
+                                <type></type>
+                                <number></number>
+                                <expiration-month></expiration-month>
+                                <expiration-year></expiration-year>
+                            </credit-card>
+                        </xml-source>
+                        <p>
+                            The outcome of the user filling out a form collecting this information
+                            could be this complete XML document:
+                        </p>
+                        <xml-source>
+                            <credit-card>
+                                <type>visa</type>
+                                <number>1234567812345678</number>
+                                <expiration-month>8</expiration-month>
+                                <expiration-year>2008</expiration-year>
+                            </credit-card>
+                        </xml-source>
+                        <p>
+                            An application using this data to do some processing (e.g. checking the
+                            validity of the credit card) receives the above XML document. There is
+                            no need to write code to go read the HTTP request parameters, or to use
+                            a framework performing this task: XForms does it all.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            More often than not, there are constraints on the data that can be entered
+                            by the end-user. For instance, in the example we just considered, the card
+                            number must have 16 digits and the expiration month must be a number between
+                            1 and 12. Traditionally code must be written to check for those constraints.
+                            And more code must be written to handle error conditions (getting back to
+                            the page displaying the form and showing the appropriate error messages).
+                            All this is done is very simple and declarative way with XForms. For
+                            instance, checking that the expiration month is valid number between 1 and
+                            12 can be done with:
+                        </p>
+                        <xml-source>
+                            <bind nodeset="/credit-card/expiration-month" type="xs:integer" constraint=". >= 1 and 12 >= ."/>
+                        </xml-source>
+                        <p>
+                            An error message can be attached to the "month" text field and if the
+                            end-user enters an invalid month the XForms engine will notice that the
+                            above constraint is not met and will display the error message. You do
+                            not have to write any code for this to happen. We will see later how you
+                            go about doing this with XForms in more details.
+                        </p>
+                    </li>
+                </ol>
+        	</section>
+        	<section>
+        		<title>Processing Model</title>
+                <img print-format="pdf" src="pages/reference-xforms-model-controls.png"
+                    style="clear: both; float: right"/>
+        		<p>
+                    XForms exposes two main components that are distinct but designed to closely
+                    work with one another:
+                </p>
+                <ul>
+                    <li>
+                        <b>XForms model</b> – The XForms model defines the data that needs to be
+                        captured and the constraints on this data.
+                    </li>
+                    <li>
+                        <b>XForms controls</b> – XForms controls are widgets, like a text field or a
+                        drop down combo box. They are generally used in an XHTML page to define the
+                        visual representation of a form. </li>
+                </ul>
+                <img print-format="pdf" src="pages/reference-xforms-operation-model.png"
+                    style="clear: both; float: right"/>
+                <p>
+                    At a high level, an application interacts with an end-user through the
+                    following steps:
+                </p>
+                <ol>
+                    <li>The application generates an XHTML page that contains XForms controls, and
+                    provides an XForms model for that page.</li>
+
+                    <li>The XForms engine processes the XForms controls and sends a HTML page to the
+                    end-user's browser.</li>
+
+                    <li>The end-user fills out the form.</li>
+
+                    <li>The XForms engine creates an XML document (called the XForms instance)
+                    based on the values entered by the end-user, and sends this document to the
+                    application.</li>
+
+                    <li>The application performs its business logic based in the XForms
+                    instance.</li>
+                </ol>
+                <img print-format="pdf" src="pages/reference-xforms-operation-model.png"
+                    style="clear: both; float: right"/>
+                <p>
+                    As we can see, your role as the author of an OXF application is:
+                </p>
+                <ul>
+                    <li>To provide the XForms model (step 1 above).</li>
+                    <li>To provide the description of the form user interface using XForms controls (step 1 above).</li>
+                    <li>To respond to user actions based on the XForms instance, which contains data captured from the end-user (step 5 above).</li>
+                </ul>
+                <p>
+                    In this chapter we will explore the first two of the three aspects above. You
+                    hook-up your backend logic for a page in your application page flow. The <a
+                    href="reference-controller">Page Flow Controller</a> documentation details how
+                    this is done.
+                </p>
+        	</section>
+        </section>
+        <section>
+            <title>XForms Model</title>
+            <img src="pages/reference-xforms-credit-card-form.png" style="clear: both; float: right"/>
+            <p>
+                To help us in our exploration of the XForms model we consider a specific example: an
+                XForms Credit Card Verifier. This example displays a simple form asking for a
+                credit card number and related information to be entered, as shown on the screenshot
+                to the right. When the "verify" button is pressed, the information entered by the
+                end-user is validated by a set of rules and the result displayed on the "Card
+                valid:" line. This example is fully implemented with 3 XML files:
+            </p>
+            <ul>
+                <li><a href="../examples/source?src=examples/xforms/xforms-credit-card/xforms-model.xml">xforms-model.xml</a>: the XForms model</li>
+                <li><a href="../examples/source?src=examples/xforms/xforms-credit-card/view.xml">view.xml</a>: the XHTML view using XForms controls</li>
+                <li><a href="../examples/source?src=examples/xforms/xforms-credit-card/page-flow.xml">page-flow.xml</a>: declared the page and references the two files above</li>
+            </ul>
+            <p>
+                We will here focus on the XForms model (xforms-model.xml) which is the most
+                interesting file for this example. The XForms model does two things:
+            </p>
+            <ol>
+                <li>It declares the XForms instance.</li>
+                <li>It declares a set of rules that are attached to nodes of the XForms instance.</li>
+            </ol>
+            <section>
+                <title>XForms Instance</title>
+                <p>
+                    You define the XForms instance by declaring an "empty" XForms instance document.
+                    In the Credit Card Verifier the XForms instance is declared with:
+                </p>
+                <xml-source>
+                    <xforms:instance>
+                        <credit-card>
+                            <type/>
+                            <number/>
+                            <expiration-month/>
+                            <expiration-year/>
+                            <verification-code/>
+                            <valid/>
+                            <gaga/>
+                        </credit-card>
+                    </xforms:instance>
+                </xml-source>
+                <p>
+                    In most cases, the XForms instance only contains empty elements and attributes
+                    that will be filled with the values entered by the end-user. When the page is
+                    first loaded, the instance declared in the XForms model becomes the active
+                    XForms instance. When the end-user submits the form, the values he enters in
+                    the forms controls are used to fill the instance. We will see in the next
+                    section how controls are bound to elements and attributes in the XForms
+                    instance.
+                </p>
+            </section>
+            <section>
+                <title>Model Item Properties</title>
+                <p>
+                    In addition to the XForms instance, the XForms model can declare a set of
+                    "rules", called "model item properties" in the XForms jargon. (We will here use
+                    indifferently the terms "rules" and "model item properties".) Let's write a set
+                    of rules for the above Credit Card Validation form. Specifically we want:
+                </p>
+                <ol>
+                    <li>To check that the credit card number is a number (with only digits)</li>
+                    <li>To check that the expiration month is valid (integer between 1 and 12)</li>
+                    <li>To check that the expiration year is valid (4 digit number)</li>
+                    <li>To display the "verification code" text field only if the card type is Visa or MasterCard</li>
+
+                    <li>To determine, through calculation, if the credit card is valid. The result
+                    of this calculation is either "true" or "false" and this value is displayed at
+                    the bottom of the bottom of the form.</li>
+                </ol>
+                <p>
+                    You describe each one of those rules with an <code>&lt;xforms:bind></code>
+                    element in the XForms model. Rules apply to elements and attributes in the
+                    XForms instance. You specify the elements and attributes each rule applies to
+                    with an XPath expression in the mandatory <code>nodeset</code> attribute. In
+                    addition to the <code>nodeset</code> attribute you want to have at least one
+                    attribute specifying the essence of the rule. We will go over the exhaustive
+                    list of all the possible attributes later in this section, but first let's see
+                    how we can express the above rules for the Credit Card Verifier form:
+                </p>
+                <img src="pages/reference-xforms-type.png" style="clear: both; float: right"/>
+                <ol>
+                    <li>
+                        <p>
+                            You specify that the credit card number must be a number with:
+                        </p>
+                        <code>&lt;xforms:bind nodeset="/credit-card/number" type="xs:integer"/></code>
+                        <p>
+                            The value of the <code>type</code> attribute is
+                            a W3C XML Schema simple type. You can see the list of simple types in the
+                            <a href="
+                            http://www.w3.org/TR/2001/REC-xmlschema-0-20010502/#CreatDt">XML Schema
+                            primer</a>. If the end-user enters an invalid credit card number (i.e. not a
+                            number), an error will be displayed as shows in the screenshot on the right.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            You can also constrain the value of an element or attribute with an
+                            XPath expression in the <code>constraint</code> attribute. For instance
+                            you specify that the expiration month must be an integer between 1 and
+                            12 with:
+                        </p>
+                        <code>&lt;xforms:bind nodeset="/credit-card/expiration-month"
+                            constraint="../number = '' or (. castable as xs:integer and . >= 1 and 12 >= .)"/></code>
+                        <p>
+                            Note that we have decided here not to bother checking the
+                            expiration month if no credit card number was entered. OXF supports XPath
+                            2.0 expressions in the constraint attribute.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Similarly, you check that the expiration year is a 4 digit number with:
+                        </p>
+                        <code>&lt;xforms:bind nodeset="/credit-card/expiration-year"
+                        constraint="../number = '' or (. castable as xs:integer and string-length(.)
+                        = 4)"/></code>.
+                    </li>
+                    <li>
+                        <p>
+                            You hide the "verification code" text field for American Express cards
+                            with:
+                        </p>
+                        <code>&lt;xforms:bind nodeset="/credit-card/verification-code"
+                        relevant="../type = 'visa' or ../type = 'mastercard'"/></code>
+                        <p>
+                            The attribute we use here is "relevant". By default, everything is
+                            relevant in the XForms instance. If a "relevant" rule is specified, the
+                            XPath expression is evaluated for each node in the nodeset, and if the
+                            expression returns false, then the node is not considered relevant. When
+                            a node is not relevant, the corresponding widget is not displayed (more
+                            on this later).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            The content of elements and attributes are in general populated by values
+                            entered by the user. But they can also be populated automatically based on
+                            XPath expressions you provide. Of course, those XPath expressions can use
+                            values entered by the end-user. We populate the <code>&lt;valid></code>
+                            element with either "true" or "false" with:
+                        </p>
+                        <code>&lt;xforms:bind nodeset="/credit-card/valid" calculate="..."/></code>.
+                        <p>
+                            The XPath expression checking that the credit card number is valid has
+                            not been included here but you can see it in the <a
+                            href="../examples/source?src=examples/xforms/xforms-credit-card/xforms-model.xml">xforms-model.xml</a>.
+                        </p>
+                    </li>
+                </ol>
+                <p>
+                    Now that we have seen a few examples of model item properties, let's go over all
+                    the XForms model item properties. Model item properties can essentially be used
+                    for 3 purposes:
+                </p>
+                <table>
+                    <tr>
+                        <th>Validation</th>
+                        <td>
+                            <p>
+                                The purpose is to determine if the content of an element
+                                or attribute in the XForms instance is valid. Invalid values can have an
+                                impact on how a form is displayed (you might want to highlight errors and
+                                show some information to help the end-user to correct the issue) and on page
+                                flow (maybe data should not be saved until it is valid), hence the need to
+                                validate in the first place. There are 3 ways to validate the content of an
+                                element or attribute:
+                            </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <b>required</b> – You can specify in the <code>required</code>
+                                        attribute an XPath expression that determines if a value is
+                                        required. The XPath can be as simple as <code>true()</code>, or
+                                        more complex and depend on other values entered by the end-user.
+                                        By default values are not required.
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <b>type</b> – In the <code>type</code> attribute you can specify
+                                        a W3C XML Schema simple type. The <code>type</code> attribute
+                                        works in association with the <code>required</code> attribute:
+                                        even if a type is specified, if the value is an empty string,
+                                        the validity will only depend on the whether the value is
+                                        required.
+                                    </p>
+                                    <table>
+                                        <tr><th/><th>Required</th><th>Not required</th></tr>
+                                        <tr><th>Value is empty</th><td>Invalid</td><td>Valid</td></tr>
+                                        <tr><th>Value is not empty</th><td colspan="2">Validated according to<br/>specified simple type</td></tr>
+                                    </table>
+                                </li>
+                                <li>
+                                    <p>
+                                        <b>constraint</b> – In the <code>constraint</code> you can
+                                        write any XPath 2.0 expression that returns a boolean value.
+                                        If false is returned, then the value is considered invalid,
+                                        otherwise it is considered valid.
+                                    </p>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Calculation</th>
+                        <td>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <b>calculate</b> – The content of the element or attribute
+                                        will be set to the result of the evaluation of the XPath 2.0
+                                        expression in the <code>calculate</code> attribute. This way
+                                        you can automatically compute some values in the XForms
+                                        instance based on other values, typically entered by the
+                                        end-user.
+                                    </p>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Visibility</th>
+                        <td>
+                            <p>
+                                By default all the XForms instance nodes are not read-only and are
+                                relevant, which means that if an XForms control is bound to that
+                                node (e.g. a text field), the control is displayed and is editable
+                                by the end-user. You can change this by providing XPath 2.0
+                                expressions in the <code>readonly</code> and <code>relevant</code>
+                                attributes:
+                            </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <b>readonly</b> – If the XPath 2.0 expression in
+                                        <code>readonly</code> evaluates to true, the control will be
+                                        displayed in non-editable mode. Typically, in an XHTML user
+                                        interface only the current value is displayed, instead of
+                                        displaying a form element, like a text field.
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <b>relevant</b> – If the XPath 2.0 expression in
+                                        <code>relevant</code> evaluates to false, the control will
+                                        not be displayed at all.
+                                    </p>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                </table>
+            </section>
+        </section>
+        <section>
+            <title>XForms Controls</title>
+            <section>
+                <title>Controls Reference</title>
+                <p>
+                    XForms controls are very similar to HTML form elements: you will find text
+                    fields, drop down lists, checkboxes, etc. These are the major differences
+                    between HTML forms elements and XForms controls:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The value displayed by a control comes from the content of an element or
+                            attribute of the XForms instance. When you declare a control, you bind
+                            it to a node of your XForms instance with an XPath-like expression in
+                            the <code>ref</code> attribute. For instance you would declare a text
+                            field bound to the <code>&lt;number></code> element, which a child of
+                            <code>&lt;credit-card></code>, with:
+                        </p>
+                        <xml-source show-namespaces="false"><xforms:input ref="/credit-card/number"/></xml-source>
+                    </li>
+                    <li>
+                        <p>
+                            The way a control is rendered depends on model item properties: if the
+                            control is bound to an invalid node then an error can be displayed, if
+                            the control is bound to a read-only node only the current value is
+                            displayed and the end-user can't change it, and if the node is not
+                            relevant the control isn't be displayed at all.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    The table below lists all the available XForms controls and shows for each one
+                    the XML you need to use in your view, as well as an example showing that
+                    control in action.
+                </p>
+                <table>
+                    <tr>
+                        <th/>
+                        <th>Typical UI for control</th>
+                        <th>XForms in the view</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <th>Text field</th>
+                        <td><img src="pages/reference-xforms-input.png"/></td>
+                        <td>
+                            <xml-source border="false" show-namespaces="false">
+                                <xforms:input ref="text"/>
+                            </xml-source>
+                        </td>
+                        <td>
+                            <a href="../goto-example/xforms-text">Text Controls</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Password field</th>
+                        <td><img src="pages/reference-xforms-secret.png"/></td>
+                        <td>
+                            <xml-source border="false" show-namespaces="false">
+                                <xforms:secret ref="secret"/>
+                            </xml-source>
+                        </td>
+                        <td>
+                            <a href="../goto-example/xforms-text">Text Controls</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Text area</th>
+                        <td><img src="pages/reference-xforms-textarea.png"/></td>
+                        <td>
+                            <xml-source border="false" show-namespaces="false">
+                                <xforms:textarea ref="textarea"/>
+                            </xml-source>
+                        </td>
+                        <td>
+                            <a href="../goto-example/xforms-text">Text Controls</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Radio buttons</th>
+                        <td><img src="pages/reference-xforms-radio.png"/></td>
+                        <td>
+                            <xml-source border="false" show-namespaces="false">
+                                <xforms:select1 ref="carrier" appearance="full">
+                                    <xforms:item>
+                                        <xforms:label>Fedex</xforms:label>
+                                        <xforms:value>fedex</xforms:value>
+                                    </xforms:item>
+                                    <xforms:item>
+                                        <xforms:label>UPS</xforms:label>
+                                        <xforms:value>ups</xforms:value>
+                                    </xforms:item>
+                                </xforms:select1>
+                            </xml-source>
+                        </td>
+                        <td>
+                            <a href="../goto-example/xforms-selection">Selection Controls</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Combo box</th>
+                        <td><img src="pages/reference-xforms-combobox.png"/></td>
+                        <td>
+                            <xml-source border="false" show-namespaces="false">
+                                <xforms:select1 ref="payment" appearance="minimal">
+                                    <xforms:item>
+                                        <xforms:label>Cash</xforms:label>
+                                        <xforms:value>cash</xforms:value>
+                                    </xforms:item>
+                                    <xforms:item>
+                                        <xforms:label>Credit</xforms:label>
+                                        <xforms:value>credit</xforms:value>
+                                    </xforms:item>
+                                </xforms:select1>
+                            </xml-source>
+                        </td>
+                        <td>
+                            <a href="../goto-example/xforms-selection">Selection Controls</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Check boxes</th>
+                        <td><img src="pages/reference-xforms-checkbox.png"/></td>
+                        <td>
+                            <xml-source border="false" show-namespaces="false">
+                                <xforms:select ref="wrapping" appearance="full">
+                                    <xforms:choices>
+                                        <xforms:item>
+                                            <xforms:label>Hard-box</xforms:label>
+                                            <xforms:value>box</xforms:value>
+                                        </xforms:item>
+                                        <xforms:item>
+                                            <xforms:label>Gift</xforms:label>
+                                            <xforms:value>gift</xforms:value>
+                                        </xforms:item>
+                                    </xforms:choices>
+                                </xforms:select>
+                            </xml-source>
+                        </td>
+                        <td>
+                            <a href="../goto-example/xforms-selection">Selection Controls</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>List</th>
+                        <td><img src="pages/reference-xforms-list.png"/></td>
+                        <td>
+                            <xml-source border="false" show-namespaces="false">
+                                <xforms:select ref="taste" appearance="compact">
+                                    <xforms:item>
+                                        <xforms:label>Vanilla</xforms:label>
+                                        <xforms:value>vanilla</xforms:value>
+                                    </xforms:item>
+                                    <xforms:item>
+                                        <xforms:label>Strawberry</xforms:label>
+                                        <xforms:value>strawberry</xforms:value>
+                                    </xforms:item>
+                                </xforms:select>
+                            </xml-source>
+                        </td>
+                        <td>
+                            <a href="../goto-example/xforms-selection">Selection Controls</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Submit button</th>
+                        <td><img src="pages/reference-xforms-submit-button.png"/></td>
+                        <td>
+                            <xml-source border="false" show-namespaces="false">
+                                <xforms:submit>
+                                    <xforms:label>Submit</xforms:label>
+                                </xforms:submit>
+                            </xml-source>
+                        </td>
+                        <td>
+                            <a href="../goto-example/xforms-submit">Submit Controls</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Submit link</th>
+                        <td><img src="pages/reference-xforms-submit-link.png"/></td>
+                        <td>
+                            <xml-source border="false" show-namespaces="false">
+                                <xforms:submit xxforms:appearance="link">
+                                    <xforms:label>Submit</xforms:label>
+                                </xforms:submit>
+                            </xml-source>
+                        </td>
+                        <td>
+                            <a href="../goto-example/xforms-submit">Submit Controls</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Submit image</th>
+                        <td><img src="pages/reference-xforms-submit-image.png"/></td>
+                        <td>
+                            <xml-source border="false" show-namespaces="false">
+                                <xforms:submit xxforms:appearance="image">
+                                    <xxforms:img src="images/submit.gif"/>
+                                </xforms:submit>
+                            </xml-source>
+                        </td>
+                        <td>
+                            <a href="../goto-example/xforms-submit">Submit Controls</a>
+                        </td>
+                    </tr>
+                </table>
+            </section>
+            <section>
+                <title>Label, Alert, Help, and Hint</title>
+                <p>
+                    Nested inside each XForms control element, you can specify additional elements
+                    that can alter the way the control is displayed. The table below lists those
+                    elements:
+                </p>
+                <table>
+                    <tr>
+                        <th>Label</th>
+                        <td>
+                            <img src="pages/reference-xforms-submit-button.png"/>
+                        </td>
+                        <td>
+                            <p>
+                                By default a label is used in submit controls, as well as the single
+                                and multiple selection controls, as shown in the table above.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Alert</th>
+                        <td>
+                            <img src="pages/reference-xforms-alert.png"/>
+                        </td>
+                        <td>
+                            <p>
+                                In each control you can specify an error message that will be
+                                displayed if the value entered by the user triggers a validation
+                                error.
+                            </p>
+                            <xml-source border="false" show-namespaces="false">
+                                <xforms:secret ref="secret">
+                                    <xforms:alert>Invalid password</xforms:alert>
+                                </xforms:secret>
+                            </xml-source>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Hint</th>
+                        <td>
+                            <img src="pages/reference-xforms-hint.png"/>
+                        </td>
+                        <td>
+                            <p>
+                                You can specify a hint on each control, which is displayed in a
+                                tooltip when the mouse is positioned over the control.
+                            </p>
+                            <xml-source border="false" show-namespaces="false">
+                                <xforms:textarea ref="textarea">
+                                    <xforms:hint>Enter at least 10 characters</xforms:hint>
+                                </xforms:textarea>
+                            </xml-source>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Help</th>
+                        <td>
+                            <img src="pages/reference-xforms-help.png"/>
+                        </td>
+                        <td>
+                            <p>
+                                If you specify a help message for a control, an icon with a
+                                question mark is displayed next to the control. A pop-up window will
+                                display the help message when the end-user clicks on the control.
+                            </p>
+                            <xml-source border="false" show-namespaces="false">
+                                <xforms:secret ref="secret">
+                                    <xforms:help>
+                                        Make sure you enter a valid password.
+                                        <p><i>The password is 42.</i></p>
+                                    </xforms:help>
+                                </xforms:secret>
+                            </xml-source>
+                        </td>
+                    </tr>
+                </table>
+            </section>
+            <section>
+                <title>UI Rendering</title>
+                <img src="pages/home-changes-epilogue.png" style="clear: both; float: right"/>
+                <p>
+                    By default OXF renders XForms controls into XHTML form elements and generates
+                    XHTML to render alerts, hints, and help messages. This default behavior helps
+                    you get started as you create your application. If you want to, you can change
+                    the way rendering into XHTML is done, or even render XForms controls into
+                    something other than XHTML, for instance SVG.
+                </p>
+                <p>
+                    Rendering of XForms elements is done in an XSLT stylesheet bundled with your
+                    application resources. The stylesheet file is called
+                    <code>xforms-to-xhtml.xsl</code> and the diagram on the right shows how the
+                    XForms output processor is called from the epilogue, and its output transformed
+                    by <code>xforms-to-xhtml.xsl</code>.
+                </p>
+                <p>
+                    Let's consider a specific example: XForms input controls are rendered to XHTML
+                    with this template in <code>xforms-to-xhtml.xsl</code>:
+                </p>
+                <xml-source border="false" show-namespaces="false">
+                    <xsl:template match="xforms:input">
+                        <xhtml:input type="text"
+                            name="{xxforms:encrypt-name(@xxforms:name)}"
+                            value="{@xxforms:value}">
+                            <xsl:call-template name="copy-other-attributes"/>
+                        </xhtml:input>
+                    </xsl:template>
+                </xml-source>
+                <p>
+                    An XHTML input field is generated and the label is not used, even if one if
+                    provided on the XForms control. Say that if a label is provided, you want to
+                    display it followed by a ":", just in front of the text field. You can do this
+                    by modifying the above template in <code>xforms-to-xhtml.xsl</code> with:
+                </p>
+                <xml-source border="false" show-namespaces="false">
+                    <xsl:template match="xforms:input">
+                        <xsl:if test="xforms:label">
+                            <xsl:value-of select="xforms:label"/>
+                            <xsl:text>: </xsl:text>
+                        </xsl:if>
+                        <xhtml:input type="text"
+                                name="{xxforms:encrypt-name(@xxforms:name)}"
+                                value="{@xxforms:value}">
+                            <xsl:call-template name="copy-other-attributes"/>
+                        </xhtml:input>
+                    </xsl:template>
+                </xml-source>
+            </section>
+        </section>
+        <section>
+            <title>XForms Repeat</title>
+            <p>
+                The XForms repeat module lets you easily create pages where XForms controls are
+                repeated, like an invoice made of invoice lines (with a description, unit price,
+                quantity), where new lines can be added, and existing lines can be edited or
+                deleted. OXF supports the following elements in the XForms repeat module:
+                <code>repeat</code>, <code>itemset</code>, <code>insert</code>, and
+                <code>delete</code>.
+            </p>
+            <img src="pages/reference-xforms-repeat.png" style="clear: both; float: right; margin: 1em"/>
+            <p>
+                The <a href="/goto-example/xforms-ubl">UBL Order</a> example illustrates this
+                scenario. See below a portion of the UBL example view that shows how
+                <code>&lt;xforms:repeat></code> is being used. In this example, a line in an HTML
+                table is generated for each order line in the XForms instance. As shown on the
+                screenshot on the right, on each line of the HTML table, two controls are generated:
+                a text field, and a "remove" button. The <code>&lt;xforms:submit></code> button
+                contains an element <code>&lt;xforms:delete></code>: this is an XForms actions,
+                which we will cover in the next section.
+            </p>
+            <xml-source show-namespaces="false">
+                <xforms:repeat nodeset="order:Order/cat:OrderLine" id="lineSet">
+                    <xhtml:tr>
+                        <xhtml:td>
+                            <xforms:input ref="cat:Item/cat:Description"/>
+                        </xhtml:td>
+                        <xhtml:td align="center">
+                            <xforms:submit xxforms:appearance="image">
+                                <xxforms:img src="/images/remove.png"/>
+                                <xforms:label/>
+                                <xforms:delete nodeset="/form/order:Order/cat:OrderLine" at="index('lineSet')"/>
+                            </xforms:submit>
+                        </xhtml:td>
+                    </xhtml:tr>
+                </xforms:repeat>
+            </xml-source>
+            <p>
+                
+            </p>
+            <p>
+
+            </p>
+        </section>
+        <section>
+            <title>XForms Actions</title>
+            <p>
+                The XForms specification focuses on the page view (by providing XForms controls) and
+                how the view interacts with the page model (by defining the XForms instance). You
+                typically implement the page model as a pipeline that receives the XForms instance
+                in input, and you can do anything you want in that pipeline, like querying a
+                database based on values entered by the end-user, or modifying the XForms instance
+                (see the <a href="reference-controller">Page Flow Controller reference
+                documentation</a> for more information on this).
+            </p>
+            <p>
+                In certain cases, you want to perform very simple operations on the XForms instance
+                when certain buttons are pressed by the end-users. Instead of doing this in the
+                page model, XForms provides you with a way to describe those simple operations
+                directly in the view with XForms actions. We go over the available XForms actions in
+                the next few sections.
+            </p>
+            <section>
+                <title>Set Value Action</title>
+                <p>
+                    When you have more than one XForms submit control (i.e. button, image, or link)
+                    on the same page you might be interested in knowing what button was pressed by
+                    the end-user. To do so, you can tell the XForms engine to set values in the
+                    XForms instance when a submit control is activated with an
+                    <code>&lt;xforms:setvalue></code> element child of the corresponding
+                    <code>&lt;xforms:submit></code> element. The <a
+                    href="../goto-example/xforms-submit">XForms Submit Example</a> illustrates
+                    this. For instance, the content of the <code>&lt;clicked></code> and
+                    <code>&lt;taste></code> elements are set with:
+                </p>
+                <xml-source>
+                    <xforms:submit>
+                        <xforms:label>Submit</xforms:label>
+                        <xforms:setvalue ref="clicked">button</xforms:setvalue>
+                        <xforms:setvalue ref="taste">vanilla</xforms:setvalue>
+                    </xforms:submit>
+                </xml-source>
+                <p>
+                    There are two variations of <code>&lt;xforms:setvalue></code>. The first one,
+                    illustrated above, specifies the value as a literal enclosed in the
+                    <code>&lt;xforms:setvalue></code> element. The second possibility consists of
+                    using the <code>value</code> attribute: the content of the attribute is an XPath
+                    expression evaluated in the context of the XForms instance, and the content of
+                    the node pointed to by the <code>ref</code> attribute will be set with the
+                    result of the XPath expression provided in the <code>value</code> attribute.
+                </p>
+            </section>
+            <section>
+                <title>Insert Action</title>
+                <p>
+                    The Insert and Delete actions are typically used in conjunctions with XForms
+                    repeat: when you create a page with a repeating structure (e.g. purchase order
+                    lines) you typically want to enable the end-user to insert a new line, and to
+                    delete existing lines. The annotated screenshot of the <a
+                    href="/goto-example/xforms-ubl">UBL Order</a> example shows which submit
+                    controls are implemented with XForms insert and XForms delete.
+                </p>
+                <img src="pages/reference-xforms-insert-delete.png"/>
+                <p>
+                    The XForms insert action creates a copy of the last element in a node set and
+                    inserts the copy in the node set where specified. Note that the copy can be
+                    inserted wherever you want in the node set, but that it is always the last
+                    element in the node set that gets copied.
+                </p>
+                <p>
+                    As shown in the example below, you specify the node set to operate on with an
+                    XPath expression in the <code>nodeset</code> attribute, the insertion point by
+                    pointing to an existing element with the <code>at</code> attribute, and declare
+                    if you want the insertion to be done after of before that element with the
+                    <code>position</code> attribute. The value of the <code>at</code> attribute is
+                    an XPath expression that returns an element position, like <code>last()</code>
+                    or <code>4</code>. Valid values for the <code>position</code> attribute are
+                    <code>before</code> and <code>after</code>.
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:submit xxforms:appearance="button">
+                        <xforms:label>Insert new line</xforms:label>
+                        <xforms:insert nodeset="/form/order:Order/cat:OrderLine" at="last()" position="after"/>
+                    </xforms:submit>
+                </xml-source>
+            </section>
+            <section>
+                <title>Delete Action</title>
+                <p>
+                    The XForms delete action deletes an element in a node set. As shown in the
+                    example below you specify the node set to operate on with an XPath expression in
+                    the <code>nodeset</code> attribute and the position of the element to delete
+                    with the <code>at</code> attribute. If you wanted to create a submit control
+                    that always deletes the second element in the node set, you would have
+                    <code>at="2"</code>. In most cases however, you want to enable the end-user to
+                    delete any displayed line. To that effect, you provide a submit control on each
+                    line in the view which would delete the corresponding element in the instance,
+                    as we did on the UBL example shown above.
+                </p>
+                <p>
+                    Even if multiple lines are displayed in the UI, you only have one submit
+                    control element in the view, inside an XForms repeat. To refer to the "current
+                    line" use the <code>index()</code> function in the <code>at</code> attribute.
+                    The <code>index()</code> function takes one attribute of type
+                    <code>xs:string</code>, which is a reference to a "repeat id". Repeat ids are
+                    declared with the <code>id</code> attribute on the
+                    <code>&lt;xforms:repeat></code> element. In the snippet below taken from the <a
+                    href="/goto-example/xforms-ubl">UBL Order example</a>, with
+                    <code>at="index('lineSet')"</code> we refer to the position of the current line
+                    in the XForms repeat with an <code>id="lineSet"</code> attribute. Repeat ids
+                    become particularly important when you have nested repeats, as shown in the <a
+                    href="/goto-example/xforms-repeat">XForms repeat example</a>.
+                </p>
+                <p>
+                    Note that when you reference a repeat id with the <code>index()</code> function
+                    in XForms actions, the element for that action must be nested in the XForms
+                    repeat element that declares the references id.
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:repeat nodeset="order:Order/cat:OrderLine" id="lineSet">
+                        <comment>... other XForms controls showing order line ...</comment>
+                        <xforms:submit>
+                            <xforms:label>Delete line</xforms:label>
+                            <xforms:delete nodeset="/form/order:Order/cat:OrderLine" at="index('lineSet')"/>
+                        </xforms:submit>
+                    </xforms:repeat>
+                </xml-source>
+            </section>
+        </section>
+    </body>
+</document>

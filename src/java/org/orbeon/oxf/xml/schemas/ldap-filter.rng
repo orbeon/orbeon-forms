@@ -1,0 +1,82 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+    <start>
+        <choice>
+            <!-- Query -->
+            <element name="filter">
+                <data type="string"/>
+            </element>
+
+            <!-- Update -->
+            <ref name="update"/>
+            <!-- Add -->
+            <ref name="add"/>
+            <!-- Delete -->
+            <ref name="delete"/>
+
+        </choice>
+    </start>
+
+    <define name="update">
+        <element name="update">
+            <interleave>
+                <element name="name">
+                    <data type="string"/>
+                </element>
+                <ref name="attributes"/>
+            </interleave>
+        </element>
+    </define>
+
+    <define name="add">
+        <element name="add">
+            <interleave>
+                <element name="name">
+                    <data type="string"/>
+                </element>
+                <ref name="attributes"/>
+            </interleave>
+        </element>
+    </define>
+
+    <define name="delete">
+        <element name="delete">
+            <element name="name">
+                <data type="string"/>
+            </element>
+        </element>
+    </define>
+
+    <define name="attributes">
+        <oneOrMore>
+            <ref name="attribute"/>
+        </oneOrMore>
+    </define>
+
+    <define name="attribute">
+        <element name="attribute">
+            <element name="name">
+                <data type="string"/>
+            </element>
+            <oneOrMore>
+                <element name="value">
+                    <data type="string"/>
+                </element>
+            </oneOrMore>
+        </element>
+    </define>
+</grammar>

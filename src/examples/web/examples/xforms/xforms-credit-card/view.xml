@@ -1,0 +1,87 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xhtml:head><xhtml:title>XForms Credit Card Verifier</xhtml:title></xhtml:head>
+    <xhtml:body>
+        <xforms:group ref="/credit-card">
+            <table border="0" cellpadding="2" cellspacing="0">
+                <tr>
+                    <td align="right">Card type:</td>
+                    <td>
+                        <xforms:select1 ref="type" appearance="minimal">
+                            <xforms:item>
+                                <xforms:label>Visa</xforms:label>
+                                <xforms:value>visa</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                                <xforms:label>Mastercard</xforms:label>
+                                <xforms:value>mastercard</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                                <xforms:label>American Express</xforms:label>
+                                <xforms:value>amex</xforms:value>
+                            </xforms:item>
+                        </xforms:select1>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">Number:</td>
+                    <td>
+                        <xforms:input ref="number">
+                            <xforms:alert>No alphabetical characters or signs are allowed in credit card number</xforms:alert>
+                        </xforms:input>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">Expiration month:</td>
+                    <td>
+                        <xforms:input ref="expiration-month" xhtml:style="width: 2em">
+                            <xforms:alert>Expiration month must be between 1 and 12</xforms:alert>
+                        </xforms:input>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">Expiration year:</td>
+                    <td>
+                        <xforms:input ref="expiration-year" xhtml:style="width: 4em">
+                            <xforms:alert>Expiration year must be a 4 digit number</xforms:alert>
+                        </xforms:input>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">Verification code:</td>
+                    <td>
+                        <xforms:input ref="verification-code" xhtml:style="width: 3em"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="right">Card valid:</td>
+                    <td>
+                        <b><xforms:output ref="valid"/></b>
+                    </td>
+                </tr>
+                <tr>
+                    <td/>
+                    <td>
+                        <xforms:submit>
+                            <xforms:label>Verify</xforms:label>
+                        </xforms:submit>
+                    </td>
+                </tr>
+            </table>
+        </xforms:group>
+    </xhtml:body>
+</xhtml:html>

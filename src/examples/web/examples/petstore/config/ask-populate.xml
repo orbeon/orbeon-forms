@@ -1,0 +1,36 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:d="http://orbeon.org/oxf/xml/document">
+
+    <xhtml:head>
+        <xhtml:title>OXF PetStore</xhtml:title>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:p>
+           Please choose one the the following two options:
+        </xhtml:p>
+        <xhtml:ul>
+            <xhtml:li>
+                This is your first time here. Please <a href="petstore/populate?path-info=./"
+                d:url-type="action">initialize</a> your database,
+            </xhtml:li>
+            <xhtml:li>
+                You are returning to this example. Go directly to the <a
+                href="petstore/">PetStore</a>.
+            </xhtml:li>
+        </xhtml:ul>
+    </xhtml:body>
+</xhtml:html>

@@ -1,0 +1,25 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<example-descriptor>
+    <title>Integrating with Java</title>
+    <source>model.xpl</source>
+    <source html="true">SystemProperties.java.xhtml</source>
+    <source>view.xsl</source>
+    <description>
+        This example shows how to create a custom processor, and how to use it in a pipeline through
+        the Java processor. Here the custom processor (<a
+        href="/javaprocessor/SystemProperties.java.html">view source</a>) generates an XML document
+        with the Java system properties. The properties are then displayed in a table by the view.
+    </description>
+</example-descriptor>

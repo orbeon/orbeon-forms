@@ -1,0 +1,399 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+         xmlns:xf="http://www.w3.org/2002/xforms"
+         xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+         xmlns:ev="http://www.w3.org/2001/xml-events">
+
+    <start>
+        <ref name="any-element"/>
+    </start>
+
+    <define name="any-element">
+        <choice>
+
+            <!-- Group -->
+            <element name="xf:group">
+                <ref name="xforms-common"/>
+                <optional>
+                    <attribute name="ref"/>
+                </optional>
+                <optional>
+                    <attribute name="xxf:show-errors"/>
+                </optional>
+                <zeroOrMore>
+                    <ref name="any-element"/>
+                </zeroOrMore>
+            </element>
+
+            <!-- Text controls -->
+            <element name="xf:input">
+                <ref name="xforms-common"/>
+                <attribute name="ref"/>
+            </element>
+            <element name="xf:secret">
+                <ref name="xforms-common"/>
+                <attribute name="ref"/>
+            </element>
+            <element name="xf:textarea">
+                <ref name="xforms-common"/>
+                <attribute name="ref"/>
+            </element>
+            <element name="xf:output">
+                <ref name="xforms-common"/>
+                <attribute name="ref"/>
+            </element>
+
+            <!-- Selection controls -->
+            <element name="xf:select">
+                <ref name="selects"/>
+            </element>
+            <element name="xf:select1">
+                <ref name="selects"/>
+            </element>
+
+            <!-- Submit controls -->
+            <element name="xf:submit">
+                <ref name="submit-trigger-content"/>
+            </element>
+
+            <!-- Trigger -->
+            <element name="xf:trigger">
+                <ref name="submit-trigger-content"/>
+            </element>
+
+            <!-- Upload controls -->
+            <element name="xf:upload">
+                <ref name="xforms-common"/>
+                <attribute name="ref"/>
+                <interleave>
+                    <optional>
+                        <element name="xf:filename">
+                            <attribute name="ref"/>
+                        </element>
+                    </optional>
+                    <optional>
+                        <element name="xf:mediatype">
+                            <attribute name="ref"/>
+                        </element>
+                    </optional>
+                    <optional>
+                        <element name="xxf:size">
+                            <attribute name="ref"/>
+                        </element>
+                    </optional>
+                </interleave>
+            </element>
+
+            <!-- Repeat -->
+            <element name="xf:repeat">
+                <ref name="xforms-common"/>
+                <attribute name="nodeset"/>
+                <optional>
+                    <attribute name="id"/>
+                </optional>
+                <optional>
+                    <attribute name="startindex">
+                        <data type="positiveInteger" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"/>
+                    </attribute>
+                </optional>
+                <optional>
+                    <attribute name="number">
+                        <data type="positiveInteger" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"/>
+                    </attribute>
+                </optional>
+                <zeroOrMore>
+                    <choice>
+                        <ref name="any-element"/>
+                        <text/>
+                    </choice>
+                </zeroOrMore>
+            </element>
+
+            <!-- Other elements -->
+            <element>
+                <anyName>
+                    <except>
+                        <nsName ns="http://www.w3.org/2002/xforms"/>
+                    </except>
+                </anyName>
+                <zeroOrMore>
+                    <choice>
+                        <attribute>
+                            <anyName/>
+                        </attribute>
+                        <text/>
+                        <ref name="any-element"/>
+                    </choice>
+                </zeroOrMore>
+            </element>
+        </choice>
+    </define>
+
+    <define name="submit-trigger-content">
+        <interleave>
+            <ref name="xforms-common"/>
+            <choice>
+                <!-- Button or link -->
+                <group>
+                    <optional>
+                        <attribute name="xxf:appearance">
+                            <choice>
+                                <value>button</value>
+                                <value>link</value>
+                            </choice>
+                        </attribute>
+                    </optional>
+                </group>
+                <!-- Image -->
+                <group>
+                    <attribute name="xxf:appearance">
+                        <value>image</value>
+                    </attribute>
+                    <interleave>
+                        <element name="xxf:img">
+                            <attribute name="src"/>
+                            <optional><attribute name="width"/></optional>
+                            <optional><attribute name="height"/></optional>
+                            <optional><attribute name="usemap"/></optional>
+                            <optional><attribute name="ismap"/></optional>
+                            <optional><attribute name="id"/></optional>
+                            <optional><attribute name="class"/></optional>
+                            <optional><attribute name="style"/></optional>
+                            <optional><attribute name="title"/></optional>
+                            <optional><attribute name="lang"/></optional>
+                            <optional><attribute name="dir"/></optional>
+                            <optional><attribute name="onclick"/></optional>
+                            <optional><attribute name="ondblclick"/></optional>
+                            <optional><attribute name="onmousedown"/></optional>
+                            <optional><attribute name="onmouseup"/></optional>
+                            <optional><attribute name="onmouseover"/></optional>
+                            <optional><attribute name="onmousemove"/></optional>
+                            <optional><attribute name="onmouseout"/></optional>
+                            <optional><attribute name="onkeypress"/></optional>
+                            <optional><attribute name="onkeydown"/></optional>
+                            <optional><attribute name="onkeyup"/></optional>
+                        </element>
+                    </interleave>
+                </group>
+            </choice>
+            <!-- Actions in an action element -->
+            <optional>
+                <element name="xf:action">
+                    <ref name="event"/>
+                    <ref name="actions"/>
+                </element>
+            </optional>
+            <!-- Actions without action element -->
+            <ref name="actions"/>
+        </interleave>
+    </define>
+
+    <define name="actions">
+        <zeroOrMore>
+            <choice>
+                <!-- Insert action -->
+                <element name="xf:insert">
+                    <ref name="event"/>
+                    <attribute name="nodeset"/>
+                    <attribute name="at"/>
+                    <attribute name="position"/>
+                </element>
+                <!-- Setvalue action -->
+                <element name="xf:setvalue">
+                    <ref name="event"/>
+                    <attribute name="ref"/>
+                    <optional>
+                        <attribute name="value"/>
+                    </optional>
+                    <optional>
+                        <text/>
+                    </optional>
+                </element>
+                <!-- Delete action -->
+                <element name="xf:delete">
+                    <ref name="event"/>
+                    <attribute name="nodeset"/>
+                    <attribute name="at"/>
+                </element>
+                <!-- Old proprietary set -->
+                <element name="xxf:set">
+                    <ref name="xforms-common"/>
+                    <attribute name="ref"/>
+                    <attribute name="value"/>
+                </element>
+            </choice>
+        </zeroOrMore>
+    </define>
+
+    <define name="event">
+        <optional>
+            <attribute name="ev:event">
+                <value>DOMActivate</value>
+            </attribute>
+        </optional>
+    </define>
+
+    <!-- What goes in a select/select1 -->
+    <define name="selects">
+        <attribute name="ref"/>
+        <optional>
+            <attribute name="appearance">
+                <choice>
+                    <value>full</value>
+                    <value>compact</value>
+                    <value>minimal</value>
+                </choice>
+            </attribute>
+        </optional>
+        <interleave>
+            <ref name="xforms-common"/>
+            <choice>
+                <optional>
+                    <element name="xf:choices">
+                        <ref name="xforms-common"/>
+                        <ref name="choices-content"/>
+                    </element>
+                </optional>
+                <group>
+                    <ref name="choices-content"/>
+                </group>
+            </choice>
+        </interleave>
+    </define>
+
+    <define name="choices-content">
+        <zeroOrMore>
+            <choice>
+                <element name="xf:item">
+                    <interleave>
+                        <ref name="xforms-common"/>
+<!--                        <element name="xf:label">-->
+<!--                            <ref name="xforms-common"/>-->
+<!--                            <text/>-->
+<!--                        </element>-->
+                        <element name="xf:value">
+                            <ref name="xforms-common"/>
+                            <text/>
+                        </element>
+                    </interleave>
+                </element>
+                <element name="xf:itemset">
+                    <interleave>
+                        <ref name="xforms-common"/>
+                        <attribute name="nodeset"/>
+                        <element name="xf:label">
+                            <ref name="xforms-common"/>
+                            <attribute name="ref"/>
+                        </element>
+                        <element name="xf:value">
+                            <ref name="xforms-common"/>
+                            <attribute name="ref"/>
+                        </element>
+                    </interleave>
+                </element>
+                <element>
+                    <anyName>
+                        <except>
+                            <nsName ns="http://www.w3.org/2002/xforms"/>
+                        </except>
+                    </anyName>
+                    <zeroOrMore>
+                        <choice>
+                            <attribute>
+                                <anyName/>
+                            </attribute>
+                            <text/>
+                            <ref name="choices-content"/>
+                        </choice>
+                    </zeroOrMore>
+                </element>
+            </choice>
+        </zeroOrMore>
+    </define>
+
+    <define name="non-xforms-content">
+        <zeroOrMore>
+            <choice>
+                <text/>
+                <element>
+                    <anyName>
+                        <except>
+                            <nsName ns="http://www.w3.org/2002/xforms"/>
+                        </except>
+                    </anyName>
+                    <zeroOrMore>
+                        <choice>
+                            <attribute>
+                                <anyName/>
+                            </attribute>
+                            <ref name="non-xforms-content"/>
+                        </choice>
+                    </zeroOrMore>
+                </element>
+            </choice>
+        </zeroOrMore>
+    </define>
+
+    <define name="non-xforms-attributes">
+        <zeroOrMore>
+            <attribute>
+                <anyName>
+                    <except>
+                        <nsName ns=""/>
+                        <nsName ns="http://www.w3.org/2002/xforms"/>
+                        <nsName ns="http://orbeon.org/oxf/xml/xforms"/>
+                    </except>
+                </anyName>
+            </attribute>
+        </zeroOrMore>
+    </define>
+
+    <define name="xforms-common">
+        <ref name="non-xforms-attributes"/>
+        <ref name="xforms-common-elements"/>
+    </define>
+
+    <define name="xforms-common-elements">
+        <zeroOrMore>
+            <choice>
+                <element name="xf:label">
+                    <optional><attribute name="ref"/></optional>
+                    <ref name="non-xforms-content"/>
+                </element>
+                <element name="xf:help"><ref name="non-xforms-content"/></element>
+                <element name="xf:hint"><ref name="non-xforms-content"/></element>
+                <element name="xf:alert"><ref name="non-xforms-attributes"/><ref name="non-xforms-content"/></element>
+                <element name="xxf:control"><empty/></element>
+                <element>
+                    <anyName>
+                        <except>
+                            <nsName ns="http://www.w3.org/2002/xforms"/>
+                        </except>
+                    </anyName>
+                    <zeroOrMore>
+                        <choice>
+                            <attribute>
+                                <anyName/>
+                            </attribute>
+                            <text/>
+                            <ref name="xforms-common-elements"/>
+                        </choice>
+                    </zeroOrMore>
+                </element>
+            </choice>
+        </zeroOrMore>
+    </define>
+
+</grammar>

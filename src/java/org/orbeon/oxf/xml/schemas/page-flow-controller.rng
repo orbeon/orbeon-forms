@@ -1,0 +1,185 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<grammar ns="http://www.orbeon.com/oxf/controller"
+    xmlns="http://relaxng.org/ns/structure/1.0"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+    <start>
+        <element name="config">
+            <optional>
+                <attribute name="instance-passing">
+                    <ref name="instancePassingValues"/>
+                </attribute>
+            </optional>
+            <!-- Files -->
+            <zeroOrMore>
+                <element name="files">
+                    <ref name="path"/>
+                    <optional>
+                        <attribute name="mime-type"/>
+                    </optional>
+                </element>
+            </zeroOrMore>
+            <!-- Pages -->
+            <zeroOrMore>
+                <element name="page">
+                    <optional>
+                        <attribute name="id"/>
+                    </optional>
+                    <optional>
+                        <attribute name="view"/>
+                    </optional>
+                    <optional>
+                        <attribute name="model"/>
+                    </optional>
+                    <optional>
+                        <attribute name="xforms"/>
+                    </optional>
+                    <ref name="path"/>
+                    <zeroOrMore>
+                        <element name="param">
+                            <attribute name="ref"/>
+                        </element>
+                    </zeroOrMore>
+                    <zeroOrMore>
+                        <element name="action">
+                            <optional>
+                                <attribute name="id"/>
+                            </optional>
+                            <optional>
+                                <attribute name="when"/>
+                            </optional>
+                            <choice>
+                                <group>
+                                    <attribute name="action"/>
+                                    <zeroOrMore>
+                                        <element name="result">
+                                            <optional>
+                                                <attribute name="when"/>
+                                            </optional>
+                                            <ref name="resultContent"/>
+                                        </element>
+                                    </zeroOrMore>
+                                </group>
+                                <zeroOrMore>
+                                    <element name="result">
+                                        <ref name="resultContent"/>
+                                    </element>
+                                </zeroOrMore>
+                            </choice>
+                        </element>
+                    </zeroOrMore>
+                </element>
+            </zeroOrMore>
+            <!-- View element -->
+            <optional>
+                <element name="view">
+                    <optional>
+                        <attribute name="xforms-output-prologue">
+                            <data type="string"/>
+                        </attribute>
+                    </optional>
+                    <optional>
+                        <attribute name="xforms-output-namespace-uri">
+                            <data type="string"/>
+                        </attribute>
+                    </optional>
+                    <optional>
+                        <attribute name="xforms-output-namespace-prefix">
+                            <data type="string"/>
+                        </attribute>
+                    </optional>
+                    <optional>
+                        <attribute name="not-found">
+                            <data type="anyURI"/>
+                        </attribute>
+                    </optional>
+                    <optional>
+                        <attribute name="epilogue">
+                            <data type="anyURI"/>
+                        </attribute>
+                    </optional>
+                </element>
+            </optional>
+            <!-- Other configuration elements -->
+            <interleave>
+                <optional>
+                    <element name="epilogue">
+                        <attribute name="url">
+                            <data type="anyURI"/>
+                        </attribute>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="not-found-handler">
+                        <attribute name="page">
+                            <data type="string"/>
+                        </attribute>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="error-handler">
+                        <attribute name="page">
+                            <data type="string"/>
+                        </attribute>
+                    </element>
+                </optional>
+            </interleave>
+        </element>
+    </start>
+    <define name="path">
+        <optional>
+            <attribute name="matcher"/>
+        </optional>
+        <attribute name="path-info"/>
+    </define>
+    <define name="resultContent">
+        <optional>
+            <attribute name="id"/>
+        </optional>
+        <optional>
+            <!-- Page id to go to -->
+            <attribute name="page"/>
+            <!-- Specify whether to pass the instance by redirecting or forwarding -->
+            <optional>
+                <attribute name="instance-passing">
+                    <ref name="instancePassingValues"/>
+                </attribute>
+            </optional>
+        </optional>
+        <zeroOrMore>
+            <ref name="anyElement"/>
+        </zeroOrMore>
+    </define>
+    <define name="anyElement">
+        <element>
+            <anyName/>
+            <zeroOrMore>
+                <choice>
+                    <attribute>
+                        <anyName/>
+                    </attribute>
+                    <text/>
+                    <ref name="anyElement"/>
+                </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+    <define name="instancePassingValues">
+        <choice>
+            <value>redirect</value>
+            <value>forward</value>
+        </choice>
+    </define>
+</grammar>

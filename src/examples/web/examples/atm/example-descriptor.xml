@@ -1,0 +1,56 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting" >
+    <title>ATM Page Flow</title>
+    <source>page-flow.xml</source>
+    <source>anything-else-form.xml</source>
+    <source>anything-else-view.xml</source>
+    <source>enter-pin-action.xsl</source>
+    <source>enter-pin-view.xsl</source>
+    <source>low-balance-form.xml</source>
+    <source>low-balance-view.xml</source>
+    <source>see-you-again-view.xml</source>
+    <source>view-account-action.xpl</source>
+    <source>view-account-form.xml</source>
+    <source>view-account-get-balance.xpl</source>
+    <source>view-account-view.xsl</source>
+    <description>
+        <p>
+            This example shows how to declare the site navigation logic in the Page Flow
+            Controller configuration. This way the site navigation logic is kept separate from the
+            pages themselves, thus achieving a better separation of concerns.
+        </p>
+        <p>
+            This example emulates a very simple ATM machine. The diagram on the right exposes the
+            logic of the ATM. Each page in this application is extremely simple and the interesting
+            part lies in the navigation logic between pages.
+        </p>
+        <p>
+            See the <a href="source?src=atm/page-flow.xml">Page Flow
+            Controller configuration</a> of this application.
+        </p>
+        <table border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <td style="text-align: center">
+                    <img src="/examples/atm/site-navigation.png" style="padding: 0.5em 1em" width="366" height="439"/>
+                </td>
+            </tr>
+            <tr>
+                <td style="font-style: italic; text-align: center">
+                    Navigation logic in the ATM application
+                </td>
+            </tr>
+        </table>
+    </description>
+</example-descriptor>

@@ -1,0 +1,33 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xdb:config datasource="xmldb:exist://localhost:8080/exist/xmlrpc">
+    <result>
+        <xdb:execute>
+            <xdb:query collection="/db" resource="blah">
+                xquery version "1.0";
+                declare namespace rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+                declare namespace dc="http://purl.org/dc/elements/1.1/";
+
+                for $p in distinct-values(//dc:creator)
+                let $books := //rdf:Description[dc:creator&amp;=$p]
+                return
+                    <result>
+                        <creator titles="{count($books)}">{$p}</creator>
+                        {for $b in $books return $b/dc:title}
+                    </result>
+            </xdb:query>
+        </xdb:execute>
+
+    </result>
+</xdb:config>

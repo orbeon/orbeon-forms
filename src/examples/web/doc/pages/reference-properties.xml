@@ -1,0 +1,722 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>OXF Properties</title>
+    </header>
+    <body>
+        <section>
+            <title>Rationale</title>
+            <p>
+                The OXF properties are used by some processors to configure or customize their
+                behavior. This section describes how the system is configured, and lists all the
+                customizable properties.
+            </p>
+        </section>
+        <section>
+            <title>Initialization</title>
+            <p>
+                The properties sub-system is initialized after the <link
+                href="reference-resource-managers">Resource Manager</link> (the properties being
+                read like any other OXF resources). By default it tries to load a file from the URL
+                <code>oxf:/properties.xml</code>. This value can be overridden in the Web
+                application descriptor <code>web.xml</code> with the <code>oxf.properties</code>
+                initialization parameter:
+            </p>
+            <xml-source>
+                <context-param>
+                    <param-name>oxf.properties</param-name>
+                    <param-value>oxf:/config/properties.xml</param-value>
+                </context-param>
+            </xml-source>
+
+            <note>
+                The properties file is read by an OXF pipeline which means that the file is
+                reloaded dynamically when needed. The changes are immediately available to the
+                application, although some properties are read only during OXF initialization.
+            </note>
+            <p>
+                The properties file supports the following datatypes:
+                <ul>
+                    <li>
+                        <code>string</code>
+                    </li>
+                    <li>
+                        <code>integer</code>
+                    </li>
+                    <li>
+                        <code>boolean</code>
+                    </li>
+                    <li>
+                        <code>date</code>
+                    </li>
+                    <li>
+                        <code>dateTime</code>
+                    </li>
+                </ul>
+            </p>
+
+            <note>
+                Dates are represented as: YYYY-MM-DD. DateTimes are represented as:
+                YYYY-MM-DDTHH:MM:SS.
+            </note>
+
+            <p>
+                The file is validated when loaded. Here is a simple example and the Relax NG
+                schema used.
+            </p>
+            <xml-source>
+<properties>
+    <property type="string" name="my-url" value="oxf:/document.xml"/>
+    <property type="boolean" name="my-boolean" value="true"/>
+    <property type="integer" name="my-integer" value="42"/>
+    <property type="date" name="my-date" value="2002-10-25"/>
+    <property type="dateTime" name="my-dateTime" value="2002-10-25T13:09:40"/>
+</properties>
+            </xml-source>
+            <xml-source>
+<element name="properties"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+    xmlns="http://relaxng.org/ns/structure/1.0">
+
+    <zeroOrMore>
+        <element name="property">
+            <attribute name="name"/>
+            <choice>
+                <group>
+                    <attribute name="type">
+                        <value>string</value>
+                    </attribute>
+                    <attribute name="value">
+                        <data type="string"/>
+                    </attribute>
+                </group>
+
+                <group>
+                    <attribute name="type">
+                        <value>boolean</value>
+                    </attribute>
+                    <attribute name="value">
+                        <data type="boolean"/>
+                    </attribute>
+                </group>
+
+                <group>
+                    <attribute name="type">
+                        <value>integer</value>
+                    </attribute>
+                    <attribute name="value">
+                        <data type="integer"/>
+                    </attribute>
+                </group>
+
+                <group>
+                    <attribute name="type">
+                        <value>date</value>
+                    </attribute>
+                    <attribute name="value">
+                        <data type="date"/>
+                    </attribute>
+                </group>
+
+                <group>
+                    <attribute name="type">
+                        <value>dateTime</value>
+                    </attribute>
+                    <attribute name="value">
+                        <data type="dateTime"/>
+                    </attribute>
+                </group>
+
+            </choice>
+        </element>
+    </zeroOrMore>
+</element>
+            </xml-source>
+        </section>
+        <section>
+            <title>Properties Reference</title>
+            <p>This section provides descriptions of the available properties.</p>
+            <anchor id="log4j"/>
+            <section>
+                <title>oxf.log4j-config</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Configures the logging system</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>string</code> (must be a URL)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>The logging system not initialized with a warning if this property
+                            is not present.</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    OXF uses the <fork
+                    href="http://jakarta.apache.org/log4j/docs/index.html">Log4J</fork> logging
+                    framework. Log4J is configured with an XML file conforming to the <link
+                    href="log4j.dtd.html">Log4J DTD</link>. Here is a sample Log4J configuration:
+                </p>
+                <xml-source>
+<log4j:configuration xmlns:log4j="log4j">
+    <appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
+        <param name="Target" value="System.out"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%-4r [%t] %-5p %c %x - %m%n"/>
+        </layout>
+    </appender>
+    <catagory name="org.orbeon.oxf.processor.DebugProcessor">
+        <priority value="info"/>
+    </catagory>
+    <root>
+        <priority value="error"/>
+        <appender-ref ref="ConsoleAppender"/>
+    </root>
+</log4j:configuration>
+                </xml-source>
+                <p>
+                    If this property is not set, the Log4J initialization is skipped. This is
+                    useful if another subsystem of your application has already initialized Log4J
+                    prior to the loading of OXF.
+                </p>
+            </section>
+
+            <a name="cache-size"/>
+            <section>
+                <title>oxf.cache.size</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Setup the size of the OXF cache</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>integer</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>200</td>
+                        </tr>
+                    </table>
+                </p>
+
+                <p>
+                    OXF uses an efficient caching system. OXF automatically determines what can be
+                    cached and when to expire objects. The cache has a default size of 200, meaning
+                    that it can hold 200 objects. This size is reasonable for most applications. A
+                    bigger cache tends to make the application faster, but it uses more memory. To
+                    tune the  cache, start the Java VM with the <code>-verbose:gc</code> option.
+                    Then with the application under typical load, look at the server logs and
+                    monitor:
+                </p>
+
+                <ul>
+                    <li>How often full garbage collections happen</li>
+                    <li>The value of the "success rate" reported by OXF after each page is generated</li>
+                </ul>
+
+                <p>
+                    The "success rate" is the percentage of the objects needed to generate the
+                    pages that were found in the cache. The closer this value is to 100%, the
+                    better. If the success rate is too low (say below 70% with a mostly static
+                    site), then the cache size should be increased. If full garbage collections
+                    happen too often, then the VM heap size should be increased. On the other hand,
+                    if the success rate is acceptable and garbage collections do not happen too
+                    often, you can consider reducing the size of the cache and maybe even the heap
+                    size.
+                </p>
+
+                <p>
+                    Tuning the VM heap size and cache size is not always needed and in most cases
+                    the default values are acceptable.
+                </p>
+            </section>
+            <section>
+                <title>oxf.xslt.transformer</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Choose the XSLT implementation</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>string</code> (either
+                                <code>interpreter</code> or the transformer
+                                factory class name
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>
+                                <code>interpreter</code>
+                            </td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    This property selects the XSLT engine used by the XSLT
+                    processor. Currently, two choices are available:</p>
+                <ul>
+                    <li>
+                        <code>interpreter</code>: Use the <fork
+                        href="http://xml.apache.org/xalan-j/">Apache
+                        Xalan</fork> XSLT processor.
+                    </li>
+                    <li>
+                        The transformer factory class name, for example
+                        <code>orbeon.apache.xalan.xsltc.trax.TransformerFactoryImpl</code>
+                        for XSLTC
+                    </li>
+                </ul>
+                <p>
+                    Using an XSLT compiler such as XSLTC presents advantages and disadvantages.
+                    XSLTC translets take a few seconds to compile to Java bytecode (and then native
+                    code if the Java VM provides just-in-time compilation) the first time they are
+                    used (like JSP), but are faster on subsequent executions. Regular Xalan
+                    transformations take less time to "compile", but transformations are on average
+                    slower. XSLTC might be preferable when stylesheets change rarely and Xalan is a
+                    good option when stylesheets are generated on the fly or change on a fairly
+                    frequent basis.
+                </p>
+                <warning>
+                    At this point in time, XSLTC is still in early development and cannot be
+                    considered a stable product. Since errors or unexpected behavior may occur, it
+                    is recommended that you use the default Xalan interpreter instead of XSLTC.
+                </warning>
+
+                <note>
+                    This property changes the XSLT implementation for the whole application. It is
+                    possible, and actually recommended in most scenarios, to use specific
+                    transformer implementations locally instead. For more information, visit the <a
+                    href="processors-xslt">XSLT Processor</a> reference.
+                </note>
+
+            </section>
+            <section>
+                <title>oxf.validation.processor</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Controls the automatic processor validation</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>boolean</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>Enabled</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    Many processors validate their configuration input with a schema. This
+                    validation is automatic and allows meaningful error reporting. To further
+                    improve the performance of the application, validation can be disabled in
+                    production environments.
+                </p>
+            </section>
+            <section>
+                <title>oxf.validation.user</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Controls user-defined validation</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>boolean</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>Enabled</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    User-defined validation is activated in the <link
+                    href="reference-xpl-pipelines">XML Pipeline Definition Language</link> with the
+                    attributes <code>schema-href</code> and <code>schema-uri</code>. To further
+                    improve the performance of the application, validation can be disabled in
+                    production environments.
+                </p>
+            </section>
+            <section>
+                <title>oxf.validation.xforms</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Controls the XForms instance validation</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>boolean</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>Enabled</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    The <link href="processors-xforms#xforms-input">XForms Input</link> processor
+                    can optionally validate user input. Although not recommended, it is possible to
+                    disable validation with this property.
+                </p>
+
+                <note>
+                    For the security of your Web application, it is recommended that you
+                    <b>always</b> validate user input with a strongly typed schema.
+                </note>
+
+            </section>
+            <section>
+                <title>oxf.prologue</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Defines OXF processors</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>string</code> (must be a URL)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>A default prologue is loaded automatically</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    Loads an OXF prologue file, where processors are declared. OXF is bundled with
+                    a default prologue file containing all processors. You can create processors
+                    (see the <link href="reference-processor-api">processor API</link>) and declare
+                    them in a custom prologue. The custom prologue doesn't replace, but completes
+                    the default prologue. It is possible to override a default processor with a
+                    custom implementation by binding it to the same URI as the default processor.
+                    The following example shows a simple custom prologue declaring an hypothetical
+                    processor:
+                </p>
+                <xml-source>
+<processors>
+    <processor name="oxf:myprocessor">
+        <class name="com.company.oxf.MyProcessor"/>
+    </processor>
+</processors>
+                </xml-source>
+            </section>
+            <!--
+            <section>
+                <title>oxf.servlet.inspector.path</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Enables OXF's inspector and sets its path.</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>string</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>The inspector is disabled.</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>OXF's inspector shows the last five pipeline executions and
+                the data flowing through the processors. This property sets the
+                inspector's path-info, relative to the web application's context
+                root.</p>
+                <note>Enabling the inspector has an impact on performance. The
+                inspector should be disabled for production use.</note>
+            </section>
+            -->
+            <section>
+                <title>oxf.main-processor.uri</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Select the application's main processor</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>string</code> (must be a processor URI)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>None, must be specified</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    This property defines the main processor, and associated inputs, created during
+                    initialization. The following processors are the two most commonly used:
+                </p>
+                <ul>
+                    <li>
+                        <code>oxf/processor/pipeline</code> to use the
+                        <link href="reference-xpl-pipelines">Pipeline processor</link>
+                    </li>
+                    <li>
+                        <code>oxf/processor/page-flow</code> to use the
+                        <link href="reference-controller">Page Flow Controller</link>
+                    </li>
+                </ul>
+                <note>
+                    It is recommended to configure the main processor within <code>web.xml</code>.
+                    For more information, visit <a href="integration-packaging">Packaging and
+                    Deployment</a>.
+                </note>
+            </section>
+            <section>
+                <title>oxf.main-processor.input.*</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Binds the main processor inputs</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>string</code> (must be a URL)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    This set of properties dynamically binds the main processor inputs. For
+                    example, to bind the <code>config</code> input to a pipeline processor, use the
+                    following declaration:
+                </p>
+                <xml-source>
+<property type="string" name="oxf.main-processor.input.config" value="oxf:/config/pipeline.xml"/>
+                </xml-source>
+                <p>
+                    The <link href="reference-controller">Web App Controller</link> input name is
+                    <code>controller</code>, thus the binding is:
+                </p>
+                <xml-source>
+<property type="string" name="oxf.main-processor.input.controller" value="oxf:/config/page-flow.xml"/>
+                </xml-source>
+                <note>
+                    The current recommendation is to configure the main processor within
+                    <code>web.xml</code>. For more information, visit <a
+                    href="integration-packaging">Packaging and Deployment</a>.
+                </note>
+            </section>
+            <anchor id="error-pipeline"/>
+            <section>
+                <title>oxf.servlet.error.processor</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Select the application error processor</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>string</code> (must be a processor URI)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>No error pipeline is used</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    Like <code>oxf.main-processor.uri</code>, this property points to an XPL file
+                    defining a pipeline. That pipeline declares the error pipeline, which is
+                    executed if a problem occurs during the normal execution process. The error
+                    pipeline can be used to log an error or display a user-friendly error message.
+                    For Web applications, if an exception is thrown during the execution of the
+                    error pipeline, or no error pipeline is defined, a static error page is
+                    generated. See <link href="reference-error-pipeline">Error Pipeline</link> for
+                    more information.
+                </p>
+            </section>
+            <section>
+                <title>oxf.servlet.error.input.*</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Binds the error processor's inputs</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>string</code> (must be a URL)
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    This property serves the same purpose as
+                    <code>oxf.main-processor.input.*</code>, but only for the error pipeline. See
+                    <link href="reference-error-pipeline">Error Pipeline</link> for more
+                    information.
+                </p>
+            </section>
+            <anchor id="classpath"/>
+            <section>
+                <title>oxf.java.classpath</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Defines a directory where Java class files are located</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>string</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    The <link href="processors-java">Java Processor</link> dynamically compiles
+                    Java code, and may need some libraries. This property defines the classpath used
+                    by the compiler.
+                </p>
+            </section>
+            <anchor id="jarpath"/>
+            <section>
+                <title>oxf.java.jarpath</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Defines a list of directories where JAR files are located</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>string</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    The <link href="processors-java">Java Processor</link> dynamically compiles
+                    Java code, and may need some libraries. This property defines a "JAR path", a
+                    list of directories containing JAR files that will be added to the classpath
+                    when compiling and running the processor executed by the Java processor.
+                </p>
+            </section>
+            <section>
+                <title>oxf.email.host</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Overrides the SMTP host used to send email throughout the application</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>string</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    This option overrides the <code>smtp-host</code> for the entire application.
+                </p>
+            </section>
+            <section>
+                <title>oxf.email.force-to</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Purpose</th>
+                            <td>Overrides the recipient of the emails</td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td>
+                                <code>string</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    During development and testing, it is useful to redirect all email to a tests
+                    address rather than sending them to the real address.
+                </p>
+            </section>
+        </section>
+    </body>
+</document>

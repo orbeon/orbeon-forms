@@ -1,0 +1,303 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Processor API</title>
+    </header>
+    <body>
+        <section>
+            <title>Scope</title>
+
+            <p>This section documents the OXF Processor Java API. This is a Java
+            API that you can use to write custom processors in Java. You can
+            then use those custom processors in your OXF applications, just
+            like the standard processors bundled with OXF.</p>
+        </section>
+        <section>
+            <title>Why Write Custom Processors?</title>
+
+            <p>In general, OXF processors encapsulate business logic to perform
+            generic tasks such as calling a Web service or accessing a database
+            using SQL. With those processors, the developer can describe the
+            specifics of a task at a high level in a declarative way.</p>
+
+            <p>However, there are special cases where:</p>
+
+            <ul>
+                <li>no existing processor exactly encapsulate the task to be
+                performed</li>
+
+                <li>or, it is more suitable to write Java code to get the job
+                done rather than using an existing processor</li>
+            </ul>
+
+            <p>In those cases, it makes sense for the developer to write
+            his/her own processor in Java. This section goes through the
+            essential APIs used to write processors in Java.</p>
+        </section>
+        <section>
+            <title>Prerequisites</title>
+            <p>Writing OXF processors is expected to be done by Java developers
+            who are comfortable with the Java language as well as compiling and
+            deploying onto J2EE application servers. In addition, we assume that
+            the developer is comfortable with both:</p>
+            <ul>
+                <li>The <link href="http://java.sun.com/j2se/1.4/docs/api/org/xml/sax/package-summary.html">SAX
+                API</link>
+                </li>
+                <li>Either the <link href="http://java.sun.com/j2se/1.4/docs/api/org/w3c/dom/package-summary.html">W3C
+                DOM</link> or <link href="http://www.dom4j.org/apidocs/overview-summary.html">DOM4J</link> APIs.</li>
+            </ul>
+        </section>
+        <section>
+            <title>Processor With Outputs</title>
+
+            <section>
+                <title>Example</title>
+                <p>We consider a very simple processor with an input
+                <code>number</code> and an output <code>double</code>. The processor
+                computes the double of the number it gets as an input. For
+                instance, if the input is
+                <code>&lt;number&gt;21&lt;/number&gt;</code>, the output will be
+                <code>&lt;number&gt;42&lt;/number&gt;</code>.</p>
+                <img print-format="pdf" src="pages/reference-processor-api-myprocessor.png"/>
+                <source><![CDATA[import org.orbeon.oxf.processor.pipeline.PipelineContext;
+import org.orbeon.oxf.processor.SimpleProcessor;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
+import org.dom4j.Document;
+
+public class MyProcessor extends SimpleProcessor {
+
+    public MyProcessor() {
+        addInputInfo(new ProcessorInputOutputInfo("number"));
+        addOutputInfo(new ProcessorInputOutputInfo("double"));
+    }
+
+    public void generateDouble(PipelineContext context,
+                               ContentHandler contentHandler)
+            throws SAXException {
+
+        // Get number from input using DOM4J
+        Document numberDocument = readInputAsDOM4J(context, "number");
+        String numberString = (String)
+            numberDocument.selectObject("string(/number)");
+        int number = Integer.parseInt(numberString);
+        String doubleString = Integer.toString(number * 2);
+
+        // Generate output document with SAX
+        contentHandler.startDocument();
+        contentHandler.startElement("", "number", "number",
+                                    new AttributesImpl());
+        contentHandler.characters(doubleString.toCharArray(), 0,
+                                  doubleString.length());
+        contentHandler.endElement("", "number", "number");
+        contentHandler.endDocument();
+    }
+}]]></source>
+        </section>
+        <section>
+            <title>Deriving from SimpleProcessor</title>
+            <p>All the processors must implement the <code>Processor</code>
+            interface (in the package
+            <code>org.orbeon.oxf.pipeline.processors</code>).
+            <code>SimpleProcessor</code> is an abstract class that implements all
+            the methods of <code>Processor</code> and that can be used as a base
+            class to create a custom processor (<code>MyProcessor.java</code> in
+            the figure below).</p>
+            <img print-format="pdf" src="pages/reference-processor-api-simple.png"/>
+        </section>
+        <section>
+            <title>Declaring Inputs and Outputs</title>
+            <p>The processor must declare its inputs and outputs. This is done
+            in the default constructor by calling the <code>addInputInfo</code>
+            and <code>addOutputInfo</code> methods and passing an object of type
+            <code>ProcessorInputOutputInfo</code>. For instance:</p>
+            <source><![CDATA[public MyProcessor() {
+    addInputInfo(new ProcessorInputOutputInfo("number"));
+    addOutputInfo(new ProcessorInputOutputInfo("double"));
+}
+]]></source>
+                <p>In addition to the name of the input/output, one can pass an
+                optional schema URI declared in the <link href="reference-properties">OXF properties</link>. If a schema
+                URI is specified, the corresponding input or output can be
+                <link href="processors-validation">validated</link>.</p>
+            </section>
+            <section>
+                <title>Implementing generate Methods</title>
+                <p>For each declared output, the class must declare a corresponding
+                <code>generate</code> method. For instance, in the example, we have an
+                output named <code>double</code>. The document for this output is
+                produced by the method <code>generateDouble</code>.
+                <code>generate</code> methods must have two arguments:</p>
+                <ul>
+                    <li>A <code>PipelineContext</code>. This context needs to be
+                    passed to other methods that need one, typically to read inputs
+                    (more on this later).</li>
+                    <li>A <code>ContentHandler</code>. This is a <link href="http://www.saxproject.org/apidoc/org/xml/sax/ContentHandler.html">SAX
+                    content handler</link> that receives the document produced by
+                    the <code>generate</code> method.</li>
+                </ul>
+            </section>
+            <section>
+                <title>Reading Inputs</title>
+                <p>If the output depends on the inputs, one will need to read
+                those inputs. There are 3 different APIs to read an input:</p>
+                <ul>
+                    <li>One can get the <link href="http://java.sun.com/j2se/1.4/docs/api/org/w3c/dom/package-summary.html">W3C
+                    DOM</link> representation of the input document by calling
+                    the <code>readInputAsDOM(context, name)</code> method.</li>
+                    <li>One can get the <link href="http://www.dom4j.org/apidocs/index.html">DOM4J</link>
+                    representation of the input document by calling the
+                    <code>readInputAsDOM4J(context, name)</code> method.</li>
+                    <li>One can provide a custom <link href="http://www.saxproject.org/apidoc/org/xml/sax/ContentHandler.html">SAX
+                    content handler</link> to the method
+                    <code>readInputAsSAX(context, name,
+                    contentHandler)</code>.</li>
+                </ul>
+                <p>Depending on what the <code>generate</code> method needs to
+                do with the input document, one API might be more appropriate
+                than the others.</p>
+                <p>In our example, we want to get the value inside the
+                <code>&lt;number&gt;</code> element. We decided to go with the
+                DOM4J API, calling the
+                <code>numberDocument.selectObject("string(/number)")</code> on
+                the DOM4J document.</p>
+            </section>
+            <section>
+                <title>Generating a Document</title>
+                <p>The output document can alternatively be generated by:</p>
+                <ul>
+                    <li>Directly calling methods of the content handler
+                    received by the <code>generate</code> method. This is what we
+                    do in the example detailed in this section. Here
+                    is the code generating the output document:</li>
+                    <source><![CDATA[contentHandler.startDocument();
+contentHandler.startElement("", "number", "number",
+                        new AttributesImpl());
+contentHandler.characters(doubleString.toCharArray(), 0,
+                      doubleString.length());
+contentHandler.endElement("", "number", "number");
+contentHandler.endDocument();
+]]></source>
+                <li>Create a DOM4J document and have it sent to the content
+                handler using a <code>LocationSAXWriter</code> (in package
+                <code>org.orbeon.oxf.xml.dom4j</code>):</li>
+            </ul>
+
+                <source><![CDATA[Document doc = ...;
+LocationSAXWriter saxWriter = new LocationSAXWriter();
+saxWriter.setContentHandler(contentHandler);
+saxWriter.write(doc);
+]]></source>
+                    <note>Using the <code>LocationSAXWriter</code> provided with
+                    OXF is the preferred way to write a DOM4J document to a SAX
+                    content handler. The standard JAXP API (calling <link href="http://java.sun.com/j2se/1.4/docs/api/javax/xml/transform/Transformer.html#transform(javax.xml.transform.Source,%20javax.xml.transform.Result)">
+                            <code>transform</code>
+                        </link>
+                    with a <link href="http://www.dom4j.org/apidocs/org/dom4j/io/DocumentSource.html">
+                            <code>org.dom4j.io.DocumentSource</code></link>)
+                    can also be used, but if it is used, the location information
+                    stored in the DOM4J document will be lost.</note>
+
+                <ul>
+                    <li>Create a W3C document and send it to the content
+                    handler using the standard JAXP API:</li>
+                </ul>
+
+                    <source><![CDATA[Document doc = ...;
+Document doc = ...;
+TransformerUtils.getXMLIdentityTransformer().transform
+(new DOMSource(doc), new SAXResult(contentHandler));
+]]></source>
+                    <note>
+                        <code>TransformerUtils</code> is an OXF class (in
+                    package <code>org.orbeon.oxf.xml</code>). It will create and
+                    cache the appropriate transformer factory. The developer is
+                    of course free to create its own factory and transformer
+                    calling directly the JAXP API.</note>
+            </section>
+        </section>
+        <section>
+            <title>Processor With No Output</title>
+            <section>
+                <title>Implementing The start Method</title>
+
+                <p>Implementing a processor with no output is very similar to
+                implementing a processor with outputs (see above). The only
+                difference is that you need to implement the
+                <code>start()</code> method, instead of the
+                <code>generate()</code> methods.</p>
+            </section>
+            <section>
+                <title>Example</title>
+
+                <p>The processor below reads its <code>data</code> input and
+                writes the content of the XML document to the standard output
+                stream.</p>
+
+                <img print-format="pdf" src="pages/reference-processor-api-systemout.png"/>
+                <source><![CDATA[
+package org.orbeon.oxf;
+
+import org.dom4j.Document;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.SimpleProcessor;
+import org.orbeon.oxf.processor.pipeline.PipelineContext;
+
+import java.io.IOException;
+import java.io.StringWriter;
+
+public class SystemOutProcessor extends SimpleProcessor {
+
+    public SystemOutProcessor() {
+        addInputInfo(new ProcessorInputOutputInfo("data"));
+    }
+
+    public void start(PipelineContext context) {
+        try {
+            Document dataDocument = readInputAsDOM4J(context, "data");
+            OutputFormat format = OutputFormat.createPrettyPrint();
+            format.setIndentSize(4);
+            StringWriter writer = new StringWriter();
+            XMLWriter xmlWriter = new XMLWriter(writer, format);
+            xmlWriter.write(dataDocument);
+            xmlWriter.close();
+            System.out.println(writer.toString());
+        } catch (IOException e) {
+            throw new OXFException(e);
+        }
+    }
+}
+]]></source>
+            </section>
+        </section>
+        <!--
+        <section>
+            <title>Processor State</title>
+
+            <p>Explain how to store something between the invocation of two
+            generate methods (can't read input more than once).</p>
+        </section>
+        -->
+    </body>
+</document>

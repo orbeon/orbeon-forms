@@ -1,0 +1,58 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<element name="config"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+    xmlns="http://relaxng.org/ns/structure/1.0">
+    <interleave>
+        <zeroOrMore>
+            <element name="start-task">
+                <interleave>
+                    <element name="name">
+                        <data type="string"/>
+                    </element>
+                    <element name="processor-uri">
+                        <data type="string"/>
+                    </element>
+                    <element name="start-time">
+                        <data type="string"/>
+                    </element>
+                    <element name="interval">
+                        <data type="long"/>
+                    </element>
+                    <optional>
+                        <element name="synchronized">
+                            <data type="boolean"/>
+                        </element>
+                    </optional>
+                    <zeroOrMore>
+                        <element name="input">
+                            <attribute name="name"/>
+                            <choice>
+                                <attribute name="url"/>
+                                <data type="string"/>
+                            </choice>
+                        </element>
+                    </zeroOrMore>
+                </interleave>
+            </element>
+        </zeroOrMore>
+        <zeroOrMore>
+            <element name="stop-task">
+                <element name="name">
+                    <data type="string"/>
+                </element>
+            </element>
+        </zeroOrMore>
+    </interleave>
+</element>

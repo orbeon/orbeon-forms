@@ -1,0 +1,105 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<!--
+  This list describes the examples to show in the Examples portal.
+
+  Examples can be grouped. All example elements must have an id. The id must not contain any '/'.
+  If a path attribute is present, the path is used to find the directory where the example is
+  located. Otherwise, the id is used as a path.
+
+  Each example directory must contain:
+
+  o page-flow.xml: the page flow for the example
+  o example-descriptor.xml: a detailed description of the example
+
+  Each example's page flow must support pages with paths starting with the example id. For example,
+  if the example id is "xforms-submit", the initial path will be "/xforms-submit", and other page
+  paths must start with "/xforms-submit", for example "/xforms-submit/page2". If an example has only
+  one page, it can simply use "*" as path for that page. Note that the example id is used, NOT the
+  example path.
+
+  Portlets cannot serve resources directly. Examples that want to serve dynamic resources must
+  prepend "/example-resources/" to the paths in the page flow. The examples framework will
+  automatically dispatch the requests for such resources. For example, the Image Server example
+  serves dynamic images with the following:
+
+  <page path-info="/example-resources/imageserver/image" xforms="form.xml" model="image.xpl"/>
+
+  Examples with standalone="true" live in the examples-standalone directory. They do not run as
+  portlets.
+-->
+<examples-list>
+    <section label="The Basics">
+    	<example id="tutorial-hello1" path="tutorial/hello1" label="Hello World Classic"/>
+        <example id="tutorial-hello2" path="tutorial/hello2" label="Hello World MVC"/>
+        <example id="tutorial-hello3" path="tutorial/hello3" label="Hello World XForms"/>
+        <example id="tutorial-hello4" path="tutorial/hello4" label="Hello World Page Flow"/>
+        <example id="cart" label="Saving State in the Session"/>
+        <example id="java" label="Integrating w/Java"/>
+        <example id="authentication" label="J2EE Authentication" standalone="true"/>
+    </section>
+    <section label="Document-Centric App">
+        <example id="bizdoc" label="The &quot;BizDoc&quot; Example"/>
+    </section>
+    <section label="Controlling Page Flow">
+        <example id="atm" label="ATM Page Flow"/>
+        <example id="counter" label="Counter Page Flow"/>
+    </section>
+    <section label="Form Handling w/XForms">
+        <example id="xforms-text" path="xforms/xforms-text" label="Text Controls"/>
+        <example id="xforms-selection" path="xforms/xforms-selection" label="Selection Controls"/>
+        <example id="xforms-submit" path="xforms/xforms-submit" label="Submit Controls"/>
+        <example id="xforms-repeat" path="xforms/xforms-repeat" label="Repeating Elements"/>
+        <example id="xforms-credit-card" path="xforms/xforms-credit-card" label="Credit Card Verifier"/>
+        <example id="xforms-report" path="xforms/xforms-report" label="Sortable Table"/>
+        <example id="xforms-wizard" path="xforms/xforms-wizard" label="Multi-Screen Wizard"/>
+        <example id="xforms-ubl" path="xforms/xforms-ubl" label="Complex UBL Order"/>
+    </section>
+    <section label="Presenting Data">
+        <example id="reports" label="Data in multiple formats"/>
+        <example id="charts" label="Charts &amp; Graphs"/>
+        <example id="imageserver" label="Image Server"/>
+    </section>
+    <section label="Database Access">
+        <example id="address-book" label="Address Book"/>
+        <example id="xmldb" label="XML:DB Databases"/>
+    </section>
+    <section label="Query &amp; Transformation">
+        <example id="xquery" label="XQuery Sandbox"/>
+        <example id="xupdate" label="XUpdate Sandbox"/>
+        <example id="xpath" label="XPath Sandbox"/>
+        <example id="xpl" label="XPL Sandbox"/>
+        <example id="knight" label="Computations using XSLT"/>
+        <example id="stx" label="Streaming Transformations"/>
+    </section>
+    <section label="Calling a Web Service">
+        <example id="quotes" label="Famous Quotes"/>
+        <example id="ca-traffic" label="California Traffic"/>
+    </section>
+    <section label="Messaging">
+        <example id="email" label="Sending Email"/>
+    </section>
+    <section label="Integrating with Struts">
+        <example id="struts-hello" label="Hello World" href="/struts/hello"/>
+        <example id="struts-pdf" label="Struts PDF Generation" href="/struts/pdf-intro"/>
+        <example id="struts-guess" label="Struts Number Guess" href="/struts/guess"/>
+        <example id="struts-validation" label="Struts Client-Side Validation" href="/struts/jsType"/>
+    </section>
+    <section label="Cool Stuff">
+        <example id="url" label="URL Generator"/>
+        <example id="rss" label="Create Your Own RSS Feeds"/>
+        <example id="spellchecker" label="Google Spell Checker"/>
+        <example id="xml-to-url" label="XML to URL"/>
+    </section>
+</examples-list>

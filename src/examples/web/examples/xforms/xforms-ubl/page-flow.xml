@@ -1,0 +1,10 @@
+<config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:xu="http://www.xmldb.org/xupdate">
+
+    <page path-info="/xforms-ubl" xforms="form.xml" model="model.xpl" view="view.xsl"/>
+
+    <page path-info="/xforms-ubl/popup" view="popup.xml"/>
+
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</config>

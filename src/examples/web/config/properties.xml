@@ -1,0 +1,33 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<properties xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <!-- Global properties -->
+    <property as="xs:anyURI"  name="oxf.log4j-config"                                value="oxf:/config/log4j.xml"/>
+    <property as="xs:integer" name="oxf.cache.size"                                  value="200"/>
+
+    <property as="xs:QName"   name="oxf.servlet.error.processor"                     value="oxf:pipeline"/>
+    <property as="xs:string"  name="oxf.servlet.error.input.config"                  value="oxf:/config/error.xpl"/>
+
+    <!-- Processor-specific properties -->
+    <property as="xs:integer" processor-name="oxf:request"   name="max-upload-size"  value="100000000"/>
+    <property as="xs:string"  processor-name="oxf:page-flow" name="instance-passing" value="redirect"/>
+
+    <!-- Encryption of hidden fields and field names -->
+    <property as="xs:boolean" name="oxf.xforms.encrypt-hidden"                       value="false"/>
+    <property as="xs:boolean" name="oxf.xforms.encrypt-names"                        value="false"/>
+    <property as="xs:string"  name="oxf.xforms.password"                             value="Password used for encryption"/>
+
+</properties>

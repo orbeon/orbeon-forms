@@ -1,0 +1,425 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Serializers</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <p>Serializers are processors with no XML output. A serializer, just
+                like any processor, can access files, connect to databases, and take
+                an action depending on its inputs.</p>
+        </section>
+
+        <anchor id="http-serializers"/>
+        <section>
+            <title>HTTP Serializers</title>
+            <p>
+                These serializers have a common goal: writing their
+                input data to the HTTPResponse or the standard output. They share
+                the same configuration, but differ in their output. The following
+                describes the common configuration, then the specifics for
+                each serializer.
+            </p>
+            <p>
+                All serializers send the cache control HTTP headers,
+                including
+                <code>Last-Modified</code>,
+                <code>Expires</code> and
+                <code>Cache-Control</code>. The MIME content type and content
+                length headers are also supported.
+            </p>
+
+            <anchor id="http-configuration"/>
+            <section>
+                <title>Configuration</title>
+                <p>
+                    The configuration consists of eleven optional elements.
+                    <p/>
+                    <table ca="|l|p{0.3\textwidth}|p{0.2\textwidth}|">
+                        <tr>
+                            <th>Element</th>
+                            <th>Purpose</th>
+                            <th>Default</th>
+                        </tr>
+                        <tr>
+                            <td>content-type</td>
+                            <td>MIME type sent to the client</td>
+                            <td>Specific to each serializer</td>
+                        </tr>
+                        <tr>
+                            <td>status-code</td>
+                            <td>HTTP status code sent to the client</td>
+                            <td>SC_OK, or 100</td>
+                        </tr>
+                        <tr>
+                            <td>empty-content</td>
+                            <td>Forces the serializer to return an empty content, without reading its data input</td>
+                            <td>false</td>
+                        </tr>
+                        <tr>
+                            <td>error-code</td>
+                            <td>HTTP error code sent to the client</td>
+                            <td>none</td>
+                        </tr>
+                        <tr>
+                            <td>method</td>
+                            <td>XSLT Output Method</td>
+                            <td>html, xml or text, depending on the serializer</td>
+                        </tr>
+                        <tr>
+                            <td>version</td>
+                            <td>HTML or XML version number</td>
+                            <td>4.01 for HTML (ignored for XML, which always output 1.0)</td>
+                        </tr>
+                        <tr>
+                            <td>public-doctype</td>
+                            <td>The public doctype</td>
+                            <td>&quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot; for HTML, none otherwise</td>
+                        </tr>
+                        <tr>
+                            <td>system-doctype</td>
+                            <td>The system doctype</td>
+                            <td>&quot;http://www.w3.org/TR/html4/loose.dtd&quot; for HTML, none otherwise </td>
+                        </tr>
+                        <tr>
+                            <td>encoding</td>
+                            <td>The default text encoding</td>
+                            <td>iso-8859-1</td>
+                        </tr>
+                        <tr>
+                            <td>indent</td>
+                            <td>Specifies if the output is indented</td>
+                            <td>true</td>
+                        </tr>
+                        <tr>
+                            <td>indent-amount</td>
+                            <td>Specifies the number of indentation space</td>
+                            <td>0</td>
+                        </tr>
+                        <tr>
+                            <td>header</td>
+                            <td>Adds a custom HTTP header to the
+                            response. The nested elements <code>name</code> and
+                            <code>value</code> contain the name and value of the
+                            header, respectively. You can add multiple headers.
+                            </td>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                </p>
+                <xml-source>
+                    <config>
+                        <content-type>text/html</content-type>
+                        <status-code>100</status-code>
+                        <empty-content>false</empty-content>
+                        <error-code>0</error-code>
+                        <version>4.01</version>
+                        <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
+                        <system-doctype>http://www.w3.org/TR/html4/strict.dtd</system-doctype>
+                        <encoding>utf-8</encoding>
+                        <indent-amount>4</indent-amount>
+                        <header>
+                            <name>Content-Disposition</name>
+                            <value>attachment; filename=image.jpeg;</value>
+                        </header>
+                    </config>
+                </xml-source>
+            </section>
+
+            <anchor id="XMLSerializer"/>
+            <section>
+                <title>XML Serializer</title>
+                <p>
+                    This serializer writes XML text. The output is indented
+                    with no spaces and encoded using the ISO-8859-1 character
+                    set. The default MIME content type is
+                    <code>text/xml</code>.
+                </p>
+
+                <xml-source>
+                    <p:processor name="oxf:xml-serializer">
+                        <p:input name="config">
+                            <config>
+                                <content-type>text/vnd.wap.wml</content-type>
+                            </config>
+                        </p:input>
+                        <p:input name="data" href="#wml"/>
+                    </p:processor>
+                </xml-source>
+            </section>
+
+            <anchor id="html-serializer"/>
+            <section>
+                <title>HTML Serializer</title>
+                <p>
+                    The HTML Serializer's output conforms to the XSLT
+                    <code>html</code> semantic. The <code>doctype</code> is set
+                    to <link
+                    href="http://www.w3.org/TR/1998/REC-html40-19980424/sgml/loosedtd.html">HTML
+                    4.0 Transitional</link> and the content is indented with no
+                    space and encoded using the ISO-8859-1 character set. The
+                    default MIME content type is <code>text/html</code>. The
+                    following is a simple HTMLSerializer example:
+                </p>
+
+                <xml-source>
+                    <p:processor name="oxf:html-serializer">
+                        <p:input name="config">
+                            <config/>
+                        </p:input>
+                        <p:input name="data" href="#html"/>
+                    </p:processor>
+                </xml-source>
+                <note>
+                    The <link
+                    href="http://www.w3.org/TR/2000/REC-xml-20001006">XML 1.0
+                    Specification</link> prohibits a DOCTYPE definition with
+                    a Public ID and no System ID.
+                </note>
+
+            </section>
+            <section>
+                <title>Text Serializer</title>
+
+                <p>
+                    The Text Serializer's output conforms to the XSLT
+                    <code>text</code> semantic. The output is encoded using the
+                    ISO-8859-1 character set. This serializer is typically
+                    useful for pipelines generating Comma Separated Value
+                    (CSV) files. The default MIME content type is
+                    <code>text/plain</code>.
+                </p>
+
+                <xml-source>
+                    <p:processor name="oxf:text-serializer">
+                        <p:input name="config">
+                            <config/>
+                        </p:input>
+                        <p:input name="data" href="#text"/>
+                    </p:processor>
+                </xml-source>
+
+            </section>
+
+            <anchor id="fop"/>
+            <section>
+                <title>PDF Serializer</title>
+                <p>
+                    The PDF Serializer produces PDF documents from an <link
+                    href="http://www.w3.org/TR/xsl/">XSL-FO</link> description
+                    of the page. The default MIME content type is
+                    <code>application/pdf</code>.
+                </p>
+                <note>
+                    The input document of the FOPSerializer must follow the
+                    <fork
+                    href="http://www.w3.org/TR/2001/REC-xsl-20011015/#">W3C
+                    XSL/FO Recommendation</fork>.
+                </note>
+                <p>
+                    The <link href="http://www.faqs.org/rfcs/rfc2183.html">RFC 2183</link> describes the
+                    <code>Content-Disposition</code> HTTP header, used by the browser to decide how to display an attachement.
+                    A value of <code>inline</code> means that the browser will try to use a plugin to display the PDF file.
+                    A value of <code>attachement</code> causes the browser to ask the user to save the file, optionnaly
+                    proposing a file name. The following two example show how this feature is used with the FOP Serializer.
+                </p>
+                <p>Using the PDF plugin:</p>
+                <xml-source>
+                    <p:processor name="oxf:pdf-serializer">
+                        <p:input name="config">
+                            <config>
+                                <header>
+                                    <name>Content-Disposition</name>
+                                    <value>inline</value>
+                                </header>
+                            </config>
+                        </p:input>
+                        <p:input name="data" href="#xslfo"/>
+                    </p:processor>
+                </xml-source>
+                <p>Saving the PDF file to disk:</p>
+                <xml-source>
+                    <p:processor name="oxf:pdf-serializer">
+                        <p:input name="config">
+                            <config>
+                                <header>
+                                    <name>Content-Disposition</name>
+                                    <value>attachement; filename=report.pdf</value>
+                                </header>
+                            </config>
+                        </p:input>
+                        <p:input name="data" href="#xslfo"/>
+                    </p:processor>
+                </xml-source>
+            </section>
+        </section>
+
+        <anchor id="url-serializer"/>
+        <section>
+            <title>URL Serializer</title>
+            <p>
+                The URL Serializer mirrors the functionality of the <link
+                href="processors-generators#URLGenerator">URL Generator</link>.
+                Instead of reading from of URL, it writes its <code>data</code>
+                input as XML in a URL. Note that only the <code>oxf:</code> and
+                <code>http</code> protocols allows writing at this time.
+
+            </p>
+            <note>
+                The <link
+                href="reference-resource-managers#flatfile">Flat File</link>
+                Resource Manager is the only Resource Manager supporting write
+                operations.
+            </note>
+            <p>
+                The URL serializer takes a <code>config</code> input with a
+                single <code>url</code> element containing the URL to write to.
+                The <code>data</code> input is serialized according the rules of
+                the XML Serializer.
+            </p>
+            <xml-source>
+                <p:processor name="oxf:url-serializer" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                    <p:input name="config">
+                        <config>
+                            <url>oxf:/path/current.xml</url>
+                        </config>
+                    </p:input>
+                    <p:input name="data" href="#xml-data"/>
+                </p:processor>
+            </xml-source>
+        </section>
+
+        <section>
+            <title>File Serializer</title>
+            <p>
+                The File Serializer is most useful in a <link
+                href="integration-command-line">command-line application</link>. When executed,
+                this serializer writes its data input into the file specified in the
+                <code>config</code> element. Here is an example:
+            </p>
+
+            <xml-source>
+                <p:processor name="oxf:file-serializer">
+                    <p:input name="config">
+                        <config>
+                            <file>test.html</file>
+                            <directory>c:/build/doc</directory>
+                            <content-type>text/html</content-type>
+                            <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
+                            <system-doctype>http://www.w3.org/TR/html4/strict.dtd</system-doctype>
+                            <encoding>utf-8</encoding>
+                            <indent-amount>4</indent-amount>
+                        </config>
+                    </p:input>
+                    <p:input name="data" href="#html"/>
+                </p:processor>
+            </xml-source>
+
+            <p>
+                The
+                <code>file</code> element specifies the file to write to.
+            </p>
+            <p>
+                The
+                <code>directory</code> element is optional. If specified, it
+                is used as a base directory for the
+                <code>file</code> element.
+            </p>
+            <p>
+                The
+                <code>content-type</code> element is optional. The default
+                is
+                <code>text/xml</code>. Other valid values are
+                <code>text/html</code> and
+                <code>text/plain</code>.
+            </p>
+
+            <p>
+                The following optional attributes can also be specified:
+                <code>public-doctype</code>,
+                <code>system-doctype</code>,
+                <code>encoding</code>,
+                <code>indent</code> and
+                <code>indent-amount</code>.
+            </p>
+
+        </section>
+        <anchor id="SessionSerializer"/>
+        <section>
+            <title>Session Serializer</title>
+            <p>The Session Serializer stores an
+                XML document into the HTTP session. The root node of the
+                document is used as the session key. See the
+                <link
+                    href="processors-generators#SessionGenerator">SessionGenerator</link>
+                for more information.
+            </p>
+
+            <p>The following example shows how to store  an XML document into the HTTP session.
+                The session key is the root element, in this case:
+                <code>cart</code>.
+            </p>
+
+            <xml-source>
+                <p:processor name="oxf:session-serializer">
+                    <p:input name="data">
+                        <cart>
+                            <item>Book 1</item>
+                            <item>Book 2</item>
+                        </cart>
+                    </p:input>
+                </p:processor>
+            </xml-source>
+
+            <p></p>
+
+        </section>
+        <section>
+            <title>Null Serializer</title>
+            <p>The Null Serializer acts as a black hole. The
+                <code>data</code>
+                input is read and ignored. This processor is useful when a
+                pipeline or a branch of a
+                <code>p:choose</code> element doesn't have to return any document.
+            </p>
+
+            <xml-source>
+                <p:processor name="oxf:null-serializer">
+                    <p:input name="data" href="#document"/>
+                </p:processor>
+            </xml-source>
+        </section>
+
+        <section>
+            <title>Flushing the Output Stream</title>
+
+            <p>All serializers (XML, HTML, text, and FOP) will flush their
+                output stream when they encounter the following processing
+                instruction:
+                <code>&lt;?oxf-serializer flush?&gt;</code>
+                <p/>
+                This instruction allows the browser to display a Web page incrementally.
+                Incremental display is typically useful when sending large tables or
+                when the first part of a Web page could be displayed, while the
+                rest of the page cannot until a time consuming action is
+                performed.
+            </p>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,51 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<example-descriptor>
+    <title>Random Quotes</title>
+    <source>model.xpl</source>
+    <source>view.xsl</source>
+    <description>
+        <p>
+            This example calls a remote Web service to get a random
+            quote and then displays that quote or a new quote every
+            time the page is loaded.
+        </p>
+        <p>
+            It shows the separation between the model and view (there is
+            no a model in the previous examples). Here, the model is
+            responsible for calling the Web service and the view for
+            displaying the quote. The Web service represents the
+            back-end and the quote represents the front-end.
+        </p>
+        <p>
+            The remote Web service is called <code>model.xpl</code> by
+            using the <a href="../doc/processors-delegation">delegation
+            processor</a>:
+        </p>
+        <p>
+            The Web service is declared to call the
+            <code>interface</code> input containing the endpoint, the
+            operation, and the namespace URI for that operation. The
+            service is called through the
+            <code>&lt;delegation:execute&gt;</code> element of the
+            <code>call</code> document.
+        </p>
+        <p>
+            The view for this example is pretty straightforward: it
+            simply displays the text of the quote received from the
+            model.
+        </p>
+    </description>
+</example-descriptor>
+    

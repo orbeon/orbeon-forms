@@ -1,0 +1,398 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline">
+    <header>
+        <title>Other Processors</title>
+    </header>
+    <body>
+        <anchor id="scheduler"/>
+        <section>
+            <title>Scheduler</title>
+            <p>
+                The OXF Scheduler allows applications to start and stop periodic tasks. An OXF task
+                is defined by an OXF processor and its inputs. You can start or stop a task at any
+                time. The <code>config</code> input must conform to the following schema:
+            </p>
+            <p>
+                <xml-source>
+                    <element name="config"
+                        datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+                        xmlns="http://relaxng.org/ns/structure/1.0">
+                        <interleave>
+                            <zeroOrMore>
+                                <element name="start-task">
+                                    <interleave>
+                                        <element name="name">
+                                            <data type="string"/>
+                                        </element>
+                                        <element name="start-time">
+                                            <data type="string"/>
+                                        </element>
+                                        <element name="interval">
+                                            <data type="long"/>
+                                        </element>
+                                        <optional>
+                                            <element name="synchronized">
+                                                <data type="boolean"/>
+                                            </element>
+                                        </optional>
+                                        <element name="processor-uri">
+                                            <data type="string"/>
+                                        </element>
+                                        <zeroOrMore>
+                                            <element name="input">
+                                                <attribute name="name"/>
+                                                <choice>
+                                                    <attribute name="url"/>
+                                                    <data type="string"/>
+                                                </choice>
+                                            </element>
+                                        </zeroOrMore>
+                                    </interleave>
+                                </element>
+                            </zeroOrMore>
+                            <zeroOrMore>
+                                <element name="stop-task">
+                                    <element name="name">
+                                        <data type="string"/>
+                                    </element>
+                                </element>
+                            </zeroOrMore>
+                        </interleave>
+                    </element>
+                </xml-source>
+            </p>
+            <section>
+                <title>Starting a Task</title>
+                <p>
+                    You start a task by invoking the Scheduler processor with the
+                    <code>start-task</code> element. The following table describes the configuration
+                    elements.
+                </p>
+                <p>
+                    <table ca="|p{0.2\textwidth}|p{0.6\textwidth}|">
+                        <tr>
+                            <th>
+                                <code>name</code>
+                            </th>
+                            <td>The name of the task</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>start-time</code>
+                            </th>
+                            <td>Either
+                                <code>now</code> or a date in Java's
+                                <link
+                                    href="http://java.sun.com/j2se/1.4.2/docs/api/java/text/DateFormat.html">
+                                    <code>DateFormat</code>
+                                </link> format.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>interval</code>
+                            </th>
+                            <td>Interval between
+                                tasks in milliseconds. If set to
+                                <code>0</code>, the task runs only once.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>synchronized</code>
+                            </th>
+                            <td>
+                                If set to <code>true</code>, the task won't run if the previous iteration is still running. Defaults to <code>false</code>.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>processor-uri</code>
+                            </th>
+                            <td>The URI of the processor that is executed when the task runs.</td>
+                        </tr>
+                        <tr>
+                            <th>
+                                <code>input</code>
+                            </th>
+                            <td>Inputs of the processor. The input can
+                                either be located in a separate file or
+                                inline.</td>
+                        </tr>
+                    </table>
+                </p>
+                <p>
+                    In most cases, the task is described in an XPL pipeline. The following example
+                    shows how to use the <link
+                    href="reference-xpl-pipelines">PipelineProcessor</link> to launch a periodic
+                    task.
+                </p>
+                <p>
+                    <xml-source>
+                        <p:processor name="oxf:scheduler">
+                            <p:input name="config">
+                                <start-task>
+                                    <name>myTask</name>
+                                    <start-time>now</start-time>
+                                    <interval>10000</interval>
+                                    <processor-uri>oxf/processor/pipeline</processor-uri>
+                                    <input name="config" url="oxf:/mytask.xpl"/>
+                                </start-task>
+                            </p:input>
+                        </p:processor>
+                    </xml-source>
+                </p>
+            </section>
+            <section>
+                <title>Stopping a Task</title>
+                <p>
+                    You can stop a task with the <code>stop-task</code> element and the name of the
+                    task.
+                </p>
+                <p>
+                    <xml-source>
+                        <p:processor name="oxf:scheduler">
+                            <p:input name="config">
+                                <stop-task>
+                                    <name>myTask</name>
+                                </stop-task>
+                            </p:input>
+                        </p:processor>
+                    </xml-source>
+                </p>
+            </section>
+        </section>
+        <anchor id="ResourceServer"/>
+        <section>
+            <title>Resource Server</title>
+            <p>
+                The Resource Server serves resources such as images, CSS stylesheet or other
+                static files. Resources are sent to the HTTP response untouched, and the HTTP cache
+                control headers are set.
+            </p>
+            <section>
+                <title>Config Input</title>
+                <p>
+                    The <code>config</code> input contains a single <code>url</code> element
+                    containing an absolute URL. The URL can be any URL supported by your platform,
+                    in particular URLs with the following protocols:
+                </p>
+                <ul>
+                    <li><code>file</code></li>
+                    <li><code>http</code></li>
+                    <li><code>oxf</code> (to access OXF resources)</li>
+                </ul>
+                <p>
+                    The Resource Server supports the deprecated use of a <code>config</code> input
+                    containing a single <code>path</code> element representing the absolute Resource
+                    Manager path of the file to serve. Since the <code>url</code> element also
+                    allows to access to OXF resources, it is recommended to use it instead of
+                    <code>path</code>.
+                </p>
+            </section>
+            <section>
+                <title>MIME Types Input</title>
+                <p>
+                    The <code>mime-types</code> input contains a list of patterns and <link
+                    href="http://www.iana.org/assignments/media-types/">MIME Media Types</link>.
+                    This mapping list determines which <code>content-type</code> header to send to
+                    the browser. The patterns are case-insensitive. OXF is bundled with a default
+                    mapping file under the URL <code>oxf:/oxf/mime-types.xml</code>. You can create
+                    your own mapping to suit your needs. The RelaxNG schema is provided below.
+                </p>
+                <xml-source>
+                    <element name="mime-types" xmlns="http://relaxng.org/ns/structure/1.0"
+                        datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+                        <oneOrMore>
+                            <element name="mime-type">
+                                <element name="name">
+                                    <data type="string"/>
+                                </element>
+                                <oneOrMore>
+                                    <element name="pattern">
+                                        <data type="string"/>
+                                    </element>
+                                </oneOrMore>
+                            </element>
+                        </oneOrMore>
+                    </element>
+                </xml-source>
+            </section>
+            <section>
+                <title>Example</title>
+                <p>
+                    The example below shows the Resource Server configured to send a PNG image file
+                    with the appropriate MIME type.
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:resource-server">
+                        <p:input name="mime-types">
+                            <mime-types>
+                                <mime-type>
+                                    <name>image/png</name>
+                                    <pattern>*.png</pattern>
+                                </mime-type>
+                            </mime-types>
+                        </p:input>
+                        <p:input name="config">
+                            <url>oxf:/images/logo.png</url>
+                        </p:input>
+                        <p:oupput name="data" id="..."/>
+                    </p:processor>
+                </xml-source>
+            </section>
+        </section>
+        <anchor id="debug"/>
+        <section>
+            <title>Debug Processor</title>
+            <p>
+                The Debug processor logs XML documents using the <link
+                href="http://jakarta.apache.org/log4j/docs/">Log4j</link> library. It has 2 inputs:
+                <code>data</code> contains the XML document to log, and <code>config</code> has a
+                <code>config</code> root element that contains a message typically be used to
+                describe the XML document. The <code>data</code> output document is the exactly the
+                same as the <code>data</code> input document. Consequently the debug processor can
+                be easily inserted in a pipeline to log the XML data flow at a given point.
+            </p>
+            <img print-format="pdf" src="pages/processors-other-debug.png"/>
+            <p>
+                For instance, the processor can be called with:
+            </p>
+            <xml-source>
+                <p:processor name="oxf:debug">
+                    <p:input name="config">
+                        <config>Employee</config>
+                    </p:input>
+                    <p:input name="data">
+                        <employee>
+                            <firstname>John</firstname>
+                            <lastname>Smith</lastname>
+                        </employee>
+                    </p:input>
+                    <p:output name="data" id="emp"/>
+                </p:processor>
+            </xml-source>
+            <p>
+                This will generate the message:
+            </p>
+            <source>Employee:
+
+                &lt;employee>
+                &lt;firstname>John&lt;/firstname>
+                &lt;lastname>Smith&lt;/lastname>
+                &lt;/employee></source>
+            <p>
+                The URI of the Debug processor is <code>oxf/processor/debug</code>. Using
+                <code>debug</code> attributes in pipelines is a shortcut for actually inserting the
+                Debug processor in the pipeline. And in fact, the Pipeline processor will insert a
+                Debug processor when encountering <code>debug</code> attributes. By changing the
+                <code>processors.xml</code> you can map the <code>oxf/processor/debug</code> URI to
+                your own "debug processor" and this processor will be called when you use
+                <code>debug</code> attributes in pipelines. If you decide to implement your own
+                debug processor, note that it must have the same interface as the default Debug
+                processor that comes with OXF.
+            </p>
+        </section>
+        <anchor id="RedirectProcessor"/>
+        <section>
+            <title>Redirect Processor</title>
+            <p>
+                The Redirect Processor allows redirecting or forwarding the execution to a new URL:
+            </p>
+            <ul>
+                <li>
+                    <p><b>Client-side</b> the browser is redirected to another URL. Typically, for
+                    a Servlet environment, the <code>sendRedirect()</code> method is called on the
+                    HTTP response object.</p>
+                </li>
+                <li>
+                    <p><b>Server-side</b>: a server-side forward is executed. Typically, for a
+                    Servlet environment, the <code>forward</code> method is called on a Servlet
+                    request dispatcher.</p>
+                </li>
+            </ul>
+            <p>
+                The processor's <code>data</code> input must conform to the following Relax NG
+                schema:
+            </p>
+            <xml-source>
+<element name="redirect-url" xmlns="http://relaxng.org/ns/structure/1.0">
+    <interleave>
+        <optional>
+            <element name="server-side">
+                <choice>
+                    <value>true</value>
+                    <value>false</value>
+                </choice>
+            </element>
+        </optional>
+        <element name="path-info">
+            <text/>
+        </element>
+        <optional>
+            <element name="parameters">
+                <zeroOrMore>
+                    <element name="parameter">
+                        <element name="name">
+                            <text/>
+                        </element>
+                        <oneOrMore>
+                            <element name="value">
+                                <text/>
+                            </element>
+                        </oneOrMore>
+                    </element>
+                </zeroOrMore>
+            </element>
+        </optional>
+    </interleave>
+</element>
+            </xml-source>
+            <p>
+                The optional boolean <code>server-side</code> element determines whether a
+                server-side forward is performed. The default is <code>false</code>.
+            </p>
+            <p>
+                This example creates a processor that redirects the browser to
+                <code>/login?user=jsmith</code>:
+            </p>
+            <xml-source>
+                <p:processor name="oxf:redirect">
+                    <p:input name="data">
+                        <redirect-url>
+                            <path-info>/login</path-info>
+                            <parameters>
+                                <parameter>
+                                    <name>user</name>
+                                    <value>jsmith</value>
+                                </parameter>
+                            </parameters>
+                        </redirect-url>
+                    </p:input>
+                </p:processor>
+            </xml-source>
+            <note>
+                It is recommended, whenever possible, to use the <link
+                href="reference-controller">Page Flow Controller</link> to perform page
+                redirections within an OXF application. The Page Flow Controller provides a
+                much higher-level abstraction of the notion of redirection than the Redirect
+                Processor.
+            </note>
+        </section>
+    </body>
+</document>

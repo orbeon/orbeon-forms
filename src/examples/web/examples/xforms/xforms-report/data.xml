@@ -1,0 +1,45 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<countries>
+    <country>
+        <name>United States of America</name>
+        <capital>Washington, D.C.</capital>
+        <population>274943496</population>
+        <gdp>9250</gdp>
+    </country>
+    <country>
+        <name>Switzerland</name>
+        <capital>Bern</capital>
+        <population>7288715</population>
+        <gdp>263</gdp>
+    </country>
+    <country>
+        <name>People's Republic of China</name>
+        <capital>Beijing</capital>
+        <population>1256167701</population>
+        <gdp>959</gdp>
+    </country>
+    <country>
+        <name>Japan</name>
+        <capital>Tokyo</capital>
+        <population>126434470</population>
+        <gdp>3780</gdp>
+    </country>
+    <country>
+        <name>Russia</name>
+        <capital>Moscow</capital>
+        <population>145904542</population>
+        <gdp>276</gdp>
+    </country>
+</countries>

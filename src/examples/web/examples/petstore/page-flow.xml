@@ -1,0 +1,122 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<config xmlns="http://www.orbeon.com/oxf/controller">
+    <files path-info="*.gif"/>
+    <files path-info="*.css"/>
+    <files path-info="*.png"/>
+    <files path-info="*.dtd"/>
+
+    <page id="home" path-info="/petstore" view="pages/home-view.xml"/>
+
+    <!-- List products in a category (say all cats) -->
+    <page path-info="/petstore/category"
+        xforms="pages/category-xforms.xml"
+        model="pages/category-model.xpl"
+        view="pages/category-view.xsl"/>
+
+    <!-- List all items for a product (say anglefishes) -->
+    <page path-info="/petstore/items-product"
+        xforms="pages/items-product-xforms.xml"
+        model="pages/items-product-model.xpl"
+        view="pages/items-view.xsl"/>
+
+    <!-- List all items that result from a search -->
+    <page path-info="/petstore/items-search"
+        xforms="pages/items-search-xforms.xml"
+        model="pages/items-search-model.xpl"
+        view="pages/items-view.xsl"/>
+
+    <!-- Provides detailed information for an item -->
+    <page path-info="/petstore/item"
+        xforms="pages/item-xforms.xml"
+        model="pages/item-model.xpl"
+        view="pages/item-view.xsl"/>
+
+    <!-- Adds an item to the card and redirects to cart page -->
+    <page path-info="/petstore/purchase"
+        xforms="pages/purchase-xforms.xml"
+        model="pages/purchase-model.xpl"/>
+
+    <!-- Displays cart -->
+    <page id="cart-display" path-info="/petstore/cart-display"
+        xforms="pages/cart-update-xforms.xpl"
+        model="pages/cart-display-model.xpl"
+        view="pages/cart-display-view.xsl"/>
+
+    <!-- Updates quantity in carts and redirect to cart page -->
+    <page path-info="/petstore/cart-update"
+        xforms="pages/cart-update-xforms.xpl">
+        <action action="pages/cart-update-model.xpl">
+            <result page="cart-display"/>
+        </action>
+    </page>
+
+    <!-- Remove the item from the cart and redirect to cart page -->
+    <page path-info="/petstore/cart-remove"
+        xforms="pages/cart-remove-xforms.xml">
+        <action action="pages/cart-remove-model.xpl">
+            <result page="cart-display"/>
+        </action>
+    </page>
+
+    <!-- Add the item from the cart and redirect to cart page -->
+    <page path-info="/petstore/cart-add"
+        xforms="pages/cart-add-xforms.xml">
+        <action action="pages/cart-add-model.xpl">
+            <result page="cart-display"/>
+        </action>
+    </page>
+
+    <!-- Login and return to referenced page -->
+    <page path-info="/petstore/login"
+        xforms="pages/login-xforms.xml"
+        view="pages/login-view.xsl"
+        model="pages/login-model.xpl"/>
+
+    <!-- Checkout page -->
+    <page path-info="/petstore/checkout"
+        model="pages/checkout-model.xpl"
+        view="pages/checkout-view.xml"/>
+
+    <!-- Set local (English or Japanese) -->
+    <page path-info="/petstore/set-locale"
+    xforms="pages/set-locale-xforms.xml">
+        <action action="pages/set-locale-model.xpl">
+            <result page="home"/>
+        </action>
+    </page>
+    <!-- Set target (Web or PDA) -->
+    <page path-info="/petstore/set-target"
+        xforms="pages/set-target-xforms.xml">
+        <action action="pages/set-target-model.xpl">
+            <result page="home"/>
+        </action>
+    </page>
+
+    <!-- Logout -->
+    <page path-info="/petstore/logout">
+        <action action="pages/logout-model.xpl">
+            <result page="home"/>
+        </action>
+    </page>
+
+    <page path-info="/petstore/ask-populate"
+         view="config/ask-populate.xml"/>
+
+    <page path-info="/petstore/petstore-sources"
+        model="config/petstore-source.xml"
+        view="config/petstore-source.xsl"/>
+
+    <epilogue url="epilogue/epilogue.xpl"/>
+</config>

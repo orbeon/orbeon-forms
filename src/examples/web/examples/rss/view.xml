@@ -1,0 +1,129 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:d="http://orbeon.org/oxf/xml/document">
+
+    <xhtml:head><xhtml:title>Create Your Own RSS Feeds</xhtml:title></xhtml:head>
+    <xhtml:body>
+        <xforms:group ref="form/rss-feed-descriptor">
+            <p>
+                The form below is prefilled to generate an RSS feed with the news displayed on the
+                Yahoo! home page. These links point to RSS feeds generate with this page:
+            </p>
+            <table style="margin-left: 5em">
+                <tr>
+                    <td>
+                        <xforms:submit xxforms:appearance="image">
+                            <xforms:label/>
+                            <xxforms:img src="/images/xml.gif"/>
+                            <xforms:setvalue ref="/form/action">yahoo</xforms:setvalue>
+                        </xforms:submit>
+                    </td>
+                    <td>Yahoo! News - Home Page Stories</td>
+                </tr>
+                <tr>
+                    <td>
+                        <xforms:submit xxforms:appearance="image">
+                            <xforms:label/>
+                            <xxforms:img src="/images/xml.gif"/>
+                            <xforms:setvalue ref="/form/action">intellij</xforms:setvalue>
+                        </xforms:submit>
+                    </td>
+                    <td>IntelliJ EAP Announcements</td>
+                </tr>
+            </table>
+            <xhtml:p>
+                <table cellpadding="3">
+                    <tr>
+                        <td rowspan="4" style="background-color: rgb(252, 229, 182)"><font size="5">1</font></td>
+                        <td colspan="2"><b>Describe how to get news items from a Web page:</b></td>
+                    </tr>
+                    <tr>
+                        <td align="right">Web site URL:</td>
+                        <td><xforms:input ref="items-url" xhtml:size="60"/></td>
+                    </tr>
+                    <tr>
+                        <td align="right">News items XPath:</td>
+                        <td><xforms:input ref="items-xpath" xhtml:size="60"/></td>
+                    </tr>
+                    <tr>
+                        <td/>
+                        <td>
+                            <xforms:submit xxforms:appearance="button">
+                                <xforms:label>Test</xforms:label>
+                                <xforms:setvalue ref="/form/action">test</xforms:setvalue>
+                            </xforms:submit>
+                        </td>
+                    </tr>
+                    <tr><td>&#160;</td></tr>
+                    <tr>
+                        <td rowspan="4" style="background-color: rgb(252, 229, 182)"><font size="5">2</font></td>
+                        <td colspan="2"><b>Describe how to get the title and URL for items:</b></td>
+                    </tr>
+                    <tr>
+                        <td align="right">Item title XPath:</td>
+                        <td><xforms:input ref="items-title-xpath" xhtml:size="60"/></td>
+                    </tr>
+                    <tr>
+                        <td align="right">Item URL XPath:</td>
+                        <td><xforms:input ref="items-url-xpath" xhtml:size="60"/></td>
+                    </tr>
+                    <tr>
+                        <td align="right">Item description XPath (optional):</td>
+                        <td><xforms:input ref="items-description-xpath" xhtml:size="60"/></td>
+                    </tr>
+                    <tr><td>&#160;</td></tr>
+                    <tr>
+                        <td rowspan="4" style="background-color: rgb(252, 229, 182)"><font size="5">3</font></td>
+                        <td colspan="2"><b>Describe the channel:</b></td>
+                    </tr>
+                    <tr>
+                        <td align="right">Channel title:</td>
+                        <td><xforms:input ref="channel-title" xhtml:size="60"/></td>
+                    </tr>
+                    <tr>
+                        <td align="right">Channel URL:</td>
+                        <td><xforms:input ref="channel-link" xhtml:size="60"/></td>
+                    </tr>
+                    <tr>
+                        <td align="right">Channel image URL:</td>
+                        <td><xforms:input ref="image-url" xhtml:size="60"/></td>
+                    </tr>
+                    <tr><td>&#160;</td></tr>
+                    <tr>
+                        <td rowspan="2" style="background-color: rgb(252, 229, 182)"><font size="5">4</font></td>
+                        <td align="right"><b>Generate RSS:</b></td>
+                        <td>
+                            <xforms:submit xxforms:appearance="image">
+                                <xforms:label/>
+                                <xxforms:img src="/images/xml.gif"/>
+                                <xforms:setvalue ref="/form/action">rss</xforms:setvalue>
+                            </xforms:submit>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td/>
+                        <td>
+                            You can then copy the URL of the generated page,<br/>
+                            and use it as an RSS feed in your favorite aggregator,<br/>
+                            like <a href="http://www.feedreader.com/">FeedReader</a>.
+                        </td>
+                    </tr>
+                </table>
+            </xhtml:p>
+        </xforms:group>
+    </xhtml:body>
+</xhtml:html>

@@ -1,0 +1,218 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+    <start>
+        <ref name="image"/>
+    </start>
+
+    <define name="image">
+        <element name="image">
+            <interleave>
+                <choice>
+                    <element name="url">
+                        <text/>
+                    </element>
+                    <!-- Deprecated -->
+                    <element name="path">
+                        <text/>
+                    </element>
+                </choice>
+                <optional>
+                    <element name="quality">
+                        <data type="float"/>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="use-cache">
+                        <data type="boolean"/>
+                    </element>
+                </optional>
+            </interleave>
+
+            <zeroOrMore>
+                <choice>
+                    <element name="transform">
+                        <attribute name="type">
+                            <value>scale</value>
+                        </attribute>
+                        <optional>
+                            <element name="quality">
+                                <choice>
+                                    <value>high</value>
+                                    <value>low</value>
+                                </choice>
+                            </element>
+                        </optional>
+                        <optional>
+                            <element name="scale-up">
+                                <data type="boolean"/>
+                            </element>
+                        </optional>
+                        <choice>
+                            <ref name="width-height"/>
+                            <ref name="max-size"/>
+                        </choice>
+                    </element>
+                    <element name="transform">
+                        <attribute name="type">
+                            <value>crop</value>
+                        </attribute>
+                        <interleave>
+                            <optional>
+                                <element name="x">
+                                    <data type="nonNegativeInteger"/>
+                                </element>
+                            </optional>
+                            <optional>
+                                <element name="y">
+                                    <data type="nonNegativeInteger"/>
+                                </element>
+                            </optional>
+                            <optional>
+                                <element name="width">
+                                    <data type="positiveInteger"/>
+                                </element>
+                            </optional>
+                            <optional>
+                                <element name="height">
+                                    <data type="positiveInteger"/>
+                                </element>
+                            </optional>
+                        </interleave>
+                    </element>
+                    <element name="transform">
+                        <attribute name="type">
+                            <value>draw</value>
+                        </attribute>
+                        <oneOrMore>
+                            <choice>
+                                <element name="rect">
+                                    <attribute name="x">
+                                        <data type="nonNegativeInteger"/>
+                                    </attribute>
+                                    <attribute name="y">
+                                        <data type="nonNegativeInteger"/>
+                                    </attribute>
+                                    <attribute name="width">
+                                        <data type="positiveInteger"/>
+                                    </attribute>
+                                    <attribute name="height">
+                                        <data type="positiveInteger"/>
+                                    </attribute>
+                                    <optional>
+                                        <ref name="color"/>
+                                    </optional>
+                                </element>
+                                <element name="fill">
+                                    <attribute name="x">
+                                        <data type="nonNegativeInteger"/>
+                                    </attribute>
+                                    <attribute name="y">
+                                        <data type="nonNegativeInteger"/>
+                                    </attribute>
+                                    <attribute name="width">
+                                        <data type="positiveInteger"/>
+                                    </attribute>
+                                    <attribute name="height">
+                                        <data type="positiveInteger"/>
+                                    </attribute>
+                                    <optional>
+                                        <ref name="color"/>
+                                    </optional>
+                                </element>
+                                <element name="line">
+                                    <attribute name="x1">
+                                        <data type="int"/>
+                                    </attribute>
+                                    <attribute name="y1">
+                                        <data type="int"/>
+                                    </attribute>
+                                    <attribute name="x2">
+                                        <data type="int"/>
+                                    </attribute>
+                                    <attribute name="y2">
+                                        <data type="int"/>
+                                    </attribute>
+                                    <optional>
+                                        <ref name="color"/>
+                                    </optional>
+                                </element>
+                            </choice>
+                        </oneOrMore>
+                    </element>
+                </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+
+    <define name="width-height">
+        <interleave>
+            <element name="width">
+                <data type="positiveInteger"/>
+            </element>
+            <element name="height">
+                <data type="positiveInteger"/>
+            </element>
+        </interleave>
+    </define>
+
+    <define name="max-size">
+        <choice>
+            <element name="max-size">
+                <data type="positiveInteger"/>
+            </element>
+            <element name="max-width">
+                <data type="positiveInteger"/>
+            </element>
+            <element name="max-height">
+                <data type="positiveInteger"/>
+            </element>
+        </choice>
+    </define>
+
+    <define name="color">
+        <element name="color">
+            <choice>
+                <attribute name="name">
+                    <choice>
+                        <value>white</value>
+                        <value>lightGray</value>
+                        <value>gray</value>
+                        <value>darkGray</value>
+                        <value>black</value>
+                        <value>red</value>
+                        <value>pink</value>
+                        <value>orange</value>
+                        <value>yellow</value>
+                        <value>green</value>
+                        <value>magenta</value>
+                        <value>cyan</value>
+                        <value>blue</value>
+                    </choice>
+                </attribute>
+                <attribute name="rgb">
+                    <data type="string">
+                        <param name="pattern">#[0-9A-Fa-f]{6}</param>
+                    </data>
+                </attribute>
+            </choice>
+            <optional>
+                <attribute name="alpha"/>
+            </optional>
+        </element>
+    </define>
+
+</grammar>

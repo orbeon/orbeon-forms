@@ -1,0 +1,27 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<example-descriptor>
+    <title>Google Spell Checker</title>
+    <source>form.xml</source>
+    <source>model.xpl</source>
+    <source>check.xpl</source>
+    <source>view.xsl</source>
+    <description>
+        When you perform a search on Google, sometimes Google will <a
+        href="http://www.google.com/help/features.html#spell">suggest a more common spelling</a> for
+        some of the word you searched. On this page, we use this feature to "spell check" some text
+        you provide. Since Google has a limit on the number of words that can be searched, this page
+        will send a query to Google for each block of 5 words in the text you provide.
+    </description>
+</example-descriptor>

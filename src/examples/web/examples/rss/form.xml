@@ -1,0 +1,40 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+    <xforms:instance>
+        <form>
+            <action/>
+            <rss-feed-descriptor>
+                <items-url>http://www.intellij.net/forums/forum.jsp?forum=7</items-url>
+                <items-xpath>//a[starts-with(@href, 'thread.jsp') and @class = 'forum']</items-xpath>
+                <items-title-xpath>.</items-title-xpath>
+                <items-url-xpath>concat('http://www.intellij.net/forums/', @href)</items-url-xpath>
+                <items-description-xpath/>
+                <channel-title>IntelliJ EAP Announcements</channel-title>
+                <channel-link>http://www.intellij.net/</channel-link>
+                <image-url>http://www.intellij.com/images/logo_bg.gif</image-url>
+            </rss-feed-descriptor>
+<!--            <rss-feed>-->
+<!--                <items-url>http://www.yahoo.com/old.html</items-url>-->
+<!--                <items-xpath>//small/a[substring(@href, 1, 2) = 's/' or substring(@href, 1, 7) = '/homer/']</items-xpath>-->
+<!--                <items-title-xpath>.</items-title-xpath>-->
+<!--                <items-url-xpath>concat('http://www.yahoo.com/', @href)</items-url-xpath>-->
+<!--                <items-description-xpath/>-->
+<!--                <channel-title>Yahoo! News - Home Page Stories</channel-title>-->
+<!--                <channel-link>http://news.yahoo.com/news</channel-link>-->
+<!--                <image-url>http://us.i1.yimg.com/us.yimg.com/i/us/nws/th/main_142.gif</image-url>-->
+<!--            </rss-feed>-->
+        </form>
+    </xforms:instance>
+</xforms:model>

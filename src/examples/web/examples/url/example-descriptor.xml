@@ -1,0 +1,31 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<example-descriptor>
+    <title>URL Generator</title>
+    <source>model.xpl</source>
+    <source>view.xsl</source>
+    <description>
+        <p>
+            OXF loads resources URLs (<code>oxf:</code>, <code>http:</code>, etc...) with the help
+            of the URL Generator. It then parses the XML file. The URL Generator is configurable to
+            use a validating XML parser.
+        </p>
+        <p>
+            The URL Generator can optionally <a href="http://tidy.sourceforge.net/">tidy</a> its
+            output, allowing OXF to transform any HTML page into XHTML. To demonstrate this feature,
+            this page loads the <a href="http://www.cnn.com">CNN.com</a> home page and uses XPath
+            to extract the main headline.
+        </p>
+    </description>
+</example-descriptor>

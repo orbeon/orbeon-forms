@@ -1,0 +1,36 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<example-descriptor>
+    <title>XSLT Knight Tour</title>
+    <source>form.xml</source>
+    <source>model.xpl</source>
+    <source>view.xsl</source>
+    <source>tour.xsl</source>
+    <description>
+        <p>
+            This example illustrates the use of XSLT 2.0. It shows the <a
+            href="source?src=xslt2%2Ftour.xsl">original <i>Knight's tour</i> example </a> written by
+            Michael Kay. In addition, we pass the start case as a stylesheet parameter and we style
+            the resulting output. <a href="source?src=xslt2%2Fview.xsl">This page view</a> also uses
+            some XSLT 2.0 features, such as sequences and new XPath 2.0 functions.
+        </p>
+        <p>
+            You can find more information on the Saxon Web site: <a
+            href="http://saxon.sourceforge.net/">http://saxon.sourceforge.net/</a>.
+        </p>
+        <p>
+            Note that the XSLT 2.0 specification is not final yet.
+        </p>
+    </description>
+</example-descriptor>

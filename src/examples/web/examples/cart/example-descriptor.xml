@@ -1,0 +1,90 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting">
+    <title>Saving State in Session</title>
+    <source>model.xpl</source>
+    <source>form.xml</source>
+    <source>add.xpl</source>
+    <source>clear.xpl</source>
+    <source>view.xsl</source>
+    <source>page-flow.xml</source>
+    <description>
+        <p>
+            This example illustrates the use of the Scope generator and serializer. The <a
+            href="/doc/processors-generators#ContextGenerator" f:url-type="resource">Scope
+            generator</a> retrieves an XML Document from a Request, Session or Application context
+            and sends it to a pipeline. The <a
+            href="../doc/processors-serializers#ContextSerializer" f:url-type="resource">Scope
+            serializer</a> stores an XML document to a Request, Session or Application context.
+        </p>
+        <p>
+            This example implements a simple shopping cart. You can add a string to the session and
+            clear it. The application shows the objects currently in the session. It involves the
+            following files:
+        </p>
+        <ul>
+            <p>
+                <li>
+                    <a href="../examples/source?src=session%2Fxforms.xml">xforms.xml</a>. This
+                    XForms model describes two fields: <code>text</code> which contains the string
+                    entered by the user, and <code>action</code> indicates which button has been
+                    activated.
+                </li>
+            </p>
+
+            <p>
+                <li>
+                    <a href="../examples/source?src=session%2Fmodel.xpl">model.xpl</a>. A Scope
+                    generator gets the XML document stored under the <code>cart</code> key. Here is
+                    an example of a cart document stored in the session: <f:xml-source
+                    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+                    xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                        <cart>
+                            <item>First</item>
+                            <item>Second</item>
+                            <item>Third</item>
+                        </cart>
+                    </f:xml-source>
+                </li>
+            </p>
+
+            <p>
+                <li>
+                    <a href="../examples/source?src=session%2Fadd.xpl">add.xpl</a>. This pipeline is
+                    called if the <code>action</code> field in the XForms instance is set to the
+                    value <code>add</code>. The document currently stored in the session is copied,
+                    and the new value is added to the document. Finally, the Scope serializer
+                    stores the resulting document in the session.
+                </li>
+            </p>
+
+            <p>
+                <li>
+                    <a href="../examples/source?src=session%2Fclear.xpl">clear.xpl</a>. This
+                    pipeline is called if the <code>action</code> field in the XForms instance is
+                    set to the value <code>clear</code>. The document currently stored in the
+                    session is emptied, leaving only a root element.
+                </li>
+            </p>
+
+            <p>
+                <li>
+                    <a href="../examples/source?src=session%2Fview.xsl">view.xpl</a>. Finally,
+                    the view converts the cart document into HTML. XForms controls are used to
+                    display the buttons and the text fields.
+                </li>
+            </p>
+        </ul>
+    </description>
+</example-descriptor>

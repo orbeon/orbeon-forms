@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Main-Class: org.orbeon.oxf.main.OXF
+Class-Path: cli/commons-cli-1.0.jar dom4j-1_4_orbeon.jar log4j-1_2_8.jar
+  jaxen-1_1-beta-1-dev.jar saxpath-dev_orbeon.jar xalan-2_5_1_orbeon.jar
+  xsltc-2_5_1_orbeon.jar
+  commons-collections-2_0.jar commons-lang-1_0-b1.jar xercesImpl_2_6_2_orbeon.jar
+  xml-apis-xerces_2_6_2_orbeon.jar relaxngDatatype-20031020.jar xsdlib-20031020.jar
+  axis-1_0b3-axis.jar axis-1_0b3-jaxrpc.jar axis-1_0b3-saaj.jar
+  axis-1_0b3-tt-bytecode.jar axis-1_0b3-wsdl4j.jar joost-20030623-orbeon.jar
+  jakarta-oro-2_0_8_orbeon.jar msv-20031020.jar isorelax-20031020.jar
+  avalon-framework-cvs-20020315.jar fop-0_20_5.jar batik-all-1_5.jar
+  jcommon-0_9_3.jar jfreechart-0_9_18.jar jtidy-04aug2000r7.jar junit.jar kawa-1_7.jar
+  mondrian-0_5_orbeon.jar saxon-6_5_2.jar saxon-7_8.jar saxon-7_9_1_orbeon.jar
+  ymsg9-v0_31.jar commons-fileupload-1.0.jar cli/servlet-2_3-4_0_4.jar
+

@@ -1,0 +1,28 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<example-descriptor>
+    <title>Streaming Transformations</title>
+    <source>model.xpl</source>
+    <source>view.xsl</source>
+    <description>
+        <p>
+            This example illustrates the use of the Streaming Transformations for XML (STX)
+            processor. It simply sorts a list of numbers using the STX transformation language.
+        </p>
+        <p>
+            For more information on Joost, the STX implementation used, please refer to <a
+            href="http://joost.sourceforge.net/">http://joost.sourceforge.net/</a>.
+        </p>
+    </description>
+</example-descriptor>

@@ -1,0 +1,395 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    <xhtml:head>
+        <xhtml:title>OXF PetStore - Sources</xhtml:title>
+    </xhtml:head>
+    <xhtml:body>
+        <xhtml:h1>The OXF Pet Store Source Code</xhtml:h1>
+
+        <xhtml:table class="gridtable" align="center">
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Configuration files</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                     <view-source src="petstore/config/page-flow.xml"/>
+                </xhtml:td>
+                <xhtml:td>Web App Controller</xhtml:td>
+            </xhtml:tr>
+
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Home Page</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/home-view.xml"/>
+                </xhtml:td>
+                <xhtml:td>View</xhtml:td>
+            </xhtml:tr>
+
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Category Page</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/category-xforms.xml"/>
+                </xhtml:td>
+                <xhtml:td>Form</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/category-model.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Model</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/category-view.xsl"/>
+                </xhtml:td>
+                <xhtml:td>View</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Items Page</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/items-product-xforms.xml"/>
+                </xhtml:td>
+                <xhtml:td>Form (items for a product)</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/items-product-model.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Model (items for a product)</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/items-search-xforms.xml"/>
+                </xhtml:td>
+                <xhtml:td>Form (free text search)</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/items-search-model.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Model (free text search)</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/items-view.xsl"/>
+                </xhtml:td>
+                <xhtml:td>View</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Item Detail Page</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/item-xforms.xml"/>
+                </xhtml:td>
+                <xhtml:td>Form</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/item-model.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Model</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/item-view.xsl"/>
+                </xhtml:td>
+                <xhtml:td>View</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Login Page</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/login-xforms.xml"/>
+                </xhtml:td>
+                <xhtml:td>Form</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/login-model.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Model</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/login-view.xsl"/>
+                </xhtml:td>
+                <xhtml:td>View</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Logout Action</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/logout-model.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Model</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Cart Page and Actions</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/cart-display-model.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Model (cart page)</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/cart-display-view.xsl"/>
+                </xhtml:td>
+                <xhtml:td>View (cart page)</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/cart-add-xforms.xml"/>
+                </xhtml:td>
+                <xhtml:td>Form (add action)</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/cart-add-model.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Model (add action)</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/cart-remove-xforms.xml"/>
+                </xhtml:td>
+                <xhtml:td>Form (remove action)</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/cart-remove-model.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Model (remove action)</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/cart-update-xforms.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Form (update action)</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/cart-update-model.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Model (update action)</xhtml:td>
+            </xhtml:tr>
+
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Checkout Page</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/checkout-model.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Model</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/checkout-view.xml"/>
+                </xhtml:td>
+                <xhtml:td>View</xhtml:td>
+            </xhtml:tr>
+
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Set Locale Action</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/set-locale-xforms.xml"/>
+                </xhtml:td>
+                <xhtml:td>Form</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/set-locale-model.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Model</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Set Target Action</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/set-target-xforms.xml"/>
+                </xhtml:td>
+                <xhtml:td>Form</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/set-target-model.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Model</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Epilogue</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/epilogue/epilogue.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Epilogue Pipeline</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/epilogue/banner.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Web Banner Model</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/epilogue/banner.xsl"/>
+                </xhtml:td>
+                <xhtml:td>Web Banner View</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/epilogue/footer.xml"/>
+                </xhtml:td>
+                <xhtml:td>Web Footer View</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/epilogue/sidebar.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Web Sidebar Model</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/epilogue/sidebar.xsl"/>
+                </xhtml:td>
+                <xhtml:td>Web Sidebar View</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/epilogue/sidebar.xsl"/>
+                </xhtml:td>
+                <xhtml:td>Web Page Template</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/epilogue/i18n-en_US.xml"/>
+                </xhtml:td>
+                <xhtml:td>I18n resources for English</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/epilogue/i18n-ja_JP.xml"/>
+                </xhtml:td>
+                <xhtml:td>I18n resources for Japanese</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/epilogue/i18n.xsl"/>
+                </xhtml:td>
+                <xhtml:td>I18n stylesheet</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/epilogue/layout-web.xsl"/>
+                </xhtml:td>
+                <xhtml:td>Web look &amp; feel</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/epilogue/layout-pda.xsl"/>
+                </xhtml:td>
+                <xhtml:td>PDA look &amp; feel</xhtml:td>
+            </xhtml:tr>
+
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Database</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/database/database.xml"/>
+                </xhtml:td>
+                <xhtml:td>Data</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/database/database.xpl"/>
+                </xhtml:td>
+                <xhtml:td>Data filtered according to locale</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/database/type.xml"/>
+                </xhtml:td>
+                <xhtml:td>How to access the data</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/database/populate.xpl"/>
+                </xhtml:td>
+                <xhtml:td>SQL Database population</xhtml:td>
+            </xhtml:tr>
+
+            <xhtml:tr>
+                <xhtml:th colspan="2">
+                    <b>Utils</b>
+                </xhtml:th>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/database/locale.xpl"/>
+                </xhtml:td>
+                <xhtml:td>The current locale</xhtml:td>
+            </xhtml:tr>
+            <xhtml:tr>
+                <xhtml:td>
+                    <view-source src="petstore/pages/utils.xsl"/>
+                </xhtml:td>
+                <xhtml:td>XSL Utils</xhtml:td>
+            </xhtml:tr>
+
+        </xhtml:table>
+    </xhtml:body>
+</xhtml:html>

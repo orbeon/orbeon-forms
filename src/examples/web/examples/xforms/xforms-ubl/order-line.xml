@@ -1,0 +1,16 @@
+<cat:OrderLine xmlns:cat="urn:oasis:names:tc:ubl:CommonAggregateTypes:1.0:0.70">
+    <cat:BuyersID/>
+    <cat:SellersID/>
+    <cat:LineExtensionAmount currencyID=""/>
+    <cat:Quantity unitCode="">1</cat:Quantity>
+    <cat:Item>
+        <cat:ID/>
+        <cat:Description>Enter description here</cat:Description>
+        <cat:SellersItemIdentification>
+            <cat:ID>Enter part number here</cat:ID>
+        </cat:SellersItemIdentification>
+        <cat:BasePrice>
+            <cat:PriceAmount currencyID="">0.00</cat:PriceAmount>
+        </cat:BasePrice>
+    </cat:Item>
+</cat:OrderLine>

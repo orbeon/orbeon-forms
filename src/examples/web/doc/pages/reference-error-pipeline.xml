@@ -1,0 +1,133 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Error Pipeline</title>
+    </header>
+    <body>
+        <section>
+            <title>Rationale</title>
+            <p> When OXF encounters an error, it throws two kinds of exceptions:
+                <code>OXFException</code> and its subclass,
+                <code>ValidationException</code>. They both contain a nested root
+                cause, and
+                <code>ValidationException</code> contains document location information.
+            </p>
+            <p> When an exception is thrown, OXF displays a default error page
+                containing the root cause and location information if available.
+                However, the application developer can display a different page by
+                specifying a pipeline to be executed upon error. This pipeline
+                could, for example, log the error and display a nice error page to the
+                user. </p>
+        </section>
+        <section>
+            <title>Usage</title>
+            <p> The error pipeline is set in
+                <link
+                    href="reference-properties#error-pipeline">OXFProperties</link>,
+                using similar methods as the main pipeline. The following properties
+                are used for this purpose:
+            </p>
+            <p>
+                <table ca="|l|p{0.5\textwidth}|">
+                    <tr>
+                        <th>
+                            <code>oxf.servlet.error.processor</code>
+                        </th>
+                        <td>URI of the main processor used for the error
+                            pipeline. It is usually the pipeline processor,
+                            <code>oxf/processor/pipeline</code>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            <code>oxf.servlet.error.input.&lt;name&gt;</code>
+                        </th>
+                        <td>Binds the inputs of the error processor. If using
+                            the pipeline processor, <code>&lt;name&gt;</code> should be
+                            <code>config</code> and the property must be a URL
+                            pointing to an XPL file
+                        </td>
+                    </tr>
+                </table>
+            </p>
+        </section>
+        <section>
+            <title>Example</title>
+            <p> In most cases, the custom error pipeline logs or displays the
+                exception that occurred. A simple error pipeline is shown below, using the
+                <code>ExceptionGenerator</code> to display the root cause message, but not the
+                exception stack trace.
+            </p>
+            <section>
+                <title>Properties</title>
+                <xml-source>
+<property type="xs:string" name="oxf.servlet.error.processor" value="oxf/processor/pipeline"/>
+<property type="xs:string" name="oxf.servlet.error.input.config" value="oxf:/config/error.xpl"/>
+                </xml-source>
+            </section>
+            <section>
+                <title>error.xpl</title>
+                <xml-source>
+<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <p:processor name="oxf:exception">
+        <p:output name="data" id="exception"/>
+    </p:processor>
+    <!-- Apply stylesheet -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#exception"/>
+        <p:input name="config">
+            <xsl:stylesheet version="1.0">
+                <xsl:template match="/">
+                    <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                        <xhtml:head>
+                            <xhtml:title>OXF - Custom Error Page</xhtml:title>
+                        </xhtml:head>
+                        <xhtml:body>
+                            <xhtml:h1>An error occured:</xhtml:h1>
+                            <xhtml:p>
+The screen demonstrates a
+custom error pipeline. For this
+example, only the first exception is shown.
+                            </xhtml:p>
+                            <xhtml:p>
+                                <code>
+                                    <xsl:value-of select="/exceptions/exception/message"/>
+                                </code>
+                            </xhtml:p>
+                        </xhtml:body>
+                    </xhtml:html>
+                </xsl:template>
+            </xsl:stylesheet>
+        </p:input>
+        <p:output name="data" id="document"/>
+    </p:processor>
+    <!-- Apply stylesheet -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#document"/>
+        <p:input name="config" href="oxf:/themes/theme1.xsl"/>
+        <p:output name="data" id="html"/>
+    </p:processor>
+    <p:processor name="oxf:html-serializer">
+        <p:input name="data" href="#html"/>
+    </p:processor>
+</p:config>
+                </xml-source>
+            </section>
+        </section>
+    </body>
+</document>

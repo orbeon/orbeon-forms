@@ -1,0 +1,73 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<element name="config" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+    xmlns="http://relaxng.org/ns/structure/1.0">
+    <!-- Portal id -->
+    <element name="portal-id">
+        <data type="string"/>
+    </element>
+    <!-- Id of the portlet to render, within the portal -->
+    <element name="portlet-id">
+        <data type="integer"/>
+    </element>
+    <!-- Optional render parameters to set before rendering -->
+    <optional>
+        <element name="render-parameters">
+            <oneOrMore>
+                <element name="param">
+                    <element name="name">
+                        <data type="string"/>
+                    </element>
+                    <element name="value">
+                        <data type="string"/>
+                    </element>
+                </element>
+            </oneOrMore>
+        </element>
+    </optional>
+    <!-- Optional window state and portlet mode to set before rendering -->
+    <optional>
+        <element name="window-state">
+            <data type="string"/>
+        </element>
+    </optional>
+    <optional>
+        <element name="portlet-mode">
+            <data type="string"/>
+        </element>
+    </optional>
+    <!-- If the input is HTML, Tidy options are used -->
+    <optional>
+        <element name="tidy-options">
+            <interleave>
+                <optional>
+                    <element name="show-warnings">
+                        <choice>
+                            <value>true</value>
+                            <value>false</value>
+                        </choice>
+                    </element>
+                    <optional>
+                        <element name="quiet">
+                            <choice>
+                                <value>true</value>
+                                <value>false</value>
+                            </choice>
+                        </element>
+                    </optional>
+                </optional>
+            </interleave>
+        </element>
+    </optional>
+</element>

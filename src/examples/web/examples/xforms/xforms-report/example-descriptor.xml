@@ -1,0 +1,45 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<example-descriptor>
+    <title>XForms Report Table</title>
+    <source>page-flow.xml</source>
+    <source>form.xml</source>
+    <source>model.xpl</source>
+    <source>view.xsl</source>
+    <source>data.xml</source>
+    <description>
+        <p>
+            This page shows how HTML controls can be mixed with links in the same form to create a
+            "report table", where you can choose how the data is sorted and what columns are
+            displayed.
+        </p>
+        <p>
+            On the table below you can select:
+        </p>
+        <ol>
+            <li>
+                What columns you want to display with the checkboxes on the right.
+            </li>
+            <li>
+                How the data in the table is sorted by clicking on the icon next to the column
+                header. The sort order will go from "no sorting", to "ascending", to "descending",
+                back to "no sorting".
+            </li>
+        </ol>
+        <p>
+            The XForms instance is displayed at the bottom of the page and you can see how it is
+            changed as you change the columns to display and the sort order.
+        </p>
+    </description>
+</example-descriptor>

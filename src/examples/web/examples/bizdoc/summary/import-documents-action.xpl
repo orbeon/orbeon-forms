@@ -1,0 +1,75 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors"
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+          xmlns:xdb="http://orbeon.org/oxf/xml/xmldb"
+          xmlns:xu="http://www.xmldb.org/xupdate">
+
+    <!-- List of documents to import -->
+    <p:processor name="oxf:identity">
+        <p:input name="data">
+            <documents>
+                <document>claim-1.xml</document>
+                <document>claim-2.xml</document>
+                <document>claim-3.xml</document>
+            </documents>
+        </p:input>
+        <p:output name="data" id="documents"/>
+    </p:processor>
+
+    <!-- For each document, read it, format it and insert it -->
+    <p:for-each href="#documents" select="/*/document">
+
+        <p:processor name="oxf:url-generator">
+            <p:input name="config" href="aggregate('config', aggregate('url', current()#xpointer(concat('oxf:/bizdoc/schema/', string(/)))))"/>
+            <p:output name="data" id="file"/>
+        </p:processor>
+
+        <!-- Dynamically generate document to insert with a new id -->
+        <p:processor name="oxf:xslt">
+            <p:input name="data" href="#file"/>
+            <p:input name="config">
+                <document-info xsl:version="2.0" xmlns:uuid="java:org.orbeon.oxf.util.UUIDUtils">
+                    <document-id>
+                        <!-- Create a document id by calling some Java code -->
+                        <xsl:value-of select="uuid:createPseudoUUID()"/>
+                    </document-id>
+                    <document>
+                        <xsl:copy-of select="/*"/>
+                    </document>
+                </document-info>
+            </p:input>
+            <p:output name="data" id="encapsulated-file"/>
+        </p:processor>
+
+        <!-- Dynamically generate query -->
+        <p:processor name="oxf:xslt">
+            <p:input name="data" href="current()"/>
+            <p:input name="config">
+                <xdb:insert collection="/db/oxf/adaptive-example" resource-id="{string(/)}" xsl:version="2.0"/>
+            </p:input>
+            <p:output name="data" id="query"/>
+        </p:processor>
+
+        <!-- Execute the insertion -->
+        <p:processor name="oxf:xmldb-insert">
+            <p:input name="datasource" href="../datasource.xml"/>
+            <p:input name="query" href="#query"/>
+            <p:input name="data" href="#encapsulated-file"/>
+        </p:processor>
+
+    </p:for-each>
+
+</p:config>

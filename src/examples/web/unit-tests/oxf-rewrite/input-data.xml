@@ -1,0 +1,58 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:portlet="http://www.orbeon.org/oxf/portlet">
+    <body background="/images/body-background.png">
+        <!-- Simple rewrites -->
+        <div>
+            <form action="/my-action">
+                <a href="/path">Click Here!</a>
+                <img src="/my-image.png"/>
+                <a href="path">Click Here!</a>
+                <img src="my-image.png"/>
+                <img src="?a=1&amp;b=2"/>
+                <input type="image" src="/my-image.png"/>
+                <input type="text" src="/my-image.png"/>
+            </form>
+        </div>
+        <!-- Check f:url-norewrite -->
+        <div>
+            <form action="/my-action" f:url-norewrite="true">
+                <a href="/path">Click Here!</a>
+                <img src="/my-image.png" f:url-norewrite="false"/>
+                <a href="path">Click Here!</a>
+                <img src="my-image.png" f:url-norewrite="false"/>
+                <img src="?a=1&amp;b=2"/>
+            </form>
+        </div>
+        <!-- Text handling -->
+        <div>
+            <p>123wsrp_rewrite456</p>
+            <script>
+                <p>123wsrp_rewrite456</p>
+            </script>
+            <SCRIPT>
+                <p>123wsrp_rewrite456</p>
+            </SCRIPT>
+        </div>
+        <!-- Table background -->
+        <table>
+            <tr>
+                <td background="/images/td-background.png">
+                    Hello
+                </td>
+            </tr>
+        </table>
+    </body>
+    <brody background="/images/body-background.png"/>
+</html>

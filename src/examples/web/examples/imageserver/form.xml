@@ -1,0 +1,54 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+    <xforms:instance>
+        <form>
+            <config>
+                <image-directory>oxf:/examples/imageserver/</image-directory>
+                <default-quality>0.7</default-quality>
+            </config>
+            <image>
+                <path>ca-coast.jpg</path>
+                <quality>0.7</quality>
+                <use-cache>false</use-cache>
+                <scale>
+                    <enable>false</enable>
+                    <quality>high</quality>
+                    <scale-up>true</scale-up>
+                    <width>100</width>
+                    <height>100</height>
+                </scale>
+                <crop>
+                    <enable>false</enable>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>100</width>
+                    <height>100</height>
+                </crop>
+                <rect x="10" y="10" height="100" width="100">
+                    <enable>false</enable>
+                    <color rgb="#FF0000" alpha="FF"/>
+                </rect>
+                <fill x="100" y="100" height="200" width="200">
+                    <enable>false</enable>
+                    <color rgb="#00FF00" alpha="55"/>
+                </fill>
+                <line x1="200" y1="200" x2="300" y2="300">
+                    <enable>false</enable>
+                    <color rgb="#0000FF" alpha="FF"/>
+                </line>
+            </image>
+        </form>
+    </xforms:instance>
+</xforms:model>

@@ -1,0 +1,103 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<grammar datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" xmlns="http://relaxng.org/ns/structure/1.0">
+
+    <start>
+        <element name="message">
+            <optional>
+                <element name="smtp-host">
+                    <data type="string"/>
+                </element>
+            </optional>
+            <element name="from">
+                <ref name="address"/>
+            </element>
+            <oneOrMore>
+                <element name="to">
+                    <ref name="address"/>
+                </element>
+            </oneOrMore>
+            <element name="subject">
+                <data type="string"/>
+            </element>
+            <ref name="body"/>
+        </element>
+    </start>
+
+    <define name="address">
+        <interleave>
+            <element name="email">
+                <data type="string"/>
+            </element>
+            <optional>
+                <element name="name">
+                    <data type="string"/>
+                </element>
+            </optional>
+        </interleave>
+    </define>
+
+
+    <define name="body">
+        <choice>
+            <group>
+                <!-- Old style, one part, text only -->
+                <element name="text">
+                    <data type="string"/>
+                </element>
+            </group> 
+            <!-- New style, MIME multipart -->
+            <group>
+                <element name="body">
+                    <optional>
+                        <attribute name="mime-multipart">
+                            <choice>
+                                <!-- default -->
+                                <value>mixed</value>
+                                <value>alternative</value>
+                            </choice>
+                        </attribute>
+                    </optional>
+                    <oneOrMore>
+                        <element name="part">
+                            <attribute name="name"/>
+                            <attribute name="content-type"/>
+                            <choice>
+                                <ref name="anyElement"/>
+                                <text/>
+                            </choice>
+                        </element>
+                    </oneOrMore>
+                </element>
+            </group>
+        </choice>
+    </define>
+
+
+    <define name="anyElement">
+        <element>
+            <anyName/>
+            <zeroOrMore>
+                <choice>
+                    <attribute>
+                        <anyName/>
+                    </attribute>
+                    <text/>
+                    <ref name="anyElement"/>
+                </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+
+</grammar>

@@ -7,7 +7,7 @@
 <!-- ====================================================================== -->
 <!-- xmlspec.xsl: An HTML XSL[1] Stylesheet for XML Spec V2.1[2] markup
 
-     Version: $Id: xmlspec.xsl,v 1.1 2005/01/28 21:33:32 ebruchez Exp $
+     Version: $Id: xmlspec.xsl,v 1.2 2005/02/01 15:52:44 ebruchez Exp $
 
      URI:     http://dev.w3.org/cvsweb/spec-prod/html/xmlspec.xsl
 
@@ -18,7 +18,7 @@
               Henry S. Thompson (ht@cogsci.ed.ac.uk)
 
      Date:    Created 07 September 1999
-              Last updated $Date: 2005/01/28 21:33:32 $ by $Author: ebruchez $
+              Last updated $Date: 2005/02/01 15:52:44 $ by $Author: ebruchez $
 
      Copyright (C) 2000, 2001, 2002 Sun Microsystems, Inc. All Rights Reserved.
      This document is governed by the W3C Software License[3] as
@@ -283,7 +283,7 @@
        context -->
   <xsl:template match="authlist">
     <dt>
-      <xsl:text>Editor</xsl:text>
+      <xsl:text>Author</xsl:text>
       <xsl:if test="count(author) > 1">
         <xsl:text>s</xsl:text>
       </xsl:if>

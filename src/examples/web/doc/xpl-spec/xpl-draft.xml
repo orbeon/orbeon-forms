@@ -47,6 +47,11 @@
                 <affiliation>Orbeon, Inc.</affiliation>
                 <email href="mailto:ebruchez@orbeon.com">ebruchez@orbeon.com</email>
             </author>
+            <author>
+                <name>Alessandro Vernet</name>
+                <affiliation>Orbeon, Inc.</affiliation>
+                <email href="mailto:avernet@orbeon.com">avernet@orbeon.com</email>
+            </author>
         </authlist>
         <copyright>
             <p>
@@ -307,9 +312,9 @@
                 <p>
                     A small set of XML processors must be provided by the XPL implementations. See
                     <specref ref="standardprocessors"/>. However most of the XML processors provided
-                    by an XPL implementations are implementation-defined. XPL implementations may
-                    also choose to be extensible and allow users of the implementation to provide
-                    their own XML processors.
+                    by XPL implementations are implementation-defined. XPL implementations may also
+                    choose to be extensible and allow users of the implementation to provide their
+                    own XML processors.
                 </p>
                 <p>
                     The use of a <termref def="qname">QName</termref> to identify an XML processor
@@ -830,10 +835,10 @@
                         <p>
                             <emph>Exposed XML Infoset Identifiers.</emph> A set of XML Infoset
                             identifiers exposed by the statement. There cannot be an intersection
-                            between the scoped XML infoset identifiers and the exposed XML infoset
+                            between the scoped XML Infoset identifiers and the exposed XML Infoset
                             identifiers. For example, a statement can attempt to expose, with an
                             <el>id</el> attribute on a <el>p:output</el> element, an XML Infoset
-                            identifier already present in the set of scoped XML infoset identifiers.
+                            identifier already present in the set of scoped XML Infoset identifiers.
                             Such a condition must raise a static error. This is referred to as the
                             <emph>no-collision rule</emph>.
                         </p>
@@ -841,10 +846,10 @@
 <!--                    <item>-->
 <!--                        <p>-->
 <!--                            <emph>Post-Statement Scope.</emph> A set of XML Infoset identifiers-->
-<!--                            consisting of the logical union of the scoped XML infoset identifiers-->
+<!--                            consisting of the logical union of the scoped XML Infoset identifiers-->
 <!--                            with a set of new XML Infoset identifiers defined by the statement. The-->
-<!--                            post-statement scope may be identical to the scoped XML infoset-->
-<!--                            identifiers, or larger than the scoped XML infoset identifiers. It may-->
+<!--                            post-statement scope may be identical to the scoped XML Infoset-->
+<!--                            identifiers, or larger than the scoped XML Infoset identifiers. It may-->
 <!--                            never be smaller.-->
 <!--                        </p>-->
 <!--                    </item>-->
@@ -1179,7 +1184,7 @@
                         attribute.
                     </p>
                     <p>
-                        Tne mandatory <el>id</el> element assigns an XML Infoset identifier with
+                        The mandatory <el>id</el> element assigns an XML Infoset identifier with
                         the particular output.
                     </p>
                     <p>
@@ -1235,7 +1240,7 @@
                     </p>
                     <p>
                         Conditions are expressed by children <el>p:when</el> elements using XPath
-                        expresssions. They are applied to an XML Infoset determined by the
+                        expressions. They are applied to an XML Infoset determined by the
                         mandatory <el>href</el> attribute of the <el>p:choose</el> element.
                     </p>
                     <p>
@@ -1385,14 +1390,14 @@
                         <el>p:for-each</el> statement.
                     </p>
                     <p>
-                        Tne mandatory <el>id</el> element exposes an XML Infoset identifier. The
+                        The mandatory <el>id</el> element exposes an XML Infoset identifier. The
                         identifier must follow the no-collision rule. This means that the identifier
                         must not be present in the set of scoped XML Infoset identifiers for the
                         parent <el>p:for-each</el> statement. The XPL implementation must raise a
                         static error if a collision is detected.
                     </p>
                     <p>
-                        The mandatory <el>href</el> attribute determines the XML infoset exposed.
+                        The mandatory <el>href</el> attribute determines the XML Infoset exposed.
                         The Infoset reference may refer to XML Infoset identifiers scoped on the
                         parent <el>p:for-each</el> element as well as to XML Infoset identifiers
                         scoped after the last statement of the sequence of statements embedded
@@ -1401,7 +1406,7 @@
                     <p>
                         For the second category of XML Infoset identifiers, each identifier used by
                         the expression in the <el>href</el> attribute refers to a sequence of XML
-                        Infosets rather than a single XML infoset as is usually the case. See
+                        Infosets rather than a single XML Infoset as is usually the case. See
                         <specref ref="for-each-execution"/>.
                     </p>
                     <p>
@@ -1806,7 +1811,7 @@
                             If there is a <el>p:output</el> element within the <el>p:for-each</el>
                             element but the iteration sequence is empty, the embedded sequence of
                             statements is never executed. The output expression is evaluated with
-                            each local XML Infoset identifier replaced with an empty sequences.
+                            each local XML Infoset identifier replaced with an empty sequence.
                         </p>
                     </item>
                 </ulist>
@@ -1965,7 +1970,7 @@ fn:aggregate($root as <emph>xs:QName</emph>, $included as <emph>node()*</emph>) 
                     The second argument of <code>aggregate()</code> is of type <code>node()*</code>,
                     in other words a sequence of nodes as defined by <bibref ref="xpath-20"/>, with
                     the exception that attribute nodes and namespace nodes are not allowed. This is
-                    consistent with the acquired infoset defined in <bibref ref="xinclude"/>. The
+                    consistent with the acquired Infoset defined in <bibref ref="xinclude"/>. The
                     Infoset associated with each node in the sequence is added as child information
                     items to the document element information item.
                 </p>
@@ -2023,7 +2028,7 @@ fn:aggregate($root as <emph>xs:QName</emph>, $included as <emph>node()*</emph>) 
                     <p>
                         When a read phase is performed on the <el>data</el> output, the Identity
                         processor must return the XML Infoset available on the <el>data</el> input.
-                        The Identity processor should obtain the XML infoset during the read phase
+                        The Identity processor should obtain the XML Infoset during the read phase
                         rather than during the initialization phase.
                     </p>
                 </div3>
@@ -2425,7 +2430,7 @@ fn:aggregate($root as <emph>xs:QName</emph>, $included as <emph>node()*</emph>) 
                         <p>
                             XPL pipelines either entirely succeed or entirely fail (basic profile).
                             When exception handling is added (exception module), exceptions are
-                            handled acccordingly.
+                            handled accordingly.
                         </p>
                     </item>
                     <item>
@@ -2449,14 +2454,14 @@ fn:aggregate($root as <emph>xs:QName</emph>, $included as <emph>node()*</emph>) 
                             <emph>The language must be rich enough to address practical
                             interoperability concerns.</emph> To achieve this goal, the language
                             cannot be simplistic and needs to implement a number of basic features.
-                            The XPL specification defines a basic profile, and a nunmber of modules
+                            The XPL specification defines a basic profile, and a number of modules
                             that can be optionally implemented. [YES]
                         </p>
                     </item>
                     <item>
                         <p>
                             <emph>The language should be as small and simple as possible.</emph> XPL
-                            supports a fairly small set of reatures and the basic concepts remain
+                            supports a fairly small set of features and the basic concepts remain
                             simple. Whenever possible, existing specifications are leveraged (XPath,
                             for example). In addition XPL, like XSLT before it, may be written by
                             hand, so the language should be reasonably concise. The notion of
@@ -2535,7 +2540,7 @@ fn:aggregate($root as <emph>xs:QName</emph>, $included as <emph>node()*</emph>) 
                             <emph>The model should allow any data set conforming to one of the W3C
                             standards, such as XML 1.1, XSLT 1.0, XML Query 1.0, etc., to be
                             specified as an input or output of a component.</emph> How this should
-                            be interpreted is not clear. Limiting inputs and outputs to Infosets
+                            be interpreted is not clear. Limiting inputs and outputs to XML Infosets
                             makes the language simpler, while still not prohibiting passing non-XML
                             Infoset data by encapsulating it within an XML Infoset, be it a simple
                             root element containing character data. [YES]
@@ -2691,7 +2696,8 @@ fn:aggregate($root as <emph>xs:QName</emph>, $included as <emph>node()*</emph>) 
                     </item>
                     <item>
                         <p>
-                            Determine whether a p:choose with only a p:otherwise is allowed.
+                            Determine whether a p:choose with only a p:otherwise is allowed. [NO,
+                            FOR CONSISTENCY WITH XSLT, THERE MUST BE A p:when]
                         </p>
                     </item>
                     <item>
@@ -2715,7 +2721,8 @@ fn:aggregate($root as <emph>xs:QName</emph>, $included as <emph>node()*</emph>) 
                             with the same name? In Presentation Server, this is used internally for
                             teeing, but do we actually have any documented processor with this
                             feature? It would definitely make things easier if we did not have to
-                            support this.
+                            support this. [NO, WE DON'T SUPPORT MULTIPLE INPUTS AND OUTPUTS WITH
+                            THE SAME NAME]
                         </p>
                     </item>
                 </olist>

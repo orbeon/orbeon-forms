@@ -224,7 +224,7 @@ h1 {
     text-decoration: none;
 }
 
-a {
+a[href] {
     color: &medium-color;;
     text-decoration: none;
 }

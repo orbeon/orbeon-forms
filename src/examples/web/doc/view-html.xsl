@@ -48,10 +48,9 @@
                 </div>
 
                 <!-- Tabs -->
-                <div class="tabs">
-                </div>
+                <div class="tabs">&#160;</div> <!-- Need to insert a space here for Safari -->
                 <div id="main">
-                     <div id="main1">
+                    <div id="main1">
                     <!-- List of sections -->
                     <div id="leftcontent">
                         <h1>PresentationServer Documentation</h1>
@@ -149,6 +148,8 @@
     </xsl:template>
 
     <xsl:template match="section[count(ancestor::section) = 0]">
+        <!-- Note: We put the h2 inside the a to get around a bug in Safari (if we don't do
+        that, the style on the a applies on the whole section. -->
         <a name="{generate-id()}"/>
         <h2>
             <xsl:number level="multiple" count="section" format="1.1.1. "/>

@@ -31,6 +31,13 @@
         <p:output name="data" id="stripped-instance"/>
     </p:processor>
 
+    <!-- Convert the XForms instance into text -->
+    <p:processor name="oxf:xml-converter">
+        <p:input name="data" href="#stripped-instance"/>
+        <p:input name="config"><config/></p:input>
+        <p:output name="data" id="text-xforms-instance"/>
+    </p:processor>
+
     <p:choose href="#instance">
         <p:when test="not(//@xxforms:valid = 'false')">
 
@@ -54,6 +61,8 @@
                 <p:input name="pdf-document" href="#pdf-document"/>
                 <!-- Custom input with PNG document -->
                 <p:input name="png-document" href="#png-document"/>
+                <!-- Custom input with XML document -->
+                <p:input name="xforms-instance" href="#text-xforms-instance"/>
             </p:processor>
 
             <!-- Return status document -->

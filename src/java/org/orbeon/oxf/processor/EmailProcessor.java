@@ -244,10 +244,10 @@ public class EmailProcessor extends ProcessorImpl {
             Element rootElement = (Element)(needsRootElement ? partOrBodyElement.elements().get(0) : partOrBodyElement);
             Document partDocument = DocumentHelper.createDocument();
             partDocument.setRootElement((Element) Dom4jUtils.cloneNode(rootElement));
-            content = handlePartContent(partDocument, contentType);
+            content = handleInlinePartContent(partDocument, contentType);
         }
 
-        if (!ProcessorUtils.isTextContentType(contentType)) {
+        if (!(ProcessorUtils.isTextContentType(contentType) || ProcessorUtils.isXMLContentType(contentType))) {
             // This is binary content
             if (content instanceof FileItem) {
                 final FileItem fileItem = (FileItem) content;
@@ -313,7 +313,7 @@ public class EmailProcessor extends ProcessorImpl {
             //part.setContentID(contentId);
     }
 
-    private String handlePartContent(Document document, String contentType) throws SAXException {
+    private String handleInlinePartContent(Document document, String contentType) throws SAXException {
         if ("text/html".equals(contentType)) {
             // Convert XHTML into an HTML String
             StringWriter writer = new StringWriter();
@@ -346,7 +346,7 @@ public class EmailProcessor extends ProcessorImpl {
         Writer writer = null;
         OutputStream os = null;
 
-        final boolean useWriter = ProcessorUtils.isTextContentType(contentType);
+        final boolean useWriter = ProcessorUtils.isTextContentType(contentType) || ProcessorUtils.isXMLContentType(contentType);
 
         try {
             os = fileItem.getOutputStream();
@@ -461,7 +461,7 @@ public class EmailProcessor extends ProcessorImpl {
             // 2. We don't read the source as SAX
             //    o It is particularly useful to support this when resources are to be used as binary
             //      attachments such as images.
-            //    o Here, we consider that the source can be XML, text/html, text/plain,
+            //    o Here, we consider that the source can be XML, text/html, text/*,
             //      or binary. We do not handle reading Base64-encoded files. We leverage the URL
             //      generator to obtain the content in XML format.
             XMLReader xmlReader;

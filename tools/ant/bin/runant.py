@@ -1,15 +1,27 @@
 #!/usr/bin/python
+# Copyright 2001,2003-2004 The Apache Software Foundation
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+
 """
 
  runant.py
 
-	This script is a translation of the runant.pl written by Steve Loughran.
-	It runs ant with/out arguments, it should be quite portable (thanks to
-	the python os library)
-	This script has been tested with Python2.0/Win2K
-
-        Copyright (c) 2001 The Apache Software Foundation.  All rights
-        reserved.
+    This script is a translation of the runant.pl written by Steve Loughran.
+    It runs ant with/out arguments, it should be quite portable (thanks to
+    the python os library)
+    This script has been tested with Python2.0/Win2K
 
  created:         2001-04-11
  author:          Pierre Dittgen pierre.dittgen@criltelecom.com
@@ -17,7 +29,6 @@
  Assumptions:
 
  - the "java" executable/script is on the command path
- - ANT_HOME has been set
 """
 import os, os.path, string, sys
 
@@ -25,75 +36,65 @@ import os, os.path, string, sys
 debug = 0
 
 #######################################################################
-#
-# check to make sure environment is setup
-#
-if not os.environ.has_key('ANT_HOME'):
-	print '\n\nANT_HOME *MUST* be set!\n\n'
-	sys.exit(1)
-else:
-	ANT_HOME = os.environ['ANT_HOME']
 
+# If ANT_HOME is not set default to script's parent directory
+if os.environ.has_key('ANT_HOME'):
+    ANT_HOME = os.environ['ANT_HOME']
+else:
+    ANT_HOME = os.path.dirname(os.path.dirname(os.path.abspath(sys.argv[0])))
+
+# set ANT_LIB location
+ANT_LIB = os.path.join(ANT_HOME, 'lib')
+
+# set JAVACMD (check variables JAVACMD and JAVA_HOME)
+JAVACMD = None
 if not os.environ.has_key('JAVACMD'):
-	JAVACMD = 'java'
+    if os.environ.has_key('JAVA_HOME'):
+        if not os.path.exists(os.environ['JAVA_HOME']):
+            print "Warning: JAVA_HOME is not defined correctly."
+        else:
+            JAVACMD = os.path.join(os.environ['JAVA_HOME'], 'bin', 'java')
+    else:
+        print "Warning: JAVA_HOME not set."
 else:
-	JAVACMD = os.environ['JAVACMD']
+    JAVACMD = os.environ['JAVACMD']
+if not JAVACMD:
+    JAVACMD = 'java'
 
-# Sets the separator char for CLASSPATH
-SEPARATOR = ':'
-if os.name == 'dos' or os.name == 'nt':
-	SEPARATOR = ';'
+launcher_jar = os.path.join(ANT_LIB, 'ant-launcher.jar')
+if not os.path.exists(launcher_jar):
+    print 'Unable to locate ant-launcher.jar. Expected to find it in %s' % \
+        ANT_LIB
 
-# Build up standard classpath
-localpath = ''
-if os.environ.has_key('CLASSPATH'):
-	localpath = os.environ['CLASSPATH']
-else:
-	if debug:
-		print 'Warning: no initial classpath\n'
+# Build up standard classpath (LOCALCLASSPATH)
+LOCALCLASSPATH = launcher_jar
+if os.environ.has_key('LOCALCLASSPATH'):
+    LOCALCLASSPATH += os.pathsep + os.environ['LOCALCLASSPATH']
 
-# Add jar files
-LIBDIR = os.path.join(ANT_HOME, 'lib')
-jarfiles = []
-for file in os.listdir(LIBDIR):
-	if file[-4:] == '.jar':
-		jarfiles.append(os.path.join(LIBDIR,file))
-if debug:
-	print 'Jar files:'
-	for jar in jarfiles:
-		print jar
-localpath = localpath + SEPARATOR + string.join(jarfiles, SEPARATOR)
-
-# If JAVA_HOME is defined, look for tools.jar & classes.zip
-# and add to classpath
-if os.environ.has_key('JAVA_HOME') and os.environ['JAVA_HOME'] != '':
-	JAVA_HOME = os.environ['JAVA_HOME']
-	TOOLS = os.path.join(JAVA_HOME, os.path.join('lib', 'tools.jar'))
-	if os.path.exists(TOOLS):
-		localpath = localpath + SEPARATOR + TOOLS
-	CLASSES = os.path.join(JAVA_HOME, os.path.join('lib', 'classes.zip'))
-	if os.path.exists(CLASSES):
-		localpath = localpath + SEPARATOR + CLASSES
-else:
-	print '\n\nWarning: JAVA_HOME environment variable is not set.\n', \
-		'If the build fails because sun.* classes could not be found\n', \
-		'you will need to set the JAVA_HOME environment variable\n', \
-		'to the installation directory of java\n'
-
-# Jikes
-ANT_OPTS = []
+ANT_OPTS = ""
 if os.environ.has_key('ANT_OPTS'):
-	ANT_OPTS = string.split(os.environ['ANT_OPTS'])
+    ANT_OPTS = os.environ['ANT_OPTS']
+
+OPTS = ""
 if os.environ.has_key('JIKESPATH'):
-	ANT_OPTS.append('-Djikes.class.path=' + os.environ['JIKESPATH'])
+    OPTS = '-Djikes.class.path=\"%s\"' % os.environ['JIKESPATH']
+
+ANT_ARGS = ""
+if os.environ.has_key('ANT_ARGS'):
+    ANT_ARGS = os.environ['ANT_ARGS']
+
+CLASSPATH = ""
+if os.environ.has_key('CLASSPATH'):
+    CLASSPATH = os.environ['CLASSPATH']
 
 # Builds the commandline
-cmdline = '%s -classpath %s -Dant.home=%s %s org.apache.tools.ant.Main %s' \
-	 % (JAVACMD, localpath, ANT_HOME, string.join(ANT_OPTS,' '), \
-	 	string.join(sys.argv[1:], ' '))
+cmdline = ('%s %s -classpath %s -Dant.home=%s %s ' + \
+    'org.apache.tools.ant.launch.Launcher %s -lib %s %s') \
+     % (JAVACMD, ANT_OPTS, LOCALCLASSPATH, ANT_HOME, OPTS, ANT_ARGS, \
+        CLASSPATH, string.join(sys.argv[1:], ' '))
 
 if debug:
-	print '\n%s\n\n' % (cmdline)
+    print '\n%s\n\n' % (cmdline)
 
 # Run the biniou!
 os.system(cmdline)

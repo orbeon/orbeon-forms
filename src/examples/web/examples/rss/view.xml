@@ -53,16 +53,16 @@
                     </tr>
                     <tr>
                         <td align="right">Web site URL:</td>
-                        <td><xforms:input ref="items-url" xhtml:size="60"/></td>
+                        <td><xforms:input ref="items-url" xhtml:size="60" xhtml:tabindex="1"/></td>
                     </tr>
                     <tr>
                         <td align="right">News items XPath:</td>
-                        <td><xforms:input ref="items-xpath" xhtml:size="60"/></td>
+                        <td><xforms:input ref="items-xpath" xhtml:size="60" xhtml:tabindex="2"/></td>
                     </tr>
                     <tr>
                         <td/>
                         <td>
-                            <xforms:submit xxforms:appearance="button">
+                            <xforms:submit xxforms:appearance="button" xhtml:tabindex="3">
                                 <xforms:label>Test</xforms:label>
                                 <xforms:setvalue ref="/form/action">test</xforms:setvalue>
                             </xforms:submit>
@@ -75,15 +75,15 @@
                     </tr>
                     <tr>
                         <td align="right">Item title XPath:</td>
-                        <td><xforms:input ref="items-title-xpath" xhtml:size="60"/></td>
+                        <td><xforms:input ref="items-title-xpath" xhtml:size="60" xhtml:tabindex="4"/></td>
                     </tr>
                     <tr>
                         <td align="right">Item URL XPath:</td>
-                        <td><xforms:input ref="items-url-xpath" xhtml:size="60"/></td>
+                        <td><xforms:input ref="items-url-xpath" xhtml:size="60" xhtml:tabindex="5"/></td>
                     </tr>
                     <tr>
                         <td align="right">Item description XPath (optional):</td>
-                        <td><xforms:input ref="items-description-xpath" xhtml:size="60"/></td>
+                        <td><xforms:input ref="items-description-xpath" xhtml:size="60" xhtml:tabindex="6"/></td>
                     </tr>
                     <tr><td>&#160;</td></tr>
                     <tr>
@@ -92,22 +92,22 @@
                     </tr>
                     <tr>
                         <td align="right">Channel title:</td>
-                        <td><xforms:input ref="channel-title" xhtml:size="60"/></td>
+                        <td><xforms:input ref="channel-title" xhtml:size="60" xhtml:tabindex="7"/></td>
                     </tr>
                     <tr>
                         <td align="right">Channel URL:</td>
-                        <td><xforms:input ref="channel-link" xhtml:size="60"/></td>
+                        <td><xforms:input ref="channel-link" xhtml:size="60" xhtml:tabindex="8"/></td>
                     </tr>
                     <tr>
                         <td align="right">Channel image URL:</td>
-                        <td><xforms:input ref="image-url" xhtml:size="60"/></td>
+                        <td><xforms:input ref="image-url" xhtml:size="60" xhtml:tabindex="9"/></td>
                     </tr>
                     <tr><td>&#160;</td></tr>
                     <tr>
                         <td rowspan="2" style="background-color: rgb(252, 229, 182)"><font size="5">4</font></td>
                         <td align="right"><b>Generate RSS:</b></td>
                         <td>
-                            <xforms:submit xxforms:appearance="image">
+                            <xforms:submit xxforms:appearance="image" xhtml:tabindex="10">
                                 <xforms:label/>
                                 <xxforms:img src="/images/xml.gif"/>
                                 <xforms:setvalue ref="/form/action">rss</xforms:setvalue>

@@ -84,7 +84,7 @@
 <!--        <menu-item label="JSR-168 Portlets" href="integration-portlets"/>-->
         <menu-item label="EJB Support" href="integration-ejb"/>
         <menu-item label="XUpdate JAXP Support" href="integration-xupdate"/>
-        <menu-item label="Using Presentation Server with Struts" href="model2x-struts"/>
+        <menu-item label="Struts Support" href="model2x-struts"/>
 <!--        <menu-item label="Presentation Server with JSF" href="model2x-jsf"/>-->
     </menu>
 </book>

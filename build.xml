@@ -553,7 +553,7 @@
 
     <target name="bizdoc-example" depends="prepare">
         <mkdir dir="${build.distrib.dir}"/>
-        <zip zipfile="${build.distrib.dir}/bizdoc-example-1.0.zip">
+        <zip zipfile="${build.distrib.dir}/bizdoc-example-1.1.zip">
             <zipfileset dir="doc/example-applications"/>
             <zipfileset dir="descriptors/examples/web/bizdoc" prefix="WEB-INF"/>
             <zipfileset dir="${web-examples-src.dir}" prefix="WEB-INF/resources">
@@ -572,7 +572,7 @@
 
     <target name="orbeon-com-example" depends="prepare">
         <mkdir dir="${build.distrib.dir}"/>
-        <zip zipfile="${build.distrib.dir}/orbeon-com-example-1.0.zip">
+        <zip zipfile="${build.distrib.dir}/orbeon-com-example-1.2.zip">
             <zipfileset dir="doc/example-applications"/>
             <zipfileset dir="descriptors/examples/web/orbeon-com" prefix="WEB-INF"/>
             <zipfileset dir="C:/Documents and Settings/Alessandro Vernet/My Documents/orbeon/cvs-public/oss-site/resources" prefix="WEB-INF/resources"/>

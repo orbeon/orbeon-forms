@@ -103,7 +103,7 @@ application servers:
 ************************************
 
     * Download the Presentation Server zip or tgz archive from
-      http://sourceforge.net/projects/orbeon/
+      http://forge.objectweb.org/projects/ops
 
     * Extract the archive in a directory that we call below:
       OIS_HOME/
@@ -159,10 +159,9 @@ Here are some pointers to useful information related to this release.
         http://www.orbeon.com/software/presentation-server
 
     * If you have questions, comments, or difficulties with the
-      Presentation Server, please subscribe to the SourceForge.net
-      orbeon-user mailing-list:
+      Presentation Server, please subscribe to the ObjectWeb user mailing-list:
 
-        http://sourceforge.net/mail/?group_id=116683
+        http://www.objectweb.org/wws/info/ops-users
 
     * For commercial support and licensing alternatives, please contact:
 
@@ -173,9 +172,9 @@ Here are some pointers to useful information related to this release.
 8. Known Issues
 ************************************
 
-For a list of known issues, consult the SourceForge issue tracking system:
+For a list of known issues, consult the ObjectWeb issue tracking system:
 
-  http://sourceforge.net/tracker/?atid=675660&group_id=116683&func=browse
+  http://forge.objectweb.org/tracker/?atid=350207&group_id=168&func=browse
 
 
 ************************************

@@ -193,12 +193,15 @@
             <section>
                 <title>Character Encoding</title>
                 <p>
-                    In the example above, no character encoding is specified, and the default
-                    <code>iso-8859-1</code> is used. In some cases, it is useful to specify a
-                    character encoding. For example, if it is known that the message only contains
-                    ASCII characters, the <code>us-ascii</code> encoding can be specified. If, on
-                    the other hand, the message contains characters from multiple languages, the
-                    <code>utf-8</code> encoding can be specified.
+                    In the example above, no character encoding is specified for the
+                    <code>body</code> element. This determines what character encoding is used in
+                    the body of the email message constructed by the Email processor. If no
+                    encoding is specified, the default <code>iso-8859-1</code> is used. In some
+                    cases, it is useful to specify a character encoding. For example, if it is known
+                    that the message only contains ASCII characters, the <code>us-ascii</code>
+                    encoding can be specified. If, on the other hand, the message contains
+                    characters from multiple languages, the <code>utf-8</code> encoding can be
+                    specified.
                 </p>
                 <p>
                     Use the <code>content-type</code> attribute to specify an encoding, for
@@ -451,6 +454,8 @@
                                     </body>
                                 </message>
                             </p:input>
+                            <p:input name="png-document"/>
+                            <p:input name="pdf-document"/>
                         </p:processor>
                     </xml-source>
                 </section>

@@ -108,10 +108,21 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             <p>
                 Because XML character data itself is represented in Unicode (in other words it is
                 designed to allow representing in a same document all the characters specified by
-                the Unicode specification), there is no requirement for specifying a character
-                encoding. This hint may be useful, for example a URL generator can by this mechanism
-                communicate to an HTTP serializer the preferred character encoding, but it is by no
-                means authoritative.
+                the Unicode specification), there is no requirement for specifying character
+                encoding in XML pipelines. However, when an XML infoset is read or written as an
+                textual XML document, specifying a character encoding may may be a useful hint. For
+                example a URL generator can, with this mechanism, communicate to an HTTP serializer
+                the preferred character encoding obtained when the document was read. The serializer
+                may then use that hint, but it is by no means authoritative.
+            </p>
+            <p>
+                In general, XML documents can be read and written using the <code>utf-8</code>
+                character encoding, which allows representing all the Unicode characters. However,
+                when dealing with other types of text documents, tools such as text editors may not
+                be able to deal correctly with <code>utf-8</code>. In such cases, it can be useful
+                to use even more widespread character encodings such as <code>iso-8859-1</code> or
+                <code>us-ascii</code>. The drawback is that such encodings allow representing a much
+                smaller set of characters than <code>utf-8</code>.
             </p>
             <p>
                 Unlike binary documents, text documents can easily be examined by users. They can

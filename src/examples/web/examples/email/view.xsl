@@ -19,17 +19,14 @@
       xmlns:xhtml="http://www.w3.org/1999/xhtml"
       xsl:version="2.0">
     <head>
-        <title>Email</title>
+        <title>Sending Email</title>
     </head>
     <body>
-        <xforms:group>
+        <xforms:group ref="/form" xxforms:show-errors="{if (doc('oxf:instance')/form/action = 'send') then 'true' else 'false'}">
             <p>
                 <xsl:choose>
                     <xsl:when test="status = 'success'">
                         <span style="color: green">Email sent!</span>
-                    </xsl:when>
-                    <xsl:when test="status = 'failure'">
-                        <span style="color: red">Please correct the validation errors before submitting the form.</span>
                     </xsl:when>
                 </xsl:choose>
             </p>
@@ -97,6 +94,7 @@
             <p>
                 <xforms:submit xxforms:appearance="button">
                     <xforms:label>Send an Email!</xforms:label>
+                    <xforms:setvalue ref="action">send</xforms:setvalue>
                 </xforms:submit>
             </p>
         </xforms:group>

@@ -16,6 +16,7 @@
 <html xsl:version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+      xmlns:f="http://orbeon.org/oxf/xml/formatting"
       xmlns:xi="http://www.w3.org/2003/XInclude"
       xmlns="http://www.w3.org/1999/xhtml">
 
@@ -85,8 +86,36 @@
             </ul>
             <p>
                 You can configure those roles in an LDAP server, or, for example with Apache Tomcat,
-                you can use a simpler file-based list of users (<code>tomcat-users.xml</code>).
+                you can use a simpler file-based list of users (<code>tomcat-users.xml</code>). You
+                should then add the following to your web.xml:
             </p>
+            <f:box>
+                <f:xml-source>
+                    <security-constraint>
+                        <web-resource-collection>
+                            <web-resource-name>Application Pages</web-resource-name>
+                            <url-pattern>/list-employees</url-pattern>
+                            <url-pattern>/edit-employee</url-pattern>
+                            <url-pattern>/show-reports</url-pattern>
+                            <url-pattern>/csv-export</url-pattern>
+                            <url-pattern>/excel-export</url-pattern>
+                        </web-resource-collection>
+                        <auth-constraint>
+                            <role-name>demo-user</role-name>
+                        </auth-constraint>
+                    </security-constraint>
+                    <login-config>
+                        <auth-method>FORM</auth-method>
+                        <form-login-config>
+                            <form-login-page>/login</form-login-page>
+                            <form-error-page>/login-error</form-error-page>
+                        </form-login-config>
+                    </login-config>
+                    <security-role>
+                        <role-name>demo-user</role-name>
+                    </security-role>
+                </f:xml-source>
+            </f:box>
             <p>
                 <xsl:choose>
                     <xsl:when test="not(doc('../ldap-config.xml')/*/host)">

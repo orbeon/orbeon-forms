@@ -203,38 +203,71 @@
 
                         <p/>
 
-                        <xforms:submit>
-                            <xforms:label>Export to CSV</xforms:label>
-                            <xforms:setvalue ref="action">export-csv</xforms:setvalue>
-                        </xforms:submit>
-
-                        <xforms:submit>
-                            <xforms:label>Export to Excel</xforms:label>
-                            <xforms:setvalue ref="action">export-excel</xforms:setvalue>
-                        </xforms:submit>
-
-                        <xforms:submit>
-                            <xforms:label>Add Employee</xforms:label>
-                            <xforms:setvalue ref="action">add-employee</xforms:setvalue>
-                        </xforms:submit>
-
-                        <!-- Show how the content of the page can depend on the current role -->
-                        <xforms:submit>
-                            <xsl:if test="not($request-security/role = 'demo-admin')">
-                                <xsl:attribute name="xhtml:style">color: red; font-weight: bolder</xsl:attribute>
-                            </xsl:if>
-                            <xforms:label>Import Data</xforms:label>
-                            <xforms:setvalue ref="action">import</xforms:setvalue>
-                        </xforms:submit>
-
-                        <xforms:submit>
-                            <xsl:if test="not($request-security/role = 'demo-admin')">
-                                <xsl:attribute name="xhtml:style">color: red; font-weight: bolder</xsl:attribute>
-                            </xsl:if>
-                            <xforms:label>Import from Excel</xforms:label>
-                            <xforms:setvalue ref="action">excel-import</xforms:setvalue>
-                        </xforms:submit>
-
+                        <table>
+                            <tr>
+                                <td>
+                                    <xforms:submit>
+                                        <xforms:help>
+                                            The <i>Add Employee</i> function allow adding a new employee to the
+                                            database.
+                                        </xforms:help>
+                                        <xforms:label>Add Employee</xforms:label>
+                                        <xforms:setvalue ref="action">add-employee</xforms:setvalue>
+                                    </xforms:submit>
+                                </td>
+                                <td>
+                                    <xforms:submit>
+                                        <xforms:help>
+                                            The <i>Export to CSV</i> function illustrates the use of the Text
+                                            serializer to generate a Comma-Separated Values file.
+                                        </xforms:help>
+                                        <xforms:label>Export to CSV</xforms:label>
+                                        <xforms:setvalue ref="action">export-csv</xforms:setvalue>
+                                    </xforms:submit>
+                                </td>
+                                <td>
+                                    <xforms:submit>
+                                        <xforms:help>
+                                            The <i>Export to Excel</i> function reads an Excel template, and
+                                            updates it with data retrieved from the database. It then sends the
+                                            file to the web browser.
+                                        </xforms:help>
+                                        <xforms:label>Export to Excel</xforms:label>
+                                        <xforms:setvalue ref="action">export-excel</xforms:setvalue>
+                                    </xforms:submit>
+                                </td>
+                                <td>
+                                    <!-- Show how the content of the page can depend on the current role -->
+                                    <xforms:submit>
+                                        <xsl:if test="not($request-security/role = 'demo-admin')">
+                                            <xsl:attribute name="xhtml:style">color: red; font-weight: bolder</xsl:attribute>
+                                        </xsl:if>
+                                        <xforms:help>
+                                            The <i>Import Data</i> function reads a text file, parses it, and
+                                            then iterates on the extracted collection of data to insert it into
+                                            the database.
+                                        </xforms:help>
+                                        <xforms:label>Import Data</xforms:label>
+                                        <xforms:setvalue ref="action">import</xforms:setvalue>
+                                    </xforms:submit>
+                                </td>
+                                <td>
+                                    <xforms:submit>
+                                        <xsl:if test="not($request-security/role = 'demo-admin')">
+                                            <xsl:attribute name="xhtml:style">color: red; font-weight: bolder</xsl:attribute>
+                                        </xsl:if>
+                                        <xforms:help>
+                                            The <i>Import from Excel</i> function uses XForms to upload a
+                                            binary Excel file. Then it extracts data from the Excel file, and
+                                            sends the data to a Web Service. On the receiving side, the Web
+                                            Service calls the data access layer to update the database.
+                                        </xforms:help>
+                                        <xforms:label>Import from Excel</xforms:label>
+                                        <xforms:setvalue ref="action">excel-import</xforms:setvalue>
+                                    </xforms:submit>
+                                </td>
+                            </tr>
+                        </table>
                     </xforms:group>
                 </div>
             </body>

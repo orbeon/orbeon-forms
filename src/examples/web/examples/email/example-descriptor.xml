@@ -20,7 +20,14 @@
     <source>get-pdf-data.xpl</source>
     <source>get-chart-data.xpl</source>
     <description>
-        This example illustrates the use of the Email processor. You have to set the SMTP host to a
-        valid mail server.
+        <p>
+            This example illustrates the use of the Email processor. You have to set the SMTP host
+            to a valid mail server. You also have to setup a database connection in your
+            <code>web.xml</code>.
+        </p>
+        <p>
+            The resulting email will look as follows:
+        </p>
+        <img src="/examples/email/result.png"/>
     </description>
 </example-descriptor>

@@ -49,7 +49,7 @@
             <!-- Send email -->
             <p:processor name="oxf:email">
                 <!-- The instance contains the email message -->
-                <p:input name="data" href="#stripped-instance"/>
+                <p:input name="data" href="#stripped-instance#xpointer(/form/message)"/>
                 <!-- Custom input with PDF document -->
                 <p:input name="pdf-document" href="#pdf-document"/>
                 <!-- Custom input with PNG document -->

@@ -20,6 +20,9 @@
     <!-- set global build.root to be dir containing this file. -->
     <dirname property='build.root' file='${ant.file}'/>
     <property name="lib.dir" location="lib"/>
+    <property name='forge-ssh-id' value='orbeonbld2@shell.forge.objectweb.org' />
+    <property name='unstbl-bld-dst' value='/var/lib/gforge/nightlybuilds/pres-server/pres-server/' />
+    <property name='local-repos' value='/home/cvs/objectweb-src/orbeon' />
 
     <fileset id='war.libs' dir="${lib.dir}">
         <include name="dom4j-1_4_orbeon.jar"/>
@@ -436,7 +439,7 @@
 
 
         <cvs command='tag TAG_OPS_${ops-version}'
-            cvsRoot=':ext:orbeonbld@cvs.sourceforge.net:/cvsroot/orbeon' failonerror='true'/>
+            cvsRoot=':local:${local-repos}' failonerror='true'/>
 
         <echo message="Deploying to ${deployDir}/${release.number}"/>
 
@@ -447,32 +450,31 @@
             </fileset>
         </copy>
 
-
         <!-- don't care if this fails.  do care if subsequent ssh commands fail though. -->
         <exec executable='ssh'>
-            <arg value='orbeonbld@shell.sourceforge.net'/>
+            <arg value='${forge-ssh-id}'/>
             <arg value='rm'/>
             <arg value='-rf'/>
-            <arg value='/home/groups/o/or/orbeon/htdocs/unstable-blds/presentation-server/*'/>
+            <arg value='${unstbl-bld-dst}*'/>
         </exec>
 
         <exec executable='ssh' failonerror='true'>
-            <arg value='orbeonbld@shell.sourceforge.net'/>
+            <arg value='${forge-ssh-id}'/>
             <arg value='mkdir'/>
-            <arg value='/home/groups/o/or/orbeon/htdocs/unstable-blds/presentation-server/${release.number}'/>
+            <arg value='${unstbl-bld-dst}${release.number}'/>
         </exec>
 
         <exec executable='scp' failonerror='true'>
             <arg value='-q'/>
             <arg value='${deployDir}/${release.number}/orbeon.war'/>
-            <arg value='orbeonbld@shell.sourceforge.net:/home/groups/o/or/orbeon/htdocs/unstable-blds/presentation-server/${release.number}/'/>
+            <arg value='${forge-ssh-id}:${unstbl-bld-dst}${release.number}/'/>
         </exec>
 
         <!-- copy log file last -->
         <exec executable='scp' failonerror='true'>
             <arg value='-q'/>
             <arg value='${deployDir}/buildLogs/oxf-${version}-build.log'/>
-            <arg value='orbeonbld@shell.sourceforge.net:/home/groups/o/or/orbeon/htdocs/unstable-blds/presentation-server/${release.number}/build.log'/>
+            <arg value='${forge-ssh-id}:${unstbl-bld-dst}${release.number}/build.log'/>
         </exec>
 
         <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${deployDir}/${release.number}/build.log'/>

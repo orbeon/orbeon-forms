@@ -1,0 +1,397 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<div1 id="processing-model">
+    <head>Processing Model</head>
+    <div2>
+        <head>Introduction</head>
+        <p>
+            The XPL processing model is based on declarative and lazy evaluation models.
+            This means that, unlike most imperative programming languages, processing order
+            is determined by first considering the results to be produced, and then walking
+            down a chain of dependencies to determine what statements must be executed. The
+            benefit of lazy evaluation and declarative programming is that they have more
+            potential for allowing implementations with different levels of optimization.
+        </p>
+    </div2>
+    <div2>
+        <head>Input Invariance</head>
+        <p>
+            A processor, when given control, may read one or more of its inputs. The XPL
+            implementation must make sure that, if a processor reads the same input several
+            times over a single execution of a sequence of statements, the XML Infoset read
+            is the same.
+        </p>
+    </div2>
+    <div2 id="output-invariance">
+        <head>Output Invariance</head>
+        <p>
+            Multiple statements may consume XML Infoset in a pipeline by referencing the
+            same XML Infoset identifier. These consumers may request the XML Infoset at
+            different times during pipeline execution. The XPL implementation must make sure
+            that the XML Infoset read by those different processors is the same for a given
+            execution of a sequence of statements.
+        </p>
+    </div2>
+    <div2 id="connections">
+        <head>Connections</head>
+        <p>
+            A processor input with name <emph>n</emph> is said to be connected when:
+        </p>
+        <ulist>
+            <item>
+                <p>
+                    The corresponding <el>p:processor</el> element contains an embedded
+                    <el>p:input</el> element with an attribute <el>name</el> with value
+                    <emph>n</emph>.
+                </p>
+            </item>
+            <item>
+                <p>
+                    The <el>p:input</el> element contains an embedded XML Infoset, or has a
+                    valid <el>href</el> attribute. See <specref ref="infoset-reference"/>.
+                </p>
+            </item>
+        </ulist>
+        <p>
+            A processor output with name <emph>n</emph> is said to be connected when:
+        </p>
+        <ulist>
+            <item>
+                It exposes an XML Infoset identifier <emph>i</emph>.
+            </item>
+            <item>
+                There exists an expression in the XPL program referring to <emph>i</emph>.
+            </item>
+        </ulist>
+    </div2>
+    <div2>
+        <head>XML Processor Execution</head>
+        <p>
+            The execution of a processor always starts with an <emph>initialization
+            phase</emph>. During the initialization phase, the XML processor:
+        </p>
+        <ulist>
+            <item>
+                <p>
+                    Is given control by the XPL implementation, through a mechanism outside
+                    the scope of XPL.
+                </p>
+            </item>
+            <item>
+                <p>
+                    Should reinitialize previous execution state if any.
+                </p>
+            </item>
+            <item>
+                <p>
+                    May read one or more of its inputs, in any order and at any time.
+                </p>
+            </item>
+            <item>
+                <p>
+                    May perform tasks unrelated to the XPL program, like interacting with
+                    other software.
+                </p>
+            </item>
+            <item>
+                <p>
+                    The processor should return control to the XPL implementation after a
+                    finite amount of time. There may be some rare uses cases where not
+                    returning control may be desirable.
+                </p>
+            </item>
+        </ulist>
+        <p>
+            If a processor does not have any connected output, the execution of the
+            processor terminates with the end of the initialization phase.
+        </p>
+        <p>
+            When a processor has at least one output, execution of the processor may resume
+            at a later point when the XML Infoset associated with an output is requested by
+            the XPL implementation. This is called a <emph>read phase</emph>. During such a
+            phase, the processor:
+        </p>
+        <ulist>
+            <item>
+                <p>
+                    Is given control by the XPL implementation, through a mechanism outside
+                    the scope of XPL.
+                </p>
+            </item>
+            <item>
+                <p>
+                    May access execution state created during the initialization phase or
+                    previous read phases, if necessary.
+                </p>
+            </item>
+            <item>
+                <p>
+                    May read one or more of its inputs, in any order and at any time.
+                </p>
+            </item>
+            <item>
+                <p>
+                    May perform tasks unrelated to the XPL program, like interacting with
+                    other software.
+                </p>
+            </item>
+            <item>
+                <p>
+                    The processor should return control to the XPL implementation after a
+                    finite amount of time, and return an XML Infoset associated with that
+                    output.. There may be some rare uses cases where not returning control
+                    may be desirable.
+                </p>
+            </item>
+        </ulist>
+        <p>
+            There is no guarantee that an XML processor will read one or more of its inputs.
+            This is entirely left to the implementor of the XML processor.
+        </p>
+        <p>
+            There is no guarantee that a processor in a pipeline will be initialized, or
+            will have any read phase after an initialization phase. The only guarantee of
+            execution is that if an XML processor does not have any outputs and is declared
+            in a sequence of statements which is executed, then it will be initialized.
+        </p>
+    </div2>
+    <div2>
+        <head>Sequence of Statements Execution</head>
+        <p>
+            The execution of a sequence of statements always starts with an <emph>initialization
+            phase</emph>. During the initialization phase:
+        </p>
+        <olist>
+            <item>
+                <p>
+                    The sequence is <emph>initialized</emph>. The meaning of this is largely
+                    implementation dependent, but may for example mean that execution state
+                    information kept by the implementation and related to the execution of
+                    this sequence of statements is discarded, for example, discarding XML
+                    Infosets associated with some Infoset identifiers in the sequence. It
+                    may also notifying processor instances that they should reinitialize
+                    some internal state.
+                </p>
+            </item>
+            <item>
+                <p>
+                    A list of statements in the sequence that do not have any connected output is
+                    established in document order (in the order they appear in the XPL
+                    program). Each statement in the list is then <emph>initialized</emph> in
+                    that order.
+                </p>
+            </item>
+            <item>
+                <p>
+                    During the initialization of an statement, that statement may read one
+                    or more of its inputs. When doing so, control is passed to the XPL
+                    implementation again. The XPL implementation must then obtain the XML
+                    Infoset associated with that input, possibly by evaluating an
+                    expression. That expression may refer to one or more XML Infoset
+                    identifier. The XPL implementation must obtain those XML Infoset
+                    identifiers in turn, by executing read phases on the statements exposing
+                    those identifiers. When XML Infosets associated with all the XML Infoset
+                    identifiers used by the expression are obtained, the XML Infoset
+                    associated with the input is complete, and control is returned to the
+                    statement.
+                </p>
+            </item>
+        </olist>
+        <p>
+            If the sequence of statements exposes XML Infoset identifiers, XML Infosets
+            associated with one or more of those identifiers may be requested by the XPL
+            implementation. When such an identifier <emph>i</emph> is requested, a
+            <emph>read phase</emph> is initiated on the sequence of statements:
+        </p>
+        <ulist>
+            <item>
+                <p>
+                    The statement exposing the identifier <emph>i</emph> is initialized if and
+                    only if not already done during the execution of the sequence of statements.
+                </p>
+            </item>
+            <item>
+                <p>
+                    The XML Infoset associated with the XML Infoset identifier
+                    <emph>i</emph> is requested from the statement by starting a read phase. The
+                    XPL implementation may decide to store the XML Infoset to fulfill
+                    further requests associated with <emph>i</emph>, and return the stored
+                    XML Infoset when possible. How this is achieve is implementation
+                    dependent, but in all cases output invariance must be guaranteed. See
+                    <specref ref="output-invariance"/>.
+                </p>
+            </item>
+            <item>
+                <p>
+                    Like during initialization, the statement may read one or more of its
+                    inputs. The same processing model applies.
+                </p>
+            </item>
+            <item>
+                <p>
+                    The XML Infoset associated with the XML Infoset identifier
+                    <emph>i</emph> is forwarded to the requestor.
+                </p>
+            </item>
+        </ulist>
+    </div2>
+    <div2>
+        <head>XPL Program Execution</head>
+        <p>
+            The execution of an XPL pipeline consists in executing the sequence of statements
+            contained under the <el>p:pipeline</el> element.
+        </p>
+        <p>
+            After the initialization phase, the XPL implementation may request XML Infosets
+            associated with pipeline outputs. To achieve this, <el>href</el> attribute
+            associated with the pipeline output to read is evaluated. This may cause
+            requesting one or more XML Infosets exposed by the sequence of statements,
+            therefore executing one or more read phases on the sequence of statements.
+        </p>
+    </div2>
+    <div2>
+        <head><el>p:choose</el> Execution</head>
+        <p>
+            This section is relevant only if the Choose Module is implemented.
+        </p>
+        <p>
+            The execution of a <el>p:choose</el> statement consists in:
+        </p>
+        <ulist>
+            <item>
+                <p>
+                    Obtaining the XML Infoset associated with the <el>p:choose</el>
+                    element's <el>href</el> attribute. The expression is evaluated, and may
+                    cause requesting one or more XML Infosets in scope.
+                </p>
+            </item>
+            <item>
+                <p>
+                    For each <el>p:when</el> element contained in the <el>p:choose</el>
+                    element, evaluate the expression contained in the <el>test</el>
+                    attribute on the XML Infoset obtained previously. Evaluation must be
+                    performed on <el>p:when</el> elements in document order. The result of
+                    the expression is converted to an <code>xs:boolean</code> type. If this
+                    is not possible, a dynamic error is generated. If the result of the
+                    boolean expression is <code>true()</code>, the branch is selected.
+                    Evaluation of further <el>p:when</el> elements must not be performed.
+                </p>
+            </item>
+            <item>
+                <p>
+                    If the branches do not export any XML Infoset identifier, the selected
+                    branch is considered a sequence of statements and is simply initialized.
+                </p>
+            </item>
+            <item>
+                <p>
+                    If the branches export at least XML Infoset identifier, the selected
+                    branch is considered a sequence of statements and is executed like a regular
+                    sequence of statements.
+                </p>
+            </item>
+        </ulist>
+        <note>
+            Because of <specref ref="output-invariance"/>, when a branch is selected during
+            a particular execution, it remains selected for the rest of the execution. In
+            particular, if a branch exports several XML Infoset identifiers, and the
+            associated XML Infosets are requested, they are always requested from the same
+            branch.
+        </note>
+    </div2>
+    <div2 id="for-each-execution">
+        <head><el>p:for-each</el> Execution</head>
+        <p>
+            This section is relevant only if the Repeat Module is implemented.
+        </p>
+        <p>
+            The execution of a <el>p:for-each</el> statement consists in:
+        </p>
+        <ulist>
+            <item>
+                <p>
+                    Obtaining the XML Infoset associated with the <el>p:for-each</el>
+                    element's <el>href</el> attribute. The expression is evaluated, and may
+                    cause requesting one or more scoped XML Infosets.
+                </p>
+            </item>
+            <item>
+                <p>
+                    Evaluating the expression on the <el>p:for-each</el> element's
+                    <el>select</el> attribute. This expression must return a sequence of
+                    elements called the <emph>iteration sequence</emph>. The iteration
+                    sequence may be empty. If it does not consist of a sequence of elements,
+                    a dynamic error must be raised. The iteration sequence may be calculated
+                    lazily, and the dynamic error may be raised only when the first item in
+                    the sequence that is not an element is found, if any.
+                </p>
+            </item>
+            <item>
+                <p>
+                    If there is no nested <el>p:output</el> element, the embedded sequence
+                    of statements is executed once for each element in the iteration
+                    sequence. Because there is no read phase, this means that the sequence
+                    of statements is initialized once for each element in the iteration
+                    sequence. The function <el>current()</el> of <specref
+                    ref="infoset-reference"/> is assigned a new XML Infoset built from the
+                    current element of the iteration sequence. See <specref
+                    ref="infoset-extraction"/>.
+                </p>
+            </item>
+            <item>
+                <p>
+                    If there is a nested <el>p:output</el> element, the expression on the
+                    <el>href</el> attribute of the embedded <el>p:output</el> element,
+                    called the <emph>output expression</emph>, must be evaluated. It may
+                    refer to XML Infoset identifiers of two types:
+                </p>
+                <ulist>
+                    <p>
+                        XML Infoset identifiers in scope for the <el>p:for-each</el>
+                        statement. Those are called <emph>external XML Infoset
+                        identifiers</emph>.
+                    </p>
+                    <p>
+                        XML Infoset identifiers exposed by the sequence of statements
+                        contained within the <el>p:for-each</el> statement. Those are called
+                        <emph>local XML Infoset identifiers</emph>.
+                    </p>
+                </ulist>
+                <p>
+                    A local XML Infoset identifier must be interpreted as sequences of XML
+                    Infosets. Each execution of the sequence of statements produces the
+                    next value in the sequence. After initializing the embedded sequence of
+                    statements, a read phase is performed for each such identifier, in the
+                    order in which they appear in the output expression.
+                </p>
+                <p>
+                    External XML Infoset identifiers refer to sequences of XML Infoset
+                    identifiers that contain only one element.
+                </p>
+                <p>
+                    When the embedded sequence of statements has been executed a number of
+                    times equal to the number of elements in the iteration sequence, the
+                    output expression must have produced a complete XML Infoset. That XML
+                    Infoset is associated with the identifier on the <el>id</el> attribute
+                    of the <el>p:output</el> element.
+                </p>
+            </item>
+            <item>
+                <p>
+                    If there is a <el>p:output</el> element within the <el>p:for-each</el>
+                    element but the iteration sequence is empty, the embedded sequence of
+                    statements is never executed. The output expression is evaluated with
+                    each local XML Infoset identifier replaced with an empty sequence.
+                </p>
+            </item>
+        </ulist>
+    </div2>
+    <div2>
+        <head><el>p:try</el> Execution</head>
+        <p>
+            This section is relevant only if the Exception Module is implemented.
+        </p>
+        <p>
+            [TODO]
+        </p>
+    </div2>
+</div1>

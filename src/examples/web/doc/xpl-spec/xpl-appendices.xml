@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<back xmlns:xlink="http://www.w3.org/1999/xlink" >
+    <div1 id="references">
+        <head>References</head>
+        <div2 id="references">
+            <head>Normative References</head>
+            <blist>
+                <bibl id="xml-infoset" href="http://www.w3.org/TR/xml-infoset/" key="XML Infoset" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Richard Tobin and John Cowan, editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">XML Information Set</titleref>.
+                    World Wide Web Consortium, 2001.
+                </bibl>
+                <bibl id="xml-10" href="http://www.w3.org/TR/2000/REC-xml-20001006" key="XML 1.0" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Tim Bray, Jean Paoli, C. M. Sperberg-McQueen, Eve Maler, editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">Extensible Markup Language (XML) 1.0 (Second Edition)</titleref>.
+                    World Wide Web Consortium, 2000.
+                </bibl>
+                <bibl id="xml-11" href="http://www.w3.org/TR/xml11/" key="XML 1.1" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Tim Bray, Jean Paoli, C. M. Sperberg-McQueen, Eve Maler, François Yergeau, John Cowan, editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">Extensible Markup Language (XML) 1.1</titleref>.
+                    World Wide Web Consortium, 2004.
+                </bibl>
+                <bibl id="xml-base" href="http://www.w3.org/TR/xmlbase/" key="XML Base" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Jonathan Marsh, editor.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">XML Base</titleref>.
+                    World Wide Web Consortium, 2001.
+                </bibl>
+                <bibl id="xml-namespaces-10" href="http://www.w3.org/TR/REC-xml-names/" key="XML Namespaces 1.0" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Tim Bray, Dave Hollander, Andrew Layman, editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">Namespaces in XML</titleref>.
+                    World Wide Web Consortium, 1999.
+                </bibl>
+                <bibl id="xml-namespaces-11" href="http://www.w3.org/TR/2004/REC-xml-names11-20040204/" key="XML Namespaces 1.1" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Tim Bray, Dave Hollander, Andrew Layman, Richard Tobin, editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">XML Linking Language (XLink) Version 1.0</titleref>.
+                    World Wide Web Consortium, 2004.
+                </bibl>
+                <bibl id="xml-schema" href="http://www.w3.org/TR/xmlschema-1/" key="XML Schema" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Henry S. Thompson, David Beech, Murray Maloney, et al. editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">XML Schema Part 1: Structures</titleref>.
+                    World Wide Web Consortium, 2000.
+                </bibl>
+                <bibl id="xlink" href="http://www.w3.org/TR/xlink/" key="XLink" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Steve DeRose, Eve Maler, David Orchard, editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">XML Linking Language (XLink) Version 1.0</titleref>.
+                    World Wide Web Consortium, 2001.
+                </bibl>
+                <bibl id="xpointer-framework" href="http://www.w3.org/TR/xptr-framework/" key="XPointer Framework" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Paul Grosso, Eve Maler, Jonathan Marsh, Norman Walsh, editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">XPointer Framework</titleref>.
+                    World Wide Web Consortium, 2003.
+                </bibl>
+                <bibl id="xpointer-xpointer-scheme" href="http://www.w3.org/TR/2002/WD-xptr-xpointer-20021219/" key="XPointer xpointer() Scheme" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Steven DeRose, Eve Maler, Ron Daniel Jr., editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">XPointer xpointer() Scheme</titleref>.
+                    World Wide Web Consortium, 2002.
+                </bibl>
+                <bibl id="xpointer-xmlns-scheme" href="http://www.w3.org/TR/xptr-xmlns/" key="XPointer xmlns() Scheme" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Steven J. DeRose, Ron Daniel Jr., Eve Maler, Jonathan Marsh, editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">XPointer xmlns() Scheme</titleref>.
+                    World Wide Web Consortium, 2003.
+                </bibl>
+                <bibl id="xpath-10" href="http://www.w3.org/TR/xpath.html" key="XPath 1.0" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    James Clark, Steve DeRose, editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
+                    XML Path Language (XPath) 1.0</titleref>. World Wide Web Consortium, 1999.
+                </bibl>
+                <bibl id="xpath-20" href="http://www.w3.org/TR/2004/WD-xpath20-20041029/" key="XPath 2.0 Working Draft" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Anders Berglund, Scott Boag, Don Chamberlin, Mary F. Fernández, Michael Kay, Jonathan Robie, Jérôme Siméon, editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
+                    XML Path Language (XPath) 2.0 Working Draft</titleref>. World Wide Web Consortium, 2004.
+                </bibl>
+                <bibl id="relax-ng" href="http://www.oasis- open.org/committees/relax- ng/" key="RELAX NG" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    James Clark, editor.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">OASIS RELAX NG Technical Committee</titleref>.
+                    OASIS. 2001.
+                </bibl>
+                <bibl id="rfc2119" href="http://www.ietf.org/rfc/rfc2119.txt" key="RFC 2119" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    S. Bradner, editor.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">Key words for use in RFCs to Indicate Requirement Levels</titleref>.
+                    IETF (Internet Engineering Task Force), March 1997.
+                </bibl>
+                <bibl id="xinclude" href="http://www.w3.org/TR/xinclude/" key="XInclude" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Jonathan Marsh and David Orchard, editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">XML Inclusions (XInclude) Version 1.0</titleref>.
+                    World Wide Web Consortium, 2001.
+                </bibl>
+            </blist>
+        </div2>
+        <div2>
+            <head>Other References</head>
+            <blist>
+                <bibl id="rfc2396" href="http://www.ietf.org/rfc/rfc2396.txt" key="RFC2396" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    T. Berners-Lee, R. Fielding, L. Masinter, editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">Uniform Resource Identifiers (URI): Generic Syntax. IETF RFC 2396</titleref>.
+                </bibl>
+                <bibl id="xquery-10" href="http://www.w3.org/TR/xquery/" key="XQuery" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Don Chamberlin, James Clark, Daniela Florescu, et al., editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">XQuery 1.0: An XML Query Language</titleref>.
+                    World Wide Web Consortium, 2001.
+                </bibl>
+                <bibl id="xslt-10" href="http://www.w3.org/TR/xslt" key="XSLT 1.0" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    James Clark, editor.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
+                    XSL Transformations (XSLT) Version 1.0</titleref>. World Wide Web Consortium, 1999.
+                </bibl>
+                <bibl id="data-model" href="http://www.w3.org/TR/xpath-datamodel/" key="XQuery 1.0 and XPath 2.0 Data Model" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Mary Fernández, Ashok Malhotra, Jonathan Marsh, Marton Nagy, Norman Walsh, editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
+                    XQuery 1.0 and XPath 2.0 Data Model</titleref>. World Wide Web Consortium, 2004.
+                </bibl>
+                <bibl id="xslt-20" href="http://www.w3.org/TR/2004/WD-xslt20-20041105/" key="XSLT 2.0 Working Draft" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Michael Kay, editor.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
+                    XSL Transformations (XSLT) Version 2.0 Working Draft</titleref>. World Wide Web Consortium, 2004.
+                </bibl>
+                <bibl id="xml-pipeline-definition" href="http://www.w3.org/TR/2002/NOTE-xml-pipeline-20020228/" key="XML Pipeline Definition Language" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Norman Walsh, Eve Maler editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
+                    XML Pipeline Definition Language Version 1.0</titleref>. World Wide Web Consortium, 2002.
+                </bibl>
+                <bibl id="xml-processing" href="http://www.w3.org/TR/2004/NOTE-proc-model-req-20040405/NOTE-proc-model-req-20040405.xml" key="XML Processing Model" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                    Dmitry Lenkov, Norman Walsh editors.
+                    <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
+                    XML Processing Model Requirements</titleref>. World Wide Web Consortium, 2004.
+                </bibl>
+            </blist>
+        </div2>
+    </div1>
+    <div1 id="examples">
+        <head>Examples and Use Cases (Non-Normative)</head>
+        <div2>
+            <head></head>
+            <p>
+                [TODO]
+            </p>
+        </div2>
+    </div1>
+    <div1 id="relationship">
+        <head> Relationship with Other Specifications (Non-Normative)</head>
+        <p>
+            This section discusses the relationship of XPL with other relevant specifications.
+            It is not normative, but is there to acknowledge that those specifications were
+            taken into account and to highlight similarities and differences.
+        </p>
+        <div2>
+            <head>February 2002 XML Pipeline Definition Language W3C Note</head>
+            <p>
+                Work on XPL started in 2002 independently from <bibref
+                ref="xml-pipeline-definition"/>, a W3C Note published in February 2002. The
+                similarities between XPL and the W3C Note may appear startling. This is easily
+                explained by the fact that both initiatives aimed at solving a similar problem.
+                The similarities however remain mostly at the surface. XPL has a different
+                processing model, and proposes constructs different from those of the W3C Note.
+            </p>
+            <p>
+                XPL does:
+            </p>
+            <ulist>
+                <item><p>Define an XML pipeline language</p></item>
+                <item><p>Describe the equivalent of "processes"</p></item>
+            </ulist>
+            <p>
+                The basics of XPL are arguably simpler than the W3C Note:
+            </p>
+            <ulist>
+                <item>
+                    <p>
+                        XPL does not follow a "build system" approach with concepts such as
+                        "targets" being "up to date". Rather, an XPL pipeline is executed, and
+                        may return zero, one or more XML Infosets. This approach is closer from
+                        the approach followed by most programming languages. Further, it is
+                        thought that the concept of target is not necessary: choosing two
+                        different targets can be reduced to choosing two different pipelines.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        XPL remains declarative, in that the products of the execution of a
+                        pipeline determines the processing order.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        XPL does not allow for elements from foreign vocabularies except as a
+                        convenience in the particular case of embedded processor input Infosets.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        XPL does not specify how "processes" ("processors" in the XPL
+                        terminology) are defined (W3C Note's process definitions). Such
+                        definitions are outside the scope of XPL and left to language
+                        implementors. The only assumption is that processors are declared and
+                        that they expose an XML qualified name (QName) that identifies them.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        XPL processors only support inputs and outputs that are XML Infosets.
+                        There is no concept of additional parameters (W3C Note
+                        <el>p:param</el>) to pass to processors. The rationale for this
+                        decision is that it is always possible to pass such parameters in the
+                        form of an XML Infoset.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                    XPL does not limit the types of Infosets produced by processors.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        XPL pipelines either entirely succeed or entirely fail (basic profile).
+                        When exception handling is added (exception module), exceptions are
+                        handled accordingly.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                    There is no "p:document" element. Instead, a particular processor, such as
+                    the identity processor, can be used for the same purpose.
+                    </p>
+                </item>
+            </ulist>
+        </div2>
+        <div2>
+            <head>April 2004 XML Processing Model W3C Note</head>
+            <p>
+                <bibref ref="xml-processing"/>, a W3C Note published in April 2004, sets forth
+                a number of requirements for an XML processing model. XPL hopes to answer all
+                those requirements:
+            </p>
+            <ulist>
+                <item>
+                    <p>
+                        <emph>The language must be rich enough to address practical
+                        interoperability concerns.</emph> To achieve this goal, the language
+                        cannot be simplistic and needs to implement a number of basic features.
+                        The XPL specification defines a basic profile, and a number of modules
+                        that can be optionally implemented. [YES]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>The language should be as small and simple as possible.</emph> XPL
+                        supports a fairly small set of features and the basic concepts remain
+                        simple. Whenever possible, existing specifications are leveraged (XPath,
+                        for example). In addition XPL, like XSLT before it, may be written by
+                        hand, so the language should be reasonably concise. The notion of
+                        modules allows implementors to start small and then add more advanced
+                        features. [YES]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>The language must allow the inputs, outputs, and other parameters
+                        of a components to be specified.</emph> In this specification, the
+                        language only uses XML Infosets to pass inputs and parameters to as
+                        component. It is thought that this makes XPL simpler. Our interpretation
+                        is that this is compatible with the requirement. [YES]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>The language must define the basic minimal set of mandatory input
+                        processing options and associated error reporting options required to
+                        achieve interoperability.</emph> Currently, XPL does not have any
+                        error handling facilities. It is thought that the best way of achieving
+                        this is to implement exception handling. [NO, YES soon]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>Given a set of components and a set of documents, the language
+                        must allow the order of processing to be specified.</emph> XPL
+                        determines an implicit execution order. The order is predictable up to a
+                        certain level. Additional constraints would make the language more
+                        complex, but if needed, could be added. [?]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>It should be relatively easy to implement a conformant
+                        implementation of the language, but it should also be possible to build
+                        a sophisticated implementation that can perform parallel operations,
+                        lazy or greedy processing, and other optimizations.</emph> [YES]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>The model should be extensible enough so that applications can
+                        define new processes and make them a component in a pipeline.</emph>
+                        [YES]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>The model must provide mechanisms for addressing error handling
+                        and fallback behaviors.</emph> [SEE ERROR REPORTING ABOVE]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>The model could allow conditional processing so that different
+                        components are selected depending on run-time evaluation.</emph> [YES]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>The model should not prohibit the existence of streaming
+                        pipelines.</emph> [YES]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>The model should allow multiple inputs and multiple outputs for a
+                        component.</emph> [YES]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>The model should allow any data set conforming to one of the W3C
+                        standards, such as XML 1.1, XSLT 1.0, XML Query 1.0, etc., to be
+                        specified as an input or output of a component.</emph> How this should
+                        be interpreted is not clear. Limiting inputs and outputs to XML Infosets
+                        makes the language simpler, while still not prohibiting passing non-XML
+                        Infoset data by encapsulating it within an XML Infoset, be it a simple
+                        root element containing character data. [YES]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>Information should be passed between components in a standard way,
+                        for example, as one of the data sets conforming to an industry
+                        standard.</emph> This is not a clear requirement. Each component
+                        defines the Infosets it produces and generates, and it should not be up
+                        to the pipeline language to define what they are. However, XPL supports
+                        inline validation able to enforce such constraints. [YES?]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>The language should be expressed in XML.</emph> [YES]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>The pipeline language should be declarative, not based on
+                        APIs.</emph> [YES]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>The model should be neutral with respect to implementation
+                        language.</emph> [YES]
+                    </p>
+                </item>
+            </ulist>
+            <p>
+                It should be noted that XPL provides more than the minimal requirements above,
+                and that in addition, the use cases of that Note can all be satisfied by XPL.
+            </p>
+        </div2>
+        <div2>
+            <head>WS-BPEL 2.0</head>
+            <p>
+                [TODO]
+            </p>
+        </div2>
+        <div2>
+            <head>SXPipe</head>
+            <p>
+                [TODO]
+            </p>
+        </div2>
+    </div1>
+    <div1>
+        <head>Schema for XPL</head>
+        <p>
+            This appendix provides a W3C XML Schema for XPL.
+        </p>
+        <p>
+            [TODO]
+        </p>
+    </div1>
+    <div1>
+        <head>Summary of Issues (Non-Normative)</head>
+        <div2>
+            <head>Open Issues</head>
+            <p>
+                This appendix identifies open issues with this specification:
+            </p>
+            <olist>
+
+                <item>
+                    <p>
+                        Determine company-agnostic namespace for XPL.
+                    </p>
+                </item>
+
+                <item>
+                    <p>
+                        Determine wither p:pipeline/p:output should support embedded XML Infoset
+                        like p:input. [I DON'T SEE THE POINT, SO WOULD SAY NO]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        Determine whether p:while must be defined in XPL 1.0. [FOR 1.0 MAYBE,
+                        BUT FOR A FIRST SUBMISSION NO]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        Determine whether exception handling must be defined in XPL 1.0.[FOR 1.0 MAYBE,
+                        BUT FOR A FIRST SUBMISSION NO]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        Determine whether unconnected outputs are allowed.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        Determine how to solve issue of exporting ids from p:choose branches.
+                        Should we use an attribute, or simply the p:output syntax?
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        Debug attributes are currently not specified. Are we happy with this
+                        solution?
+                    </p>
+                </item>
+            </olist>
+        </div2>
+        <div2>
+            <head>Closed Issues</head>
+            <olist>
+                <item>
+                    <p>
+                        Determine if terminology of "step" is appropriate. [REPLACED STEPS BY STATEMENTS]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        Determine whether p:config is to be renamed. [YES, DONE]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        Determine whether p:param are to be renamed and based on new use of
+                        p:input and p:output. Benefits: [PROPOSAL STILL NEEDS TO BE
+                        EXAMINED, BUT DONE IN THIS VERSION]
+                    </p>
+                    <ulist>
+                        <item>
+                            One less element name in the vocabulary.
+                        </item>
+                        <item>
+                            Brings consistency. An input always refers to something with an "id"
+                            as opposed to sometimes and "id" and sometimes a "name". An output
+                            always declare an "id" as opposed to declaring an "id" and sometimes
+                            a "ref".
+                        </item>
+                        <item>
+                            No confusion between href and ref.
+                        </item>
+                        <item>
+                            Pipeline outputs behave like regular processor inputs.
+                        </item>
+                        <item>
+                            Still covers all possible scenarios covered before, and more.
+                        </item>
+                        <item>
+                            Allows dissociating pipeline input and output names from internal ids.
+                        </item>
+                        <item>
+                            Allows using all the syntax of href on pipeline outputs.
+                        </item>
+                    </ulist>
+                    <p>
+                        Potential drawbacks:
+                    </p>
+                    <ulist>
+                        <item>
+                            Output href will refer to ids that are not yet visible. Does this
+                            violate something we care about? Practically, you can easily keep in
+                            memory the list of outputs and process them at the end of the
+                            pipeline.
+                        </item>
+                    </ulist>
+                    <note>
+                        Requires also to change p:for-each, if it is allowed to use a "ref"
+                        attribute. This is a big unknown for the moment: can we come up with a
+                        nice, light syntax consistent with the rest?
+                    </note>
+                </item>
+                <item>
+                    <p>
+                        Determine whether a p:choose with only a p:otherwise is allowed. [NO,
+                        FOR CONSISTENCY WITH XSLT, THERE MUST BE A p:when]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        Do we actually support officially multiple processor inputs or outputs
+                        with the same name? In Presentation Server, this is used internally for
+                        teeing, but do we actually have any documented processor with this
+                        feature? It would definitely make things easier if we did not have to
+                        support this. [NO, WE DON'T SUPPORT MULTIPLE INPUTS AND OUTPUTS WITH
+                        THE SAME NAME]
+                    </p>
+                </item>
+            </olist>
+        </div2>
+    </div1>
+</back>

@@ -1,0 +1,540 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<div1 id="syntax">
+    <head>Syntax</head>
+    <div2>
+        <head>Introduction</head>
+        <p>
+            The XPL syntax is organized into modules. The Pipeline module and the Processor
+            module constitute the basic framework of XPL. Other modules build on top that
+            framework to provide enhanced functionality. Modules are then grouped into
+            profiles, see <specref ref="conformance"/>.
+        </p>
+    </div2>
+    <div2>
+        <head>Namespace</head>
+        <p>
+            All the elements defined by XPL must be in the
+            <code>http://www.orbeon.com/oxf/pipeline</code> namespace [TODO: a
+            company-agnostic namespace must be chosen]. For consistency, XPL elements should
+            use the prefix <code>p</code>. This document assumes that this prefix is used.
+        </p>
+    </div2>
+    <div2>
+        <head>Pipeline Module</head>
+        <div3>
+            <head>The <el>p:pipeline</el> element</head>
+            <pre>
+&lt;p:pipeline
+version = "1.0" &gt;
+&lt;!-- Content: (p:input*, p:output*, (p:processor | p:choose | p:for-each)*) --&gt;
+&lt;/p:pipeline&gt;
+            </pre>
+            <p>
+                An <termref def="xpl-program">XPL program</termref> always starts with a
+                <el>p:pipeline</el> element. The <el>p:pipeline</el> element must be the
+                root element of the XML document containing the XPL program.
+            </p>
+            <p>
+                The <el>p:pipeline</el> element has a mandatory <el>version</el> attribute.
+                The value of the version attribute must be a valid instance of the type
+                <code>xs:decimal</code> as defined in <bibref ref="xml-schema"/>.
+            </p>
+            <p>
+                For this version of XPL, the value of the <el>version</el> attribute must
+                be <code>1.0</code>.
+            </p>
+        </div3>
+        <div3>
+            <head>The <el>p:input</el> element</head>
+            <pre>
+&lt;p:input
+name = <emph>ncname</emph>
+id? = <emph>ncname</emph>
+schema-uri? = <emph>aaa</emph>
+schema-href? = <emph>aaa</emph> /&gt;
+            </pre>
+            <p>
+                The <el>p:input</el> element defines exactly one XPL program input. Zero,
+                one or more <el>p:input</el> or <el>p:output</el> elements can be children
+                elements of the <el>p:pipeline</el> element. They must occur before any
+                other element in the XPL program.
+            </p>
+            <p>
+                The <el>name</el> attribute is mandatory. It identifies the input to
+                external users of the XPL program. There cannot be two inputs with the same
+                name, but it is possible to have an input and an output with the same name.
+                It is a static error if two inputs have the same name.
+            </p>
+            <p>
+                The <el>id</el> attribute is optional. It is an XML Infoset identifier that
+                identifies the XML Infoset associated with the input for use within the XPL
+                program. In particular, the XML Infoset may be referenced with the
+                <el>href</el> attribute on <el>p:input</el> elements within
+                <el>p:processor</el> elements.
+            </p>
+            <p>
+                If the <el>id</el> attribute is missing, the XPL program cannot read the
+                input. It may make sense to declare an XPL program input without reading it
+                so that external users of the XPL program are aware that the input may be
+                used in a future version of the program.
+            </p>
+        </div3>
+        <div3>
+            <head>The <el>p:output</el> element</head>
+            <pre>
+&lt;p:output
+name = <emph>ncname</emph>
+href = <emph>infoset-reference</emph>
+schema-uri? = <emph>aaa</emph>
+schema-href? = <emph>aaa</emph> /&gt;
+            </pre>
+            <p>
+                The <el>p:output</el> element within a <el>p:pipeline</el> element defines
+                exactly one XPL program output. Zero, one or more <el>p:input</el> or
+                <el>p:output</el> elements can be children elements of the
+                <el>p:pipeline</el> element. They must occur before any other element in the
+                XPL program.
+            </p>
+            <p>
+                The <el>name</el> attribute is mandatory. It identifies the output to
+                external users of the XPL program. There cannot be two output with the same
+                name, but it is possible to have an output and an input with the same name.
+                It is a static error if two outputs have the same name.
+            </p>
+            <p>
+                The <el>href</el> attribute is mandatory. It identifies the XML Infoset that
+                must be produced by the XPL program in association with the output.
+            </p>
+            <p>
+                The Infoset reference contained by the <el>href</el> attribute may refer to
+                any XML Infoset identifier in scope after the last statement of the XPL program.
+                See <specref ref="infoset-reference"/> for the detailed syntax.
+            </p>
+        </div3>
+        <note>
+            The <el>p:input</el> and <el>p:output</el> elements can also be used within a
+            <el>p:processor</el> element. In that context, they support different
+            attributes and content.
+        </note>
+        <!--
+        <div3>
+            <head>The <el>p:param</el> element</head>
+            <p>
+                <el>
+                    &lt;p:param
+                        name = <emph>aaa</emph>
+                        type = <emph>aaa</emph> /&gt;
+                </el>
+            </p>
+            <p>
+                [TODO: it should be considered whether the <el>p:param</el> element should be
+                replaced by <el>p:input</el> and <el>p:output</el>.]
+            </p>
+            <p>
+                [TODO: it should be considered whether pipeline outputs should be referred to by
+                <el>href</el> / <el>id</el> attributes instead of the current <el>name</el>
+                <el>ref</el>. This would make the language more consistent.]
+            </p>
+            <p>
+                The <el>p:param</el> element defines exactly one XPL program input or
+                output. Zero, one or more <el>p:param</el> elements can be children elements
+                of the <el>p:pipeline</el> element. They must occur before any other
+                element in the XPL program.
+            </p>
+            <p>
+                The <el>type</el> attribute is mandatory and can have a value of either
+                <code>input</code> or <code>output</code>. A <el>p:param</el> element with a
+                value of <code>input</code> defines an XPL program input. A <el>p:param</el>
+                element with a value of <code>output</code> defines an XPL program output.
+            </p>
+            <p>
+                The <el>name</el> attribute is mandatory. There cannot be two inputs with the
+                same name or two outputs with the same name, but it is possible to have an
+                output and an input with the same name.
+            </p>
+            <p>
+                Every input name defines an XML Infoset identifier that may be later
+                referenced with the <el>href</el> attribute on <el>p:input</el> elements within
+                <el>p:processor</el> elements.
+            </p>
+            <p>
+                Every output name defines an identifier that must be referenced with the
+                <el>ref</el> attribute on <el>p:output</el> elements within
+                <el>p:processor</el> elements. There cannot be a <el>p:output</el> element
+                defining a name identical to an <el>id</el> attribute on a <el>p:output</el>
+                element within a <el>p:processor</el> element. The XPL implementation must
+                throw a static error if such a condition is encountered.
+            </p>
+        </div3>
+        -->
+    </div2>
+    <div2>
+        <head>Processor Module</head>
+        <div3>
+            <head>The <el>p:processor</el> element</head>
+            <pre>
+&lt;p:processor
+name = <emph>qname</emph> &gt;
+&lt;!-- Content: (p:input* | p:output*) --&gt;
+&lt;/p:processor&gt;
+            </pre>
+            <p>
+                The <el>p:processor</el> element declares a statement that consists of a
+                single XML processor instance.
+            </p>
+            <p>
+                The set of XML Infoset identifiers exposed by a <el>p:processor</el>
+                statement consists of the set of identifiers declared with the <el>id</el>
+                attribute on the nested <el>p:output</el> elements, if any.
+            </p>
+            <p>
+                The <el>name</el> attribute is mandatory. It is of type <termref
+                def="qname">QName</termref>. The QName identifies a particular XML
+                processor implementation. The prefix of the given QName must be in scope on
+                the <el>p:processor</el> element.
+            </p>
+            <p>
+                More than one <el>p:processor</el> elements with the same <el>name</el>
+                attribute may be used in an XPL program. This translates into using several
+                <termref def="xml-processor-instance">instances</termref> of the XML
+                processor.
+            </p>
+            <note>
+                The presence of a <el>p:processor</el> statement in an XML program does not
+                guarantee that the processor is executed. <specref ref="processing-model"/>
+                details the conditions under which a processor is executed.
+            </note>
+        </div3>
+        <div3>
+            <head>The <el>p:input</el> element</head>
+            <pre>
+&lt;p:input
+name = <emph>ncname</emph>
+href? = <emph>infoset-reference</emph>
+schema-uri? = <emph>aaa</emph>
+schema-href? = <emph>aaa</emph> &gt;
+&lt;!-- Content: (embedded-infoset)? --&gt;
+&lt;/p:input&gt;
+            </pre>
+            <p>
+                The <el>p:input</el> element connects an XML processor input identified by the
+                mandatory <el>name</el> attribute.
+            </p>
+            <p>
+                If the <el>href</el> attribute is missing, there must be an embedded Infoset as
+                a child of the <el>p:input</el> element. In that case, here must exactly one
+                child element of the <el>p:input</el> element. If no element is present or more
+                than one element is present, a static error must be raised. If the <el>href</el>
+                attribute is present and the <el>p:input</el> element has one or more children,
+                a static error must be raised.
+            </p>
+            <p>
+                The Infoset reference contained by the <el>href</el> attribute may refer to
+                any XML Infoset identifier in scope for the parent <el>p:processor</el>. See
+                <specref ref="infoset-reference"/> for the detailed syntax.
+            </p>
+            <p>
+                The optional <el>schema-href</el> and <el>schema-uri</el> refer to an external
+                schema. If both attributes are present, a static error must be raised.
+            </p>
+            <p>
+                If the <el>schema-href</el> attribute is present, it must contain a URL
+                referring to either an W3C XML Schema schema, or a Relax NG schema.
+            </p>
+            <p>
+                If the <el>schema-uri</el> attribute is present, it must contain a URI
+                identifying either an W3C XML Schema schema, or a Relax NG schema. The mapping
+                between the URI and the actual schema is outside the scope of the XPL
+                specification.
+            </p>
+            <p>
+                The use of <el>schema-href</el> allows easily using schemas bundled with an XPL
+                program. The use of <el>schema-uri</el> allows using URIs, commonly used with
+                XML Schema, which provide a level of abstraction hiding the actual storage
+                location of actual schema files.
+            </p>
+            <p>
+                If the XML Infoset read on the input does not validate against the schema
+                specified, a dynamic error is raised.
+            </p>
+            <note>
+                The XPL implementation is allowed to start providing parts of the XML
+                Infoset to the XML processor while validation is being performed. The
+                constraint is that the XML Infoset must be valid according to the schema up
+                to that point, and that when the XML processor has received the entire XML
+                Infoset, it is guaranteed to have received an XML Infoset valid according to
+                the provided schema. Such streamed validation may not be possible with all
+                schema languages.
+            </note>
+            <p>
+                For both attributes, it is a dynamic error if the schema cannot be loaded
+                during execution.
+            </p>
+            <p>
+                The embedded XML Infoset, if any, is constructed from the single element
+                under the <el>p:input</el> element as described in <specref
+                ref="infoset-extraction"/>.
+            </p>
+        </div3>
+        <div3>
+            <head>The <el>p:output</el> element</head>
+            <pre>
+&lt;p:output
+name = <emph>ncname</emph>
+id = <emph>ncname</emph>
+schema-uri? = <emph>aaa</emph>
+schema-href? = <emph>aaa</emph> &gt;
+&lt;/p:output&gt;
+            </pre>
+            <p>
+                The <el>p:output</el> element within a <el>p:processor</el> element
+                connects an XML processor output identified by the mandatory <el>name</el>
+                attribute.
+            </p>
+            <p>
+                The mandatory <el>id</el> element assigns an XML Infoset identifier with
+                the particular output.
+            </p>
+            <p>
+                The identifier must follow the no-collision rule. This means that the
+                identifier must not be present in the set of XML Infoset identifiers in
+                scope for the parent <el>p:processor</el> statement. The XPL implementation
+                must raise a static error if a collision is detected.
+            </p>
+            <p>
+                <el>p:output</el> supports the same <el>schema-href</el> and <el>schema-uri</el>
+                attributes present on the <el>p:input</el> element. If the XML Infoset produced
+                by the XML processor does not validate against the provided schema during
+                execution, a dynamic error is raised.
+            </p>
+            <note>
+                The XPL implementation is allowed to start receiving parts of the XML
+                Infoset from the XML processor while validation is being performed, and to
+                pass such parts to further XML processors consuming the XML Infoset. The
+                requirement is that the XML Infoset must be valid according to the schema up
+                to that point. Such streamed validation may not be possible with all schema
+                languages.
+            </note>
+        </div3>
+        <note>
+            The <el>p:input</el> and <el>p:output</el> elements can also be used within a
+            <el>p:processor</el> element. In that context, they support different
+            attributes and content.
+        </note>
+    </div2>
+    <div2>
+        <head>Choose Module</head>
+        <div3>
+            <head>The <el>p:choose</el> element</head>
+            <pre>
+&lt;p:choose
+href = <emph>infoset-reference</emph> &gt;
+&lt;!-- Content: (p:when*, p:otherwise?) --&gt;
+&lt;/p:choose&gt;
+            </pre>
+            <p>
+                [TODO: Update to support p:output]
+            </p>
+            <p>
+                The <el>p:choose</el> element declares a statement used to execute different
+                sequences of statements depending on conditions evaluated during the
+                execution of the XPL program.
+            </p>
+            <p>
+                The content of a nested <el>p:when</el> or <el>p:otherwise</el> element is
+                called a <emph>branch</emph>. As detailed in the processing model section, a
+                branch may or may not be executed, and one branch of a <el>p:choose</el>
+                element at most is executed.
+            </p>
+            <p>
+                Conditions are expressed by children <el>p:when</el> elements using XPath
+                expressions. They are applied to an XML Infoset determined by the
+                mandatory <el>href</el> attribute of the <el>p:choose</el> element.
+            </p>
+            <p>
+                The set of XML Infoset identifiers exposed by a <el>p:choose</el> statement
+                consists of the set of identifiers exported by all branches, as detailed
+                below.
+            </p>
+        </div3>
+        <div3>
+            <head>The <el>p:when</el> element</head>
+            <pre>
+&lt;p:when
+test = <emph>expression</emph> &gt;
+&lt;!-- Content: (p:processor | p:choose | p:for-each)* --&gt;
+&lt;/p:when&gt;
+            </pre>
+            <p>
+                A <el>p:when</el> element is always a child of a <el>p:choose</el> element.
+                A sequence of multiple <el>p:when</el> elements can be present under a
+                single <el>p:choose</el> element.
+            </p>
+            <p>
+                The mandatory <el>test</el> attribute contains an XPath expression. The result
+                of the expression must be castable to a boolean result. It is applied on the XML
+                Infoset provided to the parent <el>p:choose</el> element.
+            </p>
+            <p>
+                The <el>p:when</el> element may support <bibref ref="xpath-10"/> or <bibref
+                ref="xpath-20"/>. The details are specified in <specref
+                ref="conformance"/>.
+            </p>
+        </div3>
+        <div3>
+            <head>The <el>p:otherwise</el> element</head>
+            <pre>
+&lt;p:otherwise&gt;
+&lt;!-- Content: (p:processor | p:choose | p:for-each)* --&gt;
+&lt;/p:otherwise&gt;
+            </pre>
+            <p>
+                A <el>p:otherwise</el> element is always a child of a <el>p:choose</el>
+                element. If any <el>p:when</el> siblings are present, they must all precede
+                a <el>p:otherwise</el> element. There must be exactly zero or one
+                <el>p:otherwise</el> element child of a <el>p:choose</el> element.
+            </p>
+        </div3>
+        <div3>
+            <head>Branches</head>
+            <p>
+                Each <el>p:when</el> or <el>p:otherwise</el> branch may contain a sequence
+                of statements.
+            </p>
+            <p>
+                The set of scoped XML Infoset identifiers for the first statement in the
+                branch consists of the set of scoped identifiers for the parent
+                <el>p:choose</el> element.
+            </p>
+            <p>
+                The set of scoped XML Infoset identifiers after the last statement of a
+                branch are subject to the following conditions:
+            </p>
+            <ulist>
+                <item>
+                    <p>
+                        <emph>Consistency.</emph> The set of XML Infoset identifiers not
+                        connected inside a branch must be consistent among all branches.
+                        This means for example that if the first branch of a
+                        <el>p:choose</el> element has two non-connected outputs identifiers
+                        such as <code>output1</code> and <code>output2</code>, then all
+                        other branches must export the same outputs identifiers.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        <emph>Exposed XML Infoset identifiers.</emph> The set of XML
+                        Infoset identifiers not connected inside a branch defines the set of
+                        exposed identifiers for the <el>p:choose</el> statement.
+                    </p>
+                </item>
+            </ulist>
+            <p>
+                A static error must be raised if any of those conditions is not met.
+            </p>
+            <note>
+                The no-collision rule applies for statements within a branch. In other words
+                an XML Infoset identifier exposed by a statement within a branch cannot
+                override an identifier scoped for the corresponding <el>p:choose</el>
+                element.
+            </note>
+        </div3>
+    </div2>
+    <div2>
+        <head>Repeat Module</head>
+        <div3>
+            <head>The <el>p:for-each</el> element</head>
+            <pre>
+&lt;p:for-each
+href = <emph>infoset-reference</emph>
+select = <emph>expression</emph>
+schema-href? <emph>aaa</emph>
+schema-uri? <emph>aaa</emph> &gt;
+&lt;!-- Content: (p:output?, (p:processor or p:choose or p:for-each)*) --&gt;
+&lt;/p:for-each&gt;
+            </pre>
+            <p>
+                The <el>p:for-each</el> element declares a statement used to execute
+                sequences of statements multiple times within the execution of a same XPL
+                program.
+            </p>
+            <p>
+                The set of exposed XML Infoset identifiers consists of the single identifier
+                defined by the optional embedded <el>p:output</el> element's <el>id</el>
+                attribute. If there is no embedded <el>p:output</el> attribute, the set is
+                empty.
+            </p>
+            <p>
+                The <el>p:for-each</el> element contains a sequence of statements. If an
+                embedded <el>p:output</el> element is present, the sequence must
+                contain at least one statement. It is a static error if this is not the
+                case.
+            </p>
+            <p>
+                The set of scoped XML Infoset identifiers before the first statement in the
+                embedded sequence of statements consists of the identifiers scoped for the
+                <el>p:for-each</el> element.
+            </p>
+            <note>
+                The no-collision rule applies for statements within a <el>p:for-each</el>
+                element. In other words an XML Infoset identifier exposed within a
+                <el>p:for-each</el> cannot override an identifier scoped for corresponding
+                <el>p:for-each</el> element.
+            </note>
+        </div3>
+        <div3>
+            <head>The <el>p:output</el> element</head>
+            <pre>
+&lt;p:output
+href = <emph>infoset-reference</emph>
+id = <emph>ncname</emph>
+schema-uri? = <emph>aaa</emph>
+schema-href? = <emph>aaa</emph> &gt;
+&lt;/p:output&gt;
+            </pre>
+            <p>
+                The <el>p:output</el> element within a <el>p:for-each</el> element exposes
+                an XML Infoset identifier to statements appearing after the current
+                <el>p:for-each</el> statement.
+            </p>
+            <p>
+                The mandatory <el>id</el> element exposes an XML Infoset identifier. The
+                identifier must follow the no-collision rule. This means that the identifier
+                must not be present in the set of scoped XML Infoset identifiers for the
+                parent <el>p:for-each</el> statement. The XPL implementation must raise a
+                static error if a collision is detected.
+            </p>
+            <p>
+                The mandatory <el>href</el> attribute determines the XML Infoset exposed.
+                The Infoset reference may refer to XML Infoset identifiers scoped on the
+                parent <el>p:for-each</el> element as well as to XML Infoset identifiers
+                scoped after the last statement of the sequence of statements embedded
+                within the <el>p:for-each</el> statement.
+            </p>
+            <p>
+                For the second category of XML Infoset identifiers, each identifier used by
+                the expression in the <el>href</el> attribute refers to a sequence of XML
+                Infosets rather than a single XML Infoset as is usually the case. See
+                <specref ref="for-each-execution"/>.
+            </p>
+            <p>
+                [TODO: explain when schema validation raises errors]
+            </p>
+        </div3>
+        <div3>
+            <head>The <el>p:while</el> element</head>
+            <p>
+                [TODO: define?]
+            </p>
+        </div3>
+    </div2>
+    <div2>
+        <head>Exception Module</head>
+        <div3>
+            <head>The <el>p:try</el> element</head>
+            <p>
+                [TODO: define?]
+            </p>
+        </div3>
+    </div2>
+</div1>

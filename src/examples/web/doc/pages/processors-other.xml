@@ -23,9 +23,10 @@
         <section>
             <title>Scheduler</title>
             <p>
-                The OXF Scheduler allows applications to start and stop periodic tasks. An OXF task
-                is defined by an OXF processor and its inputs. You can start or stop a task at any
-                time. The <code>config</code> input must conform to the following schema:
+                The Presentation Server Scheduler allows applications to start and stop periodic
+                tasks. A Presentation Server task is defined by a Presentation Server processor and
+                its inputs. You can start or stop a task at any time. The <code>config</code> input
+                must conform to the following schema:
             </p>
             <p>
                 <xml-source>
@@ -80,8 +81,8 @@
                 <title>Starting a Task</title>
                 <p>
                     You start a task by invoking the Scheduler processor with the
-                    <code>start-task</code> element. The following table describes the configuration
-                    elements.
+                    <code>start-task</code> element. The following table describes the
+                    configuration elements.
                 </p>
                 <p>
                     <table ca="|p{0.2\textwidth}|p{0.6\textwidth}|">
@@ -107,9 +108,9 @@
                             <th>
                                 <code>interval</code>
                             </th>
-                            <td>Interval between
-                                tasks in milliseconds. If set to
-                                <code>0</code>, the task runs only once.
+                            <td>
+                                Interval between tasks in milliseconds. If set to <code>0</code>,
+                                the task runs only once.
                             </td>
                         </tr>
                         <tr>
@@ -117,7 +118,8 @@
                                 <code>synchronized</code>
                             </th>
                             <td>
-                                If set to <code>true</code>, the task won't run if the previous iteration is still running. Defaults to <code>false</code>.
+                                If set to <code>true</code>, the task won't run if the previous
+                                iteration is still running. Defaults to <code>false</code>.
                             </td>
                         </tr>
                         <tr>
@@ -181,8 +183,8 @@
         <section>
             <title>Resource Server</title>
             <p>
-                The Resource Server serves resources such as images, CSS stylesheet or other
-                static files. Resources are sent to the HTTP response untouched, and the HTTP cache
+                The Resource Server serves resources such as images, CSS stylesheet or other static
+                files. Resources are sent to the HTTP response untouched, and the HTTP cache
                 control headers are set.
             </p>
             <section>
@@ -195,14 +197,14 @@
                 <ul>
                     <li><code>file</code></li>
                     <li><code>http</code></li>
-                    <li><code>oxf</code> (to access OXF resources)</li>
+                    <li><code>oxf</code> (to access Presentation Server resources)</li>
                 </ul>
                 <p>
                     The Resource Server supports the deprecated use of a <code>config</code> input
                     containing a single <code>path</code> element representing the absolute Resource
                     Manager path of the file to serve. Since the <code>url</code> element also
-                    allows to access to OXF resources, it is recommended to use it instead of
-                    <code>path</code>.
+                    allows to access to Presentation Server resources, it is recommended to use it
+                    instead of <code>path</code>.
                 </p>
             </section>
             <section>
@@ -211,9 +213,10 @@
                     The <code>mime-types</code> input contains a list of patterns and <link
                     href="http://www.iana.org/assignments/media-types/">MIME Media Types</link>.
                     This mapping list determines which <code>content-type</code> header to send to
-                    the browser. The patterns are case-insensitive. OXF is bundled with a default
-                    mapping file under the URL <code>oxf:/oxf/mime-types.xml</code>. You can create
-                    your own mapping to suit your needs. The RelaxNG schema is provided below.
+                    the browser. The patterns are case-insensitive. Presentation Server is bundled
+                    with a default mapping file under the URL <code>oxf:/oxf/mime-types.xml</code>.
+                    You can create your own mapping to suit your needs. The RelaxNG schema is
+                    provided below.
                 </p>
                 <xml-source>
                     <element name="mime-types" xmlns="http://relaxng.org/ns/structure/1.0"
@@ -305,7 +308,7 @@
                 your own "debug processor" and this processor will be called when you use
                 <code>debug</code> attributes in pipelines. If you decide to implement your own
                 debug processor, note that it must have the same interface as the default Debug
-                processor that comes with OXF.
+                processor that comes with Presentation Server.
             </p>
         </section>
         <anchor id="RedirectProcessor"/>
@@ -389,9 +392,9 @@
             <note>
                 It is recommended, whenever possible, to use the <link
                 href="reference-controller">Page Flow Controller</link> to perform page
-                redirections within an OXF application. The Page Flow Controller provides a
-                much higher-level abstraction of the notion of redirection than the Redirect
-                Processor.
+                redirections within a Presentation Server application. The Page Flow Controller
+                provides a much higher-level abstraction of the notion of redirection than the
+                Redirect Processor.
             </note>
         </section>
     </body>

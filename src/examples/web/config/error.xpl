@@ -28,7 +28,7 @@
                 <xsl:template match="/">
                     <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
                         <xhtml:head>
-                            <xhtml:title>OXF - Error Page</xhtml:title>
+                            <xhtml:title>Presentation Server - Error Page</xhtml:title>
                         </xhtml:head>
                         <xhtml:body>
                             <xhtml:h1>An error occured</xhtml:h1>

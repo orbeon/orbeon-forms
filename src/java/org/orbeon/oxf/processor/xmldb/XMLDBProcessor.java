@@ -300,8 +300,8 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
     /**
      * Insert a resource in a collection.
      *
-     * @param pipelineContext OXF pipeline context
-     * @param datasource          the processor configuration
+     * @param pipelineContext pipeline context
+     * @param datasource      the processor configuration
      * @param collectionName  identifies the collection in which to insert the resource
      * @param input           processor input containing the XML resource to insert
      */

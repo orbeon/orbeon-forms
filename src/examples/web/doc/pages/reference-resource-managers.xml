@@ -22,17 +22,17 @@
         <section>
             <title>Introduction</title>
             <p>
-                The resource manager is the OXF component responsible for reading and writing XML
-                and binary resources. The resource manager abstracts the actual mechanisms used to
-                store resources. For instance, resources could be stored in:</p>
+                The resource manager is the Presentation Server component responsible for reading
+                and writing XML and binary resources. The resource manager abstracts the actual
+                mechanisms used to store resources. For instance, resources could be stored in:</p>
             <ul>
                 <li>flat files (using the regular file system)</li>
                 <li>a WAR file</li>
             </ul>
             <p>The resource manager is both used:</p>
             <ul>
-                <li>internally by OXF</li>
-                <li>in OXF applications through URLs with the
+                <li>internally by Presentation Server</li>
+                <li>in Presentation Server applications through URLs with the
                     <code>oxf:/</code> protocol
                 </li>
             </ul>
@@ -44,9 +44,10 @@
         <section>
             <title>General Configuration</title>
             <p>
-                The resource manager is initialized in the OXF main servlet. Configuration is
-                handled in the Web application descriptor (<code>web.xml</code>) by setting a number
-                of properties. The first property indicates the resource manager factory:
+                The resource manager is initialized in the Presentation Server main servlet.
+                Configuration is handled in the Web application descriptor (<code>web.xml</code>)
+                by setting a number of properties. The first property indicates the resource manager
+                factory:
             </p>
             <xml-source>
                 <context-param>
@@ -219,7 +220,7 @@
             <p>
                 The class loader resource manager can load resource from a JAR file or from a
                 directory in the classpath. This resource manager is required to load internal
-                resources for OXF.
+                resources for Presentation Server.
             </p>
             <section>
                 <title>Example</title>
@@ -298,8 +299,8 @@
             </p>
             <p>
                 This resource manager is able to load resources form any URL (http or ftp). It can
-                be used if your resources are located on a Web server or a content management system
-                with an HTTP interface.
+                be used if your resources are located on a Web server or a content management
+                system with an HTTP interface.
             </p>
             <section>
                 <title>Example</title>
@@ -343,13 +344,15 @@
                 This resource manager loads XML documents from <link
                 href="http://www.intersystems.com/">InterSystems</link> Cach&#233; Object Database.
                 <link href="http://www.mgateway.tzo.com/eXtc.htm">eXtc</link> provides a W3C DOM
-                interface to Cach&#233; and allows OXF to store and retrieve XML documents. This
-                section assumes Cach&#233; and eXtc are already installed on your system.
+                interface to Cach&#233; and allows Presentation Server to store and retrieve XML
+                documents. This section assumes Cach&#233; and eXtc are already installed on your
+                system.
             </p>
 
             <note>
                 To enable this Resource Manager, you must copy <code>CacheDB.jar</code> from
-                Cach&#233; distribution into OXF <code>WEB-INF/lib</code> directory.
+                Cach&#233; distribution into Presentation Server <code>WEB-INF/lib</code>
+                directory.
             </note>
 
             <warning>
@@ -360,14 +363,15 @@
             <section>
                 <title>Importing XML Files into Cach&#233;</title>
                 <p>
-                    OXF ships with <code>CacheImport</code> to populate the database with resource
-                    from a directory. Set your <code>CLASSPATH</code> environment variable to
-                    include the following JAR files to run <code>CacheImport</code>:
+                    Presentation Server ships with <code>CacheImport</code> to populate the
+                    database with resource from a directory. Set your <code>CLASSPATH</code>
+                    environment variable to include the following JAR files to run
+                    <code>CacheImport</code>:
                 </p>
 
                 <p>
                     <ul>
-                        <li>oxf.jar</li>
+                        <li>orbeon.jar</li>
                         <li>CacheDB.jar</li>
                         <li>commons-cli.jar</li>
                         <li>xercesImpl-2_2_1_orbeon.jar</li>
@@ -454,9 +458,9 @@
             <p>
                 With the priority resource manager you can chain several resource managers. It is
                 crucial to be able to load resources from multiple sources since some resources are
-                bundled in the OXF JAR file. Thus, the class loader resource manager must always be
-                in the priority chain. It usually has the lowest priority so the application
-                developer can override system resources.
+                bundled in the Presentation Server JAR file. Thus, the class loader resource
+                manager must always be in the priority chain. It usually has the lowest priority so
+                the application developer can override system resources.
             </p>
             <p>
                 There can be any number of chained resource managers. They are configured by adding

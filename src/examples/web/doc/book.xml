@@ -14,7 +14,7 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<book software="OXF" title="OXF User's Manual" copyright="Orbeon, Inc">
+<book software="OXF" title="Presentation Server User's Manual" copyright="Orbeon, Inc">
     <menu label="Getting Started">
         <menu-item label="Welcome" href="index"/>
         <menu-item label="Changes" href="home-changes"/>
@@ -27,7 +27,7 @@
         <menu-item label="XForms" href="reference-xforms"/>
         <menu-item label="Page Flow" href="reference-controller"/>
         <menu-item label="XPL and Pipelines" href="reference-xpl-pipelines"/>
-<!--        <menu-item label="OXF Properties" href="reference-properties"/>-->
+<!--        <menu-item label="Presentation Server Properties" href="reference-properties"/>-->
         <menu-item label="Resource Managers" href="reference-resource-managers"/>
         <menu-item label="Authentication" href="reference-authentication"/>
         <menu-item label="Error Pipeline" href="reference-error-pipeline"/>
@@ -59,7 +59,7 @@
 <!--        <menu-item label="JSR-168 Portlets" href="integration-portlets"/>-->
         <menu-item label="EJB Support" href="integration-ejb"/>
         <menu-item label="XUpdate JAXP Support" href="integration-xupdate"/>
-        <menu-item label="Using OXF with Struts" href="model2x-struts"/>
-<!--        <menu-item label="OXF with JSF" href="model2x-jsf"/>-->
+        <menu-item label="Using Presentation Server with Struts" href="model2x-struts"/>
+<!--        <menu-item label="Presentation Server with JSF" href="model2x-jsf"/>-->
     </menu>
 </book>

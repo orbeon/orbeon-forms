@@ -268,7 +268,7 @@ public class URLGenerator extends ProcessorImpl {
                     if (cachedResource == null) {
                         // We were unable to just replay from cache without accessing the resource
 
-                        // Decide whether to use read from the special OXF handler or the generic URL handler
+                        // Decide whether to use read from the special oxf: handler or the generic URL handler
                         ResourceHandler handler = Handler.PROTOCOL.equals(config.getURL().getProtocol())
                                 ? (ResourceHandler) new OXFResourceHandler(config)
                                 : (ResourceHandler) new URLResourceHandler(config);

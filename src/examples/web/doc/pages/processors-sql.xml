@@ -465,7 +465,7 @@ select first_name, last_name
                     on <code>sql:param</code>: <code>sql-type</code>. By default, text is written
                     using the JDBC setString() method. In case the data must be stored in the
                     database as a Character Large OBject (CLOB) or other database-specific types,
-                    it is necessary to tell OXF that a different API must be used. For example, to
+                    it is necessary to tell Presentation Server that a different API must be used. For example, to
                     write a string into a CLOB:
                 </p>
 
@@ -784,7 +784,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
 
                 <note>
                     <p>
-                        Base64-encoded data can be used in OXF in the following ways:
+                        Base64-encoded data can be used in Presentation Server in the following ways:
                     </p>
                     <ul>
                         <li>
@@ -1240,7 +1240,7 @@ select level1.value v1, level2.value v2, level3.value v3
         <section>
             <title>Transactions</title>
             <p>
-                OXF executes each HTTP request in its own transaction. If a
+                Presentation Server executes each HTTP request in its own transaction. If a
                 request fails for any reason, the SQL Processor rolls back the
                 transaction. The transaction is committed only when the pipeline
                 execution in complete.

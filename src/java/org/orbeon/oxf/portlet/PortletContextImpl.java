@@ -26,7 +26,7 @@ import java.util.*;
 
 public class PortletContextImpl implements PortletContext {
 
-    private static final String SERVER_NAME = "OXF Portlet Container";
+    private static final String SERVER_NAME = "Presentation Server Portlet Container";
     private static final int SERVER_MAJOR_VERSION = 1;
     private static final int SERVER_MINOR_VERSION = 0;
 

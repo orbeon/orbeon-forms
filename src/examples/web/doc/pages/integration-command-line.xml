@@ -22,18 +22,19 @@
         <section>
             <title>Introduction</title>
             <p>
-                You can use OXF to build standalone command-line applications running pipelines. Use
-                cases include: creating a hardcopy of a web site, importing or exporting XML data
-                to and from a relational database, testing pipelines, automating repetitive
-                operations on XML files (selection, transformation, aggregation, etc.). OXF becomes
-                your "XML toolbox".
+                You can use Presentation Server to build standalone command-line applications
+               running pipelines. Use cases include: creating a hardcopy of a web site, importing or
+               exporting XML data to and from a relational database, testing pipelines, automating
+               repetitive operations on XML files (selection, transformation, aggregation, etc.).
+               Presentation Server becomes your "XML toolbox".
             </p>
         </section>
         <section>
             <title>Command Line Interface</title>
             <p>
-                OXF ships with a command line interface (CLI). The easiest way to run it is to use
-                the executable <code>orbeon.jar</code> file and pass it a pipeline file:
+                Presentation Server ships with a command line interface (CLI). The easiest way to
+                run it is to use the executable <code>orbeon.jar</code> file and pass it a pipeline
+                file:
             </p>
             <source>java -jar orbeon.jar pipeline.xpl</source>
             <p>
@@ -44,7 +45,7 @@
             <p>
                 Sometimes, it is better to group files under a resources <i>sandbox</i> addressed by
                 the <code>oxf:</code> protocol. This is the standard way of accessing resources
-                (files) within OXF web applications, but it is also useful with command-line
+                (files) within web applications, but it is also useful with command-line
                 applications. In such cases, specify a resource manager root directory with the
                 <code>-r</code> option, for example:
             </p>
@@ -58,18 +59,18 @@
                 and an absolute path within the sandbox, as shown above.
             </p>
             <note>
-                OXF's jar file (<code>orbeon.jar</code>) is executable via the <code>java -jar</code>
-                mechanism. However, it depends on a number of libraries that must be in the same
-                directory as <code>orbeon.jar</code>. It is recommended to expand the WAR file, and refer
-                to the <code>orbeon.jar</code> file under the WAR file's <i>WEB-INF/lib</i>
-                directory.
+                Presentation Server's jar file (<code>orbeon.jar</code>) is executable via the
+                <code>java -jar</code> mechanism. However, it depends on a number of libraries that
+                must be in the same directory as <code>orbeon.jar</code>. It is recommended to
+                expand the WAR file, and refer to the <code>orbeon.jar</code> file under the WAR
+                file's <i>WEB-INF/lib</i> directory.
             </note>
         </section>
         <section>
             <title>Examples</title>
             <p>
-                OXF comes with simple examples of command-line applications under the
-                <code>src/examples/cli</code> directory. To run those examples, from a command
+                Presentation Server comes with simple examples of command-line applications under
+                the <code>src/examples/cli</code> directory. To run those examples, from a command
                 prompt, enter either one of the subdirectories and run the <code>java</code> command
                 following the explanations above, for example, from the <code>simple</code>
                 directory:

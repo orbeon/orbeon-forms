@@ -36,7 +36,7 @@ public class Handler extends URLStreamHandler {
                 if (key == null) {
                     String urlString = getURL().toExternalForm();
                     if (!urlString.startsWith(PROTOCOL+":"))
-                        throw new OXFException("OXF URL must start with oxf:");
+                        throw new OXFException("Presentation Server URL must start with oxf:");
                     key = urlString.substring(PROTOCOL.length()+1, urlString.length());
                 }
                 return key;

@@ -8,7 +8,8 @@
         <p>
             This page illustrates how the <a href="/doc/processors-messaging#yim">Instant Messenger
             processor</a> can be used, and shows some capabilities of the <a
-            href="/doc/integration-webservices">Web services support</a> provided by OXF.
+            href="/doc/integration-webservices">Web services support</a> provided by Presentation
+            Server.
         </p>
         <h2>How to Use This Page?</h2>
         <ol>

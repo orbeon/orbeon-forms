@@ -25,7 +25,7 @@
             <section>
                 <title>Introduction</title>
                 <p>
-                    OXF uses the
+                    Presentation Server uses the
                     <link
                         href="http://www.jfree.org/jfreechart/index.html">JFreeChart</link>
                     to draw and display charts. The following features are supported:
@@ -469,13 +469,11 @@
         <section>
             <title>Excel Processor</title>
             <p>
-                OXF ships with the
-                <link
-                    href="http://jakarta.apache.org/poi/index.html">POI</link>
-                library which allows import and export of Microsoft Excel
-                documents. OXF uses an Excel file template to define the
-                layout of the spreadsheet. You define cells that will contain
-                the values with a special markup.
+                Presentation Server ships with the <link
+                href="http://jakarta.apache.org/poi/index.html">POI</link> library which allows
+                import and export of Microsoft Excel documents. Presentation Server uses an Excel
+                file template to define the layout of the spreadsheet. You define cells that will
+                contain the values with a special markup.
             </p>
             <section>
                 <title>Preparing the Spreadsheet</title>

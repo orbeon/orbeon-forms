@@ -23,7 +23,9 @@
     <xhtml:body>
         <xforms:group>
             <xhtml:p>
-                Run the report now, and view it in one of the formats below. (Note: requires database set up if run locally.  Please see the "Installing OXF" section of the documentation.) :
+                Run the report now, and view it in one of the formats below. (Note: requires
+                database set up if run locally. Please see the "Installing Presentation server"
+                section of the documentation.):
                 <xhtml:ul>
                     <xhtml:li>
                         <xforms:submit xxforms:appearance="link">

@@ -21,12 +21,13 @@
 	<body>
 		<section>
 			<title>Rationale</title>
-			<p>OXF comes with a number of pre-built processors. However, in
-            some cases, it makes sense for the developer to write a new
-            processor in Java. For the purpose of this discussion, let's assume
-            that the processor is implemented in a file called
-            <code>MyProcessor.java</code>. Custom processors can essentially be
-            deployed in two ways:</p>
+			<p>
+                Presentation Server comes with a number of pre-built processors. However, in some
+                cases, it makes sense for the developer to write a new processor in Java. For the
+                purpose of this discussion, let's assume that the processor is implemented in a file
+                called <code>MyProcessor.java</code>. Custom processors can essentially be deployed
+                in two ways:
+            </p>
 			<ul>
 				<li>"Manually":
                     <ol>
@@ -34,11 +35,11 @@
 						<li>Place the compiled class in
                         <code>WEB-INF/classes</code> (or in any other location where
                         it can be found by the classloader used to load the
-                        classes in <code>oxf.jar</code>).</li>
+                        classes in <code>orbeon.jar</code>).</li>
 						<li>Declare the new processor in
                         <code>processors.xml</code> (i.e. mapping an URI to this new
                         processor).</li>
-						<li>Use the newly declared processor in an XPL (OXF Pipeline Definition Language) file using the URI
+						<li>Use the newly declared processor in an XPL (Presentation Server Pipeline Definition Language) file using the URI
                         declared in the <code>processors.xml</code>.</li>
 					</ol>
 				</li>
@@ -185,16 +186,16 @@
         <section>
             <title>Class Path</title>
             <p>
-                Before invoking the Java compiler, OXF builds a classpath using
-                two <link href="reference-properties">OXF
-                properties</link>. In addition, if OXF runs as a Web
-                Application, all JAR and ZIP files located in
-                <code>WEB-INF/lib</code> are automatically added to the
-                classpath. The following table summaries the classpath order.
+                Before invoking the Java compiler, Presentation Server builds a classpath using two
+                <link href="reference-properties">Presentation Server properties</link>. In
+                addition, if Presentation Server runs as a Web Application, all JAR and ZIP files
+                located in <code>WEB-INF/lib</code> are automatically added to the classpath. The
+                following table summaries the classpath order.
+
                 <ol>
                     <li><link href="reference-properties#classpath"><code>oxf.java.classpath</code></link> property</li>
                     <li><link href="reference-properties#jarpath"><code>oxf.java.jarpath</code></link> property</li>
-                    <li><code>WEB-INF/lib</code> directory, if OXF runs in an application server.</li>
+                    <li><code>WEB-INF/lib</code> directory, if Presentation Server runs in an application server.</li>
                 </ol>
             </p>
         </section>

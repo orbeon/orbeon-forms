@@ -17,15 +17,15 @@
     <source>view.xsl</source>
     <description>
         <p>
-            OXF loads resources URLs (<code>oxf:</code>, <code>http:</code>, etc...) with the help
-            of the URL Generator. It then parses the XML file. The URL Generator is configurable to
-            use a validating XML parser.
+            Presentation Server loads resources URLs (<code>oxf:</code>, <code>http:</code>,
+            etc...) with the help of the URL Generator. It then parses the XML file. The URL
+            Generator is configurable to use a validating XML parser.
         </p>
         <p>
             The URL Generator can optionally <a href="http://tidy.sourceforge.net/">tidy</a> its
-            output, allowing OXF to transform any HTML page into XHTML. To demonstrate this feature,
-            this page loads the <a href="http://www.cnn.com">CNN.com</a> home page and uses XPath
-            to extract the main headline.
+            output, allowing Presentation Server to transform any HTML page into XHTML. To
+            demonstrate this feature, this page loads the <a href="http://www.cnn.com">CNN.com</a>
+            home page and uses XPath to extract the main headline.
         </p>
     </description>
 </example-descriptor>

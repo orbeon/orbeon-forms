@@ -13,12 +13,11 @@
 -->
 <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <xhtml:head>
-        <xhtml:title>OXF Example - Documentation</xhtml:title>
+        <xhtml:title>Orbeon Presentation Server Example - Documentation</xhtml:title>
     </xhtml:head>
     <xhtml:body>
         <xhtml:p>
-            Read the OXF
-            <a href="../doc/index">documentation</a>.
+            Read the Orbeon Presentation Server <a href="../doc/index">documentation</a>.
         </xhtml:p>
         <div style="float:right">
             <img print-format="pdf" src="../doc/intro-examples-doc.png"/>

@@ -16,15 +16,15 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>OXF Properties</title>
+        <title>Presentation Server Properties</title>
     </header>
     <body>
         <section>
             <title>Rationale</title>
             <p>
-                The OXF properties are used by some processors to configure or customize their
-                behavior. This section describes how the system is configured, and lists all the
-                customizable properties.
+                The Presentation Server properties are used by some processors to configure or
+                customize their behavior. This section describes how the system is configured, and
+                lists all the customizable properties.
             </p>
         </section>
         <section>
@@ -32,10 +32,10 @@
             <p>
                 The properties sub-system is initialized after the <link
                 href="reference-resource-managers">Resource Manager</link> (the properties being
-                read like any other OXF resources). By default it tries to load a file from the URL
-                <code>oxf:/properties.xml</code>. This value can be overridden in the Web
-                application descriptor <code>web.xml</code> with the <code>oxf.properties</code>
-                initialization parameter:
+                read like any other Presentation Server resources). By default it tries to load a
+                file from the URL <code>oxf:/properties.xml</code>. This value can be overridden in
+                the Web application descriptor <code>web.xml</code> with the
+                <code>oxf.properties</code> initialization parameter:
             </p>
             <xml-source>
                 <context-param>
@@ -45,9 +45,10 @@
             </xml-source>
 
             <note>
-                The properties file is read by an OXF pipeline which means that the file is
-                reloaded dynamically when needed. The changes are immediately available to the
-                application, although some properties are read only during OXF initialization.
+                The properties file is read by an Presentation Server pipeline which means that the
+                file is reloaded dynamically when needed. The changes are immediately available to
+                the application, although some properties are read only during Presentation Server
+                initialization.
             </note>
             <p>
                 The properties file supports the following datatypes:
@@ -76,8 +77,8 @@
             </note>
 
             <p>
-                The file is validated when loaded. Here is a simple example and the Relax NG
-                schema used.
+                The file is validated when loaded. Here is a simple example and the Relax NG schema
+                used.
             </p>
             <xml-source>
 <properties>
@@ -174,7 +175,7 @@
                     </table>
                 </p>
                 <p>
-                    OXF uses the <fork
+                    Presentation Server uses the <fork
                     href="http://jakarta.apache.org/log4j/docs/index.html">Log4J</fork> logging
                     framework. Log4J is configured with an XML file conforming to the <link
                     href="log4j.dtd.html">Log4J DTD</link>. Here is a sample Log4J configuration:
@@ -199,7 +200,7 @@
                 <p>
                     If this property is not set, the Log4J initialization is skipped. This is
                     useful if another subsystem of your application has already initialized Log4J
-                    prior to the loading of OXF.
+                    prior to the loading of Presentation Server.
                 </p>
             </section>
 
@@ -210,7 +211,7 @@
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
                             <th>Purpose</th>
-                            <td>Setup the size of the OXF cache</td>
+                            <td>Setup the size of the Presentation Server cache</td>
                         </tr>
                         <tr>
                             <th>Type</th>
@@ -226,29 +227,28 @@
                 </p>
 
                 <p>
-                    OXF uses an efficient caching system. OXF automatically determines what can be
-                    cached and when to expire objects. The cache has a default size of 200, meaning
-                    that it can hold 200 objects. This size is reasonable for most applications. A
-                    bigger cache tends to make the application faster, but it uses more memory. To
-                    tune the  cache, start the Java VM with the <code>-verbose:gc</code> option.
-                    Then with the application under typical load, look at the server logs and
-                    monitor:
+                    Presentation Server uses an efficient caching system. Presentation Server
+                    automatically determines what can be cached and when to expire objects. The
+                    cache has a default size of 200, meaning that it can hold 200 objects. This size
+                    is reasonable for most applications. A bigger cache tends to make the
+                    application faster, but it uses more memory. To tune the cache, start the Java
+                    VM with the <code>-verbose:gc</code> option. Then with the application under
+                    typical load, look at the server logs and monitor:
                 </p>
 
                 <ul>
                     <li>How often full garbage collections happen</li>
-                    <li>The value of the "success rate" reported by OXF after each page is generated</li>
+                    <li>The value of the "success rate" reported by Presentation Server after each page is generated</li>
                 </ul>
 
                 <p>
-                    The "success rate" is the percentage of the objects needed to generate the
-                    pages that were found in the cache. The closer this value is to 100%, the
-                    better. If the success rate is too low (say below 70% with a mostly static
-                    site), then the cache size should be increased. If full garbage collections
-                    happen too often, then the VM heap size should be increased. On the other hand,
-                    if the success rate is acceptable and garbage collections do not happen too
-                    often, you can consider reducing the size of the cache and maybe even the heap
-                    size.
+                    The "success rate" is the percentage of the objects needed to generate the pages
+                    that were found in the cache. The closer this value is to 100%, the better. If
+                    the success rate is too low (say below 70% with a mostly static site), then the
+                    cache size should be increased. If full garbage collections happen too often,
+                    then the VM heap size should be increased. On the other hand, if the success
+                    rate is acceptable and garbage collections do not happen too often, you can
+                    consider reducing the size of the cache and maybe even the heap size.
                 </p>
 
                 <p>
@@ -412,7 +412,7 @@
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
                             <th>Purpose</th>
-                            <td>Defines OXF processors</td>
+                            <td>Defines Presentation Server processors</td>
                         </tr>
                         <tr>
                             <th>Type</th>
@@ -427,13 +427,14 @@
                     </table>
                 </p>
                 <p>
-                    Loads an OXF prologue file, where processors are declared. OXF is bundled with
-                    a default prologue file containing all processors. You can create processors
-                    (see the <link href="reference-processor-api">processor API</link>) and declare
-                    them in a custom prologue. The custom prologue doesn't replace, but completes
-                    the default prologue. It is possible to override a default processor with a
-                    custom implementation by binding it to the same URI as the default processor.
-                    The following example shows a simple custom prologue declaring an hypothetical
+                    Loads an Presentation Server prologue file, where processors are declared.
+                    Presentation Server is bundled with a default prologue file containing all
+                    processors. You can create processors (see the <link
+                    href="reference-processor-api">processor API</link>) and declare them in a
+                    custom prologue. The custom prologue doesn't replace, but completes the default
+                    prologue. It is possible to override a default processor with a custom
+                    implementation by binding it to the same URI as the default processor. The
+                    following example shows a simple custom prologue declaring an hypothetical
                     processor:
                 </p>
                 <xml-source>
@@ -451,7 +452,7 @@
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
                             <th>Purpose</th>
-                            <td>Enables OXF's inspector and sets its path.</td>
+                            <td>Enables Presentation Server's inspector and sets its path.</td>
                         </tr>
                         <tr>
                             <th>Type</th>
@@ -465,7 +466,7 @@
                         </tr>
                     </table>
                 </p>
-                <p>OXF's inspector shows the last five pipeline executions and
+                <p>Presentation Server's inspector shows the last five pipeline executions and
                 the data flowing through the processors. This property sets the
                 inspector's path-info, relative to the web application's context
                 root.</p>
@@ -635,9 +636,9 @@
                     </table>
                 </p>
                 <p>
-                    The <link href="processors-java">Java Processor</link> dynamically compiles
-                    Java code, and may need some libraries. This property defines the classpath used
-                    by the compiler.
+                    The <link href="processors-java">Java Processor</link> dynamically compiles Java
+                    code, and may need some libraries. This property defines the classpath used by
+                    the compiler.
                 </p>
             </section>
             <anchor id="jarpath"/>
@@ -662,10 +663,10 @@
                     </table>
                 </p>
                 <p>
-                    The <link href="processors-java">Java Processor</link> dynamically compiles
-                    Java code, and may need some libraries. This property defines a "JAR path", a
-                    list of directories containing JAR files that will be added to the classpath
-                    when compiling and running the processor executed by the Java processor.
+                    The <link href="processors-java">Java Processor</link> dynamically compiles Java
+                    code, and may need some libraries. This property defines a "JAR path", a list of
+                    directories containing JAR files that will be added to the classpath when
+                    compiling and running the processor executed by the Java processor.
                 </p>
             </section>
             <section>

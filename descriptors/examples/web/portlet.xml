@@ -16,7 +16,7 @@
             <mime-type>text/html</mime-type>
         </supports>
         <portlet-info>
-            <title>OXF Simple Portlet</title>
+            <title>Presentation Server Simple Portlet</title>
         </portlet-info>
     </portlet>
     <portlet>
@@ -34,7 +34,7 @@
             <mime-type>text/html</mime-type>
         </supports>
         <portlet-info>
-            <title>OXF RSS Portlet</title>
+            <title>Presentation Server RSS Portlet</title>
         </portlet-info>
         <portlet-preferences>
             <preference>
@@ -62,7 +62,7 @@
             <mime-type>text/html</mime-type>
         </supports>
         <portlet-info>
-            <title>OXF Example Application</title>
+            <title>Presentation Server Example Application</title>
         </portlet-info>
     </portlet>
 

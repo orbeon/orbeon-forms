@@ -24,12 +24,12 @@
 
             <p>
                 <link href="http://www.w3.org/TR/xslt">XSLT</link> is a language
-                for transforming XML documents into other XML documents. OXF uses
+                for transforming XML documents into other XML documents. Presentation Server uses
                 XSLT extensively as its main language to process XML
                 documents.
             </p>
 
-            <p>OXF ships with multiple implementations of XSLT:</p>
+            <p>Presentation Server ships with multiple implementations of XSLT:</p>
             <ul>
                 <li>Xalan 2.5.1 Interpreter</li>
                 <li>Xalan 2.5.1 Compiler (XSLTC)</li>
@@ -37,7 +37,7 @@
                 <li>Saxon 7.9.1 (supporting a large subset of XSLT 2.0)</li>
             </ul>
 
-            <p>Additionally, OXF can use any JAXP (TrAX) compliant transformer.</p>
+            <p>Additionally, Presentation Server can use any JAXP (TrAX) compliant transformer.</p>
         </section>
         <section>
             <title>Usage</title>
@@ -141,7 +141,7 @@
                         href="http://java.sun.com/j2se/1.4.2/docs/api/javax/xml/transform/TransformerFactory.html">
                         <code>TransformerFactory</code>
                     </link>. For example, you can use the TrAX transformer
-                    to interface OXF with a new hypothetical transformer (MyTrans):
+                    to interface Presentation Server with a new hypothetical transformer (MyTrans):
 
 
                     <xml-source>
@@ -211,20 +211,17 @@
             <p>
                 <link href="http://stx.sourceforge.net/">Streaming
                     Transformations for XML (STX)</link> is a one-pass transformation
-                language for XML documents that builds on the Simple API for XML
-                (SAX). STX is intended as a high-speed, low memory consumption
-                alternative to XSLT. Since it does not require the construction of
-                an in-memory tree, it is suitable for use in resource constrained
-                scenarios.
+                language for XML documents that builds on the Simple API for XML (SAX). STX is
+                intended as a high-speed, low memory consumption alternative to XSLT. Since it does
+                not require the construction of an in-memory tree, it is suitable for use in
+                resource constrained scenarios.
             </p>
 
-            <p>OXF uses
-                <link href="http://joost.sourceforge.net/">Joost</link>
-                to implement a STX transformer. Its usage is similar to an XSLT
-                transformer, using the processor URI
-                <code>oxf:stx</code>.
-                This
-                <link href="../examples/stx">example</link> demonstrates a simple STX transformation.
+            <p>
+                Presentation Server uses <link href="http://joost.sourceforge.net/">Joost</link> to
+                implement a STX transformer. Its usage is similar to an XSLT transformer, using the
+                processor URI <code>oxf:stx</code>. This <link href="../examples/stx">example</link>
+                demonstrates a simple STX transformation.
             </p>
 
             <xml-source>

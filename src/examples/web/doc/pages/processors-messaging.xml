@@ -23,12 +23,10 @@
         <section>
             <title>Email Processor</title>
             <p>
-                This processor can send emails through an SMTP server. Its data
-                input contains the host, email header and body. The host can
-                be overridden globally in
-                <link href="reference-properties">OXF
-                Properties</link> file. The body can either contain a simple text
-                message or multiple MIME parts.
+                This processor can send emails through an SMTP server. Its data input contains the
+                host, email header and body. The host can be overridden globally in <link
+                href="reference-properties">Presentation Server Properties</link> file. The body
+                can either contain a simple text message or multiple MIME parts.
             </p>
             <section>
                 <title>Data Input</title>

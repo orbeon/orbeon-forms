@@ -33,9 +33,9 @@
         <p>
             BizDoc is a sample application that illustrates basic business document manipulation.
             Fictitious claim documents are created, read, updated, and deleted from a database. It
-            is the basis for the OXF Tutorial - please refer to the <a
-            href="/doc/pages/Tutorial.pdf" f:url-type="resource">OXF Tutorial</a> for the
-            complete documentation of this example.
+            is the basis for the Orbeon Presentation Server Tutorial - please refer to the <a
+            href="/doc/pages/Tutorial.pdf" f:url-type="resource">Presentation Server Tutorial</a> for the complete
+            documentation of this example.
         </p>
     </description>
 </example-descriptor>

@@ -16,34 +16,30 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>Beyond Model 2X with OXF</title>
+        <title>Beyond Model 2X with Presentation Server</title>
     </header>
     <body>
         <section>
-            <title>Implementing Model 2X with OXF</title>
+            <title>Implementing Model 2X with Presentation Server</title>
             <p>
-                Model 2X defines in broad terms the relationship between
-                Struts and XSLT. When implementing Model 2X, it becomes
-                clear that making the presentation layer modular and flexible requires more
-                than one XSLT transformation. There is a clear need to
-                combine resources and static documents, chain XSLT transformations,
-                generate different outputs depending on the client used, provide
-                form handling, and more.
+                Model 2X defines in broad terms the relationship between Struts and XSLT. When
+                implementing Model 2X, it becomes clear that making the presentation layer modular
+                and flexible requires more than one XSLT transformation. There is a clear need to
+                combine resources and static documents, chain XSLT transformations, generate
+                different outputs depending on the client used, provide form handling, and more.
             </p>
             <p>
-                This is where OXF and its implementation of the XML Pipeline
-                Definition Language (XPL) are put to use. See <a
-                href="model2x-struts">Using OXF with Struts</a> for more
-                information.
+                This is where Presentation Server and its implementation of the XML Pipeline
+                Definition Language (XPL) are put to use. See <a href="model2x-struts">Using
+                Presentation Server with Struts</a> for more information.
             </p>
         </section>
         <section>
             <title>Beyond Model 2X</title>
             <p>
-                Once XML pipelines are available, you can extend the presentation layer of an application
-                to use XML pipelines for implementing or
-                integrating the business logic of the application. XML
-                processors can:
+                Once XML pipelines are available, you can extend the presentation layer of an
+                application to use XML pipelines for implementing or integrating the business logic
+                of the application. XML processors can:
 
                 <ul>
                     <li>Access relational databases
@@ -67,88 +63,84 @@
                 </ul>
             </p>
 
-            <p>A completely new way of building Web applications has
-            emerged.</p>
+            <p>A completely new way of building Web applications has emerged.</p>
 
             <p>
-                With a higher-level paradigm, Model 2 frameworks like
-                Struts are no longer necessary, even though they can coexist
-                with the new model.
-                Struts and Java are not going away any time soon, but for many
-                applications the OXF model will bring enhanced flexibility,
-                modularity and productivity. See
-                <a href="reference-resource-managers">Building Web Apps with OXF</a>
+                With a higher-level paradigm, Model 2 frameworks like Struts are no longer
+                necessary, even though they can coexist with the new model. Struts and Java are not
+                going away any time soon, but for many applications the Presentation Server model
+                will bring enhanced flexibility, modularity and productivity. See <a
+                href="reference-resource-managers">Building Web Apps with Presentation Server</a>
                 for more information.
             </p>
         </section>
         <section>
-            <title>Benefits of OXF and XPL</title>
+            <title>Benefits of Presentation Server and XPL</title>
             <p>
-                The doors opened by XML processors, XML pipelines and
-                XPL are numerous. Uses include helping component reuse,
-                building standalone applications, and making Web publishing
-                and Web application development more effective.
+                The doors opened by XML processors, XML pipelines and XPL are numerous. Uses include
+                helping component reuse, building standalone applications, and making Web
+                publishing and Web application development more effective.
             </p>
             <p>
-                Some of the benefits of OXF are listed below. In general,
-                OXF addresses many of the issues and limitations that
-                developers stumble upon when using technologies such as JSP and
-                XML:
+                Some of the benefits of Presentation Server are listed below. In general,
+                Presentation Server addresses many of the issues and limitations that developers
+                stumble upon when using technologies such as JSP and XML:
             </p>
 
             <section>
                 <title>Modularity and componentization</title>
                 <p>
-                    Most frameworks and platforms fail to deliver on the promise
-                    of CBD (Component Based Development). OXF provides the
-                    infrastructure to build modular applications with reusable
-                    XML components. In addition, the <a
-                    href="reference-controller">Web Application
-                    Controller</a> provides advanced separation of concerns by
-                    separating site logic, page logic, page layout, and site
-                    presentation following the MVC architecture.
+                    Most frameworks and platforms fail to deliver on the promise of CBD (Component
+                    Based Development). Presentation Server provides the infrastructure to build
+                    modular applications with reusable XML components. In addition, the <a
+                    href="reference-controller">Web Application Controller</a> provides advanced
+                    separation of concerns by separating site logic, page logic, page layout, and
+                    site presentation following the MVC architecture.
                 </p>
             </section>
 
             <section>
                 <title>Separating business logic and presentation logic</title>
                 <p>
-                    Whether written in OXF XML pipeline technologies or in
-                    traditional Java/J2EE technologies such as Struts and
-                    EJBs, backend systems integrate elegantly with presentation
-                    logic using the popular MVC architecture. OXF goes one step
-                    further and advocates the separation of different aspects of
-                    the presentation layer (such as page layout, navigation,
-                    localization,  look and feel) into several components
-                    assembled together with XPL.
+                    Whether written in Presentation Server XML pipeline technologies or in
+                    traditional Java/J2EE technologies such as Struts and EJBs, backend systems
+                    integrate elegantly with presentation logic using the popular MVC architecture.
+                    Presentation Server goes one step further and advocates the separation of
+                    different aspects of the presentation layer (such as page layout, navigation,
+                    localization, look and feel) into several components assembled together with
+                    XPL.
                 </p>
             </section>
 
             <section>
                 <title>Agility and Consistency across applications</title>
-                <p>OXF advocates centralizing the look and feel code. This allows for much more flexibility when business
-                    requirements change.</p>
+                <p>
+                    Presentation Server advocates centralizing the look and feel code. This allows
+                    for much more flexibility when business requirements change.
+                </p>
             </section>
 
             <section>
                 <title>Accelerated development cycles</title>
-                <p>OXF allows developers to avoid the tedious J2EE development cycles Save -> Compile -> Package ->
-                    Deploy -> Reload. In the OXF realm, you change your XML document, save it
-                    and reload your page and you're done! While OXF relies on and expands
-                    the J2EE platform, we strongly believe that enterprise developers should
-                    not have to put up with the intricacies of J2EE development. OXF alleviates
+                <p>
+                    Presentation Server allows developers to avoid the tedious J2EE development
+                    cycles Save -> Compile -> Package -> Deploy -> Reload. In the Presentation
+                    Server realm, you change your XML document, save it and reload your page and
+                    you're done! While Presentation Server relies on and expands the J2EE
+                    platform, we strongly believe that enterprise developers should not have to put
+                    up with the intricacies of J2EE development. Presentation Server alleviates
                     those difficulties and at the same time allows developers to access and
                     effectively leverage all J2EE technologies.</p>
             </section>
 
             <section>
                 <title>XML development made easier</title>
-                <p>The number of available XML tools
-                    and APIs is daunting. With the concept of XML processors and its
-                    implementation of the XML Pipeline Definition Language (XPL), OXF simplifies XML
-                    development. XML processors talk to each-other using state-of-the-art,
-                    performance-tuned techniques based on SAX, with built-in
-                    validation, debugging, and caching.</p>
+                <p>
+                    The number of available XML tools and APIs is daunting. With the concept of XML
+                    processors and its implementation of the XML Pipeline Definition Language (XPL),
+                    Presentation Server simplifies XML development. XML processors talk to
+                    each-other using state-of-the-art, performance-tuned techniques based on SAX,
+                    with built-in validation, debugging, and caching.</p>
             </section>
 
 

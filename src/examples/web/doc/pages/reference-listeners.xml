@@ -20,9 +20,9 @@
     </header>
     <body>
             <section>
-                <title>OXF Servlet Context Listener</title>
+                <title>Presentation Server Servlet Context Listener</title>
                 <p>
-                    The OXF Servlet Context Listener allows configuring one processor to be called
+                    The Presentation Server Servlet Context Listener allows configuring one processor to be called
                     when the Servlet context is initialized, and one to be called when the Servlet
                     context is destroyed. These processors are looked up in the following
                     locations, in this order:
@@ -67,7 +67,7 @@
                     generator, or any HTTP serializers. You have access to the Application context.
                 </p>
                 <p>
-                    For the OXF Servlet Context Listener to be called, you need to configure the
+                    For the Presentation Server Servlet Context Listener to be called, you need to configure the
                     following listener in your <code>web.xml</code>:
                     <xml-source>
 <listener>
@@ -83,9 +83,9 @@
                 </note>
             </section>
             <section>
-                <title>OXF Session Listener</title>
+                <title>Presentation Server Session Listener</title>
                 <p>
-                    The OXF Session Listener allows configuring one processor to be called when the
+                    The Presentation Server Session Listener allows configuring one processor to be called when the
                     Session is created, and one to be called when the Session is destroyed. These
                     processors are looked up in the following locations, in this order:
                 </p>
@@ -130,7 +130,7 @@
                     Session contexts.
                 </p>
                 <p>
-                    For the OXF Session Listener to be called, you need to configure the
+                    For the Presentation Server Session Listener to be called, you need to configure the
                     following listener in your <code>web.xml</code>:
                     <xml-source>
 <listener>

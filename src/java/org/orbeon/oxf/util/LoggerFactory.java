@@ -43,7 +43,7 @@ public class LoggerFactory {
     }
 
     /**
-     * Init log4j. Needs OXF Properties system up and running.
+     * Init log4j. Needs Presentation Server Properties system up and running.
      */
     public static void initLogger() {
         try {

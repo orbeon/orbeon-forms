@@ -21,7 +21,7 @@
 	<body>
 		<section>
 			<title>Classification</title>
-			<p>OXF provides EJB support in two different
+			<p>Presentation Server provides EJB support in two different
             areas:</p>
 			<ul>
 				<li>Calling existing EJBs</li>
@@ -67,9 +67,10 @@
                     is intensively accessing a database local to that
                     remote server).</li>
 				</ul>
-				<p>With Processor EJB Encapsulation, OXF processors can
-                benefit from the same advantages provided to EJB
-                components by the application server.</p>
+				<p>
+                    With Processor EJB Encapsulation, Presentation Server processors can benefit
+                    from the same advantages provided to EJB components by the application server.
+                </p>
 			</section>
 			<section>
 				<title>Usage</title>

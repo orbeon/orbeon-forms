@@ -22,10 +22,10 @@
         <section>
             <title>Introduction</title>
             <p>
-                This section describes the XML Pipeline Definition Language (XPL) used by OXF. The
-                XPL interpreter is actually itself implemented as an XML processor, the Pipeline
-                processor. For an introduction to pipelines, see <link
-                href="OXF Tutorial.pdf">OXF Tutorial</link>.
+                This section describes the XML Pipeline Definition Language (XPL) used by
+                Presentation Server. The XPL interpreter is actually itself implemented as an XML
+                processor, the Pipeline processor. For an introduction to pipelines, see <link
+                href="Tutorial.pdf">Orbeon Presentation Server Tutorial</link>.
             </p>
         </section>
         <section>
@@ -147,7 +147,7 @@
                     </ul>
                     <p>
                         This mechanism allows grouping related processors in a namespace. For
-                        example, all the basic OXF processors are grouped in the
+                        example, all the basic Presentation Server processors are grouped in the
                         <code>http://www.orbeon.com/oxf/processors</code> namespace. This namespace
                         is typically mapped to the <code>oxf</code> prefix. Processors are then
                         referred to using names such as <code>oxf:xslt</code> or
@@ -179,8 +179,8 @@
                     the corresponding input or output. <code>schema-href</code> references a
                     document using the <link href="#href"> <code>href</code></link> syntax.
                     <code>schema-uri</code> specifies the URI of a schema that is mapped to a
-                    specific schema in the <link href="reference-properties">OXF properties
-                    file</link>.
+                    specific schema in the <link href="reference-properties">Presentation Server
+                    properties file</link>.
                 </p></li>
                 <li><p>
                     Optionally, <code>&lt;p:input&gt;</code> and <code>&lt;p:output&gt;</code> can

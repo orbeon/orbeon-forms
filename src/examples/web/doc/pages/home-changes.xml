@@ -23,6 +23,14 @@
         <section>
 			<title>New in Version 2.5.3</title>
             <section>
+                <title>OXF Server Renamed to Orbeon Presentation Server</title>
+                <p>
+                    OXF Server is now called Orbeon Presentation Server. The new naming is
+                    consistent with the other components of the Open Integration Suite open source
+                    project.
+                </p>
+            </section>
+            <section>
                 <title>Command-Line Client</title>
                 <ul>
                     <li>
@@ -1098,7 +1106,7 @@
                     </ul>
                     <p>
                         For more information, please refer to the <a
-                        href="http://www.orbeon.com/oxf/doc/pages/OXF%20Tutorial.pdf">OXF Tutorial</a>.
+                        href="http://www.orbeon.com/oxf/doc/pages/Tutorial.pdf">OXF Tutorial</a>.
                     </p>
                 </section>
                 <section>

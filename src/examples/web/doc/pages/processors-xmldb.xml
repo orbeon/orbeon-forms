@@ -28,16 +28,16 @@
                 structure cannot be mapped naturally to a relational database.
             </p>
             <p>
-                OXF integrates with the following XML databases:
+                Presentation Server integrates with the following XML databases:
             </p>
         </section>
         <section>
             <title>Tamino XML Server 4.1</title>
             <p>
                 Software AG's <a href="http://www.softwareag.com/tamino/">Tamino</a> provides a
-                complete XML storage solution. OXF allows you to easily store, query, update, and
-                delete documents in Tamino. The following sections describe the four OXF processors
-                for Tamino:
+                complete XML storage solution. Presentation Server allows you to easily store,
+                query, update, and delete documents in Tamino. The following sections describe the
+                four Presentation Server processors for Tamino:
             </p>
             <section>
                 <title>Configuration</title>
@@ -47,9 +47,10 @@
                 </p>
                 <p>
                     The configuration of the Tamino processors can be done in two ways: either
-                    system-wide via the <link href="reference-properties">OXF Properties</link>, or
-                    locally for a specific instance of the processor through the <code>config</code>
-                    input. The local configuration takes precedence if available.
+                    system-wide via the <link href="reference-properties">Presentation Server
+                    Properties</link>, or locally for a specific instance of the processor through
+                    the <code>config</code> input. The local configuration takes precedence if
+                    available.
                 </p>
                 <note>
                     The <code>collection</code> configuration elements cannot be specified
@@ -130,7 +131,7 @@
                     <title>System-Wide Configuration</title>
                     <p>
                         The Tamino processor can be configured in the <link
-                        href="reference-properties">OXF Properties</link>, allowing all instances
+                        href="reference-properties">Presentation Server Properties</link>, allowing all instances
                         to share the same configuration. The following properties are allowed:
                     </p>
                     <p>
@@ -368,9 +369,9 @@
             <section>
                 <title>Transactions</title>
                 <p>
-                    OXF initiates a transaction for every HTTP request, and commits the transaction
-                    when the pipeline is executed normally. If an exception occurs in the pipeline,
-                    the transaction in rolled back.
+                    Presentation Server initiates a transaction for every HTTP request, and commits
+                    the transaction when the pipeline is executed normally. If an exception occurs
+                    in the pipeline, the transaction in rolled back.
                 </p>
             </section>
         </section>

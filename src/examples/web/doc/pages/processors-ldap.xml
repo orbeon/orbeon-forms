@@ -22,17 +22,13 @@
         <section>
             <title>Introduction</title>
             <p>
-                The LDAP Processor allows OXF to query an LDAP
-                directory server. The LDAP processor uses the
-                <link
-                    href="http://java.sun.com/products/jndi/">Java Naming and
-                    Directory Interface (JNDI)</link> and should work with all
-                compatible servers. However, it has only been tested with
-                <link
-                    href="http://wwws.sun.com/software/products/directory_srvr/home_directory.html">Sun
-                    ONE Directory Server</link> and
-                <link
-                    href="http://www.openldap.org/">Open LDAP</link>.
+                The LDAP Processor allows Presentation Server to query an LDAP directory server. The
+                LDAP processor uses the <link href="http://java.sun.com/products/jndi/">Java Naming
+                and Directory Interface (JNDI)</link> and should work with all compatible servers.
+                However, it has only been tested with <link
+                href="http://wwws.sun.com/software/products/directory_srvr/home_directory.html">Sun
+                ONE Directory Server</link> and <link href="http://www.openldap.org/">Open
+                LDAP</link>.
             </p>
         </section>
         <section>
@@ -47,13 +43,11 @@
             <section>
                 <title>Configuration</title>
                 <p>
-                    The configuration of the LDAP Processor can be done in two
-                    ways: either system-wide via the
-                    <link
-                        href="reference-properties">OXF Properties</link>, or
-                    locally for a specific instance of the processor through the
-                    <code>config</code> input. The local configuration takes
-                    precedence if available.
+                    The configuration of the LDAP Processor can be done in two ways: either
+                    system-wide via the <link href="reference-properties">Presentation Server
+                    Properties</link>, or locally for a specific instance of the processor through
+                    the <code>config</code> input. The local configuration takes precedence if
+                    available.
                 </p>
                 <note>
                     The
@@ -174,11 +168,10 @@
                 <section>
                     <title>System-Wide Configuration</title>
                     <p>
-                        The LDAP Processor can be configured through the
-                        <link
-                            href="reference-properties">OXF Properties</link>,
-                        allowing all instances to share the same configuration.
-                        The following properties are allowed:
+                        The LDAP Processor can be configured through the <link
+                        href="reference-properties">Presentation Server Properties</link>, allowing
+                        all instances to share the same configuration. The following properties are
+                        allowed:
                     </p>
                     <p>
                         <table>

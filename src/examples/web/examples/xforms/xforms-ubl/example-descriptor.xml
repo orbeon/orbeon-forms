@@ -14,8 +14,8 @@
         <p>
             As a developer, you describe the XML document in the XForms model, and the UI with
             XForms controls embedded in XHTML. Events are handled on the server side, which gives
-            you the full flexibility of OXF when handling events. This page implements the
-            "real-word example" provided by Micah Dubinko in his book <a
+            you the full flexibility of Presentation Server when handling events. This page
+            implements the "real-word example" provided by Micah Dubinko in his book <a
             href="http://dubinko.info/writing/xforms/book.html#id2800591">XForms Essentials</a>.
         </p>
     </description>

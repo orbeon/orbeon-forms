@@ -22,35 +22,31 @@
         <section>
             <title>Introduction</title>
             <p>
-                Generators are a special type of processors in that they have no XML
-                data inputs, only outputs. They are generally used at the top of
-                an XML pipeline to generate XML data from a Java object or other
-                non-XML source. OXF provides several generators as described
-                below.
+                Generators are a special type of processors in that they have no XML data inputs,
+                only outputs. They are generally used at the top of an XML pipeline to generate XML
+                data from a Java object or other non-XML source. Presentation Server provides
+                several generators as described below.
             </p>
         </section>
         <anchor id="RequestGenerator"/>
         <section>
             <title>Request Generator</title>
             <p>
-                This generator streams XML from the current HTTP request. It
-                can serialize request attributes including headers, parameters,
-                query strings, user and server information.
+                This generator streams XML from the current HTTP request. It can serialize request
+                attributes including headers, parameters, query strings, user and server
+                information.
             </p>
             <note>
-                The Request Generator can be used as the first component in a
-                Web application pipeline. It is recommended to use the <a
-                href="reference-controller">Page Flow Controller</a>
-                whenever possible, but there are cases where additional data
-                from the request is necessary.
+                The Request Generator can be used as the first component in a Web application
+                pipeline. It is recommended to use the <a href="reference-controller">Page Flow
+                Controller</a> whenever possible, but there are cases where additional data from
+                the request is necessary.
             </note>
             <p>
-                The RequestGenerator takes a mandatory configuration to select
-                which request attribute to display. This configuration consists
-                of a series of
-                <code>include</code> and
-                <code>exclude</code>
-                elements containing an XPath expression selecting a number of element from the request tree.
+                The RequestGenerator takes a mandatory configuration to select which request
+                attribute to display. This configuration consists of a series of
+                <code>include</code> and <code>exclude</code> elements containing an XPath
+                expression selecting a number of element from the request tree.
             </p>
             <p>
                 Sample Configuration:
@@ -124,23 +120,20 @@
                 </request>
             </xml-source>
             <note>
-                OXF adds a request attribute: the
-                <code>request-path</code>. This
-                attribute is defined as a concatenation of the
-                <code>servlet-path</code> and the
-                <code>path-info</code>. This is
-                useful because both original attributes are frequently mixed up and
-                often change depending on the application server or its configuration.
+                Presentation Server adds a request attribute: the <code>request-path</code>. This
+                attribute is defined as a concatenation of the <code>servlet-path</code> and the
+                <code>path-info</code>. This is useful because both original attributes are
+                frequently mixed up and often change depending on the application server or its
+                configuration.
             </note>
             <note>
-                 When specifying <code>/request/body</code> in the list of included
-                 parameters, the Request Generator parses the body of request.
-                 This allows implementing Web Services.
+                 When specifying <code>/request/body</code> in the list of included parameters, the
+                 Request Generator parses the body of request. This allows implementing Web
+                 Services.
             </note>
             <warning>
-                This generator excludes all attributes by default. To
-                obtain the whole attributes tree (as shown in the example above), you must
-                explicitly include
+                This generator excludes all attributes by default. To obtain the whole attributes
+                tree (as shown in the example above), you must explicitly include
                 <code>/request</code> (see below).
             </warning>
 
@@ -159,10 +152,10 @@
         <anchor id="ExceptionGenerator"/>
         <section>
             <title>Exception Generator</title>
-            <p>The Exception Generator is usually used in an
-                <link href="reference-error-pipeline">error pipeline</link>. It serializes an
-                exception into XML. The following shows an XML stream resulting
-                from an exception.
+            <p>
+                The Exception Generator is usually used in an <link
+                href="reference-error-pipeline">error pipeline</link>. It serializes an exception
+                into XML. The following shows an XML stream resulting from an exception.
             </p>
             <xml-source>
                 <exceptions>
@@ -174,8 +167,9 @@
                     <exception>more exceptions</exception>
                 </exceptions>
             </xml-source>
-            <p>A typical error pipeline should include an
-                Exception Generator followed by one or more transformation(s), and an HTMLSerializer.</p>
+            <p>
+                A typical error pipeline should include an Exception Generator followed by one or
+                more transformation(s), and an HTMLSerializer.</p>
 
 
             <xml-source>
@@ -197,13 +191,13 @@
                     href="#StrutsActionErrorsGenerator">StrutsActionErrorsGenerator</link>.
             </warning>
 
-            <p>The Struts Action Form Generator allows OXF to be used
-                with the
-                <fork href="http://jakarta.apache.org/struts/">Jakarta Struts</fork>
-                framework. In this configuration, Struts is used for the back-end,
-                generating beans that are serialized by this generator. One
-                or more OXF pipeline(s) are called to generate the front-end views. See
-                <link href="model2x-struts">Using OXF with Struts</link> for more information.
+            <p>
+                The Struts Action Form Generator allows Presentation Server to be used with the
+                <fork href="http://jakarta.apache.org/struts/">Jakarta Struts</fork> framework. In
+                this configuration, Struts is used for the back-end, generating beans that are
+                serialized by this generator. One or more Presentation Server pipeline(s) are called
+                to generate the front-end views. See <link href="model2x-struts">Using Presentation
+                Server with Struts</link> for more information.
             </p>
             <xml-source>
                 <p:processor name="oxf:struts">
@@ -217,26 +211,22 @@
             <title>Bean Generator</title>
 
             <p>
-                The Bean Generator serializes objects in the HTTP request or
-                session to XML. If an object is a W3C Document
-                (<code>org.w3c.dom.Document</code>), the XML for this document
-                is sent as-is. Otherwise, the object is assumed to be a JavaBean
-                and is serialized to XML with <link
-                href="http://castor.exolab.org">Castor XML</link>. This
-                generator takes two inputs:
+                The Bean Generator serializes objects in the HTTP request or session to XML. If an
+                object is a W3C Document (<code>org.w3c.dom.Document</code>), the XML for this
+                document is sent as-is. Otherwise, the object is assumed to be a JavaBean and is
+                serialized to XML with <link href="http://castor.exolab.org">Castor XML</link>.
+                This generator takes two inputs:
             </p>
 
             <section>
                 <title>Configuration Input</title>
 
-                <p>The configuration input describes which bean to serialize,
-                    and two optional sources. The sources can be
-                    <code>request</code>,
-                    <code>session</code> or both. If both are
-                    specified, they are tried in order. In the example below, the
-                    request is searched for the
-                    <code>guess</code> bean. If not
-                    found, the session is tried.
+                <p>
+                    The configuration input describes which bean to serialize, and two optional
+                    sources. The sources can be <code>request</code>, <code>session</code> or both.
+                    If both are specified, they are tried in order. In the example below, the
+                    request is searched for the <code>guess</code> bean. If not found, the session
+                    is tried.
                 </p>
 
                 <xml-source>
@@ -285,11 +275,11 @@
             <section>
                 <title>Mapping Input</title>
 
-                <p>This input specifies the Castor mapping file. See
-                    <link
-                        href="http://castor.exolab.org/xml-mapping.html">Castor
-                        Documentation</link> for more information on the mapping file.
-                    In most instances, the default mapping is sufficient:
+                <p>
+                    This input specifies the Castor mapping file. See <link
+                    href="http://castor.exolab.org/xml-mapping.html">Castor Documentation</link>
+                    for more information on the mapping file. In most instances, the default mapping
+                    is sufficient:
                 </p>
 
                 <xml-source>
@@ -302,10 +292,10 @@
             <section>
                 <title>Output</title>
 
-                <p>The output document contains a
-                    <code>beans</code> root node.
-                    Each serialized bean is a child of the root node. The
-                    example above generates the following document:
+                <p>
+                    The output document contains a <code>beans</code> root node. Each serialized
+                    bean is a child of the root node. The example above generates the following
+                    document:
                 </p>
 
                 <xml-source>
@@ -324,11 +314,11 @@
         <section>
             <title>Struts ActionErrors Generator</title>
 
-            <p>The Struts ActionErrors Generator looks in the request for a
-                Struts ActionErrors instance. Struts stores this object whenever an
-                ActionForm's validate() method returns a non-null value. This
-                generator takes no configuration and its output looks like the
-                following:</p>
+            <p>
+                The Struts ActionErrors Generator looks in the request for a Struts ActionErrors
+                instance. Struts stores this object whenever an ActionForm's validate() method
+                returns a non-null value. This generator takes no configuration and its output looks
+                like the following:</p>
 
             <xml-source>
                 <errors>
@@ -338,48 +328,44 @@
                 </errors>
             </xml-source>
 
-            <note>This generator uses the Struts application resources if
-                available.</note>
+            <note>
+                This generator uses the Struts application resources if available.
+            </note>
         </section>
 
         <anchor id="URLGenerator"/>
         <section>
             <title>URL Generator</title>
             <p>
-                The URL Generator fetches a document from a URL and produces an
-                XML output document. Common protocols such as
-                <code>http</code>, <code>ftp</code>, and <code>file</code> are
-                supported as well as the OXF resource protocol
-                (<code>oxf</code>). See the <link
-                href="reference-resource-managers">Resource Managers</link> for
-                more information about the <code>oxf</code> protocol.
+                The URL Generator fetches a document from a URL and produces an XML output
+                document. Common protocols such as <code>http</code>, <code>ftp</code>, and
+                <code>file</code> are supported as well as the Presentation Server resource protocol
+                (<code>oxf</code>). See the <link href="reference-resource-managers">Resource
+                Managers</link> for more information about the <code>oxf</code> protocol.
             </p>
             <section>
                 <title>Content Type</title>
                 <p>
-                    The URL Generator operates in several modes depending on the
-                    content type of the source document. The content type is
-                    determined according to the following priorities:
+                    The URL Generator operates in several modes depending on the content type of
+                    the source document. The content type is determined according to the following
+                    priorities:
                 </p>
                 <ol>
                     <li>
-                        Use the content type in the <code>content-type</code>
-                        element if <code>force-content-type</code> is set to
-                        <code>true</code>.
+                        Use the content type in the <code>content-type</code> element if
+                        <code>force-content-type</code> is set to <code>true</code>.
                     </li>
                     <li>
-                        Use the content type set by the connection (for example,
-                        the content type sent with the document by an HTTP
-                        server), if any. In particular when using the
-                        <code>oxf</code> or <code>file</code> protocol, the
-                        connection content type is never available. When using
-                        the <code>http</code> protocol, the connection content
-                        type may or may not be available depending on the
+                        Use the content type set by the connection (for example, the content type
+                        sent with the document by an HTTP server), if any. In particular when using
+                        the <code>oxf</code> or <code>file</code> protocol, the connection content
+                        type is never available. When using the <code>http</code> protocol, the
+                        connection content type may or may not be available depending on the
                         configuration of the HTTP server.
                     </li>
                     <li>
-                        Use the content type in the <code>content-type</code>
-                        element, if specified.
+                        Use the content type in the <code>content-type</code> element, if
+                        specified.
                     </li>
                     <li>
                         Use <code>text/xml</code>.
@@ -389,13 +375,12 @@
             <section>
                 <title>XML Mode</title>
                 <p>
-                    The XML mode is selected when the content type is
-                    <code>text/xml</code> according to the selection algorithm
-                    above. The generator fetches the specified URL and parses
-                    the XML document. If the <code>validating</code> option is
-                    set to <code>true</code>, a validating parser is used,
-                    otherwise a non-validating parser is used. Using a
-                    validating parser allows to validate a document with a DTD.
+                    The XML mode is selected when the content type is <code>text/xml</code>
+                    according to the selection algorithm above. The generator fetches the specified
+                    URL and parses the XML document. If the <code>validating</code> option is set
+                    to <code>true</code>, a validating parser is used, otherwise a non-validating
+                    parser is used. Using a validating parser allows to validate a document with a
+                    DTD.
                 </p>
                 <p>
                     Example:
@@ -413,19 +398,18 @@
                     </p:processor>
                 </xml-source>
                 <note>
-                    The URL must point to a well-formed XML document. If it
-                    doesn't, an exception will be raised.
+                    The URL must point to a well-formed XML document. If it doesn't, an exception
+                    will be raised.
                 </note>
             </section>
             <section>
                 <title>HTML Mode</title>
                 <p>
-                    The HTML mode is selected when the content type is
-                    <code>text/html</code> according to the selection algorithm
-                    above. In this mode, the URL Generator uses <link
-                    href="http://tidy.sourceforge.net/">HTML Tidy</link> to
-                    transform HTML into XML. This feature is useful to later
-                    extract information from HTML using XPath.
+                    The HTML mode is selected when the content type is <code>text/html</code>
+                    according to the selection algorithm above. In this mode, the URL Generator
+                    uses <link href="http://tidy.sourceforge.net/">HTML Tidy</link> to transform
+                    HTML into XML. This feature is useful to later extract information from HTML
+                    using XPath.
                 </p>
                 <p>
                     Examples:
@@ -461,13 +445,12 @@
             <section>
                 <title>Encoding</title>
                 <p>
-                    When reading XML documents, the preferred method of
-                    determining the character encoding is to leave the XML
-                    parser auto detect the encoding as per the XML specification.
-                    In some rare instances, it may be necessary to override the
-                    encoding. For this purpose, the <code>force-encoding</code>
-                    and <code>encoding</code> elements can be used to override
-                    this default behavior, for example:
+                    When reading XML documents, the preferred method of determining the character
+                    encoding is to leave the XML parser auto detect the encoding as per the XML
+                    specification. In some rare instances, it may be necessary to override the
+                    encoding. For this purpose, the <code>force-encoding</code> and
+                    <code>encoding</code> elements can be used to override this default behavior,
+                    for example:
                 </p>
                 <xml-source>
                     <p:processor name="oxf:url-generator">
@@ -483,41 +466,34 @@
                     </p:processor>
                 </xml-source>
                 <p>
-                    This use is discouraged, and should be reserved for cases
-                    where it is known that a document specifies an incorrect
-                    encoding and it is not possible to modify the document. Note
-                    that it does not make sense in the case of XML to use an
-                    <code>encoding</code> element without
-                    <code>force-encoding</code> set to <code>true</code>,
-                    because the XML parser will always select an encoding, be it
-                    the default <code>utf-8</code>, and the
-                    <code>encoding</code> element will be ignored.
+                    This use is discouraged, and should be reserved for cases where it is known that
+                    a document specifies an incorrect encoding and it is not possible to modify the
+                    document. Note that it does not make sense in the case of XML to use an
+                    <code>encoding</code> element without <code>force-encoding</code> set to
+                    <code>true</code>, because the XML parser will always select an encoding, be it
+                    the default <code>utf-8</code>, and the <code>encoding</code> element will be
+                    ignored.
                 </p>
                 <p>
-                    When reading HTML documents, the following selection
-                    algorithm applies:
+                    When reading HTML documents, the following selection algorithm applies:
                 </p>
                 <ol>
                     <li>
-                        Use the encoding in the <code>encoding</code>
-                        element if <code>force-encoding</code> is set to
-                        <code>true</code>.
+                        Use the encoding in the <code>encoding</code> element if
+                        <code>force-encoding</code> is set to <code>true</code>.
                     </li>
                     <li>
-                        Use the encoding set by the connection (for example, the
-                        encoding sent with the document by an HTTP server), if
-                        any. In particular when using the <code>oxf</code> or
-                        <code>file</code> protocol, the connection encoding is
-                        never available. When using the <code>http</code>
-                        protocol, the connection encoding may or may not be
-                        available, and is usually specified along with the
-                        content type in the <code>content-type</code> header,
-                        for example: <code>content-type: text/html;
-                        charset=iso-8859-1</code>
+                        Use the encoding set by the connection (for example, the encoding sent with
+                        the document by an HTTP server), if any. In particular when using the
+                        <code>oxf</code> or <code>file</code> protocol, the connection encoding is
+                        never available. When using the <code>http</code> protocol, the connection
+                        encoding may or may not be available, and is usually specified along with
+                        the content type in the <code>content-type</code> header, for example:
+                        <code>content-type: text/html; charset=iso-8859-1</code>
                     </li>
                     <li>
-                        Use the content type in the <code>content-type</code>
-                        element, if specified.
+                        Use the content type in the <code>content-type</code> element, if
+                        specified.
                     </li>
                     <li>
                         Use <code>iso-8859-1</code>.
@@ -539,27 +515,24 @@
                     </p:processor>
                 </xml-source>
                 <p>
-                    In this version, only the following encodings are supported
-                    for HTML documents:
+                    In this version, only the following encodings are supported for HTML documents:
                 </p>
                 <ul>
                     <li>iso-8859-1</li>
                     <li>utf-8</li>
                 </ul>
                 <p>
-                    Also note that use of the HTML <code>&lt;meta></code> tag
-                    to specify the encoding from within an HTML document is not
-                    supported either.
+                    Also note that use of the HTML <code>&lt;meta></code> tag to specify the
+                    encoding from within an HTML document is not supported either.
                 </p>
             </section>
             <a name="http-headers"/>
             <section>
                 <title>HTTP Headers</title>
                 <p>
-                    When retrieving a document from an HTTP server, you can optionally specify
-                    the headers sent to the server by adding one or more
-                    <code>header</code> elements, as illustrated in the
-                    example below:
+                    When retrieving a document from an HTTP server, you can optionally specify the
+                    headers sent to the server by adding one or more <code>header</code> elements,
+                    as illustrated in the example below:
                 </p>
                 <xml-source>
                     <p:processor name="oxf:url-generator">
@@ -584,11 +557,9 @@
             <section>
                 <title>Cache Control</title>
                 <p>
-                    It is possible to configure whether the URL Generator caches
-                    documents locally in the OXF cache. By default, it does. To
-                    disable caching, use the
-                    <code>cache-control/use-local-cache</code> element, for
-                    example:
+                    It is possible to configure whether the URL Generator caches documents locally
+                    in the Presentation Server cache. By default, it does. To disable caching, use
+                    the <code>cache-control/use-local-cache</code> element, for example:
                 </p>
                 <xml-source>
                     <p:processor name="oxf:url-generator">
@@ -605,17 +576,15 @@
                     </p:processor>
                 </xml-source>
                 <p>
-                    Using the local cache causes the URL Generator to check if
-                    the document is in the OXF cache first. If it is, its
-                    validity is checked with the protocol handler (looking at
-                    the last modified date for files, the
-                    <code>last-modified</code> header for http, etc.). If the
-                    cached document is valid, it is used. Otherwise, it is
-                    fetched and put in the cache.
+                    Using the local cache causes the URL Generator to check if the document is in
+                    the Presentation Server cache first. If it is, its validity is checked with the
+                    protocol handler (looking at the last modified date for files, the
+                    <code>last-modified</code> header for http, etc.). If the cached document is
+                    valid, it is used. Otherwise, it is fetched and put in the cache.
                 </p>
                 <p>
-                    When the local cache is disabled, the document is never
-                    revalidated and always fetched.
+                    When the local cache is disabled, the document is never revalidated and always
+                    fetched.
                 </p>
             </section>
         </section>
@@ -624,10 +593,9 @@
         <section>
             <title>Session Generator</title>
             <p>
-                The Session Generator outputs the XML document stored in the HTTP
-                session, under the specified key. If no document is stored under
-                the specified key, this generator will send a null document with
-                key as root element.
+                The Session Generator outputs the XML document stored in the HTTP session, under
+                the specified key. If no document is stored under the specified key, this generator
+                will send a null document with key as root element.
             </p>
             <warning>
                 The XML document must be stored with the
@@ -659,12 +627,11 @@
         <section>
             <title>Request Security Generator</title>
             <p>
-                The Request Security Generator extracts information about the
-                currently logged user from the HTTP request. Its optional
-                configuration contains a list of roles the application developer
-                is interested in. Only those roles will be listed in the
-                generator's output if the role is present. For instance, the
-                output of the request security generator could be:
+                The Request Security Generator extracts information about the currently logged user
+                from the HTTP request. Its optional configuration contains a list of roles the
+                application developer is interested in. Only those roles will be listed in the
+                generator's output if the role is present. For instance, the output of the request
+                security generator could be:
             </p>
             <xml-source>
                 <request-security>
@@ -707,10 +674,9 @@
             <p>
                 The Servlet Include Generator, using the <a
                 href="http://jakarta.apache.org/tomcat/tomcat-4.1-doc/servletapi/javax/servlet/RequestDispatcher.html">RequestDispatcher</a>,
-                calls and parses the result of another servlet running in the
-                same Java virtual machine. The servlet can
-                generate either XML or HTML. The generator automatically detects HTML and
-                uses HTMLTidy to clean and parse the stream as XML.
+                calls and parses the result of another servlet running in the same Java virtual
+                machine. The servlet can generate either XML or HTML. The generator automatically
+                detects HTML and uses HTMLTidy to clean and parse the stream as XML.
             </p>
             <note>
                 This generator works only in a servlet environment. It is not supported in portlets.
@@ -718,11 +684,10 @@
             <section>
                 <title>Config Input</title>
                 <p>
-                    The <code>config</code> input describes the servlet to call,
-                    and optionally configures the HTMLTidy process. You can
-                    specify the servlet either by name or path, and optionally
-                    specify a context path. The RelaxNG
-                    schema for this input is the following:
+                    The <code>config</code> input describes the servlet to call, and optionally
+                    configures the HTMLTidy process. You can specify the servlet either by name or
+                    path, and optionally specify a context path. The RelaxNG schema for this input
+                    is the following:
                 </p>
                 <xml-source>
                     <element name="config" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
@@ -770,17 +735,15 @@
             <section>
                 <title>Data Output</title>
                 <p>
-                    The data output contains the result in the servlet include
-                    call.
+                    The data output contains the result in the servlet include call.
                 </p>
             </section>
             <section>
                 <title>Example</title>
                 <p>
                     This generator calls the <code>reports</code> servlet in the
-                    <code>/admin</code> context path. Since this servlet is
-                    generating HTML, it's better to have verbose error reporting from
-                    HTMLTidy.
+                    <code>/admin</code> context path. Since this servlet is generating HTML, it's
+                    better to have verbose error reporting from HTMLTidy.
                 </p>
                 <xml-source>
                     <p:processor name="oxf:servlet-include">

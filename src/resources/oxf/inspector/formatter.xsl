@@ -17,7 +17,7 @@
     <xsl:template match="/">
         <html>
             <head>
-                <title>OXF XML Formatter</title>
+                <title>Presentation Server XML Formatter</title>
                 <script>
                     <![CDATA[
                     function hideShow(obj) {

@@ -22,7 +22,7 @@
     <xsl:template match="/">
         <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting">
             <xhtml:head>
-                <xhtml:title>OXF Documentation</xhtml:title>
+                <xhtml:title>Presentation Server Documentation</xhtml:title>
             </xhtml:head>
             <xhtml:body>
                 <!-- Banner (with search) -->
@@ -54,7 +54,7 @@
                      <div id="main1">
                     <!-- List of sections -->
                     <div id="leftcontent">
-                        <h1>OXF Documentation</h1>
+                        <h1>Presentation Server Documentation</h1>
                         <ul class="tree-sections">
                             <xsl:for-each select="doc('book.xml')/book/menu">
                                 <li class="tree-section">

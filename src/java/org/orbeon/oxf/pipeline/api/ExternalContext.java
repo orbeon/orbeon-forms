@@ -23,8 +23,8 @@ import java.util.Map;
  * ExternalContext abstracts context, request and response information so that compile-time
  * dependencies on the Servlet API or Portlet API can be removed.
  *
- * It is also possible to use ExternalContext to embed OXF and to provide a web-like
- * request/response interface.
+ * It is also possible to use ExternalContext to embed Presentation Server and to provide a
+ * web-like request/response interface.
  */
 public interface ExternalContext {
 

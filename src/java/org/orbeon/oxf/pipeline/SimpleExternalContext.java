@@ -23,9 +23,9 @@ import java.security.Principal;
 import java.util.*;
 
 /**
- * Simple implementation of the ExternalContext and related interfaces. When
- * embedding OXF (e.g. in Eclipse), this class can be used directly be used
- * directly or can be subclassed.
+ * Simple implementation of the ExternalContext and related interfaces. When embedding
+ * Presentation Server (e.g. in Eclipse), this class can be used directly be used directly or can
+ * be subclassed.
  */
 public class SimpleExternalContext implements ExternalContext {
     private static final Logger logger = LoggerFactory.createLogger(SimpleExternalContext.class);

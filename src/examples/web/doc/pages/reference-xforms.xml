@@ -28,11 +28,11 @@
         <section>
             <title>Scope</title>
             <p>
-                Web applications use forms to collect data from users. OXF form handling is based on
-                <link href="http://www.w3.org/MarkUp/Forms/">XForms</link>, namely the <a
-                href="http://www.w3.org/TR/xforms/">XForms 1.0 W3C Recommendation</a>. This section
-                provides an introduction to XForms concepts and explains how to use XForms in your
-                OXF application.
+                Web applications use forms to collect data from users. Presentation Server form
+                handling is based on <link href="http://www.w3.org/MarkUp/Forms/">XForms</link>,
+                namely the <a href="http://www.w3.org/TR/xforms/">XForms 1.0 W3C
+                Recommendation</a>. This section provides an introduction to XForms concepts and
+                explains how to use XForms in your Presentation Server application.
             </p>
         </section>
         <section>
@@ -44,11 +44,11 @@
 					to the rank of W3C Recommendation quite recently, in October 2003. Mainstream browsers
 					(Internet Explorer, Mozilla / Firefox, Opera, Safari) do not yet support XForms natively.
 					However you can already leverage the benefits of XForms today by using a server-side XForms
-					engine like the one provided in OXF. Until browsers natively support XForms, the OXF XForms
-					engine will transparently generate HTML forms and perform the work that would be done by an
-					XForms-compliant browser. This way you can start leveraging XForms today, be ready for upcoming
-					XForms-compliant browsers, and work smoothly with the mainstream browsers that are deployed
-					in the marketplace.
+					engine like the one provided in Presentation Server. Until browsers natively support XForms,
+					the Presentation Server XForms engine will transparently generate HTML forms and perform the
+					work that would be done by an XForms-compliant browser. This way you can start leveraging
+					XForms today, be ready for upcoming XForms-compliant browsers, and work smoothly with the
+					mainstream browsers that are deployed in the marketplace.
     			</p>
         	</section>
         	<section>
@@ -99,15 +99,15 @@
                     </li>
                     <li>
                         <p>
-                            More often than not, there are constraints on the data that can be entered
-                            by the end-user. For instance, in the example we just considered, the card
-                            number must have 16 digits and the expiration month must be a number between
-                            1 and 12. Traditionally code must be written to check for those constraints.
-                            And more code must be written to handle error conditions (getting back to
-                            the page displaying the form and showing the appropriate error messages).
-                            All this is done is very simple and declarative way with XForms. For
-                            instance, checking that the expiration month is valid number between 1 and
-                            12 can be done with:
+                            More often than not, there are constraints on the data that can be
+                            entered by the end-user. For instance, in the example we just
+                            considered, the card number must have 16 digits and the expiration month
+                            must be a number between 1 and 12. Traditionally code must be written to
+                            check for those constraints. And more code must be written to handle
+                            error conditions (getting back to the page displaying the form and
+                            showing the appropriate error messages). All this is done is very
+                            simple and declarative way with XForms. For instance, checking that the
+                            expiration month is valid number between 1 and 12 can be done with:
                         </p>
                         <xml-source>
                             <bind nodeset="/credit-card/expiration-month" type="xs:integer" constraint=". >= 1 and 12 >= ."/>
@@ -165,7 +165,7 @@
                 <img print-format="pdf" src="pages/reference-xforms-operation-model.png"
                     style="clear: both; float: right"/>
                 <p>
-                    As we can see, your role as the author of an OXF application is:
+                    As we can see, your role as the author of an Presentation Server application is:
                 </p>
                 <ul>
                     <li>To provide the XForms model (step 1 above).</li>
@@ -269,12 +269,12 @@
                         </p>
                         <code>&lt;xforms:bind nodeset="/credit-card/number" type="xs:integer"/></code>
                         <p>
-                            The value of the <code>type</code> attribute is
-                            a W3C XML Schema simple type. You can see the list of simple types in the
-                            <a href="
-                            http://www.w3.org/TR/2001/REC-xmlschema-0-20010502/#CreatDt">XML Schema
-                            primer</a>. If the end-user enters an invalid credit card number (i.e. not a
-                            number), an error will be displayed as shows in the screenshot on the right.
+                            The value of the <code>type</code> attribute is a W3C XML Schema
+                            simple type. You can see the list of simple types in the <a href="
+                            http://www.w3.org/TR/2001/REC-xmlschema-0-20010502/#CreatDt">XML
+                            Schema primer</a>. If the end-user enters an invalid credit card number
+                            (i.e. not a number), an error will be displayed as shows in the
+                            screenshot on the right.
                         </p>
                     </li>
                     <li>
@@ -287,9 +287,9 @@
                         <code>&lt;xforms:bind nodeset="/credit-card/expiration-month"
                             constraint="../number = '' or (. castable as xs:integer and . >= 1 and 12 >= .)"/></code>
                         <p>
-                            Note that we have decided here not to bother checking the
-                            expiration month if no credit card number was entered. OXF supports XPath
-                            2.0 expressions in the constraint attribute.
+                            Note that we have decided here not to bother checking the expiration
+                            month if no credit card number was entered. Presentation Server supports
+                            XPath 2.0 expressions in the constraint attribute.
                         </p>
                     </li>
                     <li>
@@ -318,11 +318,11 @@
                     </li>
                     <li>
                         <p>
-                            The content of elements and attributes are in general populated by values
-                            entered by the user. But they can also be populated automatically based on
-                            XPath expressions you provide. Of course, those XPath expressions can use
-                            values entered by the end-user. We populate the <code>&lt;valid></code>
-                            element with either "true" or "false" with:
+                            The content of elements and attributes are in general populated by
+                            values entered by the user. But they can also be populated
+                            automatically based on XPath expressions you provide. Of course, those
+                            XPath expressions can use values entered by the end-user. We populate
+                            the <code>&lt;valid></code> element with either "true" or "false" with:
                         </p>
                         <code>&lt;xforms:bind nodeset="/credit-card/valid" calculate="..."/></code>.
                         <p>
@@ -342,32 +342,33 @@
                         <th>Validation</th>
                         <td>
                             <p>
-                                The purpose is to determine if the content of an element
-                                or attribute in the XForms instance is valid. Invalid values can have an
-                                impact on how a form is displayed (you might want to highlight errors and
-                                show some information to help the end-user to correct the issue) and on page
-                                flow (maybe data should not be saved until it is valid), hence the need to
-                                validate in the first place. There are 3 ways to validate the content of an
-                                element or attribute:
+                                The purpose is to determine if the content of an element or
+                                attribute in the XForms instance is valid. Invalid values can have
+                                an impact on how a form is displayed (you might want to highlight
+                                errors and show some information to help the end-user to correct the
+                                issue) and on page flow (maybe data should not be saved until it is
+                                valid), hence the need to validate in the first place. There are 3
+                                ways to validate the content of an element or attribute:
                             </p>
                             <ul>
                                 <li>
                                     <p>
-                                        <b>required</b> – You can specify in the <code>required</code>
-                                        attribute an XPath expression that determines if a value is
-                                        required. The XPath can be as simple as <code>true()</code>, or
-                                        more complex and depend on other values entered by the end-user.
-                                        By default values are not required.
+                                        <b>required</b> – You can specify in the
+                                        <code>required</code> attribute an XPath expression that
+                                        determines if a value is required. The XPath can be as
+                                        simple as <code>true()</code>, or more complex and depend on
+                                        other values entered by the end-user. By default values are
+                                        not required.
                                     </p>
                                 </li>
                                 <li>
                                     <p>
-                                        <b>type</b> – In the <code>type</code> attribute you can specify
-                                        a W3C XML Schema simple type. The <code>type</code> attribute
-                                        works in association with the <code>required</code> attribute:
-                                        even if a type is specified, if the value is an empty string,
-                                        the validity will only depend on the whether the value is
-                                        required.
+                                        <b>type</b> – In the <code>type</code> attribute you can
+                                        specify a W3C XML Schema simple type. The <code>type</code>
+                                        attribute works in association with the
+                                        <code>required</code> attribute: even if a type is
+                                        specified, if the value is an empty string, the validity
+                                        will only depend on the whether the value is required.
                                     </p>
                                     <table>
                                         <tr><th/><th>Required</th><th>Not required</th></tr>
@@ -378,9 +379,9 @@
                                 <li>
                                     <p>
                                         <b>constraint</b> – In the <code>constraint</code> you can
-                                        write any XPath 2.0 expression that returns a boolean value.
-                                        If false is returned, then the value is considered invalid,
-                                        otherwise it is considered valid.
+                                        write any XPath 2.0 expression that returns a boolean
+                                        value. If false is returned, then the value is considered
+                                        invalid, otherwise it is considered valid.
                                     </p>
                                 </li>
                             </ul>
@@ -394,8 +395,8 @@
                                     <p>
                                         <b>calculate</b> – The content of the element or attribute
                                         will be set to the result of the evaluation of the XPath 2.0
-                                        expression in the <code>calculate</code> attribute. This way
-                                        you can automatically compute some values in the XForms
+                                        expression in the <code>calculate</code> attribute. This
+                                        way you can automatically compute some values in the XForms
                                         instance based on other values, typically entered by the
                                         end-user.
                                     </p>
@@ -728,11 +729,11 @@
                 <title>UI Rendering</title>
                 <img src="pages/home-changes-epilogue.png" style="clear: both; float: right"/>
                 <p>
-                    By default OXF renders XForms controls into XHTML form elements and generates
-                    XHTML to render alerts, hints, and help messages. This default behavior helps
-                    you get started as you create your application. If you want to, you can change
-                    the way rendering into XHTML is done, or even render XForms controls into
-                    something other than XHTML, for instance SVG.
+                    By default Presentation Server renders XForms controls into XHTML form elements
+                    and generates XHTML to render alerts, hints, and help messages. This default
+                    behavior helps you get started as you create your application. If you want to,
+                    you can change the way rendering into XHTML is done, or even render XForms
+                    controls into something other than XHTML, for instance SVG.
                 </p>
                 <p>
                     Rendering of XForms elements is done in an XSLT stylesheet bundled with your
@@ -781,7 +782,8 @@
                 The XForms repeat module lets you easily create pages where XForms controls are
                 repeated, like an invoice made of invoice lines (with a description, unit price,
                 quantity), where new lines can be added, and existing lines can be edited or
-                deleted. OXF supports the following elements in the XForms repeat module:
+                deleted. Presentation Server supports the following elements in the XForms repeat
+                module:
                 <code>repeat</code>, <code>itemset</code>, <code>insert</code>, and
                 <code>delete</code>.
             </p>

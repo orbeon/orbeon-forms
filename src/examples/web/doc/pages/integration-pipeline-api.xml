@@ -71,9 +71,9 @@ if (logger.isInfoEnabled())
 ResourceManagerWrapper.init(props);]]></source>
             </section>
             <section>
-                <title>Initialize OXF Properties</title>
+                <title>Initialize Presentation Server Properties</title>
                 <p>
-                    This initializes the OXF properties with the default properties file bundled in
+                    This initializes the Presentation Server properties with the default properties file bundled in
                     the Orbeon JAR file.
                 </p>
                 <source><![CDATA[

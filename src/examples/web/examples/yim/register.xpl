@@ -36,7 +36,7 @@
                             <to>
                                 <xsl:value-of select="/form/user-account"/>
                             </to>
-                            <body>OXF Google ready. Please type in a query.</body>
+                            <body>Presentation Server Google ready. Please type in a query.</body>
                         </message>
                     </yim>
                 </xsl:template>

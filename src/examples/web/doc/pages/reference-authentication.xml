@@ -24,7 +24,7 @@
             <p>
                 Most Web applications require some sort of authentication,
                 either just to access an "administrative" section, or for the
-                whole application. OXF Web applications use the standard
+                whole application. Presentation Server Web applications use the standard
                 authentication mechanism provided by your J2EE application
                 server. This section provides an overview of the standard
                 J2EE authentication mechanism.
@@ -107,7 +107,7 @@
             <code>administrator</code> role. But how do you declare users and how
             are those users mapped to roles? This is application server
             dependent, so you won't find an exact answer to this question in the
-            OXF User Guide and you should refer to your application server
+            Presentation Server User Guide and you should refer to your application server
             documentation. </p>
             <p>Usually the process is straightforward. For example, with Tomcat
             using the memory realm, you can declare the users and their

@@ -22,15 +22,15 @@
         <section>
             <title>Introduction</title>
 
-            <p>Welcome to the OXF User Guide!</p>
+            <p>Welcome to the Orbeon Presentation Server User Guide!</p>
 
             <p>
-                OXF is a native XML Web application platform that is purpose-built to automate
-                document-centric business processes with Web applications built directly from XML
-                business documents. Although OXF was designed primarily to develop Web
-                applications, it can be used to build all sorts of XML applications, including
-                Enterprise Application Integration (EAI), Content Management Systems (CMS), and
-                more.
+                Orbeon Presentation Server is a native XML Web application platform that is
+                purpose-built to automate document-centric business processes with web applications
+                built directly from XML business documents. Although Presentation Server was
+                designed primarily to develop Web applications, it can be used to build all sorts of
+                XML applications, including Enterprise Application Integration (EAI), Content
+                Management Systems (CMS), and more.
             </p>
         </section>
 
@@ -38,10 +38,13 @@
             <title>Purpose of the User Guide</title>
 
             <p>
-                The purpose of this guide is to get users acquainted with the fundamental concepts of OXF: XML
-                processors and XML pipelines, the XML Pipeline Definition Language (XPL), the Page Flow Controller (PFC), and OXF's built-in XML processors. It also introduces you to the most popular Web
-                application architecture models and shows how OXF builds on those models and enhances them. Finally, it
-                documents in detail the XML processors included with the OXF distributions.
+                The purpose of this guide is to get users acquainted with the fundamental concepts
+                of Presentation Server: XML processors and XML pipelines, the XML Pipeline
+                Definition Language (XPL), the Page Flow Controller (PFC), and Presentation
+                Server's built-in XML processors. It also introduces you to the most popular Web
+                application architecture models and shows how Presentation Server builds on those
+                models and enhances them. Finally, it documents in detail the XML processors
+                included with the Presentation Server distributions.
             </p>
 
         </section>

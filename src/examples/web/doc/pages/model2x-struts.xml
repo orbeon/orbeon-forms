@@ -17,31 +17,26 @@
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>Using OXF  with Struts</title>
+        <title>Using Presentation Server with Struts</title>
     </header>
     <body>
         <section>
             <title>Introduction</title>
             <p>
-                <link href="http://jakarta.apache.org/struts/">Struts</link> is
-                a popular Web Application framework, based on the
-                <link
-                    href="model2x-intro">MVC</link> pattern. In recent years, Struts
-                has quickly gained popularity due to its ease of use and
+                <link href="http://jakarta.apache.org/struts/">Struts</link> is a popular Web
+                Application framework, based on the <link href="model2x-intro">MVC</link> pattern.
+                In recent years, Struts has quickly gained popularity due to its ease of use and
                 conformance to the Model 2 pattern.
             </p>
             <p>
-                This chapter demonstrates how to use OXF in conjunction with a
-                Struts-based Web Application in a pattern called
-                <a
-                    href="model2x-model2x">Model 2X</a>. It assumes that the reader is familiar
-                with Struts.
+                This chapter demonstrates how to use Presentation Server in conjunction with a
+                Struts-based Web Application in a pattern called <a href="model2x-model2x">Model
+                2X</a>. It assumes that the reader is familiar with Struts.
             </p>
 
             <p>
-                Please refer to
-                <link href="model2x-model2x">this page</link> for
-                more information about the use of XSLT in place of JSP.
+                Please refer to <link href="model2x-model2x">this page</link> for more information
+                about the use of XSLT in place of JSP.
             </p>
 
         </section>
@@ -49,8 +44,8 @@
         <section>
             <title>Control Flow</title>
             <p>
-                The following figure presents the flow of the request,
-                from the client to the Struts servlet and OXF pipeline:
+                The following figure presents the flow of the request, from the client to the
+                Struts servlet and Presentation Server pipeline:
             </p>
             <img print-format="pdf" src="pages/model2x-struts-model2x.png"/>
             <p>
@@ -59,9 +54,9 @@
                     <li>Controller Servlet creates the Form Bean</li>
                     <li>Controller Servlet calls the Action Class</li>
                     <li>The Action Class creates and fills in the Result Bean(s)</li>
-                    <li>The Request is forwarded to the OXF Servlet</li>
-                    <li>The OXF Servlet serializes  the Result Bean in XML</li>
-                    <li>An OXF pipeline is applied on the XML Bean</li>
+                    <li>The Request is forwarded to the Presentation Server Servlet</li>
+                    <li>The Presentation Server Servlet serializes  the Result Bean in XML</li>
+                    <li>An Presentation Server pipeline is applied on the XML Bean</li>
                     <li>HTML is sent back to the client</li>
                 </ol>
             </p>
@@ -70,13 +65,12 @@
 
         <section>
             <title>Implementation</title>
-            <p>A Struts-OXF Web Application contains two servlets: the
-                Struts controller server and the OXF processor servlet. The
-                former is the default servlet, serving all URI, while the
-                latter is bound to
-                <code>xpl</code> files and other resources served by
-                OXF (images, css, etc.). Here is a Web Application
-                descriptor that instantiates both servlets:
+            <p>
+                A Struts-Presentation Server Web Application contains two servlets: the Struts
+                controller server and the Presentation Server processor servlet. The former is the
+                default servlet, serving all URI, while the latter is bound to <code>xpl</code>
+                files and other resources served by Presentation Server (images, css, etc.). Here is
+                a Web Application descriptor that instantiates both servlets:
             </p>
             <xml-source>
                 <web-app>
@@ -159,15 +153,13 @@
             </warning>
 
             <p>
-                The Struts controller servlet interprets the request and creates
-                form beans containing the request parameters. It then
-                instantiates and calls the appropriate action class. The result
-                bean is then set in the request, and the request is forwarded to
-                the OXF processor servlet. Struts chooses the forwarding pages
-                in the same way as the traditional JSP forward: through
-                <code>forward</code> commands in the
-                <code>struts-config.xml</code> file. For example, the following
-                fragment shows a Struts action with one possible forward, the
+                The Struts controller servlet interprets the request and creates form beans
+                containing the request parameters. It then instantiates and calls the appropriate
+                action class. The result bean is then set in the request, and the request is
+                forwarded to the Presentation Server processor servlet. Struts chooses the
+                forwarding pages in the same way as the traditional JSP forward: through
+                <code>forward</code> commands in the <code>struts-config.xml</code> file. For
+                example, the following fragment shows a Struts action with one possible forward, the
                 <code>hello.xpl</code> pipeline:
             </p>
             <xml-source>
@@ -179,29 +171,22 @@
             </xml-source>
 
             <p>
-                OXF utilizes a
-                <link
-                    href="processors-generators#BeanGenerator">BeanGenerator</link>
-                to serialize beans from the request or session into XML. This
-                process makes use of the
-                <link
-                    href="http://castor.exolab.org/">Castor XML Marshaller</link>.
+                Presentation Server utilizes a <link
+                href="processors-generators#BeanGenerator">BeanGenerator</link> to serialize beans
+                from the request or session into XML. This process makes use of the <link
+                href="http://castor.exolab.org/">Castor XML Marshaller</link>.
             </p>
 
             <p>
-                The OXF processor servlet is configured to use a simple
-                pipeline that looks at the request's path and executes the
-                corresponding pipeline, feeding it with the bean form generator.
-                The pipeline's output is then processed through a second
-                pipeline, the epilogue. This allows to apply common stylesheets
-                ot all pages, such as style, internationalization, etc. The main
-                pipeline is also responsible to serve static resources, such as
-                images or css style sheets. Theses resources are served via the
-                ResourceServer. You will find below the complete source of the
-                Struts main pipeline. The same file,
-                <code>struts.xpl</code> is
-                also available with the struts examples bundled in OXF
-                distribution.
+                The Presentation Server processor servlet is configured to use a simple pipeline
+                that looks at the request's path and executes the corresponding pipeline, feeding it
+                with the bean form generator. The pipeline's output is then processed through a
+                second pipeline, the epilogue. This allows to apply common stylesheets ot all pages,
+                such as style, internationalization, etc. The main pipeline is also responsible to
+                serve static resources, such as images or css style sheets. Theses resources are
+                served via the ResourceServer. You will find below the complete source of the Struts
+                main pipeline. The same file, <code>struts.xpl</code> is also available with the
+                struts examples bundled in Presentation Server distribution.
             </p>
 
             <xml-source>
@@ -313,12 +298,10 @@
             <title>Writing a Struts View Pipeline</title>
 
             <p>
-                The
-                <code>struts.xpl</code> pipeline presented in the previous
-                section acts as a dispatcher. When the Struts servlet forwards
-                the request to the OXF servlet, this pipeline is executed. It
-                loads, connects and executes the view pipeline for each page.
-                The view pipeline must conform to the following contract:
+                The <code>struts.xpl</code> pipeline presented in the previous section acts as a
+                dispatcher. When the Struts servlet forwards the request to the Presentation Server
+                servlet, this pipeline is executed. It loads, connects and executes the view
+                pipeline for each page. The view pipeline must conform to the following contract:
 
                 <ul>
                     <li>It
@@ -326,26 +309,20 @@
                         <code>data</code> output
                     </li>
 
-                    <li>It
-                        <b>can</b> have any number of input. Each input is
-                        automatically connected to a Bean Generator, serializing a
-                        bean in the request. The name of the input determines the
-                        name of the request or session property where the bean is
-                        stored.
+                    <li>
+                        It <b>can</b> have any number of input. Each input is automatically
+                        connected to a Bean Generator, serializing a bean in the request. The name
+                        of the input determines the name of the request or session property where
+                        the bean is stored.
                     </li>
 
-                    <li>It
-                        <b>can</b> have an
-                        <code>errors</code> input. This
-                        input is connected to a Struts ActionError generator. If no
-                        errors are available, an empty
-                        <code>errors</code> element
-                        is  generated. The error messages come from the Struts
-                        application resources and can be internationalized. Refer to
-                        the
-                        <link
-                            href="processors-generators#StrutsActionErrorsGenerator">Struts
-                            ActionError documentation</link> for more information.
+                    <li>
+                        It <b>can</b> have an <code>errors</code> input. This input is connected to
+                        a Struts ActionError generator. If no errors are available, an empty
+                        <code>errors</code> element is generated. The error messages come from the
+                        Struts application resources and can be internationalized. Refer to the
+                        <link href="processors-generators#StrutsActionErrorsGenerator">Struts
+                        ActionError documentation</link> for more information.
                     </li>
                 </ul>
             </p>
@@ -354,21 +331,19 @@
         <section>
             <title>Accessing the Struts Application Resources</title>
             <p>
-                OXF provides a mechanism to access Struts resources from an XSLT
-                stylesheet. You define a resource bundle in
-                <code>struts-config.xml</code>, in the
-                <code>message-resource</code> element. You can declare several
-                resource bundles by specifying a
-                <code>key</code> attribute.
+                Presentation Server provides a mechanism to access Struts resources from an XSLT
+                stylesheet. You define a resource bundle in <code>struts-config.xml</code>, in the
+                <code>message-resource</code> element. You can declare several resource bundles by
+                specifying a <code>key</code> attribute.
             </p>
             <xml-source>
                 <message-resources parameter="org.orbeon.oxf.struts.examples.ApplicationResources"
                     null="false" key="messages"/>
             </xml-source>
             <p>
-                You access the resource bundle with the
-                <code>struts:message()</code> function. This function takes 6
-                parameters, but only the first one is mandatory.
+                You access the resource bundle with the <code>struts:message()</code> function. This
+                function takes 6 parameters, but only the first one is mandatory.
+
                 <source>
                     <code>struts:message(key, bundle, arg0, arg1, arg2, arg3, arg4)</code>
                 </source>
@@ -416,14 +391,12 @@
                 </table>
             </p>
             <p>
-                XSLT processors use a slightly different mechanism to access the
-                Struts message library. OXF provides wrappers for Xalan, Saxon 6
-                and 7. XSLTC calls the Java method directly. Declare the
-                <code>struts</code> namespace and import the specified
-                stylesheet to be able to call the
-                <code>struts:message()</code>
-                function. The table below shows the namespaces and stylesheets to
-                import for the supported XSLT processors.
+                XSLT processors use a slightly different mechanism to access the Struts message
+                library. Presentation Server provides wrappers for Xalan, Saxon 6 and 7. XSLTC
+                calls the Java method directly. Declare the <code>struts</code> namespace and import
+                the specified stylesheet to be able to call the <code>struts:message()</code>
+                function. The table below shows the namespaces and stylesheets to import for the
+                supported XSLT processors.
             </p>
             <p>
                 <table>
@@ -460,9 +433,8 @@
                 </table>
             </p>
             <p>
-                The following example calls the Struts support library for
-                Xalan. It displays the content of the
-                <code>page.title</code> resource key.
+                The following example calls the Struts support library for Xalan. It displays the
+                content of the <code>page.title</code> resource key.
             </p>
             <xml-source>
                 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:struts="http://www.orbeon.com/oxf/struts">
@@ -485,17 +457,15 @@
         <section>
             <title>Using the Struts Validator</title>
             <p>
-                The
-                <a
-                    href="http://jakarta.apache.org/struts/userGuide/dev_validator.html">Struts
-                    validator</a> allows you to write Javascript code to
-                validate user input on the browser. Struts uses the
-                <code>html:javascript</code> tag to display the necessary
+                The <a href="http://jakarta.apache.org/struts/userGuide/dev_validator.html">Struts
+                validator</a> allows you to write Javascript code to validate user input on the
+                browser. Struts uses the <code>html:javascript</code> tag to display the necessary
                 Javascript code.
             </p>
             <p>
-                Similarly, OXF exposes this functionality through an XSLT
-                function. Only the first parameter is mandatory.
+                Similarly, Presentation Server exposes this functionality through an XSLT function.
+                Only the first parameter is mandatory.
+
                 <source>
                     <code>struts:javascript(formName, dynamicJavaScript, staticJavaScript, method, page)</code>
                 </source>
@@ -533,14 +503,12 @@
                 </table>
             </p>
             <p>
-                XSLT processors use a slightly different mechanism to access the
-                Struts javascript library. OXF provides wrappers for Xalan, Saxon 6
-                and 7. XSLTC calls the Java method directly. Declare the
-                <code>struts</code> namespace and import the specified
-                stylesheet to be able to call the
-                <code>struts:javascript()</code>
-                function. The table below shows the namespaces and stylesheets to
-                import for the supported XSLT processors.
+                XSLT processors use a slightly different mechanism to access the Struts javascript
+                library. Presentation Server provides wrappers for Xalan, Saxon 6 and 7. XSLTC
+                calls the Java method directly. Declare the <code>struts</code> namespace and import
+                the specified stylesheet to be able to call the <code>struts:javascript()</code>
+                function. The table below shows the namespaces and stylesheets to import for the
+                supported XSLT processors.
             </p>
             <p>
                 <table>
@@ -577,8 +545,9 @@
                 </table>
             </p>
             <p>
-                The following example shows how to call the
-                <code>struts:javascript</code> from a simple Xalan template.
+                The following example shows how to call the <code>struts:javascript</code> from a
+                simple Xalan template.
+
                 <xml-source>
                     <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:struts="http://www.orbeon.com/oxf/struts">
                         <xsl:import href="oxf:/oxf/struts/struts-support-xalan.xsl"/>

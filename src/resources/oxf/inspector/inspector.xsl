@@ -15,7 +15,7 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:d="http://orbeon.org/oxf/xml/document">
   <xsl:template match="/">
-    <xsl:variable name="title" select="'OXF Pipeline Inspector'"/>
+    <xsl:variable name="title" select="'Presentation Server Pipeline Inspector'"/>
     <d:document>
       <d:head><d:title><xsl:value-of select="$title"/></d:title></d:head>
       <d:body>

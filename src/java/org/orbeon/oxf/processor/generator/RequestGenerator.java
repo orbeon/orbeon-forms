@@ -497,8 +497,9 @@ public class RequestGenerator extends ProcessorImpl {
                                     }
                                 }
                             } catch (FileUploadBase.SizeLimitExceededException e) {
-                                // Should we do something smart so we can use the OXF error page anyway?
-                                // Right now, this is going to fail miserably with an error.
+                                // Should we do something smart so we can use the Presentation
+                                // Server error page anyway? Right now, this is going to fail
+                                // miserably with an error.
                                 throw e;
                             }
 

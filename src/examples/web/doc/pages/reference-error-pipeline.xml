@@ -21,18 +21,18 @@
     <body>
         <section>
             <title>Rationale</title>
-            <p> When OXF encounters an error, it throws two kinds of exceptions:
-                <code>OXFException</code> and its subclass,
-                <code>ValidationException</code>. They both contain a nested root
-                cause, and
-                <code>ValidationException</code> contains document location information.
+            <p>
+                When Presentation Server encounters an error, it throws two kinds of exceptions:
+                <code>OXFException</code> and its subclass, <code>ValidationException</code>. They
+                both contain a nested root cause, and <code>ValidationException</code> contains
+                document location information.
             </p>
-            <p> When an exception is thrown, OXF displays a default error page
-                containing the root cause and location information if available.
-                However, the application developer can display a different page by
-                specifying a pipeline to be executed upon error. This pipeline
-                could, for example, log the error and display a nice error page to the
-                user. </p>
+            <p>
+                When an exception is thrown, Presentation Server displays a default error page
+                containing the root cause and location information if available. However, the
+                application developer can display a different page by specifying a pipeline to be
+                executed upon error. This pipeline could, for example, log the error and display a
+                nice error page to the user. </p>
         </section>
         <section>
             <title>Usage</title>
@@ -95,7 +95,7 @@
                 <xsl:template match="/">
                     <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
                         <xhtml:head>
-                            <xhtml:title>OXF - Custom Error Page</xhtml:title>
+                            <xhtml:title>Presentation Server - Custom Error Page</xhtml:title>
                         </xhtml:head>
                         <xhtml:body>
                             <xhtml:h1>An error occured:</xhtml:h1>

@@ -21,37 +21,34 @@
     <body>
         <section>
             <title>Scope</title>
-
-            <p>This section documents the OXF Processor Java API. This is a Java
-            API that you can use to write custom processors in Java. You can
-            then use those custom processors in your OXF applications, just
-            like the standard processors bundled with OXF.</p>
+            <p>This section documents the Presentation Server Processor Java API. This is a Java API
+            that you can use to write custom processors in Java. You can then use those custom
+            processors in your Presentation Server applications, just like the standard processors
+            bundled with Presentation Server.</p>
         </section>
         <section>
             <title>Why Write Custom Processors?</title>
 
-            <p>In general, OXF processors encapsulate business logic to perform
-            generic tasks such as calling a Web service or accessing a database
-            using SQL. With those processors, the developer can describe the
-            specifics of a task at a high level in a declarative way.</p>
+            <p>In general, Presentation Server processors encapsulate business logic to perform
+            generic tasks such as calling a Web service or accessing a database using SQL. With
+            those processors, the developer can describe the specifics of a task at a high level in
+            a declarative way.</p>
 
             <p>However, there are special cases where:</p>
 
             <ul>
-                <li>no existing processor exactly encapsulate the task to be
-                performed</li>
+                <li>no existing processor exactly encapsulate the task to be performed</li>
 
-                <li>or, it is more suitable to write Java code to get the job
-                done rather than using an existing processor</li>
+                <li>or, it is more suitable to write Java code to get the job done rather than
+                using an existing processor</li>
             </ul>
 
-            <p>In those cases, it makes sense for the developer to write
-            his/her own processor in Java. This section goes through the
-            essential APIs used to write processors in Java.</p>
+            <p>In those cases, it makes sense for the developer to write his/her own processor in
+            Java. This section goes through the essential APIs used to write processors in Java.</p>
         </section>
         <section>
             <title>Prerequisites</title>
-            <p>Writing OXF processors is expected to be done by Java developers
+            <p>Writing Presentation Server processors is expected to be done by Java developers
             who are comfortable with the Java language as well as compiling and
             deploying onto J2EE application servers. In addition, we assume that
             the developer is comfortable with both:</p>
@@ -135,7 +132,7 @@ public class MyProcessor extends SimpleProcessor {
 }
 ]]></source>
                 <p>In addition to the name of the input/output, one can pass an
-                optional schema URI declared in the <link href="reference-properties">OXF properties</link>. If a schema
+                optional schema URI declared in the <link href="reference-properties">Presentation Server properties</link>. If a schema
                 URI is specified, the corresponding input or output can be
                 <link href="processors-validation">validated</link>.</p>
             </section>
@@ -207,7 +204,7 @@ saxWriter.setContentHandler(contentHandler);
 saxWriter.write(doc);
 ]]></source>
                     <note>Using the <code>LocationSAXWriter</code> provided with
-                    OXF is the preferred way to write a DOM4J document to a SAX
+                    Presentation Server is the preferred way to write a DOM4J document to a SAX
                     content handler. The standard JAXP API (calling <link href="http://java.sun.com/j2se/1.4/docs/api/javax/xml/transform/Transformer.html#transform(javax.xml.transform.Source,%20javax.xml.transform.Result)">
                             <code>transform</code>
                         </link>
@@ -227,11 +224,10 @@ TransformerUtils.getXMLIdentityTransformer().transform
 (new DOMSource(doc), new SAXResult(contentHandler));
 ]]></source>
                     <note>
-                        <code>TransformerUtils</code> is an OXF class (in
-                    package <code>org.orbeon.oxf.xml</code>). It will create and
-                    cache the appropriate transformer factory. The developer is
-                    of course free to create its own factory and transformer
-                    calling directly the JAXP API.</note>
+                        <code>TransformerUtils</code> is a Presentation Server class (in package
+                        <code>org.orbeon.oxf.xml</code>). It will create and cache the appropriate
+                        transformer factory. The developer is of course free to create its own
+                        factory and transformer calling directly the JAXP API.</note>
             </section>
         </section>
         <section>

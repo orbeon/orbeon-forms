@@ -36,6 +36,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.*;
 import java.net.URL;
 import java.security.Principal;
@@ -456,21 +457,22 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
 
         public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
             // Create URL
-            String redirectURLString = NetUtils.pathInfoParametersToRelativeURL(pathInfo, parameters);
             if (isServerSide) {
                 // Server-side redirect: do a forward
-                javax.servlet.RequestDispatcher requestDispatcher = nativeRequest.getRequestDispatcher(redirectURLString);
+                javax.servlet.RequestDispatcher requestDispatcher = nativeRequest.getRequestDispatcher(pathInfo);
                 try {
                     // Destroy the pipeline context before doing the forward. Nothing significant
                     // should allowed on "this side" of the forward after the forward return.
                     pipelineContext.destroy(true);
                     // Execute the forward
-                    requestDispatcher.forward(nativeRequest, nativeResponse);
+                    RequestWrapper wrappedRequest = new RequestWrapper(nativeRequest, parameters);
+                    requestDispatcher.forward(wrappedRequest, nativeResponse);
                 } catch (ServletException e) {
                     throw new OXFException(e);
                 }
             } else {
                 // Client-side redirect: send the redirect to the client
+                String redirectURLString = NetUtils.pathInfoParametersToRelativeURL(pathInfo, parameters);
                 if (redirectURLString.startsWith("/"))
                     nativeResponse.sendRedirect(request.getContextPath() + redirectURLString);
                 else
@@ -764,6 +766,32 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             } catch (ServletException e) {
                 throw new OXFException(e);
             }
+        }
+    }
+
+    private static class RequestWrapper extends HttpServletRequestWrapper {
+
+        private Map parameters;
+
+        public RequestWrapper(HttpServletRequest httpServletRequest, Map parameters) {
+            super(httpServletRequest);
+            this.parameters = parameters;
+        }
+
+        public Map getParameterMap() {
+            return parameters;
+        }
+
+        public Enumeration getParameterNames() {
+            return new Vector(parameters.keySet()).elements();
+        }
+
+        public String[] getParameterValues(String s) {
+            return (String[]) parameters.get(s);
+        }
+
+        public String getParameter(String s) {
+            return (String) parameters.get(s);
         }
     }
 }

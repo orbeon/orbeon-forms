@@ -75,7 +75,7 @@
                 <code>&lt;number&gt;21&lt;/number&gt;</code>, the output will be
                 <code>&lt;number&gt;42&lt;/number&gt;</code>.</p>
                 <img print-format="pdf" src="pages/reference-processor-api-myprocessor.png"/>
-                <source><![CDATA[import org.orbeon.oxf.processor.pipeline.PipelineContext;
+                <source><![CDATA[import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.SimpleProcessor;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.xml.sax.ContentHandler;
@@ -262,7 +262,7 @@ import org.dom4j.io.XMLWriter;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.SimpleProcessor;
-import org.orbeon.oxf.processor.pipeline.PipelineContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.io.IOException;
 import java.io.StringWriter;

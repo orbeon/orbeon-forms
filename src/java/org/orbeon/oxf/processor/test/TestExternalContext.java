@@ -20,7 +20,7 @@ import java.security.Principal;
 import java.util.*;
 
 /**
- * ExternalContext used by the TestProcessor. It is configurable with an XML document representing
+ * ExternalContext used by the TestScriptProcessor. It is configurable with an XML document representing
  * the request.
  */
 public class TestExternalContext implements ExternalContext  {

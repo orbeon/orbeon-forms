@@ -15,7 +15,7 @@
 <group description="Cache" xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <test description="Simple URL Generator" name="oxf:test">
+    <test description="Simple URL Generator" name="oxf:test-script">
         <input name="config">
             <script>
                 <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -40,7 +40,7 @@
         </input>
     </test>
 
-    <test description="URL Generator With XInclude" name="oxf:test">
+    <test description="URL Generator With XInclude" name="oxf:test-script">
         <input name="config">
             <script>
                 <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -73,7 +73,7 @@
         </input>
     </test>
 
-    <test description="URL Generator Configuration Change" name="oxf:test">
+    <test description="URL Generator Configuration Change" name="oxf:test-script">
         <input name="config">
             <script>
                 <!-- Initial config -->
@@ -146,7 +146,7 @@
         </input>
     </test>
 
-    <test description="Simple XSLT" name="oxf:test">
+    <test description="Simple XSLT" name="oxf:test-script">
         <input name="config">
             <script>
                 <processor name="oxf:xslt" xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -175,7 +175,7 @@
         </input>
     </test>
 
-    <test description="XSLT With Dependencies " name="oxf:test">
+    <test description="XSLT With Dependencies " name="oxf:test-script">
         <input name="config">
             <script>
                 <processor name="oxf:xslt" xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -319,7 +319,7 @@
         </input>
     </test>
 
-    <test description="Simple Request" name="oxf:test">
+    <test description="Simple Request" name="oxf:test-script">
         <input name="config">
             <script>
                 <processor name="oxf:request" xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -341,7 +341,7 @@
         </input>
     </test>
 
-    <test description="Request with Parameters" name="oxf:test">
+    <test description="Request with Parameters" name="oxf:test-script">
         <input name="config">
             <script>
                 <processor name="oxf:request" xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -410,7 +410,7 @@
         </input>
     </test>
 
-    <test description="Request with Body" name="oxf:test">
+    <test description="Request with Body" name="oxf:test-script">
         <input name="config">
             <script>
                 <processor name="oxf:request" xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -426,7 +426,7 @@
         </input>
     </test>
 
-    <test description="Simple Scope" name="oxf:test">
+    <test description="Simple Scope" name="oxf:test-script">
         <input name="config">
             <script>
                 <!-- Set a request because the Scope processors need an external context -->
@@ -674,7 +674,7 @@
         </input>
     </test>
 
-    <test description="Simple Scope Bean" name="oxf:test">
+    <test description="Simple Scope Bean" name="oxf:test-script">
         <input name="config">
             <script>
                 <!-- Set a request because the Scope processors need an external context -->
@@ -962,7 +962,7 @@
         </input>
     </test>
 
-    <test description="Bean Generator" name="oxf:test">
+    <test description="Bean Generator" name="oxf:test-script">
         <input name="config">
             <script>
                 <!-- Set a request because the Bean generator needs an external context -->

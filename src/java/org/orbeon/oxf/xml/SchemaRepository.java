@@ -18,7 +18,7 @@ import org.orbeon.oxf.portlet.processor.PortletContainerProcessor;
 import org.orbeon.oxf.portlet.processor.PortletIncludeGenerator;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.scope.ScopeProcessorBase;
-import org.orbeon.oxf.processor.test.TestProcessor;
+import org.orbeon.oxf.processor.test.TestScriptProcessor;
 import org.orbeon.oxf.processor.scratchpad.PDFTemplateProcessor;
 import org.orbeon.oxf.processor.converter.JFreeChartConverter;
 import org.orbeon.oxf.processor.converter.XMLConverter;
@@ -115,7 +115,7 @@ public class SchemaRepository {
         schemas.put(XMLDBProcessor.XMLDB_QUERY_URI, PROCESSORS_SCHEMA_PATH + "xmldb/xmldb-processor-query.rng");
 
         // Test processor schema
-        schemas.put(TestProcessor.TEST_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "test/test-processor-config.rng");
+        schemas.put(TestScriptProcessor.TEST_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "test/test-processor-config.rng");
 
         schemas.put(PDFTemplateProcessor.PDF_TEMPLATE_MODEL_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "scratchpad/pdf-template-model.rng");
 

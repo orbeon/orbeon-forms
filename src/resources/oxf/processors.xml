@@ -465,8 +465,8 @@
     </processor>
 
     <!-- Test processors -->
-    <processor name="oxf:test">
-        <class name="org.orbeon.oxf.processor.test.TestProcessor"/>
+    <processor name="oxf:test-script">
+        <class name="org.orbeon.oxf.processor.test.TestScriptProcessor"/>
     </processor>
 
     <processor name="oxf:sax-debugger">

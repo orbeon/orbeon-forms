@@ -76,6 +76,16 @@
                     </td>
                 </tr>
                 <tr>
+                    <th>Cc Email</th>
+                    <td>
+                        <xforms:input ref="message/cc/email"/>
+                    </td>
+                    <th>Cc Name</th>
+                    <td>
+                        <xforms:input ref="message/cc/name"/>
+                    </td>
+                </tr>
+                <tr>
                     <th>Subject *</th>
                     <td colspan="3">
                         <xforms:input ref="message/subject" xhtml:style="width: 100%"/>

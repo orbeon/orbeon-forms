@@ -19,13 +19,14 @@
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
 
-    <!-- Strip instance of XForms annotations -->
+    <!-- Strip instance of XForms annotations and remove non-relevant elements -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#instance"/>
         <p:input name="config">
             <xsl:transform version="2.0" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:template match="@xxforms:*"/>
+                <xsl:template match="*[@xxforms:relevant = 'false']"/>
             </xsl:transform>
         </p:input>
         <p:output name="data" id="stripped-instance"/>

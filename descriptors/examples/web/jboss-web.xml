@@ -18,5 +18,7 @@
      </loader-repository-config>
   </loader-repository>
   </class-loading>
+  <!-- Uncomment this for the authentication example -->
+  <!-- <security-domain>java:/jaas/orbeon-demo</security-domain> -->
 </jboss-web>
 

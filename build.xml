@@ -222,19 +222,18 @@
           </zipfileset>
         </jar>
         
-        <tempfile property='cli.manifest' />
-
         <pathconvert dirsep='/' pathsep=' ' property='cli.jar.mf.cp' refid='war.libs' >
           <map from='${lib.dir}' to='lib' />
         </pathconvert>
 
         <basename file='${jar.file}' property='jar.name' />
 
-        <manifest file='${cli.manifest}' >
-          <attribute name='Main-Class' value='org.orbeon.oxf.main.OXF' />
-          <attribute name='Class-Path' value='lib/${jar.name} commons-cli-1_0.jar ${cli.jar.mf.cp}' />
-        </manifest>
-        <jar destfile='${cli.jar.file}' compress='false' manifest='${cli.manifest}' />
+        <jar destfile='${cli.jar.file}' compress='false'  >
+          <manifest>
+            <attribute name='Main-Class' value='org.orbeon.oxf.main.OXF' />
+            <attribute name='Class-Path' value='lib/${jar.name} commons-cli-1_0.jar ${cli.jar.mf.cp}' />
+          </manifest>
+        </jar>
     </target>
 
     <!-- WAR -->
@@ -247,6 +246,7 @@
             classpathref="class.path" debug="${build.debug}" optimize="off" target="1.3" source="1.3" srcdir="${web-examples-src.dir}/examples-standalone/struts-view/src"/>
         <copy todir="${war.dir}/WEB-INF/classes">
             <fileset dir="${web-examples-src.dir}/examples-standalone/struts-view/src/" includes="**/*.properties"/>
+            <fileset dir="descriptors/examples/web/jboss-security" includes="*.properties"/>
         </copy>
         
         <copy todir="${war.dir}/WEB-INF/lib">
@@ -483,12 +483,12 @@
 <!--    		<arg value='${deployDir}/${release.number}/orbeon.war' />-->
 <!--    		<arg value='${user.home}/webapps/orbeon.war' />-->
 <!--    	</exec>-->
-<!---->
-<!--        <delete>-->
-<!--            <fileset dir="${deployDir}">-->
-<!--                <exclude name="${release.number}/**"/>-->
-<!--            </fileset>-->
-<!--        </delete>-->
+
+        <delete>
+            <fileset dir="${deployDir}">
+                <exclude name="${release.number}/**"/>
+           </fileset>
+        </delete>
 
 
     </target>

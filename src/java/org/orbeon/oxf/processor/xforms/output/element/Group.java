@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.xforms.output.element;
 
 import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
+import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.resources.OXFProperties;
@@ -22,6 +23,11 @@ import org.orbeon.oxf.common.OXFException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import org.dom4j.Document;
+import org.dom4j.VisitorSupport;
+import org.dom4j.Attribute;
+import org.dom4j.Element;
+import org.dom4j.Node;
 
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -39,9 +45,32 @@ public class Group extends XFormsElement {
     public void end(XFormsElementContext context, String uri, String localname, String qname) throws SAXException {
         if (isFirstGroup) {
 
+            // Go through the instance and wipe out the nodes bound to a control (generated is true)
+            Document instance = context.getInstance();
+            instance.accept(new VisitorSupport() {
+                public void visit(Attribute node) {
+                    wipeValue(node);
+                }
+
+                public void visit(Element node) {
+                    wipeValue(node);
+                }
+
+                private void wipeValue(Node node) {
+                    InstanceData data;
+                    if(node instanceof Element)
+                        data = (InstanceData)((Element)node).getData();
+                    else
+                        data = (InstanceData)((Attribute)node).getData();
+
+                    if(data != null && data.isGenerated())
+                        node.setText("");
+                }
+            });
+
             // Encode instance in a string and put in hidden field
             String instanceString = XFormsUtils.instanceToString(context.getPipelineContext(),
-                    context.getEncryptionPassword(), context.getInstance());
+                    context.getEncryptionPassword(), instance);
             sendHiddenElement(context, "$instance", instanceString);
 
             // Generate hidden field with random key encrypted with server key

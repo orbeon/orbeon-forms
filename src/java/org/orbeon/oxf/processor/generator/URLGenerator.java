@@ -422,7 +422,7 @@ public class URLGenerator extends ProcessorImpl {
     private interface ResourceHandler {
         public Object getValidity() throws IOException;
         public String getResourceContentType() throws IOException;
-        public String getResourceEncoding() throws IOException;
+        public String getConnectionEncoding() throws IOException;
         public void destroy() throws IOException;
         public void readHTML(ContentHandler output) throws IOException;
         public void readText(ContentHandler output, String contentType) throws IOException;
@@ -444,7 +444,7 @@ public class URLGenerator extends ProcessorImpl {
             return null;
         }
 
-        public String getResourceEncoding() throws IOException {
+        public String getConnectionEncoding() throws IOException {
             // We generally don't know the "connection" encoding
             // NOTE: We could know, if the underlying protocol was for example HTTP. But we may
             // want to abstract that anyway, so that the behavior is consistent whatever the sandbox
@@ -471,10 +471,16 @@ public class URLGenerator extends ProcessorImpl {
         private String getExternalEncoding() throws IOException {
             if (config.isForceEncoding())
                 return config.getEncoding();
-            else if (config.isIgnoreConnectionEncoding())
-                return null;
-            else
-                return getResourceEncoding();
+
+            String connectionEncoding = getConnectionEncoding();
+            if (!config.isIgnoreConnectionEncoding() && connectionEncoding != null)
+                return connectionEncoding;
+
+            String userEncoding = config.getEncoding();
+            if (userEncoding != null)
+                return userEncoding;
+
+            return null;
         }
 
         public void readHTML(ContentHandler output) throws IOException {
@@ -489,7 +495,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public void readXML(ContentHandler output) throws IOException {
             if (getExternalEncoding() != null) {
-                // The encoding is set externally, either force by the user, or set by the connection
+                // The encoding is set externally, either forced by the user, or set by the connection
                 inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
                 XMLUtils.readerToSAX(new InputStreamReader(inputStream, getExternalEncoding()), config.getURL().toExternalForm(), output, config.isValidating());
             } else {
@@ -523,7 +529,7 @@ public class URLGenerator extends ProcessorImpl {
             return NetUtils.getContentTypeContentType(urlConn.getContentType());
         }
 
-        public String getResourceEncoding() throws IOException {
+        public String getConnectionEncoding() throws IOException {
             openConnection();
             return NetUtils.getContentTypeCharset(urlConn.getContentType());
         }
@@ -562,10 +568,16 @@ public class URLGenerator extends ProcessorImpl {
         private String getExternalEncoding() throws IOException {
             if (config.isForceEncoding())
                 return config.getEncoding();
-            else if (config.isIgnoreConnectionEncoding())
-                return null;
-            else
-                return getResourceEncoding();
+
+            String connectionEncoding = getConnectionEncoding();
+            if (!config.isIgnoreConnectionEncoding() && connectionEncoding != null)
+                return connectionEncoding;
+
+            String userEncoding = config.getEncoding();
+            if (userEncoding != null)
+                return userEncoding;
+
+            return null;
         }
 
         public void readHTML(ContentHandler output) throws IOException {

@@ -34,29 +34,23 @@ public class Group extends XFormsElement {
     public void start(XFormsElementContext context, String uri, String localname, String qname, Attributes attributes) throws SAXException {
         isFirstGroup = context.getParentElement(0) == null;
         super.start(context, uri, localname, qname, attributes);
-
-        if (isFirstGroup) {
-            if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
-                // Generate hidden field with random key encrypted with server key
-                String serverPassword = OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD);
-                String encryptedRandomKey = SecureUtils.encrypt(context.getPipelineContext(),
-                        serverPassword, context.getEncryptionPassword());
-                sendHiddenElement(context, "$key", encryptedRandomKey);
-
-//                 Encode instance in a string and put in hidden field
-//                String instanceString = XFormsUtils.instanceToString(context.getPipelineContext(),
-//                        context.getEncryptionPassword(), context.getInstance());
-//                sendHiddenElement(context, "$instance", instanceString);
-            }
-        }
     }
 
     public void end(XFormsElementContext context, String uri, String localname, String qname) throws SAXException {
         if (isFirstGroup) {
+
             // Encode instance in a string and put in hidden field
             String instanceString = XFormsUtils.instanceToString(context.getPipelineContext(),
                     context.getEncryptionPassword(), context.getInstance());
             sendHiddenElement(context, "$instance", instanceString);
+
+            // Generate hidden field with random key encrypted with server key
+            if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
+                String serverPassword = OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD);
+                String encryptedRandomKey = SecureUtils.encrypt(context.getPipelineContext(),
+                        serverPassword, context.getEncryptionPassword());
+                sendHiddenElement(context, "$key", encryptedRandomKey);
+            }
         }
 
         // Close form

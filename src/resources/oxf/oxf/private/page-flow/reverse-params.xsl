@@ -15,7 +15,8 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:saxon="http://saxon.sf.net/"
-    xmlns:c="http://www.orbeon.com/oxf/controller">
+    xmlns:c="http://www.orbeon.com/oxf/controller"
+    xmlns:function="http://www.orbeon.com/xslt-function">
 
     <!--
         The purpose of this transformation is to annotate an existing URL redirect configuration.
@@ -37,6 +38,7 @@
 
     <!-- Copy template -->
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+    <xsl:import href="oxf:/oxf/xslt/utils/evaluate.xsl"/>
 
     <!-- Inputs -->
     <xsl:variable name="instance" select="document('oxf:instance')" as="document-node()"/>
@@ -70,10 +72,14 @@
 <!--                <xsl:message terminate="no">1: <xsl:value-of select="$ref"/></xsl:message>-->
 
                 <!-- Evaluate expression in the context of $instance -->
-                <xsl:for-each select="$instance">
-                    <xsl:value-of select="string(saxon:evaluate($ref))"/>
-<!--                    <xsl:message terminate="no">2: <xsl:value-of select="string(saxon:evaluate($ref))"/></xsl:message>-->
-                </xsl:for-each>
+                <!--   Note: the evaluate function returns multiple nodes, not sure why, -->
+                <!--   so we concatenate the string values. -->
+                <xsl:variable name="param-nodes" as="node()*"
+                    select="function:evaluate($instance, $ref, $params[1]/namespace::node())"/>
+                <xsl:variable name="param-value" as="xs:string"
+                    select="string-join(for $n in $param-nodes return string($n), '')"/>
+                <xsl:value-of select="$param-value"/>
+<!--                <xsl:message terminate="no">2: <xsl:value-of select="$param-value"/></xsl:message>-->
 
                 <!-- Recurse for other regexp groups -->
                 <xsl:call-template name="build-path-info">

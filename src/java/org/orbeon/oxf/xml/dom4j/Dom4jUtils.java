@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
+import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.dom4j.util.UserDataElement;
 import org.dom4j.util.UserDataAttribute;
@@ -21,6 +22,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParser;
@@ -92,11 +94,14 @@ public class Dom4jUtils {
      * Removes the elements and text inside the given element, but not the attributes or
      * namespace declarations on the element.
      */
-    public static void clearElementContent(org.dom4j.Element element) {
-        for (final java.util.ListIterator j = element.content().listIterator(); j.hasNext();) {
-            org.dom4j.Node child = (org.dom4j.Node) j.next();
-            if (child instanceof org.dom4j.Text || child instanceof org.dom4j.Element)
+    public static void clearElementContent( final org.dom4j.Element elt ) {
+        final java.util.List cntnt = elt.content();
+        for ( final java.util.ListIterator j = cntnt.listIterator(); j.hasNext(); ) {
+            final org.dom4j.Node chld = ( org.dom4j.Node )j.next();
+            if ( chld.getNodeType() == org.dom4j.Node.TEXT_NODE 
+                 || chld.getNodeType() == org.dom4j.Node.ELEMENT_NODE ) {
                 j.remove();
+            }
         }
     }
 }

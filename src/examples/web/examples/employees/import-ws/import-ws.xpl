@@ -35,7 +35,7 @@
         <p:output name="data" id="file"/>
     </p:processor>
 
-    <!-- Iteratoe over employees and insert them into the database -->
+    <!-- Iterate over employees and insert them into the database -->
     <p:for-each href="#file" select="/soapenv:Envelope/soapenv:Body/employee:employees/employee:employee">
         <p:processor name="oxf:pipeline">
             <p:input name="config" href="../data-access/update-employee.xpl"/>

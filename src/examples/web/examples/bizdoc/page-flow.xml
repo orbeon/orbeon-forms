@@ -71,7 +71,7 @@
     <!-- Show XML document -->
     <page id="xml-detail" path-info="/example-resources/bizdoc/xml-detail" xforms="detail/xml-detail-xforms-model.xml" model="detail/xml-detail-model.xpl"/>
 
-    <page id="detail-1" path-info="/bizdoc/detail-1" xforms="detail/detail-xforms-model.xml" model="detail/debug-model.xpl" view="detail/detail-view-1.xsl">
+    <page id="detail-1" path-info="/bizdoc/detail-1" xforms="detail/detail-xforms-model.xml" view="detail/detail-view-1.xsl">
         <!-- Save the current document and documemnt is valid -->
         <action when="/form/action = 'save' and not(/form/document//@*[local-name() = 'error'])" action="detail/save-document-action.xpl">
             <result page="detail-1">

@@ -575,11 +575,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             if (NetUtils.urlHasProtocol(urlString))
                 return urlString;
 
-            // Not sure why those lines below were added, as we don't use staticContext later
-//            StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-//            if (staticContext == null)
-//                throw new OXFException("StaticContext not found.");
-
             try {
                 ExternalContext.Request request = getRequest();
 

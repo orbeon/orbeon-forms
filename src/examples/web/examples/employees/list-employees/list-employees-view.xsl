@@ -256,11 +256,23 @@
                                         <xsl:if test="not($request-security/role = 'demo-admin')">
                                             <xsl:attribute name="xhtml:style">color: red; font-weight: bolder</xsl:attribute>
                                         </xsl:if>
+                                        <xsl:if test="not(doc('../ws-config.xml')/*/host)">
+                                            <xsl:attribute name="xhtml:disabled">true</xsl:attribute>
+                                        </xsl:if>
                                         <xforms:help>
-                                            The <i>Import from Excel</i> function uses XForms to upload a
-                                            binary Excel file. Then it extracts data from the Excel file, and
-                                            sends the data to a Web Service. On the receiving side, the Web
-                                            Service calls the data access layer to update the database.
+                                            <xsl:if test="not(doc('../ws-config.xml')/*/host)">
+                                                <p>
+                                                    The <i>Import from Excel</i> functionality is
+                                                    disabled because the Web Service is not
+                                                    configured.
+                                                </p>
+                                            </xsl:if>
+                                            <p>
+                                                The <i>Import from Excel</i> function uses XForms to upload a
+                                                binary Excel file. Then it extracts data from the Excel file, and
+                                                sends the data to a Web Service. On the receiving side, the Web
+                                                Service calls the data access layer to update the database.
+                                            </p>
                                         </xforms:help>
                                         <xforms:label>Import from Excel</xforms:label>
                                         <xforms:setvalue ref="action">excel-import</xforms:setvalue>

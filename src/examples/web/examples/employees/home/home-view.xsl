@@ -76,6 +76,22 @@
                 </li>
             </ul>
             <p>
+                When the datasource is configured, please also uncomment all the sections in your
+                <code>web.xml</code> marked with "Uncomment this for the SQL examples".
+            </p>
+            <p>
+                <xsl:choose>
+                    <xsl:when test="not(doc('../ws-config.xml')/*/host)">
+                        <b>Currently, Web Service functionality is not configured.</b> If you
+                        choose to use it, please configure the file <code>ldap-config.xml</code>.
+                    </xsl:when>
+                    <xsl:otherwise>
+                        You appear to have configured Web Service functionality by configuring the
+                        file <code>ws-config.xml</code>.
+                    </xsl:otherwise>
+                </xsl:choose>
+            </p>
+            <p>
                 You can also configure some users and roles:
             </p>
             <ul>
@@ -87,7 +103,7 @@
             <p>
                 You can configure those roles in an LDAP server, or, for example with Apache Tomcat,
                 you can use a simpler file-based list of users (<code>tomcat-users.xml</code>). You
-                should then add the following to your web.xml:
+                should then add the following to your <code>web.xml</code>:
             </p>
             <f:box>
                 <f:xml-source>

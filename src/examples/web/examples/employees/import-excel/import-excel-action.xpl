@@ -38,7 +38,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#workbook"/>
         <p:input name="config">
-            <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+            <xsl:stylesheet version="2.0">
                 <xsl:template match="/">
                     <delegation:execute service="import" operation="import">
                         <employee:employees>
@@ -61,16 +61,23 @@
         <p:output name="data" id="call"/>
     </p:processor>
 
-    <!-- Excecute call -->
-    <p:processor name="oxf:delegation">
-        <p:input name="interface">
-            <config>
-                <service id="import" type="webservice" endpoint="http://localhost:8888/oxf/example-resources/employees/import-ws" style="document">
+    <!-- Build interface -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#workbook"/>
+        <p:input name="config">
+            <config xsl:version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                <service id="import" type="webservice" endpoint="http://{doc('../ws-config.xml')/*/host}:{doc('../ws-config.xml')/*/port}{doc('../ws-config.xml')/*/path}" style="document">
                     <operation nsuri="http://www.openuri.org/" name="import"
                         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" select="/*"/>
                 </service>
             </config>
         </p:input>
+        <p:output name="data" id="interface"/>
+    </p:processor>
+
+    <!-- Excecute call -->
+    <p:processor name="oxf:delegation">
+        <p:input name="interface" href="#interface"/>
         <p:input name="call" href="#call"/>
         <p:output name="data" id="result"/>
     </p:processor>

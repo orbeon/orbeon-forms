@@ -23,7 +23,10 @@ import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.oxf.Handler;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
@@ -35,7 +38,10 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -637,25 +643,6 @@ public class URLGenerator extends ProcessorImpl {
             } catch (TransformerException e) {
                 throw new OXFException(e);
             }
-        }
-
-        public static void readTextOld(InputStream is, String encoding, ContentHandler output) throws IOException {
-            if (encoding == null)
-                encoding = DEFAULT_TEXT_ENCODING;
-            BufferedReader br = new BufferedReader(new InputStreamReader(is, encoding));
-
-            // Parse the input and output elements
-            ContentHandlerHelper helper = new ContentHandlerHelper(output);
-            helper.startDocument();
-            helper.startElement(DEFAULT_TEXT_DOCUMENT_ELEMENT);
-
-            String line;
-            while ((line = br.readLine()) != null) {
-                helper.element(DEFAULT_TEXT_LINE_ELEMENT, line);
-            }
-
-            helper.endElement();
-            helper.endDocument();
         }
 
         /**

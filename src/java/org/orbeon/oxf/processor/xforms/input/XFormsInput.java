@@ -129,8 +129,9 @@ public class XFormsInput extends ProcessorImpl {
                     }
 
                     // Fill-out instance
-                    for (int i = 0; i < requestParameters.getPaths().length; i++) {
-                        String path = requestParameters.getPaths()[i];
+                    String[] paths = requestParameters.getPaths();
+                    for (int i = 0; i < paths.length; i++) {
+                        String path = paths[i];
                         instance.setValue(path, requestParameters.getValue(path), requestParameters.getType(path), false);
                     }
 

@@ -553,16 +553,36 @@
 
     <target name="bizdoc-example" depends="prepare">
         <mkdir dir="${build.distrib.dir}"/>
-        <zip zipfile="${build.distrib.dir}/bizdoc-example-1.1.zip">
+        <zip zipfile="${build.distrib.dir}/bizdoc-example-${version.number}.zip">
             <zipfileset dir="doc/example-applications"/>
             <zipfileset dir="descriptors/examples/web/bizdoc" prefix="WEB-INF"/>
             <zipfileset dir="${web-examples-src.dir}" prefix="WEB-INF/resources">
                 <include name="config/**/*"/>
                 <include name="images/**/*"/>
                 <include name="oxf-theme/**/*"/>
-                <include name="bizdoc/**/*"/>
             </zipfileset>
             <zipfileset dir="${web-examples-src.dir}/examples/bizdoc" prefix="WEB-INF/resources/bizdoc">
+                <include name="**/*"/>
+                <exclude name="example-descriptor.xml"/>
+                <exclude name="page-flow.xpl"/>
+            </zipfileset>
+        </zip>
+    </target>
+
+    <target name="employees-example" depends="prepare">
+        <mkdir dir="${build.distrib.dir}"/>
+        <zip zipfile="${build.distrib.dir}/employees-example-${version.number}.zip">
+            <zipfileset dir="doc/example-applications"/>
+            <zipfileset dir="descriptors/examples/web/employees" prefix="WEB-INF"/>
+            <zipfileset dir="${web-examples-src.dir}" prefix="WEB-INF/resources">
+                <include name="config/**/*"/>
+                <include name="examples/datasource-sql.xml"/>
+                <include name="examples/employees/export-excel/employees.xls"/>
+                <include name="images/**/*"/>
+                <include name="init-database/**/*"/>
+                <include name="oxf-theme/**/*"/>
+            </zipfileset>
+            <zipfileset dir="${web-examples-src.dir}/examples/employees" prefix="WEB-INF/resources/employees">
                 <include name="**/*"/>
                 <exclude name="example-descriptor.xml"/>
                 <exclude name="page-flow.xpl"/>

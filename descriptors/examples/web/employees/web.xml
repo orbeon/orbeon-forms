@@ -31,7 +31,7 @@
     </context-param>
     <context-param>
         <param-name>oxf.main-processor.input.controller</param-name>
-        <param-value>oxf:/bizdoc/page-flow.xml</param-value>
+        <param-value>oxf:/employees/page-flow.xml</param-value>
     </context-param>
     <!-- Servlets and mapping -->
     <servlet>

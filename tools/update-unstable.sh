@@ -2,4 +2,4 @@
 
 set -e
 
-echo  y | setcopy -u ops-unstable
+echo  y | sitecopy -u ops-unstable

@@ -837,5 +837,74 @@
             <root>Hello, world!</root>
         </output>
     </test>
+    
+    <test description="Redefinition of id in inner block" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="y" type="output"/>
+                <p:processor name="oxf:identity">
+                    <p:input name="data"><a/></p:input>
+                    <p:output name="data" id="x"/>
+                </p:processor>
+                <p:for-each href="#x" select="/*" ref="y" root="b">
+                    <p:processor name="oxf:identity">
+                        <p:input name="data"><c/></p:input>
+                        <p:output name="data" id="x"/>
+                    </p:processor>
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="#x"/>
+                        <p:output name="data" ref="y"/>
+                    </p:processor>
+                </p:for-each>
+            </p:config>
+        </input>
+        <output name="y">
+            <b><c/></b>
+        </output>
+    </test>
+
+<!--    <test description="Subpipeline with non-called output and serializer" name="oxf:pipeline">-->
+<!--        <input name="config">-->
+<!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">-->
+<!--                <p:param name="result" type="output"/>-->
+<!--                <p:processor name="oxf:pipeline">-->
+<!--                    <p:input name="config">-->
+<!--                        <p:config>-->
+<!--                            <p:param name="not-read" type="output"/>-->
+<!--                            <p:processor name="oxf:scope-serializer">-->
+<!--                                <p:input name="data"><x/></p:input>-->
+<!--                                <p:input name="config">-->
+<!--                                    <config>-->
+<!--                                        <key>key</key>-->
+<!--                                        <scope>application</scope>-->
+<!--                                    </config>-->
+<!--                                </p:input>-->
+<!--                            </p:processor>-->
+<!--                            <p:processor name="oxf:identity">-->
+<!--                                <p:input name="data"><dummy/></p:input>-->
+<!--                                <p:output name="data" ref="not-read"/>-->
+<!--                            </p:processor>-->
+<!--                        </p:config>-->
+<!--                    </p:input>-->
+<!--                    <p:output name="not-read" id="not-read"/>-->
+<!--                </p:processor>-->
+<!--                <p:processor name="oxf:scope-generator">-->
+<!--                    <p:input name="config">-->
+<!--                        <config>-->
+<!--                            <key>key</key>-->
+<!--                            <scope>application</scope>-->
+<!--                        </config>-->
+<!--                    </p:input>-->
+<!--                    <p:output name="data" ref="result"/>-->
+<!--                </p:processor>-->
+<!--                <p:processor name="oxf:null-serializer">-->
+<!--                    <p:input name="data" href="#not-read"/>-->
+<!--                </p:processor>-->
+<!--            </p:config>-->
+<!--        </input>-->
+<!--        <output name="result">-->
+<!--            <b><c/></b>-->
+<!--        </output>-->
+<!--    </test>-->
 
 </group>

@@ -440,12 +440,6 @@
         <cvs command='tag TAG_OPS_${ops-version}'
             cvsRoot='${local-repos}' failonerror='true'/>
 
-        <!-- 2/27/2005 d : This pair of operations trigger the taginfo synch script. -->
-        <cvs command='tag -F TAG_Dummy_For_OW_Sync'
-            cvsRoot='${local-repos}' failonerror='true'/>
-        <cvs command='tag -d TAG_Dummy_For_OW_Sync'
-            cvsRoot='${local-repos}' failonerror='true'/>
-
         <echo message="Deploying to ${deployDir}/${release.number}"/>
 
         <mkdir dir="${deployDir}/${release.number}"/>
@@ -458,6 +452,12 @@
         <mkdir dir="${unstbl-bld-dst}/${release.number}"/>
         <copy file='${deployDir}/${release.number}/orbeon.war' todir='${unstbl-bld-dst}/${release.number}'/>
         <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${unstbl-bld-dst}/${release.number}/build.log'/>
+
+        <!-- 2/27/2005 d : This pair of operations trigger the taginfo synch script. -->
+        <cvs command='tag -F TAG_Dummy_For_OW_Sync'
+            cvsRoot='${local-repos}' failonerror='true'/>
+        <cvs command='tag -d TAG_Dummy_For_OW_Sync'
+            cvsRoot='${local-repos}' failonerror='true'/>
 
         <exec executable='sh' failonerror='true' >
           <arg value='${build.root}/tools/update-unstable.sh' />

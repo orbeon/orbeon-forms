@@ -379,7 +379,7 @@
       </fileset>
     </copy>
 
-    <copy file='${deployDir}/buildLogs/oxf-OXF_2_5_BUILD_${version}-build.log' tofile='${deployDir}/${release.number}/build.log' />
+    <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${deployDir}/${release.number}/build.log' />
 
     <delete>
       <fileset dir="${deployDir}">

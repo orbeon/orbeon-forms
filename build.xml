@@ -218,7 +218,7 @@
                 <include name="exist-cvs.jar"/>
                 <include name="exist-optional-cvs.jar"/>
                 <include name="xmldb-eXist_20040510.jar"/>
-                <include name="xmlrpc-1.2-eXist_20040510.jar"/>
+                <include name="xmlrpc-1_2_eXist_20041005_patched.jar"/>
                 <include name="jms-api-1_1.jar"/>
             </fileset>
             <fileset dir="${build.lib.dir}">

@@ -21,7 +21,7 @@
     -->
 
     <test description="XML conversion" name="oxf:xml-converter">
-        <input name="data" href="oxf:/bizdoc/schema/claim-1.xml"/>
+        <input name="data" href="oxf:/examples/bizdoc/schema/claim-1.xml"/>
         <input name="config">
             <config>
                 <content-type>application/xml</content-type>

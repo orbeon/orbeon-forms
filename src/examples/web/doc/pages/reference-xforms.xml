@@ -1101,6 +1101,7 @@
                 These controls are not part of the XForms specification and consequently are in the XXForms namespace.
             </p>
             <section>
+                <anchor id="conditionals"/>
                 <title>Conditionals</title>
                 <p>
                     Two controls provide a mechanism to selectively enable markup and other XForms controls depending of

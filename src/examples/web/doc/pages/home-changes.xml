@@ -33,6 +33,15 @@
                     </p>
                 </section>
                 <section>
+                    <title>XForms Conditionals</title>
+                    <p>
+                       Two new extension controls provide a mechanism to selectively enable markup and other XForms controls depending of
+                       the values stored in the XForms instance. The syntax is modeled after the XSLT language:
+                       <code>if</code> and <code>choose/when/otherwise</code>. See the <a href="reference-xforms#conditionals">XForms Conditionals</a>
+                       documentation for more information.
+                    </p>
+                </section>
+                <section>
                     <title>Itemset Support</title>
                     <p>
                         The XForms element <code>&lt;itemset></code> is now supported. You can use it

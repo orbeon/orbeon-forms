@@ -61,7 +61,6 @@ public class RequestParameters {
     private Map idToValue = new HashMap();
     private Map idToType = new HashMap();
     private List actions = new ArrayList();
-    private Map fileInfos;
     private Document instance;
 
     private final boolean encryptNames = OXFProperties.instance().getPropertySet().getBoolean

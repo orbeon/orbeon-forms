@@ -74,10 +74,6 @@
                 Java processor is a bit more complex than the XML code used to call a processor
                 declared in <code>processors.xml</code>.
             </p>
-            <p>
-                The Java processor can be used from within a web application, but also from the
-                command line.
-            </p>
         </section>
 		<section>
 			<title>Usage</title>
@@ -259,8 +255,6 @@
                 one of the classes (that the custom processor depends on) has changed
                 since the last compilation, the source of the customer processor
                 must be "touched" to force a re-compilation.</li>
-				<li>The Java processor uses the JDK 1.4 compiler (or higher) and
-                so cannot be used with JDK 1.3.</li>
 			</ul>
 		</section>
         <section>

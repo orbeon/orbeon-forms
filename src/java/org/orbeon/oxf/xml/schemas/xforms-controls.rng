@@ -407,6 +407,7 @@
                 <element name="xf:label">
                     <optional><attribute name="ref"/></optional>
                     <ref name="non-xforms-content"/>
+                    <ref name="non-xforms-attributes"/>
                 </element>
                 <element name="xf:help"><ref name="non-xforms-content"/></element>
                 <element name="xf:hint"><ref name="non-xforms-content"/></element>

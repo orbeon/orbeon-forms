@@ -1279,12 +1279,12 @@
                 <tr>
                     <td colspan="2"><a href="http://www.w3.org/TR/xforms/slice2.html#concepts-model">2.3 Constraining Values</a></td>
                     <td>
-                        Data entered by the user can be checked by specifying a schema in the XForms
-                        model (the schema is then used to validate the instance), or by declaring a
-                        <code>relevant</code>, <code>constraint</code>, or <code>type</code> model
-                        item property in the XForms model. However, it is not yet possible to have
-                        an inline schema in the XForms model, and reference a type declared in this
-                        schema in a <code>type</code> model item property.
+                        Data entered by the end-user can be validated with a schema referenced from the the XForms
+                        model, or with model item properties 
+                        (<code>relevant</code>, <code>constraint</code>, or <code>type</code>) defined in the 
+                        XForms model. However, it is not yet possible to have
+                        an inline schema in the XForms model. It is also not possible to reference a type declared in a
+                        schema from the <code>type</code> model item property.
                         
                         <p>
                             [RFE <a href="http://tinyurl.com/5cavs">1076200</a>]<br/>
@@ -1327,26 +1327,20 @@
                 <tr>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-attrs-single-node">3.2.3 Single-Node Binding Attributes</a></td>
                     <td>
-                        Only the <code>ref</code> attribute is supported. The <code>bind</code> and
-                        <code>model</code> attributes are not supported.
+                        The <code>ref</code> and <code>bind</code> attributes are supported. 
+                        The <code>model</code> attribute is not supported.
                     
-                        <p>
-                            [RFE <a href="http://tinyurl.com/6k68e">1059115</a>]<br/>
-                            [RFE <a href="http://tinyurl.com/4jbd7">1076212</a>]
-                        </p>
+                        <p>[RFE <a href="http://tinyurl.com/4jbd7">1076212</a>]</p>
                     </td>
                     &partial;
                 </tr>
                 <tr>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-attrs-nodeset">3.2.4 Node-Set Binding Attributes</a></td>
                     <td>
-                        Only the <code>nodeset</code> attribute is supported. The <code>bind</code> and
-                        <code>model</code> attributes are not supported.
+                        The <code>nodeset</code> and <code>bind</code> attributes are supported. 
+                        The <code>model</code> attribute is not supported.
                     
-                        <p>
-                            [RFE <a href="http://tinyurl.com/6k68e">1059115</a>]<br/>
-                            [RFE <a href="http://tinyurl.com/4jbd7">1076212</a>]
-                        </p>
+                        <p>[RFE <a href="http://tinyurl.com/4jbd7">1076212</a>]</p>
                     </td>
                     &partial;
                 </tr>
@@ -1365,8 +1359,8 @@
                     <td rowspan="4"><a href="http://www.w3.org/TR/xforms/slice3.html#structure-abstract">3.3 The XForms Core Module</a></td>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-model">3.3.1 The model Element</a></td>
                     <td>
-                        The <code>&lt;xforms:model></code> element cannot be used in a view, 
-                        the <code>functions</code> attribute is not supported and it is not possible 
+                        The <code>&lt;xforms:model></code> element cannot be used in a view. 
+                        The <code>functions</code> attribute is not supported. It is not possible 
                         to reference multiple schemas with the <code>schema</code> attribute (only
                         one schema is supported.
                         
@@ -1420,10 +1414,11 @@
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-extension">3.5.1 The extension Element</a></td>
                     <td>
                         The <code>&lt;extension></code> element can be used by a host language.
-                        Presentation Server does not have any contraint on the host language
-                        and since no language levarages this element, its use is forbidden at
-                        this point. To adhere more closely to specification, the RFE below
-                        asks for this element to be authorized and just ignored. 
+                        Presentation Server does not have any constraint on the host language
+                        and since no language leverages this element, its use is forbidden at
+                        this point. To adhere more closely to specification, 
+                        the <code>&lt;extension></code> element should be authorized and just
+                        ignored. 
                         
                         <p>[RFE <a href="http://tinyurl.com/4sxtp">1076393</a>]</p>
                     </td>
@@ -1442,7 +1437,7 @@
                         <p>
                             Even though events are not supported, it is still possible to
                             implement the same functionality on the server-side with Presentation
-                            Server. The main drawback is that a round-trip to the server is then
+                            Server. The main drawback is that a round-trip to the server is
                             required.
                         </p>
                         <p>
@@ -1463,9 +1458,10 @@
                         <p>
                             Without event (in the current version of Presentation Server), you
                             attach to the combo box JavaScript that submits the form when the
-                            selected value changes. On the server-side the instance gets updated and
-                            the text field gets displayed or not accordingly. The main drawback here
-                            is that a round-trip to the server is required.
+                            selected value changes. On the server-side the instance gets updated, 
+                            the <code>relevant</code> model item property evaluated and
+                            accordingly the text field is displayed or hidden. The main drawback 
+                            in this case is that a round-trip to the server is required.
                         </p>
                     </td>
                     &future;
@@ -1474,10 +1470,11 @@
                     <td rowspan="5"><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice5.html">5 Datatypes</a></td>
                     <td colspan="2"><a href="5.1 XML Schema Built-in Datatypes">5.1 XML Schema Built-in Datatypes</a></td>
                     <td>
-                        The specification indicated that XForms supports all XML Schema datatypes
-                        except for <code>xsd:duration</code>, <code>xsd:ENTITY</code>,
-                        <code>xsd:ENTITIES</code>, and <code>xsd:NOTATION</code>. Presentation
-                        Server supports all XML Schema datatypes, including those.
+                        The specification indicated that an XForms engine must support 
+                        all XML Schema datatypes except for <code>xsd:duration</code>, 
+                        <code>xsd:ENTITY</code>,<code>xsd:ENTITIES</code>, and 
+                        <code>xsd:NOTATION</code>. Presentation Server supports all 
+                        XML Schema datatypes, including those.
 
                         <p>[RFE <a href="http://tinyurl.com/49wje">1078077</a>]</p>
                     </td>
@@ -1511,8 +1508,8 @@
                     <td rowspan="7"><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-xformsconstraints">6.1 Model Item Property Definitions</a></td>
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice6.html#model-prop-type">6.1.1 The type Property</a></td>
                     <td>
-                        In Presentastion Server no error is triggered if the same model item
-                        property is set twice on the same node. Also the inheritace rules for 
+                        In Presentation Server no error is triggered if the same model item
+                        property is set twice on the same node. Also the inheritance rules for 
                         model item properties are not supported. This applies to all the model item
                         properties (section 6.1).
 
@@ -1670,9 +1667,9 @@
                         <code>if</code> keyword of XPath 2.0. We recommend you use the XPath 
                         2.0 <code>if</code> statement instead of the function. In case you want 
                         to use the XForms function, it is available under the 
-                        name <code>xfif</code>. It is not planned to support the XForms 
+                        name <code>xfif</code>. We are not planning to support the XForms 
                         <code>if</code> function in future versions of Presentation Server, as 
-                        the XForms specification is expected to use XPath 2.0 in future version 
+                        the future versions of the XForms specification are expected to use XPath 2.0
                         and consequently to deprecate the <code>if</code> function.
                     </td>
                     &partial;
@@ -1701,7 +1698,7 @@
                 <tr>
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice7.html#fn-index">7.8.5 The index() Function</a></td>
                     <td>
-                        The argument if the <code>index</code> function is the id defined on a 
+                        The argument of the <code>index</code> function references and id defined on a 
                         <code>&lt;xforms:repeat></code> element. With Presentation Server, it 
                         is only valid to call the <code>index</code> function with an id 
                         referencing a <code>&lt;xforms:repeat></code> element that is an 
@@ -1767,7 +1764,7 @@
                     <td rowspan="11"><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice8.html#id2625797">8.1 The XForms Form Controls Module</a></td>
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice8.html#ui-processing">8.1.1 Implementation Requirements Common to All Form Controls</a></td>
                     <td>
-                       The <code>inputmode</code>, <code>incremental</code> attributes is not supported.
+                       The <code>inputmode</code> and <code>incremental</code> attributes are not supported.
 
                        <p>
                            [RFE <a href="http://tinyurl.com/45zxj">1078708</a>]<br/>
@@ -1780,8 +1777,8 @@
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice8.html#ui-input">8.1.2 The input Element</a></td>
                     <td>
                         Dates and times are rendered using the regular textfield widget, instead 
-                        of using a more specific date or time specific widget. Note that this is 
-                        not mandated by the XForms specification.
+                        of using a more specific date or time specific widget. Note that using a 
+                        date or time-specific widget is not mandated by the XForms specification.
 
                         <p>[RFE <a href="http://tinyurl.com/4n7xc">1078712</a>]</p>
                     </td>
@@ -1804,7 +1801,7 @@
                         embedded inside a <code>&lt;xforms:label></code>, 
                         <code>&lt;xforms:hint></code>, <code>&lt;xforms:help></code>, 
                         <code>&lt;xforms:alert></code>, and <code>&lt;xforms:message></code>. 
-                        Instead, use the single node binding attriubutes available on those 
+                        Instead, use the single node binding attributes available on those 
                         elements.
                         
                         <p>
@@ -1817,11 +1814,11 @@
                 <tr>
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice8.html#ui-upload">8.1.6 The upload Element</a></td>
                     <td>
-                        The <code>mediatype</code> attribute is not supported. You should only 
-                        bind this control to datetypes <code>xs:anyURI</code>, 
-                        <code>xs:base64Binary</code>, or <code>xs:hexBinay</code>, or 
-                        types derived by restriction from them. Presentation Server does 
-                        not enforce this contraint.
+                        The <code>mediatype</code> attribute is not supported. According to the 
+                        specification, you should only bind this control to 
+                        datatypes <code>xs:anyURI</code>, <code>xs:base64Binary</code>, 
+                        or <code>xs:hexBinay</code>, or types derived by restriction from them. 
+                        Presentation Server does not enforce this constraint.
                             
                         <p>
                             [RFE <a href="http://tinyurl.com/4kfof">1078715</a>]<br/>
@@ -1861,25 +1858,17 @@
                 <tr>
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice8.html#ui-selectMany">8.1.10 The select Element</a></td>
                     <td>
-                        Open selection is not supported. The control does not indicate an 
-                        out-of-range condition of the value in the instance have no 
-                        corresponding choice item.
+                        The control does not indicate an out-of-range condition if the value 
+                        in the instance have no corresponding choice item.
                         
-                        <p>
-                            [RFE <a href="http://tinyurl.com/4vfs8">1072228</a>]<br/>
-                            [RFE <a href="http://tinyurl.com/5hcjp">1078733</a>]
-                        </p>
+                        <p>[RFE <a href="http://tinyurl.com/5hcjp">1078733</a>]</p>
                     </td>
                     &partial;
                 </tr>
                 <tr>
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice8.html#ui-selectOne">8.1.11 The select1 Element</a></td>
-                    <td>
-                        Open selection is not supported.
-                        
-                        <p>[RFE <a href="http://tinyurl.com/3wo8b">1080089</a>]</p>
-                    </td>
-                    &partial;
+                    <td/>
+                    &full;
                 </tr>
                 <tr>
                     <td rowspan="3"><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice8.html#ui-commonelem">8.2 Common Markup for Selection Controls</a></td>
@@ -1967,7 +1956,9 @@
                 <tr>
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice9.html#ui.repeat.via.attrs">9.3.2 Creating Repeating Structures Via Attributes</a></td>
                     <td>
-                        Using attributes instead of elements to create repeating structures is not supported.
+                        Using attributes instead of elements to create repeating structures is 
+                        not supported. Note that this is useful only when the host language does 
+                        not permit XForms elements, which does not happen in Presentation Server. 
 
                         <p>[RFE <a href="http://tinyurl.com/5ye2o">1080102</a>]</p>
                     </td>
@@ -2112,12 +2103,15 @@
                     <td colspan="2"><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice11.html#serialize-xml">11.3 Serialization as application/xml</a></td>
                     <td rowspan="7">
                         <p>
-                            The semantic for the <code>serialization</code> and <code>method</code> 
-                            attribute in Presentation Server is different than the one described 
-                            in the specification. In Presentation Server your code always receives 
-                            the instance data submitted by the user as XML (in general as the 
-                            input to a pipeline), regardless of the encoding or method used 
-                            between the Web browser and the server.
+                            The <code>serialization</code> and <code>method</code> attributes are
+                            supported in Presentation Server but their semantic is different than
+                            the one described in the specification. In Presentation Server your back
+                            end code always receives the instance data as XML (in general as the
+                            input to a pipeline), regardless of the encoding or method used between
+                            the Web browser and the server. However you might want to set one or
+                            both of those attributes to get around the limitations of a particular
+                            serialization/method or use a particular serialization/method that is
+                            best suited in your case.
                         </p>
                         <p>
                             By default the method is <code>get</code> and the serialization 

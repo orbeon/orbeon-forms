@@ -139,8 +139,11 @@ public class Dom4jUtils {
         return ret;
     }
     /**
-     * Clone a node, making sure that we copy all the declared namespace of
-     * the source.
+     * Clone a node making sure that we copy all the declared namespace of the source and any user
+     * data.  Note that the copying of UserData is to work around pbm in DOM4J.  The pbm is that
+     * while UserDataAttribute.clone works as expected UserDataElement.clone doesn't use it and
+     * consequently user data on attributes is lost when one calls UserDataElement.clone. ( or
+     * createCopy for that matter )
      */
     public static org.dom4j.Element cloneElement( final org.dom4j.Element e ) {
         final Map namespaceContext = Dom4jUtils.getNamespaceContext( e );

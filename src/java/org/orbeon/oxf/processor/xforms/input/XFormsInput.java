@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.xforms.input;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
@@ -147,13 +148,13 @@ public class XFormsInput extends ProcessorImpl {
 
                         serializer.reset(pipelineContext);
                         serializer.start(pipelineContext);
-                        instance.setDocument(serializer.getDocument(pipelineContext));
+
+                        Document schemaAnnotatedInstance = serializer.getDocument(pipelineContext);
+                        instance.setDocument(DocumentHelper.createDocument(schemaAnnotatedInstance.getRootElement().createCopy()));
 
                         // Validator removes decoration; need to re-set.
                         XFormsUtils.setInitialDecoration(instance.getDocument());
                     }
-
-
 
                     // Run actions
                     Action[] actions = requestParameters.getActions();

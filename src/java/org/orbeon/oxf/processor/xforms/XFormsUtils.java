@@ -92,13 +92,7 @@ public class XFormsUtils {
     private static void setInitialDecorationWorker(Element element, int[] currentId, Map idToNodeMap) {
         int elementId = ++currentId[0];
         idToNodeMap.put(new Integer(elementId), element);
-        Object o = element.getData();
-        if(o instanceof LocationData)
-            element.setData(new InstanceData((LocationData) o, elementId));
-        else if(o instanceof InstanceData)
-            element.setData(new InstanceData( ((InstanceData)o).getLocationData(), elementId));
-        else
-            throw new OXFException("No Location data found in instance");
+        element.setData(new InstanceData((LocationData) element.getData(), elementId));
 
         for (Iterator i = element.attributes().iterator(); i.hasNext();) {
             Attribute attribute = (Attribute) i.next();

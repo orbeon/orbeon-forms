@@ -1247,8 +1247,7 @@
     <!-- FIXME: Only the first invalid element is marked as invalid. -->
     <test description="Schema validation with multiple errors" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors"
-                    >
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param name="instance" type="output"/>
                 <p:processor name="oxf:xforms-input">
                     <p:input name="model">
@@ -1380,6 +1379,49 @@
                 <a>122</a>
                 <b>2</b>
             </instance>
+        </output>
+    </test>
+
+    <test description="Performing twice the same validation with attributes" name="oxf:pipeline">
+        <input name="for-each">
+            <a><a/><a/></a>
+        </input>
+        <input name="xforms-model">
+            <xforms:model schema="form-attributes.xsd">
+                <xforms:instance>
+                    <instance>
+                        <a a="1">1</a>
+                        <b b="2">2</b>
+                        <c c="3">3</c>
+                    </instance>
+                </xforms:instance>
+            </xforms:model>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="for-each" type="input"/>
+                <p:param name="xforms-model" type="input"/>
+                <p:param name="result" type="output"/>
+                <p:for-each href="#for-each" select="/a/a">
+                    <p:processor name="oxf:xforms-input">
+                        <p:input name="model" href="#xforms-model"/>
+                        <p:input name="request"><request><parameters/></request></p:input>
+                        <p:input name="filter"><params/></p:input>
+                        <p:input name="matcher-result"><result/></p:input>
+                        <p:output name="data" id="instance-1"/>
+                    </p:processor>
+                    <p:processor name="oxf:null-serializer">
+                        <p:input name="data" href="#instance-1"/>
+                    </p:processor>
+                </p:for-each>
+                <p:processor name="oxf:identity">
+                    <p:input name="data"><dummy/></p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <dummy/>
         </output>
     </test>
     

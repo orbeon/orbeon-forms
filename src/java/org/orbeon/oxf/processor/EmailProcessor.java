@@ -66,6 +66,7 @@ import java.util.Properties;
  * o revise support of text/html
  *   o built-in support for HTML could handle src="cid:*" with part/message ids
  * o support text/xml? or XHTML?
+ * o support non-multipart body!
  * o build message with SAX, not DOM, so streaming of input is possible
  */
 public class EmailProcessor extends ProcessorImpl {

@@ -146,6 +146,41 @@ public class SystemUtils {
         return ret;
     }
 
+    /**
+     * @return If url is of form jar:file:<path1>!/<path2> return <path1>, URL
+     *         decoding <path1> if it can be determined that it matters.  If
+     *         URL is not of specified form return null.
+     */
+    public static String getJarFilePath( final java.net.URL u ) 
+    throws java.io.UnsupportedEncodingException {
+        final String ret;
+        final String prot = u.getProtocol();
+        done : {
+            if ( "jar".equals( prot ) ) {
+                // The current class is in a JAR file
+                final String urlPath = u.getFile();
+                final int end = urlPath.indexOf( "!/" );
+                final String fileSlash = "file:/";
+                final int fileSlashLen = fileSlash.length();
+                if ( end > fileSlashLen && urlPath.regionMatches( true, 0, fileSlash, 0, fileSlashLen ) ) {
+                    final String fnam = urlPath.substring( fileSlashLen, end );
+                    final File file = new File( fnam );
+                    if ( file.exists() ) {
+                        ret = fnam;
+                    } else {
+                        // Try to decode only if we cannot find the file (see explanation in other method above)
+                        final String fnamDec = URLDecoder.decode( fnam, "utf-8" );
+                        final File fileDec = new File( fnamDec );
+                        ret = fileDec.exists() ? fnamDec : fnam;
+                    }
+                    break done;
+                } 
+            }
+            ret = null;
+        }
+        return ret;
+    }
+
     public static String getJarPath(Class clazz) {
         String resourceName = StringUtils.replace(clazz.getName(), ".", "/") + ".class";
         try {

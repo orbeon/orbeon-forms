@@ -973,71 +973,11 @@
                     <title>Scope Generator and Scope Serializer</title>
                     <p>
                         The Session generator and Session serializer processors are deprecated. They
-                        are replaced by the Scope generator and Scope serializer processors, which can
-                        store and retrieve documents from the session scope, but also from the
-                        application and request scopes.
+                        are replaced by the <a href="processors-generators#scope-generator">Scope
+                        generator</a> and <a href="processors-serializers#scope-serializer">Scope
+                        serializer</a> processors, which can store and retrieve documents from the
+                        session scope, but also from the application and request scopes.
                     </p>
-                    <p>
-                        Both the Scope generator and serialializer have a <code>config</code> input. The
-                        format for the config document is:
-                    </p>
-                    <xml-source>
-                        <config>
-                            <key>cart</key>
-                            <scope>application|session|request</scope>
-                        </config>
-                    </xml-source>
-                    <table>
-                        <tr>
-                            <th>key</th>
-                            <td>
-                                The <code>&lt;key></code> element contains a string used to identify
-                                the document. The same key must be used to store and retrieve a
-                                document.
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>scope</th>
-                            <td>
-                                The <code>&lt;scope></code> element specifies in what scope the document
-                                is to be stored (for the serializer) or retrieved from (for the
-                                generator). The available scopes are:
-
-                                <ul>
-                                    <li>
-                                        application – The application scope starts when the Web
-                                        application is deployed. It ends when the Web application is
-                                        undeployed. The application scope provides an efficient storage
-                                        for data that does not need to be persisted and that is common for
-                                        all users. It is typically used to cache information (e.g.
-                                        configuration data for the application read from a database).
-                                    </li>
-                                    <li>
-                                        session – The session scope is attached to a given user of the
-                                        Web application. It is typically used to store information that
-                                        does not need to be persisted and is specific to a given user.
-                                        It is typically used to cache the user's profile.
-                                    </li>
-                                    <li>
-                                        request – The request scope starts when an HTTP request is sent
-                                        to the server. It ends when the corresponding HTTP response is
-                                        sent back to the client. The request scope can be used to
-                                        integrate an OXF application with legacy J2EE servlets.
-                                    </li>
-                                </ul>
-                            </td>
-                        </tr>
-                    </table>
-                    <p>
-                        In addition to the <code>config</code> input, the Scope serializer has a
-                        <code>data</code> input to enable documents to store information in the scope, and the Scope
-                        generator has a <code>data</code> output for the document retrieved from the
-                        scope. When the Scope generator cannot find any document in scope for the given key,
-                        it returns a "null document":
-                    </p>
-                    <xml-source>
-                        <null xsi:nil="true"/>
-                    </xml-source>
                 </section>
                 <section>
                     <title>Session Listeners</title>

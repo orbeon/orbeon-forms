@@ -422,29 +422,71 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 <code>indent</code> and <code>indent-amount</code>.
             </p>
         </section>
-        <anchor id="SessionSerializer"/>
+        <anchor id="scope-serializer"/>
         <section>
-            <title>Session Serializer</title>
+            <title>Scope Serializer</title>
             <p>
-                The Session Serializer stores an XML document into the HTTP session. The root node
-                of the document is used as the session key. See the <link
-                href="processors-generators#SessionGenerator">SessionGenerator</link> for more
-                information.
+                The Scope serializer can store documents into the application, session and request
+                scopes. It works together with the <a
+                href="processors-generators#scope-generator">Scope generator</a>.
             </p>
             <p>
-                The following example shows how to store an XML document into the HTTP session. The
-                session key is the root element, in this case: <code>cart</code>.
+                The Scope serializer has a <code>config</code> input in the following format:
             </p>
             <xml-source>
-                <p:processor name="oxf:session-serializer">
-                    <p:input name="data">
-                        <cart>
-                            <item>Book 1</item>
-                            <item>Book 2</item>
-                        </cart>
-                    </p:input>
-                </p:processor>
+                <config>
+                    <key>cart</key>
+                    <scope>application|session|request</scope>
+                </config>
             </xml-source>
+            <table>
+                <tr>
+                    <th>key</th>
+                    <td>
+                        The <code>&lt;key></code> element contains a string used to identify
+                        the document. The same key must be used to store and retrieve a
+                        document.
+                    </td>
+                </tr>
+                <tr>
+                    <th>scope</th>
+                    <td>
+                        The <code>&lt;scope></code> element specifies in what scope the document is
+                        to be stored. The available scopes are:
+
+                        <ul>
+                            <li>
+                                <b>application</b> - The application scope starts when the Web
+                                application is deployed. It ends when the Web application is
+                                undeployed. The application scope provides an efficient storage for
+                                data that does not need to be persisted and that is common for all
+                                users. It is typically used to cache information (e.g. configuration
+                                data for the application read from a database).
+                            </li>
+                            <li>
+                                <b>session</b> - The session scope is attached to a given user of
+                                the Web application. It is typically used to store information that
+                                does not need to be persisted and is specific to a given user. It is
+                                typically used to cache the user's profile.
+                            </li>
+                            <li>
+                                <b>request</b> - The request scope starts when an HTTP request is
+                                sent to the server. It ends when the corresponding HTTP response is
+                                sent back to the client. The request scope can be used to integrate
+                                a Presentation Server application with legacy J2EE servlets.
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <p>
+                In addition to the <code>config</code> input, the Scope serializer has a
+                <code>data</code> input receiving the document to store.
+            </p>
+            <note>
+                The Session serializer, previously used, is now deprecated. Use the Scope
+                serializer with session scope instead.
+            </note>
         </section>
         <section>
             <title>Null Serializer</title>

@@ -791,38 +791,75 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             </section>
         </section>
 
-        <anchor id="SessionGenerator"/>
+        <anchor id="scope-generator"/>
         <section>
-            <title>Session Generator</title>
+            <title>Scope Generator</title>
             <p>
-                The Session generator outputs the XML document stored in the HTTP session, under
-                the specified key. If no document is stored under the specified key, this generator
-                will send a null document with key as root element.
+                The Scope generator can retrieve documents from the application, session and request
+                scopes. It works together with the <a
+                href="processors-serializers#scope-serializer">Scope serializer</a>.
             </p>
-            <warning>
-                The XML document must be stored with the
-                <link
-                    href="processors-serializers#SessionSerializer">SessionSerializer</link>
-                in the session
-            </warning>
+            <p>
+                The Scope generator has a <code>config</code> input in the following format:
+            </p>
+            <xml-source>
+                <config>
+                    <key>cart</key>
+                    <scope>application|session|request</scope>
+                </config>
+            </xml-source>
+            <table>
+                <tr>
+                    <th>key</th>
+                    <td>
+                        The <code>&lt;key></code> element contains a string used to identify
+                        the document. The same key must be used to store and retrieve a
+                        document.
+                    </td>
+                </tr>
+                <tr>
+                    <th>scope</th>
+                    <td>
+                        The <code>&lt;scope></code> element specifies in what scope the document is
+                        to be retrieved from. The available scopes are:
 
-            <xml-source>
-                <p:processor name="oxf:session-generator">
-                    <p:input name="config">
-                        <key>cart</key>
-                    </p:input>
-                    <p:output name="data" id="session"/>
-                </p:processor>
-            </xml-source>
-            <p>If the session doesn't contain a document under
-                the
-                <code>cart</code> key, the following document is
-                generated:
+                        <ul>
+                            <li>
+                                <b>application</b> - The application scope starts when the Web
+                                application is deployed. It ends when the Web application is
+                                undeployed. The application scope provides an efficient storage for
+                                data that does not need to be persisted and that is common for all
+                                users. It is typically used to cache information (e.g. configuration
+                                data for the application read from a database).
+                            </li>
+                            <li>
+                                <b>session</b> - The session scope is attached to a given user of
+                                the Web application. It is typically used to store information that
+                                does not need to be persisted and is specific to a given user. It is
+                                typically used to cache the user's profile.
+                            </li>
+                            <li>
+                                <b>request</b> - The request scope starts when an HTTP request is
+                                sent to the server. It ends when the corresponding HTTP response is
+                                sent back to the client. The request scope can be used to integrate
+                                a Presentation Server application with legacy J2EE servlets.
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+            </table>
+            <p>
+                In addition to the <code>config</code> input, the Scope generator has a
+                <code>data</code> output for the document retrieved. When the Scope generator cannot
+                find any document in scope for the given key, it returns a "null document":
             </p>
             <xml-source>
-                <cart xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xsi:nil="true"/>
+                <null xsi:nil="true"/>
             </xml-source>
+            <note>
+                The Session generator, previously used, is now deprecated. Use the Scope generator
+                with session scope instead.
+            </note>
         </section>
 
         <anchor id="RequestSecurityGenerator"/>

@@ -84,7 +84,11 @@ public class RequestParameters {
             for (Iterator i = parameters.iterator(); i.hasNext();) {
                 Element parameterElement = (Element) i.next();
                 String name = parameterElement.element("name").getStringValue();
-                String value = parameterElement.element("value").getStringValue();
+
+                List values = new ArrayList();
+                for(Iterator elementIterator = parameterElement.elementIterator("value"); elementIterator.hasNext();)
+                    values.add( ((Element)elementIterator.next()).getStringValue() );
+
                 String type = parameterElement.element("value").attributeValue
                         (new QName("type", XMLUtils.XSI_NAMESPACE));
 
@@ -92,7 +96,8 @@ public class RequestParameters {
                     // Un-base64, uncompress to get XML as text
                     String xmlText;
                     {
-                        String compressed = value;
+                        // there is only one value for $instnace
+                        String compressed = (String)values.get(0);
                         if (XFormsUtils.isHiddenEncryptionEnabled())
                             compressed = SecureUtils.decrypt(pipelineContext, encryptionPassword, compressed);
                         ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(compressed));
@@ -123,20 +128,26 @@ public class RequestParameters {
                     String sizeName = s;
 
                     // Store file in instance
-                    addValue(fileName, value, type);
+                    addValue(fileName, values, type);
 
                     // Store other information about file
                     if (filenameName.length() > 0) {
                         String filenameFromRequest = parameterElement.element("filename").getStringValue();
-                        addValue(filenameName, filenameFromRequest, null);
+                        List vals = new ArrayList();
+                        vals.add(filenameFromRequest);
+                        addValue(filenameName, vals, null);
                     }
                     if (name.startsWith("$upload^") && mediatypeName.length() > 0) {
                         String contentTypeFromRequest = parameterElement.element("content-type").getStringValue();
-                        addValue(mediatypeName, contentTypeFromRequest, null);
+                        List vals = new ArrayList();
+                        vals.add(contentTypeFromRequest);
+                        addValue(mediatypeName, vals, null);
                     }
                     if (name.startsWith("$upload^") && sizeName.length() > 0) {
                         String contentLengthFromRequest = parameterElement.element("content-length").getStringValue();
-                        addValue(sizeName, contentLengthFromRequest, null);
+                        List vals = new ArrayList();
+                        vals.add(contentLengthFromRequest);
+                        addValue(sizeName, vals, null);
                     }
 
                 } else if (name.startsWith("$action^") || name.startsWith("$actionImg^")) {
@@ -182,7 +193,7 @@ public class RequestParameters {
                         actions.add(action);
                     }
                 } else if (name.startsWith("$node^")) {
-                    addValue(name, value, type);
+                    addValue(name, values, type);
                 }
             }
         } catch (IOException e) {
@@ -200,15 +211,18 @@ public class RequestParameters {
      *
      * Also store the value type in idToType if present.
      */
-    private void addValue(String name, String value, String type) {
+    private void addValue(String name, List values, String type) {
         String idString = name.substring("$node^".length());
         if (XFormsUtils.isNameEncryptionEnabled())
             idString = SecureUtils.decrypt(pipelineContext, encryptionPassword, idString);
         Integer idObject = new Integer(idString);
         String currentValue = (String) idToValue.get(idObject);
-        idToValue.put(idObject,
-                currentValue == null || "".equals(currentValue) ? value :
-                "".equals(value) ? currentValue : currentValue + ' ' + value);
+        for(Iterator i = values.iterator(); i.hasNext();) {
+            String value = (String)i.next();
+            currentValue =  currentValue == null || "".equals(currentValue) ? value :
+                    "".equals(value) ? currentValue : currentValue + ' ' + value;
+            idToValue.put(idObject, currentValue);
+        }
         if (type != null)
             idToType.put(idObject, type);
     }

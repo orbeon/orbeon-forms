@@ -135,6 +135,15 @@
         <xsl:choose>
             <xsl:when test="not(@appearance) or @appearance = 'compact'">
                 <xhtml:select name="{$name}" multiple="multiple">
+                    <xsl:if test="$open">
+                        <xsl:attribute name="onchange">
+                            o = this.options;
+                            if( o[o.length - 1].selected)      
+                                 getElementById('<xsl:value-of select="$name"/>_OTHER').disabled = false;    
+                             else 
+                                 getElementById('<xsl:value-of select="$name"/>_OTHER').disabled = true;
+                        </xsl:attribute>
+                    </xsl:if>
                     <xsl:call-template name="copy-other-attributes"/>
                     <xsl:apply-templates>
                         <xsl:with-param name="name" select="$name" tunnel="yes"/>
@@ -176,6 +185,14 @@
         <xsl:choose>
             <xsl:when test="not(@appearance) or @appearance = 'compact' or @appearance = 'minimal'">
                 <xhtml:select name="{$name}">
+                    <xsl:if test="$open">
+                            <xsl:attribute name="onchange">
+                                if(this.value == '')      
+                                     getElementById('<xsl:value-of select="$name"/>_OTHER').disabled = false;    
+                                 else 
+                                     getElementById('<xsl:value-of select="$name"/>_OTHER').disabled = true;
+                            </xsl:attribute>
+                    </xsl:if>
                     <xsl:call-template name="copy-other-attributes"/>
                     <xsl:apply-templates>
                         <xsl:with-param name="name" select="$name" tunnel="yes"/>
@@ -234,8 +251,7 @@
                 <xsl:choose>
                     <xsl:when test="$appearance = 'compact'">
                         <!-- List -->
-                        <xhtml:option value="{xforms:value}"
-                            onclick="getElementById('{$name}_OTHER').disabled = true">
+                        <xhtml:option value="{xforms:value}">
                             <xsl:call-template name="copy-other-attributes"/>
                             <xsl:if test="$values = xs:string(xforms:value)">
                                 <xsl:attribute name="selected" select="'selected'"/>
@@ -243,8 +259,7 @@
                             <xsl:value-of select="xforms:label"/>
                         </xhtml:option>
                          <xsl:if test="$open and position() = last()">
-                            <xhtml:option value=""
-                                onclick="getElementById('{$name}_OTHER').disabled = false">
+                            <xhtml:option value="">
                                 <xsl:if test="not(empty($other-value))">
                                     <xsl:attribute name="selected">selected</xsl:attribute>
                                 </xsl:if>
@@ -262,8 +277,12 @@
                             <xsl:value-of select="xforms:label"/>
                         </xhtml:input>
                         <xsl:if test="$open and position() = last()">
-                            <xhtml:input type="checkbox" name="" value=""
-                                    onclick="e = getElementById('{$name}_OTHER'); e.disabled = !e.disabled">
+                            <xhtml:input type="checkbox" name="" value="">
+                                <xsl:if test="$open">
+                                    <xsl:attribute name="onclick">
+                                        e = getElementById('<xsl:value-of select="$name"/>_OTHER'); e.disabled = !e.disabled;
+                                    </xsl:attribute>
+                                </xsl:if>
                                 <xsl:if test="not(empty($other-value))">
                                     <xsl:attribute name="checked">checked</xsl:attribute>
                                 </xsl:if>
@@ -277,8 +296,7 @@
                 <xsl:choose>
                     <xsl:when test="$appearance = 'compact' or $appearance = 'minimal'">
                         <!-- Combo box -->
-                        <xhtml:option value="{xforms:value}"
-                            onclick="getElementById('{$name}_OTHER').disabled = true">
+                        <xhtml:option value="{xforms:value}">
                             <xsl:call-template name="copy-other-attributes"/>
                             <xsl:if test="$value = xs:string(xforms:value)">
                                 <xsl:attribute name="selected" select="'selected'"/>
@@ -286,8 +304,7 @@
                             <xsl:value-of select="xforms:label"/>
                         </xhtml:option>
                         <xsl:if test="$open and position() = last()">
-                            <xhtml:option value=""
-                                onclick="getElementById('{$name}_OTHER').disabled = false">
+                            <xhtml:option value="">
                                 <xsl:if test="not(empty($other-value))">
                                     <xsl:attribute name="selected">selected</xsl:attribute>
                                 </xsl:if>
@@ -297,8 +314,12 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <!-- Radio button -->
-                        <xhtml:input type="radio" name="{$name}" value="{xforms:value}"
-                            onclick="getElementById('{$name}_OTHER').disabled = true">
+                        <xhtml:input type="radio" name="{$name}" value="{xforms:value}">
+                            <xsl:if test="$open">
+                                <xsl:attribute name="onclick">
+                                    getElementById('<xsl:value-of select="$name"/>_OTHER').disabled = true
+                                </xsl:attribute> 
+                            </xsl:if>
                             <xsl:call-template name="copy-other-attributes"/>
                             <xsl:if test="$value = xs:string(xforms:value)">
                                 <xsl:attribute name="checked" select="'checked'"/>

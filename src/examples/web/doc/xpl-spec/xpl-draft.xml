@@ -160,7 +160,7 @@
             <div2>
                 <head>XPL Implementation</head>
                 <termdef id="xplimplementation" term="XPL implementation">
-                    A specific software product able execute an XPL program according to the XPL
+                    A specific software product able to execute an XPL program according to the XPL
                     specification is referred to as an <term>XPL implementation</term>.
                 </termdef>
                 <p>
@@ -298,7 +298,7 @@
                     <item>
                         <p><emph>A set of inputs and outputs</emph>, defining how the XML processor
                         interfaces with an XPL program. See <specref
-                        ref="processor-interface"/>.</p>
+                        ref="processor-inputs-outputs"/>.</p>
                     </item>
                     <item>
                         <p><emph>A behavior</emph>, defining tasks performed by the XML processor
@@ -341,8 +341,8 @@
                     </item>
                 </ulist>
                 <p>
-                    The definition of the mapping between a particular QName and an XML processor
-                    implementation is outside the scope of XPL.
+                    The mapping between a particular QName and an XML processor implementation is
+                    implementation-dependent.
                 </p>
             </div2>
             <div2 id="processor-instance">
@@ -358,11 +358,11 @@
                     Multiple instances of the same XML processor may occur in an XPL program.
                 </p>
                 <p>
-                    XPL does not specify if or how an XML processor is instantiated or keeps state
+                    XPL does not specify how an XML processor is instantiated or keeps state
                     information during an XPL program execution.
                 </p>
             </div2>
-            <div2 id="processor-interface">
+            <div2 id="processor-inputs-outputs">
                 <head>Inputs and Outputs</head>
                 <p>
                     Inputs and outputs connect an XML processor instance to the rest of the
@@ -379,15 +379,14 @@
                 <p>
                     <termdef id="connected-input-output" term="connected input of output">
                         A <term>connected input or output</term> is an input or output of an XML
-                        processor instance declared in an <termref def="xpl-program">XPL
-                        program</termref>.
+                        processor instance connected according to <specref ref="connections"/>.
                     </termdef>
                 </p>
                 <p>
                     <termdef id="dynamic-input-output" term="dynamic input of output">
                         A <term>dynamic input or output</term> is a connected input or output of an
                         XML processor instance which is not defined by the XML processor before the
-                        execution of the <termref def="xpl-program">XPL program</termref>
+                        execution of the <termref def="xpl-program">XPL program</termref>.
                     </termdef>
                 </p>
                 <p>
@@ -535,7 +534,7 @@
                 </p>
             </div2>
         </div1>
-        <div1 id="xpl-program">
+        <div1 id="xpl-program-generalities">
             <head>XPL Program</head>
             <div2>
                 <head>Structure</head>

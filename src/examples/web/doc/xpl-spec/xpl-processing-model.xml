@@ -56,10 +56,14 @@
         </p>
         <ulist>
             <item>
-                It exposes an XML Infoset identifier <emph>i</emph>.
+                <p>
+                    It exposes an XML Infoset identifier <emph>i</emph>.
+                </p>
             </item>
             <item>
-                There exists an expression in the XPL program referring to <emph>i</emph>.
+                <p>
+                    There exists an expression in the XPL program referring to <emph>i</emph>.
+                </p>
             </item>
         </ulist>
     </div2>

@@ -465,6 +465,19 @@
                        Should the Pipeline processor be renamed the XPL processor?
                     </p>
                 </item>
+                <item>
+                    <p>
+                       The <termref def="xpl-program">XPL program</termref> definition mentions
+                       that an XPL program is an XML document. How does this relate with XInclude
+                       inclusions?
+                    </p>
+                </item>
+                <item>
+                    <p>
+                       The <termref def="xpl-program">XPL program</termref> definition mentions
+                       versions 1.0 of XML and namespaces. Should versions 1.1 be allowed?
+                    </p>
+                </item>
             </olist>
         </div2>
 <!--        <div2>-->

@@ -15,7 +15,6 @@ package org.orbeon.oxf.processor.xforms.output;
 
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.common.OXFException;
-
 import java.util.Map;
 
 /**
@@ -33,6 +32,7 @@ public class InstanceData {
     private int id = -1;
     private String invalidBindIds = null;
     private Map idToNodeMap;
+    private java.util.List schemaErrors = null;
 
     public InstanceData(LocationData locationData) {
         this.locationData = locationData;
@@ -100,5 +100,22 @@ public class InstanceData {
 
     public String getSystemId() {
         return locationData.getSystemID();
+    }
+    public java.util.Iterator getSchemaErrorsMsgs() {
+        final java.util.Collection unmod;
+        if ( schemaErrors == null ) {
+            unmod = java.util.Collections.EMPTY_LIST;
+        } else {
+            unmod = java.util.Collections.unmodifiableCollection( schemaErrors );
+        }
+        final java.util.Iterator ret = unmod.iterator();
+        return ret;
+    }
+    public void addSchemaError( final String msg ) {
+        valid.set( false );
+        if ( schemaErrors == null ) {
+            schemaErrors = new java.util.ArrayList( 1 );
+        }
+        schemaErrors.add( msg );
     }
 }

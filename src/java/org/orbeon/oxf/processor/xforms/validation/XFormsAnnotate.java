@@ -18,6 +18,7 @@ import org.dom4j.DocumentHelper;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.Model;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
@@ -53,7 +54,9 @@ public class XFormsAnnotate extends ProcessorImpl {
                     final Document instance = DocumentHelper.createDocument
                             (readCacheInputAsDOM4J(context, INPUT_INSTANCE).getRootElement().createCopy());
                     XFormsUtils.setInitialDecoration(instance.getDocument());
-                    model.applyInputOutputBinds(instance);
+                    Boolean enabledObj = getPropertySet().getBoolean( Constants.XFORMS_VALIDATION_FLAG, true);
+                    final boolean enabled = enabledObj.booleanValue();
+                    model.applyInputOutputBinds( instance, context, enabled );
 
                     // Output the instance to the specified content handler
                     LocationSAXWriter saxw = new LocationSAXWriter();

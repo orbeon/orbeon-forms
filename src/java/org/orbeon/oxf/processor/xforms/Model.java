@@ -13,6 +13,25 @@
  */
 package org.orbeon.oxf.processor.xforms;
 
+import com.sun.msv.grammar.Grammar;
+import com.sun.msv.grammar.IDContextProvider2;
+import com.sun.msv.reader.GrammarReaderController;
+import com.sun.msv.reader.util.GrammarLoader;
+import com.sun.msv.util.DatatypeRef;
+import com.sun.msv.util.StartTagInfo;
+import com.sun.msv.util.StringRef;
+import com.sun.msv.verifier.Acceptor;
+import com.sun.msv.verifier.regexp.REDocumentDeclaration;
+import com.sun.msv.verifier.regexp.StringToken;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+import org.apache.log4j.Logger;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
@@ -22,6 +41,9 @@ import org.dom4j.Namespace;
 import org.dom4j.Node;
 import org.dom4j.QName;
 import org.dom4j.util.UserDataDocumentFactory;
+import org.orbeon.oxf.cache.Cache;
+import org.orbeon.oxf.cache.CacheKey;
+import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -29,11 +51,13 @@ import org.orbeon.oxf.processor.xforms.output.BooleanModelItemProperty;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.processor.xforms.output.XFormsFunctionLibrary;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
@@ -45,18 +69,149 @@ import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.xpath.StandaloneContext;
 import org.orbeon.saxon.xpath.XPathEvaluator;
 import org.orbeon.saxon.xpath.XPathException;
-
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import org.relaxng.datatype.Datatype;
+import org.xml.sax.helpers.AttributesImpl;
+import org.xml.sax.InputSource;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
 /**
  * Represents information from the XForms model.
  */
 public class Model {
+    
+    private static class Controller implements GrammarReaderController {
+        
+        static private Logger logger = LoggerFactory.createLogger( Controller.class );
+        
+        private final String base;
+        private final SchemaInfo schemaInfo;
+        
+        Controller( final String bs, final SchemaInfo schmInf ) {
+            base = bs;
+            schemaInfo = schmInf;
+        }
+        public void warning( final Locator[] locs, final String msg ) {
+            if ( locs == null && locs.length == 0 ) {
+                logger.warn( msg );
+            } else {
+                final String frst = XMLUtils.toString( locs[ 0 ] );
+                final StringBuffer sb = new StringBuffer( frst );
+                for ( int i = 1; i < locs.length; i++ ) {
+                    sb.append( ',' );
+                    final String locMsg = XMLUtils.toString( locs [ i ] );
+                    sb.append( locMsg );
+                }
+                sb.append( ':' );
+                sb.append( msg );
+                final String logMsg = sb.toString();
+                logger.warn( logMsg );
+            }
+        }
+        public void error( final Locator[] locs, final String msg, final Exception ex ) {
+            final LocationData ld = locs.length > 0 ? new LocationData( locs[ 0 ] ) : null;
+            throw new ValidationException( msg, ex, ld );
+        }
+        public InputSource resolveEntity( final String pid, final String sid ) 
+        throws SAXException, IOException {
+            final java.net.URL u = URLFactory.createURL( base, sid );
+            schemaInfo.addInclude( u );
+            
+            final String surl = u.toString();
+            final InputSource ret = XMLUtils.ENTITY_RESOLVER.resolveEntity( "", surl );
+            return ret;
+        }
+        
+    }
+    
+    private static class SchemaKey extends CacheKey {
+        final int hash;
+        final java.net.URL url;
+        
+        SchemaKey( final java.net.URL u ) {
+            setClazz( SchemaKey.class );
+            url = u;
+            hash = url.hashCode();
+        }
+        public int hashCode() {
+            return hash;
+        }
+        public boolean equals( final Object rhsObj ) {
+            final boolean ret;
+            if ( rhsObj instanceof SchemaKey ) {
+                final SchemaKey rhs = ( SchemaKey )rhsObj;
+                ret = url.equals( rhs.url );
+            } else {
+                ret = false;
+            }
+            return ret; 
+        }
+    }
+    
+    private static class SchemaInfo {
 
+        private final java.util.ArrayList includes = new java.util.ArrayList( 0 );
+        private final java.util.ArrayList modTimes = new java.util.ArrayList( 0 );
+        private Grammar grammar;
+        
+        void addInclude( final java.net.URL u ) throws java.io.IOException {
+            // Get the time first.  This way if there's a problem the array lengths will remain
+            // the same.
+            final Long modTim = NetUtils.getLastModified( u, ( Long )null );
+            includes.add( u );
+            modTimes.add( modTim );
+        }
+
+        boolean includesUpToDate() {
+            boolean ret = true;
+            final int size = includes.size();
+            for ( int i = 0; ret && i < size; i++ ) {
+                final java.net.URL u = ( java.net.URL )includes.get( i );
+                try {
+                    final Long crntTim = NetUtils.getLastModified( u, ( Long )null );
+                    final Long lstTim = ( Long )modTimes.get( i );
+                    ret = crntTim.equals( lstTim );
+                } catch ( final java.io.IOException e ) {
+                    // We won't propagate here.  Reason is that while an include may be missing 
+                    // it may just be the case that it isn't included anymore _and_ it has been
+                    // removed.  So, we return false and then on a reparse we will find out the 
+                    // truth.
+                    ret = false;
+                }
+            }
+            return ret;
+        }
+        
+        void setGrammar( final Grammar g ) {
+            grammar = g;
+        }
+        Grammar getGrammar() {
+            return grammar;
+        }
+        
+    }
+
+    private static class ValidationContext implements IDContextProvider2 {
+        public void onID( final Datatype dt, final String s ) {
+        }
+        public String resolveNamespacePrefix( final String s ) {
+            return null;
+        }
+        public String getBaseUri() {
+            return null;
+        }
+        public boolean isUnparsedEntity( final String s ) {
+            return false;
+        }
+        public boolean isNotation( final String s ) {
+            return false;
+        }
+        public void onID( final Datatype dt, final StringToken st ) {
+        }
+    }
+    
+    private static final ValidationContext validationContext = new ValidationContext();
+    
     private static final String DEFAULT_MODEL_ID = "wsrp_rewrite_xforms";
 
     private PipelineContext pipelineContext;
@@ -136,27 +291,189 @@ public class Model {
             handleBindContainer(bind, modelBind);
         }
     }
-
-    /**
-     * Updates the instance according to information in the &lt;bind&gt;
-     * elements.
-     */
-    public void applyInputOutputBinds(Document instance) {
-        for (Iterator i = binds.iterator(); i.hasNext();) {
-            ModelBind modelBind = (ModelBind) i.next();
-            try {
-                // Create XPath evaluator for this bind
-                final DocumentWrapper documentWrapper = new DocumentWrapper(instance, null);
-                applyInputOutputBinds(documentWrapper, modelBind);
-
-            } catch (Exception e) {
-                throw new ValidationException(e, modelBind.getLocationData());
-            }
+    
+    private void addSchemaError( final org.dom4j.Element elt, final String errMsg ) {
+        final InstanceData instDat = XFormsUtils.getInstanceData( elt );
+        final String em;
+        if ( errMsg == null ) {
+            // Looks like if n is an element and errMsg == null then the problem is missing 
+            // character data.  No idea why MSV doesn't just give us the error msg itself.
+            em = "Missing character data.";
+        } else {
+            em = errMsg;
         }
-
-        reconciliate(instance.getRootElement());
+        instDat.addSchemaError( em );
     }
 
+    private void addSchemaError( final org.dom4j.Attribute att, final String errMsg ) {
+        // Looks like if n is an element and errMsg == null then the problem is missing character
+        // data.
+        final InstanceData instDat = XFormsUtils.getInstanceData( att );
+        instDat.addSchemaError( errMsg );
+        final org.dom4j.Element elt = att.getParent();
+        final InstanceData eltInstDat = XFormsUtils.getInstanceData( elt );
+        
+    }
+    
+    private void validateElement( final org.dom4j.Element elt, final Acceptor acc ) {
+        final String nsURI = elt.getNamespaceURI();
+        final String nam = elt.getName();
+        final String qnam = elt.getQualifiedName();
+        final java.util.List attLst = elt.attributes();
+        final AttributesImpl atts = new AttributesImpl();
+        // Note that we don't strip xxform:* atts here as doing so would cause confustion in
+        // validateChildren
+        for ( final java.util.Iterator itr = attLst.iterator(); itr.hasNext(); ) {
+            final org.dom4j.Attribute att = ( org.dom4j.Attribute )itr.next();
+            final String auri = att.getNamespaceURI();
+            final String anam = att.getName();
+            final String aQNam = att.getQualifiedName();
+            final String val = att.getValue();
+            atts.addAttribute( auri, anam, aQNam, null, val );
+        }
+        final StartTagInfo si = new StartTagInfo( nsURI, nam, qnam, atts, validationContext );
+        Acceptor chldAcc = acc.createChildAcceptor( si, null );
+        final StringRef sr = new StringRef();
+        if ( chldAcc == null ) {
+            chldAcc = acc.createChildAcceptor( si, sr );
+            addSchemaError( elt, sr.str );
+        }
+        final int charCare = chldAcc.getStringCareLevel();
+        validateChildren( elt, chldAcc, si, charCare );
+        if ( !chldAcc.isAcceptState( null ) ) {
+            chldAcc.isAcceptState( sr );
+            addSchemaError( elt, sr.str );
+        }
+        if ( !acc.stepForward( chldAcc, null ) ) {
+            acc.stepForward( chldAcc, sr );
+            addSchemaError( elt, sr.str );
+        }
+        
+    }
+
+    /**
+     * Note that all of the attribs of elt should be in si.attributes.  If they are out of synch
+     * it break the ability to access the attribs by index.
+     */
+    private void validateChildren
+    ( final org.dom4j.Element elt, final Acceptor acc, final StartTagInfo si, final int charCare ) {
+        
+        final int end = si.attributes.getLength();
+        final StringRef sr = new StringRef();
+        for ( int i = 0; i < end; i++ ) {
+            final String uri = si.attributes.getURI( i );
+            if ( Constants.XXFORMS_NAMESPACE_URI.equals( uri ) ) continue;
+            final String nam = si.attributes.getLocalName( i );
+            final String qNam = si.attributes.getQName( i );
+            final String val = si.attributes.getValue( i );
+            
+            if ( !acc.onAttribute2( uri, nam, qNam, val, si.context, null, ( DatatypeRef )null ) ) {
+                final org.dom4j.Attribute att = elt.attribute( i );
+                acc.onAttribute2( uri, nam, qNam, val, si.context, sr, ( DatatypeRef )null );
+                addSchemaError( att, sr.str );
+            }
+        }
+        if ( !acc.onEndAttributes( si, null ) ) {
+            acc.onEndAttributes( si, sr );
+            addSchemaError( elt, sr.str );
+        }
+        for ( final java.util.Iterator itr = elt.elementIterator(); itr.hasNext(); ) {
+            final org.dom4j.Element chld = ( org.dom4j.Element )itr.next();
+            validateElement( ( org.dom4j.Element )chld, acc ); 
+        }
+        // If we just iterate over nodes, i.e. use nodeIterator() ) then validation of char data
+        // ends up being incorrect.  Specifically elements of type xs:string end up being invalid
+        // when they are empty. ( Which is wrong. )
+        final String txt = elt.getText();
+        switch ( charCare ) {
+            case Acceptor.STRING_IGNORE : {
+                if ( txt.length() > 0 ) {
+                   addSchemaError( elt, sr.str );
+              }
+              break;
+            }
+            case Acceptor.STRING_PROHIBITED : {
+                final String trmd = txt.trim();
+                if ( trmd.length() > 0 ) {
+                    addSchemaError( elt, sr.str );
+                }
+                break;
+            }
+            case Acceptor.STRING_STRICT : {
+                if ( !acc.onText2( txt, si.context, null, null ) ) {
+                    acc.onText2( txt, si.context, sr, null );
+                    addSchemaError( elt, sr.str );
+                }
+                break;
+            }
+        }
+    }
+    
+    public void applyInputOutputBinds
+    ( final org.dom4j.Document doc, final PipelineContext pctxt, final boolean useSchema ) {
+        final String surl = useSchema ? getSchema() : null;
+        if ( surl != null ) {
+            
+            try {
+                final java.net.URL url = URLFactory.createURL( surl );
+                final Long modTim = NetUtils.getLastModified( url, ( Long )null );
+                
+                final Cache cache = ObjectCache.instance();
+                
+                final SchemaKey schmKey = new SchemaKey( url );
+                
+                final SchemaInfo schmInf;
+                {
+                    final Object cached = cache.findValid( pctxt, schmKey, modTim );
+                    schmInf = cached == null ? null : ( SchemaInfo )cached;
+                }
+
+                // Grammar is thread safe while REDocumentDeclaration is not so cache grammar 
+                // instead of doc decl.
+                final Grammar grmr;
+                if ( schmInf == null || !schmInf.includesUpToDate() ) {
+                    final SchemaInfo newSchmInf = new SchemaInfo();
+                    
+                    final InputSource is = XMLUtils.ENTITY_RESOLVER.resolveEntity( "", surl );
+                    final Controller cntrlr = new Controller( surl, newSchmInf );
+                    final SAXParserFactory fctry = XMLUtils.createSAXParserFactory( false );
+                    
+                    grmr = GrammarLoader.loadSchema( is, cntrlr, fctry );
+                    newSchmInf.setGrammar( grmr );
+                    cache.add( pctxt, schmKey, modTim, newSchmInf );
+                } else {
+                    
+                    grmr = schmInf.getGrammar();
+                }
+                final REDocumentDeclaration rdd = new REDocumentDeclaration( grmr );
+                final Acceptor acc = rdd.createAcceptor();
+                final org.dom4j.Element relt = doc.getRootElement();
+                validateElement( relt, acc );
+                
+            } catch ( final java.io.IOException e ) {
+                throw new OXFException( e );
+            } catch ( final SAXException e ) {
+                throw new OXFException( e );
+            } catch ( final ParserConfigurationException e ) {
+                throw new OXFException( e );
+            }
+            
+        }
+        for ( java.util.Iterator i = binds.iterator(); i.hasNext(); ) {
+            final ModelBind modelBind = ( ModelBind )i.next();
+            try {
+                // Create XPath evaluator for this bind
+                final DocumentWrapper documentWrapper = new DocumentWrapper( doc, null );
+                applyInputOutputBinds( documentWrapper, modelBind );
+
+            } catch ( final Exception e ) {
+                final LocationData loc = modelBind.getLocationData();
+                throw new ValidationException( e, loc );
+            }
+        }
+        final org.dom4j.Element elt = doc.getRootElement();
+        reconciliate( elt );
+    }
     // Worker
     private void applyInputOutputBinds(final DocumentWrapper documentWrapper, final ModelBind modelBind)
             throws XPathException {
@@ -406,25 +723,15 @@ public class Model {
         final InstanceData instDat = ( InstanceData )elt.getData();
         final String invldBnds = instDat.getInvalidBindIds();
         updateAttribute( elt, Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME, invldBnds );
+        
 
         // Reconcile boolean model item properties
         reconcileBoolean( instDat.getReadonly(), elt, Constants.XXFORMS_READONLY_ATTRIBUTE_QNAME ); 
         reconcileBoolean( instDat.getRelevant(), elt, Constants.XXFORMS_RELEVANT_ATTRIBUTE_QNAME );
         reconcileBoolean( instDat.getRequired(), elt, Constants.XXFORMS_REQUIRED_ATTRIBUTE_QNAME );
         {
-            // 02/24/2005 d : This is a hack that should go away very shortly, as soon as the 
-            //                schema validation is cleaned up.
-            //                It is here because while we want to keep users from directly
-            //                setting the xxforms:* attributes we currently need use it as the 
-            //                mechanism by which the XFormsValidationProcessor denotes errors.
-            final Attribute errAttr = elt.attribute( Constants.XXFORMS_ERROR_ATTRIBUTE_QNAME );
             final BooleanModelItemProperty validProp = instDat.getValid();
-            if ( errAttr == null ) {
-                reconcileBoolean( validProp, elt, Constants.XXFORMS_VALID_ATTRIBUTE_QNAME );
-            } else {
-                validProp.set( false );
-                updateAttribute( elt, Constants.XXFORMS_VALID_ATTRIBUTE_QNAME, "false" ); 
-            }
+            reconcileBoolean( validProp, elt, Constants.XXFORMS_VALID_ATTRIBUTE_QNAME );
         }
         for ( final java.util.Iterator i = elt.elements().iterator(); i.hasNext(); ) {
             final Object o = i.next();

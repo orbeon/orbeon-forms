@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.xforms.output.element;
 
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -23,6 +24,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.xpath.XPathException;
@@ -213,18 +215,26 @@ public class XFormsElement {
             // Linking attribute: load content to xxforms:src-value
             if(attributes.getIndex("", "src") != -1 && LINKING_CONTROLS.containsKey(localname)) {
                 try {
+                    final String val;
                     String src = attributes.getValue("src");
-                    URL url = URLFactory.createURL(src);
+                    if ( "orbeon:xforms:schema:errors".equals( src ) ) {
+                        final org.dom4j.Node nd = context.getCurrentSingleNode();
+                        final InstanceData instDat = XFormsUtils.getInstanceData( nd );
+                        final java.util.Iterator itr = instDat.getSchemaErrorsMsgs();
+                        val = StringUtils.join( itr, "\n" );
+                    } else {
+                        URL url = URLFactory.createURL(src);
 
-                    // Load file into buffer
-                    InputStreamReader stream = new InputStreamReader(url.openStream());
-                    StringBuffer value = new StringBuffer();
-                    char[] buff = new char[BUFFER_SIZE];
-                    int c = 0;
-                    while( (c = stream.read(buff, 0, BUFFER_SIZE-1)) != -1)
-                        value.append(buff, 0, c);
-
-                    addExtensionAttribute(newAttributes, "src-value", value.toString());
+                        // Load file into buffer
+                        InputStreamReader stream = new InputStreamReader(url.openStream());
+                        StringBuffer value = new StringBuffer();
+                        char[] buff = new char[BUFFER_SIZE];
+                        int c = 0;
+                        while( (c = stream.read(buff, 0, BUFFER_SIZE-1)) != -1)
+                            value.append(buff, 0, c);
+                        val = value.toString();
+                    }
+                    addExtensionAttribute(newAttributes, "src-value", val );
                 } catch (MalformedURLException e) {
                     throw new OXFException(e);
                 } catch (IOException ioe) {

@@ -13,32 +13,26 @@
  */
 package org.orbeon.oxf.processor.xforms.input;
 
+import java.util.Iterator;
+import java.util.List;
 import org.apache.log4j.Logger;
-import org.dom4j.Element;
 import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
-import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.DOMSerializer;
-import org.orbeon.oxf.processor.generator.DOMGenerator;
-import org.orbeon.oxf.processor.validation.XFormsValidationProcessor;
-import org.orbeon.oxf.processor.xforms.Model;
-import org.orbeon.oxf.processor.xforms.XFormsUtils;
+import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.input.action.Action;
 import org.orbeon.oxf.processor.xforms.input.action.ActionFunctionContext;
+import org.orbeon.oxf.processor.xforms.Model;
+import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.ContentHandler;
-
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Handle XForms decoding.
@@ -57,7 +51,6 @@ public class XFormsInput extends ProcessorImpl {
 
     static private Logger logger = LoggerFactory.createLogger(XFormsInput.class);
 
-    final static private String XFORMS_VALIDATION_FLAG = "validate";
     final static private String INPUT_MODEL = "model";
     final static private String INPUT_MATCHER_RESULT = "matcher-result";
     final static private String INPUT_REQUEST = "request";
@@ -132,29 +125,6 @@ public class XFormsInput extends ProcessorImpl {
                         logger.debug("1) Instance recontructed from request:\n"
                                 + XMLUtils.domToString(instance.getDocument()));
 
-                    // Schema-validate if necessary
-                    Boolean enabled = getPropertySet().getBoolean(XFORMS_VALIDATION_FLAG, true);
-                    if (enabled != null && enabled.booleanValue() && model.getSchema() != null) {
-
-                        Processor validator = new XFormsValidationProcessor(model.getSchema());
-                        Processor resourceGenerator = PipelineUtils.createURLGenerator(model.getSchema());
-                        PipelineUtils.connect(resourceGenerator, ProcessorImpl.OUTPUT_DATA, validator, XFormsValidationProcessor.INPUT_SCHEMA);
-                        PipelineUtils.connect(XFormsValidationProcessor.DECORATION_CONFIG, ProcessorImpl.OUTPUT_DATA,
-                                validator, ProcessorImpl.INPUT_CONFIG);
-                        DOMGenerator domGenerator = new DOMGenerator(instance.getDocument());
-                        PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, validator, ProcessorImpl.INPUT_DATA);
-                        DOMSerializer serializer = new DOMSerializer();
-                        PipelineUtils.connect(validator, ProcessorImpl.OUTPUT_DATA, serializer, ProcessorImpl.INPUT_DATA);
-
-                        serializer.reset(pipelineContext);
-                        serializer.start(pipelineContext);
-
-                        Document schemaAnnotatedInstance = serializer.getDocument(pipelineContext);
-                        instance.setDocument(DocumentHelper.createDocument(schemaAnnotatedInstance.getRootElement().createCopy()));
-
-                        // Validator removes decoration; need to re-set.
-                        XFormsUtils.setInitialDecoration(instance.getDocument());
-                    }
 
                     // Run actions
                     Action[] actions = requestParameters.getActions();
@@ -168,7 +138,14 @@ public class XFormsInput extends ProcessorImpl {
                                 + XMLUtils.domToString(instance.getDocument()));
 
                     // Run model item properties
-                    model.applyInputOutputBinds(instance.getDocument());
+                    final org.dom4j.Document d = instance.getDocument();
+                    
+                    final boolean schmVldat; 
+                    {
+                        final Boolean schmVldatdObj = getPropertySet().getBoolean( Constants.XFORMS_VALIDATION_FLAG, true);
+                        schmVldat = schmVldatdObj.booleanValue();
+                    }
+                    model.applyInputOutputBinds( d, pipelineContext, schmVldat );  
                     if (logger.isDebugEnabled())
                         logger.debug("3) Instance with model item properties applied:\n"
                                 + XMLUtils.domToString(instance.getDocument()));
@@ -182,3 +159,4 @@ public class XFormsInput extends ProcessorImpl {
         return output;
     }
 }
+ 

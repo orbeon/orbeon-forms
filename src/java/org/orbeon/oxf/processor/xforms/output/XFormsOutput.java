@@ -56,7 +56,9 @@ public class XFormsOutput extends ProcessorImpl {
                 final Document instance = DocumentHelper.createDocument
                         (readCacheInputAsDOM4J(context, INPUT_INSTANCE).getRootElement().createCopy());
                 XFormsUtils.setInitialDecoration(instance.getDocument());
-                model.applyInputOutputBinds(instance);
+                Boolean enabledObj = getPropertySet().getBoolean( Constants.XFORMS_VALIDATION_FLAG, true);
+                final boolean enabled = enabledObj.booleanValue();
+                model.applyInputOutputBinds( instance, context, enabled ); 
 
                 // Create evaluation context
                 final XFormsElementContext elementContext =
@@ -71,3 +73,4 @@ public class XFormsOutput extends ProcessorImpl {
         return output;
     }
 }
+ 

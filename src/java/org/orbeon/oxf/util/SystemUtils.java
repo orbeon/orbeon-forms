@@ -22,13 +22,6 @@ public class SystemUtils {
         return new File(System.getProperty("java.io.tmpdir")).getAbsoluteFile();
     }
 
-    public static void gatherPaths( final java.util.Collection trgt, final String pth ) {
-    	final java.io.File[] files = pathToFiles( pth );
-    	for ( int i = 0; i < files.length; i++ ) {
-    		trgt.add( files[ i ] );
-    	}
-    }
-    
     public static java.io.File[] pathToFiles( final String pth ) {
     	final java.util.ArrayList pthArr = new java.util.ArrayList();
     	final java.util.StringTokenizer st = new java.util.StringTokenizer
@@ -41,6 +34,13 @@ public class SystemUtils {
     	final java.io.File[] ret = new java.io.File[ pthArr.size() ];
     	pthArr.toArray( ret );
     	return ret;
+    }
+    
+    public static void gatherPaths( final java.util.Collection trgt, final String pth ) {
+    	final java.io.File[] files = pathToFiles( pth );
+    	for ( int i = 0; i < files.length; i++ ) {
+    		trgt.add( files[ i ] );
+    	}
     }
     
     public static void gatherSystemPaths( java.util.Collection c ) {
@@ -71,8 +71,7 @@ public class SystemUtils {
     	final StringBuffer sbuf = new StringBuffer();
     	final java.util.LinkedList urlLst = new java.util.LinkedList();
     	for ( ClassLoader cl = clazz.getClassLoader(); cl != null; cl = cl.getParent() ) {
-    		if ( !( cl instanceof java.net.URLClassLoader ) ) 
-    		{
+    		if ( !( cl instanceof java.net.URLClassLoader ) ) {
     			continue;
     		}
     		final java.net.URLClassLoader ucl = ( java.net.URLClassLoader )cl;
@@ -86,8 +85,7 @@ public class SystemUtils {
     		}
     	}
     	for ( final java.util.Iterator itr = urlLst.iterator();
-    	      itr.hasNext(); )
-    	{
+    	      itr.hasNext(); ) {
     		final java.net.URL url = ( java.net.URL )itr.next();
 			final String fnam = url.getFile();
 			final java.io.File fil = new java.io.File( fnam );

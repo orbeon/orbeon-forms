@@ -47,6 +47,9 @@
     <!-- Standalone BizDoc example -->
     <page path-info="/bizdoc*" model="/examples/bizdoc/page-flow.xpl"/>
 
+    <!-- Standalone Blog example -->
+    <page path-info="/blog*" model="/examples/blog/page-flow.xpl"/>
+
     <!-- Standalone Employees example -->
     <page path-info="/employees*" model="/examples/employees/page-flow.xpl"/>
 

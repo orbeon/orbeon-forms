@@ -1,13 +1,12 @@
 package org.orbeon.saxon.dom4j;
+import org.dom4j.Document;
+import org.orbeon.oxf.processor.xforms.output.InstanceData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NamePool;
 import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.type.Type;
-import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.xpath.XPathException;
-import org.orbeon.saxon.event.Receiver;
-import org.dom4j.Document;
 
 /**
   * The root node of an XPath tree. (Or equivalently, the tree itself).<P>
@@ -34,7 +33,19 @@ public class DocumentWrapper extends NodeWrapper implements DocumentInfo {
         super(doc, null, 0);
         node = doc;
         nodeKind = Type.DOCUMENT;
-        this.baseURI = baseURI;
+
+        // Extract the location info is available
+        if(baseURI == null) {
+            Object data = doc.getRootElement().getData();
+            if(data instanceof LocationData)   {
+                this.baseURI = ((LocationData)data).getSystemID();
+            } else if(data instanceof InstanceData) {
+                this.baseURI = ((InstanceData)data).getSystemId();
+            }
+        }
+        else
+            this.baseURI = baseURI;
+
         docWrapper = this;
         namePool = NamePool.getDefaultNamePool();
     }

@@ -233,7 +233,7 @@ public class XPathCache {
                 index = xpathExpression.indexOf("$", index+1);
                 numberVariables++;
             }
-
+            origContext.setBaseURI(contextNode.getDocumentRoot().getBaseURI());
             StandaloneContext standaloneContext = new XPathCacheStandaloneContext(origContext, numberVariables);
             evaluator.setStaticContext(standaloneContext);
 
@@ -245,7 +245,7 @@ public class XPathCache {
                     standaloneContext.declareNamespace(prefix, (String) prefixToURIMap.get(prefix));
                 }
             }
-            
+
             // Declare variables
             Map variables = new HashMap();
             if (variableToValueMap != null) {

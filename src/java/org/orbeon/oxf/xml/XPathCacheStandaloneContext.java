@@ -25,11 +25,22 @@ import org.orbeon.saxon.xpath.StandaloneContext;
 import org.orbeon.saxon.xpath.StaticError;
 import org.orbeon.saxon.xpath.Variable;
 import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.oxf.resources.URLFactory;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.transform.URIResolver;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.sax.SAXSource;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.net.URL;
+import java.io.IOException;
 
 public class XPathCacheStandaloneContext extends StandaloneContext {
+
+    private static final URIResolver URI_RESOLVER = new XPathCacheURIResolver();
 
     private int numSlots;
     private StandaloneContext origContext;
@@ -39,7 +50,18 @@ public class XPathCacheStandaloneContext extends StandaloneContext {
                 sm.setNumberOfVariables(numSlots);
                 return sm;
             }
-        };
+
+        /**
+         * Get the URIResolver used in this configuration
+         *
+         * @return the URIResolver. If no URIResolver has been set explicitly, the
+         *         default URIResolver is used.
+         */
+
+        public URIResolver getURIResolver() {
+            return URI_RESOLVER;
+        }
+    };
 
 
     /**
@@ -352,5 +374,19 @@ public class XPathCacheStandaloneContext extends StandaloneContext {
      * Create a StandaloneContext using the default Configuration and NamePool
      */
 
+    private static class XPathCacheURIResolver implements URIResolver {
+        public Source resolve(String href, String base) throws TransformerException {
+            try {
+                URL url = URLFactory.createURL(base, href);
+                return new SAXSource(XMLUtils.newSAXParser(false).getXMLReader(), new InputSource(url.openStream()));
+            } catch (SAXException e) {
+                throw new TransformerException(e);
+            } catch (IOException e) {
+                throw new TransformerException(e);
+            }
+
+        }
+    }
 
 }
+

@@ -36,6 +36,7 @@ import org.orbeon.saxon.xpath.StandaloneContext;
 import org.orbeon.saxon.xpath.XPathEvaluator;
 import org.orbeon.saxon.xpath.XPathException;
 import org.orbeon.saxon.functions.FunctionLibrary;
+import org.orbeon.saxon.om.Item;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -206,6 +207,8 @@ public class Model {
                                         Object resultItem = k.next();
                                         if (resultItem instanceof Node) {
                                             elementNode.add(((Node) elementNode.clone()));
+                                        } else if(resultItem instanceof Item) {
+                                            elementNode.add(DocumentFactory.getInstance().createText(((Item)resultItem).getStringValue()));
                                         } else {
                                             elementNode.add(DocumentFactory.getInstance().createText(resultItem.toString()));
                                         }

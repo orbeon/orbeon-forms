@@ -88,4 +88,12 @@ public class InstanceData {
     public void setIdToNodeMap(Map idToNodeMap) {
         this.idToNodeMap = idToNodeMap;
     }
+
+    public LocationData getLocationData() {
+        return locationData;
+    }
+
+    public String getSystemId() {
+        return locationData.getSystemID();
+    }
 }

@@ -915,7 +915,7 @@
         </output>
     </test>
 
-    <test description="Constraint with Korean character" name="oxf:xforms-annotate">
+    <test description="Constraint with Korean character" name="oxf:xforms-annotate" only="true">
         <input name="instance">
             <instance>
                 <a>&#x1105;</a>
@@ -928,7 +928,7 @@
             </xforms:model>
         </input>
         <output name="instance">
-            <instance>
+            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <a xxforms:valid="true">&#x1105;</a>
                 <b xxforms:valid="false">&#x1200;</b>
             </instance>

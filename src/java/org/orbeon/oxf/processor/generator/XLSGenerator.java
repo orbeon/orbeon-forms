@@ -17,37 +17,76 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.commons.fileupload.DiskFileUpload;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XLSUtils;
+import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.XMLConstants;
 import org.xml.sax.ContentHandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.StringTokenizer;
+import java.net.URL;
 
 /**
  * NOTE: This generator depends on the Servlet API.
  */
-public class XLSGenerator extends org.orbeon.oxf.processor.ProcessorImpl {
+public class XLSGenerator extends ProcessorImpl {
+
+    private final static String INPUT_REQUEST = "request";
 
     public XLSGenerator() {
-        addOutputInfo(new org.orbeon.oxf.processor.ProcessorInputOutputInfo(OUTPUT_DATA));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_REQUEST));
+        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
-    public org.orbeon.oxf.processor.ProcessorOutput createOutput(String name) {
-        org.orbeon.oxf.processor.ProcessorOutput output = new org.orbeon.oxf.processor.ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, ContentHandler contentHandler) {
+    public ProcessorOutput createOutput(String name) {
+        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
 
                 try {
-                    byte[] fileContent = (byte[]) context.getAttribute(PipelineContext.XLS_GENERATOR_LAST_FILE);
-                    if (fileContent == null)
-                        throw new OXFException("No file was uploaded");
+                    // Read binary content of uploaded Excel file
+                    final byte[] fileContent;
+                    {
+                        final String NO_FILE = "No file was uploaded";
+                        Document requestDocument  = readInputAsDOM4J(context, INPUT_REQUEST);
+                        Element valueElement = (Element) XPathCache.createCacheXPath(context,
+                                "/request/parameters/parameter[1]/value").evaluate(requestDocument);
+                        if (valueElement == null) throw new OXFException(NO_FILE);
+                        String type = valueElement.attributeValue(XMLConstants.XSI_TYPE_QNAME);
+                        if (type == null) throw new OXFException(NO_FILE);
+
+                        if (type.endsWith("anyURI")) {
+                            // Read file from disk
+                            String url = valueElement.getStringValue();
+                            InputStream urlInputStream = new URL(url).openStream();
+                            byte[] buffer = new byte[1024];
+                            ByteArrayOutputStream fileByteArray = new ByteArrayOutputStream();
+                            int size;
+                            while ((size = urlInputStream.read(buffer)) != -1)
+                                fileByteArray.write(buffer, 0, size);
+                            urlInputStream.close();
+                            fileContent = fileByteArray.toByteArray();
+                        } else {
+                            // Decode base64
+                            fileContent = Base64.decode(valueElement.getStringValue());
+                        }
+                    }
+
+                    // Generate XML from Excel file
                     DOMGenerator domGenerator = new DOMGenerator(extractFromXLS(new ByteArrayInputStream(fileContent)));
                     domGenerator.createOutput(OUTPUT_DATA).read(context, contentHandler);
 

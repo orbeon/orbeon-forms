@@ -13,29 +13,36 @@
  */
 package org.orbeon.oxf.transformer.xupdate;
 
-import org.apache.crimson.parser.XMLReaderImpl;
-import org.dom4j.io.OutputFormat;
-import org.dom4j.io.SAXContentHandler;
-import org.dom4j.io.XMLWriter;
-import org.xml.sax.InputSource;
-import org.xml.sax.XMLReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Reader;
 
-import javax.xml.transform.Templates;
-import javax.xml.transform.TransformerException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TemplatesHandler;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
+import javax.xml.transform.Templates;
+import javax.xml.transform.TransformerException;
+
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXContentHandler;
+import org.dom4j.io.XMLWriter;
+
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 public class XUpdateDriver {
 
     private final static String XUPDATE_FACTORY =
             "org.orbeon.oxf.transformer.xupdate.TransformerFactoryImpl";
 
-    public static void main(String[] args) throws TransformerException, IOException {
+    public static void main(String[] args) 
+    throws TransformerException, IOException, ParserConfigurationException
+    , SAXException {
 
         // Check arguments
         if (args.length != 2) {
@@ -46,7 +53,7 @@ public class XUpdateDriver {
         // Perform transformation
         Templates templates = createTemplates(new FileReader(args[1]));
         SAXContentHandler saxContentHandler = new SAXContentHandler();
-        templates.newTransformer().transform(new SAXSource(new XMLReaderImpl(),
+        templates.newTransformer().transform(new SAXSource( newXMLReader(),
                 new InputSource(new FileReader(args[0]))),
                 new SAXResult(saxContentHandler));
 
@@ -57,11 +64,20 @@ public class XUpdateDriver {
         xmlWriter.write(saxContentHandler.getDocument());
     }
 
+    private static XMLReader newXMLReader() 
+    throws ParserConfigurationException, SAXException {
+        final SAXParserFactory pf = SAXParserFactory.newInstance();
+        final SAXParser p = pf.newSAXParser();
+        final XMLReader ret = p.getXMLReader();
+        ret.setFeature( "http://xml.org/sax/features/namespaces", true );
+        return ret;
+    }
+
     private static Templates createTemplates(Reader xupdateReader) {
         try {
             SAXTransformerFactory factory = (SAXTransformerFactory) Class.forName(XUPDATE_FACTORY).newInstance();
             TemplatesHandler templatesHandler = factory.newTemplatesHandler();
-            XMLReader xmlReader = new XMLReaderImpl();
+            XMLReader xmlReader = newXMLReader();
             xmlReader.setContentHandler(templatesHandler);
             xmlReader.parse(new InputSource(xupdateReader));
             return templatesHandler.getTemplates();

@@ -680,9 +680,9 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
         throws TransformerException {
         if (nodeKind==Type.ELEMENT) {
             NamePool pool = docWrapper.getNamePool();
-            AxisIterator enum = iterateAxis(Axis.NAMESPACE);
+            AxisIterator enm = iterateAxis(Axis.NAMESPACE);
             while (true) {
-                NodeWrapper wrapper = (NodeWrapper)enum.next();
+                NodeWrapper wrapper = (NodeWrapper)enm.next();
                 if (wrapper == null) {
                     break;
                 }

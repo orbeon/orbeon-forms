@@ -97,4 +97,6 @@ public class TransformerFactoryImpl extends SAXTransformerFactory {
     public ErrorListener getErrorListener() {
         return null;
     }
+    public void setFeature( final String s, final boolean b ) {
+    }
 }

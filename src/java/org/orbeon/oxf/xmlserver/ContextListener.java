@@ -21,10 +21,16 @@ import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.util.JMSUtils;
 import org.orbeon.oxf.util.PipelineUtils;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
 import javax.jms.*;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import java.util.*;
 
 public class ContextListener implements ServletContextListener {
 

@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.xforms.output.element;
 
-import org.apache.xml.utils.NamespaceSupport2;
+import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;

@@ -461,6 +461,7 @@
         <exec executable='ssh' failonerror='true'>
             <arg value='${forge-ssh-id}'/>
             <arg value='mkdir'/>
+            <arg value='-p'/>
             <arg value='${unstbl-bld-dst}${release.number}'/>
         </exec>
 

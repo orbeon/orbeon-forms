@@ -40,8 +40,8 @@ import java.io.*;
 /**
  * Intercept either an OutputStream or a Writer.
  *
- * This implementation holds buffer for either a Writer or an Output Stream. The
- * buffer can then be parsed.
+ * This implementation holds a buffer for either a Writer or an Output Stream. The buffer can then
+ * be parsed.
  */
 public class StreamInterceptor {
 

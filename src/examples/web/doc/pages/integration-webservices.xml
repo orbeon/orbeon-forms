@@ -88,36 +88,37 @@
                     </xml-source>
                 </li>
                 <li>
-                    <p>To get the SOAP envelope sent to the Web services, use the
-                    <link href="processors-generators#RequestGenerator">request
-                    generator</link> and include the path
-                    <code>/request/body</code>:</p>
+                    <p>To get the SOAP envelope sent to the Web service, use the <link
+                    href="processors-generators#RequestGenerator">Request generator</link> and
+                    include the path <code>/request/body</code>, specifying the
+                    <code>xs:anyURI</code> type for the result. The resuting URI can then be parsed
+                    with the URL generator:</p>
 
                     <xml-source>
+                        <comment> Extract request body as a URI </comment>
                         <p:processor name="oxf:request">
                             <p:input name="config">
-                                <config>
+                                <config stream-type="xs:anyURI" xmlns:xs="http://www.w3.org/1999/XMLSchema">
                                     <include>/request/body</include>
                                 </config>
                             </p:input>
                             <p:output name="data" id="request"/>
                         </p:processor>
+
+                        <comment> Dereference URI </comment>
+                        <p:processor name="oxf:url-generator">
+                            <p:input name="config" href="aggregate('config', aggregate('url', #request#xpointer(string(/reqest/body)))"/>
+                            <p:output name="data" id="file"/>
+                        </p:processor>
                     </xml-source>
 
-                    <p>You will find the SOAP envelope sent by the client of
-                    your Web service in the <code>body</code> element, which is
-                    itself in the <code>request</code> element. For
-                    example:</p>
+                    <p>You will find the SOAP envelope sent by the client of your Web service as the
+                    resulting file. For example:</p>
 
                     <xml-source>
-                        <request>
-                            <body>
-                                <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-                                    <soapenv:Body>...</soapenv:Body>
-                                </soapenv:Envelope>
-                            </body>
-                        </request>
-
+                        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                            <soapenv:Body>...</soapenv:Body>
+                        </soapenv:Envelope>
                     </xml-source>
                 </li>
                 <li>

@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor.generator;
 
 import org.apache.commons.fileupload.DefaultFileItem;
+import org.apache.commons.fileupload.DefaultFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.dom4j.*;
@@ -27,7 +28,10 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.XMLConstants;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -36,14 +40,12 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXResult;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
@@ -57,13 +59,16 @@ import java.util.*;
  *     o If content-type is multipart/form-data, special handling takes place.
  *       o File items are read with commons upload, either in memory if small or on disk if large
  *       o Only references to the file items are stored in the DOM
+ *     o A special marker is put in place for the request body
  *   o Filter the DOM request based on config
  *   o Serialize the DOM into SAX
  *     o References to file items are treated specially during the serialization process
  *       o Small files are serialized, and the xs:base64Binary type is set
  *       o Large files are referenced, and the xs:anyURI type is set
+ *     o The body marker, if not filtered, causes the body of the request to be read
+ *       o Small files are serialized, and the xs:base64Binary type is set
+ *       o Large files are referenced, and the xs:anyURI type is set
  *
- *   o FIXME: Request body processing is badly implemented!!!
  *   o FIXME: The upload code checks that the total request body is not larger than the maximum
  *     upload size specified. But If many small files are uploaded, can we potentially use a lot
  *     of memory?
@@ -80,16 +85,16 @@ public class RequestGenerator extends ProcessorImpl {
     private static final String REQUEST_PRIVATE_NAMESPACE_URI = "http://orbeon.org/oxf/xml/request-private";
 
     // Maximum upload size
-    public static final int DEFAULT_MAX_UPLOAD_SIZE = 1024 * 1024;
-    public static final String MAX_UPLOAD_SIZE_PROPERTY = "max-upload-size";
+    private static final int DEFAULT_MAX_UPLOAD_SIZE = 1024 * 1024;
+    private static final String MAX_UPLOAD_SIZE_PROPERTY = "max-upload-size";
 
     // Maximum size kept in memory
-    public static final int DEFAULT_MAX_UPLOAD_MEMORY_SIZE = 10 * 1024;
-    public static final String MAX_UPLOAD_MEMORY_SIZE_PROPERTY = "max-upload-memory-size";
+    private static final int DEFAULT_MAX_UPLOAD_MEMORY_SIZE = 10 * 1024;
+    private static final String MAX_UPLOAD_MEMORY_SIZE_PROPERTY = "max-upload-memory-size";
 
     // Enable saving input stream
-    public static final boolean DEFAULT_ENABLE_INPUT_STREAM_SAVING = true;
-    public static final String ENABLE_INPUT_STREAM_SAVING_PROPERTY = "enable-input-stream-saving";
+//    private static final boolean DEFAULT_ENABLE_INPUT_STREAM_SAVING = true;
+//    private static final String ENABLE_INPUT_STREAM_SAVING_PROPERTY = "enable-input-stream-saving";
 
     private static final Long VALIDITY = new Long(0);
 
@@ -125,41 +130,59 @@ public class RequestGenerator extends ProcessorImpl {
                             if (REQUEST_PRIVATE_NAMESPACE_URI.equals(uri)) {
                                 // Special treatment for this element
                                 if (FILE_ITEM_ELEMENT.equals(qName)) {
+                                    // Marker for file item
+
                                     String parameterName = attributes.getValue(PARAMETER_NAME_ATTRIBUTE);
                                     FileItem fileItem = (FileItem) getRequest(pipelineContext).getParameterMap().get(parameterName);
-                                    if (fileItem.getSize() > 0) {
-                                        if (fileItem.isInMemory()) {
-                                            // The content of the file is streamed to the output (xs:base64Binary)
-                                            InputStream fileItemInputStream = null;
-                                            try {
-                                                fileItemInputStream = fileItem.getInputStream();
-                                                XMLUtils.inputStreamToBase64Characters(fileItemInputStream, getContentHandler());
-                                            } catch (IOException e) {
-                                                throw new OXFException(e);
-                                            } finally {
-                                                if (fileItemInputStream != null) {
-                                                    try {
-                                                        fileItemInputStream.close();
-                                                    } catch (IOException e) {
-                                                        throw new OXFException(e);
-                                                    }
-                                                }
-                                            }
-                                        } else {
-                                            // Only a reference to the file is output (xs:anyURI)
-                                            DefaultFileItem defaultFileItem = (DefaultFileItem) fileItem;
-                                            // File must exist on disk since isInMemory() returns false
-                                            File file = defaultFileItem.getStoreLocation();
-                                            try {
-                                                URL fileURL = file.toURL();
-                                                char[] chars = fileURL.toExternalForm().toCharArray();
-                                                getContentHandler().characters(chars, 0, chars.length);
-                                            } catch (MalformedURLException e) {
-                                                throw new OXFException(e);
-                                            }
+
+                                    AttributesImpl newAttributes = new AttributesImpl();
+                                    super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+                                    super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+                                    newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
+                                            useBase64(pipelineContext, fileItem) ? XMLConstants.BASE64BINARY_TYPE : XMLConstants.ANYURI_TYPE);
+                                    super.startElement("", "value", "value", newAttributes);
+                                    writeFileItem(pipelineContext, fileItem, getContentHandler());
+                                    super.endElement("", "value", "value");
+                                    super.endPrefixMapping(XMLConstants.XSD_PREFIX);
+                                    super.endPrefixMapping(XMLConstants.XSI_PREFIX);
+                                }
+                            } else if (localname.equals("body") && uri.equals("")) {
+                                // Marker for request body
+
+                                // Read InputStream into FileItem object, if not already present
+
+                                // We do this so we can read the body multiple times, if needed.
+                                // For large files, there will be a performance hit. If we knew
+                                // we didn't need to read it multiple times, we could avoid
+                                // saving the stream, but practically, it can happen, and it is
+                                // convenient.
+                                Context context = getContext(pipelineContext);
+                                if (context.bodyFileItem == null) {
+                                    final FileItem fileItem = new DefaultFileItemFactory(getMaxMemorySizeProperty(), SystemUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
+                                    pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
+                                        public void contextDestroyed(boolean success) {
+                                            fileItem.delete();
                                         }
+                                    });
+                                    try {
+                                        OutputStream outputStream = fileItem.getOutputStream();
+                                        NetUtils.copyStream(getRequest(pipelineContext).getInputStream(), outputStream);
+                                        outputStream.close();
+                                    } catch (IOException e) {
+                                        throw new OXFException(e);
                                     }
                                 }
+                                // Serialize the stream into the body element
+                                AttributesImpl newAttributes = new AttributesImpl();
+                                super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+                                super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+                                newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
+                                        useBase64(pipelineContext, context.bodyFileItem) ? XMLConstants.BASE64BINARY_TYPE : XMLConstants.ANYURI_TYPE);
+                                super.startElement(uri, localname, qName, newAttributes);
+                                writeFileItem(pipelineContext, context.bodyFileItem, getContentHandler());
+                                super.endElement(uri, localname, qName);
+                                super.endPrefixMapping(XMLConstants.XSD_PREFIX);
+                                super.endPrefixMapping(XMLConstants.XSI_PREFIX);
                             } else {
                                 super.startElement(uri, localname, qName, attributes);
                             }
@@ -199,15 +222,22 @@ public class RequestGenerator extends ProcessorImpl {
 
                 // Set request document
                 if (state.requestDocument == null) {
+                    // Read config document
                     Document config = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
-                    //String fileUploadType = XPathUtils.selectStringValue(config, "/config/file-upload/type");
-                    //state.fileUploadType = (fileUploadType == null) ? DEFAULT_FILE_UPLOAD_TYPE : fileUploadType;
+
+                    // Try to find stream-type attribute
+                    QName streamTypeQName = XMLUtils.extractAttributeValueQName(config.getRootElement(), "stream-type");
+                    if (streamTypeQName != null && !(streamTypeQName.equals(XMLConstants.XS_BASE64BINARY_QNAME) || streamTypeQName.equals(XMLConstants.XS_ANYURI_QNAME)))
+                        throw new OXFException("Invalid value for stream-type attribute: " + streamTypeQName.getQualifiedName());
+                    state.requestedStreamType = streamTypeQName;
+
+                    // Read and store request
                     state.requestDocument = readRequestAsDOM4J(pipelineContext, config);
                 }
 
-                // Set cache key, unless there is at least one upload
+                // Set cache key, unless there is at least one upload or unless the body is read
                 Context context = getContext(pipelineContext);
-                if (state.outputCacheKey == null && !context.hasUpload) {
+                if (state.outputCacheKey == null && !context.hasUpload || context.bodyFileItem != null) {
                     // NOTE: In theory, we could cache by digesting the uploaded files as well
                     state.outputCacheKey = new OutputCacheKey(getOutputByName(OUTPUT_DATA), new String(XMLUtils.getDigest(state.requestDocument)));
                 }
@@ -216,6 +246,61 @@ public class RequestGenerator extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
+    }
+
+    /**
+     * Check whether a specific FileItem must be generated as Base64.
+     */
+    private boolean useBase64(PipelineContext pipelineContext, FileItem fileItem) {
+        State state = (State) getState(pipelineContext);
+
+        return (state.requestedStreamType == null && fileItem.isInMemory())
+                || (state.requestedStreamType != null && state.requestedStreamType.equals(XMLConstants.XS_BASE64BINARY_QNAME));
+    }
+
+    private void writeFileItem(PipelineContext pipelineContext, FileItem fileItem, ContentHandler contentHandler) throws SAXException {
+        if (fileItem.getSize() > 0) {
+            if (useBase64(pipelineContext, fileItem)) {
+                // The content of the file is streamed to the output (xs:base64Binary)
+                InputStream fileItemInputStream = null;
+                try {
+                    fileItemInputStream = fileItem.getInputStream();
+                    XMLUtils.inputStreamToBase64Characters(fileItemInputStream, contentHandler);
+                } catch (IOException e) {
+                    throw new OXFException(e);
+                } finally {
+                    if (fileItemInputStream != null) {
+                        try {
+                            fileItemInputStream.close();
+                        } catch (IOException e) {
+                            throw new OXFException(e);
+                        }
+                    }
+                }
+            } else {
+                // Only a reference to the file is output (xs:anyURI)
+                DefaultFileItem defaultFileItem = (DefaultFileItem) fileItem;
+                String uri;
+                if (!fileItem.isInMemory()) {
+                    // File must exist on disk since isInMemory() returns false
+                    File file = defaultFileItem.getStoreLocation();
+                    try {
+                        uri = file.toURL().toExternalForm();
+                    } catch (MalformedURLException e) {
+                        throw new OXFException(e);
+                    }
+                } else {
+                    // File does not exist on disk, must convert
+                    try {
+                        uri = XMLUtils.inputStreamToAnyURI(pipelineContext, fileItem.getInputStream());
+                    } catch (IOException e) {
+                        throw new OXFException(e);
+                    }
+                }
+                char[] chars = uri.toCharArray();
+                contentHandler.characters(chars, 0, chars.length);
+            }
+        }
     }
 
     private Document readRequestAsDOM4J(PipelineContext pipelineContext, Node config) {
@@ -284,6 +369,8 @@ public class RequestGenerator extends ProcessorImpl {
             addTextElement(requestElement, "content-length", Integer.toString(request.getContentLength()));
         if (all || XPathUtils.selectSingleNode(config, "/config/parameters") != null)
             addParameters(context, requestElement, request);
+        if (all || XPathUtils.selectSingleNode(config, "/config/body") != null)
+            addBody(context, requestElement);
         if (all || XPathUtils.selectSingleNode(config, "/config/protocol") != null)
             addTextElement(requestElement, "protocol", request.getProtocol());
         if (all || XPathUtils.selectSingleNode(config, "/config/remote-addr") != null)
@@ -465,13 +552,13 @@ public class RequestGenerator extends ProcessorImpl {
                     parameterElement.addElement("content-type").addText(fileItem.getContentType());
                 parameterElement.addElement("content-length").addText(Long.toString(fileItem.getSize()));
 
-                // Create value element with type information
-                Element valueElement = parameterElement.addElement("value");
                 if (fileItem.getSize() > 0) {
-                    valueElement.addNamespace(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-                    valueElement.addAttribute(XMLConstants.XSI_TYPE_QNAME, fileItem.isInMemory() ? XMLConstants.BASE64BINARY_TYPE : XMLConstants.ANYURI_TYPE);
-                    Element fileItemElement = valueElement.addElement(FILE_ITEM_ELEMENT, REQUEST_PRIVATE_NAMESPACE_URI);
+                    // Create private placeholder element with parameter name as attribute
+                    Element fileItemElement = parameterElement.addElement(FILE_ITEM_ELEMENT, REQUEST_PRIVATE_NAMESPACE_URI);
                     fileItemElement.addAttribute(PARAMETER_NAME_ATTRIBUTE, name);
+                } else {
+                    // Just generate an empty "value" element
+                    parameterElement.addElement("value");
                 }
             } else {
                 throw new OXFException("Invalid value type.");
@@ -479,22 +566,27 @@ public class RequestGenerator extends ProcessorImpl {
         }
     }
 
+    protected void addBody(PipelineContext pipelineContext, Element requestElement) {
+        // This just adds a placeholder element
+        requestElement.addElement("body");
+    }
+
     public void reset(PipelineContext context) {
         setState(context, new State());
     }
 
     /**
-     * We store in the state the request document (output of this processor) and
-     * its key. This information is stored to be reused by readImpl() after a
-     * getKeyImpl() in the same pipeline context, or vice versa.
+     * We store in the state the request document (output of this processor) and its key. This
+     * information is stored to be reused by readImpl() after a getKeyImpl() in the same pipeline
+     * context, or vice versa.
      */
     private static class State {
         public OutputCacheKey outputCacheKey;
         public Document requestDocument;
-        //public String fileUploadType;
+        public QName requestedStreamType;
     }
 
-    public static Context getContext(PipelineContext pipelineContext) {
+    private static Context getContext(PipelineContext pipelineContext) {
         Context context = (Context) pipelineContext.getAttribute(PipelineContext.REQUEST_GENERATOR_CONTEXT);
         if (context == null) {
             context = new Context();
@@ -503,8 +595,27 @@ public class RequestGenerator extends ProcessorImpl {
         return context;
     }
 
-    public static class Context {
+    /**
+     * This context is kept in the PipelineContext so that if multiple Request generators are run,
+     * common information is reused.
+     */
+    private static class Context {
         public Document wholeRequest;
         public boolean hasUpload;
+        public FileItem bodyFileItem;
+    }
+
+    public static int getMaxSizeProperty() {
+        OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
+        Integer maxSizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_SIZE_PROPERTY);
+        int maxSize = (maxSizeProperty != null) ? maxSizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_SIZE;
+        return maxSize;
+    }
+
+    public static int getMaxMemorySizeProperty() {
+        OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
+        Integer maxMemorySizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_MEMORY_SIZE_PROPERTY);
+        int maxMemorySize = (maxMemorySizeProperty != null) ? maxMemorySizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE;
+        return maxMemorySize;
     }
 }

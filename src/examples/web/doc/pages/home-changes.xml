@@ -30,6 +30,41 @@
                     processor) and SQL databases.
                 </p>
             </section>
+            <section>
+                <title>XForms Upload</title>
+                <p>
+                    The XForms Upload control has been fixed. It comes with an <a
+                    href="/goto-example/xforms-upload">example</a> and is documented in the <a
+                    href="/doc/reference-xforms#upload">XForms reference documentation</a>.
+                </p>
+            </section>
+            <section>
+                <title>Improved Request Body Support</title>
+                <p>
+                    It was possible in the past with the Request generator to obtain the request
+                    body, which was automatically parsed as XML. It is now possible to read the body
+                    several times, and to obtain it as <code>xs:anyURI</code> or
+                    <code>xs:base64Binary</code>. Parsing may then be done using the URL generator.
+                </p>
+                <p>
+                    In a related change, the Request generator now supports specifying whether
+                    uploaded files or the request body must be generated as <code>xs:anyURI</code>
+                    or <code>xs:base64Binary</code>.
+                </p>
+            </section>
+<!--            <section>-->
+<!--				<title>Better Base64 Support and Binary Serializer</title>-->
+<!--				<p>-->
+<!--                    The URL generator now supports reading binary files. Those are converted into-->
+<!--                    XML text using the Base64 encoding. [TODO: Document, content-types, etc.]-->
+<!--                </p>-->
+<!--				<p>-->
+<!--                    A new serializer, the Binary serializer, supports decoding of Base64-encoded-->
+<!--                    data and sending the resulting binary stream to a client. Base64 support in OXF-->
+<!--                    has been improved, with upgrades to the SQL processor and the Request generator.-->
+<!--                    [TODO: Example with the two processors.]-->
+<!--                </p>-->
+<!--			</section>-->
         </section>
         <section>
 			<title>New in Version 2.5.4</title>

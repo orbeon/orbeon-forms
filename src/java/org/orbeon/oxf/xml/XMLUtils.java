@@ -826,12 +826,23 @@ public class XMLUtils {
     /**
      * Convert a String in xs:base64Binary to an xs:anyURI.
      *
-     * NOTE: The implementation crestes a temporary file. The Pipeline Context is required so that
-     * the file can be deleted when no longer used.
+     * NOTE: The implementation creates a temporary file. The Pipeline Context is required so
+     * that the file can be deleted when no longer used.
      */
     public static String base64BinaryToAnyURI(PipelineContext pipelineContext, String value) {
-        // Convert Base64 to binary
+        // Convert Base64 to binary first
         byte[] bytes = XMLUtils.base64StringToByteArray(value);
+
+        return inputStreamToAnyURI(pipelineContext, new ByteArrayInputStream(bytes));
+    }
+
+    /**
+     * Convert an InputStream to an xs:anyURI.
+     *
+     * NOTE: The implementation creates a temporary file. The Pipeline Context is required so
+     * that the file can be deleted when no longer used.
+     */
+    public static String inputStreamToAnyURI(PipelineContext pipelineContext, InputStream inputStream) {
         // We use the commons fileupload utilities to save a file
         if (fileItemFactory == null)
             fileItemFactory = new DefaultFileItemFactory(0, SystemUtils.getTemporaryDirectory());
@@ -846,7 +857,7 @@ public class XMLUtils {
         OutputStream os = null;
         try {
             os = fileItem.getOutputStream();
-            NetUtils.copyStream(new ByteArrayInputStream(bytes), os);
+            NetUtils.copyStream(inputStream, os);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

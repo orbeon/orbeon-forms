@@ -163,6 +163,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         try {
                             config = DocumentHelper.parseText
                                     ("<config><include>/request/parameters</include></config>");
+//                                    ("<config xmlns:xs='http://www.w3.org/2001/XMLSchema' stream-type='xs:anyURI'><include>/request/parameters</include></config>");
                         } catch (DocumentException e) {
                             throw new OXFException(e);
                         }

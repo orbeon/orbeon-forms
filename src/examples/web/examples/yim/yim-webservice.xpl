@@ -1,29 +1,36 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
+    <!-- Extract request body as a URI -->
     <p:processor name="oxf:request">
         <p:input name="config">
-            <config>
+            <config stream-type="xs:anyURI" xmlns:xs="http://www.w3.org/1999/XMLSchema">
                 <include>/request/body</include>
             </config>
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>
 
+    <!-- Dereference URI -->
+    <p:processor name="oxf:url-generator">
+        <p:input name="config" href="aggregate('config', aggregate('url', #request#xpointer(string(/reqest/body)))"/>
+        <p:output name="data" id="file"/>
+    </p:processor>
+
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#request"/>
+        <p:input name="data" href="#file"/>
         <p:input name="config">
             <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                     xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:m="urn:orbeon.com">
                 <xsl:template match="/">
                     <config>
                         <session>
-                            <xsl:copy-of select="/request/body/SOAP-ENV:Envelope/SOAP-ENV:Body/m:sendYIM/login"/>
-                            <xsl:copy-of select="/request/body/SOAP-ENV:Envelope/SOAP-ENV:Body/m:sendYIM/password"/>
+                            <xsl:copy-of select="/SOAP-ENV:Envelope/SOAP-ENV:Body/m:sendYIM/login"/>
+                            <xsl:copy-of select="/SOAP-ENV:Envelope/SOAP-ENV:Body/m:sendYIM/password"/>
                         </session>
                         <message>
-                            <xsl:copy-of select="/request/body/SOAP-ENV:Envelope/SOAP-ENV:Body/m:sendYIM/to"/>
-                            <xsl:copy-of select="/request/body/SOAP-ENV:Envelope/SOAP-ENV:Body/m:sendYIM/body"/>
+                            <xsl:copy-of select="/SOAP-ENV:Envelope/SOAP-ENV:Body/m:sendYIM/to"/>
+                            <xsl:copy-of select="/SOAP-ENV:Envelope/SOAP-ENV:Body/m:sendYIM/body"/>
                         </message>
                     </config>
                 </xsl:template>

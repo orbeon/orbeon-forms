@@ -742,6 +742,7 @@
                     </tr>
                 </table>
             </section>
+            <a name="upload"/>
             <section>
                 <title>Upload</title>
                 <p>
@@ -800,10 +801,10 @@
                 </xml-source>
                 <warning>
                     The URL stored as the value of the upload is temporary and only valid for the
-                    duration of the current request. It is also only accessible from the server
-                    side, and will not be accessible from a client such as a web browser. It is not
+                    duration of the current request. It is only accessible from the server side,
+                    and will not be accessible from a client such as a web browser. It is not
                     guaranteed to be a <code>file:</code> URL, only that it can be read with
-                    Presentation Server's URL Generator.
+                    Presentation Server's URL generator.
                 </warning>
                 <p>
                     The contents of the file can be retrieved using the URL Generator. The result

@@ -55,4 +55,5 @@ public class XMLConstants {
     public final static QName XS_DATETIME_QNAME = new QName("dateTime", XSD_NAMESPACE);
     public final static QName XS_QNAME_QNAME = new QName("QName", XSD_NAMESPACE);
     public final static QName XS_ANYURI_QNAME = new QName("anyURI", XSD_NAMESPACE);
+    public final static QName XS_BASE64BINARY_QNAME = new QName("base64Binary", XSD_NAMESPACE);
 }

@@ -11,29 +11,36 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
- <element name="config" xmlns="http://relaxng.org/ns/structure/1.0">
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
 
-     <interleave>
-         <zeroOrMore>
-             <choice>
-                 <element name="include">
-                     <text/>
-                 </element>
-                 <element name="exclude">
-                     <text/>
-                 </element>
-             </choice>
-         </zeroOrMore>
-<!--         <optional>-->
-<!--             <element name="file-upload">-->
-<!--                 <element name="type">-->
-<!--                    <choice>-->
-<!--                        <value>xs:anyURI</value>-->
-<!--                        <value>xs:base64Binary</value>-->
-<!--                    </choice>-->
-<!--                </element>-->
-<!--            </element>-->
-<!--         </optional>-->
-     </interleave>
+    <start>
+        <element name="config">
+            <optional>
+                <attribute name="stream-type">
+                    <choice>
+                        <data type="QName">
+                            <param name="pattern">.+:anyURI</param>
+                        </data>
+                        <data type="QName">
+                            <param name="pattern">.+:base64Binary</param>
+                        </data>
+                    </choice>
+                </attribute>
+            </optional>
+            <interleave>
+                <zeroOrMore>
+                    <choice>
+                        <element name="include">
+                            <text/>
+                        </element>
+                        <element name="exclude">
+                            <text/>
+                        </element>
+                    </choice>
+                </zeroOrMore>
+            </interleave>
+        </element>
+    </start>
 
- </element>
+</grammar>

@@ -22,7 +22,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.XMLConstants;
 import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.HttpServletRequestStub;
@@ -56,6 +55,9 @@ public class ServletExternalContext implements ExternalContext {
         private Map sessionMap;
         private Map parameterMap;
         private ServletInputStreamRepeater repeater;
+
+        private boolean getParameterMapMultipartFormDataCalled;
+        private boolean getInputStreamCalled;
 
         public String getContainerType() {
             return "servlet";
@@ -108,11 +110,11 @@ public class ServletExternalContext implements ExternalContext {
                 if (getContentType() != null && getContentType().startsWith("multipart/form-data")) {
                     // Special handling for multipart/form-data
 
+                    if (getInputStreamCalled)
+                        throw new OXFException("Cannot call getParameterMap() after getInputStream() when a form was posted with multipart/form-data");
+
                     // If needed, instanciate the repeater that may take care of temporarily storing the input stream
-                    // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
-                    OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
-                    boolean enableInputStreamSaving = propertySet.getBoolean(RequestGenerator.ENABLE_INPUT_STREAM_SAVING_PROPERTY, RequestGenerator.DEFAULT_ENABLE_INPUT_STREAM_SAVING).booleanValue();
-                    enableInputStreamSaving = false;// no longer do this; this was required for upload and portlets, now we do it differently
+                    boolean enableInputStreamSaving = false;// no longer do this; this was required for upload and portlets, now we do it differently
 
                     ServletInputStreamRepeater localRepeater = null;
                     try {
@@ -127,6 +129,9 @@ public class ServletExternalContext implements ExternalContext {
                     } catch (IOException e) {
                         throw new OXFException(e);
                     }
+
+                    // Remember that we were called, so we can display a meaningful exception if getInputStream() is called after this
+                    getParameterMapMultipartFormDataCalled = true;
                 } else {
                     // Try to set an appropriate encoding for forms and parameters
                     if (OXFServlet.supportsServlet23) {
@@ -258,10 +263,15 @@ public class ServletExternalContext implements ExternalContext {
         }
 
         public InputStream getInputStream() throws IOException {
-            if (repeater != null)
+            if (repeater != null) {
                 return repeater.getSavedInputStream();
-            else
+            } else {
+                if (getParameterMapMultipartFormDataCalled)
+                    throw new OXFException("Cannot call getInputStream() after getParameterMap() when a form was posted with multipart/form-data");
+                // Remember that we were called, so we can display a meaningful exception if getParameterMap() is called after this
+                getInputStreamCalled = true;
                 return nativeRequest.getInputStream();
+            }
         }
 
         public Locale getLocale() {
@@ -285,6 +295,13 @@ public class ServletExternalContext implements ExternalContext {
         }
     }
 
+    /**
+     * Utility method to decode a multipart/fomr-data stream and return a Map of parameters of type
+     * String[] or FileData.
+     *
+     * NOTE: This is used also by PortletExternalContext. Should probably remove this dependency
+     * at some point.
+     */
     public static Map getParameterMapMultipart(PipelineContext pipelineContext, final ExternalContext.Request request, final ServletInputStreamRepeater repeater) {
 
         final Map uploadParameterMap = new HashMap();
@@ -294,12 +311,8 @@ public class ServletExternalContext implements ExternalContext {
 
             // Read properties
             // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
-            OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
-            Integer maxSizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_SIZE_PROPERTY);
-            int maxSize = (maxSizeProperty != null) ? maxSizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_SIZE;
-
-            Integer maxMemorySizeProperty = propertySet.getInteger(RequestGenerator.MAX_UPLOAD_MEMORY_SIZE_PROPERTY);
-            int maxMemorySize = (maxMemorySizeProperty != null) ? maxMemorySizeProperty.intValue() : RequestGenerator.DEFAULT_MAX_UPLOAD_MEMORY_SIZE;
+            int maxSize = RequestGenerator.getMaxSizeProperty();
+            int maxMemorySize = RequestGenerator.getMaxMemorySizeProperty();
 
             if (repeater != null)
                 repeater.setMaxMemorySize(maxMemorySize);
@@ -324,6 +337,13 @@ public class ServletExternalContext implements ExternalContext {
             });
 
             // Wrap and implement just the required methods for the upload code
+            final InputStream inputStream;
+            try {
+                inputStream = (repeater != null) ? repeater.getInputStream() : request.getInputStream();
+            } catch (IOException e) {
+                throw new OXFException(e);
+            }
+
             HttpServletRequest wrapper = new HttpServletRequestStub() {
 
                 public String getHeader(String s) {
@@ -343,15 +363,14 @@ public class ServletExternalContext implements ExternalContext {
                         return request.getContentLength();
                 }
 
-                public ServletInputStream getInputStream() throws IOException {
+                public ServletInputStream getInputStream() {
                     // NOTE: The upload code does not actually check that it
                     // doesn't read more than the content-length sent by the client!
                     // Maybe here would be a good place to put an interceptor and
                     // make sure we don't read too much.
-                    final InputStream is = (repeater != null) ? repeater.getInputStream() : request.getInputStream();
                     return new ServletInputStream() {
                         public int read() throws IOException {
-                            return is.read();
+                            return inputStream.read();
                         }
                     };
                 }
@@ -369,19 +388,28 @@ public class ServletExternalContext implements ExternalContext {
                         uploadParameterMap.put(fileItem.getFieldName(), fileItem);
                     }
                 }
+                // Make sure repeater finishes its job
+                if (repeater != null) {
+                    repeater.finishReading();
+                    logger.debug("Finished reading InputStream repeater (announced content length "
+                            + repeater.getContentLength() + " bytes, actual read "
+                            + repeater.getActualByteCount() + " bytes)");
+                }
             } catch (FileUploadBase.SizeLimitExceededException e) {
                 // Should we do something smart so we can use the Presentation
                 // Server error page anyway? Right now, this is going to fail
                 // miserably with an error.
                 throw e;
-            }
-
-            // Make sure repeater finishes its job
-            if (repeater != null) {
-                repeater.finishReading();
-                logger.debug("Finished reading InputStream repeater (announced content length "
-                        + repeater.getContentLength() + " bytes, actual read "
-                        + repeater.getActualByteCount() + " bytes)");
+            } finally {
+                // Close the input stream; if we don't nobody does, and if this stream is
+                // associated with a temporary file, that file may resist deletion
+                if (inputStream != null) {
+                    try {
+                        inputStream.close();
+                    } catch (IOException e) {
+                        throw new OXFException(e);
+                    }
+                }
             }
 
             return uploadParameterMap;

@@ -442,7 +442,7 @@
                     <p>
                         XPL must have a company-agnostic namsepace used for the elements of its
                         syntax and for the Standard XML Processor Library. This can be done once the
-                        specification has a definite host.
+                        specification has found a host organization.
                     </p>
                 </item>
                 <item>
@@ -465,12 +465,12 @@
                 </item>
             </olist>
         </div2>
-        <div2>
-            <head>Closed Issues</head>
+<!--        <div2>-->
+<!--            <head>Closed Issues</head>-->
 <!--            <olist>-->
 <!--                <item>-->
 <!--                </item>-->
 <!--            </olist>-->
-        </div2>
+<!--        </div2>-->
     </div1>
 </back>

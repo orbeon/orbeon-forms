@@ -385,15 +385,15 @@
             </item>
         </ulist>
     </div2>
-    <div2>
-        <head><el>p:try</el> Execution</head>
-        <p>
-            This section is relevant only if the Exception Module is implemented.
-        </p>
-        <p>
-            [TODO]
-        </p>
-    </div2>
+<!--    <div2>-->
+<!--        <head><el>p:try</el> Execution</head>-->
+<!--        <p>-->
+<!--            This section is relevant only if the Exception Module is implemented.-->
+<!--        </p>-->
+<!--        <p>-->
+<!--            [TODO]-->
+<!--        </p>-->
+<!--    </div2>-->
     <div2 id="schema-references-processing">
         <head>Schema References</head>
         <p>

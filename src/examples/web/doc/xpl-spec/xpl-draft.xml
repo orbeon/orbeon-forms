@@ -1101,13 +1101,10 @@ fn:current() as <emph>document-node()</emph>
 <!--
 
 TODO:
-    o debug attribute: proc, choose, for-each
-    o schemas on p:param [now p:output / p:input]: group explanation in central location
     o improve [Relationship with the W3C Note 28 February 2002]
     o Refer to ncname definition: http://www.w3.org/TR/REC-xml-names/#NT-NCName
     o mention sub-pipelines (in xpl:pipeline?)
     o check XPath 2.0 spec and "host language"
-    o p:choose: export of identifiers
     o put p:while and p:try in a "future improvements section"
     o threading: mention?
 -->

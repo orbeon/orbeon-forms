@@ -287,11 +287,10 @@ href = <emph>infoset-reference</emph> &gt;
                 <el>id</el> attribute which defines an XML Infoset identifier to expose.
             </p>
             <p>
-                [TODO: Is this what we want to have, or do we just want to have the id attribute and
-                it has visibility inside as well as outside?] The mandatory <el>href</el> attribute
-                determines the XML Infoset exposed. The Infoset reference may refer to XML Infoset
-                identifiers scoped on the parent <el>p:choose</el> element as well as to XML Infoset
-                identifiers scoped in the branches of the <el>p:choose</el> statement.
+                The mandatory <el>href</el> attribute determines the XML Infoset exposed. The
+                Infoset reference may refer to XML Infoset identifiers scoped on the parent
+                <el>p:choose</el> element as well as to XML Infoset identifiers scoped in the
+                branches of the <el>p:choose</el> statement.
             </p>
             <p>
                 The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <bibref
@@ -455,18 +454,15 @@ schema-href? = <emph>uri-reference</emph> &gt;
         <div3>
             <head>The <el>p:while</el> element</head>
             <p>
-                [TODO: define?]
+                [TODO]
             </p>
         </div3>
     </div2>
     <div2>
         <head>Exception Module</head>
-        <div3>
-            <head>The <el>p:try</el> element</head>
-            <p>
-                [TODO: define?]
-            </p>
-        </div3>
+        <p>
+            [TODO]
+        </p>
     </div2>
     <div2 id="schema-references-syntax">
         <head>Schema References</head>

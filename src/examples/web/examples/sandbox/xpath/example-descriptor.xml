@@ -1,0 +1,25 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<example-descriptor>
+    <title>XPath Sandbox</title>
+    <source>model.xpl</source>
+    <source>form.xml</source>
+    <source>view.xsl</source>
+    <source>input.xml</source>
+    <description>
+        <p>
+            This example demonstrates the use of XPath 2.0 to transform XML documents. 
+        </p>
+    </description>
+</example-descriptor>

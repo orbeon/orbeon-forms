@@ -78,10 +78,10 @@
         <example id="xmldb" label="XML:DB Databases"/>
     </section>
     <section label="Query &amp; Transformation">
-        <example id="xquery" label="XQuery Sandbox"/>
-        <example id="xupdate" label="XUpdate Sandbox"/>
-        <example id="xpath" label="XPath Sandbox"/>
-        <example id="xpl" label="XPL Sandbox"/>
+        <example id="xquery" path="sandbox/xquery" label="XQuery Sandbox"/>
+        <example id="xupdate" path="sandbox/xupdate" label="XUpdate Sandbox"/>
+        <example id="xpath" path="sandbox/xpath" label="XPath Sandbox"/>
+        <example id="xpl" path="sandbox/xpl" label="XPL Sandbox"/>
         <example id="knight" label="Computations using XSLT"/>
         <example id="stx" label="Streaming Transformations"/>
     </section>

@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.portlet.processor.PortletContainerProcessor;
 import org.orbeon.oxf.portlet.processor.PortletIncludeGenerator;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.scope.ScopeProcessorBase;
 import org.orbeon.oxf.processor.test.TestProcessor;
 import org.orbeon.oxf.processor.scratchpad.PDFTemplateProcessor;
 import org.orbeon.oxf.processor.converter.JFreeChartConverter;
@@ -83,6 +84,8 @@ public class SchemaRepository {
         schemas.put(JFreeChartConverter.CHART_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/chart-converter-config.rng");
         schemas.put(XSLFOConverter.XSLFO_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/xslfo-converter-config.rng");
         schemas.put(ToXLSConverter.TO_XLS_CONVERTER_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "converter/to-xls-converter-config.rng");
+
+        schemas.put(ScopeProcessorBase.SCOPE_CONFIG_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "scope/scope-config.rng");
 
         schemas.put(EmailProcessor.EMAIL_CONFIG_NAMESPACE_URI, "schemas/email.rng");
         schemas.put(BeanGenerator.BEAN_CONFIG_NAMESPACE_URI, "schemas/bean-generator-config.rng");

@@ -16,6 +16,9 @@
 
     <start>
         <element name="script">
+            <optional>
+                <ref name="set-request"/>
+            </optional>
             <ref name="processor"/>
 
             <zeroOrMore>
@@ -79,12 +82,11 @@
                         </element>
                     </optional>
                     <optional>
-                        <element name="set-request">
-                            <choice>
-                                <attribute name="href"/>
-                                <!-- TODO: Use schema for request -->
-                                <ref name="anyElement"/>
-                            </choice>
+                        <ref name="set-request"/>
+                    </optional>
+                    <optional>
+                        <element name="run-processor">
+                            <empty/>
                         </element>
                     </optional>
                 </interleave>
@@ -126,6 +128,16 @@
                     </choice>
                 </element>
             </zeroOrMore>
+        </element>
+    </define>
+
+    <define name="set-request">
+        <element name="set-request">
+            <choice>
+                <attribute name="href"/>
+                <!-- TODO: Use schema for request -->
+                <ref name="anyElement"/>
+            </choice>
         </element>
     </define>
 

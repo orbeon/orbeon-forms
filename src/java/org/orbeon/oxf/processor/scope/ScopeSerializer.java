@@ -20,11 +20,11 @@ import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.xml.SAXStore;
 
-public class ScopeSerializer extends ScopeConfigReader {
+public class ScopeSerializer extends ScopeProcessorBase {
 
 
     public ScopeSerializer() {
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SCOPE_CONFIG_NAMESPACE_URI));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
     }
 
@@ -43,11 +43,11 @@ public class ScopeSerializer extends ScopeConfigReader {
 
         // Store the SAX store in context
         ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        if (config.getContextType() == ScopeConfigReader.REQUEST_CONTEXT) {
+        if (config.getContextType() == ScopeProcessorBase.REQUEST_CONTEXT) {
             externalContext.getRequest().getAttributesMap().put(config.getKey(), store);
-        } else if (config.getContextType() == ScopeConfigReader.SESSION_CONTEXT) {
+        } else if (config.getContextType() == ScopeProcessorBase.SESSION_CONTEXT) {
             externalContext.getSession(true).getAttributesMap().put(config.getKey(), store);
-        } else if (config.getContextType() == ScopeConfigReader.APPLICATION_CONTEXT) {
+        } else if (config.getContextType() == ScopeProcessorBase.APPLICATION_CONTEXT) {
             externalContext.getAttributesMap().put(config.getKey(), store);
         }
     }

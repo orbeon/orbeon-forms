@@ -76,7 +76,7 @@ public class TestProcessor extends ProcessorImpl {
                     handleWaitCommand(executionContext, commandElement);
                 } else if (commandName.equals("read")) {
                     handleReadCommand(executionContext, commandElement);
-                } else if (commandName.equals("run")) {
+                } else if (commandName.equals("run-processor")) {
                     handleRunCommand(executionContext, commandElement);
                 } else if (commandName.equals("set-request")) {
                     handleSetRequestCommand(executionContext, commandElement);
@@ -187,7 +187,11 @@ public class TestProcessor extends ProcessorImpl {
     }
 
     private void handleRunCommand(ExecutionContext executionContext, Element commandElement) {
-        throw new IllegalArgumentException("Not implemented yet.");
+        PipelineContext pipelineContext = new PipelineContext();
+        if (executionContext.externalContext != null)
+            pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, executionContext.externalContext);
+        executionContext.mainProcessor.reset(pipelineContext);
+        executionContext.mainProcessor.start(pipelineContext);
     }
 
     private void handleSetRequestCommand(ExecutionContext executionContext, Element commandElement) {

@@ -26,6 +26,8 @@ public class TestExternalContext implements ExternalContext  {
     private Request request;
     private Response response;
 
+    private Map attributesMap;
+
     public TestExternalContext(Document requestDocument) {
         this.requestDocument = requestDocument;
     }
@@ -339,13 +341,14 @@ public class TestExternalContext implements ExternalContext  {
     }
 
     public Map getAttributesMap() {
-        // NIY
-        return null;
+        if (attributesMap == null) {
+            attributesMap = new HashMap();
+        }
+        return attributesMap;
     }
 
     public Map getInitAttributesMap() {
-        // NIY
-        return null;
+        return Collections.EMPTY_MAP;
     }
 
     public Object getNativeContext() {

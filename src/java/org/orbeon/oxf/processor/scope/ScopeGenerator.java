@@ -13,12 +13,11 @@
  */
 package org.orbeon.oxf.processor.scope;
 
-import org.orbeon.oxf.cache.*;
+import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.SAXStore;
@@ -31,81 +30,71 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
-import java.util.Arrays;
 
-public class ScopeGenerator extends ScopeConfigReader {
+public class ScopeGenerator extends ScopeProcessorBase {
 
-    private InternalCacheKey DEFAULT_LOCAL_KEY = new InternalCacheKey(this, "constant", "constant");
+    private static SAXStore nullDocumentSAXStore;
 
     public ScopeGenerator() {
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SCOPE_CONFIG_NAMESPACE_URI));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, final ContentHandler contentHandler) {
+        ProcessorOutput output = new ProcessorImpl.DigestTransformerOutputImpl(getClass(), name) {
+            public void readImpl(PipelineContext pipelineContext, final ContentHandler contentHandler) {
                 try {
-                    State state = computeState(context);
-                    if (state.saxStore == null) {
-                        // Send empty document
-                        LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
-                        locationSAXWriter.setContentHandler(contentHandler);
-                        locationSAXWriter.write(XMLUtils.NULL_DOCUMENT);
-                    } else {
-                        state.saxStore.replay(contentHandler);
-                    }
+                    State state = (State) getFilledOutState(pipelineContext);
+                    state.saxStore.replay(contentHandler);
                 } catch (SAXException e) {
                     throw new OXFException(e);
                 }
             }
 
-            protected boolean supportsLocalKeyValidity() {
-                return true;
+            protected byte[] computeDigest(PipelineContext pipelineContext, DigestState digestState) {
+                if (digestState.digest == null) {
+                    fillOutState(pipelineContext, digestState);
+                }
+                return digestState.digest;
             }
 
-            protected CacheKey getLocalKey(PipelineContext context) {
-                State state = computeState(context);
-                return state.key == null ? DEFAULT_LOCAL_KEY : new InternalCacheKey(ScopeGenerator.this,
-                        Arrays.asList(new Object[] {state.key}));
-            }
-
-            protected Object getLocalValidity(PipelineContext context) {
-                State state = computeState(context);
-                return state.validity;
-            }
-
-            private State computeState(PipelineContext context) {
+            protected boolean fillOutState(PipelineContext pipelineContext, DigestState digestState) {
                 try {
-                    State state = (State) getState(context);
-                    if (!state.computed) {
+                    State state = (State) digestState;
+                    if (state.saxStore == null) {
 
-                        state.computed = true;
-                        ContextConfig config = readConfig(context);
+                        ContextConfig config = readConfig(pipelineContext);
 
                         // Get value from context
-                        ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-                        Object value = config.getContextType() ==  ScopeConfigReader.REQUEST_CONTEXT
+                        ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                        if (externalContext == null)
+                            throw new OXFException("Missing external context");
+                        Object value = config.getContextType() ==  ScopeProcessorBase.REQUEST_CONTEXT
                                 ? externalContext.getRequest().getAttributesMap().get(config.getKey())
-                                : config.getContextType() ==  ScopeConfigReader.SESSION_CONTEXT
+                                : config.getContextType() ==  ScopeProcessorBase.SESSION_CONTEXT
                                 ? externalContext.getSession(true).getAttributesMap().get(config.getKey())
-                                : config.getContextType() ==  ScopeConfigReader.APPLICATION_CONTEXT
+                                : config.getContextType() ==  ScopeProcessorBase.APPLICATION_CONTEXT
                                 ? externalContext.getAttributesMap().get(config.getKey())
                                 : null;
 
                         if (value != null) {
                             if (value instanceof ScopeStore) {
-
                                 // Case 1: use the stored key/validity as internal key/validity
                                 ScopeStore contextStore = (ScopeStore) value;
                                 state.saxStore = contextStore.getSaxStore();
-                                state.key = contextStore.getKey();
-                                state.validity = contextStore.getValidity();
+
+                                if (!config.isTestIgnoreStoredKeyValidity()) {
+                                    // Regular case
+                                    state.key = contextStore.getKey();
+                                    state.validity = contextStore.getValidity();
+                                } else {
+                                    // Special test mode (will use digest)
+                                    state.key = null;
+                                    state.validity = null;
+                                }
 
                             } else {
-
                                 // Case 2: "generate the validity from object" (similar to what is done in the BeanGenerator)
-
                                 if (value instanceof SAXStore) {
                                     state.saxStore = (SAXStore) value;
                                 } else {
@@ -125,39 +114,23 @@ public class ScopeGenerator extends ScopeConfigReader {
                                                 + " is of unknown type: " + value.getClass().getName());
                                     }
                                 }
-
-                                ProcessorInput configInput = getInputByName(INPUT_CONFIG);
-                                OutputCacheKey configKey = getInputKey(context, configInput);
-                                Object configValidity = getInputValidity(context, configInput);
-                                if (configKey != null && configValidity != null) {
-
-                                    // We store in cache: (config) -> (digest, validity)
-                                    InternalCacheKey internalCacheKey = new InternalCacheKey
-                                            (ScopeGenerator.this, Arrays.asList(new Object[] {configKey}));
-
-                                    // Compute digest of the SAX Store (the output of this processor)
-                                    byte[] digest; {
-                                        XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
-                                        state.saxStore.replay(digestContentHandler);
-                                        digest = digestContentHandler.getResult();
-                                    }
-
-                                    // Do we have a validity for this digest in cache?
-                                    Cache cache = ObjectCache.instance();
-                                    DigestValidity digestValidity = (DigestValidity) cache.findValid(context, internalCacheKey, configValidity);
-                                    if (digestValidity != null && digest.equals(digestValidity.digest)) {
-                                        state.validity = digestValidity.lastModified;
-                                    } else {
-                                        Long currentValidity = new Long(System.currentTimeMillis());
-                                        cache.add(context, internalCacheKey, configValidity, new DigestValidity(digest, currentValidity));
-                                        state.validity = currentValidity;
-                                    }
-                                }
                             }
+                        } else {
+                            // Store empty document
+                            if (nullDocumentSAXStore == null) {
+                                nullDocumentSAXStore = new SAXStore();
+                                Transformer identity = TransformerUtils.getIdentityTransformer();
+                                identity.transform(new DocumentSource(XMLUtils.NULL_DOCUMENT), new SAXResult(nullDocumentSAXStore));
+                            }
+                            state.saxStore = nullDocumentSAXStore;
                         }
 
+                        // Compute digest of the SAX Store
+                        XMLUtils.DigestContentHandler digestContentHandler = new XMLUtils.DigestContentHandler("MD5");
+                        state.saxStore.replay(digestContentHandler);
+                        state.digest = digestContentHandler.getResult();
                     }
-                    return state;
+                    return true;
 
                 } catch (Exception e) {
                     throw new OXFException(e);
@@ -172,20 +145,7 @@ public class ScopeGenerator extends ScopeConfigReader {
         setState(context, new State());
     }
 
-    private static class State {
-        public boolean computed = false;
+    private static class State extends DigestState {
         public SAXStore saxStore;
-        public OutputCacheKey key;
-        public Object validity;
-    }
-
-    private static class DigestValidity {
-        public byte[] digest;
-        public Long lastModified;
-
-        public DigestValidity(byte[] digest, Long lastModified) {
-            this.digest = digest;
-            this.lastModified = lastModified;
-        }
     }
 }

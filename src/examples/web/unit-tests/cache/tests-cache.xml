@@ -191,8 +191,256 @@
         </input>
     </test>
 
+    <test description="Simple Scope" name="oxf:test">
+        <input name="config">
+            <script>
+                <!-- Set a request because the Scope processors need an external context -->
+                <set-request href="cache/request1.xml"/>
+
+                <!-- First, store a document into the application scope -->
+                <processor name="oxf:scope-serializer" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k1</key>
+                            <scope>application</scope>
+                        </config>
+                    </input>
+                    <input name="data">
+                        <test-document>
+                            <element1 attribute1="value1"/>
+                            <element2 attribute2="value2"/>
+                            Some Text!
+                        </test-document>
+                    </input>
+                </processor>
+                <run-processor/>
+                <!-- Setup generator without using key/validity -->
+                <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k1</key>
+                            <scope>application</scope>
+                            <test-ignore-stored-key-validity>true</test-ignore-stored-key-validity>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v1"/>
+                <assert output-name="data" condition="output-cached"/>
+                <assert output-name="data" condition="output-equals">
+                    <test-document>
+                        <element1 attribute1="value1"/>
+                        <element2 attribute2="value2"/>
+                        Some Text!
+                    </test-document>
+                </assert>
+
+                <!-- Check with same document -->
+                <processor name="oxf:scope-serializer" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k1</key>
+                            <scope>application</scope>
+                        </config>
+                    </input>
+                    <input name="data">
+                        <test-document>
+                            <element1 attribute1="value1"/>
+                            <element2 attribute2="value2"/>
+                            Some Text!
+                        </test-document>
+                    </input>
+                </processor>
+                <run-processor/>
+                <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k1</key>
+                            <scope>application</scope>
+                            <test-ignore-stored-key-validity>true</test-ignore-stored-key-validity>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-cached"/>
+                <assert output-name="data" condition="output-equals">
+                    <test-document>
+                        <element1 attribute1="value1"/>
+                        <element2 attribute2="value2"/>
+                        Some Text!
+                    </test-document>
+                </assert>
+                <assert output-name="data" condition="cached-value-equal" value="v1"/>
+
+                <!-- Check with different document -->
+                <processor name="oxf:scope-serializer" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k1</key>
+                            <scope>application</scope>
+                        </config>
+                    </input>
+                    <input name="data">
+                        <test-document>
+                            <element1 attribute1="value1"/>
+                            <element2 attribute2="value2"/>
+                            Some Different Text!
+                        </test-document>
+                    </input>
+                </processor>
+                <run-processor/>
+                <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k1</key>
+                            <scope>application</scope>
+                            <test-ignore-stored-key-validity>true</test-ignore-stored-key-validity>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+                <assert output-name="data" condition="output-equals">
+                    <test-document>
+                        <element1 attribute1="value1"/>
+                        <element2 attribute2="value2"/>
+                        Some Different Text!
+                    </test-document>
+                </assert>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v2"/>
+                <assert output-name="data" condition="output-cached"/>
+
+                <!-- Check with different scope -->
+                <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k1</key>
+                            <scope>request</scope>
+                            <test-ignore-stored-key-validity>true</test-ignore-stored-key-validity>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+                <!-- The following doesn't work because one is <null/> and the other <null></null> -->
+<!--                <assert output-name="data" condition="output-equals">-->
+<!--                    <null xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>-->
+<!--                </assert>-->
+                <processor name="oxf:scope-serializer" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k1</key>
+                            <scope>request</scope>
+                        </config>
+                    </input>
+                    <input name="data">
+                        <test-document>
+                            <element1 attribute1="value1"/>
+                            <element2 attribute2="value2"/>
+                            Some Request Text!
+                        </test-document>
+                    </input>
+                </processor>
+                <run-processor/>
+                <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k1</key>
+                            <scope>application</scope>
+                            <test-ignore-stored-key-validity>true</test-ignore-stored-key-validity>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-cached"/>
+                <assert output-name="data" condition="cached-value-equal" value="v2"/>
+                <assert output-name="data" condition="output-equals">
+                    <test-document>
+                        <element1 attribute1="value1"/>
+                        <element2 attribute2="value2"/>
+                        Some Different Text!
+                    </test-document>
+                </assert>
+                <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k1</key>
+                            <scope>request</scope>
+                            <test-ignore-stored-key-validity>true</test-ignore-stored-key-validity>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-equals">
+                    <test-document>
+                        <element1 attribute1="value1"/>
+                        <element2 attribute2="value2"/>
+                        Some Request Text!
+                    </test-document>
+                </assert>
+
+                <!-- Try different key -->
+                <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k2</key>
+                            <scope>request</scope>
+                            <test-ignore-stored-key-validity>true</test-ignore-stored-key-validity>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+                <processor name="oxf:scope-serializer" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k2</key>
+                            <scope>request</scope>
+                        </config>
+                    </input>
+                    <input name="data">
+                        <test-document>
+                            <element1 attribute1="value1"/>
+                            <element2 attribute2="value2"/>
+                            Some Request Text #2!
+                        </test-document>
+                    </input>
+                </processor>
+                <run-processor/>
+                <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k1</key>
+                            <scope>request</scope>
+                            <test-ignore-stored-key-validity>true</test-ignore-stored-key-validity>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-equals">
+                    <test-document>
+                        <element1 attribute1="value1"/>
+                        <element2 attribute2="value2"/>
+                        Some Request Text!
+                    </test-document>
+                </assert>
+                <processor name="oxf:scope-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <key>k2</key>
+                            <scope>request</scope>
+                            <test-ignore-stored-key-validity>true</test-ignore-stored-key-validity>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-equals">
+                    <test-document>
+                        <element1 attribute1="value1"/>
+                        <element2 attribute2="value2"/>
+                        Some Request Text #2!
+                    </test-document>
+                </assert>
+
+            </script>
+        </input>
+    </test>
+
     <!-- TODO: XSLT with imports, doc(), document(), what about doc() w/ XInclude? -->
     <!-- TODO: URL gen: modify config -->
     <!-- TODO: Request gen: upload + body -->
-    <!-- TODO: Scope gen when supported -->
+    <!-- TODO: Bean gen -->
 </group>

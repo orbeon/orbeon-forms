@@ -24,13 +24,13 @@
             <title>Overview</title>
 
             <p>
-                Your Presentation Server applications can consume and expose Web services.</p>
+                Your PresentationServer applications can consume and expose Web services.</p>
         </section>
 
         <section>
             <title>Consuming Web Services</title>
 
-            <p>Applications built on Presentation Server call Web services using the <link
+            <p>Applications built on PresentationServer call Web services using the <link
             href="processors-delegation">delegation processor</link>. For example, this is how you
             would call the famous highway traffic Web service to get the conditions on the 101
             highway in California from an XPL:</p>
@@ -78,7 +78,7 @@
                 <li>
                     <p>Declare the Web service in the <code>page-flow.xml</code>, just like a
                     regular page with no view. The Web services will be implemented in an XPL file.
-                    The Presentation Server example portal features a Web service that sends
+                    The PresentationServer example portal features a Web service that sends
                     instant messages to Yahoo! users. It is declared in the
                     <code>page-flow.xml</code> as follows:</p>
 

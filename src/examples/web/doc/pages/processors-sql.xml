@@ -520,7 +520,7 @@ select first_name, last_name
                     on <code>sql:param</code>: <code>sql-type</code>. By default, text is written
                     using the JDBC setString() method. In case the data must be stored in the
                     database as a Character Large OBject (CLOB) or other database-specific types,
-                    it is necessary to tell Presentation Server that a different API must be used. For example, to
+                    it is necessary to tell PresentationServer that a different API must be used. For example, to
                     write a string into a CLOB:
                 </p>
 
@@ -829,7 +829,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </xml-source>
                 <note>
                     <p>
-                        Base64-encoded binary documents are widely used in Presentation Server, in
+                        Base64-encoded binary documents are widely used in PresentationServer, in
                         particular in the following cases:
                     </p>
                     <ul>
@@ -1298,7 +1298,7 @@ select level1.value v1, level2.value v2, level3.value v3
         <section>
             <title>Transactions</title>
             <p>
-                Presentation Server executes each HTTP request in its own transaction. If a
+                PresentationServer executes each HTTP request in its own transaction. If a
                 request fails for any reason, the SQL Processor rolls back the
                 transaction. The transaction is committed only when the pipeline
                 execution in complete.

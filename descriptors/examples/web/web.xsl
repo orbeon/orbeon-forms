@@ -178,7 +178,7 @@
             </xsl:call-template>
             -->
 
-            <xsl:comment> Set Presentation Server listeners </xsl:comment>
+            <xsl:comment> Set PresentationServer listeners </xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'listeners'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>

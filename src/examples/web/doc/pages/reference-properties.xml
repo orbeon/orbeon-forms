@@ -17,21 +17,21 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>Presentation Server Properties</title>
+        <title>PresentationServer Properties</title>
     </header>
     <body>
         <section>
             <title>Overview</title>
             <ul>
                 <li><p>
-                    <b>Rationale</b> – The Presentation Server properties are used by some
+                    <b>Rationale</b> – The PresentationServer properties are used by some
                     processors to configure or customize their behavior. This section describes how
                     the system is configured, and lists all the customizable properties.
                 </p></li>
                 <li><p>
                     <b>Properties File Location</b> – The properties sub-system is initialized after
                     the <link href="reference-resource-managers">Resource Manager</link> (the
-                    properties being read like any other Presentation Server resources). By default
+                    properties being read like any other PresentationServer resources). By default
                     it tries to load a file from the URL <code>oxf:/properties.xml</code>. This
                     value can be overridden in the Web application descriptor <code>web.xmxl</code>
                     with the <code>oxf.properties</code> initialization parameter:
@@ -98,7 +98,7 @@
                     </table>
                 </p>
                 <p>
-                    Presentation Server uses the <fork
+                    PresentationServer uses the <fork
                     href="http://jakarta.apache.org/log4j/docs/index.html">Log4J</fork> logging
                     framework. Log4J is configured with an XML file conforming to the <link
                     href="log4j.dtd.html">Log4J DTD</link>. Here is a sample Log4J configuration:
@@ -123,7 +123,7 @@
                 <p>
                     If this property is not set, the Log4J initialization is skipped. This is
                     useful if another subsystem of your application has already initialized Log4J
-                    prior to the loading of Presentation Server.
+                    prior to the loading of PresentationServer.
                 </p>
             </section>
 
@@ -134,7 +134,7 @@
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
                             <th>Purpose</th>
-                            <td>Setup the size of the Presentation Server cache</td>
+                            <td>Setup the size of the PresentationServer cache</td>
                         </tr>
                         <tr>
                             <th>Type</th>
@@ -150,7 +150,7 @@
                 </p>
 
                 <p>
-                    Presentation Server uses an efficient caching system. Presentation Server
+                    PresentationServer uses an efficient caching system. PresentationServer
                     automatically determines what can be cached and when to expire objects. The
                     cache has a default size of 200, meaning that it can hold 200 objects. This size
                     is reasonable for most applications. A bigger cache tends to make the
@@ -161,7 +161,7 @@
 
                 <ul>
                     <li>How often full garbage collections happen</li>
-                    <li>The value of the "success rate" reported by Presentation Server after each page is generated</li>
+                    <li>The value of the "success rate" reported by PresentationServer after each page is generated</li>
                 </ul>
 
                 <p>
@@ -242,7 +242,7 @@
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
                             <th>Purpose</th>
-                            <td>Defines Presentation Server processors</td>
+                            <td>Defines PresentationServer processors</td>
                         </tr>
                         <tr>
                             <th>Type</th>
@@ -255,8 +255,8 @@
                     </table>
                 </p>
                 <p>
-                    Loads a Presentation Server prologue file, where processors are declared.
-                    Presentation Server is bundled with a default prologue file containing all
+                    Loads a PresentationServer prologue file, where processors are declared.
+                    PresentationServer is bundled with a default prologue file containing all
                     processors. You can create processors (see the <link
                     href="reference-processor-api">processor API</link>) and declare them in a
                     custom prologue. The custom prologue doesn't replace, but completes the default
@@ -292,7 +292,7 @@
                     </table>
                 </p>
                 <p>
-                    SAX is the underlying mechanism in Presentation Server by which processors
+                    SAX is the underlying mechanism in PresentationServer by which processors
                     receive and generate XML data. Given only the constraints of the SAX API, it is
                     possible for a processor to generate an invalid sequence of SAX events. Another
                     processor that receives that invalid sequence of events may or may not be able

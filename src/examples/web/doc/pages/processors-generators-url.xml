@@ -29,7 +29,7 @@
             <p>
                 The URL generator fetches a document from a URL and produces an XML output document.
                 Common protocols such as <code>http:</code>, <code>ftp:</code>, and
-                <code>file:</code> are supported as well as the Presentation Server resource
+                <code>file:</code> are supported as well as the PresentationServer resource
                 protocol (<code>oxf:</code>). See <link href="reference-resource-managers">Resource
                 Managers</link> for more information about the <code>oxf:</code> protocol.
             </p>
@@ -348,7 +348,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             <title>Cache Control</title>
             <p>
                 It is possible to configure whether the URL generator caches documents locally
-                in the Presentation Server cache. By default, it does. To disable caching, use
+                in the PresentationServer cache. By default, it does. To disable caching, use
                 the <code>cache-control/use-local-cache</code> element, for example:
             </p>
             <xml-source>
@@ -367,7 +367,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             </xml-source>
             <p>
                 Using the local cache causes the URL generator to check if the document is in
-                the Presentation Server cache first. If it is, its validity is checked with the
+                the PresentationServer cache first. If it is, its validity is checked with the
                 protocol handler (looking at the last modified date for files, the
                 <code>last-modified</code> header for http, etc.). If the cached document is
                 valid, it is used. Otherwise, it is fetched and put in the cache.

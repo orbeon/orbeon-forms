@@ -25,15 +25,15 @@
             <section>
                 <title>Servlet and Portlet Deployment</title>
                 <p>
-                    Presentation Server is typically used to create Web applications. In this case,
-                    Presentation Server relies on standard Java Servlet technology, and the Web
+                    PresentationServer is typically used to create Web applications. In this case,
+                    PresentationServer relies on standard Java Servlet technology, and the Web
                     application's <code>web.xml</code> file is configured to use the Presentation
-                    Server Servlet or Presentation Server Servlet Filter. Presentation Server
+                    Server Servlet or PresentationServer Servlet Filter. PresentationServer
                     conforms to the Java Servlet API and handles a Web client's entire real estate
                     on the browser.
                 </p>
                 <p>
-                    Presentation Server also provides the Presentation Server Portlet, which
+                    PresentationServer also provides the PresentationServer Portlet, which
                     supports the implementation of standard Java portlets that can be deployed
                     within any portal or portlet container compatible with the Java Portlet
                     specification. This specification is also known as JSR-168. It is expected to be
@@ -89,10 +89,10 @@
             </section>
         </section>
         <section>
-            <title>Presentation Server and Portlets</title>
+            <title>PresentationServer and Portlets</title>
             <warning>
                 <p>
-                    The current Presentation Server Portlet integration is based on the <a
+                    The current PresentationServer Portlet integration is based on the <a
                     href="http://jcp.org/aboutJava/communityprocess/first/jsr168/index.html">Portlet
                     Specification Version 1.0 Public Final Draft of August 26, 2003 </a>. The
                     Portlet API will only be frozen as of the final 1.0 specification, due around
@@ -100,21 +100,21 @@
                 </p>
                 <p>
                     Make sure that you follow the <a href="intro-install">installation</a> notes
-                    and download the Portlet API JAR file before you use the Presentation Server
+                    and download the Portlet API JAR file before you use the PresentationServer
                     Portlet functionality. This is necessary until the final version of the Portlet
                     API specification is available and redistributable.
                 </p>
             </warning>
             <p>
-                Presentation Server hides the complexity of the Portlet API to allow most
-                Presentation Server applications to work unmodified within portlet containers and to
+                PresentationServer hides the complexity of the Portlet API to allow most
+                PresentationServer applications to work unmodified within portlet containers and to
                 follow best practices allowed by the Web Application Controller. In particular,
                 the Portlet API requires:
             </p>
             <ul>
                 <li>
                     <p>
-                        <b>Separation of faceless actions from rendering.</b> Presentation Server
+                        <b>Separation of faceless actions from rendering.</b> PresentationServer
                         allows actions to generate output while still adhering to the Java Portlet
                         specification. Developers are obviously free to only write faceless actions.
                         In the Page Flow Controller, such actions end with a <code>&lt;result
@@ -123,8 +123,8 @@
                 </li>
                 <li>
                     <p>
-                        <b>Getting rid of the familiar concept of URL path.</b> Presentation Server
-                        abstracts this behavior and provides Presentation Server Portlet developers
+                        <b>Getting rid of the familiar concept of URL path.</b> PresentationServer
+                        abstracts this behavior and provides PresentationServer Portlet developers
                         with the notion of a path, implicitly in the Web Application Controller, or
                         explicitly with the Request Generator, while still adhering to the Java
                         Portlet specification.
@@ -134,21 +134,21 @@
                     <p>
                         <b>Getting rid of the familiar concept of URL redirection.</b> Instead,
                         portlet actions can set parameters to use in subsequent portlet rendering.
-                        Presentation Server abstracts this behavior and provides, indirectly in the
+                        PresentationServer abstracts this behavior and provides, indirectly in the
                         Page Flow Controller, or explicitly with the Redirect Processor, the notion
                         of redirecting to another page within the portlet.
                     </p>
                 </li>
                 <li>
                     <p>
-                        <b>Calling APIs to generate URLs.</b> Presentation Server handles this by
+                        <b>Calling APIs to generate URLs.</b> PresentationServer handles this by
                         providing automatic <a href="reference-url-rewriting">URL rewriting</a>.
                     </p>
                 </li>
                  <li>
                     <p>
-                        <b>Generating Markup Fragments.</b> The default Presentation Server
-                        epilogue automatically extracts a fragment from a Presentation Server
+                        <b>Generating Markup Fragments.</b> The default PresentationServer
+                        epilogue automatically extracts a fragment from a PresentationServer
                         <code>&lt;d:document></code>. This allows pages to remain unmodified for
                         both servlet and portlet deployment. The default epilogue also makes sure
                         that no HTML or XML DOCTYPE is generated at the beginning of a fragment.
@@ -163,12 +163,12 @@
                 Configuration of portlets is done in a standard file called
                 <code>portlet.xml</code> that sits in the same directory <code>(WEB-INF)</code> as
                 your <code>web.xml</code>. The <code>portlet-class</code> element must always be
-                <code>org.orbeon.oxf.portlet.OXFPortlet</code> for Presentation Server Portlets (you
-                can also configure non-Presentation Server Portlets within the same
+                <code>org.orbeon.oxf.portlet.OXFPortlet</code> for PresentationServer Portlets (you
+                can also configure non-PresentationServer Portlets within the same
                 <code>portlet.xml</code>). The main processor URI and optional inputs are specified
                 with the <code>oxf.main-processor.uri</code> and
                 <code>oxf.main-processor.input.*</code> initialization parameters. For example, the
-                Presentation Server examples are configured to work within a portlet as follows:
+                PresentationServer examples are configured to work within a portlet as follows:
             </p>
             <xml-source>
 <portlet-app>
@@ -187,24 +187,24 @@
             <mime-type>text/html</mime-type>
         </supports>
         <portlet-info>
-            <title>Presentation Server Example Application</title>
+            <title>PresentationServer Example Application</title>
         </portlet-info>
     </portlet>
 </portlet-app>
             </xml-source>
             <p>
-                It is possible to configure several Presentation Server Portlets within the same
+                It is possible to configure several PresentationServer Portlets within the same
                 <code>portlet.xml</code>, with the same or a different configuration. The
                 <code>portlet-name</code> element however must be different for each portlet, as per
                 the Java Portlet specification. For more examples, please consult the example
-                <code>portlet.xml</code> file in the Presentation Server examples.
+                <code>portlet.xml</code> file in the PresentationServer examples.
             </p>
         </section>
         <section>
             <title>Portlet Output</title>
             <p>
                 The type of the portlet output is determined by the serializer. With the default
-                Presentation Server epilogue, the HTML serializer is used. The Simple Portlet
+                PresentationServer epilogue, the HTML serializer is used. The Simple Portlet
                 example illustrates how to use the XML Serializer instead.
             </p>
         </section>
@@ -268,17 +268,17 @@
         <section>
             <title>Deployment</title>
             <p>
-                A Presentation Server portlet application is deployed like a regular Web
+                A PresentationServer portlet application is deployed like a regular Web
                 application. You have to make sure that, in addition to the <code>web.xml</code>,
                 you have a valid <code>portlet.xml</code> configuration file as well.
             </p>
             <p>
                 You can deploy the application in any portlet container supporting the version of
                 the specification mentioned above. Alternatively, you can use the Presentation
-                Server Portal implementation, bundled with Presentation Server (see below).
+                Server Portal implementation, bundled with PresentationServer (see below).
             </p>
             <p>
-                It is possible to deploy Presentation Server Servlets, Servlet Filters, Servlet
+                It is possible to deploy PresentationServer Servlets, Servlet Filters, Servlet
                 Context Listeners, and Portlets within the same application:
             </p>
             <img print-format="pdf" src="pages/integration-portlets-deployment.png" width="522" height="234"/>
@@ -289,24 +289,24 @@
             </p>
         </section>
         <section>
-            <title>Presentation Server Portal (Alpha)</title>
+            <title>PresentationServer Portal (Alpha)</title>
             <p>
-               Presentation Server ships with the Presentation Server Portlet Container and a
-               demonstration Presentation Server Portal.
+               PresentationServer ships with the PresentationServer Portlet Container and a
+               demonstration PresentationServer Portal.
             </p>
             <note>
                 This software is currently in Alpha stage and is provided for demonstration and
                 evaluation purposes.
             </note>
             <p>
-                The Presentation Server Portlet Container is based on two processors, described in
+                The PresentationServer Portlet Container is based on two processors, described in
                 the following two sections.
             </p>
             <section>
                 <title>Portlet Container Processor</title>
                 <p>
                     The Portlet Container Processor must be present in every pipeline that makes
-                    use of the Presentation Server Portal. It manages the Presentation Server
+                    use of the PresentationServer Portal. It manages the PresentationServer
                     Portlet Container and makes sure that the configured portlets are instantiated.
                     The processor takes the following inputs and outputs:
                 </p>
@@ -342,21 +342,21 @@
                                         <portlet-instance>
                                             <portlet-id>1</portlet-id>
                                             <portlet-name>OXFSimplePortlet</portlet-name>
-                                            <title>Presentation Server Simple Portlet</title>
+                                            <title>PresentationServer Simple Portlet</title>
                                             <portlet-mode>view</portlet-mode>
                                             <window-state>normal</window-state>
                                         </portlet-instance>
                                         <portlet-instance>
                                             <portlet-id>2</portlet-id>
                                             <portlet-name>OXFRSSPortlet</portlet-name>
-                                            <title>Presentation Server RSS Portlet</title>
+                                            <title>PresentationServer RSS Portlet</title>
                                             <portlet-mode>view</portlet-mode>
                                             <window-state>normal</window-state>
                                         </portlet-instance>
                                         <portlet-instance>
                                             <portlet-id>3</portlet-id>
                                             <portlet-name>OXFExamples</portlet-name>
-                                            <title>Presentation Server Example Application</title>
+                                            <title>PresentationServer Example Application</title>
                                             <portlet-mode>view</portlet-mode>
                                             <window-state>normal</window-state>
                                         </portlet-instance>
@@ -414,7 +414,7 @@
                                                     <portlet:url>url4</portlet:url>
                                                 </portlet:portlet-mode>
                                             </portlet:portlet-modes>
-                                            <portlet:portlet-title>Presentation Server Simple Portlet</portlet:portlet-title>
+                                            <portlet:portlet-title>PresentationServer Simple Portlet</portlet:portlet-title>
                                             <portlet:body>
                                                 <div>
                                                     <h2>This is a title</h2>
@@ -442,7 +442,7 @@
                     case, the HTML is transformed into XML before being included.
                 </p>
                 <p>
-                    Using Presentation Server to implement the portal user interface gives the
+                    Using PresentationServer to implement the portal user interface gives the
                     portal implementer a lot of power, including:
                 </p>
                 <ul>
@@ -463,9 +463,9 @@
         <section>
             <title>Limitations</title>
             <section>
-                <title>Presentation Server Portlets</title>
+                <title>PresentationServer Portlets</title>
                 <p>
-                    The Presentation Server Portlet developer should be aware of the following
+                    The PresentationServer Portlet developer should be aware of the following
                     limitations:
                 </p>
                 <ul>
@@ -483,7 +483,7 @@
                         set a portlet mode or window state hint in a URL.
                     </li>
                     <li>
-                        <b>Content Type Hints.</b> It is not possible for an Presentation Server
+                        <b>Content Type Hints.</b> It is not possible for an PresentationServer
                         Portlet to know which content types are supported by the portal.
                     </li>
                     <li>
@@ -491,7 +491,7 @@
                         preferences or store them from within a portlet.
                     </li>
                     <li>
-                        <b>XML Fragments.</b> The Presentation Server Portlet currently must
+                        <b>XML Fragments.</b> The PresentationServer Portlet currently must
                         generate XML fragments containing a root node. This is rarely an issue, as a
                         fragment can for example be embedded within an XHTML <code>&lt;div></code>
                         element.
@@ -520,14 +520,14 @@
                     <li>Or any processor serving resources</li>
                 </ul>
                 <p>
-                    Presentation Server Portlets can however refer to resources served by the
-                    Presentation Server Servlet.
+                    PresentationServer Portlets can however refer to resources served by the
+                    PresentationServer Servlet.
                 </p>
             </section>
             <section>
-                <title>Presentation Server Portal (Alpha)</title>
+                <title>PresentationServer Portal (Alpha)</title>
                 <p>
-                    This version of the Presentation Server Portal has the following known limitations:
+                    This version of the PresentationServer Portal has the following known limitations:
                 </p>
                 <ul>
                     <li>PortletRequestDispatcher is only partially implemented.</li>

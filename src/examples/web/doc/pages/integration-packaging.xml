@@ -23,10 +23,10 @@
 			<title>Scope</title>
 			<p>
                 This section explains the structure of the standard WAR distributed with
-                Presentation Server and how this WAR integrates with the application server (or
+                PresentationServer and how this WAR integrates with the application server (or
                 Servlet container). This information is useful if you need to repackage Presentation
                 Server. For instance, if you want to build an EAR file, or if you need to deploy
-                more complex Presentation Server applications containing Servlets, Servlet Filters,
+                more complex PresentationServer applications containing Servlets, Servlet Filters,
                 Portlets, and Servlet context listeners.
             </p>
 		</section>
@@ -41,7 +41,7 @@
 					<td>
 						<code>WEB-INF/lib/orbeon.jar</code>
 					</td>
-					<td>JAR file with all the Presentation Server classes.</td>
+					<td>JAR file with all the PresentationServer classes.</td>
 				</tr>
 				<tr>
 					<td>
@@ -49,7 +49,7 @@
 					</td>
 					<td>
                         All the other JAR files in the <code>WEB-INF/lib</code> directory are used
-                        either by the Presentation Server core engine, or one of the Presentation
+                        either by the PresentationServer core engine, or one of the Presentation
                         Server processors.
                     </td>
 				</tr>
@@ -71,7 +71,7 @@
                         The standard portlet descriptor for this WAR file is required if you use
                         portlets. It typically declares instances of <code>OXFPortlet</code>. For
                         more information, see <a href="integration-portlets">Writing Portlets With
-                        Presentation Server</a>.
+                        PresentationServer</a>.
                     </td>
 				</tr>
 				<tr>
@@ -99,19 +99,19 @@
 						<code>WEB-INF/resources/*</code>
 					</td>
 					<td>
-                        Contains the resources for the Presentation Server example application.
+                        Contains the resources for the PresentationServer example application.
                         Most of the files in this directory will be replaced when you build your own
-                        Presentation Server web applications. In particular, this directory
-                        contains <code>properties.xml</code>, the main Presentation Server
+                        PresentationServer web applications. In particular, this directory
+                        contains <code>properties.xml</code>, the main PresentationServer
                         configuration file.
                     </td>
 				</tr>
 			</table>
 		</section>
 		<section>
-			<title>Presentation Server Initialization</title>
+			<title>PresentationServer Initialization</title>
             <p>
-                The following figure illustrates the initialization of a simple Presentation Server
+                The following figure illustrates the initialization of a simple PresentationServer
                 deployment in a J2EE application server:
             </p>
 			<img print-format="pdf" src="pages/integration-packaging-bootstrap.png" width="593" height="581"/>
@@ -152,13 +152,13 @@
 					<ul>
 						<li>
                             What resource manager has to be used, and how this resource manager is
-                            configured. In the default WAR bundled in the Presentation Server
-                            distribution, Presentation Server loads resources from the
+                            configured. In the default WAR bundled in the PresentationServer
+                            distribution, PresentationServer loads resources from the
                             <code>WEB-INF/resources</code> directory inside the WAR. If it can't
                             find a resource in this directory, it will try to look for it inside
                             <code>orbeon.jar</code>. Only static resources that are part of
-                            Presentation Server are stored in <code>orbeon.jar</code> (as opposed to
-                            Presentation Server applications). The <link
+                            PresentationServer are stored in <code>orbeon.jar</code> (as opposed to
+                            PresentationServer applications). The <link
                             href="reference-resource-managers">Resource Managers</link> section
                             explains in detail how resource managers work.
                         </li>
@@ -173,7 +173,7 @@
 				</li>
 				<li>
 					<p>
-                        Presentation Server is configured through an XML file,
+                        PresentationServer is configured through an XML file,
                         <code>properties.xml</code>, stored with the resources. The exact name and
                         path of this file is specified within <code>web.xml</code>.
                         <code>properties.xml</code> may declare the main processor to be executed by
@@ -208,7 +208,7 @@
 					</xml-source>
                     <p>
                         For more information about the properties file, see
-                        <link href="reference-properties">Presentation Server
+                        <link href="reference-properties">PresentationServer
                         Properties</link>.
                     </p>
 				</li>
@@ -241,20 +241,20 @@
                 </p>
                 <p>
                     In the simplest web application deployment scenario, as shown in the example
-                    above, only one Presentation Server Servlet needs to be configured. In more
-                    complex scenarios, it is possible to deploy multiple Presentation Server
-                    Servlets, Servlet filters, and Portlets, as well as one Presentation Server
+                    above, only one PresentationServer Servlet needs to be configured. In more
+                    complex scenarios, it is possible to deploy multiple PresentationServer
+                    Servlets, Servlet filters, and Portlets, as well as one PresentationServer
                     Servlet context listener, within the same Web or Portlet Application. The
                     following figure illustrates this:
                 </p>
                 <img print-format="pdf" src="pages/integration-portlets-deployment.png" width="522" height="234"/>
                 <p>
-                    Additional non-Presentation Server components can obviously be deployed within
+                    Additional non-PresentationServer components can obviously be deployed within
                     the same Web or Portlet Application.
                 </p>
             </section>
             <section>
-                <title>Presentation Server Servlet, Presentation Server Servlet Filter, and Presentation Server Portlet</title>
+                <title>PresentationServer Servlet, PresentationServer Servlet Filter, and PresentationServer Portlet</title>
                 <p>
                     These components can each have their own main processor. The main processor for
                     such components is looked up in the following locations, in this order:
@@ -323,7 +323,7 @@
                 <title>Definition</title>
                 <p>
                     In case an error is encoutered during the execution or the main processor,
-                    Presentation Server tries to execute an error processor. The error processor is
+                    PresentationServer tries to execute an error processor. The error processor is
                     typically a pipeline that produces a page showing the exception that was
                     encountered. For more information, please refer to the <a
                     href="reference-error-pipeline">Error Pipeline</a> documentation.

@@ -23,7 +23,7 @@
             <title>What is the Page Flow Controller?</title>
 
             <p>
-                The Presentation Server Page Flow Controller dispatches incoming user requests to individual pages
+                The PresentationServer Page Flow Controller dispatches incoming user requests to individual pages
                 based on a declarative description of the pages, built out of forms, models and 
                 views, following the model-view-controller (MVC) architecture.
             </p>
@@ -318,7 +318,7 @@
                 application controller configuration:</p>
 
                 <ul>
-                    <li><link href="../examples/source?src=config/page-flow.xml">The Presentation Server showcase
+                    <li><link href="../examples/source?src=config/page-flow.xml">The PresentationServer showcase
                     application main configuration</link></li>
 
                     <li><link href="../examples/source?src=atm%2Fpage-flow.xml">The ATM example
@@ -326,7 +326,7 @@
                 </ul>
 
                 <p>For further information please also see the <a href="Tutorial.pdf">Orbeon
-                Presentation Server Tutorial</a>.</p>
+                PresentationServer Tutorial</a>.</p>
 
             </section>
             <section>
@@ -360,7 +360,7 @@
                         <td>
                             In this case, an additional <code>matcher</code> argument must be
                             specified. The <code>matcher</code> argument must point to a matcher
-                            processor URI. Two matcher processors are provided with Presentation Server: the Perl5
+                            processor URI. Two matcher processors are provided with PresentationServer: the Perl5
                             matcher (URI <code>oxf/processor/perl5-matcher</code>) and the Glob
                             matcher (URI <code>oxf/processor/glob-matcher</code>). The Perl5 matcher
                             accepts <link
@@ -387,7 +387,7 @@
                     As with the <code>files</code> element, a matcher can also be specified. When
                     using a matcher where groups can be created, the part of the URI matched by
                     those groups can be passed to the model and the view through the XForms
-                    instance. Note that the only matcher bundled with Presentation Server that
+                    instance. Note that the only matcher bundled with PresentationServer that
                     accepts groups is the Perl5 matcher. For example, if you have the following
                     configuration:
                 </p>

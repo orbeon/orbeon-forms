@@ -24,7 +24,7 @@
             <p>
                 Generators are a special category of processors that have no XML data inputs, only
                 outputs. They are generally used at the top of an XML pipeline to generate XML data
-                from a Java object or other non-XML source. Presentation Server provides several
+                from a Java object or other non-XML source. PresentationServer provides several
                 generators as described below. See also the <a
                 href="processors-generators-url">URL</a> and <a
                 href="processors-generators-request">Request</a> generators.
@@ -137,7 +137,7 @@
                                     <b>request</b> - The request scope starts when an HTTP request is
                                     sent to the server. It ends when the corresponding HTTP response is
                                     sent back to the client. The request scope can be used to integrate
-                                    a Presentation Server application with legacy J2EE servlets.
+                                    a PresentationServer application with legacy J2EE servlets.
                                 </li>
                             </ul>
                         </td>

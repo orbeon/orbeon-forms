@@ -40,7 +40,7 @@
             <title>Standard Converters</title>
             <p>
                 The standard converters convert XML infosets (the XML documents that circulate in
-                Presentation Server pipelines) into text according to standard output methods
+                PresentationServer pipelines) into text according to standard output methods
                 defined by the XSLT specification. They convert to the following formats:
             </p>
             <ul>
@@ -293,9 +293,9 @@
         <section>
             <title>XLS Converters</title>
             <p>
-                Presentation Server ships with the <link
+                PresentationServer ships with the <link
                 href="http://jakarta.apache.org/poi/">POI</link> library which allows import and
-                export of Microsoft Excel documents. Presentation Server uses an Excel file
+                export of Microsoft Excel documents. PresentationServer uses an Excel file
                 template to define the layout of the spreadsheet. You define cells that will contain
                 the values with a special markup.
             </p>

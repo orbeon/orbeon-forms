@@ -540,7 +540,7 @@
                 <ul>
                     <li><b>Using the Java Security Manager</b> — The Java security manager can be
                     used to prevent OXF applications to perform unauthorized operations. The <link
-                    href="intro-install#security">Installing Presentation Server</link> section now
+                    href="intro-install#security">Installing PresentationServer</link> section now
                     documents how to run OXF under a Security Manager.</li>
 
                     <li><b>Chart Processor</b> — Documentation for the Chart processor is now

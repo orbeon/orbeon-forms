@@ -19,7 +19,7 @@
     xmlns:jsf="http://orbeon.org/oxf/xml/jsf-output"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <header>
-        <title>Using Presentation Server with JavaServer&#8482; Faces (JSF)</title>
+        <title>Using PresentationServer with JavaServer&#8482; Faces (JSF)</title>
     </header>
     <body>
         <section>
@@ -30,7 +30,7 @@
                 Process under JSR-127. JSF is primarily designed to build Web applications.
             </p>
             <p>
-                This chapter explains how to integrate Presentation Server with JSF. Most of this
+                This chapter explains how to integrate PresentationServer with JSF. Most of this
                 documentation also applies to the <a
                 href="http://www.orbeon.com/model2x/xml-renderkit">standalone distribution</a> of
                 the XML RenderKit for JavaServer Faces. It may also be a good read for anyone
@@ -109,14 +109,14 @@
                 <li>Write one JSP page for each different layout</li>
             </ul>
             <p>
-                The Presentation Server approach allows you to address this problem elegantly:
+                The PresentationServer approach allows you to address this problem elegantly:
             </p>
             <ul>
                 <li>
                     <p>
                         <b>Write an XML RenderKit once and for all.</b> Note that if you use only
                         the JSF Standard User Interface Components, you don't have to write your
-                        own renderer: you can use the one that comes with Presentation Server. This
+                        own renderer: you can use the one that comes with PresentationServer. This
                         means that you don't have to write a single line of Java to customize the
                         appearance of JSF components.
                     </p>
@@ -171,7 +171,7 @@
                             generates output through the RenderKit associated with the components.
                             Since the output of the standard RenderKit is HTML and not XML, it is
                             necessary to fix it. One way of doing this is to switch to an XML
-                            RenderKit instead. Presentation Server comes with such an XML RenderKit
+                            RenderKit instead. PresentationServer comes with such an XML RenderKit
                             implementation for the JSF Standard User Interface Components.
                         </p>
                         <p>
@@ -190,7 +190,7 @@
         <section>
             <title>Standalone Control Flow</title>
             <p>
-                When the XML RenderKit is used standalone (without Presentation Server), the
+                When the XML RenderKit is used standalone (without PresentationServer), the
                 following control flow (compatible with the Model 2X architecture) occurs: a custom
                 Servlet Filter implements a mini-controller, parses the JSP output and applies an
                 XSLT transformation. Such a filter can be modified at will to provide more or less
@@ -213,31 +213,31 @@
             </p>
         </section>
         <section>
-            <title>Presentation Server Control Flow</title>
+            <title>PresentationServer Control Flow</title>
             <p>
-                The current version of Presentation Server supports rendering JSF components using
+                The current version of PresentationServer supports rendering JSF components using
                 XML pipelines. You can use XSLT or other transformation languages. The flow is very
                 similar to the standalone flow, but dispatching the request to JSF and parsing the
-                JSP output is implemented in a generic XML processor in Presentation Server called
+                JSP output is implemented in a generic XML processor in PresentationServer called
                 the Servlet Filter Generator. The generator can be connected to any other XML
                 processors. A typical use is to connect its output to an XSLT Transformer.
             </p>
             <p>
                  The following figure illustrates the flow of the request, from
-                 the client to Presentation Server to JSF and back:
+                 the client to PresentationServer to JSF and back:
             </p>
             <img print-format="pdf" src="pages/model2x-jsf-overview.png"/>
             <p>
                 <ol>
                     <li>HTTP Request</li>
-                    <li>The Presentation Server Controller dispatches the request to an XML pipeline</li>
+                    <li>The PresentationServer Controller dispatches the request to an XML pipeline</li>
                     <li>Using a Servlet Filter Generator, the pipeline calls a JSF tree</li>
                     <li>The JSF Controller processes the request and forwards it to a JSP page</li>
                     <li>
                         If necessary using the JSF tag libraries and, indirectly, the XML RenderKit,
                         the JSP page generates XML output
                     </li>
-                    <li>The resulting XML is generated within Presentation Server by the Servlet Filter Generator</li>
+                    <li>The resulting XML is generated within PresentationServer by the Servlet Filter Generator</li>
                     <li>Through an optional series of transformations, the response is sent to the client</li>
                 </ol>
             </p>
@@ -245,7 +245,7 @@
         <section>
             <title>The XML RenderKit</title>
             <p>
-                Presentation Server comes with an XML RenderKit for the JSF Standard User Interface
+                PresentationServer comes with an XML RenderKit for the JSF Standard User Interface
                 Components. The XML RenderKit can also be used independently from Presentation
                 Server.
             </p>
@@ -279,7 +279,7 @@
                     The JSF Standard HTML RenderKit is currently not able to generate XHTML (the
                     XML-compliant version of HTML). It may do so in the future, or third-party
                     vendors may implement RenderKits with such functionality. It is important to
-                    note that a RenderKit generating XHTML is different from the Presentation Server
+                    note that a RenderKit generating XHTML is different from the PresentationServer
                     XML RenderKit. An XHTML RenderKit would generate the button above as
                     <code>&lt;input type="text" value="Submit"/></code>. The only difference with
                     the HTML version is the trailing slash (which is invalid in HTML). Similarly, a
@@ -342,7 +342,7 @@
                 <title>Sample XSLT Stylesheet</title>
                 <p>
                     A sample XSLT stylesheet that generates an (X)HTML output for each component
-                    ships Presentation Server as well as in the standalone distribution of the XML
+                    ships PresentationServer as well as in the standalone distribution of the XML
                     RenderKit for JavaServer Faces. It is also available online:
                 </p>
                 <p>

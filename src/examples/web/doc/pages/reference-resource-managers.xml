@@ -22,7 +22,7 @@
         <section>
             <title>Introduction</title>
             <p>
-                The resource manager is the Presentation Server component responsible for reading
+                The resource manager is the PresentationServer component responsible for reading
                 and writing XML and other resources like binary and text documents. The resource
                 manager abstracts the actual mechanisms used to store resources. An important
                 benefit of using such an abstraction is that it is possible to store all your
@@ -35,8 +35,8 @@
             </ul>
             <p>The resource manager is both used:</p>
             <ul>
-                <li>internally by Presentation Server</li>
-                <li>in Presentation Server applications through URLs with the <code>oxf:</code> protocol</li>
+                <li>internally by PresentationServer</li>
+                <li>in PresentationServer applications through URLs with the <code>oxf:</code> protocol</li>
             </ul>
             <p>
                 This section describes the different types of resource managers and explains their
@@ -46,7 +46,7 @@
         <section>
             <title>General Configuration</title>
             <p>
-                The resource manager is initialized in the Presentation Server main servlet.
+                The resource manager is initialized in the PresentationServer main servlet.
                 Configuration is handled in the Web application descriptor (<code>web.xml</code>)
                 by setting a number of properties. The first property indicates the resource manager
                 factory:
@@ -222,7 +222,7 @@
             <p>
                 The class loader resource manager can load resource from a JAR file or from a
                 directory in the classpath. This resource manager is required to load internal
-                resources for Presentation Server.
+                resources for PresentationServer.
             </p>
             <section>
                 <title>Example</title>
@@ -409,7 +409,7 @@
             <p>
                 With the priority resource manager you can chain several resource managers. It is
                 crucial to be able to load resources from multiple sources since some resources are
-                bundled in the Presentation Server JAR file. Thus, the class loader resource
+                bundled in the PresentationServer JAR file. Thus, the class loader resource
                 manager must always be in the priority chain. It usually has the lowest priority so
                 the application developer can override system resources.
             </p>
@@ -468,14 +468,14 @@
                 This resource manager loads XML documents from <link
                 href="http://www.intersystems.com/">InterSystems</link> Cach&#233; Object Database.
                 <link href="http://www.mgateway.tzo.com/eXtc.htm">eXtc</link> provides a W3C DOM
-                interface to Cach&#233; and allows Presentation Server to store and retrieve XML
+                interface to Cach&#233; and allows PresentationServer to store and retrieve XML
                 documents. This section assumes Cach&#233; and eXtc are already installed on your
                 system.
             </p>
 
             <note>
                 To enable this Resource Manager, you must copy <code>CacheDB.jar</code> from
-                Cach&#233; distribution into Presentation Server <code>WEB-INF/lib</code>
+                Cach&#233; distribution into PresentationServer <code>WEB-INF/lib</code>
                 directory.
             </note>
 
@@ -487,7 +487,7 @@
             <section>
                 <title>Importing XML Files into Cach&#233;</title>
                 <p>
-                    Presentation Server ships with <code>CacheImport</code> to populate the
+                    PresentationServer ships with <code>CacheImport</code> to populate the
                     database with resource from a directory. Set your <code>CLASSPATH</code>
                     environment variable to include the following JAR files to run
                     <code>CacheImport</code>:

@@ -29,7 +29,7 @@
                 conformance to the Model 2 pattern.
             </p>
             <p>
-                This chapter demonstrates how to use Presentation Server in conjunction with a
+                This chapter demonstrates how to use PresentationServer in conjunction with a
                 Struts-based Web Application in a pattern called <a href="model2x-model2x">Model
                 2X</a>. It assumes that the reader is familiar with Struts.
             </p>
@@ -45,7 +45,7 @@
             <title>Control Flow</title>
             <p>
                 The following figure presents the flow of the request, from the client to the
-                Struts servlet and Presentation Server pipeline:
+                Struts servlet and PresentationServer pipeline:
             </p>
             <img print-format="pdf" src="pages/model2x-struts-model2x.png"/>
             <p>
@@ -54,9 +54,9 @@
                     <li>Controller Servlet creates the Form Bean</li>
                     <li>Controller Servlet calls the Action Class</li>
                     <li>The Action Class creates and fills in the Result Bean(s)</li>
-                    <li>The Request is forwarded to the Presentation Server Servlet</li>
-                    <li>The Presentation Server Servlet serializes  the Result Bean in XML</li>
-                    <li>An Presentation Server pipeline is applied on the XML Bean</li>
+                    <li>The Request is forwarded to the PresentationServer Servlet</li>
+                    <li>The PresentationServer Servlet serializes  the Result Bean in XML</li>
+                    <li>An PresentationServer pipeline is applied on the XML Bean</li>
                     <li>HTML is sent back to the client</li>
                 </ol>
             </p>
@@ -66,10 +66,10 @@
         <section>
             <title>Implementation</title>
             <p>
-                A Struts-Presentation Server Web Application contains two servlets: the Struts
-                controller server and the Presentation Server processor servlet. The former is the
+                A Struts-PresentationServer Web Application contains two servlets: the Struts
+                controller server and the PresentationServer processor servlet. The former is the
                 default servlet, serving all URI, while the latter is bound to <code>xpl</code>
-                files and other resources served by Presentation Server (images, css, etc.). Here is
+                files and other resources served by PresentationServer (images, css, etc.). Here is
                 a Web Application descriptor that instantiates both servlets:
             </p>
             <xml-source>
@@ -156,7 +156,7 @@
                 The Struts controller servlet interprets the request and creates form beans
                 containing the request parameters. It then instantiates and calls the appropriate
                 action class. The result bean is then set in the request, and the request is
-                forwarded to the Presentation Server processor servlet. Struts chooses the
+                forwarded to the PresentationServer processor servlet. Struts chooses the
                 forwarding pages in the same way as the traditional JSP forward: through
                 <code>forward</code> commands in the <code>struts-config.xml</code> file. For
                 example, the following fragment shows a Struts action with one possible forward, the
@@ -171,14 +171,14 @@
             </xml-source>
 
             <p>
-                Presentation Server utilizes a <link
+                PresentationServer utilizes a <link
                 href="processors-generators#bean-generator">Bean generator</link> to serialize
                 beans from the request or session into XML. This process makes use of the <link
                 href="http://castor.exolab.org/">Castor XML Marshaller</link>.
             </p>
 
             <p>
-                The Presentation Server processor servlet is configured to use a simple pipeline
+                The PresentationServer processor servlet is configured to use a simple pipeline
                 that looks at the request's path and executes the corresponding pipeline, feeding it
                 with the bean form generator. The pipeline's output is then processed through a
                 second pipeline, the epilogue. This allows to apply common stylesheets ot all pages,
@@ -186,7 +186,7 @@
                 serve static resources, such as images or css style sheets. Theses resources are
                 served via the ResourceServer. You will find below the complete source of the Struts
                 main pipeline. The same file, <code>struts.xpl</code> is also available with the
-                struts examples bundled in Presentation Server distribution.
+                struts examples bundled in PresentationServer distribution.
             </p>
 
             <xml-source>
@@ -299,7 +299,7 @@
 
             <p>
                 The <code>struts.xpl</code> pipeline presented in the previous section acts as a
-                dispatcher. When the Struts servlet forwards the request to the Presentation Server
+                dispatcher. When the Struts servlet forwards the request to the PresentationServer
                 servlet, this pipeline is executed. It loads, connects and executes the view
                 pipeline for each page. The view pipeline must conform to the following contract:
 
@@ -331,7 +331,7 @@
         <section>
             <title>Accessing the Struts Application Resources</title>
             <p>
-                Presentation Server provides a mechanism to access Struts resources from an XSLT
+                PresentationServer provides a mechanism to access Struts resources from an XSLT
                 stylesheet. You define a resource bundle in <code>struts-config.xml</code>, in the
                 <code>message-resource</code> element. You can declare several resource bundles by
                 specifying a <code>key</code> attribute.
@@ -392,7 +392,7 @@
             </p>
             <p>
                 XSLT processors use a slightly different mechanism to access the Struts message
-                library. Presentation Server provides wrappers for Xalan, Saxon 6 and 7. XSLTC
+                library. PresentationServer provides wrappers for Xalan, Saxon 6 and 7. XSLTC
                 calls the Java method directly. Declare the <code>struts</code> namespace and import
                 the specified stylesheet to be able to call the <code>struts:message()</code>
                 function. The table below shows the namespaces and stylesheets to import for the
@@ -463,7 +463,7 @@
                 Javascript code.
             </p>
             <p>
-                Similarly, Presentation Server exposes this functionality through an XSLT function.
+                Similarly, PresentationServer exposes this functionality through an XSLT function.
                 Only the first parameter is mandatory.
 
                 <source>
@@ -504,7 +504,7 @@
             </p>
             <p>
                 XSLT processors use a slightly different mechanism to access the Struts javascript
-                library. Presentation Server provides wrappers for Xalan, Saxon 6 and 7. XSLTC
+                library. PresentationServer provides wrappers for Xalan, Saxon 6 and 7. XSLTC
                 calls the Java method directly. Declare the <code>struts</code> namespace and import
                 the specified stylesheet to be able to call the <code>struts:javascript()</code>
                 function. The table below shows the namespaces and stylesheets to import for the

@@ -17,24 +17,24 @@
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>Using the Presentation Server XUpdate Engine in Java</title>
+        <title>Using the PresentationServer XUpdate Engine in Java</title>
     </header>
     <body>
         <section>
             <title>Scope</title>
 
-            <p>Presentation Server applications use the <link href="processors-xupdate">XUpdate
-            processor</link> to perform XUpdate transformations. The Presentation Server XUpdate
+            <p>PresentationServer applications use the <link href="processors-xupdate">XUpdate
+            processor</link> to perform XUpdate transformations. The PresentationServer XUpdate
             engine implements the JAXP API that can be used directly by Java programs for
             experimentation purposes. This section describes the JAXP interface exposed by the
-            Presentation Server XUpdate engine. We assume here that you are familiar with the basics
+            PresentationServer XUpdate engine. We assume here that you are familiar with the basics
             of the JAXP APIs.</p>
         </section>
         <section>
             <title>API</title>
 
             <p>Note: The JAXP methods described in this section are the only ones supported by
-            Presentation Server.</p>
+            PresentationServer.</p>
 
             <section>
                 <title>Creating a Templates</title>
@@ -79,7 +79,7 @@
             your classpath:</p>
 
             <ul>
-                <li>Presentation Server: <code>orbeon.jar</code></li>
+                <li>PresentationServer: <code>orbeon.jar</code></li>
                 <li>dom4j: <code>dom4j-1_4.jar</code></li>
                 <li>Jaxen: <code>jaxen-1_1-beta-1-dev.jar</code></li>
                 <li>SAXPath: <code>saxpath-dev_orbeon.jar</code></li>
@@ -90,7 +90,7 @@
             <p> To get those JAR files:</p>
             <ol>
                 <li><link href="http://www.orbeon.com/oxf/download">Download
-                Presentation Server</link></li>
+                PresentationServer</link></li>
 
                 <li>Extract orbeon.war from the ZIP archive.</li>
 

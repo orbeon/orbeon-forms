@@ -25,7 +25,7 @@
             <section>
                 <title>Introduction</title>
                 <p>
-                    Presentation Server uses the
+                    PresentationServer uses the
                     <link
                         href="http://www.jfree.org/jfreechart/index.html">JFreeChart</link>
                     to draw and display charts. The following features are supported:
@@ -474,9 +474,9 @@
                 information.
             </note>
             <p>
-                Presentation Server ships with the <link
+                PresentationServer ships with the <link
                 href="http://jakarta.apache.org/poi/index.html">POI</link> library which allows
-                import and export of Microsoft Excel documents. Presentation Server uses an Excel
+                import and export of Microsoft Excel documents. PresentationServer uses an Excel
                 file template to define the layout of the spreadsheet. You define cells that will
                 contain the values with a special markup.
             </p>

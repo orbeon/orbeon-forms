@@ -16,7 +16,7 @@
             <mime-type>text/html</mime-type>
         </supports>
         <portlet-info>
-            <title>Presentation Server Simple Portlet</title>
+            <title>PresentationServer Simple Portlet</title>
         </portlet-info>
     </portlet>
     <portlet>
@@ -34,7 +34,7 @@
             <mime-type>text/html</mime-type>
         </supports>
         <portlet-info>
-            <title>Presentation Server RSS Portlet</title>
+            <title>PresentationServer RSS Portlet</title>
         </portlet-info>
         <portlet-preferences>
             <preference>
@@ -62,7 +62,7 @@
             <mime-type>text/html</mime-type>
         </supports>
         <portlet-info>
-            <title>Presentation Server Example Application</title>
+            <title>PresentationServer Example Application</title>
         </portlet-info>
     </portlet>
 

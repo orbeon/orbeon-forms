@@ -141,7 +141,7 @@
                 </request>
             </xml-source>
             <note>
-                Presentation Server adds a request attribute: the <code>request-path</code>. This
+                PresentationServer adds a request attribute: the <code>request-path</code>. This
                 attribute is defined as a concatenation of the <code>servlet-path</code> and the
                 <code>path-info</code>. This is useful because both original attributes are
                 frequently mixed up and often change depending on the application server or its
@@ -257,7 +257,7 @@
             valid for the duration of the current request. It is only accessible from the server
             side, and will not be accessible from a client such as a web browser. It is not
             guaranteed to be a <code>file:</code> URL, only that it can be read with
-            Presentation Server's <a href="#url-generator">URL generator</a>.
+            PresentationServer's <a href="#url-generator">URL generator</a>.
         </warning>
     </body>
 </document>

@@ -26,7 +26,7 @@
                 Traditionally, Web applications developers generate URLs in their Web pages
                 manually. For example, an HTML <code>&lt;a></code> element contains an
                 <code>href</code> attribute specifying the destination of a link. The default
-                Presentation Server Page Flow Controller epilogue contains a URL rewriting
+                PresentationServer Page Flow Controller epilogue contains a URL rewriting
                 mechanism for HTML and XHTML documents.
             </p>
             <section>
@@ -230,7 +230,7 @@
         <section>
             <title>Working with URL Rewriting</title>
             <p>
-                In Presentation Server, URLs come from two different sources:
+                In PresentationServer, URLs come from two different sources:
             </p>
             <ul>
                 <li>
@@ -346,8 +346,8 @@
                             <code>/oxf/example1/my/image.gif?scale=100</code>
                             <br/><br/>
 
-                            Note that using resource URLs relative to an Presentation Server Portlet
-                            path (as handled by Presentation Server) does not necessarily make sense
+                            Note that using resource URLs relative to an PresentationServer Portlet
+                            path (as handled by PresentationServer) does not necessarily make sense
                             unless you define your hierarchy of resources carefully.
                         </td>
                     </tr>
@@ -357,7 +357,7 @@
         <section>
             <title>Customizing URL Rewriting</title>
             <p>
-                There are multiple reasons why the default Presentation Server URL rewriting may
+                There are multiple reasons why the default PresentationServer URL rewriting may
                 need to be modified, including:
             </p>
             <ul>

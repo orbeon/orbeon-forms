@@ -22,7 +22,7 @@
         <section>
             <title>Introduction</title>
             <p>
-                The LDAP Processor allows Presentation Server to query an LDAP directory server. The
+                The LDAP Processor allows PresentationServer to query an LDAP directory server. The
                 LDAP processor uses the <link href="http://java.sun.com/products/jndi/">Java Naming
                 and Directory Interface (JNDI)</link> and should work with all compatible servers.
                 However, it has only been tested with <link
@@ -44,7 +44,7 @@
                 <title>Configuration</title>
                 <p>
                     The configuration of the LDAP Processor can be done in two ways: either
-                    system-wide via the <link href="reference-properties">Presentation Server
+                    system-wide via the <link href="reference-properties">PresentationServer
                     Properties</link>, or locally for a specific instance of the processor through
                     the <code>config</code> input. The local configuration takes precedence if
                     available.
@@ -169,7 +169,7 @@
                     <title>System-Wide Configuration</title>
                     <p>
                         The LDAP Processor can be configured through the <link
-                        href="reference-properties">Presentation Server Properties</link>, allowing
+                        href="reference-properties">PresentationServer Properties</link>, allowing
                         all instances to share the same configuration. The following properties are
                         allowed:
                     </p>

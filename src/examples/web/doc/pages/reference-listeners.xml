@@ -22,7 +22,7 @@
             <section>
                 <title>Servlet Context Listener</title>
                 <p>
-                    The Presentation Server Servlet Context Listener allows configuring one
+                    The PresentationServer Servlet Context Listener allows configuring one
                     processor to be called when the Servlet context is initialized, and one to be
                     called when the Servlet context is destroyed. These processors are looked up in
                     the following locations, in this order:
@@ -67,7 +67,7 @@
                     generator, or any HTTP serializers. You have access to the Application context.
                 </p>
                 <p>
-                    For the Presentation Server Servlet Context Listener to be called, you need to
+                    For the PresentationServer Servlet Context Listener to be called, you need to
                     configure the following listener in your <code>web.xml</code>:
                 </p>
                 <xml-source>
@@ -85,7 +85,7 @@
             <section>
                 <title>Session Listener</title>
                 <p>
-                    The Presentation Server Session Listener allows configuring one processor to be
+                    The PresentationServer Session Listener allows configuring one processor to be
                    called when the Session is created, and one to be called when the Session is
                    destroyed. These processors are looked up in the following locations, in this
                    order:
@@ -131,7 +131,7 @@
                     Session contexts.
                 </p>
                 <p>
-                    For the Presentation Server Session Listener to be called, you need to configure the
+                    For the PresentationServer Session Listener to be called, you need to configure the
                     following listener in your <code>web.xml</code>:
                 </p>
                 <xml-source>

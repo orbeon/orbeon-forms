@@ -26,12 +26,12 @@
 
             <p>
                 <link href="http://www.w3.org/TR/xslt">XSLT</link> is a language
-                for transforming XML documents into other XML documents. Presentation Server uses
+                for transforming XML documents into other XML documents. PresentationServer uses
                 XSLT extensively as its main language to process XML
                 documents.
             </p>
 
-            <p>Presentation Server ships with multiple implementations of XSLT:</p>
+            <p>PresentationServer ships with multiple implementations of XSLT:</p>
             <ul>
                 <li>Xalan 2.5.1 Interpreter</li>
                 <li>Xalan 2.5.1 Compiler (XSLTC)</li>
@@ -39,7 +39,7 @@
                 <li>Saxon 8.1.1 (supporting a large subset of XSLT 2.0)</li>
             </ul>
 
-            <p>Additionally, Presentation Server can use any Java API for XML Processing (JAXP)
+            <p>Additionally, PresentationServer can use any Java API for XML Processing (JAXP)
             compliant transformer.</p>
         </section>
         <section>
@@ -153,7 +153,7 @@
                         href="http://java.sun.com/j2se/1.4.2/docs/api/javax/xml/transform/TransformerFactory.html">
                         <code>TransformerFactory</code>
                     </link>. For example, you can use the TrAX transformer to interface
-                    Presentation Server with a new hypothetical transformer (MyTrans):
+                    PresentationServer with a new hypothetical transformer (MyTrans):
 
 
                     <xml-source>
@@ -316,7 +316,7 @@
             </p>
 
             <p>
-                Presentation Server uses <link href="http://joost.sourceforge.net/">Joost</link> to
+                PresentationServer uses <link href="http://joost.sourceforge.net/">Joost</link> to
                 implement a STX transformer. Its usage is similar to an XSLT transformer, using the
                 processor URI <code>oxf:stx</code>. This <link href="../examples/stx">example</link>
                 demonstrates a simple STX transformation.

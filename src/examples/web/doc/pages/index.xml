@@ -22,15 +22,15 @@
         <section>
             <title>Introduction</title>
 
-            <p>Welcome to the Orbeon Presentation Server User Guide!</p>
+            <p>Welcome to the Orbeon PresentationServer User Guide!</p>
 
             <p>
-                Orbeon Presentation Server is a J2EE-based MVC framework for building Web
+                Orbeon PresentationServer is a J2EE-based MVC framework for building Web
                 applications that present and capture XML using XForms, XSLT, and Web Services.
-                Presentation Server benefits from standardized forms processing using XForms, rich
-                controller semantics, and full-featured XML pipelines. Presentation Server is in
+                PresentationServer benefits from standardized forms processing using XForms, rich
+                controller semantics, and full-featured XML pipelines. PresentationServer is in
                 fact built around Orbeon's optimized XML pipeline engine, a mature, high-performance
-                engine for pipeline processing of XML. Presentation Server is ideal for building
+                engine for pipeline processing of XML. PresentationServer is ideal for building
                 Composite Applications in a Service Oriented Architecture (SOA), an can be used on
                 its own, or within the <a href="http://www.orbeon.com/software/">OIS suite</a>.
             </p>
@@ -41,11 +41,11 @@
 
             <p>
                 The purpose of this guide is to get users acquainted with the fundamental concepts
-                of Presentation Server: XML processors and XML pipelines, the XML Pipeline
+                of PresentationServer: XML processors and XML pipelines, the XML Pipeline
                 Definition Language (XPL), XForms, the Page Flow Controller (PFC), and
-                Presentation Server's built-in XML processors. It is highly recommended to quickly
+                PresentationServer's built-in XML processors. It is highly recommended to quickly
                 get to the <a href="/doc/pages/Tutorial.pdf">Tutorial</a> to get started with
-                developing applications with Presentation Server.
+                developing applications with PresentationServer.
             </p>
 
         </section>

@@ -144,14 +144,14 @@
     <xsl:template match="/">
         <book>
             <titlepag>
-                <title>Orbeon Presentation Server User Manual version 2.7.2</title>
+                <title>Orbeon PresentationServer User Manual version 2.7.2</title>
                 <author>Orbeon, Inc.</author>
                 <date>January 11 2005</date>
                 <abstract>
-                    Orbeon Presentation Server is the most advanced XML transformation framework
+                    Orbeon PresentationServer is the most advanced XML transformation framework
                     built on top of proven J2EE technologies. It stands out in a crowd of existing
                     J2EE frameworks by fully leveraging the ubiquity and the flexibility of XML.
-                    Although Presentation Server was designed primarily to develop Web
+                    Although PresentationServer was designed primarily to develop Web
                     applications, it can be used to build all sorts of XML applications, including
                     Enterprise Application Integration (EAI), Content Management Systems (CMS),
                     and more.

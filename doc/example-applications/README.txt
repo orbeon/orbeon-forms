@@ -1,9 +1,9 @@
-======================================================
+=====================================================
 
-= = = = = =   Orbeon Presentation Server   = = = = = =
-= = = = = =       Example Application      = = = = = =
+= = = = = =   Orbeon PresentationServer   = = = = = =
+= = = = = =       Example Application     = = = = = =
 
-======================================================
+=====================================================
 
 Copyright 1999-2005 (C) Orbeon, Inc. All rights reserved.
 
@@ -22,7 +22,7 @@ like to build an application or site similar to the one in this
 example.
 
 For more information about the Example Applications for the
-Orbeon Presentation Server and how to run them see
+Orbeon PresentationServer and how to run them see
 http://www.orbeon.com/community/downloads
 
 ************************************

@@ -1,19 +1,19 @@
-======================================================
+=====================================================
 
-= = = =    Orbeon Presentation Server Read Me    = = =
+= = = =    Orbeon PresentationServer Read Me    = = =
 
-======================================================
+=====================================================
 
 Copyright 1999-2005 (C) Orbeon, Inc. All rights reserved.
 
 This README.TXT file covers the following topics:
 
-    1. About Orbeon Presentation Server
+    1. About Orbeon PresentationServer
     2. Licenses
     3. New Features
     4. Software Prerequisites
-    5. Installing Presentation Server
-    6. Compiling Presentation Server
+    5. Installing PresentationServer
+    6. Compiling PresentationServer
     7. More Information
     8. Known Issues
     9. Third-Party Software
@@ -24,16 +24,16 @@ For more information, visit:
 
 
 ************************************
-1. About Orbeon Presentation Server
+1. About Orbeon PresentationServer
 ************************************
 
-Orbeon Presentation Server is a J2EE-based MVC framework for building
+Orbeon PresentationServer is a J2EE-based MVC framework for building
 Web applications that present and capture XML using XForms, XSLT, and
-Web Services. Presentation Server benefits from standardized forms
+Web Services. PresentationServer benefits from standardized forms
 processing using XForms, rich controller semantics, and full-featured
-XML pipelines. Presentation Server is in fact built around Orbeon's
+XML pipelines. PresentationServer is in fact built around Orbeon's
 optimized XML pipeline engine, a mature, high-performance engine for
-pipeline processing of XML. Presentation Server is ideal for building
+pipeline processing of XML. PresentationServer is ideal for building
 Composite Applications in a Service Oriented Architecture (SOA), an can
 be used on its own, or within the OIS suite.
 
@@ -88,7 +88,7 @@ or in this distribution under:
 4. Software Prerequisites
 ************************************
 
-Orbeon Presentation Server is supported on the following
+Orbeon PresentationServer is supported on the following
 application servers:
 
     * Apache Tomcat 4.1.30 with JDK 1.4.2
@@ -99,10 +99,10 @@ application servers:
 
 
 ************************************
-5. Installing Presentation Server
+5. Installing PresentationServer
 ************************************
 
-    * Download the Presentation Server zip or tgz archive from
+    * Download the PresentationServer zip or tgz archive from
       http://forge.objectweb.org/projects/ops
 
     * Extract the archive in a directory that we call below:
@@ -120,7 +120,7 @@ under the root directory OIS_HOME/:
       tutorial application.  For more information on the BizDoc
       example application, please consult the tutorial, Tutorial.pdf.
 
-    * doc: this directory contains the Presentation Server
+    * doc: this directory contains the PresentationServer
       documentation as static HTML files, as well as the tutorial,
       Tutorial.pdf.
 
@@ -129,11 +129,11 @@ under the root directory OIS_HOME/:
     * licenses: this directory contains third-party software licenses
 
 You then need to deploy orbeon.war file to your servlet containers or
-application server of choice. In the Presentation Server
+application server of choice. In the PresentationServer
 documentation, you will find detailed installation instructions for
 several servlet containers / applications servers.
 
-More detailed information on installing Presentation Server can be
+More detailed information on installing PresentationServer can be
 found in the documentation under OIS_HOME/doc/ in the "Installation
 Instructions" section, or directly online:
 
@@ -141,10 +141,10 @@ Instructions" section, or directly online:
 
 
 ************************************
-6. Compiling Presentation Server
+6. Compiling PresentationServer
 ************************************
 
-For information about compiling Presentation Server, please visit:
+For information about compiling PresentationServer, please visit:
 
   http://www.orbeon.com/community/getting-involved
 
@@ -159,7 +159,7 @@ Here are some pointers to useful information related to this release.
         http://www.orbeon.com/software/presentation-server
 
     * If you have questions, comments, or difficulties with the
-      Presentation Server, please subscribe to the ObjectWeb user mailing-list:
+      PresentationServer, please subscribe to the ObjectWeb user mailing-list:
 
         http://www.objectweb.org/wws/info/ops-users
 

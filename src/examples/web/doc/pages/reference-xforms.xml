@@ -23,12 +23,12 @@
         <section>
             <title>Scope</title>
             <p>
-                Web applications use forms to collect data from users. Presentation Server's form
+                Web applications use forms to collect data from users. PresentationServer's form
                 handling capabilities are based on <link
                 href="http://www.w3.org/MarkUp/Forms/">XForms</link>, namely the <a
                 href="http://www.w3.org/TR/xforms/">XForms 1.0 W3C Recommendation</a>. This section
                 provides an introduction to XForms concepts and explains how to use XForms in your
-                Presentation Server application.
+                PresentationServer application.
             </p>
         </section>
         <section>
@@ -40,8 +40,8 @@
                     to the rank of W3C Recommendation quite recently, in October 2003. Mainstream browsers
                     (Internet Explorer, Mozilla / Firefox, Opera, Safari) do not yet support XForms natively.
                     However you can already leverage the benefits of XForms today by using a server-side XForms
-                    engine like the one provided in Presentation Server. Until browsers natively support XForms,
-                    the Presentation Server XForms engine will transparently generate HTML forms and perform the
+                    engine like the one provided in PresentationServer. Until browsers natively support XForms,
+                    the PresentationServer XForms engine will transparently generate HTML forms and perform the
                     work that would be done by an XForms-compliant browser. This way you can start leveraging
                     XForms today, be ready for upcoming XForms-compliant browsers, and work smoothly with the
                     mainstream browsers that are deployed in the marketplace.
@@ -154,7 +154,7 @@
                 </ol>
                 <img print-format="pdf" src="pages/reference-xforms-operation-model.png" style="clear: both; float: right"/>
                 <p>
-                    As we can see, your role as the author of an Presentation Server application is:
+                    As we can see, your role as the author of an PresentationServer application is:
                 </p>
                 <ul>
                     <li>To provide the XForms model (step 1 above).</li>
@@ -278,7 +278,7 @@
                             constraint="../number = '' or (. castable as xs:integer and . >= 1 and 12 >= .)"/></code>
                         <p>
                             Note that we have decided here not to bother checking the expiration
-                            month if no credit card number was entered. Presentation Server supports
+                            month if no credit card number was entered. PresentationServer supports
                             XPath 2.0 expressions in the constraint attribute.
                         </p>
                     </li>
@@ -805,7 +805,7 @@
             <section>
                 <title>Upload</title>
                 <p>
-                    The preferred way to handle file uploads with Presentation Server is to use
+                    The preferred way to handle file uploads with PresentationServer is to use
                     XForms. For this purpose, use the XForms Upload control:
                 </p>
                 <xml-source show-namespaces="false">
@@ -876,7 +876,7 @@
                     file in Base64-encoded text.
                 </p>
                 <note>
-                    Using the <code>xs:anyURI</code> type allows Presentation Server to make sure
+                    Using the <code>xs:anyURI</code> type allows PresentationServer to make sure
                     the uploaded file does not have to reside entirely in memory. This is the
                     preferred method for uploading large files.
                 </note>
@@ -901,7 +901,7 @@
                 <title>UI Rendering</title>
                 <img src="pages/home-changes-epilogue.png" style="clear: both; float: right"/>
                 <p>
-                    By default Presentation Server renders XForms controls into XHTML form elements
+                    By default PresentationServer renders XForms controls into XHTML form elements
                     and generates XHTML to render alerts, hints, and help messages. This default
                     behavior helps you get started as you create your application. If you want to,
                     you can change the way rendering into XHTML is done, or even render XForms
@@ -950,7 +950,7 @@
                 The XForms repeat module lets you easily create pages where XForms controls are
                 repeated, like an invoice made of invoice lines (with a description, unit price,
                 quantity), where new lines can be added, and existing lines can be edited or
-                deleted. Presentation Server supports the following elements in the XForms repeat
+                deleted. PresentationServer supports the following elements in the XForms repeat
                 module:
                 <code>repeat</code>, <code>itemset</code>, <code>insert</code>, and
                 <code>delete</code>.
@@ -1113,7 +1113,7 @@
             <section>
                 <title>Message Action</title>
                 <p>
-                    The XForms message action displays a message to the user. Presentation Server being a server-side
+                    The XForms message action displays a message to the user. PresentationServer being a server-side
                     XForms implementation, it uses the Javascript <code>alert()</code> function to pop-up a modal dialog box to the
                     user.
                     <img print-format="pdf" src="pages/reference-xforms-message.png" style="clear: both; float: right"/>
@@ -1226,7 +1226,7 @@
                 <p>
                     Hidden HTML fields are not visible to the end user, but their value can be set
                     for example by JavaScript code embedded in the page. There is no standard XForms
-                    control for hidden fields. Presentation Server provides a control as an XForms
+                    control for hidden fields. PresentationServer provides a control as an XForms
                     extension:
                 </p>
                 <xml-source>
@@ -1234,9 +1234,9 @@
                 </xml-source>
                 <p>
                     To set the value of a hidden field from your own JavaScript, you need to be able
-                    to reference the hidden form element. Presentation Server automatically assigns
+                    to reference the hidden form element. PresentationServer automatically assigns
                     an opaque name to each form element. This name is used internally by
-                    Presentation Server to repopulate the XForms instance upon form submission. This
+                    PresentationServer to repopulate the XForms instance upon form submission. This
                     means that you cannot assign your own name to a form element. Instead you
                     should use the HTML <code>id</code> attribute, and reference the field in
                     JavaScript by that identifier. You assign an identifier to the hidden XForms

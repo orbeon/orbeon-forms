@@ -157,7 +157,7 @@
                                 <b>request</b> - The request scope starts when an HTTP request is
                                 sent to the server. It ends when the corresponding HTTP response is
                                 sent back to the client. The request scope can be used to integrate
-                                a Presentation Server application with legacy J2EE servlets.
+                                a PresentationServer application with legacy J2EE servlets.
                             </li>
                         </ul>
                     </td>

@@ -22,10 +22,10 @@
         <section>
             <title>Introduction</title>
             <p>
-                These processors allow Presentation Server to be used with the <fork
+                These processors allow PresentationServer to be used with the <fork
                 href="http://jakarta.apache.org/struts/">Jakarta Struts</fork> framework. In this
                 configuration, Struts is used for the back-end, generating beans that are serialized
-                by this generator. One or more Presentation Server pipeline(s) are called to
+                by this generator. One or more PresentationServer pipeline(s) are called to
                 generate the front-end views. See <link href="model2x-struts">Using Presentation
                 Server with Struts</link> for more information.
             </p>
@@ -59,10 +59,10 @@
                 href="#StrutsActionErrorsGenerator">StrutsActionErrorsGenerator</link>.
             </warning>
             <p>
-                The Struts Action Form generator allows Presentation Server to be used with the
+                The Struts Action Form generator allows PresentationServer to be used with the
                 <fork href="http://jakarta.apache.org/struts/">Jakarta Struts</fork> framework. In
                 this configuration, Struts is used for the back-end, generating beans that are
-                serialized by this generator. One or more Presentation Server pipeline(s) are called
+                serialized by this generator. One or more PresentationServer pipeline(s) are called
                 to generate the front-end views. See <link href="model2x-struts">Using Presentation
                 Server with Struts</link> for more information.
             </p>

@@ -22,17 +22,17 @@
         <section>
             <title>Introduction</title>
             <p>
-                You can use Presentation Server to build standalone command-line applications
+                You can use PresentationServer to build standalone command-line applications
                running pipelines. Use cases include: creating a hardcopy of a web site, importing or
                exporting XML data to and from a relational database, testing pipelines, automating
                repetitive operations on XML files (selection, transformation, aggregation, etc.).
-               Presentation Server becomes your "XML toolbox".
+               PresentationServer becomes your "XML toolbox".
             </p>
         </section>
         <section>
             <title>Command Line Interface</title>
             <p>
-                Presentation Server ships with a command line interface (CLI). The easiest way to
+                PresentationServer ships with a command line interface (CLI). The easiest way to
                 run it is to use the executable <code>cli-orbeon.jar</code> file and pass it a pipeline
                 file:
             </p>
@@ -59,7 +59,7 @@
                 and an absolute path within the sandbox, as shown above.
             </p>
             <note>
-                Presentation Server's jar file (<code>cli-orbeon.jar</code>) is executable via the
+                PresentationServer's jar file (<code>cli-orbeon.jar</code>) is executable via the
                 <code>java -jar</code> mechanism. However, it depends on a number of libraries that
                 must be in the 'lib' directory beneath the directory containing <code>cli-orbeon.jar</code>. It is recommended to
                 expand the WAR file, and refer to the <code>cli-orbeon.jar</code> file under the WAR
@@ -69,7 +69,7 @@
         <section>
             <title>Examples</title>
             <p>
-                Presentation Server comes with simple examples of command-line applications under
+                PresentationServer comes with simple examples of command-line applications under
                 the <code>src/examples/cli</code> directory. To run those examples, from a command
                 prompt, enter either one of the subdirectories and run the <code>java</code> command
                 following the explanations above, for example, from the <code>simple</code>

@@ -21,7 +21,7 @@
 	<body>
 		<section>
 			<title>Classification</title>
-			<p>Presentation Server provides EJB support in two different
+			<p>PresentationServer provides EJB support in two different
             areas:</p>
 			<ul>
 				<li>Calling existing EJBs</li>
@@ -68,7 +68,7 @@
                     remote server).</li>
 				</ul>
 				<p>
-                    With Processor EJB Encapsulation, Presentation Server processors can benefit
+                    With Processor EJB Encapsulation, PresentationServer processors can benefit
                     from the same advantages provided to EJB components by the application server.
                 </p>
 			</section>

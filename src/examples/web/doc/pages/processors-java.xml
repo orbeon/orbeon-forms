@@ -22,7 +22,7 @@
         <section>
             <title>Rationale</title>
             <p>
-                Presentation Server comes with a number of pre-built processors. However, in some
+                PresentationServer comes with a number of pre-built processors. However, in some
                 cases, it makes sense for the developer to write a new processor in Java. For the
                 purpose of this discussion, let's assume that the processor is implemented in a file
                 called <code>MyProcessor.java</code>. Custom processors can essentially be deployed
@@ -39,7 +39,7 @@
                         <li>Declare the new processor in
                         <code>processors.xml</code> (i.e. mapping an URI to this new
                         processor).</li>
-                        <li>Use the newly declared processor in an XPL (Presentation Server Pipeline Definition Language) file using the URI
+                        <li>Use the newly declared processor in an XPL (PresentationServer Pipeline Definition Language) file using the URI
                         declared in the <code>processors.xml</code>.</li>
                     </ol>
                 </li>
@@ -177,7 +177,7 @@
         <section>
             <title>Compilation Class Path</title>
             <p>
-                Before invoking the Java compiler, Presentation Server builds a classpath using two
+                Before invoking the Java compiler, PresentationServer builds a classpath using two
                 <link href="reference-properties#java-processor">properties</link>. The following
                 list summaries the complete classpath order.
 
@@ -203,7 +203,7 @@
                     </li>
                     <li>
                         All the JAR and ZIP files under the <code>WEB-INF/lib</code> directory, if
-                        found and Presentation Server runs in an application server.
+                        found and PresentationServer runs in an application server.
                     </li>
                     <li>
                         If the <code>WEB-INF/lib</code> directory is not found, all the JAR and ZIP

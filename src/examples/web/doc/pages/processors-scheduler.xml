@@ -23,8 +23,8 @@
         <section>
             <title>Scheduler</title>
             <p>
-                The Presentation Server Scheduler allows applications to start and stop periodic
-                tasks. A Presentation Server task is defined by a Presentation Server processor and
+                The PresentationServer Scheduler allows applications to start and stop periodic
+                tasks. A PresentationServer task is defined by a PresentationServer processor and
                 its inputs. You can start or stop a task at any time. The <code>config</code> input
                 must conform to the following schema:
             </p>

@@ -21,15 +21,15 @@
     <body>
         <section>
             <title>Scope</title>
-            <p>This section documents the Presentation Server Processor Java API. This is a Java API
+            <p>This section documents the PresentationServer Processor Java API. This is a Java API
             that you can use to write custom processors in Java. You can then use those custom
-            processors in your Presentation Server applications, just like the standard processors
-            bundled with Presentation Server.</p>
+            processors in your PresentationServer applications, just like the standard processors
+            bundled with PresentationServer.</p>
         </section>
         <section>
             <title>Why Write Custom Processors?</title>
 
-            <p>In general, Presentation Server processors encapsulate business logic to perform
+            <p>In general, PresentationServer processors encapsulate business logic to perform
             generic tasks such as calling a Web service or accessing a database using SQL. With
             those processors, the developer can describe the specifics of a task at a high level in
             a declarative way.</p>
@@ -48,7 +48,7 @@
         </section>
         <section>
             <title>Prerequisites</title>
-            <p>Writing Presentation Server processors is expected to be done by Java developers
+            <p>Writing PresentationServer processors is expected to be done by Java developers
             who are comfortable with the Java language as well as compiling and
             deploying onto J2EE application servers. In addition, we assume that
             the developer is comfortable with both:</p>
@@ -135,7 +135,7 @@ public class MyProcessor extends SimpleProcessor {
 ]]></source>
                 <p>
                     In addition to the name of the input/output, one can pass an optional schema
-                    URI declared in the <link href="reference-properties">Presentation Server
+                    URI declared in the <link href="reference-properties">PresentationServer
                     properties</link>. If a schema URI is specified, the corresponding input or
                     output can be <link href="processors-validation">validated</link>.
                 </p>
@@ -214,7 +214,7 @@ saxWriter.setContentHandler(contentHandler);
 saxWriter.write(doc);
 ]]></source>
                     <note>Using the <code>LocationSAXWriter</code> provided with
-                    Presentation Server is the preferred way to write a DOM4J document to a SAX
+                    PresentationServer is the preferred way to write a DOM4J document to a SAX
                     content handler. The standard JAXP API (calling <link href="http://java.sun.com/j2se/1.4/docs/api/javax/xml/transform/Transformer.html#transform(javax.xml.transform.Source,%20javax.xml.transform.Result)">
                             <code>transform</code>
                         </link>
@@ -233,7 +233,7 @@ Transformer identity = TransformerUtils.getIdentityTransformer();
 transformer.transform(new DOMSource(doc), new SAXResult(contentHandler));
 ]]></source>
                     <note>
-                        <code>TransformerUtils</code> is a Presentation Server class (in package
+                        <code>TransformerUtils</code> is a PresentationServer class (in package
                         <code>org.orbeon.oxf.xml</code>). It will create and cache the appropriate
                         transformer factory. The developer is of course free to create its own
                         factory and transformer calling directly the JAXP API.</note>

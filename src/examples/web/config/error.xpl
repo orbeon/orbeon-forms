@@ -29,10 +29,10 @@
                 <xsl:template match="/">
                     <html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml">
                         <head>
-                            <title>Presentation Server - Error Page</title>
+                            <title>PresentationServer - Error Page</title>
                         </head>
                         <body>
-                            <h1>Presentation Server - Error Page</h1>
+                            <h1>PresentationServer - Error Page</h1>
 
                             <table class="gridtable">
                                 <tr>

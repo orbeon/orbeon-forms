@@ -403,6 +403,12 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- Generate hidden form element for disabled controls -->
+    <xsl:template match="xforms:*[@xhtml:disabled = 'true' and not(@xxforms:relevant = 'false')]" priority="8">
+        <xhtml:input type="hidden" name="{@xxforms:name}" value="{@xxforms:value}"/>
+        <xsl:next-match/>
+    </xsl:template>
+    
     <!-- Display label -->
     <xsl:template match="xforms:*[xforms:label and not(local-name() = ('submit', 'item', 'itemset'))]" priority="7">
         <!-- Order of preference is: binding attributes (ref, bind), linking attribute (src), inline content -->

@@ -20,10 +20,12 @@ import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.io.File;
@@ -44,6 +46,7 @@ public class TestProcessor extends ProcessorImpl {
     private static class ExecutionContext {
         public Processor mainProcessor;
         public OutputProcessor outputProcessor;
+        public ExternalContext externalContext;
     }
 
 
@@ -99,7 +102,11 @@ public class TestProcessor extends ProcessorImpl {
         ensureOutputConnected(executionContext, outputName);
 
         // Tell output processor to read and cache value
-        executionContext.outputProcessor.readCacheInputWithValue(outputName, value);
+        PipelineContext pipelineContext = new PipelineContext();
+        if (executionContext.externalContext != null)
+            pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, executionContext.externalContext);
+        executionContext.mainProcessor.reset(pipelineContext);
+        executionContext.outputProcessor.readCacheInputWithValue(pipelineContext, outputName, value);
     }
 
     private void ensureOutputConnected(ExecutionContext executionContext, String outputName) {
@@ -122,18 +129,23 @@ public class TestProcessor extends ProcessorImpl {
         if (outputName != null)
             ensureOutputConnected(executionContext, outputName);
 
+        PipelineContext pipelineContext = new PipelineContext();
+        if (executionContext.externalContext != null)
+            pipelineContext.setAttribute(PipelineContext.EXTERNAL_CONTEXT, executionContext.externalContext);
+        executionContext.mainProcessor.reset(pipelineContext);
+
         if (condition.equals("output-cached")) {
-            if (!executionContext.outputProcessor.isInputInCache(outputName))
+            if (!executionContext.outputProcessor.isInputInCache(pipelineContext, outputName))
                 throw new OXFException("Assertion failed: output '" + outputName + "' is not cached, but was expected to be.");
         } else if (condition.equals("output-not-cached")) {
-            if (executionContext.outputProcessor.isInputInCache(outputName))
+            if (executionContext.outputProcessor.isInputInCache(pipelineContext, outputName))
                 throw new OXFException("Assertion failed: output '" + outputName + "' is cached, but was expected not to be.");
         } else if (condition.equals("cached-value-equal")) {
-            Object result = executionContext.outputProcessor.getCachedValue(outputName);
+            Object result = executionContext.outputProcessor.getCachedValue(pipelineContext, outputName);
             if (!value.equals(result))
                 throw new OXFException("Assertion failed: output '" + outputName + "' caches '" + result +  " ', but expected '" + value + "'.");
         } else if (condition.equals("cached-value-not-equal")) {
-            Object result = executionContext.outputProcessor.getCachedValue(outputName);
+            Object result = executionContext.outputProcessor.getCachedValue(pipelineContext, outputName);
             if (value.equals(result))
                 throw new OXFException("Assertion failed: output '" + outputName + "' caches '" + result +  " ', but was expected to be different.");
         } else {
@@ -167,15 +179,27 @@ public class TestProcessor extends ProcessorImpl {
     }
 
     private void handleSetRequestCommand(ExecutionContext executionContext, Element commandElement) {
-        throw new IllegalArgumentException("Not implemented yet.");
+        String href = commandElement.attributeValue("href");
+
+        // Build request document
+        Document requestDocument;
+        if (href == null) {
+            requestDocument = XMLUtils.createDOM4JDocument();
+            requestDocument.setRootElement(((Element) commandElement.elements().get(0)).createCopy());
+        } else {
+            // TODO
+            throw new IllegalArgumentException("Not implemented yet.");
+        }
+
+        // Create external context
+        executionContext.externalContext = new TestExternalContext(requestDocument);
     }
 
     private static class OutputProcessor extends ProcessorImpl {
         public void start(PipelineContext pipelineContext) {
         }
 
-        public void readCacheInputWithValue(String inputName, final String value) {
-            PipelineContext pipelineContext = new PipelineContext();
+        public void readCacheInputWithValue(PipelineContext pipelineContext, String inputName, final String value) {
 
             ProcessorInput input = getInputByName(inputName);
             ProcessorOutput output = input.getOutput();
@@ -199,13 +223,11 @@ public class TestProcessor extends ProcessorImpl {
             }
         }
 
-        public boolean isInputInCache(String inputName) {
-            PipelineContext pipelineContext = new PipelineContext();
-            return isInputInCache(pipelineContext, inputName);
+        public boolean isInputInCache(PipelineContext pipelineContext, String inputName) {
+            return super.isInputInCache(pipelineContext, inputName);
         }
 
-        public Object getCachedValue(String inputName) {
-            PipelineContext pipelineContext = new PipelineContext();
+        public Object getCachedValue(PipelineContext pipelineContext, String inputName) {
 
             ProcessorInput input = getInputByName(inputName);
 

@@ -28,6 +28,7 @@ import java.util.*;
  * be subclassed.
  */
 public class SimpleExternalContext implements ExternalContext {
+
     private static final Logger logger = LoggerFactory.createLogger(SimpleExternalContext.class);
 
     protected class Request implements ExternalContext.Request {
@@ -86,7 +87,7 @@ public class SimpleExternalContext implements ExternalContext {
         }
 
         public String getCharacterEncoding() {
-            return "UTF-8";
+            return "utf-8";
         }
 
         public int getContentLength() {
@@ -221,7 +222,7 @@ public class SimpleExternalContext implements ExternalContext {
         }
 
         public String getCharacterEncoding() {
-            return "UTF-8";
+            return "utf-8";
         }
 
         public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {

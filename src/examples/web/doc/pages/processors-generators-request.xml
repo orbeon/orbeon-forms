@@ -69,6 +69,7 @@
             </p>
             <xml-source>
                 <request>
+                    <container-type>servlet</container-type>
                     <content-length>-1</content-length>
                     <parameters>
                         <parameter>
@@ -87,7 +88,9 @@
                     <scheme>http</scheme>
                     <server-name>localhost</server-name>
                     <server-port>8080</server-port>
-                    <secure>false</secure>
+                    <is-secure>false</is-secure>
+                    <auth-type>BASIC</auth-type>
+                    <remote-user>jdoe</remote-user>
                     <context-path>/oxf</context-path>
                     <headers>
                         <header>
@@ -131,6 +134,7 @@
                     <path-info>/doc/home-welcome</path-info>
                     <request-path>/doc/home-welcome</request-path>
                     <path-translated>C:\orbeon\projects\OXF\build\oxf-war\doc\home-welcome</path-translated>
+                    <query-string>id=12&amp;print=false</query-string>
                     <requested-session-id>DA6E64FC1E6DFF0499B5D6F46A32186A</requested-session-id>
                     <request-uri>/oxf/doc/home-welcome</request-uri>
                     <servlet-path/>

@@ -22,6 +22,7 @@
                     <element name="input">
                         <attribute name="name"/>
                         <choice>
+                            <!-- TODO: There MUST be an element. anyElement below allows text + optional element... -->
                             <attribute name="href"/>
                             <ref name="anyElement"/>
                         </choice>
@@ -73,6 +74,15 @@
                                     </attribute>
                                     <attribute name="value"/>
                                 </group>
+                            </choice>
+                        </element>
+                    </optional>
+                    <optional>
+                        <element name="set-request">
+                            <choice>
+                                <attribute name="href"/>
+                                <!-- TODO: Use schema for request -->
+                                <ref name="anyElement"/>
                             </choice>
                         </element>
                     </optional>

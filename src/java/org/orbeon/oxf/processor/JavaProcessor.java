@@ -29,10 +29,12 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.SystemUtils;
 import org.xml.sax.ContentHandler;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -251,34 +253,11 @@ public class JavaProcessor extends ProcessorImpl {
 
         // Try to add directory containing current JAR file if WEB-INF/lib was not found
         if (!gotLibDir) {
-            try {
-                final String RESOURCE_NAME = "org/orbeon/oxf/processor/JavaProcessor.class";
-                URL url = getClass().getClassLoader().getResource(RESOURCE_NAME);
-                if (url.getProtocol().equals("jar")) {
-                    if (url.getProtocol().equals("jar")) {
-                        // The current class is in a JAR file
-                        String file = url.getFile();
-
-                        int end = file.length() - ("!/".length() + RESOURCE_NAME.length());
-                        final String fileSlash = "file:/";
-                        final int fileSlashLen = fileSlash.length();
-                        if (end > fileSlashLen && file.regionMatches(true, 0, fileSlash, 0, fileSlashLen)) {
-                            file = file.substring(fileSlashLen, end);
-
-                            file = URLDecoder.decode(file, "utf-8");
-
-                            if (logger.isDebugEnabled())
-                                logger.debug("Found current JAR file: " + file);
-
-                            File jarDirectory = new File(file).getParentFile();
-                            if (jarDirectory.isDirectory())
-                                jarpath.append(jarDirectory.getCanonicalPath())
-                                        .append(PATH_SEPARATOR);
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                throw new OXFException(e);
+            String pathToCurrentJarDir = SystemUtils.getJarPath(getClass());
+            if (pathToCurrentJarDir != null) {
+                if (logger.isDebugEnabled())
+                    logger.debug("Found current JAR directory: " + pathToCurrentJarDir);
+                jarpath.append(pathToCurrentJarDir).append(PATH_SEPARATOR);
             }
         }
 

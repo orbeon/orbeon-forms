@@ -127,6 +127,7 @@
       <include name="**/Secure*.java"/>
     </javac>
   </target>
+
   <!-- Compile test source -->
   <target name="test-classes" depends="classes">
     <mkdir dir="${build.test-classes.dir}"/>

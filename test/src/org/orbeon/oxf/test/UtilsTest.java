@@ -15,9 +15,14 @@ package org.orbeon.oxf.test;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.orbeon.oxf.processor.JavaProcessor;
+import org.orbeon.oxf.resources.ResourceManager;
+import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.NumberUtils;
+import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -31,7 +36,11 @@ import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.File;
+import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
 
 public class UtilsTest extends TestCase {
 
@@ -44,10 +53,10 @@ public class UtilsTest extends TestCase {
 
         suite.addTest(new UtilsTest("testNumberUtils"));
         suite.addTest(new UtilsTest("testLocationDocumentSourceResult"));
+        suite.addTest(new UtilsTest("testJarPath"));
 
         return suite;
     }
-
 
     public void testNumberUtils() {
         byte[] bytes1 = {(byte) 0x12, (byte) 0x34, (byte) 0x56, (byte) 0x78, (byte) 0x9a, (byte) 0xbc, (byte) 0xde, (byte) 0xf0};
@@ -63,19 +72,37 @@ public class UtilsTest extends TestCase {
         assertEquals(NumberUtils.toHexString(bytes3), results3);
     }
 
+    private ResourceManager setupResourceManager() {
+        // Setup resource manager
+        Map props = new HashMap();
+        Properties properties = System.getProperties();
+        for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
+            String name = (String) e.nextElement();
+            if (name.startsWith("oxf.resources."))
+                props.put(name, properties.getProperty(name));
+        }
+        ResourceManagerWrapper.init(props);
+        ResourceManager resourceManager = ResourceManagerWrapper.instance();
+
+        return resourceManager;
+    }
+
     public void testLocationDocumentSourceResult() {
         try {
             Transformer transformer = TransformerUtils.getIdentityTransformer();
-            File file = new File("test/resources/company.xml");
 
-            Source source = new StreamSource(file);
-            LocationDocumentResult result = new LocationDocumentResult(file.getAbsolutePath());
+            ResourceManager resourceManager = setupResourceManager();
+
+            InputStream is = resourceManager.getContentAsStream("/unit-tests/company.xml");
+
+            Source source = new StreamSource(is);
+            LocationDocumentResult result = new LocationDocumentResult(resourceManager.getRealPath("/unit-tests/company.xml"));
             transformer.transform(source, result);
 
             Document doc = result.getDocument();
             Element firstName = (Element) doc.createXPath("//firstname").selectNodes(doc).get(0);
-            assertEquals(firstName.getTextTrim(), "Omar");
-            assertEquals(((LocationData) firstName.getData()).getLine(), 4);
+            assertEquals("Omar", firstName.getTextTrim());
+            assertEquals(17, ((LocationData) firstName.getData()).getLine());
 
             source = new LocationDocumentSource(doc);
             SAXResult saxResult = new SAXResult(new ForwardingContentHandler() {
@@ -89,7 +116,7 @@ public class UtilsTest extends TestCase {
 
                 public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
                     if ("firstname".equals(localname)) {
-                        assertEquals(locator.getLineNumber(), 4);
+                        assertEquals(17, locator.getLineNumber());
                         foundFirstName = true;
                     }
                 }
@@ -101,7 +128,7 @@ public class UtilsTest extends TestCase {
 
                 public void endElement(String uri, String localname, String qName) throws SAXException {
                     if ("firstname".equals(localname)) {
-                        assertEquals(buff.toString(), "Omar");
+                        assertEquals("Omar", buff.toString());
                     }
                 }
 
@@ -111,5 +138,11 @@ public class UtilsTest extends TestCase {
             e.printStackTrace();
             fail(e.toString());
         }
+    }
+
+    public void testJarPath() {
+        String result = SystemUtils.getJarPath(JavaProcessor.class);
+        assertNotNull(result);
+        assertTrue(StringUtils.replace(result, "\\", "/").endsWith("build/orbeon-presentation-server-war/WEB-INF/lib"));
     }
 }

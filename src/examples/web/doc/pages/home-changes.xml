@@ -61,10 +61,17 @@
             <section>
 				<title>URL Generator Binary Mode</title>
 				<p>
-                    The <a href="processors-generators#url-generator">URL generator</a>'s support of
-                    streaming binary files encoded with Base64 is now documented. The <a
+                    The <a href="processors-generators#url-generator">URL generator</a>'s support
+                    for streaming binary files encoded with Base64 is now documented. The <a
                     href="/goto-example/xforms-upload">XForms Upload example</a> illustrates this
                     capability.
+                </p>
+			</section>
+            <section>
+				<title>URL Generator Plain Text Mode</title>
+				<p>
+                    The <a href="processors-generators#url-generator">URL generator</a>'s support
+                    for reading plain text files is now documented.
                 </p>
 			</section>
             <section>

@@ -778,6 +778,10 @@
                     than the original binary data. For more information, please refer to the <a
                     href="http://www.ietf.org/rfc/rfc2045.txt">RFC</a>.</li>
                 </ul>
+                <note>
+                    It is mandatory to specify either one of <code>xs:anyURI</code> or
+                    <code>xs:base64Binary</code>.
+                </note>
                 <p>
                     The optional <code>xforms:filename</code>, <code>xforms:mediatype</code>, and
                     <code>xxforms:size</code> (the latter being an extension) allow storing metadata

@@ -551,6 +551,58 @@
                 </note>
             </section>
             <section>
+                <title>Plain Text Mode</title>
+                <p>
+                    The plain text mode is selected when the content type is <code>text/plain</code>
+                    according to the selection algorithm above. In this mode, the URL generator
+                    reads the input as a text file and produces an XML document where lines of text
+                    have been separated. A line is considered to be terminated by either:
+                </p>
+                <ul>
+                    <li>a line feed ('\n', ASCII character number 10)</li>
+                    <li>a carriage return ('\r', ASCII character number 13)</li>
+                    <li>a carriage return followed immediately by a line feed</li>
+                </ul>
+                <p>
+                    Example:
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config">
+                            <config>
+                                <url>oxf:/list.txt</url>
+                                <content-type>text/plain</content-type>
+                            </config>
+                        </p:input>
+                        <p:output name="data" id="image-data"/>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    Assume the input document contains the following text:
+                </p>
+                <code>
+                    This is line one of the input document!<br/>
+                    This is line two of the input document!<br/>
+                    This is line three of the input document!
+                </code>
+                <p>
+                    The resulting document consists of a <code>document</code> root element
+                    containing a sequence of <code>line</code> elements, one for each line contained
+                    in the initial text document.
+                </p>
+                <xml-source>
+<document>
+    <line>This is line one of the input document!</line>
+    <line>This is line two of the input document!</line>
+    <line>This is line three of the input document!</line>
+</document>
+                </xml-source>
+                <note>
+                    The plain text mode does not allow detecting what actual end of line characters
+                    (line feed or carriage return or both) is used in the input document.
+                </note>
+            </section>
+            <section>
                 <title>Binary Mode</title>
                 <p>
                     The binary mode is selected when the content type is none of the

@@ -25,8 +25,8 @@
     </page>
 
     <page path-info="/xforms-uploaded-image"
-          xforms="uploaded-image-xforms-model.xml"
-          model="uploaded-image-model.xpl">
+          xforms="database-upload-xforms-model.xml"
+          model="database-upload-model.xpl">
     </page>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>

@@ -167,100 +167,6 @@
                 session scopes, is now deprecated. Use the Scope generator instead.
             </note>
         </section>
-        <anchor id="bean-generator"/>
-        <section>
-            <title>Bean Generator</title>
-            <note>
-                This processor is deprecated. Please refer to the <a href="#scope-generator">Scope
-                generator</a> instead.
-            </note>
-            <p>
-                The Bean generator serializes objects in the request or session to XML. If an object
-                is a W3C Document (<code>org.w3c.dom.Document</code>), the XML for this document is
-                sent as-is. Otherwise, the object is assumed to be a JavaBean and is serialized to
-                XML with <link href="http://www.castor.org">Castor</link>. This generator takes
-                two inputs:
-            </p>
-            <section>
-                <title>Configuration</title>
-                <p>
-                    The configuration input describes which bean to serialize, and two optional
-                    sources. The sources can be <code>request</code>, <code>session</code> or both.
-                    If both are specified, they are tried in order. In the example below, the
-                    request is searched for the <code>guess</code> bean. If not found, the session
-                    is tried.
-                </p>
-                <xml-source>
-                    <p:input name="config">
-                        <config>
-                            <attribute>guess</attribute>
-                            <source>request</source>
-                            <source>session</source>
-                        </config>
-                    </p:input>
-                </xml-source>
-                <p>Here is the RelaxNG schema:</p>
-                <xml-source>
-                    <element name="config"
-                        datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
-                        xmlns="http://relaxng.org/ns/structure/1.0">
-
-                        <interleave>
-
-                            <oneOrMore>
-                                <element name="attribute">
-                                    <data type="string"/>
-                                </element>
-                            </oneOrMore>
-
-                            <interleave>
-                                <optional>
-                                    <element name="source">
-                                        <value>request</value>
-                                    </element>
-                                </optional>
-                                <optional>
-                                    <element name="source">
-                                        <value>session</value>
-                                    </element>
-                                </optional>
-                            </interleave>
-
-                        </interleave>
-
-                    </element>
-                </xml-source>
-            </section>
-            <section>
-                <title>Mapping Input</title>
-                <p>
-                    This input specifies the Castor mapping file. See <link
-                    href="http://www.castor.org/xml-mapping.html">Castor Documentation</link> for
-                    more information on the mapping file. In most instances, the default mapping is
-                    sufficient:
-                </p>
-                <xml-source>
-                    <p:input name="mapping">
-                        <mapping/>
-                    </p:input>
-                </xml-source>
-            </section>
-            <section>
-                <title>Output</title>
-                <p>
-                    The output document contains a <code>beans</code> root node. Each serialized
-                    bean is a child of the root node. The example above generates the following
-                    document:
-                </p>
-                <xml-source>
-                    <beans>
-                        <guess useraguess="0">
-                            <message>Hello</message>
-                        </guess>
-                    </beans>
-                </xml-source>
-            </section>
-        </section>
         <anchor id="servletinclude"/>
         <section>
             <title>Servlet Include Generator</title>
@@ -382,6 +288,100 @@
                     <p:output name="data" id="exception"/>
                 </p:processor>
             </xml-source>
+        </section>
+        <anchor id="bean-generator"/>
+        <section>
+            <title>Bean Generator</title>
+            <note>
+                This processor is deprecated. Please refer to the <a href="#scope-generator">Scope
+                generator</a> instead.
+            </note>
+            <p>
+                The Bean generator serializes objects in the request or session to XML. If an object
+                is a W3C Document (<code>org.w3c.dom.Document</code>), the XML for this document is
+                sent as-is. Otherwise, the object is assumed to be a JavaBean and is serialized to
+                XML with <link href="http://www.castor.org">Castor</link>. This generator takes
+                two inputs:
+            </p>
+            <section>
+                <title>Configuration</title>
+                <p>
+                    The configuration input describes which bean to serialize, and two optional
+                    sources. The sources can be <code>request</code>, <code>session</code> or both.
+                    If both are specified, they are tried in order. In the example below, the
+                    request is searched for the <code>guess</code> bean. If not found, the session
+                    is tried.
+                </p>
+                <xml-source>
+                    <p:input name="config">
+                        <config>
+                            <attribute>guess</attribute>
+                            <source>request</source>
+                            <source>session</source>
+                        </config>
+                    </p:input>
+                </xml-source>
+                <p>Here is the RelaxNG schema:</p>
+                <xml-source>
+                    <element name="config"
+                        datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+                        xmlns="http://relaxng.org/ns/structure/1.0">
+
+                        <interleave>
+
+                            <oneOrMore>
+                                <element name="attribute">
+                                    <data type="string"/>
+                                </element>
+                            </oneOrMore>
+
+                            <interleave>
+                                <optional>
+                                    <element name="source">
+                                        <value>request</value>
+                                    </element>
+                                </optional>
+                                <optional>
+                                    <element name="source">
+                                        <value>session</value>
+                                    </element>
+                                </optional>
+                            </interleave>
+
+                        </interleave>
+
+                    </element>
+                </xml-source>
+            </section>
+            <section>
+                <title>Mapping Input</title>
+                <p>
+                    This input specifies the Castor mapping file. See <link
+                    href="http://www.castor.org/xml-mapping.html">Castor Documentation</link> for
+                    more information on the mapping file. In most instances, the default mapping is
+                    sufficient:
+                </p>
+                <xml-source>
+                    <p:input name="mapping">
+                        <mapping/>
+                    </p:input>
+                </xml-source>
+            </section>
+            <section>
+                <title>Output</title>
+                <p>
+                    The output document contains a <code>beans</code> root node. Each serialized
+                    bean is a child of the root node. The example above generates the following
+                    document:
+                </p>
+                <xml-source>
+                    <beans>
+                        <guess useraguess="0">
+                            <message>Hello</message>
+                        </guess>
+                    </beans>
+                </xml-source>
+            </section>
         </section>
     </body>
 </document>

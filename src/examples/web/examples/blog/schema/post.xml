@@ -10,6 +10,12 @@
         <category-name>General Stuff</category-name>
     </categories>
     <comments>
-        <comment>...</comment>
+        <comment>
+            <date-created>2004-03-28T10:12:23</date-created>
+            <name>Erik Bruchez</name>
+            <email>e@b</email>
+            <uri>http://erik.bruchez.name/</uri>
+            <text>Great post!</text>
+        </comment>
     </comments>
 </post>

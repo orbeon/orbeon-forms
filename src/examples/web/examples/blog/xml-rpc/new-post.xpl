@@ -48,6 +48,7 @@
                         </xsl:for-each>
                     </categories>
                 </xsl:if>
+                <comments/>
             </post>
         </p:input>
         <p:output name="data" id="post" debug="xxxnewpost"/>

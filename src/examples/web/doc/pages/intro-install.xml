@@ -617,13 +617,21 @@
                 Look for the line that starts with <code>set JAVA_OPTS</code>. Add at the end of
                 this line the following option:
                 <code>-Dorg.jboss.logging.Log4jService.catchSystemOut=false</code></li>
+                
+                <li>Edit
+                <code>JBOSS_HOME/server/default/deploy/jbossweb-tomcat50.sar/META-INF/jboss-service.xml</code>
+                and change the value in <code>&lt;attribute name="UseJBossWebLoader"></code> from
+                <code>false</code> to <code>true</code>.</li>
+                
+                <li>Start JBoss by running <code>JBOSS_HOME/bin/run.bat</code> (or
+                <code>run.sh</code> on UNIX).</li>
             </ol>
         </section>
 <!--        <section>-->
 <!--            <title>Installing OXF on Netscape Enterprise Server 6.1 SP4</title>-->
 <!--            <ol>-->
 <!--                <li>-->
-<!--                    Create a new directory where you would like to deploy the OXF Web application, e.g. <code>C:\oxf</code>.-->
+<!--                    Create a new directory where you would like to deploy the OXF Web application, e.g. <code>C:/oxf</code>.-->
 <!--                    We will call this directory <code>OXF_DIR</code>.-->
 <!--                </li>-->
 <!--                <li>-->
@@ -655,7 +663,7 @@
 <!--                                <p>-->
 <!--                                    The patch fixes a bug in the NES implementation of the servlet-->
 <!--                                    <code>getInitParameterNames()</code> method. Assuming that <code>NES_HOME</code> represents the location of your-->
-<!--                                    Netscape Enterprise Server (NES) installation, e.g. <code>C:\Netscape</code>, to apply the patch:-->
+<!--                                    Netscape Enterprise Server (NES) installation, e.g. <code>C:/Netscape</code>, to apply the patch:-->
 <!--                                    <ul>-->
 <!--                                        <li>Stop the NES server</li>-->
 <!--                                        <li>Download the patch: <link href="http://www.orbeon.com/public/nes61sp4-struts-patch.zip">nes61sp4-struts-patch.zip</link></li>-->

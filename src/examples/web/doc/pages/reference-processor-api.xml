@@ -122,19 +122,29 @@ public class MyProcessor extends SimpleProcessor {
         </section>
         <section>
             <title>Declaring Inputs and Outputs</title>
-            <p>The processor must declare its inputs and outputs. This is done
-            in the default constructor by calling the <code>addInputInfo</code>
-            and <code>addOutputInfo</code> methods and passing an object of type
-            <code>ProcessorInputOutputInfo</code>. For instance:</p>
+            <p>
+                The processor must declare its mandatory static inputs and outputs. This is done in
+                the default constructor by calling the <code>addInputInfo</code> and
+                <code>addOutputInfo</code> methods and passing an object of type
+                <code>ProcessorInputOutputInfo</code>. For instance:
+            </p>
             <source><![CDATA[public MyProcessor() {
     addInputInfo(new ProcessorInputOutputInfo("number"));
     addOutputInfo(new ProcessorInputOutputInfo("double"));
 }
 ]]></source>
-                <p>In addition to the name of the input/output, one can pass an
-                optional schema URI declared in the <link href="reference-properties">Presentation Server properties</link>. If a schema
-                URI is specified, the corresponding input or output can be
-                <link href="processors-validation">validated</link>.</p>
+                <p>
+                    In addition to the name of the input/output, one can pass an optional schema
+                    URI declared in the <link href="reference-properties">Presentation Server
+                    properties</link>. If a schema URI is specified, the corresponding input or
+                    output can be <link href="processors-validation">validated</link>.
+                </p>
+                <note>
+                    Note that the processor may have optional inputs and outputs, and/or read
+                    dynamic inputs and generate dynamic outputs, in which case it doesn't need to
+                    declare such inputs with <code>addInputInfo</code> and
+                    <code>addOutputInfo</code>.
+                </note>
             </section>
             <section>
                 <title>Implementing generate Methods</title>

@@ -58,7 +58,7 @@ public class JavaProcessor extends ProcessorImpl {
 
     public JavaProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, JAVA_CONFIG_NAMESPACE_URI));
-        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
+        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA)); // Why do we have this? Is this a mistake?
     }
 
     public ProcessorOutput createOutput(final String name) {

@@ -21,7 +21,7 @@
         <xforms:group ref="form/rss-feed-descriptor">
             <p>
                 The form below is prefilled to generate an RSS feed with the news displayed on the
-                Yahoo! home page. These links point to RSS feeds generate with this page:
+                Yahoo! home page. These links point to RSS feeds generated with this page:
             </p>
             <table style="margin-left: 5em">
                 <tr>

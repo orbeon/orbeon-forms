@@ -14,32 +14,26 @@
 package org.orbeon.oxf.processor.xforms.output.element;
 
 import org.dom4j.Node;
-import org.jaxen.JaxenException;
 import org.jaxen.NamespaceContext;
 import org.jaxen.SimpleNamespaceContext;
-import org.jaxen.expr.DefaultXPathFactory;
-import org.jaxen.expr.FunctionCallExpr;
-import org.jaxen.expr.LiteralExpr;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.JaxenXPathRewrite;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.xpath.XPathException;
 import org.orbeon.saxon.xpath.XPathExpression;
-import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * MISSING:
@@ -80,7 +74,7 @@ public class XFormsElement {
                 String test = attributes.getValue("test");
                 XPathExpression xpathExpression = XPathCache.createCacheXPath20(context.getPipelineContext(),
                         context.getDocumentWrapper(), context.getDocumentWrapper().wrap(context.getRefNode()),
-                        "boolean(" + test + ")", prefixToURI, context.getRepeatIdToIndex(), null);
+                        "boolean(" + test + ")", prefixToURI, context.getRepeatIdToIndex(), context.getFunctionLibrary());
                 Boolean value = (Boolean) xpathExpression.evaluateSingle();
                 addExtensionAttribute(newAttributes, "value", Boolean.toString(value.booleanValue()));
             } else if (context.getParentElement(0) instanceof Itemset
@@ -135,7 +129,7 @@ public class XFormsElement {
                     Object at = XPathCache.createCacheXPath20(context.getPipelineContext(),
                             context.getDocumentWrapper(), contextNode,
                             "round(" + attributes.getValue("at") + ")", context.getCurrentPrefixToURIMap(),
-                            null, context.getFunctionLibrary()).evaluateSingle();
+                            context.getRepeatIdToIndex(), context.getFunctionLibrary()).evaluateSingle();
                     if (!(at instanceof Number))
                         throw new ValidationException("'at' expression must return a number",
                                 new LocationData(context.getLocator()));
@@ -144,9 +138,11 @@ public class XFormsElement {
                 if (attributes.getIndex("", "value") != -1) {
                     // Evaluate "value" as a string
                     String value = (String) XPathCache.createCacheXPath20(context.getPipelineContext(),
-                            context.getDocumentWrapper(), context.getDocumentWrapper().wrap(context.getCurrentNode()),
+                            context.getDocumentWrapper(),
+                            context.getDocumentWrapper().wrap(context.getCurrentNode()),
                             "string(" + attributes.getValue("value") + ")",
-                            context.getCurrentPrefixToURIMap(), null, null).evaluateSingle();
+                            context.getCurrentPrefixToURIMap(), context.getRepeatIdToIndex(),
+                            context.getFunctionLibrary()).evaluateSingle();
                     addExtensionAttribute(newAttributes, "value-value", value);
                 }
             }

@@ -75,7 +75,7 @@ public class FileSerializer extends CachedSerializer {
         private String directory;
         private String file;
         private boolean omitXMLDeclaration;
-        private boolean standalone;
+        private Boolean standalone;
         boolean cacheUseLocalCache;
 
         public Config(Document document) {
@@ -134,7 +134,7 @@ public class FileSerializer extends CachedSerializer {
             // Standalone
             String standaloneString = XPathUtils.selectStringValueNormalize(document, "/config/standalone");
             if (standaloneString != null)
-                standalone = new Boolean(standaloneString).booleanValue();
+                standalone = new Boolean(standaloneString);
 
             // Cache control
             String cacheUseLocalCacheString = XPathUtils.selectStringValueNormalize(document, "/config/cache-control/use-local-cache");
@@ -172,7 +172,7 @@ public class FileSerializer extends CachedSerializer {
             return omitXMLDeclaration;
         }
 
-        public boolean isStandalone() {
+        public Boolean isStandalone() {
             return standalone;
         }
 

@@ -23,27 +23,6 @@
         <section>
 			<title>New in Version 2.6</title>
             <section>
-                <title>BizDoc Application Changes</title>
-                <p>
-                    The data access layer of the BizDoc application has been refactored to support
-                    the following backends:
-                </p>
-                <ul>
-                    <li>
-                        <b>XML databases:</b> XML documents are accessed through the XML:DB
-                        processors. Currently, the backend assumes the built-in open source eXist
-                        database.
-                    </li>
-                    <li>
-                        <b>SQL databases:</b> XML documents are accessed as a text or native XML
-                        format.
-                    </li>
-                </ul>
-                <p>
-                    It is now possible to visualize each document as XML from the user interface.
-                </p>
-            </section>
-            <section>
                 <title>XForms Upload</title>
                 <p>
                     The XForms Upload control has been fixed. It comes with an <a
@@ -107,8 +86,8 @@
                     </ul>
                     <p>
                         The new architecture introduces <a
-                        href="processors-converters">Converters</a> in charge of the first task,
-                        and plain <a href="processors-serializers">Serializers</a> in charge of the
+                        href="processors-converters">converters</a> in charge of the first task, and
+                        plain <a href="processors-serializers">serializers</a> in charge of the
                         second task. It also standardize the mechanism to encapsulate text documents
                         and binary documents into XML documents. This mechanism is used by the URL
                         generator, converters, and serializers.
@@ -141,10 +120,24 @@
                 </section>
 			</section>
             <section>
-                <title>WebDAV Resource Manager</title>
+                <title>BizDoc Application Changes</title>
                 <p>
-                    A <a href="reference-resource-managers#webdav">WebDAV resource manager</a> is
-                    now included. It supports basic authentication.
+                    The data access layer of the BizDoc application has been refactored to support
+                    the following backends:
+                </p>
+                <ul>
+                    <li>
+                        <b>XML databases:</b> XML documents are accessed through the XML:DB
+                        processors. Currently, the backend assumes the built-in open source eXist
+                        database.
+                    </li>
+                    <li>
+                        <b>SQL databases:</b> XML documents are accessed as a text or native XML
+                        format.
+                    </li>
+                </ul>
+                <p>
+                    It is now possible to visualize each document as XML from the user interface.
                 </p>
             </section>
             <section>
@@ -199,6 +192,13 @@
                     declared). This provides access to optional inputs and outputs. Please refer to
                     the Javadoc for the <code>Processor</code> class for more information, as well
                     as the <code>ListInputs</code> unit test.
+                </p>
+            </section>
+            <section>
+                <title>WebDAV Resource Manager</title>
+                <p>
+                    A <a href="reference-resource-managers#webdav">WebDAV resource manager</a> is
+                    now included. It supports basic authentication.
                 </p>
             </section>
 <!--            <section>-->

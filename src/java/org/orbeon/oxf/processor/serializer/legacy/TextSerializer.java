@@ -43,7 +43,7 @@ public class TextSerializer extends HttpTextSerializer {
                 null,
                 getEncoding(config, null, DEFAULT_ENCODING),
                 true,
-                false,
+                null,
                 config.indent,
                 config.indentAmount);
         identity.setResult(new StreamResult(writer));

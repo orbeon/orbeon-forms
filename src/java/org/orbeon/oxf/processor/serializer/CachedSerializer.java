@@ -34,7 +34,6 @@ public abstract class CachedSerializer extends ProcessorImpl {
     public static final boolean DEFAULT_EMPTY = false;
     public static final boolean DEFAULT_CACHE_USE_LOCAL_CACHE = true;
     public static final boolean DEFAULT_OMIT_XML_DECLARATION = false;
-    public static final boolean DEFAULT_STANDALONE = false;
 
 
     protected CachedSerializer() {

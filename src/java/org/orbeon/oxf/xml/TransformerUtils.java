@@ -168,7 +168,7 @@ public class TransformerUtils {
                                              String systemDoctype,
                                              String encoding,
                                              boolean omitXMLDeclaration,
-                                             boolean standalone,
+                                             Boolean standalone,
                                              boolean indent,
                                              int indentAmount) {
         if (method != null && !"".equals(method))
@@ -184,7 +184,8 @@ public class TransformerUtils {
         transformer.setOutputProperty(OutputKeys.INDENT, indent ? "yes" : "no");
         transformer.setOutputProperty(XALAN_INDENT_AMOUNT, String.valueOf(indentAmount));
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, omitXMLDeclaration ? "yes" : "no");
-        transformer.setOutputProperty(OutputKeys.STANDALONE, standalone ? "yes" : "no");
+        if (standalone != null)
+            transformer.setOutputProperty(OutputKeys.STANDALONE, standalone.booleanValue() ? "yes" : "no");
     }
 
 

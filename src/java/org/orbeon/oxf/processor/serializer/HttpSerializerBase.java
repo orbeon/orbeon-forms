@@ -211,7 +211,8 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                             config.publicDoctype = publicDoctype;
                             config.systemDoctype = systemDoctype;
                             config.omitXMLDeclaration = ProcessorUtils.selectBooleanValue(configElement, "/config/omit-xml-declaration", DEFAULT_OMIT_XML_DECLARATION);
-                            config.standalone = ProcessorUtils.selectBooleanValue(configElement, "/config/standalone", DEFAULT_STANDALONE);
+                            String standaloneString = XPathUtils.selectStringValueNormalize(configElement, "/config/standalone");
+                            config.standalone = (standaloneString == null) ? null : new Boolean(standaloneString);
                             config.indent = ProcessorUtils.selectBooleanValue(configElement, "/config/indent", DEFAULT_INDENT);
                             if (indentAmount != null) config.indentAmount = indentAmount.intValue();
 
@@ -247,7 +248,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
         public String publicDoctype;
         public String systemDoctype;
         public boolean omitXMLDeclaration = DEFAULT_OMIT_XML_DECLARATION;
-        public boolean standalone = DEFAULT_STANDALONE;
+        public Boolean standalone;
         public boolean indent = DEFAULT_INDENT;
         public int indentAmount = DEFAULT_INDENT_AMOUNT;
 

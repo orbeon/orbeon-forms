@@ -98,8 +98,12 @@
                     </tr>
                     <tr>
                         <td>standalone</td>
-                        <td>Specifies whether a standalone document declaration is output</td>
-                        <td>false for XML, ignored otherwise</td>
+                        <td>
+                            If true, specifies <code>standalone="yes"</code> in the document
+                            declaration. If false, specifies <code>standalone="no"</code> in the
+                            document declaration.
+                        </td>
+                        <td>not specified for XML, ignored otherwise</td>
                     </tr>
                     <tr>
                         <td>indent</td>
@@ -126,6 +130,7 @@
                     </config>
                 </xml-source>
             </section>
+            <anchor id="xml-converter"/>
             <section>
                 <title>XML Converter</title>
                 <p>

@@ -694,8 +694,12 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     </tr>
                     <tr>
                         <td>standalone</td>
-                        <td>Specifies whether a standalone document declaration is output</td>
-                        <td>false for XML, ignored otherwise</td>
+                        <td>
+                            If true, specifies <code>standalone="yes"</code> in the document
+                            declaration. If false, specifies <code>standalone="no"</code> in the
+                            document declaration.
+                        </td>
+                        <td>not specified for XML, ignored otherwise</td>
                     </tr>
                     <tr>
                         <td>indent</td>
@@ -736,7 +740,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                         <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
                         <system-doctype>http://www.w3.org/TR/html4/strict.dtd</system-doctype>
                         <omit-xml-declaration>false</omit-xml-declaration>
-                        <standalone>false</standalone>
+                        <standalone>true</standalone>
                         <encoding>utf-8</encoding>
                         <indent-amount>4</indent-amount>
                         <cache-control>

@@ -17,13 +17,41 @@
 
     <start>
         <element name="methodResponse">
-            <element name="params">
-                <oneOrMore>
-                    <element name="param">
-                        <ref name="value"/>
+            <choice>
+                <element name="params">
+                    <oneOrMore>
+                        <element name="param">
+                            <ref name="value"/>
+                        </element>
+                    </oneOrMore>
+                </element>
+                <element name="fault">
+                    <element name="value">
+                        <element name="struct">
+                            <element name="member">
+                                <element name="name">
+                                    <value>faultCode</value>
+                                </element>
+                                <element name="value">
+                                    <element name="int">
+                                        <data type="integer"/>
+                                    </element>
+                                </element>
+                            </element>
+                            <element name="member">
+                                <element name="name">
+                                    <value>faultString</value>
+                                </element>
+                                <element name="value">
+                                    <element name="string">
+                                        <data type="string"/>
+                                    </element>
+                                </element>
+                            </element>
+                        </element>
                     </element>
-                </oneOrMore>
-            </element>
+                </element>
+            </choice>
         </element>
     </start>
 

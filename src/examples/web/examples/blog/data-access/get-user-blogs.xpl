@@ -18,25 +18,20 @@
           xmlns:xdb="http://orbeon.org/oxf/xml/xmldb"
           xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <p:param type="input" name="query" schema-href="get-categories-query.rng"/>
-    <p:param type="output" name="categories"  schema-href="get-categories-result.rng"/>
+    <p:param type="input" name="query" schema-href="get-user-blogs-query.rng"/>
+    <p:param type="output" name="blogs"/>
 
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#query"/>
         <p:input name="config">
             <xdb:query collection="/db/orbeon/blog-example/blogs" create-collection="true" xsl:version="2.0">
                 xquery version "1.0";
-                <categories>
+                <blogs>
                     {
-                    for $i in (/blog[username = '<xsl:value-of select="/query/username"/>'
-                               and blog-id = '<xsl:value-of select="/query/blog-id"/>'])[1]/categories/category
-                    return
-                        <category>
-                            <name>{xs:string($i/name)}</name>
-                            <id>{count($i/preceding-sibling::category) + 1}</id>
-                        </category>
+                    for $i in /blog[username = '<xsl:value-of select="/query/username"/>' and blog-id]
+                        return $i
                     }
-                </categories>
+                </blogs>
             </xdb:query>
         </p:input>
         <p:output name="data" id="xmldb-query"/>
@@ -45,7 +40,7 @@
     <p:processor name="oxf:xmldb-query">
         <p:input name="datasource" href="../datasource.xml"/>
         <p:input name="query" href="#xmldb-query"/>
-        <p:output name="data" ref="categories"/>
+        <p:output name="data" ref="blogs"/>
     </p:processor>
 
 </p:config>

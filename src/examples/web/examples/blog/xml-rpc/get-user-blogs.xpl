@@ -14,58 +14,62 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-          xmlns:xs="http://www.w3.org/2001/XMLSchema"
-          xmlns:xdb="http://orbeon.org/oxf/xml/xmldb"
-          xmlns:xu="http://www.xmldb.org/xupdate">
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <p:param type="input" name="params"/>
     <p:param type="output" name="params"/>
 
-    <!-- TODO: Separate data access -->
-
+     <!-- Format query -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#params"/>
         <p:input name="config">
-            <xdb:query collection="/db/orbeon/blog-example/blogs" create-collection="true" xsl:version="2.0">
-                xquery version "1.0";
-                <params>
-                    <param>
-                        <value>
-                            <array>
-                                <data>
-                                {
-                                for $i in /blog[username = '<xsl:value-of select="/params/param[2]/value/string"/>']
-                                return
-                                    <value>
-                                        <struct>
-                                            <member>
-                                                <name>url</name>
-                                                <value>xxx/{xs:string($i/id)}</value>
-                                            </member>
-                                            <member>
-                                                <name>blogid</name>
-                                                <value>{xs:string($i/id)}</value>
-                                            </member>
-                                            <member>
-                                                <name>blogName</name>
-                                                <value>{xs:string($i/name)}</value>
-                                            </member>
-                                        </struct>
-                                    </value>
-                                }
-                                </data>
-                            </array>
-                        </value>
-                    </param>
-                </params>
-            </xdb:query>
+            <query xsl:version="2.0">
+                <username><xsl:value-of select="/params/param[2]/value/string"/></username>
+            </query>
         </p:input>
         <p:output name="data" id="query"/>
     </p:processor>
 
-    <p:processor name="oxf:xmldb-query">
-        <p:input name="datasource" href="../datasource.xml"/>
+    <!-- Call data access -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../data-access/get-user-blogs.xpl"/>
         <p:input name="query" href="#query"/>
+        <p:output name="blogs" id="blogs"/>
+    </p:processor>
+
+    <!-- Format response -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#blogs"/>
+        <p:input name="config">
+            <params xsl:version="2.0">
+                <param>
+                    <value>
+                        <array>
+                            <data>
+                                <xsl:for-each select="/blogs/blog">
+                                    <value>
+                                        <struct>
+                                            <member>
+                                                <name>url</name>
+                                                <value>xxx/<xsl:value-of select="blog-id"/></value>
+                                            </member>
+                                            <member>
+                                                <name>blogid</name>
+                                                <value><xsl:value-of select="blog-id"/></value>
+                                            </member>
+                                            <member>
+                                                <name>blogName</name>
+                                                <value><xsl:value-of select="name"/></value>
+                                            </member>
+                                        </struct>
+                                    </value>
+                                </xsl:for-each>
+                            </data>
+                        </array>
+                    </value>
+                </param>
+            </params>
+        </p:input>
         <p:output name="data" ref="params"/>
     </p:processor>
 

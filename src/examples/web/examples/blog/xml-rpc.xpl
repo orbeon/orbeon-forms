@@ -13,7 +13,8 @@
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <!-- Extract request body -->
     <p:processor name="oxf:request">
@@ -31,59 +32,105 @@
         <p:output name="data" id="xmlrpc-request" schema-href="schema/xml-rpc-request.rng"/>
     </p:processor>
 
-    <!-- TODO: Handle XML-RPC authentication based on username + password -->
+    <!-- Handle XML-RPC authentication based on username + password -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#request"/>
+        <p:input name="config">
+            <query xsl:version="2.0">
+                <username><xsl:value-of select="/methodCall/params/param[2]/value/string"/></username>
+                <password><xsl:value-of select="/methodCall/params/param[3]/value/string"/></password>
+            </query>
+        </p:input>
+        <p:output name="data" id="authenticate-query"/>
+    </p:processor>
 
-    <!-- Dispatch request -->
-    <p:choose href="#xmlrpc-request" debug="xxxrequest">
-        <p:when test="/methodCall/methodName = 'blogger.getUsersBlogs'">
-            <p:processor name="oxf:pipeline">
-                <p:input name="config" href="xml-rpc/get-user-blogs.xpl"/>
-                <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
-                <p:output name="params" id="response"/>
-            </p:processor>
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="data-access/authenticate-user.xpl"/>
+        <p:input name="query" href="#authenticate-query"/>
+        <p:output name="authenticated" id="authenticated"/>
+    </p:processor>
+    
+    <p:choose href="#authenticated" debug="xxxauthenticated">
+        <p:when test="/* = 'true'">
+            <!-- Dispatch request if use is authenticated -->
+            <p:choose href="#xmlrpc-request" debug="xxxrequest">
+                <p:when test="/methodCall/methodName = 'blogger.getUsersBlogs'">
+                    <p:processor name="oxf:pipeline">
+                        <p:input name="config" href="xml-rpc/get-user-blogs.xpl"/>
+                        <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
+                        <p:output name="params" id="response"/>
+                    </p:processor>
+                </p:when>
+                <p:when test="/methodCall/methodName = 'metaWeblog.getCategories'">
+                    <p:processor name="oxf:pipeline">
+                        <p:input name="config" href="xml-rpc/get-categories.xpl"/>
+                        <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
+                        <p:output name="params" id="response"/>
+                    </p:processor>
+                </p:when>
+                <p:when test="/methodCall/methodName = 'metaWeblog.newPost'">
+                    <p:processor name="oxf:pipeline">
+                        <p:input name="config" href="xml-rpc/new-post.xpl"/>
+                        <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
+                        <p:output name="params" id="response"/>
+                    </p:processor>
+                </p:when>
+                <p:when test="/methodCall/methodName = 'metaWeblog.getRecentPosts'">
+                    <p:processor name="oxf:pipeline">
+                        <p:input name="config" href="xml-rpc/get-recent-posts.xpl"/>
+                        <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
+                        <p:output name="params" id="response"/>
+                    </p:processor>
+                </p:when>
+                <p:when test="/methodCall/methodName = 'metaWeblog.getPost'">
+                    <p:processor name="oxf:pipeline">
+                        <p:input name="config" href="xml-rpc/get-post.xpl"/>
+                        <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
+                        <p:output name="params" id="response"/>
+                    </p:processor>
+                </p:when>
+                <p:when test="/methodCall/methodName = 'metaWeblog.editPost'">
+                    <p:processor name="oxf:pipeline">
+                        <p:input name="config" href="xml-rpc/edit-post.xpl"/>
+                        <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
+                        <p:output name="params" id="response"/>
+                    </p:processor>
+                </p:when>
+                <p:when test="/methodCall/methodName = 'blogger.deletePost'">
+                    <p:processor name="oxf:pipeline">
+                        <p:input name="config" href="xml-rpc/delete-post.xpl"/>
+                        <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
+                        <p:output name="params" id="response"/>
+                    </p:processor>
+                </p:when>
+            </p:choose>
         </p:when>
-        <p:when test="/methodCall/methodName = 'metaWeblog.getCategories'">
-            <p:processor name="oxf:pipeline">
-                <p:input name="config" href="xml-rpc/get-categories.xpl"/>
-                <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
-                <p:output name="params" id="response"/>
+        <p:otherwise>
+            <!-- Return fault if authentication failed -->
+            <p:processor name="oxf:identity">
+                <p:input name="data">
+                    <fault>
+                        <value>
+                            <struct>
+                                <member>
+                                    <name>faultCode</name>
+                                    <value>
+                                        <int>4</int>
+                                    </value>
+                                </member>
+                                <member>
+                                    <name>faultString</name>
+                                    <value>
+                                        <string>Error: User authentication failed.</string>
+                                    </value>
+                                </member>
+                            </struct>
+                        </value>
+                    </fault>
+                </p:input>
+                <p:output name="data" id="response"/>
             </p:processor>
-        </p:when>
-        <p:when test="/methodCall/methodName = 'metaWeblog.newPost'">
-            <p:processor name="oxf:pipeline">
-                <p:input name="config" href="xml-rpc/new-post.xpl"/>
-                <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
-                <p:output name="params" id="response"/>
-            </p:processor>
-        </p:when>
-        <p:when test="/methodCall/methodName = 'metaWeblog.getRecentPosts'">
-            <p:processor name="oxf:pipeline">
-                <p:input name="config" href="xml-rpc/get-recent-posts.xpl"/>
-                <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
-                <p:output name="params" id="response"/>
-            </p:processor>
-        </p:when>
-        <p:when test="/methodCall/methodName = 'metaWeblog.getPost'">
-            <p:processor name="oxf:pipeline">
-                <p:input name="config" href="xml-rpc/get-post.xpl"/>
-                <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
-                <p:output name="params" id="response"/>
-            </p:processor>
-        </p:when>
-        <p:when test="/methodCall/methodName = 'metaWeblog.editPost'">
-            <p:processor name="oxf:pipeline">
-                <p:input name="config" href="xml-rpc/edit-post.xpl"/>
-                <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
-                <p:output name="params" id="response"/>
-            </p:processor>
-        </p:when>
-        <p:when test="/methodCall/methodName = 'blogger.deletePost'">
-            <p:processor name="oxf:pipeline">
-                <p:input name="config" href="xml-rpc/delete-post.xpl"/>
-                <p:input name="params" href="#xmlrpc-request#xpointer(/*/params)"/>
-                <p:output name="params" id="response"/>
-            </p:processor>
-        </p:when>
+        </p:otherwise>
     </p:choose>
 
     <!-- Generate response -->

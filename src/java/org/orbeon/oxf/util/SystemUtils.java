@@ -53,7 +53,7 @@ public class SystemUtils {
      * @param c	Reciever of java.io.File's gathered from sun.boot.class.path elements
      * 			as well as the contents of the dirs named in java.ext.dirs.	
      */
-    public static void gatherSystemPaths( java.util.Collection c ) {
+    public static void gatherSystemPaths( final java.util.Collection c ) {
     	final String bootcp = System.getProperty( "sun.boot.class.path" );
     	gatherPaths( c, bootcp );
     	final String extDirProp = System.getProperty( "java.ext.dirs" );

@@ -47,7 +47,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXResult;
 import java.io.*;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 
 /**

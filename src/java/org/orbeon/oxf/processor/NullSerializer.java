@@ -14,6 +14,7 @@
 package org.orbeon.oxf.processor;
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -25,9 +26,9 @@ public class NullSerializer extends ProcessorImpl {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
     }
 
-    public void start(org.orbeon.oxf.pipeline.api.PipelineContext context) {
+    public void start(PipelineContext pipelineContext) {
         try {
-            readInputAsSAX(context, INPUT_DATA, new NullContentHandler());
+            readInputAsSAX(pipelineContext, INPUT_DATA, new NullContentHandler());
         } catch (Exception e) {
             throw new OXFException(e);
         }

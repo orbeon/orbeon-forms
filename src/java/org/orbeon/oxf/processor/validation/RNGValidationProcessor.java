@@ -328,7 +328,7 @@ public class RNGValidationProcessor extends ProcessorImpl {
                 };
 
                 public void parse(InputSource _input)
-                        throws IOException, SAXException {
+                        throws IOException {
                     if(_input.getSystemId() == null)
                         input.getOutput().read(context, forwardingContentHandler);
                     else {

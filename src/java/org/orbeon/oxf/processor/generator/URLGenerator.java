@@ -345,6 +345,8 @@ public class URLGenerator extends ProcessorImpl {
                                 // Create store for caching if necessary
                                 ContentHandler output = config.isCacheUseLocalCache() ? new SAXStore(contentHandler) : contentHandler;
 
+                                //System.out.println("XXX " + config.toString() + " XXX " + handler.getResourceContentType());
+
                                 // Read resource
                                 if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType)) {
                                     handler.readHTML(output);
@@ -538,11 +540,19 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public String getResourceContentType() throws IOException {
+            // Return null for file protocol, as it returns incorrect content types
+            if ("file".equals(config.getURL().getProtocol()))
+                return null;
+            // Otherwise, try URLConnection
             openConnection();
             return NetUtils.getContentTypeContentType(urlConn.getContentType());
         }
 
         public String getConnectionEncoding() throws IOException {
+            // Return null for file protocol, as it returns incorrect content types
+            if ("file".equals(config.getURL().getProtocol()))
+                return null;
+            // Otherwise, try URLConnection
             openConnection();
             return NetUtils.getContentTypeCharset(urlConn.getContentType());
         }

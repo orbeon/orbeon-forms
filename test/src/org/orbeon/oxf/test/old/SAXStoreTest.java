@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.test.old;
 
+/*
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.dom4j.Document;
@@ -36,6 +37,7 @@ import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.TransformerHandler;
 import java.util.Iterator;
 import java.util.Properties;
+*/
 
 public class SAXStoreTest /*extends TestCase*/ {
 
@@ -259,6 +261,9 @@ public class SAXStoreTest /*extends TestCase*/ {
 
 /*
   $Log: SAXStoreTest.java,v $
+  Revision 1.2  2005/03/30 23:30:43  dsmall
+  Get rid of unused import warning.
+
   Revision 1.1  2004/11/11 13:18:32  ebruchez
   Run more than one test class.
 

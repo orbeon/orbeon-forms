@@ -8,6 +8,7 @@
  */
 package org.orbeon.oxf.processor;
 
+/*
 import org.apache.axis.AxisFault;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
@@ -33,6 +34,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
+*/
 
 public class BusServiceCreationProcessor {}
 /*

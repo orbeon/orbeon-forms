@@ -74,24 +74,26 @@
                                     </span>
                                 </td></tr>
                                 <!-- Tabs -->
-                                <tr><td colspan="2" class="tabs">
-                                    <xf:group ref="/form" xhtml:style="margin-bottom: 0">
-                                        <xsl:for-each select="$portlets">
-                                            <xsl:choose>
-                                                <xsl:when test="@name = $visible-portlet-name">
-                                                    <span class="tab-selected-left">&#160;</span>
-                                                    <span class="tab-selected"><xsl:value-of select="@short-title"/></span>
-                                                </xsl:when>
-                                                <xsl:otherwise>
-                                                    <xf:submit xxf:appearance="link" xhtml:class="tab">
-                                                        <xf:label><xsl:value-of select="@short-title"/></xf:label>
-                                                        <xf:setvalue ref="action">show-portlet</xf:setvalue>
-                                                        <xf:setvalue ref="visible-portlet"><xsl:value-of select="@name"/></xf:setvalue>
-                                                    </xf:submit>
-                                                </xsl:otherwise>
-                                            </xsl:choose>
-                                        </xsl:for-each>
-                                    </xf:group>
+                                <tr><td colspan="2">
+                                    <div class="tabs">
+                                        <xf:group ref="/form" xhtml:style="margin-bottom: 0">
+                                            <xsl:for-each select="$portlets">
+                                                <xsl:choose>
+                                                    <xsl:when test="@name = $visible-portlet-name">
+                                                        <span class="tab-selected-left">&#160;</span>
+                                                        <span class="tab-selected"><xsl:value-of select="@short-title"/></span>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <xf:submit xxf:appearance="link" xhtml:class="tab">
+                                                            <xf:label><xsl:value-of select="@short-title"/></xf:label>
+                                                            <xf:setvalue ref="action">show-portlet</xf:setvalue>
+                                                            <xf:setvalue ref="visible-portlet"><xsl:value-of select="@name"/></xf:setvalue>
+                                                        </xf:submit>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+                                            </xsl:for-each>
+                                        </xf:group>
+                                    </div>
                                 </td></tr>
                                 <tr>
                                     <!-- List of examples -->

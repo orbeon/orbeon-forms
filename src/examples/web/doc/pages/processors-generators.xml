@@ -381,6 +381,28 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     fetched.
                 </p>
             </section>
+            <section>
+                <title>Relative URLs</title>
+                <p>
+                    URLs passed to the URL generator can be relative. For example, consider the
+                    following pipeline fragment declared in a file called
+                    <code>oxf:/my-pipelines/backend/import.xpl</code>:
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config">
+                            <config>
+                                <url>../../documents/claim.xml</url>
+                            </config>
+                        </p:input>
+                        <p:output name="data" id="file"/>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    In this case, the URL resolves to:
+                    <code>oxf:/documents/claim.xml</code>.
+                </p>
+            </section>
         </section>
         <anchor id="request-generator"/>
         <section>

@@ -120,6 +120,14 @@
                     </p>
                 </section>
             </section>
+            <section>
+                <title>URL generator</title>
+                <p>
+                    The <a href="processors-generators#url-generator">URL generator</a> now supports
+                    URLs relative to the location where the generator is used, instead of just
+                    absolute URLs.
+                </p>
+            </section>
         </section>
         <section>
             <title>New in Version 2.6</title>

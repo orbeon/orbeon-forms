@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.processor.scope;
 
-import org.orbeon.oxf.cache.Cache;
-import org.orbeon.oxf.cache.InternalCacheKey;
-import org.orbeon.oxf.cache.ObjectCache;
-import org.orbeon.oxf.cache.OutputCacheKey;
+import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -67,7 +64,7 @@ public class ScopeGenerator extends ScopeConfigReader {
                 return true;
             }
 
-            protected InternalCacheKey getLocalKey(PipelineContext context) {
+            protected CacheKey getLocalKey(PipelineContext context) {
                 State state = computeState(context);
                 return state.key == null ? DEFAULT_LOCAL_KEY : new InternalCacheKey(ScopeGenerator.this,
                         Arrays.asList(new Object[] {state.key}));

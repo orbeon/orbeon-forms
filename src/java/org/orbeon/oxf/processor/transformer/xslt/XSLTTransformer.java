@@ -173,7 +173,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 return true;
             }
 
-            protected InternalCacheKey getLocalKey(PipelineContext context) {
+            protected CacheKey getLocalKey(PipelineContext context) {
                 try {
                     KeyValidity configKeyValidity = getConfigKeyValidity(context);
                     URIReferences uriReferences = getURIReferences(context, configKeyValidity);

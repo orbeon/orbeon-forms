@@ -43,8 +43,7 @@ import org.xml.sax.SAXException;
 import java.util.*;
 
 /**
- * Helper class that implements default method of the
- * Processor interface.
+ * Helper class that implements default method of the Processor interface.
  */
 public abstract class ProcessorImpl implements Processor {
     
@@ -1151,19 +1150,14 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     /**
-     * Implementation of a caching transformer output that assumes that an
-     * output simply depends on all the inputs plus optional local information.
+     * Implementation of a caching transformer output that assumes that an output simply depends on
+     * all the inputs plus optional local information.
      *
-     * The key computed depends on the current processor's class name (that
-     * identifies the processor functionality), the output name, and all the
-     * input keys. A key will look like this (package names removed for
-     * concision):
+     * It is possible to implement local key and validity information as well, that represent data
+     * not coming from an XML input. If any input is connected to an output that is not cacheable,
+     * a null key is returned.
      *
-     * XSLTTransformer#data?[ResourceGenerator#data?my/document|ResourceGenerator#config?my/other/document]
-     *
-     * It is possible to implement local key and validty information as well,
-     * that represent data not coming from an XML input. If any input is
-     * connected to an output that is not cacheable, a null key is returned.
+     * Use DigestTransformerOutputImpl whenever possible.
      */
     public abstract class CacheableTransformerOutputImpl extends ProcessorOutputImpl {
         public CacheableTransformerOutputImpl(Class clazz, String name) {
@@ -1178,7 +1172,7 @@ public abstract class ProcessorImpl implements Processor {
             return false;
         }
 
-        protected InternalCacheKey getLocalKey(PipelineContext context) {
+        protected CacheKey getLocalKey(PipelineContext context) {
             throw new UnsupportedOperationException();
         }
 
@@ -1202,7 +1196,7 @@ public abstract class ProcessorImpl implements Processor {
 
             // Add local key if needed
             if (supportsLocalKeyValidity()) {
-                InternalCacheKey localKey = getLocalKey(context);
+                CacheKey localKey = getLocalKey(context);
                 if (localKey == null) return null;
                 keys.add(localKey);
             }
@@ -1234,5 +1228,121 @@ public abstract class ProcessorImpl implements Processor {
 
             return validityObjects;
         }
+    }
+
+    /**
+     * Implementation of a caching transformer output that assumes that an output simply depends on
+     * all the inputs plus optional local information that can be digested.
+     */
+    public abstract class DigestTransformerOutputImpl extends CacheableTransformerOutputImpl {
+
+        private final Long DEFAULT_VALIDITY = new Long(0);
+
+        public DigestTransformerOutputImpl(Class clazz, String name) {
+            super(clazz, name);
+        }
+
+        protected final boolean supportsLocalKeyValidity() {
+            return true;
+        }
+
+        protected final CacheKey getLocalKey(PipelineContext pipelineContext) {
+            for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
+                String key = (String) i.next();
+                if (!isInputInCache(pipelineContext, key))// NOTE: This requires that there is only one input with that name
+                    return null;
+            }
+            return getFilledOutState(pipelineContext).key;
+        }
+
+        protected final Object getLocalValidity(PipelineContext pipelineContext) {
+            for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
+                String key = (String) i.next();
+                if (!isInputInCache(pipelineContext, key))// NOTE: This requires that there is only one input with that name
+                    return null;
+            }
+            return getFilledOutState(pipelineContext).validity;
+        }
+
+        /**
+         * Fill-out user data into the state, if needed. Return caching information.
+         *
+         * @param pipelineContext the current PipelineContext
+         * @param digestState state set during processor start() or reset()
+         * @return false if private information is known that requires disabling caching, true otherwise
+         */
+        protected abstract boolean fillOutState(PipelineContext pipelineContext, DigestState digestState);
+
+        /**
+         * Compute a digest of the internal document on which the output depends.
+         *
+         * @param digestState state set during processor start() or reset()
+         * @return the digest
+         */
+        protected abstract byte[] computeDigest(PipelineContext pipelineContext, DigestState digestState);
+
+        /**
+         *
+         * @param pipelineContext
+         * @return
+         */
+        protected final DigestState getFilledOutState(PipelineContext pipelineContext) {
+            // This is called from both readImpl and getLocalValidity. Based on the assumption that
+            // a getKeyImpl will be followed soon by a readImpl if it fails, we compute key,
+            // validity, and user-defined data.
+
+            DigestState state = (DigestState) getState(pipelineContext);
+
+            // Create request document
+            boolean allowCaching = fillOutState(pipelineContext, state);
+
+            // Compute key and validity if possible
+            if ((state.validity == null || state.key == null) && allowCaching) {
+                // Compute digest
+                if (state.digest == null) {
+                    state.digest = computeDigest(pipelineContext, state);
+                }
+                // Compute local key
+                if (state.key == null) {
+                    state.key = new InternalCacheKey(ProcessorImpl.this, "requestHash", new String(state.digest));
+                }
+                // Compute local validity
+                if (state.validity == null) {
+                    state.validity = DEFAULT_VALIDITY; // HACK so we don't recurse at the next line
+                    OutputCacheKey outputCacheKey = getKeyImpl(pipelineContext);
+                    if (outputCacheKey != null) {
+                        Cache cache = ObjectCache.instance();
+                        DigestValidity digestValidity = (DigestValidity) cache.findValid(pipelineContext, outputCacheKey, DEFAULT_VALIDITY);
+                        if (digestValidity != null &&  Arrays.equals(state.digest, digestValidity.digest)) {
+                            state.validity = digestValidity.lastModified;
+                        } else {
+                            Long currentValidity = new Long(System.currentTimeMillis());
+                            cache.add(pipelineContext, outputCacheKey, DEFAULT_VALIDITY, new DigestValidity(state.digest, currentValidity));
+                            state.validity = currentValidity;
+                        }
+                    } else {
+                        state.validity = null; // HACK restore
+                    }
+                }
+            }
+
+            return state;
+        }
+    }
+
+    private static class DigestValidity {
+        public DigestValidity(byte[] digest, Long lastModified) {
+            this.digest = digest;
+            this.lastModified = lastModified;
+        }
+
+        public byte[] digest;
+        public Long lastModified;
+    }
+
+    protected static class DigestState {
+        public byte[] digest;
+        public CacheKey key;
+        public Object validity;
     }
 }

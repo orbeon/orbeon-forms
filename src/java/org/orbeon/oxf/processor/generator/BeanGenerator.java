@@ -18,10 +18,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Marshaller;
-import org.orbeon.oxf.cache.Cache;
-import org.orbeon.oxf.cache.InternalCacheKey;
-import org.orbeon.oxf.cache.ObjectCache;
-import org.orbeon.oxf.cache.OutputCacheKey;
+import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -178,7 +175,7 @@ public class BeanGenerator extends ProcessorImpl {
                 return true;
             }
 
-            protected InternalCacheKey getLocalKey(PipelineContext context) {
+            protected CacheKey getLocalKey(PipelineContext context) {
                 return DEFAULT_LOCAL_KEY;
             }
 

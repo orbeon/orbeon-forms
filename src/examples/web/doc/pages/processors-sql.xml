@@ -679,6 +679,7 @@ select first_name, last_name
 
             </section>
 
+            <anchor id="binary-data"/>
             <section>
                 <title>Reading and Writing Binary Data</title>
 
@@ -804,8 +805,8 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                         </li>
                         <li>
                             <p>
-                                The <code>binary-serializer</code> converts a Base64-encoded input into
-                                a binary output.
+                                The <code>binary-http-serializer</code> converts a Base64-encoded
+                                input into a binary output.
                             </p>
                         </li>
                         <li>

@@ -282,15 +282,13 @@ public class URLGenerator extends ProcessorImpl {
                             } else {
                                 // We need to read the resource
 
-                                // Find content-type to use. If the config says to
-                                // force the content-type, we use the content-type
-                                // provided by the user. Otherwise, we give the
-                                // priority to the content-type provided by the
-                                // connection, then the content-type provided by the
-                                // user, then we use the default content-type (XML).
-                                // The user will have to provide a content-type for
-                                // example to read HTML documents with the file:
-                                // protocol.
+                                // Find content-type to use. If the config says to force the
+                                // content-type, we use the content-type provided by the user.
+                                // Otherwise, we give the priority to the content-type provided by
+                                // the connection, then the content-type provided by the user, then
+                                // we use the default content-type (XML). The user will have to
+                                // provide a content-type for example to read HTML documents with
+                                // the file: protocol.
                                 String contentType;
                                 if (config.isForceContentType()) {
                                     contentType = config.getContentType();
@@ -575,7 +573,7 @@ public class URLGenerator extends ProcessorImpl {
             }
         }
 
-        public static void readHTML(InputStream is, TidyConfig tidyConfig, String encoding, ContentHandler output) throws IOException {
+        public static void readHTML(InputStream is, TidyConfig tidyConfig, String encoding, ContentHandler output) {
             Tidy tidy = new Tidy();
 //          tidy.setOnlyErrors(false);
             tidy.setShowWarnings(tidyConfig.isShowWarnings());
@@ -614,7 +612,7 @@ public class URLGenerator extends ProcessorImpl {
             helper.endDocument();
         }
 
-        public static void readBinary(InputStream is, ContentHandler output) throws IOException {
+        public static void readBinary(InputStream is, ContentHandler output) {
             ContentHandlerHelper helper = new ContentHandlerHelper(output);
             helper.startDocument();
             helper.startElement(DEFAULT_BINARY_DOCUMENT_ELEMENT);

@@ -276,13 +276,14 @@
                     </p:processor>
                 </xml-source>
             </section>
+            <anchor id="binary-http-serializer"/>
             <section>
-                <title>Binary Serializer</title>
+                <title>Binary HTTP Serializer</title>
                 <p>
-                    The Binary serializer reads characters of its input document as Base64-encoded
-                    binary and sends the data converted into a binary stream, without further
-                    transformation. All the character content of the input is considered as Base64.
-                    Elements, namespace declarations, attributes, processing instructions,
+                    The Binary HTTP serializer reads characters of its input document as
+                    Base64-encoded binary and sends the data converted into a binary stream, without
+                    further transformation. All the character content of the input is considered as
+                    Base64. Elements, namespace declarations, attributes, processing instructions,
                     comments, are ignored. The minimal requirement for the input document is to have
                     a root element (necessary in every well-formed XML document) containing some
                     Base64-encoded character data.
@@ -291,32 +292,43 @@
                     The input of the serializer can look as follows:
                 </p>
                 <xml-source>
-<binary>
+<document>
 /9j/4AAQSkZJRgABAQEBygHKAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4R
 ...
 KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
-</binary>
+</document>
                 </xml-source>
                 <p>
                     The default content-type is <code>application/octet-stream</code>. It can be
                     overridden using the <code>content-type</code> configuration element. Here is an
-                    example of configuration:
+                    example connecting the <a href="processors-generators#url-generator">URL
+                    generator</a> to the serializer, and the appropriate configurations:
                 </p>
                 <xml-source>
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config">
+                            <config>
+                                <url>oxf:/my-image.jpg</url>
+                                <content-type>application/octet-stream</content-type>
+                            </config>
+                        </p:input>
+                        <p:output name="data" id="image-data"/>
+                    </p:processor>
                     <p:processor name="oxf:binary-http-serializer">
                         <p:input name="config">
                             <config>
                                 <content-type>image/jpeg</content-type>
                             </config>
                         </p:input>
-                        <p:input name="data" href="oxf:/my-image.jpg"/>
+                        <p:input name="data" href="#image-data"/>
                     </p:processor>
                 </xml-source>
                 <note>
                     The Binary serializer performs streaming. If its input data consists of a stream
                     of short character SAX events, such as those produced by the Request generator
-                    the URL generator, or the SQL processor, it is possible to serialize an
-                    "infinitely" long document.
+                    the <a href="processors-generators#url-generator">URL generator</a>, or the <a
+                    href="processors-sql#binary-data">SQL processor</a>, it is possible to
+                    serialize an "infinitely" long document.
                 </note>
             </section>
         </section>
@@ -326,23 +338,19 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             <title>URL Serializer</title>
             <p>
                 The URL Serializer mirrors the functionality of the <link
-                href="processors-generators#URLGenerator">URL Generator</link>.
-                Instead of reading from of URL, it writes its <code>data</code>
-                input as XML in a URL. Note that only the <code>oxf:</code> and
-                <code>http</code> protocols allows writing at this time.
+                href="processors-generators#url-generator">URL Generator</link>. Instead of reading
+                from of URL, it writes its <code>data</code> input as XML in a URL. Note that only
+                the <code>oxf:</code> and <code>http</code> protocols allows writing at this time.
 
             </p>
             <note>
-                The <link
-                href="reference-resource-managers#flatfile">Flat File</link>
-                Resource Manager is the only Resource Manager supporting write
-                operations.
+                The <link href="reference-resource-managers#flatfile">Flat File</link> Resource
+                Manager is the only Resource Manager supporting write operations.
             </note>
             <p>
-                The URL serializer takes a <code>config</code> input with a
-                single <code>url</code> element containing the URL to write to.
-                The <code>data</code> input is serialized according the rules of
-                the XML Serializer.
+                The URL serializer takes a <code>config</code> input with a single <code>url</code>
+                element containing the URL to write to. The <code>data</code> input is serialized
+                according the rules of the XML Serializer.
             </p>
             <xml-source>
                 <p:processor name="oxf:url-serializer" xmlns:p="http://www.orbeon.com/oxf/pipeline">

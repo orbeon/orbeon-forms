@@ -132,7 +132,7 @@
                         Checker</link> spell-checks a paragraph of text entered
                         in a form by searching it on Google. The queries are
                         sent to Google with the <link
-                        href="processors-generators#URLGenerator">URL
+                        href="processors-generators#url-generator">URL
                         generator</link>.
                     </li>
                     <li>

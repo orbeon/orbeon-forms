@@ -433,7 +433,7 @@
             </note>
         </section>
 
-        <anchor id="URLGenerator"/>
+        <anchor id="url-generator"/>
         <section>
             <title>URL Generator</title>
             <p>
@@ -540,6 +540,48 @@
                 <note>
                     Tidy has some tolerance for malformed HTML, but it is
                     encouraged to access well-formed HTML whenever possible.
+                </note>
+            </section>
+            <section>
+                <title>Binary Mode</title>
+                <p>
+                    The binary mode is selected when the content type is none of the
+                    <code>text/*</code> content types. In this mode, the URL generator uses a Base64
+                    encoding to transform binary content into XML.
+                </p>
+                <p>
+                    Example:
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config">
+                            <config>
+                                <url>oxf:/my-image.jpg</url>
+                                <content-type>application/octet-stream</content-type>
+                            </config>
+                        </p:input>
+                        <p:output name="data" id="image-data"/>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    The resulting document consists of a <code>document</code> root node containing
+                    character data encoded with Base64:
+                </p>
+                <xml-source>
+<document>
+/9j/4AAQSkZJRgABAQEBygHKAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4R
+...
+KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
+</document>
+                </xml-source>
+                <note>
+                    The URL generator performs streaming. It generates a stream of short character
+                    SAX events. It is therefore possible to generate an "infinitely" long document
+                    with a constant amount of memory, assuming the generator is connected to other
+                    processors that do not require storing the entire stream of data in memory, for
+                    example the <a href="processors-sql#binary-data">SQL processor</a> (with an
+                    appropriate configuration to stream BLOBs), or the <a
+                    href="processors-serializers#binary-http-serializer">Binary HTTP serializer</a>.
                 </note>
             </section>
             <section>

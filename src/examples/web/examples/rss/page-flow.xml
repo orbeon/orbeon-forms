@@ -24,7 +24,7 @@
                             <items-url>http://www.yahoo.com/old.html</items-url>
                             <items-xpath>//a[starts-with(@href, 's/') and font]</items-xpath>
                             <items-title-xpath>.</items-title-xpath>
-                            <items-url-xpath>concat('http://www.yahoo.com/', @href)</items-url-xpath>
+                            <items-url-xpath>@href</items-url-xpath>
                             <items-description-xpath/>
                             <channel-title>Yahoo! News - Home Page Stories</channel-title>
                             <channel-link>http://news.yahoo.com/news</channel-link>
@@ -43,7 +43,7 @@
                             <items-url>http://www.intellij.net/forums/forum.jsp?forum=7</items-url>
                             <items-xpath>//a[starts-with(@href, 'thread.jsp') and @class = 'forum']</items-xpath>
                             <items-title-xpath>.</items-title-xpath>
-                            <items-url-xpath>concat('http://www.intellij.net/forums/', @href)</items-url-xpath>
+                            <items-url-xpath>@href</items-url-xpath>
                             <items-description-xpath/>
                             <channel-title>IntelliJ EAP Announcements</channel-title>
                             <channel-link>http://www.intellij.net/</channel-link>

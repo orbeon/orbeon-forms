@@ -23,7 +23,7 @@
                 <tr>
                     <td align="right">Radio buttons:</td>
                     <td>
-                        <xforms:select1 ref="carrier" appearance="full">
+                        <xforms:select1 ref="document/carrier" appearance="full">
                             <xforms:item>
                                 <xforms:label>Fedex</xforms:label>
                                 <xforms:value>fedex</xforms:value>
@@ -38,22 +38,18 @@
                 <tr>
                     <td align="right">Combo box:</td>
                     <td>
-                        <xforms:select1 ref="payment" appearance="minimal">
-                            <xforms:item>
-                                <xforms:label>Cash</xforms:label>
-                                <xforms:value>cash</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                                <xforms:label>Credit</xforms:label>
-                                <xforms:value>credit</xforms:value>
-                            </xforms:item>
+                        <xforms:select1 ref="document/payment" appearance="minimal">
+                            <xforms:itemset nodeset="/form/data/payments/payment">
+                            	<xforms:label ref="@label"/>
+                            	<xforms:copy ref="@value"/>
+                            </xforms:itemset>
                         </xforms:select1>
                     </td>
                 </tr>
                 <tr>
                     <td align="right">Check boxes:</td>
                     <td>
-                        <xforms:select ref="wrapping" appearance="full">
+                        <xforms:select ref="document/wrapping" appearance="full">
                             <xforms:choices>
                                 <xforms:item>
                                     <xforms:label>Hard-box</xforms:label>
@@ -70,27 +66,12 @@
                 <tr>
                     <td align="right">List:</td>
                     <td>
-                        <xforms:select ref="taste" appearance="compact">
-                            <xforms:item>
-                                <xforms:label>Vanilla</xforms:label>
-                                <xforms:value>vanilla</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                                <xforms:label>Strawberry</xforms:label>
-                                <xforms:value>strawberry</xforms:value>
-                            </xforms:item>
-                        </xforms:select>
-                    </td>
-                </tr>
-                <tr>
-                    <td align="right">Marital status:</td>
-                    <td>
-                        <xforms:select1 ref="marital-status" appearance="full">
-                            <xforms:itemset nodeset="/form/marital-status-choices/marital-status">
+                        <xforms:select ref="document/taste" appearance="compact">
+                            <xforms:itemset nodeset="/form/data/tastes/taste">
                             	<xforms:label ref="@label"/>
                             	<xforms:copy ref="@value"/>
                             </xforms:itemset>
-                        </xforms:select1>
+                        </xforms:select>
                     </td>
                 </tr>
                 <tr>

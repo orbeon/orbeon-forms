@@ -14,17 +14,27 @@
 <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
     <xforms:instance>
         <form>
-            <carrier>ups</carrier>
-            <payment/>
-            <wrapping/>
-            <taste/>
-			<marital-status>widow</marital-status>
-			<marital-status-choices>
-				<marital-status value="single" label="Single"/>
-				<marital-status value="married" label="Married"/>
-				<marital-status value="widow" label="Widow"/>
-				<marital-status value="divorced" label="Divorced"/>
-			</marital-status-choices>
+            <tortilla/>
+            <document>
+                <carrier>ups</carrier>
+                <payment/>
+                <wrapping/>
+                <taste/>
+            </document>
+            <data>
+                <tortilla-selections>
+                    <tortilla-selection type="flour">Flour</tortilla-selection>
+                    <tortilla-selection type="corn">Corn</tortilla-selection>
+                </tortilla-selections>
+                <payments>
+            	   <payment value="cash" label="Cash"/>
+            	   <payment value="credit" label="Credit"/>
+            	</payments>
+            	<tastes>
+            	   <taste value="vanilla" label="Vanilla"/>
+            	   <taste value="strawberry" label="Strawberry"/>
+            	</tastes>
+            </data>
         </form>
     </xforms:instance>
 </xforms:model>

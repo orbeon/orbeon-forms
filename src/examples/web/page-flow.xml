@@ -33,6 +33,7 @@
     <!-- Examples portal -->
     <page id="home" path-info="/" model="/examples-portal/page-flow.xpl"/>
     <page path-info="/goto-example/.+" matcher="oxf:perl5-matcher" model="/examples-portal/page-flow.xpl"/>
+    <page path-info="/goto-source/.+" matcher="oxf:perl5-matcher" model="/examples-portal/page-flow.xpl"/>
 
     <!-- Dispatch resources for the examples. This is necessary, since portlets cannot serve resources directly. -->
     <page path-info="/example-resources/.*" matcher="oxf:perl5-matcher" model="/examples/dispatch.xpl"/>
@@ -82,10 +83,8 @@
 
     <!-- Not Found and Error pages -->
     <page id="not-found" path-info="/not-found" view="/config/not-found.xml"/>
-    <page id="error" path-info="/error" model="/config/error.xpl"/>
 
     <epilogue url="/config/epilogue.xpl"/>
     <not-found-handler page="not-found"/>
-<!--    <error-handler page="error"/>-->
 
 </config>

@@ -371,7 +371,7 @@
                 </p>
                 <p>
                     <termdef id="static-input-output" term="static input or output">
-                        A <term>static input or output</term> is an input or output defined by an
+                        A <term>static input or output</term> is an input or output exposed by an
                         <termref def="xml-processor">XML processor</termref> before the execution of
                         the <termref def="xpl-program">XPL program</termref>.
                     </termdef>
@@ -385,7 +385,7 @@
                 <p>
                     <termdef id="dynamic-input-output" term="dynamic input of output">
                         A <term>dynamic input or output</term> is a connected input or output of an
-                        XML processor instance which is not defined by the XML processor before the
+                        XML processor instance which is not exposed by the XML processor before the
                         execution of the <termref def="xpl-program">XPL program</termref>.
                     </termdef>
                 </p>
@@ -452,9 +452,9 @@
                     </table>
                 </p>
                 <note>
-                    The mechanism by which an XPL processor exposes inputs and outputs, and whether
-                    they are mandatory or optional to the XPL implementation is outside the scope
-                    of this specification.
+                    The mechanism by which an XML processor exposes inputs and outputs, and whether
+                    they are mandatory or optional to the XPL implementation is outside the scope of
+                    this specification.
                 </note>
             </div2>
             <div2 id="processor-behavior">
@@ -513,12 +513,12 @@
                     </item>
                     <item>
                         <p>
-                            <emph>Reading outputs.</emph> "Reading an output" means that the XML
+                            <emph>Reading outputs.</emph> "Reading an output" means that the XPL
                             implementation gives control to an XML processor instance in association
                             with an output. When in control, the XML processor instance must produce
                             the XML Infoset associated with that particular output. If the XML
                             implementation reads a dynamic output, the XML processor instance may
-                            generate an error if it does not support that output.
+                            generate a dynamic error if it does not support that output.
                         </p>
                     </item>
                 </ulist>
@@ -547,7 +547,7 @@
                             <emph>Input and output parameters.</emph> Each input or output has a
                             name, and may either provide the XPL program with an XML Infoset (case
                             of an input), or produces an XML Infoset (case of an output). The XPL
-                            program may have no input or outputs.
+                            program may have no input or output.
                         </p>
                     </item>
                     <item>
@@ -561,10 +561,10 @@
                 <note>
                     Some use cases do not require that an XPL program have any inputs or outputs. It
                     is important to note that information, whether in the form or XML Infosets or
-                    other forms, is not necessarily exchanged with XPL programs through pipeline
-                    inputs and outputs, but possibly with other means. For example, an XML processor
-                    can access information by connecting to a relational database and return an XML
-                    Infoset to the XPL program.
+                    other forms, is not necessarily exchanged with XPL programs through inputs and
+                    outputs, but possibly through other means. For example, an XML processor can access
+                    information by connecting to a relational database and return an XML Infoset to
+                    the XPL program.
                 </note>
             </div2>
             <div2>
@@ -625,8 +625,9 @@
                 </p>
                 <p>
                     If there is no previous statement, the set of XML Infoset identifiers in scope
-                    for a statement of an XPL program , unless specified otherwise, consists of the
-                    set of <el>id</el> attributes of the XPL program inputs.
+                    for a statement of an XPL program, unless specified otherwise, consists of the
+                    set of identifiers specified by the <el>id</el> attributes of the XPL program
+                    inputs.
                 </p>
                 <p>
                     In this specification, a statement consists of either a <el>p:processor</el>,

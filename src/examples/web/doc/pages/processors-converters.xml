@@ -105,7 +105,12 @@
                         <td>
                             If true, specifies <code>standalone="yes"</code> in the document
                             declaration. If false, specifies <code>standalone="no"</code> in the
-                            document declaration.
+                            document declaration. If missing, no standalone attribute is produced.
+                            For more information about standalone document declarations, please
+                            refer to the <a
+                            href="http://www.w3.org/TR/2000/REC-xml-20001006#sec-rmd">relevant
+                            section of the XML specification</a>. In most cases, this does not need
+                            to be specified.
                         </td>
                         <td>not specified for XML, ignored otherwise</td>
                     </tr>

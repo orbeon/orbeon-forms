@@ -50,29 +50,27 @@
                             </image>
                         </channel>
                         <!-- Items -->
-                        <items>
-                            <xsl:for-each select="saxon:evaluate($descriptor/items-xpath)">
-                                <xsl:message>current: <xsl:copy-of select="."/></xsl:message>
-                                <xsl:variable name="item" select="."/>
-                                <item>
-                                    <title>
-                                        <xsl:value-of select="saxon:evaluate($descriptor/items-title-xpath)"/>
-                                    </title>
-                                    <link>
-                                        <xsl:variable name="url" select="string(saxon:evaluate($descriptor/items-url-xpath))" as="xs:string"/>
-                                        <xsl:value-of select="if (starts-with($url, 'http:')) then $url else concat($descriptor/channel-link, $url)"/>
-                                    </link>
-                                    <guid isPermaLink="false">
-                                        <xsl:value-of select="saxon:evaluate($descriptor/items-title-xpath)"/>
-                                    </guid>
-                                    <xsl:if test="$descriptor/items-description-xpath != ''">
-                                        <description>
-                                            <xsl:copy-of select="saxon:evaluate($descriptor/items-description-xpath)"/>
-                                        </description>
-                                    </xsl:if>
-                                </item>
-                            </xsl:for-each>
-                        </items>
+                        <xsl:for-each select="saxon:evaluate($descriptor/items-xpath)">
+                            <xsl:message>current: <xsl:copy-of select="."/></xsl:message>
+                            <xsl:variable name="item" select="."/>
+                            <item>
+                                <title>
+                                    <xsl:value-of select="saxon:evaluate($descriptor/items-title-xpath)"/>
+                                </title>
+                                <link>
+                                    <xsl:variable name="url" select="string(saxon:evaluate($descriptor/items-url-xpath))" as="xs:string"/>
+                                    <xsl:value-of select="if (starts-with($url, 'http:')) then $url else concat($descriptor/channel-link, $url)"/>
+                                </link>
+                                <guid isPermaLink="false">
+                                    <xsl:value-of select="saxon:evaluate($descriptor/items-title-xpath)"/>
+                                </guid>
+                                <xsl:if test="$descriptor/items-description-xpath != ''">
+                                    <description>
+                                        <xsl:copy-of select="saxon:evaluate($descriptor/items-description-xpath)"/>
+                                    </description>
+                                </xsl:if>
+                            </item>
+                        </xsl:for-each>
                     </rss>
                 </xsl:template>
             </xsl:stylesheet>

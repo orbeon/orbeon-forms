@@ -59,7 +59,11 @@ public class FromXLSConverter extends ProcessorImpl {
                     final byte[] fileContent = os.toByteArray();
 
                     // Generate XML from Excel file
-                    DOMGenerator domGenerator = new DOMGenerator(extractFromXLS(new ByteArrayInputStream(fileContent)));
+                    final java.io.ByteArrayInputStream bais = new ByteArrayInputStream(fileContent);
+                    final org.dom4j.Document d = extractFromXLS( bais );
+                    final DOMGenerator domGenerator = new DOMGenerator
+                        ( d, "from xls output", DOMGenerator.ZeroValidity
+                          , DOMGenerator.DefaultContext );
                     domGenerator.createOutput(OUTPUT_DATA).read(context, contentHandler);
 
                 } catch (IOException e) {

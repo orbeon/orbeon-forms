@@ -121,7 +121,11 @@ public class PipelineBlock {
             configElement.addElement("root").addText(hrefAggregate.getRoot());
             addNamespaces(configElement, node);
 
-            DOMGenerator configGenerator = new DOMGenerator(aggregatorConfig);
+            final String sid = locationData == null 
+                             ? DOMGenerator.DefaultContext 
+                             : locationData.getSystemID();
+            final DOMGenerator configGenerator = new DOMGenerator
+                ( aggregatorConfig, "aggregate config", DOMGenerator.ZeroValidity, sid );
             PipelineUtils.connect(configGenerator, ProcessorImpl.OUTPUT_DATA, aggregator, ProcessorImpl.INPUT_CONFIG);
 
             // Connect data input to aggregator
@@ -157,15 +161,19 @@ public class PipelineBlock {
             ASTHrefXPointer hrefXPointer = (ASTHrefXPointer) href;
 
             // Create config for XPath processor
-            Document aggregatorConfig = DocumentHelper.createDocument();
-            Element configElement = aggregatorConfig.addElement("config");
+            final Document xpthCfg = DocumentHelper.createDocument();
+            final Element configElement = xpthCfg.addElement("config");
             configElement.addElement("xpath").addText(hrefXPointer.getXpath());
             addNamespaces(configElement, node);
 
             // Connect XPath processor to config
             Processor xpathProcessor = new XPathProcessor();
             xpathProcessor.setLocationData(locationData);
-            DOMGenerator configGenerator = new DOMGenerator(aggregatorConfig);
+            final String sid = locationData == null 
+                             ? DOMGenerator.DefaultContext 
+                             : locationData.getSystemID();
+            final DOMGenerator configGenerator = new DOMGenerator
+                ( xpthCfg, "xpath config", DOMGenerator.ZeroValidity, sid );
             PipelineUtils.connect(configGenerator, ProcessorImpl.OUTPUT_DATA, xpathProcessor, ProcessorImpl.INPUT_CONFIG);
 
             // Connect data input to XPath processor

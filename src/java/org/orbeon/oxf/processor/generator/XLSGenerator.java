@@ -90,7 +90,12 @@ public class XLSGenerator extends ProcessorImpl {
                     }
 
                     // Generate XML from Excel file
-                    DOMGenerator domGenerator = new DOMGenerator(extractFromXLS(new ByteArrayInputStream(fileContent)));
+                    final java.io.ByteArrayInputStream bais 
+                        = new ByteArrayInputStream( fileContent );
+                    final org.dom4j.Document d = extractFromXLS( bais );
+                    final DOMGenerator domGenerator = new DOMGenerator
+                        ( d, "xls generator output", DOMGenerator.ZeroValidity
+                          , DOMGenerator.DefaultContext );
                     domGenerator.createOutput(OUTPUT_DATA).read(context, contentHandler);
                 } catch (XPathException xpe) {
                     throw new OXFException(xpe);

@@ -23,6 +23,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.net.MalformedURLException;
@@ -89,8 +90,10 @@ public class ProcessorUtils {
                     throw new OXFException("Input content is mandatory");
                 Element copiedElement = originalElement.createCopy();
                 addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
-                DOMGenerator domGenerator = new DOMGenerator(copiedElement);
-                PipelineUtils.connect(domGenerator, "data", processor, name);
+                final String sid = Dom4jUtils.makeSystemId( originalElement ); 
+                final DOMGenerator domGenerator = new DOMGenerator
+                    ( copiedElement, "input from pipeline utils", DOMGenerator.ZeroValidity, sid );
+                PipelineUtils.connect( domGenerator, "data", processor, name );
             } else {
                 // Href
                 LocationData locationData = (LocationData) inputElement.getData();

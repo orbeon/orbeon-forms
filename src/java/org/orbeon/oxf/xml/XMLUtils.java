@@ -29,6 +29,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.w3c.dom.Document;
@@ -505,10 +506,10 @@ public class XMLUtils {
          * 1.4.2_06-b03 	P4 2.6 Ghz	/ 	50 th	tc 4.1.30	9154 ms ( 150 mb ), 6949 ( 512 mb ) 	1.7316203642295738 ( 150 mb ), 1.479365288194895 ( 512 mb )
          *
          */
-        final DocumentSource ds = new DocumentSource( d );
-        final XMLReader rdr = ds.getXMLReader();
+        final LocationDocumentSource lds = new LocationDocumentSource( d );
+        final XMLReader rdr = lds.getXMLReader();
         rdr.setErrorHandler( errorHandler );
-        return ds;
+        return lds;
     }
 
     public static byte[] getDigest(org.dom4j.Document document) {

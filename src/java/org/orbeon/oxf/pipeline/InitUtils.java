@@ -27,6 +27,7 @@ import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.XMLProcessorRegistry;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -167,8 +168,12 @@ public class InitUtils {
                 Processor urlGenerator = PipelineUtils.createURLGenerator(url);
                 PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, processor, name);
             } else if (o instanceof Element) {
-                Element element = (Element) o;
-                Processor domGenerator = PipelineUtils.createDOMGenerator(element, null);
+                final Element elt = ( Element )o;
+                final LocationData ld = ( LocationData )elt.getData();
+                final String lsid = ld == null ? null : ld.getSystemID();
+                final String sid = lsid == null ? DOMGenerator.DefaultContext : lsid;
+                Processor domGenerator = PipelineUtils.createDOMGenerator
+                    ( elt, "init input", DOMGenerator.ZeroValidity, sid );
                 PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, processor, name);
             } else
                 throw new IllegalStateException("Incorrect type in map.");

@@ -15,7 +15,6 @@ package org.orbeon.oxf.processor.transformer;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.*;
@@ -24,6 +23,7 @@ import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.xpath.XPathException;
@@ -87,30 +87,37 @@ public class XPathProcessor extends ProcessorImpl {
                     // connected to an aggregator, which adds a new root node.
                     for (Iterator i = results.iterator(); i.hasNext();) {
                         Object result = i.next();
-                        if (result != null) {
-                            if (result instanceof Element || result instanceof Document) {
-                                Node node = (Node) result;
-                                DOMGenerator domGenerator = new DOMGenerator(node);
-                                ProcessorOutput domOutput = domGenerator.createOutput(OUTPUT_DATA);
-                                domOutput.read(context, new ForwardingContentHandler(contentHandler) {
-                                    public void startDocument() {
-                                    }
+                        if ( result == null ) continue;
+                        final String strVal;
+                        if ( result instanceof org.dom4j.Element || result instanceof org.dom4j.Document ) {
+                            final org.dom4j.Element elt = result instanceof org.dom4j.Element 
+                                              ? ( org.dom4j.Element )result 
+                                              : ( ( org.dom4j.Document )result ).getRootElement();
+                            final String sid = Dom4jUtils.makeSystemId( elt  );
+                            final DOMGenerator domGenerator = new DOMGenerator
+                                ( elt, "xpath result doc", DOMGenerator.ZeroValidity, sid );
+                            final ProcessorOutput domOutput = domGenerator.createOutput( OUTPUT_DATA );
+                            domOutput.read(context, new ForwardingContentHandler(contentHandler) {
+                                public void startDocument() {
+                                }
 
-                                    public void endDocument() {
-                                    }
-                                });
-                            } else if (result instanceof String) {
-                                String stringValue = (String) result;
-                                contentHandler.characters(stringValue.toCharArray(), 0, stringValue.length());
-                            } else if (result instanceof Double) {
-                                String stringValue = XMLUtils.removeScientificNotation(((Double) result).doubleValue());
-                                contentHandler.characters(stringValue.toCharArray(), 0, stringValue.length());
-                            } else {
-                                String message = "Unsupported type returned by XPath expression: "
-                                        + (result == null ? "null" : result.getClass().getName());
-                                throw new ValidationException(message, locationData);
-                            }
+                                public void endDocument() {
+                                }
+                            });
+                            continue;
+                        } else if ( result instanceof String ) {
+                            strVal = ( String )result;
+                        } else if ( result instanceof Double ) {
+                            final double d = ( ( Double )result ).doubleValue();
+                            strVal = XMLUtils.removeScientificNotation( d );
+                        } else {
+                            String message = "Unsupported type returned by XPath expression: "
+                                    + (result == null ? "null" : result.getClass().getName());
+                            throw new ValidationException(message, locationData);
                         }
+                        final char[] ch = strVal.toCharArray();
+                        final int len = strVal.length();
+                        contentHandler.characters( ch, 0, len );
                     }
                     contentHandler.endDocument();
                 }catch (XPathException xpe) {

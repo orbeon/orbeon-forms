@@ -22,6 +22,11 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 
 public class PipelineUtils {
+    
+    private static void configDOMGenerator( final DOMGenerator dm ) {
+        dm.setId( "N/A" );
+        dm.setName( XMLConstants.DOM_GENERATOR_PROCESSOR_QNAME );
+    }
 
     public static void connect(Processor producer, String outputName, Processor consumer, String inputName) {
         ProcessorOutput output = producer.createOutput(outputName);
@@ -30,12 +35,20 @@ public class PipelineUtils {
         input.setOutput(output);
     }
 
-    public static Processor createDOMGenerator(org.dom4j.Node config, Object validity) {
-        DOMGenerator domGenerator = new DOMGenerator(config, validity);
-        domGenerator.setId("N/A");
-        domGenerator.setName(XMLConstants.DOM_GENERATOR_PROCESSOR_QNAME);
-        return domGenerator;
+    public static Processor createDOMGenerator
+    ( final org.dom4j.Element cfg, final String id, final Object v, final String sid ) {
+        final DOMGenerator ret = new DOMGenerator( cfg, id, v, sid );
+        configDOMGenerator( ret );
+        return ret;
     }
+
+    public static Processor createDOMGenerator
+    ( final org.dom4j.Document cfg, final String id, final Object v, final String sid ) {
+        final DOMGenerator ret = new DOMGenerator( cfg, id, v, sid );
+        configDOMGenerator( ret );
+        return ret;
+    }
+
 
     public static Processor createURLGenerator(String urlStr) {
         if (urlStr == null || urlStr.equals(""))

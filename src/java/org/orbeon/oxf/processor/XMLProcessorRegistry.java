@@ -23,6 +23,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.Iterator;
 
@@ -36,11 +37,11 @@ public class XMLProcessorRegistry extends ProcessorImpl {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, PROCESSOR_REGISTRY_CONFIG_NAMESPACE_URI));
     }
 
-    public void start(PipelineContext context) {
+    public void start( final PipelineContext ctxt ) {
         try {
-            Node config = readInputAsDOM4J(context, INPUT_CONFIG);
-            final Object configValidity = getInputValidity(context, getInputByName(INPUT_CONFIG));
-            for (Iterator i = XPathUtils.selectIterator(config, "/processors/processor | /processors/processors/processor"); i.hasNext();) {
+            final Node cfg = readInputAsDOM4J( ctxt, INPUT_CONFIG );
+            
+            for (Iterator i = XPathUtils.selectIterator(cfg, "/processors/processor | /processors/processors/processor"); i.hasNext();) {
                 Element processorElement = (Element) i.next();
 
                 // Extract processor name
@@ -126,10 +127,15 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                                         Processor resourceGenerator = PipelineUtils.createURLGenerator(src);
                                         PipelineUtils.connect(resourceGenerator, OUTPUT_DATA, baseProcessor, name);
                                     } else {
+                                        final ProcessorInput in = getInputByName( INPUT_CONFIG );
+                                        final Object cfgVldty = getInputValidity( ctxt, in );
                                         // We must have some XML in the <input> tag
-                                        Processor domGenerator = PipelineUtils.createDOMGenerator
-                                                (XPathUtils.selectSingleNode(config, "*"), configValidity);
-                                        PipelineUtils.connect(domGenerator, OUTPUT_DATA, baseProcessor, name);
+                                        final org.dom4j.Element e = ( org.dom4j.Element )XPathUtils
+                                            .selectSingleNode( config, "*" );
+                                        final String sid = Dom4jUtils.makeSystemId( e );
+                                        final Processor dg = PipelineUtils.createDOMGenerator
+                                                ( e, "input from registry", cfgVldty, sid );
+                                        PipelineUtils.connect(dg, OUTPUT_DATA, baseProcessor, name);
                                     }
                                 }
                                 return baseProcessor;

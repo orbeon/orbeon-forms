@@ -22,6 +22,7 @@ import org.orbeon.oxf.debugger.api.BreakpointKey;
 import org.orbeon.oxf.debugger.api.Debuggable;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.pipeline.choose.AbstractChooseProcessor;
 import org.orbeon.oxf.processor.pipeline.choose.ConcreteChooseProcessor;
@@ -259,29 +260,38 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                         // We have some inline XML in the <input> tag
                         Node inlineNode = input.getContent();
 
-                        Document document;
-                        if (inlineNode instanceof Element) {
+                        final org.dom4j.Document doc;
+                        final int ndTyp = inlineNode.getNodeType();
+                        if ( ndTyp == org.dom4j.Node.ELEMENT_NODE ) {
                             // Create new Document
-                            Element inlineElement = (Element) inlineNode;
-                            document = DocumentHelper.createDocument(inlineElement.createCopy());
+                            final org.dom4j.Element elt = ( org.dom4j.Element )inlineNode;
+                            final org.dom4j.Element eltCpy = elt.createCopy();
+                            doc = DocumentHelper.createDocument( eltCpy );
                             // Make sure the parent namespaces are copied over
-                            Map parentNamespaceContext = XMLUtils.getNamespaceContext(inlineElement.getParent());
-                            Element rootElement = document.getRootElement();
+                            final org.dom4j.Element prntElt = elt.getParent();
+                            final java.util.Map parentNamespaceContext 
+                                = XMLUtils.getNamespaceContext( prntElt );
+                            final Element rtElt = doc.getRootElement();
                             for (Iterator k = parentNamespaceContext.keySet().iterator(); k.hasNext();) {
                                 String prefix = (String) k.next();
                                 String uri = (String) parentNamespaceContext.get(prefix);
-                                rootElement.addNamespace(prefix, uri);
+                                rtElt.addNamespace(prefix, uri);
                             }
-                        } else if (inlineNode instanceof Document) {
-                            document = (Document) inlineNode;
+                        } else if ( ndTyp == org.dom4j.Node.DOCUMENT_NODE ) {
+                            doc = ( org.dom4j.Document )inlineNode;
                         } else {
                             throw new OXFException("Invalid type for inline document: " + inlineNode.getClass().getName());
                         }
 
                         // Create generator for the static text
-                        Processor documentProcessor = PipelineUtils.createDOMGenerator(document, astPipeline.getValidity());
+                        final Object v = astPipeline.getValidity();
+                        final LocationData ld = astPipeline.getLocationData();
+                        String sid = ld == null ? DOMGenerator.DefaultContext : ld.getSystemID();
+                        if ( sid == null ) sid = DOMGenerator.DefaultContext;
+                        final Processor docPrcssr 
+                            = PipelineUtils.createDOMGenerator(doc, "inline config", v, sid );
 
-                        ProcessorOutput pout = documentProcessor.createOutput(OUTPUT_DATA);
+                        ProcessorOutput pout = docPrcssr.createOutput(OUTPUT_DATA);
                         pin = processor.createInput(input.getName());
 
                         // NOTE: We should have a customizable mechanism to do this
@@ -290,7 +300,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                         // To solve this, maybe a flag specifying that we are
                         // using a template should be explicitly specified on
                         // the input?
-                        if (false && XPathUtils.selectBooleanValue(document, "/*/@*[local-name() = 'version' and namespace-uri() = 'http://www.w3.org/1999/XSL/Transform'] = '2.0'").booleanValue()) {
+                        if (false && XPathUtils.selectBooleanValue(doc, "/*/@*[local-name() = 'version' and namespace-uri() = 'http://www.w3.org/1999/XSL/Transform'] = '2.0'").booleanValue()) {
                             // It is embedded XSLT 2.0: connect through XSLT transformer
 
                             ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(jndiName);
@@ -311,7 +321,9 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
 
                             // Connect data input (for now, a null document)
                             ProcessorInput dataInput = templateProcessor.createInput(INPUT_DATA);
-                            Processor nullGenerator = PipelineUtils.createDOMGenerator(XMLUtils.NULL_DOCUMENT, astPipeline.getValidity());
+                            Processor nullGenerator = PipelineUtils.createDOMGenerator
+                                ( XMLUtils.NULL_DOCUMENT, "null input", DOMGenerator.ZeroValidity
+                                  , DOMGenerator.DefaultContext );
                             ProcessorOutput nullGeneratorOutput = nullGenerator.createOutput(OUTPUT_DATA);
                             nullGeneratorOutput.setInput(dataInput);
                             dataInput.setOutput(nullGeneratorOutput);
@@ -441,7 +453,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
 
             pipelineReaderInput.setOutput(new ProcessorImpl.ProcessorOutputImpl(getClass(), "dummy") {
                 public void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                    PipelineProcessor.this.readInputAsSAX(context, _configInput, contentHandler);
+                     ProcessorImpl.readInputAsSAX(context, _configInput, contentHandler); 
                 }
 
                 public OutputCacheKey getKeyImpl(PipelineContext context) {

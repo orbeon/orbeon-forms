@@ -14,14 +14,14 @@
 package org.orbeon.oxf.cache;
 
 public class CompoundOutputCacheKey extends OutputCacheKey {
-
+    
     private final java.util.List keys;
     private final int hash;
 
     public CompoundOutputCacheKey( final Class c, final String onam, final CacheKey[] kys ) {
         super( c, onam );
-        if ( kys == null || kys.length == 0 ) {
-            throw new IllegalArgumentException( "key must not be null and must have len > 0" );
+        if ( kys == null ) {
+            throw new IllegalArgumentException( "key must not be null" );
         }
         keys = new java.util.ArrayList( kys.length );
         for ( int i = 0; i < kys.length; i++ ) {

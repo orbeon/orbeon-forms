@@ -65,17 +65,15 @@ public class MSVValidationProcessor extends ProcessorImpl {
             add(new ElementDelegate("decorate") {{
                 setText("false");
             }});
-        }}));
+        }}), "no decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext );
         DECORATION_CONFIG = new DOMGenerator(new DocumentDelegate(new ElementDelegate("config") {{
             add(new ElementDelegate("decorate") {{
                 setText("true");
             }});
-        }}));
+        }}), "decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext );
         // 02/06/2004 d : If we don't do anything VM would just convert unchecked exceptions thrown
-        //                from here into ExceptionInIntializerError, without setting the cause.
+        //                from here into ExceptionInIntializerError without setting the cause.
         //                This of course makes diagnosing reports from the field a major pain.
-        //                otherwise info will just show up as an 
-        //                ExceptionInInitializerError.
         try {
             factory = XMLUtils.createSAXParserFactory( false );
         } catch ( final Error e ) {

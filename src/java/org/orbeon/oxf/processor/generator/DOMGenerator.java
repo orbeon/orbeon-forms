@@ -13,153 +13,183 @@
  */
 package org.orbeon.oxf.processor.generator;
 
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import org.dom4j.DocumentHelper;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.cache.SimpleOutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.util.NumberUtils;
-import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.SAXException;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXResult;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * A DOMGenerator reads an input from a Node, and outputs SAX events.
+ * DOM Document to sax event processor.
+ * 
+ * A note wrt caching.  Each instance of DOMGenerator creates a unique key for caching.  The 
+ * validity, however, is provided by whoever instantiates the DOMGenerator.  The intent is that
+ * a.) we don't get cache hits for two different DOM objs that happen to have equivalent content.
+ *     ( source of performance problem in past ), and 
+ * b.) two doc fragments are considered equivalent input iff they are the same fragment.
+ * 
+ * Unfortunately at the moment (b) happens more by coincedence than by design.  That is just so
+ * happens that that with current impl and usage of DOMGenerator we get this result.  It would
+ * be better if there was code that made this happen explicitly.  
  */
-public class DOMGenerator extends ProcessorImpl {
-
-    private Document document;
-
-    private final SimpleOutputCacheKey outputKey;
-    private final String key;
-    private Object validity;
-    private SAXStoreEntry saxStoreEntry;
-    private static Map keyToSaxStore = new HashMap();
+public final class DOMGenerator extends ProcessorImpl {
     
-    {
-        addOutputInfo(new org.orbeon.oxf.processor.ProcessorInputOutputInfo(OUTPUT_DATA));
-    }
+    /**
+     * Abstraction that lets use either DOM4J or W3C document as source.  
+     */
+    private static abstract class SourceFactory {
+        private final String systemID;
 
-    public DOMGenerator( Node node, Object validity ) {
-        this.validity = validity;
-        if (node == null) {
-            throw new OXFException("Null node passed to DOMGenerator");
-        } else if (node instanceof Document) {
-            this.document = (Document) node;
-        } else {
-            Document document = XMLUtils.createDocument();
-            document.appendChild(document.importNode(node, true));
-            this.document = document;
+        protected SourceFactory( final String sid ) {
+            systemID = sid;
         }
-        final byte[] dgst = XMLUtils.getDigest( document );
-        key = NumberUtils.toHexString( dgst );
-        outputKey = new SimpleOutputCacheKey( DOMGenerator.class, OUTPUT_DATA, key );
-    }
+        
+        abstract Source makeDOMSource();
 
-    public DOMGenerator(org.dom4j.Node node) {
-        this(node, new Long(0));
-    }
-
-    public DOMGenerator(org.dom4j.Node node, Object validity) {
-        this.validity = validity;
-        try {
-            if (node == null)
-                throw new OXFException("Null node passed to DOMGenerator");
-
-            // Create document from node
-            org.dom4j.Document document;
-            if (node instanceof org.dom4j.Document) {
-                document = (org.dom4j.Document) node;
-            } else if (node instanceof org.dom4j.Element) {
-                document = DocumentHelper.createDocument(((org.dom4j.Element) node).createCopy());
-            } else {
-                throw new OXFException("Unsupported DOM4J node type " + node.getClass().getName());
-            }
-
-            // Create key
-            final byte[] dgst = XMLUtils.getDigest( document );
-            key = NumberUtils.toHexString( dgst );
-            outputKey = new SimpleOutputCacheKey( DOMGenerator.class, OUTPUT_DATA, key );
-
-            // Get SAX Store Entry, if possible from map
-            synchronized (keyToSaxStore) {
-                saxStoreEntry = (SAXStoreEntry) keyToSaxStore.get(outputKey);
-                if (saxStoreEntry == null) {
-                    // Create SAX Store
-                    saxStoreEntry = new SAXStoreEntry();
-                    saxStoreEntry.saxStore = new SAXStore();
-                    saxStoreEntry.referenceCount = 1;
-                    LocationSAXWriter saxWriter = new LocationSAXWriter();
-                    saxWriter.setContentHandler(saxStoreEntry.saxStore);
-                    saxWriter.write(document);
-                    keyToSaxStore.put(outputKey, saxStoreEntry);
-                } else {
-                    saxStoreEntry.referenceCount++;
-                }
-            }
-        } catch (SAXException e) {
-            throw new OXFException(e);
+        final Source makeSource() {
+            final Source ret = makeDOMSource();
+            ret.setSystemId( systemID );
+            return ret;
+        }
+    };
+    
+    private static class DOM4JSourceFactory extends SourceFactory {
+        
+        private final org.dom4j.Document doc;
+        
+        DOM4JSourceFactory( final org.dom4j.Document d, final String sid, boolean clone ) {
+            super( sid );
+            doc = clone ? ( org.dom4j.Document )d.clone() : d;
+        }
+        
+        Source makeDOMSource() {
+            final Source ret = XMLUtils.getDocumentSource( doc );
+            return ret;
         }
     }
+    
+    private static class W3CSourceFactory extends SourceFactory {
+        private final org.w3c.dom.Document doc;
 
-    protected void finalize() throws Throwable {
-        if (saxStoreEntry != null) {
-            synchronized (keyToSaxStore) {
-                if (saxStoreEntry.referenceCount == 1) {
-                    keyToSaxStore.remove(outputKey);
-                } else {
-                    saxStoreEntry.referenceCount--;
-                }
-            }
+        W3CSourceFactory( final org.w3c.dom.Document d, final String sid ) {
+            super( sid );
+            if ( d == null ) throw new OXFException( "Document d == null" );
+            doc = ( org.w3c.dom.Document )d.cloneNode( true );
         }
-        super.finalize();
+        Source makeDOMSource() {
+            final Source ret = new DOMSource( doc );
+            return ret;
+        }
+    }
+    
+    private static class DocKey extends SimpleOutputCacheKey {
+        
+        public DocKey( final String id ) {
+            super( DOMGenerator.class, OUTPUT_DATA, id );
+        }
+
+        public String toString() {
+            return "DocKey [ " +  super.toString() + " ]"; 
+        }
+        public boolean equals( final Object rhsObj ) {
+            return rhsObj == this;
+        }
+    }
+    
+    public final static Long ZeroValidity = new Long( 0 );
+    public final static String DefaultContext = "oxf:/";
+
+    private static org.dom4j.Document makeCopyDoc( final org.dom4j.Element e ) {
+        final org.dom4j.Element cpy = ( org.dom4j.Element )e.createCopy();
+        final org.dom4j.Document ret = DocumentHelper.createDocument( cpy );
+        return ret;
+    }
+    
+
+    private final SourceFactory sourceFactory;
+    private final DocKey key;
+    private final Object validity;
+
+    private DOMGenerator( final String id, final Object v, final SourceFactory srcFctry ) {
+            key = new DocKey( id ); 
+            validity = v;
+            sourceFactory = srcFctry;
+            final ProcessorInputOutputInfo pInOutInf = new ProcessorInputOutputInfo( OUTPUT_DATA );
+            addOutputInfo( pInOutInf );
     }
 
-    public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, ContentHandler contentHandler) {
+    /**
+     * @param id Is really just for debugging purposes.  Should give some clue as to who is 
+     *         instantiating this DOMGenerator.
+     * @param sid Base url used to resolve any relative urls that may be contained within the 
+     *        document.
+     */
+    public DOMGenerator
+    ( final org.w3c.dom.Document d, final String id, Object v, final String sid ) {
+        this( id, v, new W3CSourceFactory( d, sid )  );
+    }
+
+    /**
+     * @param id Is really just for debugging purposes.  Should give some clue as to who is 
+     *         instantiating this DOMGenerator.
+     * @param sid Base url used to resolve any relative urls that may be contained within the 
+     *        document.
+     */
+
+    public DOMGenerator( final org.dom4j.Element e, final String id, Object v, final String sid ) {
+        this( id, v, new DOM4JSourceFactory( makeCopyDoc( e ), sid, false )  );
+    }
+
+    /**
+     * @param id Is really just for debugging purposes.  Should give some clue as to who is 
+     *         instantiating this DOMGenerator.
+     * @param sid Base url used to resolve any relative urls that may be contained within the 
+     *        document.
+     */
+    public DOMGenerator
+    ( final org.dom4j.Document d, final String id, Object v, final String sid ) {
+        this( id, v, new DOM4JSourceFactory( d, sid, true )  );
+    }
+
+    public ProcessorOutput createOutput( final String nm ) {
+
+        final Class cls = getClass();
+        final ProcessorOutput ret = new ProcessorImpl.CacheableTransformerOutputImpl( cls, nm ) {
+            public void readImpl( final PipelineContext ctxt, final ContentHandler cntntHndlr ) {
                 try {
-                    if (document != null) {
-                        Transformer identity = TransformerUtils.getIdentityTransformer();
-                        identity.transform(new DOMSource(document, key ), new SAXResult(contentHandler));
-                    } else {
-                        saxStoreEntry.saxStore.replay(contentHandler);
-                    }
-                } catch (TransformerException e) {
+                    final Transformer idnt = TransformerUtils.getIdentityTransformer();
+                    // NOTE: source cannot be an instance var.  Reason is that the XMLReader it
+                    // will create is stateful.  ( Meaning that if it used by multiple threads 
+                    // confusion will ensue.
+                    final Source source = sourceFactory.makeSource();
+                    final SAXResult sr = new SAXResult( cntntHndlr  );
+                    idnt.transform( source, sr );
+                } catch ( final TransformerException e ) {
                     throw new OXFException(e);
-                } catch (SAXException e) {
-                    throw new OXFException(e);
-                }
+                } 
             }
 
-            public OutputCacheKey getKeyImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {
-                return outputKey;
+            public OutputCacheKey getKeyImpl( final PipelineContext ctxt ) {
+                return key;
             }
 
-            public Object getValidityImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {
+            public Object getValidityImpl( final PipelineContext ctxt ) {
                 return validity;
             }
         };
 
-        addOutput(name, output);
-        return output;
-    }
-
-    private static class SAXStoreEntry {
-        public SAXStore saxStore;
-        public int referenceCount;
+        addOutput( nm, ret );
+        return ret;
     }
 }

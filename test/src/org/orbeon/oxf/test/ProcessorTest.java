@@ -28,6 +28,7 @@ import org.orbeon.oxf.processor.DOMSerializer;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.XMLProcessorRegistry;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
@@ -95,9 +96,11 @@ public class ProcessorTest extends TestCase {
 
             // Run registry.
             XMLProcessorRegistry registry = new XMLProcessorRegistry();
-            Processor config = PipelineUtils.createDOMGenerator(resourceManager.getContentAsDOM4J("processors.xml"),
-                    new Long(resourceManager.lastModified("processors.xml")));
-            PipelineUtils.connect(config, "data", registry, "config");
+            final String fname = "processors.xml";
+            final org.dom4j.Document doc = resourceManager.getContentAsDOM4J( fname );
+            final Processor config = PipelineUtils.createDOMGenerator
+                ( doc, fname, DOMGenerator.ZeroValidity, fname );
+            PipelineUtils.connect( config, "data", registry, "config" );
             registry.start(pipelineContext);
         } catch (Exception e) {
             e.printStackTrace();

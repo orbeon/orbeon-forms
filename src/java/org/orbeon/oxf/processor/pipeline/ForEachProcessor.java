@@ -17,8 +17,6 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.dom4j.XPath;
-import org.jaxen.SimpleNamespaceContext;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -31,6 +29,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
@@ -247,11 +246,14 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                     try {
                         for (Iterator i = expr.evaluate().iterator(); i.hasNext();) {
                             Node node = (Node) i.next();
-                            if (!(node instanceof Element))
+                            if ( node.getNodeType() != org.dom4j.Node.ELEMENT_NODE )
                                 throw new OXFException("Select expression '" + select
                                         + "' did not return a sequence of elements. One node was a '"
                                         + node.getNodeTypeName() + "'");
-                            DOMGenerator domGenerator = new DOMGenerator(node);
+                            final org.dom4j.Element elt = ( org.dom4j.Element )node;
+                            final String sid = Dom4jUtils.makeSystemId( elt );
+                            final DOMGenerator domGenerator = new DOMGenerator
+                                ( elt, "for each input", DOMGenerator.ZeroValidity, sid );
                             domGenerator.createOutput(OUTPUT_DATA);
                             state.domGenerators.add(domGenerator);
                         }

@@ -20,6 +20,7 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.util.JMSUtils;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.w3c.dom.Document;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -89,7 +90,10 @@ public class ContextListener implements ServletContextListener {
                                                 + " input documents, while " + bodyElements.size() + " have been provided");
                                     for (int j = 0; j < bodyElements.size(); j++) {
                                         SOAPBodyElement soapBodyElement = (SOAPBodyElement) bodyElements.elementAt(j);
-                                        DOMGenerator domGenerator = new DOMGenerator(soapBodyElement.getAsDocument(), new Long(0));
+                                        final Document d = soapBodyElement.getAsDocument();
+                                        final DOMGenerator domGenerator = new DOMGenerator
+                                            ( d, "soap body", DOMGenerator.ZeroValidity
+                                              , DOMGenerator.DefaultContext ) ;
                                         PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA,
                                                 pipelineProcessor, (String) service.getInputNames().get(j));
                                     }

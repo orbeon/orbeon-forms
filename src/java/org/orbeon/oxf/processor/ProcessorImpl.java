@@ -984,10 +984,10 @@ public abstract class ProcessorImpl implements Processor {
                                 configElement.addElement("column").addText(Integer.toString(debugLocationData.getCol()));
                             }
                         }
-                        PipelineUtils.connect(new DOMGenerator(debugConfigDocument), "data", debugProcessor, "config");
-                        filter = new ConcreteProcessorFilter(debugProcessor.getInputByName(INPUT_DATA),
-                                debugProcessor.getOutputByName(OUTPUT_DATA),
-                                filter);
+                        final DOMGenerator dg = new DOMGenerator
+                            ( debugConfigDocument, "debug filter"
+                              , DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext );
+                        PipelineUtils.connect( dg, "data", debugProcessor, "config");
                     }
                 }
             }

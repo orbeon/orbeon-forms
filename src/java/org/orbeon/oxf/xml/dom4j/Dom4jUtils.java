@@ -16,6 +16,7 @@ package org.orbeon.oxf.xml.dom4j;
 import org.dom4j.io.SAXReader;
 import org.dom4j.util.UserDataElement;
 import org.dom4j.util.UserDataAttribute;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -110,5 +111,16 @@ public class Dom4jUtils {
                 j.remove();
             }
         }
+    }
+    public static String makeSystemId( final org.dom4j.Document d ) {
+        final org.dom4j.Element e = d.getRootElement();
+        final String ret = makeSystemId( e );
+        return ret;
+    }
+    public static String makeSystemId( final org.dom4j.Element e ) {
+        final LocationData ld = ( LocationData )e.getData();
+        final String ldSid = ld == null ? null : ld.getSystemID();
+        final String ret = ldSid == null ? DOMGenerator.DefaultContext : ldSid;
+        return ret;
     }
 }

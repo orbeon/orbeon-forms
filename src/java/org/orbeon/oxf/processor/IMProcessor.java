@@ -172,7 +172,9 @@ public class IMProcessor extends ProcessorImpl {
                 messageElement.addElement("body").addText(ev.getMessage());
 
                 // Connect to processor
-                DOMGenerator domGenerator = new DOMGenerator(messageDocument);
+                final DOMGenerator domGenerator = new DOMGenerator
+                    ( messageDocument, "IM message", DOMGenerator.ZeroValidity
+                      , DOMGenerator.DefaultContext );
                 ProcessorOutput output = domGenerator.createOutput("data");
                 ProcessorInput input = onMessageReceived.getInputByName("data");
                 output.setInput(input);

@@ -203,6 +203,11 @@ public class ProcessorTest extends TestCase {
         this.expectedDocuments = expectedDocuments;
     }
 
+
+    public String getName() {
+        return description;
+    }
+
     /**
      * Run test and compare to expected result
      */

@@ -30,9 +30,9 @@ import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.xml.InspectingContentHandler;
 import org.orbeon.oxf.xml.SchemaRepository;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.InspectingContentHandler;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.w3c.dom.Document;
@@ -107,10 +107,6 @@ public abstract class ProcessorImpl implements Processor {
 
     public void setName(QName name) {
         this.name = name;
-    }
-
-    protected Map getInputs() {
-        return inputMap;
     }
 
     public ProcessorInput getInputByName(String name) {
@@ -1210,7 +1206,7 @@ public abstract class ProcessorImpl implements Processor {
 
             // Create input information
             List keys = new ArrayList();
-            Map inputsMap = getInputs();
+            Map inputsMap = getConnectedInputs();
             for (Iterator i = inputsMap.keySet().iterator(); i.hasNext();) {
                 List currentInputs = (List) inputsMap.get(i.next());
                 for (Iterator j = currentInputs.iterator(); j.hasNext();) {
@@ -1234,7 +1230,7 @@ public abstract class ProcessorImpl implements Processor {
         public Object getValidityImpl(PipelineContext context) {
             List validityObjects = new ArrayList();
 
-            Map inputsMap = getInputs();
+            Map inputsMap = getConnectedInputs();
             for (Iterator i = inputsMap.keySet().iterator(); i.hasNext();) {
                 List currentInputs = (List) inputsMap.get(i.next());
                 for (Iterator j = currentInputs.iterator(); j.hasNext();) {

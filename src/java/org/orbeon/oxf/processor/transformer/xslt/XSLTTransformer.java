@@ -137,7 +137,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                     // Execute transformation
                     try {
-                        if (XSLTTransformer.this.getInputs().size() > 3) {
+                        if (XSLTTransformer.this.getConnectedInputs().size() > 3) {
                             // When other inputs are connected, they can be read
                             // with the doc() function in XSLT. Reading those
                             // documents might happen before the whole input

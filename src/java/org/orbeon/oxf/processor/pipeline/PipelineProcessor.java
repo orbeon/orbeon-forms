@@ -604,7 +604,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
         });
 
         // Save inputs in state for InternalTopOutput
-        state.pipelineInputs = getInputs();
+        state.pipelineInputs = getConnectedInputs();
 
         // Bottom inputs: copy in state
         state.nameToBottomInputMap = config.getNameToInputMap();

@@ -80,7 +80,7 @@
             </fileset>
             <!--            <pathelement location="${build.classes.dir}"/>-->
             <pathelement location="${jar.file}"/>
-            <pathelement location="${java.home}/lib/tools.jar"/>
+            <pathelement location="${java.home}/../lib/tools.jar"/>
             <pathelement location="C:\bea81sp2\weblogic81\server\lib\weblogic.jar"/>
         </path>
         <available classname="javax.crypto.Cipher" classpathref="class.path" property="jce.available"/>

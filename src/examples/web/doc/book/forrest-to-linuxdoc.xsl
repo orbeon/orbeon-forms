@@ -144,9 +144,9 @@
     <xsl:template match="/">
         <book>
             <titlepag>
-                <title>Orbeon Presentation Server User Manual version 2.2</title>
+                <title>Orbeon Presentation Server User Manual version 2.7.1</title>
                 <author>Orbeon, Inc.</author>
-                <date>November 11, 2003</date>
+                <date>January 11 2005</date>
                 <abstract>
                     Orbeon Presentation Server is the most advanced XML transformation framework
                     built on top of proven J2EE technologies. It stands out in a crowd of existing

@@ -60,6 +60,7 @@ public class FileSerializer extends CachedSerializer {
 
     public FileSerializer() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, FILE_SERIALIZER_CONFIG_NAMESPACE_URI));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
     }
 
     private static class Config {

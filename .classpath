@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="WEB-INF/classes"/>
-	<classpathentry excluding="**/*.css|**/*.properties|**/*.rng|**/*.tld|**/*.xml|**/*.xsd|org/orbeon/faces/|org/orbeon/faces11/**/*.java|org/orbeon/oxf/common/Version.java|org/orbeon/oxf/processor/tamino/**/*.java|org/orbeon/oxf/resources/Cache*|org/orbeon/oxf/resources/Tamino*|org/orbeon/oxf/resources/XMLDB*" kind="src" path="src/java"/>
+	<classpathentry excluding="org/orbeon/faces/|org/orbeon/faces11/|org/orbeon/oxf/common/Version.java|org/orbeon/oxf/resources/Cache*|org/orbeon/oxf/resources/XMLDB*" kind="src" path="src/java"/>
 	<classpathentry sourcepath="JRE_SRC" kind="var" path="JRE_LIB"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/antlr-2_7_4.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/antlr-2_7_4-orbeon.jar"/>

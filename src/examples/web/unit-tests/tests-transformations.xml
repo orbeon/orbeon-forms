@@ -206,7 +206,7 @@
         </output>
     </test>
 
-    <test description="XQuery: a little bit of everything" name="oxf:xquery" only="true">
+    <test description="XQuery: a little bit of everything" name="oxf:xquery">
         <input name="data">
             <company>
                 <department id="1" name="HR">

@@ -183,7 +183,7 @@
                 <include name="xsltc-2_5_1_orbeon.jar"/>
                 <include name="commons-collections-2_0.jar"/>
                 <include name="commons-lang-1_0-b1.jar"/>
-                <include name="commons-cli-1.0.jar"/>
+                <include name="commons-cli-1_0.jar"/>
                 <include name="commons-fileupload-1.0.jar"/>
                 <include name="commons-beanutils-1_5.jar"/>
                 <include name="commons-logging-1_0_4.jar"/>
@@ -243,7 +243,7 @@
         <copy todir="${war.dir}/WEB-INF/lib/cli">
             <fileset dir="${lib.dir}">
                 <include name="servlet*"/>
-                <include name="commons-cli-1.0.jar"/>
+                <include name="commons-cli-1_0.jar"/>
             </fileset>
         </copy>
     </target>

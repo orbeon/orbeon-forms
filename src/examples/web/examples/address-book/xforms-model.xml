@@ -11,17 +11,14 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<example-descriptor>
-    <title>HTML, PDF, and Excel Reports</title>
-    <source>model.xpl</source>
-    <source>generic-table.xsl</source>
-    <source>pdf.xpl</source>
-    <source>pdf.xsl</source>
-    <source>initialization/init-database.xpl</source>
-    <source>initialization/init-script.xpl</source>
-    <description>
-        <p>
-            <img src="/examples/reports/process.png"/>
-        </p>
-    </description>
-</example-descriptor>
+<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+    <xforms:instance>
+        <form>
+            <id/>
+            <first/>
+            <last/>
+            <phone/>
+            <action/>
+        </form>
+    </xforms:instance>
+</xforms:model>

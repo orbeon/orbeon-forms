@@ -30,9 +30,12 @@
     <define name="element-or-connection">
         <choice>
             <element name="sql:connection">
-                <element name="sql:datasource">
-                    <text/>
-                </element>
+                <!-- Datasource can now be specified externally -->
+                <optional>
+                    <element name="sql:datasource">
+                        <text/>
+                    </element>
+                </optional>
                 <oneOrMore>
                     <ref name="element-or-execute"/>
                 </oneOrMore>

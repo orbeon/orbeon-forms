@@ -23,15 +23,15 @@
 
     <p:processor name="oxf:sql">
         <p:input name="data" href="#query"/>
+        <p:input name="datasource" href="../../datasource-sql.xml"/>
         <p:input name="config">
             <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
                 <sql:connection>
-                    <sql:datasource>db</sql:datasource>
                     <employees>
                         <sql:execute>
                             <sql:query>
                                 select *
-                                  from demo_employee e
+                                  from oxf_employee e
                                  where manager_id = <sql:param select="/*/employee-id" type="xs:int"/>
                                  order by lastname, firstname, age, title, phone
                             </sql:query>
@@ -46,9 +46,9 @@
                         <sql:execute>
                             <sql:query>
                                 select *
-                                  from demo_employee e
+                                  from oxf_employee e
                                  where manager_id in (select employee_id
-                                                        from demo_employee e
+                                                        from oxf_employee e
                                                        where manager_id = <sql:param select="/*/employee-id" type="xs:int"/>)
                                  order by manager_id, lastname, firstname, age, title, phone
                             </sql:query>

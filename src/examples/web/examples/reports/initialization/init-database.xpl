@@ -22,7 +22,11 @@
         <p:input name="config" href="/init-database/init-database.xpl"/>
         <p:input name="required-tables">
             <tables>
-                <table><name>oxf_employee</name></table>
+                <table><name>oxf_category_details</name></table>
+                <table><name>oxf_product</name></table>
+                <table><name>oxf_product_details</name></table>
+                <table><name>oxf_item</name></table>
+                <table><name>oxf_item_details</name></table>
             </tables>
         </p:input>
         <p:input name="init-pipeline" href="init-script.xpl"/>

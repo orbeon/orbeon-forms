@@ -19,18 +19,18 @@
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:processor name="oxf:sql-output">
+        <p:input name="datasource" href="../../../datasource-sql.xml"/>
         <p:input name="config">
             <sql:config>
                 <sql:connection>
-                    <sql:datasource>db</sql:datasource>
                     <!-- Drop tables if they exist -->
                     <sql:execute>
-                        <sql:update>drop table demo_employee if exists</sql:update>
+                        <sql:update>drop table oxf_employee if exists</sql:update>
                     </sql:execute>
                     <!-- Create tables -->
                     <sql:execute>
                         <sql:update>
-                            create table demo_employee (
+                            create table oxf_employee (
                                 employee_id integer identity primary key,
                                 firstname   varchar (50) not null,
                                 lastname    varchar (50) not null,

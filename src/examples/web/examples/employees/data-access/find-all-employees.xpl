@@ -21,15 +21,15 @@
     <p:param type="output" name="data"/>
 
     <p:processor name="oxf:sql-output">
+        <p:input name="datasource" href="../../datasource-sql.xml"/>
         <p:input name="config">
             <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
                 <sql:connection>
-                    <sql:datasource>db</sql:datasource>
                     <employees>
                         <sql:execute>
                             <sql:query>
                                 select *
-                                  from demo_employee e
+                                  from oxf_employee e
                                  order by lastname, firstname, age, title, phone
                             </sql:query>
                             <sql:results>

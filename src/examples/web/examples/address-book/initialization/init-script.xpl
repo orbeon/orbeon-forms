@@ -14,23 +14,36 @@
     limitations under the License.
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:oxf="http://www.orbeon.com/oxf/processors"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-          xmlns:employee="http://orbeon.org/ops/examples/employee-demo/employee">
-
-    <p:processor name="oxf:pipeline">
-        <p:input name="config" href="initialization/init-database.xpl"/>
-    </p:processor>
+          xmlns:sql="http://orbeon.org/oxf/xml/sql"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:processor name="oxf:sql-output">
         <p:input name="datasource" href="../../datasource-sql.xml"/>
         <p:input name="config">
-            <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
+            <sql:config>
                 <sql:connection>
+                    <!-- Drop tables if they exist -->
+                    <sql:execute>
+                        <sql:update>drop table oxf_address_book if exists</sql:update>
+                    </sql:execute>
+                    <!-- Create tables -->
                     <sql:execute>
                         <sql:update>
-                            delete from oxf_employee
+                            create table oxf_address_book (
+                                id      integer not null identity primary key,
+                                first   varchar(255) not null,
+                                last    varchar(255) not null,
+                                phone   varchar(255) not null
+                            )
                         </sql:update>
+                    </sql:execute>
+                    <!-- Insert initial data -->
+                    <sql:execute>
+                        <sql:update>insert into oxf_address_book values (null, 'John', 'Smith', '555-123-4567')</sql:update>
+                    </sql:execute>
+                    <sql:execute>
+                        <sql:update>insert into oxf_address_book values (null, 'Tom', 'Washington', '555-123-4567')</sql:update>
                     </sql:execute>
                     <dummy/>
                 </sql:connection>

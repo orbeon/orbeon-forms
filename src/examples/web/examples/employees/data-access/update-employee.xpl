@@ -22,13 +22,13 @@
 
     <p:processor name="oxf:sql-input">
         <p:input name="data" href="#employee"/>
+        <p:input name="datasource" href="../../datasource-sql.xml"/>
         <p:input name="config">
             <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
                 <sql:connection>
-                    <sql:datasource>db</sql:datasource>
                     <sql:execute>
                         <sql:update>
-                            update demo_employee set
+                            update oxf_employee set
                                 firstname = <sql:param type="xs:string" select="/*/employee:firstname"/>,
                                 lastname = <sql:param type="xs:string" select="/*/employee:lastname"/>,
                                 phone = <sql:param type="xs:string" select="/*/employee:phone" null-if="/*/employee:phone = ''"/>,

@@ -20,32 +20,40 @@ import org.jaxen.UnresolvableException;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.DatabaseContext;
+import org.orbeon.oxf.processor.Datasource;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xml.XPathContentHandler;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.helpers.NamespaceSupport;
 
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.*;
 
 /**
  * Interpreter context for the SQL processor.
  */
-class SQLProcessorInterpreterContext {
+class SQLProcessorInterpreterContext extends DatabaseContext {
 
     private OXFProperties.PropertySet propertySet;
+
+    // Locator for datasource declaration, if any
+    private Locator documentLocator;
+
+    // Either one of those two must be set
+    private String jndiName;
+    private Datasource datasource;
 
     private PipelineContext pipelineContext;
     private Node input;
     private XPathContentHandler xpathContentHandler;
     private ContentHandler output;
     private NamespaceSupport namespaceSupport;
-
-    private String jndiName;
 
     private List executionContextStack;
     private List currentNodes;
@@ -83,101 +91,55 @@ class SQLProcessorInterpreterContext {
     }
 
     public void setConnection(Locator documentLocator, String datasourceName) throws Exception {
-        synchronized (SQLProcessor.class) {
-            final String _jndiName = "jdbc/" + datasourceName;
-            // Try to get a connection for this datasource name from the pipeline context
-            Connection connection = (Connection) getContext(pipelineContext).connections.get(_jndiName);
-            try {
-                // Leave this here so the finally block is called
-                if (connection != null)
-                    return;
-
-                // Create connection for this datasource name
-                javax.naming.Context initialContext = new InitialContext();
-                javax.naming.Context envContext = (javax.naming.Context) initialContext.lookup("java:comp/env");
-                DataSource ds = (DataSource) envContext.lookup(_jndiName);
-                if (ds == null) {
-                    throw new ValidationException("Cannot find DataSource object by looking-up: " + _jndiName, new LocationData(documentLocator));
-                }
-                final Connection _newConnection = ds.getConnection();
-                // Set connection properties
-                _newConnection.setAutoCommit(false);
-                // Commit or rollback when context is destroyed
-                getPipelineContext().addContextListener(new PipelineContext.ContextListenerAdapter() {
-                    public void contextDestroyed(boolean success) {
-                        try {
-                            if (success) {
-                                SQLProcessor.logger.info("Committing JDBC connection for datasource: " + _jndiName + ".");
-                                _newConnection.commit();
-                                _newConnection.close();
-                            } else {
-                                SQLProcessor.logger.info("Rolling back JDBC connection for datasource: " + _jndiName + ".");
-                                _newConnection.rollback();
-                                _newConnection.close();
-                            }
-                        } catch (SQLException e) {
-                            throw new OXFException(e);
-                        }
-                    }
-                });
-                // Store connection into pipeline context
-                getContext(pipelineContext).connections.put(_jndiName, _newConnection);
-
-                connection = _newConnection;
-            } finally {
-                // Don't forget to set other fields based on the connection
-                if (connection != null) {
-                    this.jndiName = _jndiName;
-                }
-            }
-        }
+        this.documentLocator = documentLocator;
+        jndiName = "jdbc/" + datasourceName;
     }
 
     public DatabaseDelegate getDelegate() {
         // Try to obtain delegate from context
         Context context = getContext(pipelineContext);
-        DatabaseDelegate databaseDelegate = (DatabaseDelegate) context.delegates.get(jndiName);
-        if (databaseDelegate != null)
-            return databaseDelegate;
-
-        // Delegate needs to be created
-        try {
-            DatabaseMetaData databaseMetaData = getConnection().getMetaData();
-            String productName = databaseMetaData.getDatabaseProductName();
-            Class clazz = null;
-            if ("oracle".equalsIgnoreCase(productName)) {
-                // First try Tomcat (4.1 or greater)
-                try {
-                    clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.SQLProcessorOracleTomcatDelegate");
-                    SQLProcessor.logger.info("Using Oracle Tomcat delegate.");
-                } catch (Throwable t) {
-                    // Ignore
-                }
-                // Then try WebLogic (8.1 or greater)
-                if (clazz == null) {
+        String delegateKey = (jndiName != null) ? jndiName : datasource.toString();
+        DatabaseDelegate databaseDelegate = (DatabaseDelegate) context.delegates.get(delegateKey);
+        if (databaseDelegate == null) {
+            // Delegate needs to be created
+            try {
+                DatabaseMetaData databaseMetaData = getConnection().getMetaData();
+                String productName = databaseMetaData.getDatabaseProductName();
+                Class clazz = null;
+                if ("oracle".equalsIgnoreCase(productName)) {
+                    // First try Tomcat (4.1 or greater)
                     try {
-                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.SQLProcessorOracleWebLogic81Delegate");
-                        SQLProcessor.logger.info("Using Oracle WebLogic delegate.");
+                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.SQLProcessorOracleTomcatDelegate");
+                        SQLProcessor.logger.info("Using Oracle Tomcat delegate.");
                     } catch (Throwable t) {
                         // Ignore
                     }
-                }
-                // Then try the generic delegate
-                if (clazz == null) {
-                    try {
-                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.SQLProcessorOracleGenericDelegate");
-                        SQLProcessor.logger.info("Using Oracle generic delegate.");
-                    } catch (Throwable t) {
-                        clazz = SQLProcessorGenericDelegate.class;
-                        SQLProcessor.logger.info("Could not load Oracle database delegate. Using generic delegate.");
+                    // Then try WebLogic (8.1 or greater)
+                    if (clazz == null) {
+                        try {
+                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.SQLProcessorOracleWebLogic81Delegate");
+                            SQLProcessor.logger.info("Using Oracle WebLogic delegate.");
+                        } catch (Throwable t) {
+                            // Ignore
+                        }
                     }
-                }
-            } else
-                clazz = SQLProcessorGenericDelegate.class;
-            databaseDelegate = (DatabaseDelegate) clazz.newInstance();
-            getContext(pipelineContext).delegates.put(jndiName, databaseDelegate);
-        } catch (Exception e) {
-            throw new OXFException(e);
+                    // Then try the generic delegate
+                    if (clazz == null) {
+                        try {
+                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.SQLProcessorOracleGenericDelegate");
+                            SQLProcessor.logger.info("Using Oracle generic delegate.");
+                        } catch (Throwable t) {
+                            clazz = SQLProcessorGenericDelegate.class;
+                            SQLProcessor.logger.info("Could not load Oracle database delegate. Using generic delegate.");
+                        }
+                    }
+                } else
+                    clazz = SQLProcessorGenericDelegate.class;
+                databaseDelegate = (DatabaseDelegate) clazz.newInstance();
+                getContext(pipelineContext).delegates.put(delegateKey, databaseDelegate);
+            } catch (Exception e) {
+                throw new OXFException(e);
+            }
         }
         return databaseDelegate;
     }
@@ -272,7 +234,22 @@ class SQLProcessorInterpreterContext {
     }
 
     public Connection getConnection() {
-        return (Connection) getContext(pipelineContext).connections.get(jndiName);
+        if (jndiName != null) {
+            // Connection was configured with as a JDBC datasource
+            try {
+                return getConnection(pipelineContext, jndiName);
+            } catch (RuntimeException e) {
+                if (documentLocator != null)
+                    throw new ValidationException(e, new LocationData(documentLocator));
+                else
+                    throw e;
+            }
+        } else if (datasource != null) {
+            // Connection was configured with an internal datasource
+            return getConnection(pipelineContext, datasource);
+        } else {
+            throw new OXFException("No datasource configured, cannot get connection to database.");
+        }
     }
 
     public Node getInput() {
@@ -287,6 +264,16 @@ class SQLProcessorInterpreterContext {
         this.input = input;
         currentNodes = new ArrayList();
         currentNodes.add(input);
+    }
+
+    /**
+     * Set optional Datasource object. If null, the configuration has to contain a reference to a
+     * datasource.
+     *
+     * @param datasource  Datasource object or null
+     */
+    public void setDatasource(Datasource datasource) {
+        this.datasource = datasource;
     }
 
     public XPathContentHandler getXPathContentHandler() {
@@ -386,8 +373,7 @@ class SQLProcessorInterpreterContext {
     }
 
     private static class Context {
-        // Map datasource names to connections and delegates
-        public Map connections = new HashMap();
+        // Map datasource names to delegates
         public Map delegates = new HashMap();
     }
 }

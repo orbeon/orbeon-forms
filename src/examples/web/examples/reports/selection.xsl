@@ -23,9 +23,7 @@
     <xhtml:body>
         <xforms:group>
             <xhtml:p>
-                Run the report now, and view it in one of the formats below. (Note: requires
-                database set up if run locally. Please see the "Installing Presentation server"
-                section of the documentation.):
+                Run the report now, and view it in one of the formats below:
                 <xhtml:ul>
                     <xhtml:li>
                         <xforms:submit xxforms:appearance="link">
@@ -39,7 +37,7 @@
                             <xforms:label>XML in table format</xforms:label>
                             <xforms:setvalue ref="/action">report-xml-table</xforms:setvalue>
                         </xforms:submit>:
-                        the hierarchical format transformed by <a href="source?src=report/generic-table.xsl">report/generic-table.xsl</a>
+                        the hierarchical format transformed by <a href="source?src=report/generic-table.xsl">generic-table.xsl</a>
                     </xhtml:li>
                     <xhtml:li>
                         <xforms:submit xxforms:appearance="link">

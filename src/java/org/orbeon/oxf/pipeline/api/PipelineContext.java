@@ -41,10 +41,11 @@ public class PipelineContext {
     public static final String THROWABLE = "throwable";
     public static final String LOCATION_DATA = "location-data";
 
-    public static final String XLS_GENERATOR_LAST_FILE = "last-file";
     public static final String REQUEST_GENERATOR_CONTEXT = "request-generator-context";
     public static final String SQL_PROCESSOR_CONTEXT = "sql-processor-context";
     public static final String XSLT_STYLESHEET_URI_LISTENER = "xslt-stylesheet-uri-listener";
+
+    public static final String DATASOURCE_CONTEXT = "datasource-context";
 
     public static final String REQUEST = "request";
 

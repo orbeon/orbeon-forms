@@ -197,7 +197,7 @@
                 <include name="isorelax-20031020.jar"/>
                 <include name="xsdlib-20031020.jar"/>
                 <include name="relaxngDatatype-20031020.jar"/>
-                <include name="hsqldb-1_7_1.jar"/>
+                <include name="hsqldb-1_7_2_8_orbeon.jar"/>
                 <include name="jfreechart*"/>
                 <include name="jcommon*"/>
                 <include name="activation-1_0_2.jar"/>

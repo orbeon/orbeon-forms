@@ -14,22 +14,37 @@
     limitations under the License.
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:oxf="http://www.orbeon.com/oxf/processors"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-          xmlns:employee="http://orbeon.org/ops/examples/employee-demo/employee">
-
-    <p:processor name="oxf:pipeline">
-        <p:input name="config" href="initialization/init-database.xpl"/>
-    </p:processor>
+          xmlns:sql="http://orbeon.org/oxf/xml/sql"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:processor name="oxf:sql-output">
         <p:input name="datasource" href="../../datasource-sql.xml"/>
         <p:input name="config">
-            <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
+            <sql:config>
                 <sql:connection>
                     <sql:execute>
                         <sql:update>
-                            delete from oxf_employee
+                            update oxf_employee set manager_id = 430
+                             where employee_id in (58, 51, 308)
+                        </sql:update>
+                    </sql:execute>
+                    <sql:execute>
+                        <sql:update>
+                            update oxf_employee set manager_id = 58
+                             where employee_id in (40, 393)
+                        </sql:update>
+                    </sql:execute>
+                    <sql:execute>
+                        <sql:update>
+                            update oxf_employee set manager_id = 51
+                             where employee_id in (214, 346)
+                        </sql:update>
+                    </sql:execute>
+                    <sql:execute>
+                        <sql:update>
+                            update oxf_employee set manager_id = 40
+                             where employee_id in (460, 515)
                         </sql:update>
                     </sql:execute>
                     <dummy/>

@@ -17,15 +17,12 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <!-- Make sure database is initialized with the tables and data we are using -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="/init-database/init-database.xpl"/>
-        <p:input name="required-tables">
-            <tables>
-                <table><name>oxf_employee</name></table>
-            </tables>
-        </p:input>
-        <p:input name="init-pipeline" href="init-script.xpl"/>
+        <p:input name="config" href="create-database.xpl"/>
+    </p:processor>
+
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="create-database.xpl"/>
     </p:processor>
 
 </p:config>

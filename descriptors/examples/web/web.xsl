@@ -227,7 +227,7 @@
                         <servlet-class>org.hsqldb.Servlet</servlet-class>
                         <init-param>
                             <param-name>hsqldb.server.database</param-name>
-                            <param-value>oxf</param-value>
+                            <param-value>orbeondb</param-value>
                         </init-param>
                         <load-on-startup>4</load-on-startup>
                     </servlet>

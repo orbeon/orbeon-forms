@@ -26,19 +26,19 @@
 
     <p:processor name="oxf:sql">
         <p:input name="data" href="#query"/>
+        <p:input name="datasource" href="../../datasource-sql.xml"/>
         <p:input name="config">
             <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
                 <sql:connection>
-                    <sql:datasource>db</sql:datasource>
                     <employees>
                         <sql:execute>
                             <!-- The following commented-out code works with SQL Server -->
 <!--                            <sql:query>-->
 <!--                                select top <sql:param select="/*/page-size" type="oxf:literalString" replace="true"/> *-->
-<!--                                  from demo_employee e-->
+<!--                                  from oxf_employee e-->
 <!--                                 where employee_id not in-->
 <!--                                       (select top <sql:param select="string(number(/*/page-size) * (number(/*/page-number) - 1))" type="oxf:literalString" replace="true"/> employee_id-->
-<!--                                          from demo_employee e-->
+<!--                                          from oxf_employee e-->
 <!--                                         order by <sql:param select="/*/sort-column" type="oxf:literalString" replace="true"/>-->
 <!--                                                  <sql:param select="concat(' ', /*/sort-order)" type="oxf:literalString" replace="true"/>)-->
 <!--                                 order by <sql:param select="/*/sort-column" type="oxf:literalString" replace="true"/>-->
@@ -48,7 +48,7 @@
                             <sql:query>
                                 select limit <sql:param select="concat(string(number(/*/page-size) * (number(/*/page-number) - 1)), ' ', /*/page-size)" type="oxf:literalString" replace="true"/>
                                        *
-                                  from demo_employee e
+                                  from oxf_employee e
                                  order by <sql:param select="/*/sort-column" type="oxf:literalString" replace="true"/>
                                           <sql:param select="concat(' ', /*/sort-order)" type="oxf:literalString" replace="true"/>
                             </sql:query>
@@ -62,7 +62,7 @@
                         </sql:execute>
                         <sql:execute>
                             <sql:query>
-                                select count(*) employee_count from demo_employee e
+                                select count(*) employee_count from oxf_employee e
                             </sql:query>
                             <sql:results>
                                 <sql:row-results>

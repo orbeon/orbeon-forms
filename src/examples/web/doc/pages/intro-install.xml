@@ -60,7 +60,7 @@
                 created.</p></li>
 
                 <li><p>With Tomcat 5, move <code>xercesImpl.jar</code> and
-                <code>xmlParserAPIs.jar</code> from <code>common/endoresed</code> to
+                <code>xmlParserAPIs.jar</code> from <code>common/endorsed</code> to
                 <code>server/lib</code>. This way Xerces will be available to Tomcat, but it won't
                 override the version of Xerces and standard XML APIs that comes with Presentation
                 Server.</p></li>
@@ -71,6 +71,7 @@
                 your Tomcat installation), or perform one of the optional installation steps
                 below.</p></li>
 
+<!--
                 <li><p>Optionally, configure a datasource to use the SQL examples
                 using the bundled HSQLDB database:
 
@@ -79,7 +80,7 @@
                         uncomment the three sections delimited with "Uncomment this for the SQL
                         example".</li>
 
-                        <li>Copy <code>hsqldb-1_7_1.jar</code> from
+                        <li>Copy <code>hsqldb-1_7_2_4_orbeon.jar</code> from
                         <code>TOMCAT_HOME/webapps/orbeon/WEB-INF/lib</code> to
                         <code>TOMCAT_HOME/common/lib</code>.</li>
 
@@ -108,7 +109,7 @@
                                         </parameter>
                                         <parameter>
                                             <name>url</name>
-                                            <value>jdbc:hsqldb:http://localhost:8080/orbeon/db</value>
+                                            <value>jdbc:hsqldb:http://localhost:8080/orbeon/db/orbeondb</value>
                                         </parameter>
                                         <parameter>
                                             <name>username</name>
@@ -131,7 +132,7 @@
                                 <Context path="/orbeon" docBase="orbeon" reloadable="true" override="true">
                                    <Resource name="jdbc/db" auth="Container"
                                       type="javax.sql.DataSource" driverClassName="org.hsqldb.jdbcDriver"
-                                      url="jdbc:hsqldb:http://localhost:8080/orbeon/db"
+                                      url="jdbc:hsqldb:http://localhost:8080/orbeon/db/orbeondb"
                                       username="sa" password="" maxActive="20" maxIdle="10" maxWait="-1"/>
                                 </Context>
                             </xml-source>
@@ -139,6 +140,7 @@
 
                     </ol></p>
                 </li>
+-->
                 <li><p>Optionally, to run the authentication example:
 
                     <ol>
@@ -275,6 +277,7 @@
                     </ol></p>
                 </li></p>
 
+<!--
                 <p><li>Optionally, configure a datasource to use the SQL examples
                 using the bundled HSQLDB database:
 
@@ -289,11 +292,11 @@
                             <p><ul>
                                 <li>On WebLogic 7: before the call to
                                 <code>startWLS.cmd</code> add a line: <code>set
-                                PRE_CLASSPATH=applications\orbeon\WEB-INF\lib\hsqldb-1_7_1.jar</code>.</li>
+                                PRE_CLASSPATH=applications\orbeon\WEB-INF\lib\hsqldb-1_7_2_4_orbeon.jar</code>.</li>
 
                                 <li>On WebLogic 8: at the end of the line
                                 <code>set CLASSPATH=...</code>, add:
-                                <code>;applications\orbeon\WEB-INF\lib\hsqldb-1_7_1.jar</code></li>
+                                <code>;applications\orbeon\WEB-INF\lib\hsqldb-1_7_2_4_orbeon.jar</code></li>
                             </ul></p>
                         </li>
 
@@ -322,6 +325,7 @@
                         data source.</li>
                     </ol></p>
                 </li></p>
+-->
 
                 <p><li>Optionally, to run the authentication example:
 
@@ -411,12 +415,13 @@
                     Launch WebSphere server and log in to the administrative
                     console at <code>http://localhost:9090/admin"></code>.
                 </li></p>
+<!--
                 <li>
                      Optionally, configure a datasource to use the SQL examples using the bundled HSQLDB database:
                      <ul>
                          <p><li>
                              Extract the
-                             <code>hsqldb-1.7.1.jar</code> file from Presentation Server
+                             <code>hsqldb-1_7_2_4_orbeon.jar</code> file from Presentation Server
                              WAR file, and save it on WebSphere's directory.
                          </li></p>
 
@@ -457,15 +462,16 @@
 
                      </ul>
                  </li>
-
-                <p><li>
-                    Install and deploy Presentation Server (<code>orbeon.war</code>). Using the
-                    administrative console (Install New Application) and
-                    uploading the war file. Set the application name to
-                    <code>orbeon</code>. Don't forget to map the JDBC resource if
-                    you created the DataSource above. Finally, save the
-                    configuration and start to the application.
-                </li></p>
+-->
+                <p>
+                    <li>
+                        Install and deploy Presentation Server (<code>orbeon.war</code>). Using the
+                        administrative console (Install New Application) and uploading the war file.
+                        Set the application name to <code>orbeon</code>. <!-- Don't forget to map
+                        the JDBC resource if you created the DataSource above. --> Finally, save
+                        the configuration and start to the application.
+                    </li>
+                </p>
             </ol>
         </section>
 <!--        <section>-->
@@ -491,7 +497,7 @@
 <!--                    Optionally, configure a datasource to use the SQL examples using the bundled HSQLDB database:-->
 <!--                    <ul>-->
 <!--                       <p> <li>-->
-<!--                            Extract the <code>hsqldb-1.7.1.jar</code> file from OXF-->
+<!--                            Extract the <code>hsqldb-1_7_2_4_orbeon.jar</code> file from OXF-->
 <!--                            WAR file, and save it on your hard drive.-->
 <!--                        </li></p>-->
 <!---->
@@ -567,7 +573,7 @@
 <!---->
 <!--                <li>Optionally, configure a datasource to use the SQL examples-->
 <!--                using the bundled HSQLDB database. Copy the file-->
-<!--                <code>hsqldb-1_7_1.jar</code> from the OXF distribution to-->
+<!--                <code>hsqldb-1_7_2_4_orbeon.jar</code> from the OXF distribution to-->
 <!--                the <code>lib</code> directory of OC4J. Edit <code>data-sources.xml</code>-->
 <!--                and add the following element:-->
 <!--                    <xml-source>-->
@@ -701,11 +707,11 @@
         <section>
             <title>Running the BizDoc Tutorial Application</title>
             <p>
-                To install the standalone BizDoc application described in the Presentation Server Tutorial, simply
-                deploy the <code>orbeon-bizdoc.war</code> file in your application server. To do so,
-                follow the installation instructions above depending on your application server, but
-                deploy <code>orbeon-bizdoc.war</code> instead of <code>orbeon.war</code>. You do not have
-                to include the optional steps.
+                To install the standalone BizDoc application described in the Presentation Server
+                Tutorial, simply deploy the <code>orbeon-bizdoc.war</code> file in your application
+                server. To do so, follow the installation instructions above depending on your
+                application server, but deploy <code>orbeon-bizdoc.war</code> instead of
+                <code>orbeon.war</code>. You do not have to include the optional steps.
             </p>
             <p>
                 Access the application using the <code>/orbeon-bizdoc/</code> path from web browser.

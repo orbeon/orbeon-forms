@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
+import org.orbeon.oxf.processor.Datasource;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -58,11 +59,6 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
     public static final String XMLDB_DATASOURCE_URI = "http://www.orbeon.org/oxf/xmldb-datasource";
     public static final String XMLDB_QUERY_URI = "http://www.orbeon.org/oxf/xmldb-query";
 
-    public static final String DRIVER_CLASS_NAME = "driver-class-name";
-    public static final String URI_PROPERTY = "uri";
-    public static final String USERNAME_PROPERTY = "username";
-    public static final String PASSWORD_PROPERTY = "password";
-
     protected static final String ROOT_COLLECTION_PATH = "/db";
     protected static final String XMLDB_URI_PREFIX = "xmldb:";
     protected static final String XUPDATE_SERVICE_NAME = "XUpdateQueryService";
@@ -70,24 +66,6 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
     protected static final String COLLECTION_SERVICE_NAME = "CollectionManagementService";
 
     private static Map drivers = new HashMap();
-
-    private Datasource readDatasource(Document datasourceDocument) {
-        Datasource datasource = new Datasource();
-
-        // Try local configuration first
-        String driverClassName = XPathUtils.selectStringValueNormalize(datasourceDocument, "/*/" + DRIVER_CLASS_NAME);
-        String url = XPathUtils.selectStringValueNormalize(datasourceDocument, "/*/" + URI_PROPERTY);
-        String username = XPathUtils.selectStringValueNormalize(datasourceDocument, "/*/" + USERNAME_PROPERTY);
-        String password = XPathUtils.selectStringValueNormalize(datasourceDocument, "/*/" + PASSWORD_PROPERTY);
-
-        // Override with properties if needed
-        datasource.setDriverClassName(driverClassName != null ? driverClassName : getPropertySet().getString(DRIVER_CLASS_NAME));
-        datasource.setUri(url != null ? url : getPropertySet().getString(URI_PROPERTY));
-        datasource.setUsername(username != null ? username : getPropertySet().getString(USERNAME_PROPERTY));
-        datasource.setPassword(password != null ? password : getPropertySet().getString(PASSWORD_PROPERTY));
-
-        return datasource;
-    }
 
     private Config readConfig(Document configDocument) {
         Config config = new Config();
@@ -105,11 +83,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
     }
 
     protected Datasource getDatasource(PipelineContext pipelineContext) {
-         return (Datasource) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_DATASOURCE), new CacheableInputReader() {
-            public Object read(PipelineContext context, ProcessorInput input) {
-                return readDatasource(readInputAsDOM4J(context, INPUT_DATASOURCE));
-            }
-        });
+        return Datasource.getDatasource(pipelineContext, this, getInputByName(INPUT_DATASOURCE));
     }
 
     protected Config getConfig(PipelineContext pipelineContext) {
@@ -431,45 +405,6 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         } else {
             // TODO: Handle location info
             throw new IllegalArgumentException("Invalid operation: " + config.getOperation());
-        }
-    }
-
-    protected static class Datasource {
-        private String driverClassName;
-        private String uri;
-        private String username;
-        private String password;
-
-        public String getDriverClassName() {
-            return driverClassName;
-        }
-
-        public void setDriverClassName(String driverClassName) {
-            this.driverClassName = driverClassName;
-        }
-
-        public String getUri() {
-            return uri;
-        }
-
-        public void setUri(String uri) {
-            this.uri = uri;
-        }
-
-        public String getPassword() {
-            return password;
-        }
-
-        public void setPassword(String password) {
-            this.password = password;
-        }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
         }
     }
 

@@ -22,13 +22,13 @@
 
     <p:processor name="oxf:sql-input">
         <p:input name="data" href="#query"/>
+        <p:input name="datasource" href="../../datasource-sql.xml"/>
         <p:input name="config">
             <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
                 <sql:connection>
-                    <sql:datasource>db</sql:datasource>
                     <sql:execute>
                         <sql:update>
-                            delete from demo_employee
+                            delete from oxf_employee
                              where employee_id = <sql:param type="xs:int" select="/*/employee-id"/>
                         </sql:update>
                     </sql:execute>

@@ -26,15 +26,15 @@
 
     <p:processor name="oxf:sql-input">
         <p:input name="data" href="#employee"/>
+        <p:input name="datasource" href="../../datasource-sql.xml"/>
         <p:input name="config">
             <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
                 <sql:connection>
-                    <sql:datasource>db</sql:datasource>
                     <sql:execute>
                         <sql:update>
-                            insert into demo_employee (employee_id, firstname, lastname, phone, title, age, manager_id)
+                            insert into oxf_employee (employee_id, firstname, lastname, phone, title, age, manager_id)
                             values (
-                                (select max(employee_id) + 1 from demo_employee),
+                                (select max(employee_id) + 1 from oxf_employee),
                                 <sql:param type="xs:string" select="/*/employee:firstname"/>,
                                 <sql:param type="xs:string" select="/*/employee:lastname"/>,
                                 <sql:param type="xs:string" select="/*/employee:phone" null-if="/*/employee:phone = ''"/>,

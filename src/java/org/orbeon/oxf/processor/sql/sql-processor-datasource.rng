@@ -1,0 +1,42 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<element name="datasource" xmlns="http://relaxng.org/ns/structure/1.0"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+    <interleave>
+        <optional>
+            <!-- Driver class name, for example "org.hsqldb.jdbcDriver" -->
+            <element name="driver-class-name">
+                <data type="string"/>
+            </element>
+        </optional>
+        <optional>
+            <!-- Driver URI, for example "jdbc:hsqldb:file:/opt/db/testdb" -->
+            <element name="uri">
+                <data type="anyURI"/>
+            </element>
+        </optional>
+        <!-- Username -->
+        <optional>
+            <element name="username">
+                <data type="string"/>
+            </element>
+        </optional>
+        <!-- Password -->
+        <optional>
+            <element name="password">
+                <data type="string"/>
+            </element>
+        </optional>
+    </interleave>
+</element>

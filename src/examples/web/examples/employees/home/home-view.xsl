@@ -53,37 +53,13 @@
             </ul>
             <h2>Installation and Configuration</h2>
             <p>
-                In order to use the rest of this application, you need to make sure the database is
-                correctly configured. To do so, configure your application server to expose a
-                J2EE datasource:
-            </p>
-            <ul>
-                <li>Datasource name: <code>jdbc/db</code></li>
-                <li>
-                    Datasource parameters:
-                    <ul>
-                        <li><code>driverClassName</code>: <code>org.hsqldb.jdbcDriver</code></li>
-                        <li>
-                            <code>url</code>:
-                            <code>jdbc:hsqldb:http://<i>localhost:8888</i>/<i>orbeon</i>/db</code>,
-                            where <i>localhost:8888</i> refers to the host and port of your
-                            application server's installation, and where <i>orbeon</i> refers
-                            to the context path of your application.
-                        </li>
-                        <li><code>username</code>: <code>sa</code></li>
-                        <li><code>password</code>: <i>blank</i></li>
-                    </ul>
-                </li>
-            </ul>
-            <p>
-                When the datasource is configured, please also uncomment all the sections in your
-                <code>web.xml</code> marked with "Uncomment this for the SQL examples".
+                The example should work out of the box except for web service functionality.
             </p>
             <p>
                 <xsl:choose>
                     <xsl:when test="not(doc('../ws-config.xml')/*/host)">
                         <b>Currently, Web Service functionality is not configured.</b> If you
-                        choose to use it, please configure the file <code>ldap-config.xml</code>.
+                        choose to use it, please configure the file <code>ws-config.xml</code>.
                     </xsl:when>
                     <xsl:otherwise>
                         You appear to have configured Web Service functionality by configuring the
@@ -92,7 +68,7 @@
                 </xsl:choose>
             </p>
             <p>
-                You can also configure some users and roles:
+                You may also optionally configure the following users and roles:
             </p>
             <ul>
                 <li><code>demo-admin</code> role</li>

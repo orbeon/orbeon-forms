@@ -13,31 +13,29 @@
 -->
 <example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <title>Address Book</title>
-    <requires-setup>true</requires-setup>
+    <source>xforms-model.xml</source>
     <source>model.xpl</source>
-    <source>form.xml</source>
     <source>view.xsl</source>
+    <source>initialization/init-database.xpl</source>
+    <source>initialization/init-script.xpl</source>
     <description>
         <p>
-            This example demonstrates the <a href="/doc/processors-sql" f:url-type="resource">SQL
-            processor</a>. It implements a simple address book, allowing the user to add and remove
-            entries to a SQL database. Please read the <a href="/doc/intro-install"
-            f:url-type="resource">installation</a> section before trying this example.
+            This example demonstrates a basic use of the <a href="/doc/processors-sql"
+            f:url-type="resource">SQL processor</a>. It implements a simple address book, allowing
+            the user to add and remove entries to a SQL database.
         </p>
         <h4>Database Initialization</h4>
         <p>
-            This example necessitates a working database. A special pipeline named <a
-            href="../examples/source?src=sql%2Fpopulate.xpl">sql/populate.xpl</a>, creates tables
-            and inserts sample data. Note that the SQL processor's input is blank, since it is not
-            necessary. You are then redirected to the example's main page. Here is the database
-            schema, containing only one table: <code>create cached table friends (id identity, first
-            varchar, last varchar, phone varchar)</code>
+            This example necessitates a working database. By default, the test database embedded
+            with Presentation Server is used. A special pipeline, <code>init-database.xpl</code>,
+            creates tables and inserts sample data if the tables don't exist in the database yet.
+            Here is the database schema, containing only one table: <code>create cached table
+            oxf_address_book (id identity, first varchar, last varchar, phone varchar)</code>
         </p>
         <h4>Displaying All Records</h4>
         <p>
-            This example displays the content of the table in the database. The <a
-            href="../examples/source?src=sql%2Fmodel.xpl">model pipeline</a> generates data in the
-            XML syntax show below:
+            This example displays the content of the table in the database. <code>model.xpl</code>
+            generates data in the XML syntax shown below:
         </p>
         <f:xml-source>
             <friends>
@@ -65,8 +63,6 @@
         <f:xml-source>
             <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
                 <sql:connection>
-                    <sql:datasource>db</sql:datasource>
-
                     <sql:execute>
                         <sql:query>select * from friends</sql:query>
                         <sql:results>
@@ -94,8 +90,8 @@
             </sql:config>
         </f:xml-source>
         <p>
-            Finally, the <link href="../examples/source?src=sql%2Fview.xpl">sql/view.xpl</link>
-            pipeline transforms the result document into HTML with a simple XSLT stylesheet.
+            Finally, <code>view.xsl</code> transforms the result document into HTML with a simple
+            XSLT stylesheet.
         </p>
         <h4>Inserting and Deleting Records</h4>
         <p>

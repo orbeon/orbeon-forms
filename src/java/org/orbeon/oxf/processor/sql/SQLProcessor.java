@@ -82,6 +82,9 @@ public class SQLProcessor extends ProcessorImpl {
     static Logger logger = LoggerFactory.createLogger(SQLProcessor.class);
     public static final String SQL_NAMESPACE_URI = "http://orbeon.org/oxf/xml/sql";
 
+    private static final String INPUT_DATASOURCE = "datasource";
+    public static final String SQL_DATASOURCE_URI = "http://www.orbeon.org/oxf/sql-datasource";
+
 //    private static final String SQL_TYPE_VARCHAR = "varchar";
     private static final String SQL_TYPE_CLOB = "clob";
     private static final String SQL_TYPE_BLOB = "blob";
@@ -100,7 +103,13 @@ public class SQLProcessor extends ProcessorImpl {
         this.hasInput = hasInput;
         this.hasOutput = hasOutput;
 
+        // Optional datasource input
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_DATASOURCE, SQL_DATASOURCE_URI));
+
+        // Mandatory config input
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SQL_NAMESPACE_URI));
+
+        // Data input and output
         if (hasInput)
             addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
         if (hasOutput)
@@ -248,8 +257,19 @@ public class SQLProcessor extends ProcessorImpl {
                     data = readInputAsDOM4J(context, INPUT_DATA);
             }
 
+            // Try to read datasource input if any
+            Datasource datasource = null; {
+                List datasourceInputs = (List) getConnectedInputs().get(INPUT_DATASOURCE);
+                if (datasourceInputs != null) {
+                    if (datasourceInputs.size() > 1)
+                        throw new OXFException("At most one one datasource input can be connected.");
+                    ProcessorInput datasourceInput = (ProcessorInput) datasourceInputs.get(0);
+                    datasource = Datasource.getDatasource(context, this, datasourceInput);
+                }
+            }
+
             // Replay the config SAX store through the interpreter
-            config.configInput.replay(new RootInterpreter(context, getPropertySet(), data, xpathContentHandler, contentHandler));
+            config.configInput.replay(new RootInterpreter(context, getPropertySet(), data, datasource, xpathContentHandler, contentHandler));
         } catch (OXFException e) {
             throw e;
         } catch (Exception e) {
@@ -1746,11 +1766,12 @@ public class SQLProcessor extends ProcessorImpl {
         private SQLProcessorInterpreterContext interpreterContext;
         private NamespaceSupport namespaceSupport = new NamespaceSupport();
 
-        public RootInterpreter(PipelineContext context, OXFProperties.PropertySet propertySet, Node input, XPathContentHandler xpathContentHandler, ContentHandler output) {
+        public RootInterpreter(PipelineContext context, OXFProperties.PropertySet propertySet, Node input, Datasource datasource, XPathContentHandler xpathContentHandler, ContentHandler output) {
             super(null, false);
             interpreterContext = new SQLProcessorInterpreterContext(propertySet);
             interpreterContext.setPipelineContext(context);
             interpreterContext.setInput(input);
+            interpreterContext.setDatasource(datasource);
             interpreterContext.setXPathContentHandler(xpathContentHandler);
             interpreterContext.setOutput(output);
             interpreterContext.setNamespaceSupport(namespaceSupport);

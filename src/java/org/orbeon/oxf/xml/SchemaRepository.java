@@ -60,7 +60,7 @@ public class SchemaRepository {
         schemas.put(DelegationProcessor.DELEGATION_NAMESPACE_URI, "schemas/delegation.rng");
         schemas.put(JavaProcessor.JAVA_CONFIG_NAMESPACE_URI, "schemas/java.rng");
         schemas.put(URLGenerator.URL_NAMESPACE_URI, "schemas/url-generator-config.rng");
-        schemas.put(SQLProcessor.SQL_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "sql/sql-processor-config.rng");
+
         schemas.put(RedirectProcessor.REDIRECT_SCHEMA_URI, "schemas/redirect.rng");
         schemas.put(RequestGenerator.REQUEST_CONFIG_NAMESPACE_URI, "schemas/request-config.rng");
         schemas.put(ImageServer.IMAGE_SERVER_CONFIG_NAMESPACE_URI, "schemas/image-server-config.rng");
@@ -100,6 +100,9 @@ public class SchemaRepository {
         schemas.put(PageFlowControllerProcessor.CONTROLLER_NAMESPACE_URI, "schemas/page-flow-controller-runtime.xsd");
         schemas.put(MSVValidationProcessor.ORBEON_ERROR_NS, "schemas/validation-config.rng");
         schemas.put(DirectoryGenerator.DIRECTORY_GENERATOR_NAMESPACE_URI, "schemas/directory-generator-config.rng");
+        // SQL processor schemas
+        schemas.put(SQLProcessor.SQL_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "sql/sql-processor-config.rng");
+        schemas.put(SQLProcessor.SQL_DATASOURCE_URI, PROCESSORS_SCHEMA_PATH + "sql/sql-processor-datasource.rng");
         // Tamino schemas
         schemas.put(TaminoProcessor.TAMINO_CONFIG_URI, PROCESSORS_SCHEMA_PATH + "tamino/tamino-config.rng");
         schemas.put(TaminoQueryProcessor.TAMINO_QUERY_URI, PROCESSORS_SCHEMA_PATH + "tamino/tamino-query.rng");

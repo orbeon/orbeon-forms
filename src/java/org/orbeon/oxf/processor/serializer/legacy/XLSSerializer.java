@@ -91,7 +91,7 @@ public class XLSSerializer extends HttpBinarySerializer {
             } catch (XPathException e) {
                 throw new OXFException(e);
             } finally {
-                if(expr != null)
+                if (expr != null)
                     expr.returnToPool();
             }
             for (Iterator i = nodes.iterator(); i.hasNext();) {
@@ -149,12 +149,12 @@ public class XLSSerializer extends HttpBinarySerializer {
 
                         // Set cell value
                         Object newObject = sheetElement.selectObject(sourceXPath);
-                        
+
                         PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
                                 wrapper.wrap(newObject), "string()");
                         String newValue;
                         try {
-                            newValue = (String)expr.evaluateSingle();
+                            newValue = (String) expr.evaluateSingle();
                         } catch (XPathException e) {
                             throw new OXFException(e);
                         } finally {

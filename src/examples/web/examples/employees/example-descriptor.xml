@@ -14,9 +14,8 @@
 <example-descriptor>
     <title>BizDoc</title>
     <source>data-access/initialization/create-database.xpl</source>
-    <source>data-access/initialization/create-hierarchy.xpl</source>
     <source>data-access/initialization/init-database.xpl</source>
-<!--    <source>data-access/initialization/IsEmployeeDatabaseIntialized.java</source>-->
+    <source>data-access/initialization/init-script.xpl</source>
     <source>data-access/auth-info.xpl</source>
     <source>data-access/create-employee.xpl</source>
     <source>data-access/delete-all-employees.xpl</source>
@@ -37,6 +36,7 @@
     <source>export-excel/export-excel-action.xpl</source>
     <source>home/home-view.xsl</source>
     <source>import/import-employees.xpl</source>
+    <source>import/create-hierarchy.xpl</source>
 <!--    <source>import/ParseLines.java</source>-->
 <!--    <source>import/people.txt</source>-->
     <source>import-excel/import-excel-action.xpl</source>

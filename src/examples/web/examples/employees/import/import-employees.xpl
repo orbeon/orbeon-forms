@@ -77,7 +77,7 @@
 
     <!-- Create simple hierarchy -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="../data-access/initialization/create-hierarchy.xpl"/>
+        <p:input name="config" href="create-hierarchy.xpl"/>
     </p:processor>
 
 </p:config>

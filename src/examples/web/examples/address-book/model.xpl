@@ -19,21 +19,21 @@
     <p:param type="input" name="instance"/>
     <p:param type="output" name="data"/>
 
+    <!-- Make sure database is initialized with the tables and data we are using -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="/init-database/init-database.xpl"/>
+        <p:input name="config" href="initialization/init-database.xpl"/>
     </p:processor>
 
     <p:choose href="#instance">
         <p:when test="/form/action='add'">
             <p:processor name="oxf:sql">
                 <p:input name="data" href="#instance"/>
+                <p:input name="datasource" href="../datasource-sql.xml"/>
                 <p:input name="config">
                     <sql:config>
                         <sql:connection>
-                            <sql:datasource>db</sql:datasource>
-
                             <sql:execute>
-                                <sql:update>insert into friends values(
+                                <sql:update>insert into oxf_address_book values(
                                     null,
                                     <sql:parameter type="xs:string" select="/form/first"/>,
                                     <sql:parameter type="xs:string" select="/form/last"/>,
@@ -52,13 +52,12 @@
         <p:when test="starts-with(/form/action, 'del-')">
             <p:processor name="oxf:sql">
                 <p:input name="data" href="aggregate('id', #instance#xpointer(substring-after(/form/action, 'del-')))"/>
+                <p:input name="datasource" href="../datasource-sql.xml"/>
                 <p:input name="config">
                     <sql:config>
                         <sql:connection>
-                            <sql:datasource>db</sql:datasource>
-
                             <sql:execute>
-                                <sql:update>delete from friends where id =
+                                <sql:update>delete from oxf_address_book where id =
                                     <sql:parameter type="xs:int" select="/id"/>
                                 </sql:update>
                             </sql:execute>
@@ -82,14 +81,13 @@
 
     <p:processor name="oxf:sql">
         <p:input name="data" href="#instance"/>
+        <p:input name="datasource" href="../datasource-sql.xml"/>
         <p:input name="config">
             <sql:config>
                 <sql:connection>
-                    <sql:datasource>db</sql:datasource>
-
                     <sql:execute>
                         <sql:query>
-                            select * from friends
+                            select * from oxf_address_book
                         </sql:query>
                         <sql:results>
                             <friends>

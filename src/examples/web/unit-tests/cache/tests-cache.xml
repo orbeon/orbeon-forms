@@ -175,12 +175,14 @@
         </input>
     </test>
 
-    <test description="XSLT With doc(), document() and imports " name="oxf:test">
+    <test description="XSLT With Dependencies " name="oxf:test">
         <input name="config">
             <script>
                 <processor name="oxf:xslt" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="config" href="cache/stylesheet2.xsl"/>
                     <input name="data" href="cache/document1.xml"/>
+                    <input name="my-input" href="cache/b-2.xml"/>
+                    <input name="my-unused-input" href="cache/c-2.xml"/>
                 </processor>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v1"/>
@@ -239,8 +241,80 @@
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v9"/>
                 <assert output-name="data" condition="cached-value-equal" value="v9"/>
-                <!-- Touch file XIncluded from depending stylesheet -->
+                <!-- Touch file connected to user-defined input but not referenced -->
+                <assert output-name="data" condition="output-cached"/>
+                <touch url="cache/c-2.xml"/>
+                <wait delay="2090"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v10"/>
+                <assert output-name="data" condition="cached-value-equal" value="v10"/>
+                <!-- Touch file doc('input:*')'ed from main stylesheet -->
+                <assert output-name="data" condition="output-cached"/>
+                <touch url="cache/b-2.xml"/>
+                <wait delay="2090"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v11"/>
+                <assert output-name="data" condition="cached-value-equal" value="v11"/>
+                <!-- Touch file XIncluded from depending stylesheet (second level) -->
+                <!-- This doesn't work FIXME (XSLTTransformer) -->
+<!--                <assert output-name="data" condition="output-cached"/>-->
+<!--                <touch url="cache/d-1.xml"/>-->
+<!--                <wait delay="2090"/>-->
+<!--                <assert output-name="data" condition="output-not-cached"/>-->
+<!--                <cache-value output-name="data" value="v12"/>-->
+<!--                <assert output-name="data" condition="cached-value-equal" value="v12"/>-->
                 <!-- Touch file XIncluded from doc()'ed file -->
+                <!-- This doesn't work FIXME (XSLTTransformer) -->
+<!--                <assert output-name="data" condition="output-cached"/>-->
+<!--                <touch url="cache/e-1.xml"/>-->
+<!--                <wait delay="2090"/>-->
+<!--                <assert output-name="data" condition="output-not-cached"/>-->
+<!--                <cache-value output-name="data" value="v13"/>-->
+<!--                <assert output-name="data" condition="cached-value-equal" value="v13"/>-->
+                <!-- Test resulting output document -->
+                <assert output-name="data" condition="output-equals">
+                    <result xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xi="http://www.w3.org/2003/XInclude">Some text
+                        <test-document>
+                            <e1/>
+                            <e2 a1="v1" a2="v2"/>
+                            <e3>Some text</e3>
+                        </test-document>Yet some other text
+                        <included2 xml:base="oxf:unit-tests/cache/document2.xml">
+                            <abc/>
+                            <def/>
+                            <ghi/>
+                            <a10/>
+                            <test-document xml:base="unit-tests/cache/document1.xml">
+                                <e1/>
+                                <e2 a1="v1" a2="v2"/>
+                                <e3>Some text</e3>
+                            </test-document>
+                        </included2>Some text
+                        <some-element/>
+                        <d2 xml:base="oxf:unit-tests/cache/d-2.xml">
+                            <abc/>
+                            <def/>
+                            <ghi/>
+                            <a10/>
+                            <d1 xml:base="unit-tests/cache/d-1.xml">
+                                <e1/>
+                                <e2 a1="v1" a2="v2"/>
+                                <e3>Some text</e3>
+                            </d1>
+                        </d2>
+                        <e2>
+                            <abc/>
+                            <def/>
+                            <ghi/>
+                            <a10/>
+                            <e1 xml:base="oxf:unit-tests/cache/e-1.xml">
+                                <e1/>
+                                <e2 a1="v1" a2="v2"/>
+                                <e3>Some text</e3>
+                            </e1>
+                        </e2>
+                    </result>
+                </assert>
             </script>
         </input>
     </test>
@@ -584,7 +658,6 @@
         </input>
     </test>
 
-    <!-- TODO: XSLT with doc() w/ XInclude, or import w/ XInclude -->
     <!-- TODO: Request gen: upload + body -->
     <!-- TODO: Bean gen -->
     <!-- TODO: XSLT be able to check whether stylesheets are reloaded or not-->

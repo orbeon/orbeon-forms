@@ -46,7 +46,7 @@
             </xforms:model>
         </input>
         <output name="instance">
-            <d:form>
+            <d:form xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" >
                 <d:id xxforms:valid="true">42</d:id>
                 <d:id xxforms:valid="false">4x</d:id>
                 <d:firstname>John</d:firstname>
@@ -882,8 +882,8 @@
             <xforms:group ref="/instance">
             </xforms:group>
         </input>
-        <output name="instance">
-            <instance>
+        <output name="instance" >
+            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"  >
                 <a>
                     <b>1</b>
                 </a>
@@ -919,7 +919,7 @@
             </xforms:model>
         </input>
         <output name="instance">
-            <instance>
+            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"  >
                 <a xxforms:valid="true">&#x1105;</a>
                 <b xxforms:valid="false">&#x1200;</b>
             </instance>
@@ -1009,7 +1009,7 @@
             </xforms:group>
         </input>
         <output name="instance">
-            <instance>
+            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"  >
                 <a>Orbeon</a>
                 <b xxforms:valid="true"/>
                 <c xxforms:required="true" xxforms:valid="false"/>
@@ -1125,9 +1125,9 @@
             </xforms:group>
         </input>
         <output name="instance">
-            <instance>
-                <a xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">a</a>
-                <b xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:relevant="false">b</b>
+            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" >
+                <a xxforms:readonly="true">a</a>
+                <b xxforms:relevant="false">b</b>
             </instance>
         </output>
     </test>
@@ -1239,7 +1239,7 @@
             </p:config>
         </input>
         <output name="instance">
-            <instance>
+            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" >
                 <x a="1" xxforms:valid="true"/>
                 <y a="2" xxforms:valid="false"/>
             </instance>
@@ -1283,7 +1283,7 @@
             </p:config>
         </input>
         <output name="instance">
-            <instance>
+            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"  >
                 <a>35</a>
                 <b xxforms:valid="false">-42</b>
                 <c xxforms:valid="false">x</c>

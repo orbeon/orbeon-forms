@@ -15,11 +15,12 @@
     <xforms:instance>
         <form>
             <action/>
-            <text>Presentation Server is the most avanced XML plaform for
-building e-business applications based on industy standards
-(W3C, OASIS, JCP) and proven Java/J2EE technologies. It
-stands out in a crowd of existing J2EE frameworks by fully
-leveraging the ubiquity and the fleibility of XML.</text>
+            <text>
+Orbeon Presentation Server is a J2EE-based MVC framewok
+for building Web aplications that present and capture XML
+using XForms, XSLT, and Web Services. Presentation Server
+benefits from sandardized forms processing using XForms,
+rich controller semantics, and full-featured XML pirelines.</text>
         </form>
     </xforms:instance>
 </xforms:model>

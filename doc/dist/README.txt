@@ -1,6 +1,6 @@
 ======================================================
 
-= = = = = = = = =   Orbeon Read Me     = = = = = = = =
+= = = =    Orbeon Presentation Server Read Me    = = =
 
 ======================================================
 
@@ -8,46 +8,64 @@ Copyright 1999-2004 (C) Orbeon, Inc. All rights reserved.
 
 This README.TXT file covers the following topics:
 
-    1. Licenses
-    2. New Features
-    3. Software Prerequisites
-    4. Installing OXF
-    5. More Information
-    6. Known Issues
-    7. Third-Party Software
+    1. About Orbeon Presentation Server
+    2. Licenses
+    3. New Features
+    4. Software Prerequisites
+    5. Installing the Presentation Server
+    6. Compiling the Presentation Server
+    7. More Information
+    8. Known Issues
+    9. Third-Party Software
 
 For more information, visit:
 
   http://www.orbeon.com/
 
+
 ************************************
-1. Licenses
+1. About Orbeon Presentation Server
 ************************************
 
-The source code is distributed under the terms of the GNU Lesser General Public License (LGPL).
-The full text of the license is available at http://www.gnu.org/copyleft/lesser.html.
+The Orbeon Presentation Server is an MVC Framework for building
+Composite Web applications from XML sources using XForms. While
+similar to Apache Cocoon, the Orbeon Presentation Server benefits from
+richer controller semantics, standardized forms processing using W3C
+XForms, and tight integration with XPL, a full-featured pipeline
+processing language for XML.
+
+
+************************************
+2. Licenses
+************************************
+
+The source code is distributed under the terms of the GNU Lesser
+General Public License (LGPL).  The full text of the license is
+available at http://www.gnu.org/copyleft/lesser.html.
 
 The documentation is subject to the following terms:
 
-    * Conversion to other formats is allowed, but the actual content may not
-      be altered or edited in any way.
-    * You may create printed copies for your own personal use.
-    * For all other uses, such as selling printed copies or using (parts of) the
-      manual in another publication, prior written agreement from Orbeon, Inc.
-      is required.
+    * Conversion to other formats is allowed, but the actual content
+      may not be altered or edited in any way.
 
-See section 7 for more details about the licenses of included
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using
+      (parts of) the manual in another publication, prior written
+      agreement from Orbeon, Inc.  is required.
+
+See section 9 for more details about the licenses of included
 third-party software.
 
 Please contact Orbeon at info@orbeon.com for more information.
 
 ************************************
-2. New Features
+3. New Features
 ************************************
 
 A complete list of changes can be found online at:
 
-  http://www.orbeon.com/oxf/doc/home-changes
+  http://www.orbeon.com/ois/doc/home-changes
 
 or in this distribution under:
 
@@ -55,75 +73,87 @@ or in this distribution under:
 
 
 ************************************
-3. Software Prerequisites
+4. Software Prerequisites
 ************************************
 
-OXF is supported on the following application servers:
+The Orbeon Presentation Server is supported on the following
+application servers:
 
-    * Apache Tomcat 4.1.30 with JDK 1.4.1
-    * Apache Tomcat 5.0.25 alpha with JDK 1.4.1
+    * Apache Tomcat 4.1.30 with JDK 1.4.2
+    * Apache Tomcat 5.0.25 alpha with JDK 1.4.2
     * BEA WebLogic Server 8.1
     * IBM WebSphere 5.1
 
 
 ************************************
-4. Installing OXF
+5. Installing the Presentation Server
 ************************************
 
-    * Download the OXF zip or tgz archive from
+    * Download the Presentation Server zip or tgz archive from
       http://sourceforge.net/projects/orbeon/
 
-    * Extract the archive in a directory which we call below:
-      OXF_HOME/
+    * Extract the archive in a directory that we call below:
+      OIS_HOME/
 
-After extraction, you will find the following files and directories under the
-root directory OXF_HOME/
+After extraction, you will find the following files and directories
+under the root directory OIS_HOME/:
 
     * README.txt: this document.
 
-    * orbeon.war: the Web Archive where the software, required resources, and demo
-      samples reside.
-      
-    * orbeon-bizdoc.war: the Web Archive containing the BizDoc tutorial application.
-      For more information on the BizDoc example application, please consult the
-      tutorial, Tutorial.pdf.
+    * orbeon.war: the Web Archive where the software, required
+      resources, and demo samples reside.
 
-    * doc: this directory contains the OXF documentation as static HTML files, as
-      well as the tutorial, Tutorial.pdf.
+    * orbeon-bizdoc.war: the Web Archive containing the BizDoc
+      tutorial application.  For more information on the BizDoc
+      example application, please consult the tutorial, Tutorial.pdf.
+
+    * doc: this directory contains the Presentation Server
+      documentation as static HTML files, as well as the tutorial,
+      Tutorial.pdf.
 
     * examples: this directory contains command line examples
 
     * licenses: this directory contains third-party software licenses
 
-After extraction, you will find a WAR (Web Archive) file in the OXF_HOME/
-directory. You need to deploy this WAR file to your servlet containers or
-application server of choice. In the OXF Documentation, you'll find detailed
-installation instructions for several servlet containers / applications servers.
+You then need to deploy orbeon.war file to your servlet containers or
+application server of choice. In the Presentation Server
+documentation, you will find detailed installation instructions for
+several servlet containers / applications servers.
 
-More detailed information on installing OXF can be found in the OXF
-Documentation under OXF_HOME/doc/ in the "Installation Instructions" section,
-or directly online:
+More detailed information on installing the Presentation Server can be
+found in the documentation under OIS_HOME/doc/ in the "Installation
+Instructions" section, or directly online:
 
-  http://www.orbeon.com/oxf/doc/intro-install
+  http://www.orbeon.com/ois/doc/intro-install
 
 
 ************************************
-5. More Information
+6. Compiling the Presentation Server
+************************************
+
+For information about compiling the Presentation Server, please visit:
+
+  http://www.orbeon.com/community/getting-involved
+
+************************************
+7. More Information
 ************************************
 
 Here are some pointers to useful information related to this release.
 
     * For more information and updates, go to:
 
-        http://www.orbeon.com/my/
+        http://www.orbeon.com/software/presentation-server
 
-    * If you have questions, comments, or difficulties with OXF, visit:
+    * If you have questions, comments, or difficulties with the
+      Presentation Server, please subscribe to the SourceForge.net
+      orbeon-user mailing-list:
 
-        http://www.orbeon.com/support/
+        http://sourceforge.net/mail/?group_id=116683
 
 
 ************************************
-6. Known Issues
+8. Known Issues
 ************************************
 
 For a list of known issues, consult the SourceForge issue tracking system:
@@ -132,7 +162,7 @@ For a list of known issues, consult the SourceForge issue tracking system:
 
 
 ************************************
-7. Third-Party Software
+9. Third-Party Software
 ************************************
 
 This product includes software developed by the Apache Software Foundation
@@ -172,7 +202,7 @@ In addition, this product includes the following software:
 This software makes use of a schema for XSLT 2.0 provided under W3C
 Software License. The schema is available at the following location:
 
-    jar:oxf.jar!/org/orbeon/oxf/xml/schemas/xslt-2_0.xsd
+    jar:orbeon.jar!/org/orbeon/oxf/xml/schemas/xslt-2_0.xsd
 
 Please consult the licenses directory for more information about
 individual licenses.

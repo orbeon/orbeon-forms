@@ -34,7 +34,10 @@
     <page path-info="/blog/xmlrpc" model="xml-rpc.xpl"/>
 
     <!-- Test Create Blog -->
-    <page path-info="/blog/test/create-user-blog" model="data-access/create-user-blog.xpl"/>
+    <page path-info="/blog/test/create-user-blog" model="data-access/test-create-user-blog.xpl"/>
+
+    <!-- Test Create User -->
+    <page path-info="/blog/test/create-user" model="data-access/test-create-user.xpl"/>
 
     <!-- Page for a user's blog -->
     <page path-info="/blog/(.+)/(.+)" matcher="oxf:perl5-matcher"

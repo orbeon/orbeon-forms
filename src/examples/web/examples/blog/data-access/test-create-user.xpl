@@ -18,29 +18,43 @@
           xmlns:xdb="http://orbeon.org/oxf/xml/xmldb"
           xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <p:param type="input" name="query" schema-href="authenticate-user-query.rng"/>
-    <p:param type="output" name="authenticated" schema-href="authenticate-user-result.rng"/>
-
-    <!-- Authenticate user using an eXist extension function -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#query" debug="xxxquery"/>
+        <p:input name="data"><query/></p:input>
         <p:input name="config">
             <xdb:query collection="/db/" xsl:version="2.0" xmlns:xmldb="http://exist-db.org/xquery/xmldb">
                 xquery version "1.0";
-                <authenticated>
-                    {xmldb:authenticate(concat('<xsl:value-of select="doc('../datasource.xml')/*/uri"/>', '/db/orbeon/blog-example/'),
-                                        '<xsl:value-of select="/query/username"/>',
-                                        '<xsl:value-of select="/query/password"/>')}
-                </authenticated>
+                <result>
+                    {
+                        let $uri as xs:string := concat('<xsl:value-of select="doc('../datasource.xml')/*/uri"/>', 'db')
+                        let $user as xs:string := '<xsl:value-of select="doc('../datasource.xml')/*/username"/>'
+                        let $password as xs:string := '<xsl:value-of select="doc('../datasource.xml')/*/password"/>'
+
+                        return
+                            (: If there is no admin password, set it :)
+                            (if (xmldb:authenticate($uri, $user, ()))
+                             then xmldb:change-user($user, $password, (), ())
+                             else (),
+
+                            (: Now create test user if not already present :)
+                             if (not(xmldb:exists-user('ebruchez')))
+                             then xmldb:create-user('ebruchez', 'ebruchez', 'users', concat($uri, '/orbeon/blog-example/'))
+                             else ()
+                            )
+                    }
+                </result>
             </xdb:query>
         </p:input>
-        <p:output name="data" id="xmldb-query"/>
+        <p:output name="data" id="xmldb-query" debug="abc"/>
     </p:processor>
 
     <p:processor name="oxf:xmldb-query">
         <p:input name="datasource" href="../datasource.xml"/>
         <p:input name="query" href="#xmldb-query"/>
-        <p:output name="data" ref="authenticated"/>
+        <p:output name="data" id="result"/>
+    </p:processor>
+
+    <p:processor name="oxf:null-serializer">
+        <p:input name="data" href="#result" debug="zzz"/>
     </p:processor>
 
 </p:config>

@@ -19,6 +19,6 @@
     <!-- Example of URL for non-embedded use -->
 <!--    <uri>xmldb:exist://localhost:9999/exist/xmlrpc</uri>-->
     <!-- Optional username and password -->
-<!--    <username></username>-->
-<!--    <password></password>-->
+    <username>admin</username>
+    <password>admin</password>
 </datasource>

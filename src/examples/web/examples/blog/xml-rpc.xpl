@@ -29,12 +29,12 @@
     <!-- Dereference URI and return XML -->
     <p:processor name="oxf:url-generator">
         <p:input name="config" href="aggregate('config', aggregate('url', #request#xpointer(string(/request/body))))"/>
-        <p:output name="data" id="xmlrpc-request" schema-href="schema/xml-rpc-request.rng"/>
+        <p:output name="data" id="xmlrpc-request" schema-href="schema/xml-rpc-request.rng" debug="xxxrequest"/>
     </p:processor>
 
     <!-- Handle XML-RPC authentication based on username + password -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#request"/>
+        <p:input name="data" href="#xmlrpc-request"/>
         <p:input name="config">
             <query xsl:version="2.0">
                 <username><xsl:value-of select="/methodCall/params/param[2]/value/string"/></username>

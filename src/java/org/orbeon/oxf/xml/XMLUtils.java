@@ -33,6 +33,7 @@ import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -418,6 +419,26 @@ public class XMLUtils {
     public static byte[] getDigest(org.dom4j.Document document) {
         return getDigest(new DocumentSource(document));
     }
+
+    // Necessary for Saxon
+    public static byte[] getDigest(NodeList nodeList) {
+        if(nodeList.getLength() == 0)
+            throw new OXFException("No node supplied");
+        else if(nodeList.getLength() == 1)
+            return getDigest((Node)nodeList.item(0));
+        else {
+            Document doc = XMLUtils.createDocument();
+            org.w3c.dom.Element root = doc.createElement("root");
+            for(int i = 0; i<nodeList.getLength(); i++) {
+                Node n = nodeList.item(i);
+                root.appendChild(n.cloneNode(true));
+            }
+            doc.appendChild(root);
+            return getDigest(doc);
+        }
+    }
+
+
 
     /**
      * Compute a digest.

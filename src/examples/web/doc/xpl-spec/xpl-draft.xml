@@ -831,9 +831,11 @@
                             <emph>Exposed XML Infoset Identifiers.</emph> A set of XML Infoset
                             identifiers exposed by the statement. There cannot be an intersection
                             between the scoped XML infoset identifiers and the exposed XML infoset
-                            identifiers. It is a static error if a statement causes an XML Infoset
-                            identifier to collide with an identifier in the scoped XML infoset
-                            identifiers. This is referred to as the <emph>no-collision rule</emph>.
+                            identifiers. For example, a statement can attempt to expose, with an
+                            <el>id</el> attribute on a <el>p:output</el> element, an XML Infoset
+                            identifier already present in the set of scoped XML infoset identifiers.
+                            Such a condition must raise a static error. This is referred to as the
+                            <emph>no-collision rule</emph>.
                         </p>
                     </item>
 <!--                    <item>-->
@@ -911,7 +913,7 @@
                     <pre>
 &lt;p:pipeline
     version = "1.0" &gt;
-    &lt;!-- Content: ((p:input | p:output)*, (p:processor | p:choose | p:for-each)*) --&gt;
+    &lt;!-- Content: (p:input*, p:output*, (p:processor | p:choose | p:for-each)*) --&gt;
 &lt;/p:pipeline&gt;
                     </pre>
                     <p>
@@ -1060,7 +1062,7 @@
                     <pre>
 &lt;p:processor
     name = <emph>qname</emph> &gt;
-    &lt;!-- Content: (p:input | p:output)* --&gt;
+    &lt;!-- Content: (p:input* | p:output*) --&gt;
 &lt;/p:processor&gt;
                     </pre>
                     <p>
@@ -2704,7 +2706,7 @@ xpointer          ::= "#xpointer(" xpath_expression ")"
 <!--
 
 TODO:
-    o threading: mention
+    o threading: mention?
     o debug attribute: proc, choose, for-each
     o schemas on p:param [now p:output / p:input]: group explanation in central location
     o improve [Relationship with the W3C Note 28 February 2002]
@@ -2712,5 +2714,7 @@ TODO:
     o mention sub-pipelines (in xpl:pipeline?)
     o check XPath 2.0 spec and "host language"
     o current() for p:for-each
+    o improve "no-collision rule"
+    o p:choose: export of identifiers
 
 -->

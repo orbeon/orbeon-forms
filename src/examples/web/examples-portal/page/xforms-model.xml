@@ -16,6 +16,7 @@
         <form>
             <action>show-example</action>
             <example-id>tutorial-hello1</example-id>
+            <source-url></source-url>
             <visible-portlet>OXFExamplesPortlet</visible-portlet>
         </form>
     </xforms:instance>

@@ -14,7 +14,10 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <page path-info="/view" xforms="oxf:/source/source-xforms.xpl" model="oxf:/source/source-model.xpl"/>
+    <page path-info="/([^/]+)/(.+)" matcher="oxf:perl5-matcher" xforms="form.xml" model="model.xpl" view="view.xsl">
+        <param ref="/form/example-id"/>
+        <param ref="/form/source-url"/>
+    </page>
 
     <page id="home" path-info="/(.+)" matcher="oxf:perl5-matcher" xforms="form.xml" model="model.xpl" view="view.xsl">
         <param ref="/form/example-id"/>

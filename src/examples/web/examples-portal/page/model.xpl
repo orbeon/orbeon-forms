@@ -83,16 +83,26 @@
                     <xsl:copy-of select="$portlet-instance/portlet-id"/>
 
                     <!-- Optional Render Parameters -->
-                    <xsl:if test="$instance/action = 'show-example'">
-                        <render-parameters>
-                            <param>
-                                <name>oxf.path</name>
-                                <value><xsl:value-of select="concat('/', $instance/example-id)"/></value>
-                            </param>
-                        </render-parameters>
-                    </xsl:if>
+                    <xsl:choose>
+                        <xsl:when test="$instance/action = 'show-example'">
+                            <render-parameters>
+                                <param>
+                                    <name>oxf.path</name>
+                                    <value><xsl:value-of select="concat('/', $instance/example-id)"/></value>
+                                </param>
+                            </render-parameters>
+                        </xsl:when>
+                        <xsl:when test="$instance/action = 'show-source' and $portlet-instance/portlet-name = 'OXFExamplesSourceCodePortlet'">
+                            <render-parameters>
+                                <param>
+                                    <name>oxf.path</name>
+                                    <value><xsl:value-of select="concat('/', $instance/example-id, '/', $instance/source-url)"/></value>
+                                </param>
+                            </render-parameters>
+                        </xsl:when>
+                    </xsl:choose>
                     <window-state>
-                        <xsl:value-of select="if (/*/portlet-name = $instance/visible-portlet) then 'normal' else 'minimized'"/>
+                        <xsl:value-of select="if ($portlet-instance/portlet-name = $instance/visible-portlet) then 'normal' else 'minimized'"/>
                     </window-state>
                 </config>
             </p:input>

@@ -29,36 +29,51 @@
                         <xforms:submit xxforms:appearance="link">
                             <xforms:label>XML in hierarchical format</xforms:label>
                             <xforms:setvalue ref="/action">report-xml-hierarchy</xforms:setvalue>
-                        </xforms:submit>: this is the output
-                        of the SQL processor, called in <a href="source?src=report/model.xpl">model.xpl</a>
+                        </xforms:submit>:
+
+                        this is the output of the SQL processor, called in <a
+                        href="/goto-source/reports/xml-hierarchy.xpl"
+                        f:url-type="resource">xml-hierarchy.xpl</a> and formatted in <a
+                        href="/goto-source/reports/xml-hierarchy.xsl"
+                        f:url-type="resource">xml-hierarchy.xsl</a>
                     </xhtml:li>
                     <xhtml:li>
                         <xforms:submit xxforms:appearance="link">
                             <xforms:label>XML in table format</xforms:label>
                             <xforms:setvalue ref="/action">report-xml-table</xforms:setvalue>
                         </xforms:submit>:
-                        the hierarchical format transformed by <a href="source?src=report/generic-table.xsl">generic-table.xsl</a>
+
+                        this is the output of the SQL processor, called in <a
+                        href="/goto-source/reports/xml-table.xpl"
+                        f:url-type="resource">xml-table.xpl</a> and formatted in <a
+                        href="/goto-source/reports/xml-table.xsl"
+                        f:url-type="resource">xml-table.xsl</a>
                     </xhtml:li>
                     <xhtml:li>
                         <xforms:submit xxforms:appearance="link">
                             <xforms:label>HTML</xforms:label>
                             <xforms:setvalue ref="/action">report-html</xforms:setvalue>
-                        </xforms:submit>: the table format transformed by the
-                        <a href="source?src=oxf-theme/theme.xsl">default theme</a>
+                        </xforms:submit>:
+
+                        the basic table format formatted by <a
+                        href="/goto-source/reports/generic-table.xsl"
+                        f:url-type="resource">generic-table.xsl</a>
                     </xhtml:li>
                     <xhtml:li>
                         <xforms:submit xxforms:appearance="link">
                             <xforms:label>PDF</xforms:label>
                             <xforms:setvalue ref="/action">report-pdf</xforms:setvalue>
                         </xforms:submit>: the table format transformed in XSL-FO by
-                        <a href="source?src=report/pdf.xsl">pdf.xsl</a>
+                        <a href="/goto-source/reports/pdf.xsl" f:url-type="resource">pdf.xsl</a>
                     </xhtml:li>
                     <xhtml:li>
                         <xforms:submit xxforms:appearance="link">
                             <xforms:label>Excel</xforms:label>
                             <xforms:setvalue ref="/action">report-excel</xforms:setvalue>
-                        </xforms:submit>: the table format transformed by the XSL
-                        export processor (new technology)
+                        </xforms:submit>:
+
+                        the table format transformed by the XSL export processor in <a
+                        href="/goto-source/reports/pdf.xsl" f:url-type="resource">excel.xpl</a>
                     </xhtml:li>
                 </xhtml:ul>
             </xhtml:p>

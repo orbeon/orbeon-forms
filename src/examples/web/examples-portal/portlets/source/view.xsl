@@ -34,7 +34,7 @@
                             <!-- Back link -->
                             <xhtml:p>
                                 <xf:submit xxf:appearance="link">
-                                    <xf:label><img src="/images/back.png"/> Back to file list</xf:label>
+                                    <xf:label><img src="/images/back.png"/>Back to file list</xf:label>
                                     <xf:setvalue ref="source-url"/>
                                 </xf:submit>
                             </xhtml:p>

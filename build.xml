@@ -454,7 +454,7 @@
         <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${unstbl-bld-dst}/${release.number}'/>
 
         <exec executable='sh' failonerror='true' >
-          <arg value='${build.root}/update-unstable.sh' />
+          <arg value='${build.root}/tools/update-unstable.sh' />
         </exec>
 
         <delete dir="${unstbl-bld-dst}/${release.number}"/>

@@ -453,6 +453,10 @@
         <copy file='${deployDir}/${release.number}/orbeon.war' todir='${unstbl-bld-dst}/${release.number}'/>
         <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${unstbl-bld-dst}/${release.number}'/>
 
+        <!-- 2/27/2005 d : If we don't delete this then sitecopy complains that because the -->
+        <!-- the certificate is for forge.objectweb.org but has been received when accessing -->
+        <!-- ops.forge.objectweb.org.  i.e. It thinks someone's spoofing the site. -->
+        <delete file="${user.home}/.sitecopy/ops-unstable.crt"/>
         <exec executable='sh' failonerror='true' >
           <arg value='${build.root}/tools/update-unstable.sh' />
         </exec>

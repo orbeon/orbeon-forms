@@ -1131,9 +1131,9 @@
                 </p>
                 <note>
                     <ul>
-                        <li>Due to browsers limitation, the only <code>level</code> of the message is <code>modal</code>. This attribute
-                            is optional.</li>
-                        <li>When using the linking attribute (<code>src</code>, the value must be an absolute URL, starting with
+                        <li>Due to browser limitations, the only <code>level</code> of the message is <code>modal</code>. This attribute
+                        is optional.</li>
+                        <li>When using the linking attribute (<code>src</code>), the value must be an absolute URL, starting with
                         <code>oxf:</code>, <code>http:</code> or other supported protocols.</li>
                     </ul>
                 </note>

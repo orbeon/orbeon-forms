@@ -210,6 +210,16 @@
                     </root>
                 </xml-source>
             </section>
+            <section>
+                <title>Data Output</title>
+                <p>
+                    The data output produces the result of the transformation. The following XML is
+                    the result of the above transformation:
+                </p>
+                <xml-source>
+                    <new-root>ab</new-root>
+                </xml-source>
+            </section>
             <anchor id="user-defined"/>
             <section>
                 <title>User-Defined Inputs</title>
@@ -249,16 +259,6 @@
                     processor to connect additional inputs as she sees fit, as long as their names
                     don't conflit with mandatory input and output names.
                 </p>
-            </section>
-            <section>
-                <title>Data Output</title>
-                <p>
-                    The data output produces the result of the transformation. The following XML is
-                    the result of the above transformation:
-                </p>
-                <xml-source>
-                    <new-root>ab</new-root>
-                </xml-source>
             </section>
         </section>
         <section>

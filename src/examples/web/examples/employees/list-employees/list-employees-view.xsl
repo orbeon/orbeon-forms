@@ -215,6 +215,8 @@
                                         <xforms:setvalue ref="action">add-employee</xforms:setvalue>
                                     </xforms:submit>
                                 </td>
+                            </tr>
+                            <tr>    
                                 <td>
                                     <xforms:submit>
                                         <xforms:help>
@@ -236,6 +238,8 @@
                                         <xforms:setvalue ref="action">export-excel</xforms:setvalue>
                                     </xforms:submit>
                                 </td>
+                            </tr>
+                            <tr>    
                                 <td>
                                     <!-- Show how the content of the page can depend on the current role -->
                                     <xforms:submit>

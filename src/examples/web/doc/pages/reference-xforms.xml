@@ -873,36 +873,6 @@
                 </p>
             </section>
             <section>
-                <title>Hidden Field</title>
-                <p>
-                    In certain situation, you want to generate a hidden field. Typically this means
-                    a <code>&lt;input type="hidden"></code> in HTML. A hidden field is not visible
-                    to the end user, but its value can be set by some JavaScript that you embed in
-                    the page. Since there is no XForms control for hidden fields, we
-                    provide an XForms extension: <code>&lt;xxforms:hidden ref="..."/></code>.
-                </p>
-                <p>
-                    To set the value of a hidden field from your own JavaScript, you need to be able
-                    to reference the hidden form element. Presentation Server assigns a name to each
-                    form element. When the end user submits the form, this name is used by
-                    Presentation Server to populate the right node in the instance with the value
-                    entered by the user. So to refer to the hidden field in JavaScript, you should
-                    not use the field's name. Instead you should assign an id to the field, and
-                    reference the field in JavaScript by that id. You can assign an id to the hidden
-                    XForms control with:
-                </p>
-                <xml-source show-namespaces="false">
-                    <xxforms:hidden ref="..." xhtml:id="my-id"/>
-                </xml-source>
-
-                <p>
-                    Then you can reference the form control in JavaScript with
-                    <code>document.getElementById('my-id')</code> (<a href="
-                    http://www.mozilla.org/docs/dom/domref/dom_doc_ref48.html">more information on
-                    getElementById</a>).
-                </p>
-            </section>
-            <section>
                 <title>UI Rendering</title>
                 <img src="pages/home-changes-epilogue.png" style="clear: both; float: right"/>
                 <p>
@@ -1190,6 +1160,44 @@
                             </p>
                         </li>
                     </ul>
+                </p>
+            </section>
+            <section>
+                <title>Hidden Fields</title>
+                <p>
+                    In certain rare situations, you may want to generate hidden form fields in an
+                    HTML page. In HTML, this is done with the following tags:
+                </p>
+                <xml-source>
+                    <input type="hidden"/>
+                </xml-source>
+                <p>
+                    Hidden HTML fields are not visible to the end user, but their value can be set
+                    for example by JavaScript code embedded in the page. There is no standard XForms
+                    control for hidden fields. Presentation Server provides a control as an XForms
+                    extension:
+                </p>
+                <xml-source>
+                    <xxforms:hidden ref="..."/>
+                </xml-source>
+                <p>
+                    To set the value of a hidden field from your own JavaScript, you need to be able
+                    to reference the hidden form element. Presentation Server automatically assigns
+                    an opaque name to each form element. This name is used internally by
+                    Presentation Server to repopulate the XForms instance upon form submission. This
+                    means that you cannot assign your own name to a form element. Instead you
+                    should use the HTML <code>id</code> attribute, and reference the field in
+                    JavaScript by that identifier. You assign an identifier to the hidden XForms
+                    control with:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xxforms:hidden ref="..." xhtml:id="my-id"/>
+                </xml-source>
+                <p>
+                    Then you can reference the form control in JavaScript with
+                    <code>document.getElementById('my-id')</code> (<a href="
+                    http://www.mozilla.org/docs/dom/domref/dom_doc_ref48.html">more information on
+                    getElementById</a>).
                 </p>
             </section>
         </section>

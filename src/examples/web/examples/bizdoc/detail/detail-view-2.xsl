@@ -157,7 +157,7 @@
                                     <td colspan="2">
                                         <xforms:submit>
                                             <xforms:label>Add Child</xforms:label>
-                                            <xforms:insert nodeset="/form/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child" at="last()" position="after"/>
+                                            <xforms:insert nodeset="claim:children/claim:child" at="last()" position="after"/>
                                         </xforms:submit>
                                     </td>
                                 </tr>

@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="Transformations" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+    <test description="Simple transformation" name="oxf:xslt">
+        <input name="data">
+            <root>
+                <a>a</a>
+                <b>b</b>
+            </root>
+        </input>
+        <input name="config">
+            <xsl:stylesheet version="1.0">
+                <xsl:template match="/">
+                    <new-root>
+                        <xsl:value-of select="/root/a"/>
+                        <xsl:value-of select="/root/b"/>
+                    </new-root>
+                </xsl:template>
+            </xsl:stylesheet>
+        </input>
+        <output name="data">
+            <new-root>ab</new-root>
+        </output>
+    </test>
+
+    <test description="saxon:parse() function" name="oxf:xslt">
+        <input name="config">
+            <xsl:stylesheet xmlns:saxon="http://saxon.sf.net/" version="2.0">
+                <xsl:template match="/">
+                    <xsl:copy-of select="saxon:parse(/document/xml-string)"/>
+                </xsl:template>
+            </xsl:stylesheet>
+        </input>
+        <input name="data">
+            <document>
+                <xml-string>
+                    &lt;name&gt;
+                        &lt;first&gt;John&lt;/first&gt;
+                        &lt;last&gt;Smith&lt;/last&gt;
+                    &lt;/name&gt;
+                </xml-string>
+            </document>
+        </input>
+        <output name="data">
+            <name>
+                <first>John</first>
+                <last>Smith</last>
+            </name>
+        </output>
+    </test>
+
+    <test description="Making sure the that .// works correctly" name="oxf:xslt">
+        <input name="data">
+            <root>
+                <x>
+                    <a>a</a>
+                </x>
+                <y>
+                    <a>b</a>
+                </y>
+            </root>
+        </input>
+        <input name="config">
+            <xsl:stylesheet version="1.0">
+                <xsl:template match="/">
+                    <new-root>
+                        <xsl:for-each select="root/y">
+                            <xsl:copy-of select=".//a"/>
+                        </xsl:for-each>
+                    </new-root>
+                </xsl:template>
+            </xsl:stylesheet>
+        </input>
+        <output name="data">
+            <new-root>
+                <a>b</a>
+            </new-root>
+        </output>
+    </test>
+
+    <test description="xalan:nodeset() function" name="oxf:xslt-1.0">
+        <input name="data">
+            <gaga/>
+        </input>
+        <input name="config">
+            <xsl:stylesheet version="1.0" exclude-result-prefixes="xalan" xmlns:xalan="http://xml.apache.org/xalan">
+                <xsl:template match="/">
+                    <xsl:variable name="gaga">
+                        <xsl:call-template name="gaga"/>
+                    </xsl:variable>
+                    <xsl:copy-of select="xalan:nodeset($gaga)/root/gaga"/>
+                </xsl:template>
+                <xsl:template name="gaga">
+                    <root>
+                        <gaga/>
+                    </root>
+                </xsl:template>
+            </xsl:stylesheet>
+        </input>
+        <output name="data">
+            <gaga/>
+        </output>
+    </test>
+
+    <!--    <disable reason="STX doesn't support multi treading">-->
+    <test description="STX Transformation on a request-like document" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                xmlns:d="http://orbeon.org/oxf/xml/document">
+                <p:processor name="oxf:identity">
+                    <p:input name="data">
+                        <request>
+                            <path-info>/this/is/a/path/info</path-info>
+                        </request>
+                    </p:input>
+                    <p:output name="data" id="request"/>
+                </p:processor>
+                <p:processor name="oxf:stx">
+                    <p:input name="data" href="#request"/>
+                    <p:input name="config">
+                        <stx:transform version="1.0" xmlns:stx="http://stx.sourceforge.net/2002/ns">
+                            <stx:template match="/">
+                                <d:document>
+                                    <d:body>
+                                        <stx:process-children/>
+                                    </d:body>
+                                </d:document>
+                            </stx:template>
+                            <stx:template match="request/path-info/text()">
+                                <stx:copy/>
+                            </stx:template>
+                        </stx:transform>
+                    </p:input>
+                    <p:output name="data" id="result"/>
+                </p:processor>
+                <p:processor name="oxf:null-serializer">
+                    <p:input name="data" href="#result"/>
+                </p:processor>
+            </p:config>
+        </input>
+    </test>
+    <!--  </disable>-->
+
+    <test description="XSLT Transformation on a request-like document" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                xmlns:d="http://orbeon.org/oxf/xml/document">
+                <p:processor name="oxf:identity">
+                    <p:input name="data">
+                        <request>
+                            <path-info>/this/is/a/path/info</path-info>
+                        </request>
+                    </p:input>
+                    <p:output name="data" id="request"/>
+                </p:processor>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#request"/>
+                    <p:input name="config">
+                        <xsl:transform version="1.0">
+                            <xsl:template match="/">
+                                <d:document>
+                                    <d:body>
+                                        <xsl:value-of select="request/path-info"/>
+                                    </d:body>
+                                </d:document>
+                            </xsl:template>
+                        </xsl:transform>
+                    </p:input>
+                    <p:output name="data" id="result"/>
+                </p:processor>
+                <p:processor name="oxf:null-serializer">
+                    <p:input name="data" href="#result"/>
+                </p:processor>
+            </p:config>
+        </input>
+    </test>
+
+    <test description="Docbase in XSLT" name="oxf:xslt">
+        <input name="data">
+            <a/>
+        </input>
+        <input name="config">
+            <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                <xsl:import href="oxf:/unit-tests/docbase/style.xsl"/>
+            </xsl:stylesheet>
+        </input>
+        <output name="data">
+            <a>
+                <b/>
+            </a>
+        </output>
+    </test>
+
+    <test description="XQuery: a little bit of everything" name="oxf:xquery">
+        <input name="data">
+            <company>
+                <department id="1" name="HR">
+                    <employee firstname="John" lastname="Smith">a</employee>
+                    <employee firstname="Peter" lastname="Strain"/>
+                    <employee firstname="Carl" lastname="Thompson"/>
+                </department>
+                <department id="2" name="Engineering">
+                    <employee firstname="Letticia" lastname="Vallejo"/>
+                    <employee firstname="Bruce" lastname="Wilson">b</employee>
+                    <employee firstname="David" lastname="Williams"/>
+                </department>
+            </company>
+        </input>
+        <input name="config">
+            <xquery>
+                declare namespace String = "class:java.lang.String"
+
+                (: Returns the employees of a given department :)
+                define function employees($data, $name) {
+                $data/company/department[@name = $name]/employee
+                }
+
+                (: Recursive function counting the number of
+                <employee/> elements :)
+                define function countEmployees($e) {
+                typeswitch($e)
+                case element(employee,*) return 1
+                default return for $i in $e/* return sum(countEmployees($i))
+                }
+
+                (: Call Java code :)
+                define function maxLastnameLength($employees) {
+                let $lengths :=
+                for $e in $employees
+                return String:length(String:new(string($e/@lastname)))
+                return max($lengths)
+                }
+
+                let $company := doc("#data")
+                let $hrEmployees := employees($company, "HR")
+                let $engineeringEmployees := employees($company, "Engineering")
+                return
+                <mixed-up-company employee-count="{countEmployees($company)}"
+                    max-lastname-length="{maxLastnameLength($company/company/department/employee)}">
+                    {
+                    for $first in $hrEmployees
+                    for $second in $engineeringEmployees
+                    return
+                    <employee firstname="{$first/@firstname}" lastname="{$second/@lastname}"/>
+                    }
+                </mixed-up-company>
+            </xquery>
+        </input>
+        <output name="data">
+            <mixed-up-company employee-count="6" max-lastname-length="8">
+                <employee firstname="John" lastname="Vallejo"/>
+                <employee firstname="John" lastname="Wilson"/>
+                <employee firstname="John" lastname="Williams"/>
+                <employee firstname="Peter" lastname="Vallejo"/>
+                <employee firstname="Peter" lastname="Wilson"/>
+                <employee firstname="Peter" lastname="Williams"/>
+                <employee firstname="Carl" lastname="Vallejo"/>
+                <employee firstname="Carl" lastname="Wilson"/>
+                <employee firstname="Carl" lastname="Williams"/>
+            </mixed-up-company>
+        </output>
+    </test>
+
+</group>

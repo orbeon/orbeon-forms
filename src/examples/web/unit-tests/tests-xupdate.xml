@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="XUpdate" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+    <test description="Remove, insert-after, insert-before" name="oxf:xupdate">
+        <input name="data">
+            <root>
+                <element>1</element>
+                <element>x</element>
+                <element>3</element>
+                <element>5</element>
+            </root>
+        </input>
+        <input name="config">
+            <xu:modifications version="1.0">
+                <xu:remove select="/root/element[2]"/>
+                <xu:insert-after select="/root/element[1]">
+                    <element>2</element>
+                </xu:insert-after>
+                <xu:insert-before select="/root/element[4]">
+                    <element>4</element>
+                </xu:insert-before>
+            </xu:modifications>
+        </input>
+        <output name="data">
+            <root>
+                <element>1</element>
+                <element>2</element>
+                <element>3</element>
+                <element>4</element>
+                <element>5</element>
+            </root>
+        </output>
+    </test>
+
+    <test description="First order function" name="oxf:xupdate">
+        <input name="data">
+            <dummy/>
+        </input>
+        <input name="config">
+            <xu:modifications>
+                <xu:function name="double">
+                    <xu:param name="f"/>
+                    <xu:function name="result">
+                        <xu:param name="x"/>
+                        <xu:value-of select="f($x) * 2"/>
+                    </xu:function>
+                    <xu:copy-of select="$result"/>
+                </xu:function>
+                <xu:function name="increment">
+                    <xu:param name="x"/>
+                    <xu:value-of select="$x + 1"/>
+                </xu:function>
+                <xu:variable name="incrementAndDouble" select="double($increment)"/>
+                <xu:update select="/">
+                    <result>
+                        <xu:value-of select="incrementAndDouble(2)"/>
+                    </result>
+                </xu:update>
+            </xu:modifications>
+        </input>
+        <output name="data">
+            <result>6</result>
+        </output>
+    </test>
+
+    <test description="Order of insertion for attribute" name="oxf:xupdate">
+        <input name="data">
+            <root/>
+        </input>
+        <input name="config">
+            <xu:modifications>
+                <xu:append select="/root">
+                    <xu:attribute name="attribute">
+                        <xu:value-of select="'a'"/>
+                        <xu:value-of select="'b'"/>
+                        <xu:value-of select="'c'"/>
+                    </xu:attribute>
+                </xu:append>
+            </xu:modifications>
+        </input>
+        <output name="data">
+            <root attribute="abc"/>
+        </output>
+    </test>
+
+</group>

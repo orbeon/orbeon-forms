@@ -105,13 +105,19 @@ public class ProcessorTest extends TestCase {
             Document tests = resourceManager.getContentAsDOM4J(System.getProperty(TEST_CONFIG));
 
             // If there's a test with the "only" attribute, execute only this one
-            Iterator i = XPathUtils.selectIterator(tests, "/tests/test[@only='true']");
+            Iterator i = XPathUtils.selectIterator(tests, "(/tests/test | /tests/group/test)[@only = 'true'][1]");
             if (!i.hasNext())
-                i = XPathUtils.selectIterator(tests, "/tests/test");
+                i = XPathUtils.selectIterator(tests, "/tests/group/test | /tests/test");
 
             for (; i.hasNext();) {
                 Element testNode = (Element) i.next();
+                Element groupNode = testNode.getParent();
                 String description = testNode.attributeValue("description", "");
+                if (groupNode.getName().equals("group")) {
+                    String groupDescription = groupNode.attributeValue("description");
+                    if (groupDescription != null)
+                        description = groupDescription + " - " + description;
+                }
                 QName processorName = XMLProcessorRegistry.extractProcessorQName(testNode);
                 currentTestError = "Error when executing test with description: '" + description + "'";
 

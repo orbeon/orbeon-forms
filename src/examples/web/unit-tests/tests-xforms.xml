@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="XForms" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+    <test description="Annotate" name="oxf:xforms-annotate">
+            <input name="instance">
+                <d:form>
+                    <d:id>42</d:id>
+                    <d:id>4x</d:id>
+                    <d:firstname>John</d:firstname>
+                    <d:firstname xxforms:valid="false">John</d:firstname>
+                    <d:lastname xxforms:valid="true">Smith</d:lastname>
+                    <d:zip xxforms:valid="true">4x</d:zip>
+                </d:form>
+            </input>
+            <input name="model">
+                <xforms:model>
+                    <xforms:bind nodeset="/d:form/d:id" type="xs:integer"/>
+                    <xforms:bind nodeset="/d:form/d:zip" type="xs:integer"/>
+                </xforms:model>
+            </input>
+            <output name="instance">
+                <d:form xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                    <d:id xxforms:valid="true">42</d:id>
+                    <d:id xxforms:valid="false">4x</d:id>
+                    <d:firstname>John</d:firstname>
+                    <d:firstname xxforms:valid="false">John</d:firstname>
+                    <d:lastname xxforms:valid="true">Smith</d:lastname>
+                    <d:zip xxforms:valid="false">4x</d:zip>
+                </d:form>
+            </output>
+        </test>
+
+    <test description="Conditionals: if" name="oxf:pipeline">
+        <input name="config">
+            <p:config>
+                <p:param type="output" name="data"/>
+
+                <p:processor uri="oxf/processor/identity">
+                    <p:input name="data">
+                        <xforms:model id="form">
+                            <xforms:submission method="post"/>
+                            <xforms:instance>
+                                <form>
+                                    <a/>
+                                    <b/>
+                                    <c/>
+                                </form>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="xforms-model"/>
+                </p:processor>
+
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="instance">
+                        <form>
+                            <a>1</a>
+                            <b>2</b>
+                            <c>3</c>
+                        </form>
+                    </p:input>
+                    <p:input name="data">
+                        <html>
+                            <body>
+                                <xforms:group ref="/form">
+                                    <xxforms:if test="a = '1'">
+                                        <xforms:input ref="b"/>
+                                    </xxforms:if>
+                                    <xforms:input ref="c"/>
+                                </xforms:group>
+                            </body>
+                        </html>
+                    </p:input>
+                    <p:output name="data" id="annotated-data"/>
+                </p:processor>
+                <!-- Transform annotated XForms to XHTML -->
+                <p:processor name="oxf:xslt"><!-- saxon1 -->
+                    <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="data" href="#annotated-data"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <body>
+                    <xhtml:form xmlns:xhtml="http://www.w3.org/1999/xhtml" id="wsrp_rewrite_form_1" xxforms:contains-hidden="true" method="post">
+                        <xhtml:input type="hidden" id="wsrp_rewrite_action_1" name="" value=""/>
+                        <xhtml:input type="hidden" name="$submitted" value="true"/>
+                        <xhtml:input type="text" name="b[2]" value="2"/>
+                        <xhtml:input type="text" name="c[3]" value="3"/>
+                        <xxforms:hidden xxforms:name="a[1]" xxforms:value="1"/>
+                    </xhtml:form>
+                </body>
+            </html>
+        </output>
+    </test>
+
+    <test description="Conditionals: choose" name="oxf:pipeline">
+        <input name="config">
+            <p:config>
+                <p:param type="output" name="data"/>
+
+                <p:processor uri="oxf/processor/identity">
+                    <p:input name="data">
+                        <xforms:model id="form">
+                            <xforms:submission method="post"/>
+                            <xforms:instance>
+                                <form>
+                                    <a/>
+                                    <b/>
+                                    <c/>
+                                    <d/>
+                                </form>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="xforms-model"/>
+                </p:processor>
+
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="instance">
+                        <form>
+                            <a>1</a>
+                            <b>2</b>
+                            <c>3</c>
+                            <d>4</d>
+                        </form>
+                    </p:input>
+                    <p:input name="data">
+                        <html>
+                            <body>
+                                <xforms:group ref="/form">
+                                    <xxforms:choose>
+                                        <xxforms:when test="a = '1'">
+                                            <xforms:input ref="b"/>
+                                        </xxforms:when>
+                                        <xxforms:when test="b = '2'">
+                                            <xforms:input ref="c"/>
+                                        </xxforms:when>
+                                        <xxforms:otherwise>
+                                            <xforms:input ref="d"/>
+                                        </xxforms:otherwise>
+                                    </xxforms:choose>
+                                </xforms:group>
+                            </body>
+                        </html>
+                    </p:input>
+                    <p:output name="data" id="annotated-data"/>
+                </p:processor>
+                <!-- Transform annotated XForms to XHTML -->
+                <p:processor name="oxf:xslt"><!-- saxon1 -->
+                    <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="data" href="#annotated-data"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <body>
+                    <xhtml:form xmlns:xhtml="http://www.w3.org/1999/xhtml" id="wsrp_rewrite_form_1" xxforms:contains-hidden="true" method="post">
+                        <xhtml:input type="hidden" id="wsrp_rewrite_action_1" name="" value=""/>
+                        <xhtml:input type="hidden" name="$submitted" value="true"/>
+                        <xhtml:input type="text" name="b[2]" value="2"/>
+                        <xhtml:input type="text" name="c[3]" value="3"/>
+                        <xxforms:hidden xxforms:name="a[1]" xxforms:value="1"/>
+                    </xhtml:form>
+                </body>
+            </html>
+        </output>
+    </test>
+
+    <test description="NS Prefixes" name="oxf:pipeline">
+        <input name="config" xmlns:a="http://orbeon.com/a" xmlns:b="http://orbeon.com/b" xmlns:c="http://orbeon.com/c">
+            <p:config>
+                <p:param type="output" name="out"/>
+
+                <p:processor uri="oxf/processor/identity">
+                    <p:input name="data">
+                        <xforms:model id="form">
+                            <xforms:submission method="post"/>
+                            <xforms:instance>
+                                <form>
+                                    <a:claim a:id="1">
+                                        <b:person>
+                                            <c:name>
+                                                <a:first/>
+                                                <b:last/>
+                                            </c:name>
+                                        </b:person>
+                                        <c:address>
+                                            <a:street/>
+                                            <b:city/>
+                                            <c:state/>
+                                            <zip/>
+                                            <country/>
+                                        </c:address>
+                                    </a:claim>
+                                </form>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="model"/>
+                </p:processor>
+
+                <p:processor uri="oxf/processor/identity">
+                    <p:input name="data">
+                        <form>
+                            <a:claim a:id="1">
+                                <b:person>
+                                    <c:name>
+                                        <a:first>John</a:first>
+                                        <b:last>Smith</b:last>
+                                    </c:name>
+                                </b:person>
+                                <c:address>
+                                    <a:street>850 N. Shoreline Blvd</a:street>
+                                    <b:city>Mountain View</b:city>
+                                    <c:state>CA</c:state>
+                                    <zip>94043</zip>
+                                    <country>USA</country>
+                                </c:address>
+                            </a:claim>
+                        </form>
+                    </p:input>
+                    <p:output name="data" id="instance"/>
+                </p:processor>
+
+
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model" href="#model"/>
+                    <p:input name="instance" href="#instance"/>
+                    <p:input name="data">
+                        <html>
+                            <xforms:group ref="/form/a:claim">
+                            </xforms:group>
+                        </html>
+                    </p:input>
+                    <p:output name="data" id="xf-out"/>
+                </p:processor>
+
+                <p:processor uri="oxf/processor/xslt-2.0">
+                    <p:input name="data" href="#xf-out"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                            <xsl:template match="/">
+                                <request>
+                                    <parameters>
+                                        <parameter>
+                                            <name>$submitted</name>
+                                            <value>true</value>
+                                        </parameter>
+                                        <xsl:for-each select="//xxforms:hidden">
+                                            <parameter>
+                                                <name>
+                                                    <xsl:value-of select="@xxforms:name"/>
+                                                </name>
+                                                <value>
+                                                    <xsl:value-of select="@xxforms:value"/>
+                                                </value>
+                                            </parameter>
+                                        </xsl:for-each>
+                                    </parameters>
+                                </request>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="request"/>
+                </p:processor>
+
+                <p:processor name="oxf:xforms-input">
+                    <p:input name="model" href="#model"/>
+                    <p:input name="request" href="#request"/>
+                    <p:input name="filter">
+                        <null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+                    </p:input>
+                    <p:input name="instance" href="#model#xpointer(xforms:model/xforms:instance/form)"/>
+                    <p:output name="data" ref="out"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="out">
+            <form>
+                <a:claim a:id="1" xmlns:a="http://orbeon.com/a">
+                    <b:person xmlns:b="http://orbeon.com/b">
+                        <c:name xmlns:c="http://orbeon.com/c">
+                            <a:first>John</a:first>
+                            <b:last>Smith</b:last>
+                        </c:name>
+                    </b:person>
+                    <c:address xmlns:c="http://orbeon.com/c">
+                        <a:street>850 N. Shoreline Blvd</a:street>
+                        <b:city xmlns:b="http://orbeon.com/b">Mountain View</b:city>
+                        <c:state>CA</c:state>
+                        <zip>94043</zip>
+                        <country>USA</country>
+                    </c:address>
+                </a:claim>
+            </form>
+        </output>
+    </test>
+
+</group>

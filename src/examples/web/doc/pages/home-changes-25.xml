@@ -21,13 +21,6 @@
 	</header>
 	<body>
         <section>
-            <title>Version 2.6 And Later</title>
-            <p>
-                Changes in version 2.6 and later are listed in a <a href="home-changes">separate
-                document</a>.
-            </p>
-        </section>
-        <section>
 			<title>New in Version 2.5.4</title>
             <section>
                 <title>Package Name in Examples and Documentation</title>
@@ -1121,13 +1114,6 @@
                 </p>
 			</section>
             -->
-		</section>
-		<section>
-			<title>Version 2.2 and Earlier</title>
-			<p>
-                Changes in version 2.2 and earlier are listed in a <a
-                href="home-changes-older">separate document</a>.
-            </p>
 		</section>
 	</body>
 </document>

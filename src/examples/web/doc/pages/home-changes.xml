@@ -114,6 +114,13 @@
                     </p>
                 </section>
                 <section>
+                    <title>Compliance Matrix</title>
+                    <p>
+                        A <a href="reference-xforms-compliance">compliance matrix</a> is now
+                        available.
+                    </p>
+                </section>
+                <section>
                     <title>Other XForms Improvements</title>
                     <p>
                         TODO
@@ -487,20 +494,6 @@
                     The source code of Presentation Server now compiles with Java 5.
                 </p>
             </section>
-        </section>
-        <section>
-            <title>Version 2.5</title>
-            <p>
-                Changes in version 2.5 are listed in a <a href="home-changes-25">separate
-                document</a>.
-            </p>
-        </section>
-        <section>
-            <title>Version 2.2 and Earlier</title>
-            <p>
-                Changes in version 2.2 and earlier are listed in a <a
-                href="home-changes-older">separate document</a>.
-            </p>
         </section>
     </body>
 </document>

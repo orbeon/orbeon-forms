@@ -1252,11 +1252,5 @@
                 </p>
             </section>
         </section>
-        <section>
-            <title>Compliance</title>
-            <p>
-                XForms conformance is described <a href="reference-xforms-compliance">in this document</a>.
-            </p>
-        </section>
     </body>
 </document>

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ *  Copyright (C) 2004 - 2005 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -130,7 +130,7 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
             }
         }
 
-        public ProcessorOutput createOutput(String name) {
+        public ProcessorOutput createOutput( final String name ) {
             ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
                 public void readImpl(PipelineContext context, ContentHandler contentHandler) {
                     try {
@@ -171,7 +171,9 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                         if (key == null) return null;
                         keys.add(key);
                     }
-                    return new OutputCacheKey(this, keys);
+                    final CacheKey[] outKys = new CacheKey[ keys.size() ];
+                    keys.toArray( outKys );
+                    return new CompoundOutputCacheKey( ForEachProcessor.class, name, outKys );
                 }
 
                 /**

@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ *  Copyright (C) 2004 - 2005 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -1216,7 +1216,11 @@ public abstract class ProcessorImpl implements Processor {
             }
 
             // Concatenate current processor info and input info
-            return new OutputCacheKey(this, keys);
+            final CacheKey[] outKys = new CacheKey[ keys.size() ];
+            keys.toArray( outKys );
+            final Class c = getProcessorClass();
+            final String nm = getName();
+            return new CompoundOutputCacheKey( c, nm, outKys );
         }
 
         public Object getValidityImpl(PipelineContext context) {

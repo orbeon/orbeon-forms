@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ *  Copyright (C) 2004 - 2005 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.generator;
 
 import org.dom4j.DocumentHelper;
 import org.orbeon.oxf.cache.OutputCacheKey;
+import org.orbeon.oxf.cache.SimpleOutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorOutput;
@@ -42,17 +43,17 @@ public class DOMGenerator extends ProcessorImpl {
 
     private Document document;
 
-    private OutputCacheKey key;
+    private final SimpleOutputCacheKey outputKey;
+    private final String key;
     private Object validity;
     private SAXStoreEntry saxStoreEntry;
     private static Map keyToSaxStore = new HashMap();
-
-    protected DOMGenerator() {
+    
+    {
         addOutputInfo(new org.orbeon.oxf.processor.ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
-    public DOMGenerator(Node node, Object validity) {
-        this();
+    public DOMGenerator( Node node, Object validity ) {
         this.validity = validity;
         if (node == null) {
             throw new OXFException("Null node passed to DOMGenerator");
@@ -63,6 +64,9 @@ public class DOMGenerator extends ProcessorImpl {
             document.appendChild(document.importNode(node, true));
             this.document = document;
         }
+        final byte[] dgst = XMLUtils.getDigest( document );
+        key = NumberUtils.toHexString( dgst );
+        outputKey = new SimpleOutputCacheKey( DOMGenerator.class, OUTPUT_DATA, key );
     }
 
     public DOMGenerator(org.dom4j.Node node) {
@@ -70,7 +74,6 @@ public class DOMGenerator extends ProcessorImpl {
     }
 
     public DOMGenerator(org.dom4j.Node node, Object validity) {
-        this();
         this.validity = validity;
         try {
             if (node == null)
@@ -87,14 +90,13 @@ public class DOMGenerator extends ProcessorImpl {
             }
 
             // Create key
-            key = new OutputCacheKey();
-            key.setClazz(getClass());
-            key.setOutputName(OUTPUT_DATA);
-            key.setKey(NumberUtils.toHexString(XMLUtils.getDigest(document)));
+            final byte[] dgst = XMLUtils.getDigest( document );
+            key = NumberUtils.toHexString( dgst );
+            outputKey = new SimpleOutputCacheKey( DOMGenerator.class, OUTPUT_DATA, key );
 
             // Get SAX Store Entry, if possible from map
             synchronized (keyToSaxStore) {
-                saxStoreEntry = (SAXStoreEntry) keyToSaxStore.get(key);
+                saxStoreEntry = (SAXStoreEntry) keyToSaxStore.get(outputKey);
                 if (saxStoreEntry == null) {
                     // Create SAX Store
                     saxStoreEntry = new SAXStoreEntry();
@@ -103,7 +105,7 @@ public class DOMGenerator extends ProcessorImpl {
                     LocationSAXWriter saxWriter = new LocationSAXWriter();
                     saxWriter.setContentHandler(saxStoreEntry.saxStore);
                     saxWriter.write(document);
-                    keyToSaxStore.put(key, saxStoreEntry);
+                    keyToSaxStore.put(outputKey, saxStoreEntry);
                 } else {
                     saxStoreEntry.referenceCount++;
                 }
@@ -117,7 +119,7 @@ public class DOMGenerator extends ProcessorImpl {
         if (saxStoreEntry != null) {
             synchronized (keyToSaxStore) {
                 if (saxStoreEntry.referenceCount == 1) {
-                    keyToSaxStore.remove(key);
+                    keyToSaxStore.remove(outputKey);
                 } else {
                     saxStoreEntry.referenceCount--;
                 }
@@ -132,7 +134,7 @@ public class DOMGenerator extends ProcessorImpl {
                 try {
                     if (document != null) {
                         Transformer identity = TransformerUtils.getIdentityTransformer();
-                        identity.transform(new DOMSource(document, getKey(context).getKey()), new SAXResult(contentHandler));
+                        identity.transform(new DOMSource(document, key ), new SAXResult(contentHandler));
                     } else {
                         saxStoreEntry.saxStore.replay(contentHandler);
                     }
@@ -144,11 +146,7 @@ public class DOMGenerator extends ProcessorImpl {
             }
 
             public OutputCacheKey getKeyImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {
-                if (key == null) {
-                    byte[] digest = XMLUtils.getDigest(document);
-                    key = new OutputCacheKey(this, NumberUtils.toHexString(digest));
-                }
-                return key;
+                return outputKey;
             }
 
             public Object getValidityImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {

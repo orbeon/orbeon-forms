@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ *  Copyright (C) 2004 - 2005 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -18,6 +18,7 @@ import org.apache.struts.action.ActionError;
 import org.apache.struts.action.ActionErrors;
 import org.apache.struts.util.MessageResources;
 import org.orbeon.oxf.cache.OutputCacheKey;
+import org.orbeon.oxf.cache.SimpleOutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -194,7 +195,8 @@ public class StrutsActionErrorsGenerator extends org.orbeon.oxf.processor.Proces
                     state.validity = latestValidity;
                 }
 
-                state.outputCacheKey = new OutputCacheKey(getOutputByName(OUTPUT_DATA), "constant");
+                state.outputCacheKey = new SimpleOutputCacheKey
+                    ( StrutsActionErrorsGenerator.class, OUTPUT_DATA, "constant" );
              }
         };
 

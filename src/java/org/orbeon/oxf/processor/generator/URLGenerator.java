@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ *  Copyright (C) 2004 - 2005 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -215,7 +215,7 @@ public class URLGenerator extends ProcessorImpl {
         public URIReferences uriReferences;
     }
 
-    public ProcessorOutput createOutput(String name) {
+    public ProcessorOutput createOutput( final String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
 
@@ -415,7 +415,7 @@ public class URLGenerator extends ProcessorImpl {
                         keys.add(configKeyValidity.key);
                     }
                     // Handle main document and config
-                    keys.add(new OutputCacheKey(this, configURIReferences.config.toString()));
+                    keys.add(new SimpleOutputCacheKey( URLGenerator.class, name, configURIReferences.config.toString()));
                     // Handle dependencies if any
                     if (configURIReferences.uriReferences != null) {
                         for (Iterator i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
@@ -423,8 +423,9 @@ public class URLGenerator extends ProcessorImpl {
                             keys.add(new InternalCacheKey(URLGenerator.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm()));
                         }
                     }
-
-                    return new OutputCacheKey(this, keys);
+                    final CacheKey[] outKys = new CacheKey[ keys.size() ];
+                    keys.toArray( outKys );
+                    return new CompoundOutputCacheKey( URLGenerator.class, name, outKys );
                 } catch (MalformedURLException e) {
                     throw new OXFException(e);
                 }

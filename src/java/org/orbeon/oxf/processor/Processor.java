@@ -156,18 +156,18 @@ public interface Processor {
     public List getOutputsInfo();
 
     /**
-     * @return  A Map containing all the inputs currently connected to this
-     *          processor. Each key in the Map is a String specifying an input
-     *          name. The List associated to the key contains one or more
-     *          <code>ProcessorInput</code> objects.
+     * @return  A read-only Map containing all the inputs currently connected
+     *          to this processor. Each key in the Map is a String specifying
+     *          an input name. The List associated to the key contains one or
+     *          more <code>ProcessorInput</code> objects.
      */
     public Map getConnectedInputs();
 
     /**
-     * @return  A Map containing all the outputs currently connected to this
-     *          processor. Each key in the Map is a String specifying an output
-     *          name. The List associated to the key contains one or more
-     *          <code>ProcessorOutput</code> objects.
+     * @return  A read-only Map containing all the outputs currently connected
+     *          to this processor. Each key in the Map is a String specifying
+     *          an output name. The List associated to the key contains one or
+     *          more <code>ProcessorOutput</code> objects.
      */
     public Map getConnectedOutputs();
 

@@ -794,7 +794,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             final Map namespacesOnResult = XMLUtils.getNamespaceContext(resultElement);
             for (Iterator i = namespacesOnResult.keySet().iterator(); i.hasNext();) {
                 String prefix = (String) i.next();
-                modificationsElement.add(new Namespace(prefix, (String) namespacesOnResult.get(prefix)));
+                if (prefix.length() > 0)
+                    modificationsElement.add(new Namespace(prefix, (String) namespacesOnResult.get(prefix)));
             }
             final Document xupdateConfig = DocumentHelper.createDocument(modificationsElement);
 

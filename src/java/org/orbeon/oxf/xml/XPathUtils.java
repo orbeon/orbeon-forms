@@ -348,6 +348,27 @@ public class XPathUtils {
         }
     }
 
+    public static List xpath2WithFullURIMultiple(DocumentWrapper documentWrapper, String xpath) {
+        try {
+            // Create String XPath expression
+            Map prefixToURIMap = new HashMap();
+            String xpathExpression = xpathWithFullURIString(xpath, prefixToURIMap);
+
+            // Create Saxon XPath expression
+            final XPathEvaluator xpathEvaluator;
+            xpathEvaluator = new XPathEvaluator(documentWrapper);
+            StandaloneContext standaloneContext = (StandaloneContext) xpathEvaluator.getStaticContext();
+            for (Iterator j = prefixToURIMap.keySet().iterator(); j.hasNext();) {
+                String prefix = (String) j.next();
+                standaloneContext.declareNamespace(prefix, (String) prefixToURIMap.get(prefix));
+            }
+
+            return xpathEvaluator.evaluate(xpathExpression);
+        } catch (XPathException e) {
+            throw new OXFException(e);
+        }
+    }
+
 
     /**
      * Example:

@@ -165,15 +165,10 @@ public class XFormsElementContext {
     }
 
     private List getRefNodeList(String refXPath) {
-        Object value = XPathUtils.xpath2WithFullURI(documentWrapper, refXPath);
-        List result = value instanceof List ? (List) value
-                : value instanceof Element || value instanceof Attribute ? Collections.singletonList(value)
-                : value == null ? Collections.EMPTY_LIST
-                : null;
+        List result = XPathUtils.xpath2WithFullURIMultiple(documentWrapper, refXPath);
         if (result == null)
             throw new OXFException("Expression '" + refXPath
-                    + "' must return an element, an attribute or a nodeset; it returned a "
-                    + value.getClass().getName());
+                    + "' must return an element, an attribute or a nodeset");
         return result;
     }
 

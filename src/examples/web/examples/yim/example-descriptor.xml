@@ -1,4 +1,4 @@
-<example-descriptor>
+<example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting" >
     <title>Instant Messaging and WebServices</title>
     <source>form.xml</source>
     <source>view.xsl</source>
@@ -32,7 +32,8 @@
         <p>
             With the second form at the bottom of this page, you can send a message to an arbitrary
             user. This will go through a Web service that you can also access using any Web service
-            client that understands the <a href="/im/yim.wsdl">WDSL for this service</a>.
+            client that understands the <a f:url-type="resource"
+            href="/example-resources/yim/view-wsdl">WDSL for this service</a>.
         </p>
         <h2>How does it Work?</h2>
         <ol>

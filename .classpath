@@ -65,7 +65,6 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/mail-1_3_2.jar"/>
 	<classpathentry kind="lib" path="lib/saxon-8_1_1_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/private/commons-logging-1_0_4.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/cli/commons-cli-1_0.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-pool-1.2.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/exist-1_0b2_build_1107.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/exist-optional-1_0b2_build_1107.jar"/>
@@ -75,5 +74,8 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/antlr-2_7_4_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/antlr-2_7_4.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/private/xercesImpl_2_6_2_orbeon.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/cli-orbeon.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/commons-cli-1_0.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/saxon-8_1_1_orbeon.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>

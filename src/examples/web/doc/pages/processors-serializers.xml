@@ -54,99 +54,98 @@
             <section>
                 <title>Configuration</title>
                 <p>
-                    The configuration consists of eleven optional elements.
-                    <p/>
-                    <table ca="|l|p{0.3\textwidth}|p{0.2\textwidth}|">
-                        <tr>
-                            <th>Element</th>
-                            <th>Purpose</th>
-                            <th>Default</th>
-                        </tr>
-                        <tr>
-                            <td>content-type</td>
-                            <td>MIME type sent to the client</td>
-                            <td>Specific to each serializer</td>
-                        </tr>
-                        <tr>
-                            <td>status-code</td>
-                            <td>HTTP status code sent to the client</td>
-                            <td>SC_OK, or 100</td>
-                        </tr>
-                        <tr>
-                            <td>empty-content</td>
-                            <td>Forces the serializer to return an empty content, without reading its data input</td>
-                            <td>false</td>
-                        </tr>
-                        <tr>
-                            <td>error-code</td>
-                            <td>HTTP error code sent to the client</td>
-                            <td>none</td>
-                        </tr>
-                        <tr>
-                            <td>method</td>
-                            <td>XSLT Output Method</td>
-                            <td>html, xml or text, depending on the serializer</td>
-                        </tr>
-                        <tr>
-                            <td>version</td>
-                            <td>HTML or XML version number</td>
-                            <td>4.01 for HTML (ignored for XML, which always output 1.0)</td>
-                        </tr>
-                        <tr>
-                            <td>public-doctype</td>
-                            <td>The public doctype</td>
-                            <td>&quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot; for HTML, none otherwise</td>
-                        </tr>
-                        <tr>
-                            <td>system-doctype</td>
-                            <td>The system doctype</td>
-                            <td>&quot;http://www.w3.org/TR/html4/loose.dtd&quot; for HTML, none otherwise</td>
-                        </tr>
-                        <tr>
-                            <td>omit-xml-declaration</td>
-                            <td>Specifies whether an XML declaration must be omitted</td>
-                            <td>false for XML and HTML (i.e. a declaration is output by default), ignored otherwise</td>
-                        </tr>
-                        <tr>
-                            <td>standalone</td>
-                            <td>Specifies whether a standalone document declaration is output</td>
-                            <td>false for XML, ignored otherwise</td>
-                        </tr>
-                        <tr>
-                            <td>encoding</td>
-                            <td>The default text encoding</td>
-                            <td>iso-8859-1</td>
-                        </tr>
-                        <tr>
-                            <td>indent</td>
-                            <td>Specifies if the output is indented</td>
-                            <td>true</td>
-                        </tr>
-                        <tr>
-                            <td>indent-amount</td>
-                            <td>Specifies the number of indentation space</td>
-                            <td>0</td>
-                        </tr>
-                        <tr>
-                            <td>cache-control/use-local-cache</td>
-                            <td>
-                                Whether the resulting stream must be locally cached. For documents
-                                or binaries that are large or known to change at every request, it
-                                is recommended to set this to false.
-                            </td>
-                            <td>true</td>
-                        </tr>
-                        <tr>
-                            <td>header</td>
-                            <td>
-                                Adds a custom HTTP header to the response. The nested elements
-                                <code>name</code> and <code>value</code> contain the name and value
-                                of the header, respectively. You can add multiple headers.
-                            </td>
-                            <td>none</td>
-                        </tr>
-                    </table>
+                    The configuration consists of the following optional elements.
                 </p>
+                <table ca="|l|p{0.3\textwidth}|p{0.2\textwidth}|">
+                    <tr>
+                        <th>Element</th>
+                        <th>Purpose</th>
+                        <th>Default</th>
+                    </tr>
+                    <tr>
+                        <td>content-type</td>
+                        <td>MIME type sent to the client</td>
+                        <td>Specific to each serializer</td>
+                    </tr>
+                    <tr>
+                        <td>status-code</td>
+                        <td>HTTP status code sent to the client</td>
+                        <td>SC_OK, or 100</td>
+                    </tr>
+                    <tr>
+                        <td>empty-content</td>
+                        <td>Forces the serializer to return an empty content, without reading its data input</td>
+                        <td>false</td>
+                    </tr>
+                    <tr>
+                        <td>error-code</td>
+                        <td>HTTP error code sent to the client</td>
+                        <td>none</td>
+                    </tr>
+                    <tr>
+                        <td>method</td>
+                        <td>XSLT Output Method</td>
+                        <td>html, xml or text, depending on the serializer</td>
+                    </tr>
+                    <tr>
+                        <td>version</td>
+                        <td>HTML or XML version number</td>
+                        <td>4.01 for HTML (ignored for XML, which always output 1.0)</td>
+                    </tr>
+                    <tr>
+                        <td>public-doctype</td>
+                        <td>The public doctype</td>
+                        <td>&quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot; for HTML, none otherwise</td>
+                    </tr>
+                    <tr>
+                        <td>system-doctype</td>
+                        <td>The system doctype</td>
+                        <td>&quot;http://www.w3.org/TR/html4/loose.dtd&quot; for HTML, none otherwise</td>
+                    </tr>
+                    <tr>
+                        <td>omit-xml-declaration</td>
+                        <td>Specifies whether an XML declaration must be omitted</td>
+                        <td>false for XML and HTML (i.e. a declaration is output by default), ignored otherwise</td>
+                    </tr>
+                    <tr>
+                        <td>standalone</td>
+                        <td>Specifies whether a standalone document declaration is output</td>
+                        <td>false for XML, ignored otherwise</td>
+                    </tr>
+                    <tr>
+                        <td>encoding</td>
+                        <td>The default text encoding</td>
+                        <td>iso-8859-1</td>
+                    </tr>
+                    <tr>
+                        <td>indent</td>
+                        <td>Specifies if the output is indented</td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>indent-amount</td>
+                        <td>Specifies the number of indentation space</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>cache-control/use-local-cache</td>
+                        <td>
+                            Whether the resulting stream must be locally cached. For documents
+                            or binaries that are large or known to change at every request, it
+                            is recommended to set this to false.
+                        </td>
+                        <td>true</td>
+                    </tr>
+                    <tr>
+                        <td>header</td>
+                        <td>
+                            Adds a custom HTTP header to the response. The nested elements
+                            <code>name</code> and <code>value</code> contain the name and value
+                            of the header, respectively. You can add multiple headers.
+                        </td>
+                        <td>none</td>
+                    </tr>
+                </table>
                 <xml-source>
                     <config>
                         <content-type>text/html</content-type>

@@ -27,6 +27,7 @@
         <menu-item label="XForms" href="reference-xforms"/>
         <menu-item label="Page Flow" href="reference-controller"/>
         <menu-item label="XPL and Pipelines" href="reference-xpl-pipelines"/>
+        <menu-item label="Non-XML Documents" href="reference-formats"/>
         <menu-item label="Properties" href="reference-properties"/>
         <menu-item label="Resource Managers" href="reference-resource-managers"/>
         <menu-item label="Authentication" href="reference-authentication"/>

@@ -336,11 +336,10 @@
                     <p>
                         When the content type of the input read is text, the input document is
                         expected to be in the text format specified by the <a
-                        href="processors-serializers#text-mode">text mode</a> of the HTTP
-                        serializer. When the content type of the input read is binary, the input
-                        document is expected to be in the binary format specified by the <a
-                        href="processors-serializers#binary-mode">binary mode</a> of the HTTP
-                        serializer.
+                        href="reference-formats#text-documents">text document format</a>. When the
+                        content type of the input read is binary, the input document is expected to
+                        be in the binary format specified by the <a
+                        href="reference-formats#binary-documents">binary document format</a>.
                     </p>
                 </section>
             </section>

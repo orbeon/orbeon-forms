@@ -49,9 +49,9 @@
                 <li><b>Text:</b> any text document</li>
             </ul>
             <p>
-                The resulting text is sent to the <code>data</code> output. It is embedded in an
-                XML document as specified by the <a href="processors-serializers#text-mode">text
-                mode</a> in the serializers documentation.
+                The resulting text is sent to the <code>data</code> output. It is embedded in an XML
+                document as specified by the <a href="reference-formats#text-documents">text
+                document format</a>.
             </p>
             <section>
                 <title>Configuration</title>
@@ -271,8 +271,7 @@
             <p>
                 The resulting binary stream is sent to the <code>data</code> output. It is embedded
                 in an XML document as specified by the <a
-                href="processors-serializers#binary-mode">binary mode</a> in the serializers
-                documentation.
+                href="reference-formats#binary-documents">binary document format</a>.
             </p>
         </section>
         <section>
@@ -319,7 +318,12 @@
                     The To XLS converter takes a <code>config</code> input describing the XLS
                     template file, and a <code>data</code> input containing the values to be
                     inserted in the template. The processor scans the template, and applies XPath
-                    expressions to fill in the template. The <code>config</code> input takes a
+                    expressions to fill in the template. It returns a <a
+                    href="reference-formats#binary-documents">binary document</a> on it
+                    <code>data</code> output.
+                </p>
+                <p>
+                    The <code>config</code> input takes a
                     single <code>config</code> element with one attribute:
                 </p>
                 <table>
@@ -397,10 +401,11 @@
                 <title>From XLS Converter</title>
                 <p>
                     The From XLS converter takes an Excel file (for example uploaded with an XForms
-                    upload control), finds special markup cells and reconstructs an XML document from
-                    this markup. The converter has one <code>data</code> input which must receive a
-                    binary document, and a <code>data</code> output containing the generated XML
-                    document. Assume the following XForms model:
+                    upload control), finds special markup cells and reconstructs an XML document
+                    from this markup. The converter has one <code>data</code> input which must
+                    receive a <a href="reference-formats#binary-documents">binary document</a>, and
+                    a <code>data</code> output containing the generated XML document. Assume the
+                    following XForms model:
                 </p>
                 <xml-source>
                     <xf:model xmlns:xf="http://www.w3.org/2002/xforms"

@@ -202,11 +202,9 @@
                     </p>
                     <p>
                         In this mode, all the character content under the root element is considered
-                        as Base64-encoded binary content. Extra elements, namespace declarations,
-                        attributes, processing instructions, comments, are ignored, but they should
-                        not be present: the input document should only have a root element
-                        (necessary in every well-formed XML document) with attributes as required,
-                        and containing only Base64-encoded character data. For example:
+                        as Base64-encoded binary content according to the <a
+                        href="reference-formats#binary-documents">binary document format</a>, for
+                        example:
                     </p>
                     <xml-source>
 <document xsi:type="xs:base64Binary" content-type="image/jpeg">
@@ -279,11 +277,9 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     </p>
                     <p>
                         In this mode, all the character content under the root element is considered
-                        as text content. Extra elements, namespace declarations, attributes,
-                        processing instructions, comments, are ignored, but they should not be
-                        present: the input document should only have a root element (necessary in
-                        every well-formed XML document) with attributes as required, and containing
-                        only character data. For example:
+                        as text content according to the <a
+                        href="reference-formats#text-documents">text document format</a>, for
+                        example:
                     </p>
                     <xml-source>
 <document xsi:type="xs:string" content-type="text/plain">

@@ -173,7 +173,8 @@
                 <title>Email Processor</title>
                 <p>
                     The <a href="processors-messaging-email">Email processor</a> now supports
-                    <code>Cc</code> and <code>Bcc</code> recipients.
+                    <code>Cc</code> and <code>Bcc</code> recipients. See the <a
+                    href="/goto-example/email">Email example</a> for an illustration.
                 </p>
             </section>
             <section>

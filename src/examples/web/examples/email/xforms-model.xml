@@ -79,5 +79,6 @@
     <!-- Calculation to create the plain text version and HTML title -->
     <xforms:bind nodeset="/form/message/body/part[1]" calculate="string(/form/message/body/part[2]/part/html/body/p[1])"/>
     <xforms:bind nodeset="/form/message/body/part[2]/part/html/head/title" calculate="string(/form/message/subject)"/>
+    <!-- Mark irrelevant nodes (to support optional fields) -->
     <xforms:bind nodeset="/form/message/cc" relevant="normalize-space(/form/message/cc/email) != ''"/>
 </xforms:model>

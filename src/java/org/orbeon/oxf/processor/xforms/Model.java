@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ *  Copyright (C) 2004 - 2005 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -325,7 +325,14 @@ public class Model {
         return ret;
     }
     
-    private void validateElement( final org.dom4j.Element elt, final Acceptor acc ) {
+    private void handleIDErrors( final IDConstraintChecker icc ) {
+        for ( ErrorInfo errInf = icc.clearErrorInfo(); errInf != null; errInf = icc.clearErrorInfo() ) {
+            addSchemaError( errInf.element, errInf.message );
+        }
+    }
+    
+    private void validateElement
+    ( final org.dom4j.Element elt, final Acceptor acc, final IDConstraintChecker icc ) {
         final String nsURI = elt.getNamespaceURI();
         final String nam = elt.getName();
         final String qnam = elt.getQualifiedName();
@@ -345,13 +352,18 @@ public class Model {
         
         final StringRef sr = new StringRef();
         final Acceptor chldAcc = getChildAcceptor( elt, si, acc, sr );
+        icc.onNextAcceptorReady( si, chldAcc, elt );
+        handleIDErrors( icc );
         
         final int charCare = chldAcc.getStringCareLevel();
-        validateChildren( elt, chldAcc, si, charCare );
+        final DatatypeRef dref = new DatatypeRef();
+        validateChildren( elt, chldAcc, si, charCare, icc, dref );
         if ( !chldAcc.isAcceptState( null ) ) {
             chldAcc.isAcceptState( sr );
             addSchemaError( elt, sr.str );
         }
+        icc.endElement( elt, dref.types );
+        handleIDErrors( icc );
         if ( !acc.stepForward( chldAcc, null ) ) {
             acc.stepForward( chldAcc, sr );
             addSchemaError( elt, sr.str );
@@ -364,10 +376,12 @@ public class Model {
      * it break the ability to access the attribs by index.
      */
     private void validateChildren
-    ( final org.dom4j.Element elt, final Acceptor acc, final StartTagInfo si, final int charCare ) {
+    ( final org.dom4j.Element elt, final Acceptor acc, final StartTagInfo si, final int charCare
+      , final IDConstraintChecker icc, final DatatypeRef dref ) {
         
         final int end = si.attributes.getLength();
         final StringRef sr = new StringRef();
+        final DatatypeRef attDRef = new DatatypeRef();
         for ( int i = 0; i < end; i++ ) {
             final String uri = si.attributes.getURI( i );
             if ( Constants.XXFORMS_NAMESPACE_URI.equals( uri ) ) continue;
@@ -375,11 +389,14 @@ public class Model {
             final String qNam = si.attributes.getQName( i );
             final String val = si.attributes.getValue( i );
             
-            if ( !acc.onAttribute2( uri, nam, qNam, val, si.context, null, ( DatatypeRef )null ) ) {
+            if ( !acc.onAttribute2( uri, nam, qNam, val, si.context, null, attDRef ) ) {
                 final org.dom4j.Attribute att = elt.attribute( i );
                 acc.onAttribute2( uri, nam, qNam, val, si.context, sr, ( DatatypeRef )null );
                 addSchemaError( att, sr.str );
             }
+            final org.dom4j.Attribute att = elt.attribute( i );
+            icc.feedAttribute( acc, att, attDRef.types );
+            handleIDErrors( icc );
         }
         if ( !acc.onEndAttributes( si, null ) ) {
             acc.onEndAttributes( si, sr );
@@ -387,7 +404,7 @@ public class Model {
         }
         for ( final java.util.Iterator itr = elt.elementIterator(); itr.hasNext(); ) {
             final org.dom4j.Element chld = ( org.dom4j.Element )itr.next();
-            validateElement( ( org.dom4j.Element )chld, acc ); 
+            validateElement( ( org.dom4j.Element )chld, acc, icc ); 
         }
         // If we just iterate over nodes, i.e. use nodeIterator() ) then validation of char data
         // ends up being incorrect.  Specifically elements of type xs:string end up being invalid
@@ -396,19 +413,21 @@ public class Model {
         switch ( charCare ) {
             case Acceptor.STRING_IGNORE : {
                 if ( txt.length() > 0 ) {
-                   addSchemaError( elt, sr.str );
-              }
-              break;
+                    addSchemaError( elt, sr.str );
+                }
+                dref.types = null;
+                break;
             }
             case Acceptor.STRING_PROHIBITED : {
                 final String trmd = txt.trim();
                 if ( trmd.length() > 0 ) {
                     addSchemaError( elt, sr.str );
                 }
+                dref.types = null;
                 break;
             }
             case Acceptor.STRING_STRICT : {
-                if ( !acc.onText2( txt, si.context, null, null ) ) {
+                if ( !acc.onText2( txt, si.context, null, dref ) ) {
                     acc.onText2( txt, si.context, sr, null );
                     addSchemaError( elt, sr.str );
                 }
@@ -456,7 +475,10 @@ public class Model {
                 final REDocumentDeclaration rdd = new REDocumentDeclaration( grmr );
                 final Acceptor acc = rdd.createAcceptor();
                 final org.dom4j.Element relt = doc.getRootElement();
-                validateElement( relt, acc );
+                final IDConstraintChecker icc = new IDConstraintChecker();
+                validateElement( relt, acc, icc );
+                icc.endDocument();
+                handleIDErrors( icc );
                 
             } catch ( final java.io.IOException e ) {
                 throw new OXFException( e );

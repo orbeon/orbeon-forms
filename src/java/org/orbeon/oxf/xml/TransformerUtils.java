@@ -149,20 +149,15 @@ public class TransformerUtils {
     public static Transformer getXMLIdentityTransformer() {
         try {
             Transformer transformer = getFactory(IDENTITY_TYPE).newTransformer();
-            applyXMLOutputProperties(transformer);
+            transformer.setOutputProperty(OutputKeys.ENCODING, DEFAULT_OUTPUT_ENCODING);
+            transformer.setOutputProperty(OutputKeys.METHOD, "xml");
+            transformer.setOutputProperty(OutputKeys.VERSION, "1.0");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty(INDENT_AMOUNT, "1");
             return transformer;
         } catch (Exception e) {
             throw new OXFException(e);
         }
-    }
-
-    private static void applyXMLOutputProperties(Transformer transformer) {
-        transformer.setOutputProperty(OutputKeys.ENCODING, DEFAULT_OUTPUT_ENCODING);
-        transformer.setOutputProperty(OutputKeys.METHOD, "xml");
-        transformer.setOutputProperty(OutputKeys.VERSION, "1.0");
-        transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty(INDENT_AMOUNT, "0");
-//        transformer.setOutputProperty(XALAN_CONTENT_HANDLER, "orbeon.apache.xml.serializer.ToXMLStream");
     }
 
     public static void applyOutputProperties(Transformer transformer,

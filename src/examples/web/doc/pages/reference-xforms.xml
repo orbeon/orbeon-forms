@@ -1,10 +1,4 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<!DOCTYPE document [
-    <!ENTITY full "<td style='background: #66FF99'>Fully supported</td>">
-    <!ENTITY partial "<td style='background: #99FFCC'>Partially supported</td>">
-    <!ENTITY future "<td style='background: #FFCC99'>Not supported yet</td>">
-    <!ELEMENT document (ANY)>
-]>
 <!--
     Copyright (C) 2004 Orbeon, Inc.
 
@@ -21,6 +15,12 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
+<!DOCTYPE document [
+    <!ENTITY full "<td style='background: #66FF99'>Fully supported</td>">
+    <!ENTITY partial "<td style='background: #99FFCC'>Partially supported</td>">
+    <!ENTITY future "<td style='background: #FFCC99'>Not supported yet</td>">
+    <!ELEMENT document (ANY)>
+]>
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <header>
         <title>XForms</title>

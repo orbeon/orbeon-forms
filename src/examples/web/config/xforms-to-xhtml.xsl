@@ -215,7 +215,7 @@
     </xsl:template>
 
     <!-- Alert -->
-    <xsl:template match="xforms:*[@xxforms:valid = 'false' and local-name() != 'group']" priority="3">
+    <xsl:template match="xforms:*[@xxforms:valid = 'false' and local-name() != 'group']" priority="4">
         <xsl:param name="show-errors" tunnel="yes"/>
         <xsl:choose>
             <xsl:when test="$show-errors = 'false'">
@@ -254,7 +254,7 @@
     </xsl:template>
 
     <!-- Help, Hint -->
-    <xsl:template match="xforms:*[xforms:help]" priority="2">
+    <xsl:template match="xforms:*[xforms:help]" priority="3">
         <xhtml:table border="0" cellpadding="0" cellspacing="0" style="margin: 0px">
             <xhtml:tr>
                 <!-- Display control -->
@@ -294,7 +294,7 @@
         </xhtml:table>
     </xsl:template>
 
-    <xsl:template match="xforms:*[xforms:hint]" priority="4">
+    <xsl:template match="xforms:*[xforms:hint]" priority="5">
         <xsl:variable name="content"><xsl:next-match/></xsl:variable>
         <xhtml:div title="{xforms:hint}" style="padding: 0px; margin: 0px">
             <xsl:copy-of select="$content"/>
@@ -343,8 +343,24 @@
     </xsl:template>
 
     <!-- Do not render if non-relevant -->
-    <xsl:template match="xforms:*[@xxforms:relevant = 'false']" priority="4">
+    <xsl:template match="xforms:*[@xxforms:relevant = 'false']" priority="6">
         <xsl:apply-templates select="." mode="no-rendering"/>
+    </xsl:template>
+    
+    <!-- Just display value if readonly -->
+    <xsl:template match="xforms:*[@xxforms:readonly = 'true']" priority="2">
+    	<xsl:variable name="value" select="@xxforms:value"/>
+    	<xsl:choose>
+			<xsl:when test="local-name() = 'select1'">
+				<xsl:value-of select=".//xforms:item[xforms:value = $value]/xforms:label"/>
+			</xsl:when>
+			<xsl:when test="local-name() = 'select'">
+				<xsl:value-of select="string-join(.//xforms:item[xforms:value = tokenize($value, ' ')]/xforms:label, ', ')"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="@xxforms:value"/>
+			</xsl:otherwise>
+    	</xsl:choose>
     </xsl:template>
 
     <!-- If we do not render a control, we need to output a hidden field instead -->

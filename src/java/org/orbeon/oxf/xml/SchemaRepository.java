@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.portlet.processor.PortletContainerProcessor;
 import org.orbeon.oxf.portlet.processor.PortletIncludeGenerator;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.scratchpad.PDFTemplateProcessor;
 import org.orbeon.oxf.processor.converter.JFreeChartConverter;
 import org.orbeon.oxf.processor.converter.XMLConverter;
 import org.orbeon.oxf.processor.converter.XSLFOConverter;
@@ -103,6 +104,8 @@ public class SchemaRepository {
         // XML:DB schemas
         schemas.put(XMLDBProcessor.XMLDB_DATASOURCE_URI, PROCESSORS_SCHEMA_PATH + "xmldb/xmldb-processor-datasource.rng");
         schemas.put(XMLDBProcessor.XMLDB_QUERY_URI, PROCESSORS_SCHEMA_PATH + "xmldb/xmldb-processor-query.rng");
+
+        schemas.put(PDFTemplateProcessor.PDF_TEMPLATE_MODEL_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "scratchpad/pdf-template-model.rng");
 
         schemas.put(Constants.XFORMS_NAMESPACE_URI + "/controls", "schemas/xforms-controls.rng");
         schemas.put(Constants.XFORMS_NAMESPACE_URI + "/model", "schemas/xforms-1_0.xsd");

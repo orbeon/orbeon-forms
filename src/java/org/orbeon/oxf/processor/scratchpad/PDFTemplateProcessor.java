@@ -32,14 +32,18 @@ import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * The PDF Template processor reads a PDF template and performs textual annotations on it.
+ */
 public class PDFTemplateProcessor extends HttpBinarySerializer {
 
     static private Logger logger = LoggerFactory.createLogger(PDFTemplateProcessor.class);
 
     public static String DEFAULT_CONTENT_TYPE = "application/pdf";
+    public static final String PDF_TEMPLATE_MODEL_NAMESPACE_URI = "http://www.orbeon.com/oxf/pdf-template/model";
 
     public PDFTemplateProcessor() {
-        addInputInfo(new ProcessorInputOutputInfo("model"));
+        addInputInfo(new ProcessorInputOutputInfo("model", PDF_TEMPLATE_MODEL_NAMESPACE_URI));
         addInputInfo(new ProcessorInputOutputInfo("instance"));
     }
 
@@ -100,8 +104,10 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                         // Get value from instance
                         String text = XPathUtils.selectStringValue(instanceDocument, ref, namespaceMap);
 
+                        // Iterate over characters and print them
                         if (text != null) {
-                            for (int j = 0; j < text.length(); j++)
+                            int len = Math.min(text.length(), (size != null) ? Integer.parseInt(size) : Integer.MAX_VALUE);
+                            for (int j = 0; j < len; j++)
                                 cb.showTextAligned(PdfContentByte.ALIGN_CENTER, text.substring(j, j + 1), xPosition + ((float) j) * space, yPosition, 0);
                         }
                     }

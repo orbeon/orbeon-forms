@@ -463,7 +463,6 @@
                 </section>
             </section>
         </section>
-        <!--
         <anchor id="yim"/>
         <section>
             <title>Yahoo Instant Messaging Processor</title>
@@ -592,6 +591,5 @@
                 </xml-source>
             </section>
         </section>
-        -->
     </body>
 </document>

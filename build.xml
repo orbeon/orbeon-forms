@@ -202,7 +202,7 @@
                 <include name="jfreechart*"/>
                 <include name="jcommon*"/>
                 <include name="activation-1_0_2.jar"/>
-                <!--        <include name="ymsg9-v0_51.jar"/>-->
+                <include name="ymsg9-v0_51.jar"/>
                 <include name="jtidy-04aug2000r7.jar"/>
                 <include name="kawa-1_7.jar"/>
                 <include name="mondrian-0_5_orbeon.jar"/>

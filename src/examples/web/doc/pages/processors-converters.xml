@@ -116,7 +116,11 @@
                     </tr>
                     <tr>
                         <td>indent</td>
-                        <td>Specifies if the output is indented</td>
+                        <td>
+                            Specifies if the output is indented. This means that line breaks maybe
+                            be inserted between adjacent elements. The actual level of indentation
+                            is specified with the <code>indent-amount</code> configuration element.
+                        </td>
                         <td>true (ignored for text method)</td>
                     </tr>
                     <tr>

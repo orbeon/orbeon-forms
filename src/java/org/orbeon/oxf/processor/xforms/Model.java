@@ -302,22 +302,20 @@ public class Model {
                 if (modelBind.getConstraint() != null) {
                     iterateNodeSet(documentWrapper, modelBind, new NodeHandler() {
                         public void handleNode(Node node) {
-                            if (XFormsUtils.getInstanceData(node).getValid().get()) {
-                                // Evaluate constraint
-                                String xpath = "boolean(" + modelBind.getConstraint() + ")";
-                                PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                                        documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
-                                        xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
+                            // Evaluate constraint
+                            String xpath = "boolean(" + modelBind.getConstraint() + ")";
+                            PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                                    documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
+                                    xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
 
-                                try {
-                                    Boolean valid = (Boolean)expr.evaluateSingle();
-                                    markValidity(valid.booleanValue(), node, modelBind.getId());
-                                } catch (XPathException e) {
-                                    throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
-                                } finally {
-                                    if(expr != null)
-                                        expr.returnToPool();
-                                }
+                            try {
+                                Boolean valid = (Boolean)expr.evaluateSingle();
+                                markValidity(valid.booleanValue(), node, modelBind.getId());
+                            } catch (XPathException e) {
+                                throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
+                            } finally {
+                                if(expr != null)
+                                    expr.returnToPool();
                             }
                         }
                     });

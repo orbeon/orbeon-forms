@@ -1044,7 +1044,7 @@
             </p:config>
         </input>
         <output name="data">
-    <instance xxforms:invalid-bind-ids="a b d" xxforms:valid="false"/>
+            <instance xxforms:invalid-bind-ids="a b d" xxforms:valid="false"/>
         </output>
     </test>
     

@@ -118,9 +118,9 @@
             </answers>
         </input>
         <output name="data">
-            <answers xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+            <answers>
                 <ultimate-answer-1>
-                    <text xsi:type="xsd:string">42</text>
+                    <text xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xsd:string">42</text>
                 </ultimate-answer-1>
                 <ultimate-answer-2>Congratulations John!</ultimate-answer-2>
             </answers>

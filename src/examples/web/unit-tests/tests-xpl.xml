@@ -975,45 +975,45 @@
         </output>
     </test>
 
-    <test description="Checking that each processor is only executed once" name="oxf:pipeline">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                <p:param name="result" type="output"/>
-                <p:processor name="oxf:identity">
-                    <p:input name="data"><x/></p:input>
-                    <p:output name="data" id="tmp" ref="result" debug="TRACE"/>
-                </p:processor>
-                <p:processor name="oxf:null-serializer">
-                    <p:input name="data" href="#tmp"/>
-                </p:processor>
-            </p:config>
-        </input>
-        <output name="result">
-            <y/>
-        </output>
-    </test>
-
-    <test description="Checking that each processor is only executed once" name="oxf:pipeline" only="true">
-        <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
-                <p:param name="result" type="output"/>
-                <p:processor name="oxf:scope-generator">
-                    <p:input name="config">
-                        <config>
-                            <key>xpl-unique</key>
-                            <scope>application</scope>
-                        </config>
-                    </p:input>
-                    <p:output name="data" id="tmp" ref="result" debug="TRACE"/>
-                </p:processor>
-                <p:processor name="oxf:null-serializer">
-                    <p:input name="data" href="#tmp"/>
-                </p:processor>
-            </p:config>
-        </input>
-        <output name="result">
-            <y/>
-        </output>
-    </test>
+<!--    <test description="Checking that each processor is only executed once" name="oxf:pipeline">-->
+<!--        <input name="config">-->
+<!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">-->
+<!--                <p:param name="result" type="output"/>-->
+<!--                <p:processor name="oxf:identity">-->
+<!--                    <p:input name="data"><x/></p:input>-->
+<!--                    <p:output name="data" id="tmp" ref="result" debug="TRACE"/>-->
+<!--                </p:processor>-->
+<!--                <p:processor name="oxf:null-serializer">-->
+<!--                    <p:input name="data" href="#tmp"/>-->
+<!--                </p:processor>-->
+<!--            </p:config>-->
+<!--        </input>-->
+<!--        <output name="result">-->
+<!--            <y/>-->
+<!--        </output>-->
+<!--    </test>-->
+<!---->
+<!--    <test description="Checking that each processor is only executed once" name="oxf:pipeline" only="true">-->
+<!--        <input name="config">-->
+<!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">-->
+<!--                <p:param name="result" type="output"/>-->
+<!--                <p:processor name="oxf:scope-generator">-->
+<!--                    <p:input name="config">-->
+<!--                        <config>-->
+<!--                            <key>xpl-unique</key>-->
+<!--                            <scope>application</scope>-->
+<!--                        </config>-->
+<!--                    </p:input>-->
+<!--                    <p:output name="data" id="tmp" ref="result" debug="TRACE"/>-->
+<!--                </p:processor>-->
+<!--                <p:processor name="oxf:null-serializer">-->
+<!--                    <p:input name="data" href="#tmp"/>-->
+<!--                </p:processor>-->
+<!--            </p:config>-->
+<!--        </input>-->
+<!--        <output name="result">-->
+<!--            <y/>-->
+<!--        </output>-->
+<!--    </test>-->
 
 </group>

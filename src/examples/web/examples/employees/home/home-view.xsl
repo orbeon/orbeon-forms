@@ -102,7 +102,7 @@
             </p>
             <h2>Using the Application</h2>
             <p>
-                Follow the "Employees" tab on the left side bar.
+                Follow the "Employees" tab to enter the application.
             </p>
         </div>
     </body>

@@ -36,12 +36,9 @@
           xforms="list-employees/list-employees-xforms-model.xml"
           model="list-employees/list-employees-model.xpl"
           view="list-employees/list-employees-view.xsl">
-        <action when="/*/action = 'import'" action="import/import-employees.xpl">
-        </action>
-        <action when="/*/action = 'cvs-export'" action="import/import-employees.xpl">
-        </action>
+        <action when="/*/action = 'import'" action="import/import-employees.xpl"/>
         <action when="/*/action = 'export-excel'">
-            <result page="export-excel"/>
+            <result page="export-excel" instance-passing="redirect-exit-portal"/>
         </action>
         <action when="/*/action = 'excel-import'">
             <result page="excel-import"/>
@@ -67,8 +64,7 @@
             <result page="list-employees"/>
         </action>
         <action when="/*/action = 'export-csv'">
-            <result page="export-csv" instance-passing="redirect">
-            </result>
+            <result page="export-csv"  instance-passing="redirect-exit-portal"/>
         </action>
     </page>
     

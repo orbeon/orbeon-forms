@@ -296,19 +296,19 @@ public class Model {
             Attribute attribute = element.attribute(Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME);
             if (instanceData.getInvalidBindIds() != null || attribute != null) {
                 // Merge
-                final String invalidBinds;
+                String invalidBinds = "";
                 {
-                    StringBuffer invalidBindsBuffer = new StringBuffer();
+                    Map invalidBindsMap = new HashMap();
                     if (instanceData.getInvalidBindIds() != null) {
-                        invalidBindsBuffer.append(instanceData.getInvalidBindIds());
+                        invalidBindsMap.put(instanceData.getInvalidBindIds(), null);
                     }
                     if (attribute != null) {
                         if (attribute.getValue().length() > 0) {
-                            invalidBindsBuffer.append(' ');
-                            invalidBindsBuffer.append(attribute.getValue());
+                            invalidBindsMap.put(attribute.getValue(), null);
                         }
                     }
-                    invalidBinds = invalidBindsBuffer.toString();
+                    for(Iterator i=invalidBindsMap.keySet().iterator(); i.hasNext();)
+                        invalidBinds = invalidBinds + (String)i.next();
                 }
 
                 // Put in DOM and attribute

@@ -17,7 +17,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import org.dom4j.Document;
 import org.orbeon.oxf.processor.SimpleProcessor;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.pipeline.PipelineContext;
+//import org.orbeon.oxf.processor.pipeline.PipelineContext;
 
 public class DeepThoughtProcessor extends SimpleProcessor {
 
@@ -26,19 +26,19 @@ public class DeepThoughtProcessor extends SimpleProcessor {
         addOutputInfo(new ProcessorInputOutputInfo("double"));
     }
 
-    public void generateDouble(PipelineContext context, ContentHandler contentHandler) throws SAXException {
-
-        // Get number from input using DOM4J
-        Document numberDocument = readInputAsDOM4J(context, "number");
-        String numberString = (String) numberDocument.selectObject("string(/number)");
-        int number = Integer.parseInt(numberString);
-        String doubleString = Integer.toString(number * 2);
-
-        // Generate output document with SAX
-        contentHandler.startDocument();
-        contentHandler.startElement("", "number", "number", new AttributesImpl());
-        contentHandler.characters(doubleString.toCharArray(), 0, doubleString.length());
-        contentHandler.endElement("", "number", "number");
-        contentHandler.endDocument();
-    }
+//    public void generateDouble(PipelineContext context, ContentHandler contentHandler) throws SAXException {
+//
+//        // Get number from input using DOM4J
+//        Document numberDocument = readInputAsDOM4J(context, "number");
+//        String numberString = (String) numberDocument.selectObject("string(/number)");
+//        int number = Integer.parseInt(numberString);
+//        String doubleString = Integer.toString(number * 2);
+//
+//        // Generate output document with SAX
+//        contentHandler.startDocument();
+//        contentHandler.startElement("", "number", "number", new AttributesImpl());
+//        contentHandler.characters(doubleString.toCharArray(), 0, doubleString.length());
+//        contentHandler.endElement("", "number", "number");
+//        contentHandler.endDocument();
+//    }
 }

@@ -249,7 +249,6 @@ public class XPathUtils {
      *     /{http://www.example.com/x}x:a/{http://www.example.com/y}y:b
      */
     public static org.dom4j.XPath xpathWithFullURI(org.dom4j.Node node, String xpath) {
-
         // Replace URI by prefix in XPath expression
         Map uriToPrefixMap = new HashMap();
         Map prefixToURIMap = new HashMap();
@@ -340,6 +339,18 @@ public class XPathUtils {
     public static String putNamespaceInName(String uri, String name, boolean isAttribute) {
 //        if (isAttribute) {
             return "".equals(uri) ? name : "{" + uri + "}" + name;
+//        } else {
+//            int colonPosition = name.indexOf(":");
+//            String localName = colonPosition == -1 ? name : name.substring(colonPosition + 1);
+//            return "".equals(uri) ? name : "{" + uri + "}" + localName;
+//        }
+    }
+    public static String putNamespaceInName(String uri, String prefix, String name, boolean isAttribute) {
+//        if (isAttribute) {
+        if(prefix != null && !"".equals(prefix))
+            return "".equals(uri) ? name : "{" + uri + "}" + prefix + ":" + name;
+        else
+            return putNamespaceInName(uri, name, isAttribute);
 //        } else {
 //            int colonPosition = name.indexOf(":");
 //            String localName = colonPosition == -1 ? name : name.substring(colonPosition + 1);

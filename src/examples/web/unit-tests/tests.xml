@@ -1898,6 +1898,134 @@
         </output>
     </test>
 
+    <test description="XForms NS Prefixes" name="oxf:pipeline">
+        <input name="config" xmlns:a="http://orbeon.com/a" xmlns:b="http://orbeon.com/b" xmlns:c="http://orbeon.com/c">
+            <p:config>
+                <p:param type="output" name="out"/>
+
+                <p:processor uri="oxf/processor/identity">
+                    <p:input name="data">
+                        <xforms:model id="form">
+                            <xforms:submission method="post"/>
+                            <xforms:instance>
+                                <form>
+                                    <a:claim>
+                                        <b:person>
+                                            <c:name>
+                                                <a:first/>
+                                                <b:last/>
+                                            </c:name>
+                                        </b:person>
+                                        <c:address>
+                                            <a:street/>
+                                            <b:city/>
+                                            <c:state/>
+                                            <zip/>
+                                            <country/>
+                                        </c:address>
+                                    </a:claim>
+                                </form>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="model"/>
+                </p:processor>
+
+                <p:processor uri="oxf/processor/identity">
+                    <p:input name="data">
+                        <form>
+                            <a:claim>
+                                <b:person>
+                                    <c:name>
+                                        <a:first>John</a:first>
+                                        <b:last>Smith</b:last>
+                                    </c:name>
+                                </b:person>
+                                <c:address>
+                                    <a:street>850 N. Shoreline Blvd</a:street>
+                                    <b:city>Mountain View</b:city>
+                                    <c:state>CA</c:state>
+                                    <zip>94043</zip>
+                                    <country>USA</country>
+                                </c:address>
+                            </a:claim>
+                        </form>
+                    </p:input>
+            <p:output name="data" id="instance"/>
+                </p:processor>
+
+
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model" href="#model"/>
+                    <p:input name="instance" href="#instance"/>
+                    <p:input name="data">
+                        <html>
+                            <xforms:group ref="/form/a:claim">
+                            </xforms:group>
+                        </html>
+                    </p:input>
+                    <p:output name="data" id="xf-out"/>
+                </p:processor>
+
+                <p:processor uri="oxf/processor/xslt-2.0">
+                    <p:input name="data" href="#xf-out"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                            <xsl:template match="/">
+                                <request>
+                                    <parameters>
+                                        <parameter>
+                                            <name>$submitted</name>
+                                            <value>true</value>
+                                        </parameter>
+                                        <xsl:for-each select="//xxforms:hidden">
+                                            <parameter>
+                                                <name><xsl:value-of select="@xxforms:name"/></name>
+                                                <value><xsl:value-of select="@xxforms:value"/></value>
+                                            </parameter>
+                                        </xsl:for-each>
+                                    </parameters>
+                                </request>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="request"/>
+                </p:processor>
+
+                <p:processor name="oxf:xforms-input">
+                     <p:input name="model" href="#model"/>
+                     <p:input name="request" href="#request"/>
+                     <p:input name="filter">
+                          <null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+                     </p:input>
+                     <p:input name="instance" href="#model#xpointer(xforms:model/xforms:instance/form)"/>
+                     <p:output name="data" ref="out"/>
+                 </p:processor>
+
+            </p:config>
+        </input>
+        <output name="out">
+            <form>
+                <a:claim xmlns:a="http://orbeon.com/a">
+                    <b:person xmlns:b="http://orbeon.com/b">
+                        <c:name xmlns:c="http://orbeon.com/c">
+                            <a:first>John</a:first>
+                            <b:last>Smith</b:last>
+                        </c:name>
+                    </b:person>
+                    <c:address xmlns:c="http://orbeon.com/c">
+                        <a:street>850 N. Shoreline Blvd</a:street>
+                        <b:city xmlns:b="http://orbeon.com/b">Mountain View</b:city>
+                        <c:state>CA</c:state>
+                        <zip>94043</zip>
+                        <country>USA</country>
+                    </c:address>
+                </a:claim>
+            </form>
+        </output>
+    </test>
+
+
     <!-- these tests need Tamino to run
     <test description="Tamino Simple Query" name="oxf:tamino-query">
     <input name="config">
@@ -1905,9 +2033,9 @@
     <url>http://localhost/tamino/welcome_4_1_4</url>
     <username>tamino</username>
     <password>password</password>
-                <collection>encyclopedia</collection>
-            </config>
-        </input>
+    <collection>encyclopedia</collection>
+    </config>
+    </input>
         <input name="data">
             <query>
                 /jazzMusician[@ino:id="1"]/name
@@ -2083,52 +2211,52 @@
      </test>
      -->
 
-    <!--
-    <test description="LDAP Processor Search" name="oxf:ldap">
-        <input name="config">
-            <config>
-                <host>localhost</host>
-                <port>7001</port>
-                <bind-dn>cn=Admin</bind-dn>
-                <password>password</password>
-                <root-dn>ou=people, ou=myrealm,dc=mydomain</root-dn>
-                <attribute>cn</attribute>
-                <attribute>wlsMemberOf</attribute>
-                <attribute>description</attribute>
-            </config>
-        </input>
-        <input name="filter">
-            <filter>(uid=jaw)</filter>
-        </input>
-        <output name="data">
-            <results>
-                <result>
-                    <name>uid=jaw</name>
-                    <attribute>
-                        <name>description</name>
-                        <value>John Wickey</value>
-                    </attribute>
-                    <attribute>
-                        <name>wlsMemberOf</name>
-                        <value>cn=msr-users,ou=groups,ou=myrealm,dc=mydomain</value>
-                        <value>cn=msr-bpi-delete-all-person,ou=groups,ou=myrealm,dc=mydomain</value>
+<!--    <test description="LDAP Processor Search" name="oxf:ldap">-->
+<!--        <input name="config">-->
+<!--            <config>-->
+<!--                <host>msr</host>-->
+<!--                <port>7001</port>-->
+<!--                <bind-dn>cn=Admin</bind-dn>-->
+<!--                <password>password</password>-->
+<!--                <root-dn>ou=people, ou=myrealm,dc=mydomain</root-dn>-->
+<!--                <attribute>cn</attribute>-->
+<!--                <attribute>wlsMemberOf</attribute>-->
+<!--                <attribute>description</attribute>-->
+<!--            </config>-->
+<!--        </input>-->
+<!--        <input name="filter">-->
+<!--            <filter>(uid=jaw)</filter>-->
+<!--        </input>-->
+<!--        <output name="data">-->
+<!--            <results>-->
+<!--                <result>-->
+<!--                    <name>uid=jaw</name>-->
+<!--                    <attribute>-->
+<!--                        <name>description</name>-->
+<!--                        <value>John Wickey</value>-->
+<!--                    </attribute>-->
+<!--                    <attribute>-->
+<!--                        <name>wlsMemberOf</name>-->
+<!--                        <value>cn=msr-users,ou=groups,ou=myrealm,dc=mydomain</value>-->
+<!--                        <value>cn=msr-bpi-delete-all-person,ou=groups,ou=myrealm,dc=mydomain</value>-->
+<!---->
+<!--                        <value>cn=msr-bpi-edit-all-person,ou=groups,ou=myrealm,dc=mydomain</value>-->
+<!--                        <value>cn=msr-bpi-delete-orgs,ou=groups,ou=myrealm,dc=mydomain</value>-->
+<!--                        <value>cn=msr-bpi-edit-orgs,ou=groups,ou=myrealm,dc=mydomain</value>-->
+<!--                        <value>cn=msr-lih-edit-lodge,ou=groups,ou=myrealm,dc=mydomain</value>-->
+<!--                        <value>cn=msr-lih-view-lodge,ou=groups,ou=myrealm,dc=mydomain</value>-->
+<!--                        <value>cn=msr-lih-delete-lodge,ou=groups,ou=myrealm,dc=mydomain</value>-->
+<!--                    </attribute>-->
+<!--                    <attribute>-->
+<!--                        <name>cn</name>-->
+<!--                        <value>jaw</value>-->
+<!--                    </attribute>-->
+<!--                </result>-->
+<!--            </results>-->
+<!--        </output>-->
+<!--    </test>-->
 
-                        <value>cn=msr-bpi-edit-all-person,ou=groups,ou=myrealm,dc=mydomain</value>
-                        <value>cn=msr-bpi-delete-orgs,ou=groups,ou=myrealm,dc=mydomain</value>
-                        <value>cn=msr-bpi-edit-orgs,ou=groups,ou=myrealm,dc=mydomain</value>
-                        <value>cn=msr-lih-edit-lodge,ou=groups,ou=myrealm,dc=mydomain</value>
-                        <value>cn=msr-lih-view-lodge,ou=groups,ou=myrealm,dc=mydomain</value>
-                        <value>cn=msr-lih-delete-lodge,ou=groups,ou=myrealm,dc=mydomain</value>
-                    </attribute>
-                    <attribute>
-                        <name>cn</name>
-                        <value>jaw</value>
-                    </attribute>
-                </result>
-            </results>
-        </output>
-    </test>
-
+  <!--
     <test description="LDAP Processor Update" name="oxf:ldap">
         <input name="config">
             <config>

@@ -130,9 +130,7 @@ public class Instance {
                     String localName = colonIndex == -1 ? qualifiedName : qualifiedName.substring(colonIndex + 1);
                     qname = namespaceURI == null
                             ? new QName(qualifiedName)
-                            : prefix == null
-                                ? new QName(qualifiedName, new Namespace(null, namespaceURI))
-                                : new QName(localName, new Namespace(null, namespaceURI), qualifiedName);
+                            : new QName(localName, new Namespace(prefix, namespaceURI), qualifiedName);
                     rest = rest.substring(endName);
                 }
 

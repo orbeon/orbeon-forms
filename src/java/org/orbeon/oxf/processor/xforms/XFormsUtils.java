@@ -72,6 +72,7 @@ public class XFormsUtils {
      * element.
      */
     public static String getNameForNode(Node node, boolean annotateElement) {
+
         StringBuffer name = new StringBuffer();
         if (annotateElement)
             XFormsUtils.getInstanceData(node).setGenerated(true);
@@ -92,13 +93,13 @@ public class XFormsUtils {
                         int position = siblings.indexOf(element);
                         name.insert(0, "[" + (position + 1) + "]");
                     }
-                    name.insert(0, XPathUtils.putNamespaceInName(element.getNamespaceURI(), element.getName(), false));
+                    name.insert(0, XPathUtils.putNamespaceInName(element.getNamespaceURI(), element.getNamespacePrefix(), element.getName(), false));
                     node = element.getParent();
                 }
             } else if (node instanceof Attribute) {
                 // Insert attribute name
                 Attribute attribute = (Attribute) node;
-                name.append("@").append(XPathUtils.putNamespaceInName(attribute.getNamespaceURI(), attribute.getQualifiedName(), true));
+                name.append("@").append(XPathUtils.putNamespaceInName(attribute.getNamespaceURI(), attribute.getNamespacePrefix(), attribute.getQualifiedName(), true));
                 node = attribute.getParent();
             } else {
                 throw new OXFException("Only element and attributes can be referenced");

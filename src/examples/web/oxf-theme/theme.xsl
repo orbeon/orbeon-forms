@@ -40,16 +40,20 @@
                     </xsl:choose>
                 </title>
                 <link rel="stylesheet" href="/oxf-theme/orbeon-layout.cssd" type="text/css"/>
-                <xsl:if test="/xhtml:html/xhtml:head/xhtml:style">
+                <!-- Copy user-defined stylesheets -->
+                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:style">
                     <style type="text/css">
-                        <xsl:value-of select="/xhtml:html/xhtml:head/xhtml:style"/>
+                        <xsl:copy-of select="@*"/>
+                        <xsl:value-of select="."/>
                     </style>
-                </xsl:if>
-                <xsl:if test="/xhtml:html/xhtml:head/xhtml:script">
-                    <script type="{/xhtml:html/xhtml:head/xhtml:script/@type}">
-                        <xsl:value-of select="/xhtml:html/xhtml:head/xhtml:script/node()"/>
+                </xsl:for-each>
+                <!-- Copy user-defined scripts -->
+                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
+                    <script>
+                        <xsl:copy-of select="@*"/>
+                        <xsl:value-of select="*"/>
                     </script>
-                </xsl:if>
+                </xsl:for-each>
                 <script type="text/javascript" src="/oxf-theme/style/theme.js"/>
             </head>
             <!-- This gives a little nudge to IE, so IE displays all the borders -->

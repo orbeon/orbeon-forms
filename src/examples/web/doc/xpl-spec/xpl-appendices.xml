@@ -2,7 +2,7 @@
 <back xmlns:xlink="http://www.w3.org/1999/xlink" >
     <div1 id="references">
         <head>References</head>
-        <div2 id="references">
+        <div2 id="normative-references">
             <head>Normative References</head>
             <blist>
                 <bibl id="xml-infoset" href="http://www.w3.org/TR/xml-infoset/" key="XML Infoset" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">

@@ -16,7 +16,7 @@
 <spec w3c-doctype="note" xmlns:xi="http://www.w3.org/2003/XInclude">
     <header>
         <title>XML Pipeline Language (XPL)</title>
-        <version>Version 1.0</version>
+        <version>Version 1.0 (Draft)</version>
         <w3c-designation>NOTE-pipeline-20050214</w3c-designation>
 <!--        <w3c-doctype>W3C Note</w3c-doctype>-->
         <w3c-doctype>Orbeon Draft Note</w3c-doctype>
@@ -56,16 +56,19 @@
         </copyright>
         <abstract>
             <p>
-                This Note describes the features and syntax for the XPL XML Pipeline Language, an
+                This Note describes the syntax and semantics for the XPL XML Pipeline Language, an
                 XML vocabulary for describing a processing model for XML components.
             </p>
         </abstract>
         <status>
             <p>
+                This document is a draft for XPL version 1.0. It does not describe a final 1.0
+                version of the XPL language.
+            </p>
+            <p>
                 This document is currently an internal draft note by Orbeon, Inc. It has not been
                 submitted to the W3C or any other standard body, even though it follows closely the
-                format of a W3C Note or Recommendation. Because it is a draft, it does not
-                necessarily describe the final 1.0 version of the XPL language.
+                format of a W3C Note or Recommendation.
             </p>
         </status>
         <sourcedesc>
@@ -83,11 +86,8 @@
     <body>
         <div1 id="intro">
             <head>Introduction</head>
-            <div2 id="terminology">
+            <div2 id="what-is-xpl">
                 <head>What is XPL?</head>
-                <p>
-                    This specification defines the syntax and semantics of the XPL 1.0 language.
-                </p>
                 <termdef id="xpl-program" term="XPL program">
                     An <term>XPL program</term> or <term>program in the XPL language</term> is a
                     well-formed XML document whose syntax is well-formed XML <bibref ref="xml-10"/>

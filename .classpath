@@ -19,7 +19,6 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-fileupload-1.0.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-httpclient-slide_2_0rc1.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-lang-1_0-b1.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/commons-logging-1_0_3.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-pool-1.1.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-validator-1_0_2.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/dom4j-1_4_orbeon.jar"/>
@@ -74,5 +73,8 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/log4j-1.3alpha0.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/itext-1_02b.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/itext-xml-1_02.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/commons-logging-1_0_4.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/activation-1_0_2.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/mail-1_3_2.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>

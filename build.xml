@@ -200,7 +200,7 @@
         <include name="hsqldb-1_7_1.jar"/>
         <include name="jfreechart*"/>
         <include name="jcommon*"/>
-        <!-- <include name="activation-1_0_2.jar"/> --> <!-- Tomcat 4 has this but not tomcat 5, so put it back -->
+        <include name="activation-1_0_2.jar"/>
 <!--        <include name="ymsg9-v0_51.jar"/>-->
         <include name="jtidy-04aug2000r7.jar"/>
         <include name="kawa-1_7.jar"/>
@@ -230,7 +230,7 @@
         <include name="xmldb-eXist_20040510.jar"/>
         <include name="xmlrpc-1_2_eXist_20041005_patched.jar"/>
         <include name="jms-api-1_1.jar"/>
-        <include name="mailapi-1_3_2.jar"/>
+        <include name="mail-1_3_2.jar"/>
         <include name="itext-1_02b.jar"/>
         <include name="itext-xml-1_02.jar"/>
       </fileset>
@@ -336,6 +336,7 @@
       <classpath>
         <path refid="class.path"/>
         <pathelement location="${build.test-classes.dir}"/>
+      	<!-- FWIW tomcat 5 doesn't include this jar. -->
         <pathelement location="${tomcat.dir}/common/lib/mailapi-1_3_2.jar"/>
       </classpath>
     </junit>
@@ -354,6 +355,7 @@
       <classpath>
         <path refid="class.path"/>
         <pathelement location="${build.test-classes.dir}"/>
+      	<!-- FWIW tomcat 5 doesn't include this jar. -->
         <pathelement location="${tomcat.dir}/common/lib/mailapi-1_3_2.jar"/>
       </classpath>
     </junit>

@@ -238,4 +238,25 @@ public class XIncludeParserConfiguration extends XML11Configuration {
 
         super.setProperty(propertyId, value);
     } // setProperty(String,Object)
+    
+    public java.util.Collection getRecognizedFeatures() {
+    	final java.util.TreeSet ret = new java.util.TreeSet();
+    	ret.addAll( fRecognizedFeatures );
+    	// Xerces uses PARSER_SETTINGS internally and makes sure that nothing
+    	// from outside Xerces passes it in.  But we are exposing features collection
+    	// here so need to remove PARSER_SETTING in case the feature set is passed
+    	// back in to Xerces.
+    	ret.remove( PARSER_SETTINGS );
+    	return ret;
+    	
+    }
+    public java.util.Map getFeatures() {
+    	// Xerces uses PARSER_SETTINGS internally and makes sure that nothing
+    	// from outside Xerces passes it in.  But we are exposing features collection
+    	// here so need to remove PARSER_SETTING in case the feature set is passed
+    	// back in to Xerces.
+    	final java.util.TreeMap ret = new java.util.TreeMap( fFeatures );
+    	ret.remove( PARSER_SETTINGS );
+    	return ret;
+    }
 }

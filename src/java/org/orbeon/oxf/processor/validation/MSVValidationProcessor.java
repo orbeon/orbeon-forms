@@ -58,6 +58,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
 
     public static DOMGenerator NO_DECORATION_CONFIG;
     public static DOMGenerator DECORATION_CONFIG;
+    private static final SAXParserFactory factory;
 
     static {
         NO_DECORATION_CONFIG = new DOMGenerator(new DocumentDelegate(new ElementDelegate("config") {{
@@ -70,6 +71,18 @@ public class MSVValidationProcessor extends ProcessorImpl {
                 setText("true");
             }});
         }}));
+        // 02/06/2004 d : Make sure to print stack trace here because
+        //                otherwise info will just show up as an 
+        //                ExceptionInInitializerError.
+        try {
+            factory = XMLUtils.createSAXParserFactory( false );
+        } catch ( final Error e ) {
+            e.printStackTrace();
+            throw e;
+        } catch ( final RuntimeException e ) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
 
@@ -78,14 +91,6 @@ public class MSVValidationProcessor extends ProcessorImpl {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_SCHEMA));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
-    }
-
-    // This factory is used by this class only. We synchronize around it later.
-    private static SAXParserFactory factory = null;
-    private static synchronized SAXParserFactory getFactory() {
-        if (factory == null)
-            factory = XMLUtils.createSAXParserFactory(false);
-        return factory;
     }
 
     /**
@@ -119,7 +124,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
                                         LocationData locator = (LocationData) schemaDoc.getRootElement().getData();
                                         final String schemaSystemId = (locator != null && locator.getSystemID() != null) ? locator.getSystemID() : null;
                                         // Be sure to set our own XML parser factory
-                                        VerifierFactory verifierFactory = new TheFactoryImpl(getFactory());
+                                        VerifierFactory verifierFactory = new TheFactoryImpl(factory);
                                         verifierFactory.setEntityResolver(new EntityResolver() {
                                             public InputSource resolveEntity(String publicId,
                                                                              String systemId)

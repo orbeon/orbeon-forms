@@ -139,7 +139,7 @@ public class XMLUtils {
             }
         }
     }
-
+    
     /**
      * Create a new SAX parser factory.
      *
@@ -147,11 +147,7 @@ public class XMLUtils {
      */
     public static SAXParserFactory createSAXParserFactory(boolean validating) {
         try {
-            SAXParserFactory factory = (SAXParserFactory) Class.forName
-                    ("orbeon.apache.xerces.jaxp.SAXParserFactoryImpl").newInstance();
-            factory.setFeature("http://xml.org/sax/features/namespaces", true);
-            factory.setFeature("http://xml.org/sax/features/namespace-prefixes", false);
-            factory.setNamespaceAware(true); // this is needed by some tools in addition to the feature
+            SAXParserFactory factory = new XercesSAXParserFactoryImpl();
             factory.setValidating(validating);
             return factory;
         } catch (Exception e) {

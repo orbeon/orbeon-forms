@@ -304,47 +304,16 @@ public class RequestGenerator extends ProcessorImpl {
     }
 
     private Document readRequestAsDOM4J(PipelineContext pipelineContext, Node config) {
-        try {
-            // Get complete request document from pipeline context, or create it if not there
-            Context context = getContext(pipelineContext);
-            if (context.wholeRequest == null)
-                context.wholeRequest = readWholeRequestAsDOM4J(pipelineContext);
-            Document result = (Document) context.wholeRequest.clone();
+        // Get complete request document from pipeline context, or create it if not there
+        Context context = getContext(pipelineContext);
+        if (context.wholeRequest == null)
+            context.wholeRequest = readWholeRequestAsDOM4J(pipelineContext);
+        Document result = (Document) context.wholeRequest.clone();
 
-            // Filter the request based on the config input
-            filterRequestDocument(result, config);
+        // Filter the request based on the config input
+        filterRequestDocument(result, config);
 
-            // Read and parse body and append the body content as XML under /request/body
-
-            // FIXME: This is quite a hack! We only handle XML. We don't handle encodings. Also,
-            // if the body is large, we need to stream. Also, this will conflict with reading
-            // parameters as only request.getInputStream() or request.getReader() may be called, and
-            // only once.
-            if (config.selectSingleNode("/config/include[string(.) = '/request/body']") != null) {
-                ExternalContext.Request request = getRequest(pipelineContext);
-                Reader reader = request.getReader();
-                // Read in String as SAX API only take an InputStream
-                // (we don't want to look charset information)
-                StringBuffer bodyString = new StringBuffer();
-                char[] buffer = new char[1024];
-                while (true) {
-                    int length = reader.read(buffer);
-                    if (length == -1) break;
-                    bodyString.append(buffer, 0, length);
-                }
-                Element bodyElement = result.getRootElement().addElement("body");
-                try {
-                    Document body = DocumentHelper.parseText(bodyString.toString());
-                    bodyElement.add(body.getRootElement());
-                } catch (DocumentException e) {
-                    bodyElement.addAttribute(new QName("nil", new Namespace(XMLUtils.XSI_PREFIX, XMLUtils.XSI_NAMESPACE)), "true");
-                }
-            }
-
-            return result;
-        } catch (IOException e) {
-            throw new OXFException(e);
-        }
+        return result;
     }
 
     private Document readWholeRequestAsDOM4J(PipelineContext context) {

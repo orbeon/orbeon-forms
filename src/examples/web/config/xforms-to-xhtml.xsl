@@ -99,7 +99,7 @@
             <xsl:otherwise>
                 <xhtml:input type="submit" name="{$name}" value="{xforms:label}">
                     <xsl:copy-of select="@* except (@xhtml:onclick | @xxforms:* | @*[namespace-uri() = ''])"/>
-                    <xsl:if test="$message != ''">
+                    <xsl:if test="@xhtml:onclick or $message != ''">
                         <xsl:attribute name="onclick" select="concat(@xhtml:onclick, '; ', $message)"/>
                     </xsl:if>
                 </xhtml:input>

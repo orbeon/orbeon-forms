@@ -786,18 +786,17 @@
         <section>
             <title>Running the BizDoc Tutorial Application</title>
             <p>
-                To install the standalone BizDoc application described in the Presentation Server
-                Tutorial, simply deploy the <code>orbeon-bizdoc.war</code> file in your application
-                server. To do so, follow the installation instructions above depending on your
-                application server, but deploy <code>orbeon-bizdoc.war</code> instead of
-                <code>orbeon.war</code>. You do not have to include the optional steps.
+                To install the standalone BizDoc example application described in the Presentation
+                Server Tutorial, please follow the instructions under <a
+                href="http://www.orbeon.com/community/downloads">Installing Example
+                Applications</a> from the Orbeon web site.
             </p>
-            <p>
-                Access the application using the <code>/orbeon-bizdoc/</code> path from web browser.
-                For example, if you application server is running on your local host on port 8080,
-                enter <code>http://localhost:8080/orbeon-bizdoc/</code> in the URL bar of your web
-                browser.
-            </p>
+<!--            <p>-->
+<!--                Access the application using the <code>/orbeon-bizdoc/</code> path from web browser.-->
+<!--                For example, if you application server is running on your local host on port 8080,-->
+<!--                enter <code>http://localhost:8080/orbeon-bizdoc/</code> in the URL bar of your web-->
+<!--                browser.-->
+<!--            </p>-->
         </section>
         <anchor id="security"/>
         <section>

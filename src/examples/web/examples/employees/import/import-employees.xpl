@@ -22,16 +22,16 @@
     <p:processor name="oxf:url-generator">
         <p:input name="config">
             <config>
-                <url>oxf:/examples/employees/import/people.txt</url>
+                <url>people.txt</url>
                 <content-type>text/plain</content-type>
             </config>
         </p:input>
-        <p:output name="data" id="file"/>
+        <p:output name="data" id="file" debug="xxx"/>
     </p:processor>
 
     <p:processor name="oxf:java">
         <p:input name="config">
-            <config sourcepath="oxf:/examples/employees/import" class="ParseLines"/>
+            <config sourcepath="." class="ParseLines"/>
         </p:input>
         <p:input name="data" href="#file"/>
         <p:output name="data" id="lines"/>

@@ -23,7 +23,7 @@
     <!-- List our database tables -->
     <p:processor name="oxf:java">
         <p:input name="config">
-            <config sourcepath="oxf:/init-database" class="ListInitializedTables"/>
+            <config sourcepath="." class="ListInitializedTables"/>
         </p:input>
         <p:input name="datasource" href="../examples/datasource-sql.xml"/>
         <p:output name="data" id="found-tables"/>

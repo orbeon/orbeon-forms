@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry excluding="org/orbeon/faces/|org/orbeon/faces11/|org/orbeon/oxf/common/Version.java|org/orbeon/oxf/resources/Cache*|org/orbeon/oxf/resources/XMLDB*" kind="src" path="src/java"/>
+	<classpathentry including="org/orbeon/oxf/test/**/*.java" kind="src" path="test/src"/>
 	<classpathentry sourcepath="JRE_SRC" kind="var" path="JRE_LIB"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/avalon-framework-cvs-20020315.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/axis-1_1-axis.jar"/>

@@ -25,6 +25,7 @@
             <section>
                 <title>XForms</title>
                 <section>
+                    <anchor id="2.6-xforms"/>
                     <title>XForms Upload</title>
                     <p>
                         The XForms Upload control has been fixed. It comes with an <a
@@ -78,6 +79,7 @@
                 </section>
             </section>
             <section>
+                <anchor id="2.6-binary"/>
                 <title>Standard Representation of Binary and Text Documents</title>
                 <p>
                     In Presentation Server <a href="reference-xpl-pipelines">XPL and pipelines</a>
@@ -97,6 +99,7 @@
                 </p>
             </section>
             <section>
+                <anchor id="2.6-body"/>
                 <title>Improved Request Body and Uploaded Files Support</title>
                 <p>
                     It was possible in the past with the <a
@@ -119,6 +122,7 @@
                 </p>
             </section>
             <section>
+                <anchor id="2.6-url"/>
 				<title>URL Generator</title>
                 <section>
                     <title>Binary Mode</title>
@@ -152,6 +156,7 @@
                 </section>
 			</section>
             <section>
+                <anchor id="2.6-serializer"/>
 				<title>Serializers</title>
 				<section>
                     <title>New Serializer Architecture</title>
@@ -207,6 +212,7 @@
                 </section>
 			</section>
             <section>
+                <anchor id="2.6-examples"/>
                 <title>Examples</title>
                 <section>
                     <title>BizDoc Application Changes</title>
@@ -250,6 +256,7 @@
                 </section>
             </section>
             <section>
+                <anchor id="2.6-pageflow"/>
                 <title>Page Flow</title>
                 <p>
                     XSLT views in <a href="reference-controller">Page Flow</a> can now access the
@@ -260,6 +267,7 @@
                 </p>
             </section>
             <section>
+                <anchor id="2.6-email"/>
                 <title>Email Processor</title>
                 <p>
                     The <a href="processors-messaging#email-processor">Email processor</a> features the
@@ -289,6 +297,7 @@
                 </p>
             </section>
             <section>
+                <anchor id="2.6-custom"/>
                 <title>Custom Processors</title>
                 <p>
                     There is a new facility to declare custom processors that does not involve
@@ -305,6 +314,7 @@
                 </p>
             </section>
             <section>
+                <anchor id="2.6-webdav"/>
                 <title>WebDAV Resource Manager</title>
                 <p>
                     A <a href="reference-resource-managers#webdav">WebDAV resource manager</a> is
@@ -312,6 +322,7 @@
                 </p>
             </section>
             <section>
+                <anchor id="2.6-java5"/>
                 <title>J2SE 5.0 Support</title>
                 <p>
                     The source code of Presentation Server now compiles with Java 5.

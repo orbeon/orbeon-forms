@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="Page Flow" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+
+    <test description="Reverse Params 1" name="oxf:xslt">
+        <input name="config" href="oxf:/oxf/private/page-flow/reverse-params.xsl"/>
+        <input name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>/([^/]*)/([^/]*)/([^/]*)/edit</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                </parameters>
+                <parameters>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </input>
+        <input name="instance">
+            <form>
+                <album-id>123</album-id>
+                <image-id>456</image-id>
+                <object id="789"/>
+            </form>
+        </input>
+        <input name="params">
+            <params>
+                <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/album-id"/>
+                <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/image-id"/>
+                <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/object/@id"/>
+            </params>
+        </input>
+        <output name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>/123/456/789/edit</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                </parameters>
+                <parameters>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </output>
+    </test>
+
+    <test description="Reverse Params 2" name="oxf:xslt">
+        <input name="config" href="oxf:/oxf/private/page-flow/reverse-params.xsl"/>
+        <input name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>([^/]*)abc([^/]*)def([^/]*)</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                </parameters>
+                <parameters>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </input>
+        <input name="instance">
+            <form>
+                <album-id>123</album-id>
+                <image-id>456</image-id>
+                <object id="789"/>
+            </form>
+        </input>
+        <input name="params">
+            <params>
+                <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/album-id"/>
+                <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/image-id"/>
+                <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/object/@id"/>
+            </params>
+        </input>
+        <output name="data">
+            <url-rewrite>
+                <other-config-param-1>This is it 1</other-config-param-1>
+                <path-info>123abc456def789</path-info>
+                <other-config-param-2>This is it 2</other-config-param-2>
+                <parameters>
+                    <parameter>
+                        <name>name1</name>
+                        <value>value1</value>
+                    </parameter>
+                </parameters>
+                <parameters>
+                    <parameter>
+                        <name>name2</name>
+                        <value>value2</value>
+                    </parameter>
+                </parameters>
+            </url-rewrite>
+        </output>
+    </test>
+
+</group>

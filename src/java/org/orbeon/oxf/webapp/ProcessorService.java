@@ -214,7 +214,7 @@ public class ProcessorService {
         } catch (Exception e) {
             logger.error("Unable to load stylesheet error.css while serving static error page. Resuming.", e);
         } finally {
-            styleReader.close();
+            if (styleReader != null) styleReader.close();
         }
         sb.append("</style>");
         sb.append("</head>");

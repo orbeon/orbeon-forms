@@ -11,7 +11,13 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xs:schema targetNamespace="http://www.orbeon.com/oxf/pipeline" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" elementFormDefault="qualified" attributeFormDefault="unqualified" xsi:schemaLocation="http://www.w3.org/2001/XMLSchema http://www.w3.org/2001/XMLSchema.xsd">
+<xs:schema targetNamespace="http://www.orbeon.com/oxf/pipeline" 
+           xmlns:p="http://www.orbeon.com/oxf/pipeline" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+           elementFormDefault="qualified" 
+           attributeFormDefault="unqualified" 
+           xsi:schemaLocation="http://www.w3.org/2001/XMLSchema http://www.w3.org/2001/XMLSchema.xsd"> 
     <xs:element name="config">
         <xs:annotation>
             <xs:documentation>XPL root element</xs:documentation>
@@ -35,6 +41,14 @@
                 <xs:group ref="p:statements"/>
             </xs:sequence>
         </xs:complexType>
+        <xs:key name="params-unique" >
+          <xs:annotation>
+            <xs:documentation>For params the pair ( name, type ) must be unique</xs:documentation>
+          </xs:annotation>
+          <xs:selector xpath="p:param" />
+          <xs:field xpath="@name" />
+          <xs:field xpath="@type" />
+        </xs:key>
     </xs:element>
     <xs:group name="statement">
         <xs:sequence>

@@ -18,6 +18,7 @@ import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.*;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
+import org.dom4j.Namespace;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorInput;
@@ -25,10 +26,14 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.HttpBinarySerializer;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PDFTemplateProcessor extends HttpBinarySerializer {
 
@@ -76,6 +81,8 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                 for (Iterator i = XPathUtils.selectIterator(configDocument, xPath); i.hasNext();) {
                     Element e = (Element) i.next();
 
+                    Map namespaceMap = XMLUtils.getNamespaceContext(e); 
+
                     String leftPosition = e.attributeValue("left-position");
                     String topPosition = e.attributeValue("top-position");
                     String spacing = e.attributeValue("spacing");
@@ -94,7 +101,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                         float space = Float.parseFloat(spacing);
 
                         // Get value from instance
-                        String text = XPathUtils.selectStringValue(instanceDocument, ref);
+                        String text = XPathUtils.selectStringValue(instanceDocument, ref, namespaceMap);
 
                         if (text != null) {
                             for (int j = 0; j < text.length(); j++)

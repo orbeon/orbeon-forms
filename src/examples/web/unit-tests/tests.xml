@@ -277,6 +277,19 @@
         </output>
     </test>
 
+    <!-- TODO: -->
+<!--    <test description="Page Flow Controller: 'when' on 'result' with no action" name="oxf:page-flow" only="true">-->
+<!--        <input name="controller">-->
+<!--            <config xmlns="http://www.orbeon.com/oxf/controller">-->
+<!--                <page path-info="/" model="model.xpl">-->
+<!--                    <action>-->
+<!--                        <result when="true()"/>-->
+<!--                    </action>-->
+<!--                </page>-->
+<!--            </config>-->
+<!--        </input>-->
+<!--    </test>-->
+
 <!--    <test description="URL Serializer" name="oxf:pipeline">-->
 <!--        <input name="data">-->
 <!--            <numbers>-->

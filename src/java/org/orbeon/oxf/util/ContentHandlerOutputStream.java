@@ -84,7 +84,7 @@ public class ContentHandlerOutputStream extends OutputStream {
 
                 // If buffer is full, write it out
                 if (currentBufferSize == byteBuffer.length) {
-                    String encoded = Base64.encode(byteBuffer);
+                    String encoded = Base64.encode(byteBuffer) + "\n";
                     // The terminating LF is already added by encode()
                     encoded.getChars(0, encoded.length(), resultingLine, 0);
                     // Output characters

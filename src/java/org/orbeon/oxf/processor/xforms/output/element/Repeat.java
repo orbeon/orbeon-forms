@@ -34,11 +34,8 @@ public class Repeat extends XFormsElement {
 
     public boolean nextChildren(XFormsElementContext context) throws SAXException {
 
-        String variableName = "v" + context.getElementDepth();
-
         if (firstChild) {
-            context.addRepeatId(repeatId);
-            context.pushGroupRef(context.getRefXPath() + "[$" + variableName + "]");
+            context.startRepeatId(repeatId);
         } else {
             // End group
             super.end(context, Constants.XFORMS_NAMESPACE_URI, "group",
@@ -47,7 +44,7 @@ public class Repeat extends XFormsElement {
 
         if (currentIndex <= lastIndex) {
             // Update context
-            context.setRepeatIdIndex(repeatId, variableName, currentIndex);
+            context.setRepeatIdIndex(repeatId, currentIndex);
 
             // Start group
             AttributesImpl attributes = new AttributesImpl();
@@ -61,8 +58,7 @@ public class Repeat extends XFormsElement {
             firstChild = false;
             return true;
         } else {
-            context.removeRepeatId(repeatId);
-            context.popGroupRef();
+            context.endRepeatId(repeatId);
             return false;
         }
     }
@@ -72,7 +68,7 @@ public class Repeat extends XFormsElement {
         repeatId = attributes.getValue("id");
 
         // Figure out start index
-        nodeset = context.getRefNodeList();
+        nodeset = context.getCurrentNodeset();
         String startindexAttribute = attributes.getValue("startindex");
         currentIndex = startindexAttribute == null ? 1 : Integer.parseInt(startindexAttribute);
 

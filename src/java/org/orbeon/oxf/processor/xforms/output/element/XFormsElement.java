@@ -14,8 +14,6 @@
 package org.orbeon.oxf.processor.xforms.output.element;
 
 import org.dom4j.Node;
-import org.jaxen.NamespaceContext;
-import org.jaxen.SimpleNamespaceContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.xforms.Constants;
@@ -91,7 +89,7 @@ public class XFormsElement {
         if (("if".equals(localname) || "when".equals(localname)) && Constants.XXFORMS_NAMESPACE_URI.equals(uri)) {
             String test = attributes.getValue("test");
             PooledXPathExpression expr = XPathCache.getXPathExpression(context.getPipelineContext(),
-                    context.getDocumentWrapper().wrap(context.getRefNode()),
+                    context.getDocumentWrapper().wrap(context.getCurrentSingleNode()),
                     "boolean(" + test + ")", prefixToURI, context.getRepeatIdToIndex());
             try {
                 Boolean value = (Boolean) expr.evaluateSingle();
@@ -106,11 +104,10 @@ public class XFormsElement {
                 && ("copy".equals(localname) || "label".equals(localname))) {
             // Pass information about the "ref" on the element to the parent "itemset"
             Itemset itemset = (Itemset) context.getParentElement(0);
-            NamespaceContext namespaceContext = new SimpleNamespaceContext(prefixToURI);
             if ("copy".equals(localname)) {
-                itemset.setCopyRef(attributes.getValue("ref"), namespaceContext);
+                itemset.setCopyRef(attributes.getValue("ref"), prefixToURI);
             } else {
-                itemset.setLabelRef(attributes.getValue("ref"), namespaceContext);
+                itemset.setLabelRef(attributes.getValue("ref"), prefixToURI);
             }
         } else {
             // Add annotations about referenced element
@@ -118,25 +115,24 @@ public class XFormsElement {
             boolean refPresent = attributes.getIndex("", "ref") != -1;
             boolean nodesetPresent = attributes.getIndex("", "nodeset") != -1;
             boolean positionPresent = attributes.getIndex(Constants.XXFORMS_NAMESPACE_URI, "position") != -1;
-            if ( refPresent || bindPresent || nodesetPresent || positionPresent) {
-                Node refNode = context.getCurrentNode();
-
-                InstanceData instanceData = context.getRefInstanceData(refNode);
+            if (refPresent || bindPresent || nodesetPresent || positionPresent) {
+                InstanceData currentNodeInstanceData = XFormsUtils.getInstanceData(context.getCurrentSingleNode());
                 addExtensionAttribute(newAttributes, Constants.XXFORMS_READONLY_ATTRIBUTE_NAME,
-                        Boolean.toString(instanceData.getReadonly().get()));
+                        Boolean.toString(currentNodeInstanceData.getReadonly().get()));
                 addExtensionAttribute(newAttributes, Constants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
-                        Boolean.toString(instanceData.getRelevant().get()));
+                        Boolean.toString(currentNodeInstanceData.getRelevant().get()));
                 addExtensionAttribute(newAttributes, Constants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
-                        Boolean.toString(instanceData.getRequired().get()));
+                        Boolean.toString(currentNodeInstanceData.getRequired().get()));
                 addExtensionAttribute(newAttributes, Constants.XXFORMS_VALID_ATTRIBUTE_NAME,
-                        Boolean.toString(instanceData.getValid().get()));
-                if (instanceData.getInvalidBindIds() != null)
-                    addExtensionAttribute(newAttributes, Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME, instanceData.getInvalidBindIds());
+                        Boolean.toString(currentNodeInstanceData.getValid().get()));
+                if (currentNodeInstanceData.getInvalidBindIds() != null)
+                    addExtensionAttribute(newAttributes, Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME, currentNodeInstanceData.getInvalidBindIds());
                 if (DATA_CONTROLS.containsKey(localname)) {
-                    addExtensionAttribute(newAttributes, "name", context.getRefName(refNode, true));
-                    addExtensionAttribute(newAttributes, "value", context.getRefValue(refNode));
+                    currentNodeInstanceData.setGenerated(true);
+                    addExtensionAttribute(newAttributes, "name", "$node^" + Integer.toString(currentNodeInstanceData.getId()));
+                    addExtensionAttribute(newAttributes, "value", context.getRefValue());
                 } else  if (ACTION_CONTROLS.containsKey(localname)) {
-                    addExtensionAttribute(newAttributes, "value", context.getRefValue(refNode));
+                    addExtensionAttribute(newAttributes, "value", context.getRefValue());
                 }
 
                 if(!positionPresent) {
@@ -151,12 +147,11 @@ public class XFormsElement {
                     addExtensionAttribute(newAttributes, Constants.XXFORMS_NODE_IDS_ATTRIBUTE_NAME, ids.toString());
 
                 }
-
             }
 
             if (attributes.getIndex("", "at") != -1) {
                 // Evaluate "at" as a number
-                NodeInfo contextNode = context.getDocumentWrapper().wrap((Node) context.getRefNodeList().get(0));
+                NodeInfo contextNode = context.getDocumentWrapper().wrap(context.getCurrentSingleNode());
                 PooledXPathExpression expr = XPathCache.getXPathExpression(context.getPipelineContext(),
                         contextNode,
                         "round(" + attributes.getValue("at") + ")",
@@ -179,7 +174,7 @@ public class XFormsElement {
             if (attributes.getIndex("", "value") != -1) {
                 // Evaluate "value" as a string
                 PooledXPathExpression expr = XPathCache.getXPathExpression(context.getPipelineContext(),
-                        context.getDocumentWrapper().wrap(context.getCurrentNode()),
+                        context.getDocumentWrapper().wrap(context.getCurrentSingleNode()),
                         "string(" + attributes.getValue("value") + ")",
                         context.getCurrentPrefixToURIMap(),
                         null,

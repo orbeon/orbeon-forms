@@ -18,20 +18,12 @@ import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.Model;
-import org.orbeon.oxf.processor.xforms.XFormsUtils;
-import org.orbeon.oxf.processor.xforms.ModelBind;
-import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.processor.xforms.output.XFormsFunctionLibrary;
-import org.orbeon.oxf.processor.xforms.output.XFormsOutputConfig;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -46,91 +38,70 @@ import java.util.*;
  */
 public class XFormsElementContext {
 
+    private ContentHandler contentHandler;
     private Document instance;
     private Model model;
-    private XFormsOutputConfig config;
-    private ContentHandler contentHandler;
-    private ContentHandlerHelper contentHandlerHelper;
     private Locator locator;
-    private Stack refStack = new Stack();
     private Stack elements = new Stack();
     private Stack nodesetStack = new Stack();
     private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
     private Map repeatIdToIndex = new HashMap();
     private PipelineContext pipelineContext;
     private DocumentWrapper documentWrapper;
-    private Map variablesValue = new HashMap();
     private FunctionLibrary functionLibrary = new XFormsFunctionLibrary(this);
 
-    public XFormsElementContext(PipelineContext pipelineContext, Model model, Document instance,
-                                XFormsOutputConfig config, ContentHandler contentHandler) {
+    public XFormsElementContext(PipelineContext pipelineContext, ContentHandler contentHandler, Model model, Document instance) {
         this.pipelineContext = pipelineContext;
+        this.contentHandler = contentHandler;
         this.model = model;
         this.instance = instance;
-        this.config = config;
-        this.contentHandler = contentHandler;
-        this.contentHandlerHelper = new ContentHandlerHelper(contentHandler);
         this.documentWrapper = new DocumentWrapper(instance, null);
     }
 
-    public void pushRelativeXPath(String ref, String bind) {
+    public void pushRelativeXPath(String bind, String ref, String nodeset) {
         PooledXPathExpression expr = null;
         try {
-            if (ref == null) {
-                if(bind == null) {
-                    // No change to current node
-                    if(nodesetStack.empty())
-                        // no binding: push a dummy element
-                        nodesetStack.push(new ArrayList());
-                    else
-                        nodesetStack.push(getCurrentNodeset());
-                }else{
-                    // Resolve the bind id to a node
-                    nodesetStack.push(model.getBindNodeset(pipelineContext, model.getModelBindById(bind), documentWrapper, instance));
-                }
-            } else {
+            if (bind != null) {
+                // Resolve the bind id to a node
+                nodesetStack.push(model.getBindNodeset(pipelineContext,
+                        model.getModelBindById(bind), documentWrapper, instance));
+            } else if (ref != null || nodeset != null) {
                 // Evaluate new xpath in context of current node
-                expr = XPathCache.getXPathExpression(pipelineContext,
-                        documentWrapper.wrap(getCurrentNode()),
-                        ref,
-                        getCurrentPrefixToURIMap(),
-                        null,
-                        functionLibrary);
-                nodesetStack.push(expr.evaluate());
+                expr = XPathCache.getXPathExpression(pipelineContext, documentWrapper.wrap(getCurrentSingleNode()),
+                        ref != null ? ref : nodeset, getCurrentPrefixToURIMap(), null, functionLibrary);
+                List newNodeset = expr.evaluate();
+                if (ref != null && newNodeset.isEmpty())
+                    throw new ValidationException("Single-node binding expression '"
+                            + ref + "' returned an empty nodeset", new LocationData(locator));
+                nodesetStack.push(newNodeset);
+            } else {
+                // No change to current node
+                nodesetStack.push(getCurrentNodeset());
             }
         } catch (XPathException e) {
-            throw new OXFException(e);
+            throw new ValidationException(e, new LocationData(locator));
         } finally {
             if(expr != null)
                 expr.returnToPool();
         }
     }
 
-    public Node getCurrentNode() {
+    public Node getCurrentSingleNode() {
         if (nodesetStack.isEmpty()) {
             return instance;
         } else {
             List nodeset = getCurrentNodeset();
-            if(nodeset.size() == 0)
-                return instance;
+            if (nodeset.size() == 0)
+                throw new ValidationException("Single node binding to unexistant node in instance",
+                        new LocationData(locator));
             else
-                return (Node)nodeset.get(0);
+                return (Node) nodeset.get(0);
         }
     }
 
     public List getCurrentNodeset() {
-//        Object current = nodesetStack.peek();
-//        if (!(current instanceof List)) {
-//            // We have a node if we are in a repeat. In this case look one level deeper in the stack.
-//            if (nodesetStack.size() > 1 && nodesetStack.get(1) instanceof List) {
-//                current = nodesetStack.get(1);
-//            } else {
-//                throw new ValidationException("Current context is a node, a nodelist is expected",
-//                        new LocationData(locator));
-//            }
-//        }
-//        return (List) current;
-        return (List)nodesetStack.peek();
+        return nodesetStack.isEmpty() ? Arrays.asList(new Object[] {instance})
+            : (List) nodesetStack.peek();
     }
 
     public Map getCurrentPrefixToURIMap() {
@@ -150,198 +121,32 @@ public class XFormsElementContext {
         return functionLibrary;
     }
 
-    public void pushGroupRef(String ref) {
-        refStack.push(ref);
-    }
-
-    public void popGroupRef() {
-        refStack.pop();
-    }
-
-    /**
-     * Returns a name used in the output, which is an encoding of an XPath
-     * expression that can be evaluated on the instance.
-     *
-     * @param annotateElement
-     */
-    public String getRefName(boolean annotateElement) {
-        PooledXPathExpression xpath = null;
-        try {
-            xpath = getXPathExpression(getRefXPath());
-            xpath.setContextNode(getDocumentWrapper().wrap(getRefNode()));
-            Object value = xpath.evaluateSingle();
-            if (!(value instanceof Element) && !(value instanceof Attribute))
-                throw new OXFException("Expression '" + getRefXPath() + "' must reference an element or an attribute");
-            return getRefName((Node) value, annotateElement);
-        } catch (XPathException e) {
-            throw new OXFException(e);
-        } finally {
-            if (xpath != null)
-                xpath.returnToPool();
-        }
-    }
-
-    public String getRefName(Node value, boolean annotateElement) {
-        return XFormsUtils.getNameForNode((Node) value, annotateElement);
-    }
-
-    /**
-     * Returns a map from name to value, for all the elements and attributes for
-     * which the method <code>getRefName</code> have been called (i.e. that has
-     * not been referenced by a form control.
-     */
-    public Map getNonReferencedNameValueMap() {
-        Map result = new HashMap();
-        getNonReferencedNameValueMap(instance.getRootElement(), result);
-        return result;
-    }
-
-    /**
-     * Worker method for <code>getNonReferencedNameValueMap</code>
-     */
-    private void getNonReferencedNameValueMap(Element element, Map map) {
-
-        // Add attribute values
-        for (Iterator i = element.attributes().iterator(); i.hasNext();) {
-            Attribute attribute = (Attribute) i.next();
-            if (!attribute.getNamespaceURI().equals(Constants.XXFORMS_NAMESPACE_URI)
-                    && !((InstanceData) attribute.getData()).isGenerated())
-                map.put(XFormsUtils.getNameForNode(attribute, true), attribute.getValue());
-        }
-
-        List children = element.elements();
-        if (children.isEmpty()) {
-            // Add value of this node
-            if (!((InstanceData) element.getData()).isGenerated())
-                map.put(XFormsUtils.getNameForNode(element, true), element.getText());
-        } else {
-            // Recurse through children
-            for (Iterator i = children.iterator(); i.hasNext();) {
-                Element child = (Element) i.next();
-                getNonReferencedNameValueMap(child, map);
-            }
-        }
-    }
-
-    /**
-     * Returns an XPath expression that can used on the instance to return the
-     * current context node.
-     */
-
-    public String getRefXPath() {
-        if (refStack.isEmpty()) {
-            return "";
-        } else {
-            return (String) refStack.peek();
-        }
-    }
-
     /**
      * Returns the text value of the currently referenced node in the instance.
      */
-  public String getRefValue(Node node) {
-        if (node instanceof Document)
-            return getRefValue(((Document)node).getRootElement());
-        
-        if (node instanceof Element)
-            return ((Element) node).getStringValue();
-        else
-            return ((Attribute) node).getValue();
+    public String getRefValue() {
+        Node node = getCurrentSingleNode();
+        return node instanceof Element ? ((Element) node).getStringValue()
+            : node instanceof Attribute ? ((Attribute) node).getValue()
+            : null;
     }
 
-    private String getRefValue(String refXPath) {
-        List list = getRefNodeList(refXPath);
-        if (list.size() != 1)
-            throw new OXFException("Expression '" + refXPath
-                    + "' must return exactly element or an attribute");
-        Node node = (Node) list.get(0);
-        return getRefValue(node);
-    }
-
-
-    public InstanceData getRefInstanceData() {
-        return getRefInstanceData(getRefNode());
-    }
-
-    public InstanceData getRefInstanceData(Node node) {
-        if(node instanceof Document)
-            return getRefInstanceData(((Document)node).getRootElement());
-        else
-            return (InstanceData) (node instanceof Element
-                    ? ((Element) node).getData()
-                    : ((Attribute) node).getData());
-    }
-
-    public List getRefNodeList() {
-        return getRefNodeList(getRefXPath());
-    }
-
-    private List getRefNodeList(String refXPath) {
-        PooledXPathExpression expr= null;
-        try {
-            expr = getXPathExpression(refXPath);
-//            for(Iterator i = variablesValue.keySet().iterator(); i.hasNext();) {
-//                String name = (String)i.next();
-//                Integer value = (Integer)variablesValue.get(name);
-//                expr.setVariable(name, value);
-//            }
-            List result = expr.evaluate();
-            if (result == null)
-                throw new OXFException("Expression '" + refXPath
-                        + "' must return an element, an attribute or a nodeset");
-            return result;
-        } catch (XPathException e) {
-            throw new OXFException(e);
-        } finally {
-            if (expr != null)
-                expr.returnToPool();
-        }
-    }
-
-    private PooledXPathExpression getXPathExpression(String refXPath) {
-        return getXPathExpression(refXPath, variablesValue);
-    }
-
-    private PooledXPathExpression getXPathExpression(String refXPath, Map variables) {
-        // Create string version of XPath expression
-        Map prefixToURIMap = new HashMap();
-        String xpath = XPathUtils.xpathWithFullURIString(refXPath, prefixToURIMap);
-
-        return XPathCache.getXPathExpression(getPipelineContext(), getDocumentWrapper(), xpath, prefixToURIMap, variables, functionLibrary);
-    }
-
-    public Node getRefNode() {
-        return getRefNode(getRefXPath());
-    }
-
-    public Node getRefNode(String refXPath) {
-        List refNodeList = getRefNodeList(refXPath);
-        Node node = refNodeList.size() == 0 ? null :
-                refNodeList.get(0) instanceof Node ? (Node) refNodeList.get(0) : null;
-        if (node == null)
-            throw new OXFException("Expression '" + getRefXPath() + "' must return a non-empty nodeset");
-        return node;
-    }
-
-    public void addRepeatId(String repeatId) {
+    public void startRepeatId(String repeatId) {
         nodesetStack.push(null);
     }
 
-    public void setRepeatIdIndex(String repeatId, String variableName, int index) {
+    public void setRepeatIdIndex(String repeatId, int index) {
         // Update current element of nodeset in stack
         nodesetStack.pop();
         List newNodeset = new ArrayList();
         newNodeset.add(getCurrentNodeset().get(index - 1));
         nodesetStack.push(newNodeset);
 
-        Integer indexObj = new Integer(index);
         if (repeatId != null)
-            repeatIdToIndex.put(repeatId, indexObj);
-        if (variableName != null)
-            variablesValue.put(variableName, indexObj);
+            repeatIdToIndex.put(repeatId, new Integer(index));
     }
 
-    public void removeRepeatId(String repeatId) {
+    public void endRepeatId(String repeatId) {
         if (repeatId != null)
             repeatIdToIndex.remove(repeatId);
         nodesetStack.pop();
@@ -355,28 +160,12 @@ public class XFormsElementContext {
         return ((Integer) index).intValue();
     }
 
-    public Document getInstance() {
-        return instance;
-    }
-
     public DocumentWrapper getDocumentWrapper() {
         return documentWrapper;
     }
 
     public Map getRepeatIdToIndex() {
         return repeatIdToIndex;
-    }
-
-    public Model getModel() {
-        return model;
-    }
-
-    public XFormsOutputConfig getConfig() {
-        return config;
-    }
-
-    public ContentHandlerHelper getContentHandlerHelper() {
-        return contentHandlerHelper;
     }
 
     public ContentHandler getContentHandler() {
@@ -407,15 +196,15 @@ public class XFormsElementContext {
         return (XFormsElement) elements.peek();
     }
 
-    public int getElementDepth() {
-        return elements.size();
-    }
-
     public XFormsElement getParentElement(int level) {
         return elements.size() > level + 1 ? (XFormsElement) elements.get(elements.size() - (level + 2)) : null;
     }
 
     public PipelineContext getPipelineContext() {
         return pipelineContext;
+    }
+
+    public Document getInstance() {
+        return instance;
     }
 }

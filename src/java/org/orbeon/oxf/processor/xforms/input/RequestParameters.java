@@ -17,21 +17,26 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.input.action.*;
 import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.AttributesImpl;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.DocumentException;
 
 import javax.crypto.Cipher;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.io.ByteArrayInputStream;
 import java.net.URLDecoder;
 import java.util.*;
-import java.util.Set;
+import java.util.zip.GZIPInputStream;
 
 public class RequestParameters {
 
@@ -46,12 +51,11 @@ public class RequestParameters {
     }
 
     private boolean submitted = false;
-    private Map pathToValue = new HashMap();
-    private Map pathToType = new HashMap();
-    private Map idToRef = new HashMap();
+    private Map idToValue = new HashMap();
+    private Map idToType = new HashMap();
     private List actions = new ArrayList();
     private Map fileInfos;
-
+    private Document instance;
 
     private final boolean encryptNames = OXFProperties.instance().getPropertySet().getBoolean
             (Constants.XFORMS_ENCRYPT_NAMES, false).booleanValue();
@@ -61,15 +65,15 @@ public class RequestParameters {
             (OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD)) : null;
 
     private static class FileInfo {
-        public FileInfo (String fileRef) {
-            this.fileRef = fileRef;
+        public FileInfo (int fileRef) {
+            this.fileId = fileRef;
         }
         public String value;
         public String type;
-        public String fileRef;
-        public String filenameRef;
-        public String mediatypeRef;
-        public String contentLengthRef;
+        public int fileId;
+        public Integer filenameId;
+        public Integer mediatypeId;
+        public Integer contentLengthId;
         public String filename;
         public String mediatype;
         public String contentLength;
@@ -80,45 +84,32 @@ public class RequestParameters {
         }
     }
 
-    private FileInfo getFileInfo(String fileRef) {
+    private FileInfo getFileInfo(int fileId) {
         if (fileInfos == null)
             fileInfos = new HashMap();
-        FileInfo fileInfo = (FileInfo) fileInfos.get(fileRef);
+        Integer fileIdObject = new Integer(fileId);
+        FileInfo fileInfo = (FileInfo) fileInfos.get(fileIdObject);
         if (fileInfo == null) {
-            fileInfo = new FileInfo(fileRef);
-            fileInfos.put(fileRef, fileInfo);
+            fileInfo = new FileInfo(fileId);
+            fileInfos.put(fileIdObject, fileInfo);
         }
         return fileInfo;
     }
 
     /**
-     * Adds (name -> value) in pathToValue. If there is already a value for this name,
+     * Adds (id -> value) in idToValue. If there is already a value for this id,
      * concatenates the two values by adding a space.
      *
-     * Also store the value type in pathToType if present.
+     * Also store the value type in idToType if present.
      */
-    private void addValue(String name, String value, String type, boolean nameDecryted) {
-        // Decrypt name if necessary
-        if (encryptNames && !nameDecryted) {
-            try {
-                name = new String(cipher.doFinal(Base64.decode(name)));
-            } catch (Exception e) {
-                throw new OXFException("Cannot decode name '" + name + "'");
-            }
-        }
-
-        String currentValue = (String) pathToValue.get(name);
-        pathToValue.put(name,
+    private void addValue(int id, String value, String type) {
+        Integer idObject = new Integer(id);
+        String currentValue = (String) idToValue.get(idObject);
+        idToValue.put(idObject,
                 currentValue == null || "".equals(currentValue) ? value :
                 "".equals(value) ? currentValue : currentValue + ' ' + value);
         if (type != null)
-            pathToType.put(name, type);
-    }
-
-    private void setValue(String name, String value, String type) {
-        pathToValue.put(name, value);
-        if (type != null)
-            pathToType.put(name, type);
+            idToType.put(idObject, type);
     }
 
     public ContentHandler getContentHandlerForRequest() {
@@ -151,7 +142,17 @@ public class RequestParameters {
             public void endElement(String namespaceURI, String localName, String qName) {
                 elementNameStack.pop();
                 if (isChildOfParameter()) {
-                    handleValue(recordingName, recordingValue.toString(), recordingAttributes);
+                    String value = recordingValue.toString();
+                    if (recordingName.equals("name"))
+                        name(value);
+                    else if (recordingName.equals("value"))
+                        value(value, recordingAttributes.getValue(XMLUtils.XSI_NAMESPACE, "type"));
+                    else if (recordingName.equals("filename"))
+                        filename(value);
+                    else if (recordingName.equals("content-type"))
+                        contentType(value);
+                    else if (recordingName.equals("content-length"))
+                        contentLength(value);
                 }
             }
 
@@ -160,19 +161,6 @@ public class RequestParameters {
                 return size == 3 && elementNameStack.elementAt(size - 1).equals("parameter")
                     && elementNameStack.elementAt(size - 2).equals("parameters")
                     && elementNameStack.elementAt(size - 3).equals("request");
-            }
-
-            private void handleValue(String elementName, String value, Attributes atts) {
-                if (elementName.equals("name"))
-                    name(value);
-                else if (elementName.equals("value"))
-                    value(value, atts.getValue(XMLUtils.XSI_NAMESPACE, "type"));
-                else if (elementName.equals("filename"))
-                    filename(value);
-                else if (elementName.equals("content-type"))
-                    contentType(value);
-                else if (elementName.equals("content-length"))
-                    contentLength(value);
             }
 
             private String name;
@@ -190,16 +178,26 @@ public class RequestParameters {
                 try {
                     if ("$submitted".equals(name)) {
                         submitted = true;
-                    } else if ("$hidden".equals(name)) {
-                        if (encryptHiddenValues) {
-                            try {
-                                value = new String(cipher.doFinal(Base64.decode(value)));
-                            } catch (Exception e) {
-                                throw new OXFException("Cannot decrypt hidden field value '" + value + "'");
-                            }
+                    } else if ("$instance".equals(name)) {
+
+                        // Un-base64, uncompress to get XML as text
+                        final String xmlText;
+                        {
+                            ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(value));
+                            StringBuffer xml = new StringBuffer();
+                            byte[] buffer = new byte[1024];
+                            GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
+                            int size;
+                            while ((size = gzipInputStream.read(buffer)) != -1)
+                                xml.append(new String(buffer, 0, size));
+                            xmlText = xml.toString();
                         }
-                        if (value.length() > 0)
-                            nameValues(value, type, encryptHiddenValues);
+
+                        // Parse XML and store as instance
+                        LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
+                        XMLUtils.stringToSAX(xmlText, null, saxContentHandler, false);
+                        instance = saxContentHandler.getDocument();
+
                     } else if (name.startsWith("$upload^")) {
                         // Handle the case of the upload element
 
@@ -216,27 +214,19 @@ public class RequestParameters {
                         fileInfoNames[count++] = s.substring(startIndex);
 
                         // Set values on FileInfo element
-                        FileInfo fileInfo = getFileInfo(fileInfoNames[0]);
+                        FileInfo fileInfo = getFileInfo(Integer.parseInt(fileInfoNames[0]));
                         fileInfo.value = value;
                         fileInfo.type = type;
 
                         if (fileInfoNames[2].length() > 0)
-                            fileInfo.filenameRef = fileInfoNames[2];
+                            fileInfo.filenameId = fileInfoNames[2].length() > 0 ? new Integer(fileInfoNames[2]) : null;
                         if (fileInfoNames[4].length() > 0)
-                            fileInfo.mediatypeRef = fileInfoNames[4];
+                            fileInfo.mediatypeId = fileInfoNames[4].length() > 0 ? new Integer(fileInfoNames[4]) : null;
                         if (fileInfoNames[6].length() > 0)
-                            fileInfo.contentLengthRef = fileInfoNames[6];
+                            fileInfo.contentLengthId = fileInfoNames[6].length() > 0 ? new Integer(fileInfoNames[6]) : null;
                         if (fileInfoNames[1].length() > 0)
                             fileInfo.originalValue = fileInfoNames[1];
 
-                    } else if ("$idRef".equals(name)) {
-                        int equalPosition = value.indexOf('=');
-                        String id = value.substring(0, equalPosition);
-                        String ref = value.substring(equalPosition + 1);
-                        List refs = (List) idToRef.get(id);
-                        if (refs == null)
-                            idToRef.put(id, refs = new ArrayList());
-                        refs.add(ref);
                     } else if (name.startsWith("$action^") || name.startsWith("$actionImg^")) {
 
                         // Image submit. If .y: ignore. If .x: remove .x at the end of name.
@@ -279,16 +269,8 @@ public class RequestParameters {
                             action.setParameters(actionParameters);
                             actions.add(action);
                         }
-                    } else if (!name.startsWith("$") && !name.equals("j_username")
-                            && !name.equals("j_password")) {
-
-                        if (name.indexOf('^') != -1) {
-                            // Special case: we extract the value from the name (for checkbox and submit)
-                            nameValues(name, type, false);
-                        } else {
-                            // Normal case
-                            addValue(name, value, type, false);
-                        }
+                    } else if (name.startsWith("$node^")) {
+                        addValue(Integer.parseInt(name.substring("$node^".length())), value, type);
                     }
                 } catch (InstantiationException e) {
                     throw new OXFException(e);
@@ -301,45 +283,19 @@ public class RequestParameters {
                 }
             }
 
-            private void nameValues(String nameValues, String type, boolean nameDecrypted) {
-                try {
-                    int position = 0;
-                    int separator;
-                    while (true) {
-                        // Get path
-                        separator = nameValues.indexOf('^', position);
-                        String decodedPath = nameValues.substring(position, separator);
-                        position = separator + 1;
-
-                        // Get value
-                        separator = nameValues.indexOf('^', position);
-                        String encodedValue = separator == -1 ?  nameValues.substring(position)
-                                : nameValues.substring(position, separator);
-                        String decodedValue = URLDecoder.decode(encodedValue, NetUtils.DEFAULT_URL_ENCODING);
-                        position = separator + 1;
-                        addValue(decodedPath, decodedValue, type, nameDecrypted);
-                        if (separator == -1) break;
-                    }
-                } catch (UnsupportedEncodingException e) {
-                    throw new OXFException(e);
-                } catch (IOException e) {
-                    throw new OXFException(e);
-                }
-            }
-
             private void filename(String filename) {
                 if (name.startsWith("$upload^"))
-                    getFileInfo(name.substring("$upload^".length(), name.indexOf("^", "$upload^".length()))).filename = filename;
+                    getFileInfo(Integer.parseInt(name.substring("$upload^".length(), name.indexOf("^", "$upload^".length())))).filename = filename;
             }
 
             private void contentType(String contentType) {
                 if (name.startsWith("$upload^"))
-                    getFileInfo(name.substring("$upload^".length(), name.indexOf("^", "$upload^".length()))).mediatype = contentType;
+                    getFileInfo(Integer.parseInt(name.substring("$upload^".length(), name.indexOf("^", "$upload^".length())))).mediatype = contentType;
             }
 
             private void contentLength(String contentLength) {
                 if (name.startsWith("$upload^"))
-                    getFileInfo(name.substring("$upload^".length(), name.indexOf("^", "$upload^".length()))).contentLength = contentLength;
+                    getFileInfo(Integer.parseInt(name.substring("$upload^".length(), name.indexOf("^", "$upload^".length())))).contentLength = contentLength;
             }
 
             public void endDocument() {
@@ -350,22 +306,22 @@ public class RequestParameters {
                         FileInfo fileInfo = (FileInfo) fileInfos.get(key);
                         if (fileInfo.hasValue()) {
                             // If a file was in fact uploaded, set all the file attributes
-                            setValue(fileInfo.fileRef, fileInfo.value, fileInfo.type);
-                            if (fileInfo.filenameRef != null)
-                                setValue(fileInfo.filenameRef, fileInfo.filename, null);
-                            if (fileInfo.mediatypeRef != null)
-                                setValue(fileInfo.mediatypeRef, fileInfo.mediatype, null);
-                            if (fileInfo.contentLengthRef != null)
-                                setValue(fileInfo.contentLengthRef, fileInfo.contentLength, null);
+                            addValue(fileInfo.fileId, fileInfo.value, fileInfo.type);
+                            if (fileInfo.filenameId != null)
+                                addValue(fileInfo.filenameId.intValue(), fileInfo.filename, null);
+                            if (fileInfo.mediatypeId != null)
+                                addValue(fileInfo.mediatypeId.intValue(), fileInfo.mediatype, null);
+                            if (fileInfo.contentLengthId != null)
+                                addValue(fileInfo.contentLengthId.intValue(), fileInfo.contentLength, null);
                         } else {
                             // Set original value and empty attributes
-                            setValue(fileInfo.fileRef, fileInfo.originalValue, null);
-                            if (fileInfo.filenameRef != null)
-                                setValue(fileInfo.filenameRef, "", null);
-                            if (fileInfo.mediatypeRef != null)
-                                setValue(fileInfo.mediatypeRef, "", null);
-                            if (fileInfo.contentLengthRef != null)
-                                setValue(fileInfo.contentLengthRef, "", null);
+                            addValue(fileInfo.fileId, fileInfo.originalValue, null);
+                            if (fileInfo.filenameId != null)
+                                addValue(fileInfo.filenameId.intValue(), "", null);
+                            if (fileInfo.mediatypeId != null)
+                                addValue(fileInfo.mediatypeId.intValue(), "", null);
+                            if (fileInfo.contentLengthId != null)
+                                addValue(fileInfo.contentLengthId.intValue(), "", null);
                         }
                     }
                 }
@@ -373,17 +329,22 @@ public class RequestParameters {
         };
     }
 
-    public String[] getPaths() {
-        Set paths = pathToValue.keySet();
-        return (String[]) paths.toArray(new String[paths.size()]);
+    public int[] getIds() {
+        int[] ids = new int[idToValue.size()];
+        int count = 0;
+        for (Iterator i = idToValue.keySet().iterator(); i.hasNext();) {
+            Integer id = (Integer) i.next();
+            ids[count++] = id.intValue();
+        }
+        return ids;
     }
 
-    public String getValue(String path) {
-        return (String) pathToValue.get(path);
+    public String getValue(int id) {
+        return (String) idToValue.get(new Integer(id));
     }
 
-    public String getType(String path) {
-        return (String) pathToType.get(path);
+    public String getType(int id) {
+        return (String) idToType.get(new Integer(id));
     }
 
     public boolean isSubmitted() {
@@ -394,7 +355,7 @@ public class RequestParameters {
         return (Action[]) actions.toArray(new Action[actions.size()]);
     }
 
-    public Map getIdToRef() {
-        return idToRef;
+    public Document getInstance() {
+        return instance;
     }
 }

@@ -27,7 +27,7 @@ package org.orbeon.oxf.util;
  *
  * @author Jeffrey Rodriguez
  * @author Sandy Gao
- * @version $Id: Base64.java,v 1.1 2004/08/21 20:06:25 ebruchez Exp $
+ * @version $Id: Base64.java,v 1.2 2004/12/10 00:19:10 avernet Exp $
  */
 public class Base64 {
 
@@ -114,7 +114,7 @@ public class Base64 {
         int      numberLines       = (numberQuartet-1)/19+1;
         char     encodedData[]     = null;
 
-        encodedData = new char[numberQuartet*4+numberLines];
+        encodedData = new char[numberQuartet*4+numberLines-1];
 
         byte k=0, l=0, b1=0,b2=0,b3=0;
 
@@ -215,8 +215,6 @@ public class Base64 {
             encodedData[encodedIndex++] = lookUpBase64Alphabet[ l<<2 ];
             encodedData[encodedIndex++] = PAD;
         }
-
-        encodedData[encodedIndex] = 0xa;
 
         return new String(encodedData);
     }

@@ -15,6 +15,10 @@ import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.PooledXPathExpression;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.saxon.xpath.XPathException;
 import org.dom4j.Node;
 import org.dom4j.XPath;
 import org.jaxen.NamespaceContext;
@@ -28,25 +32,25 @@ public class Itemset extends XFormsElement {
     private List nodelist;
     private String labelRef;
     private String copyRef;
-    private NamespaceContext labelNamespaceContext;
-    private NamespaceContext copyNamespaceContext;
+    private Map labelPrefixToURI;
+    private Map copyPrefixToURI;
 
     public void start(XFormsElementContext context, String uri, String localname,
                       String qname, Attributes attributes) throws SAXException {
         context.getContentHandler().startElement(uri, localname, qname, attributes);
-        nodelist = context.getRefNodeList();
-        context.addRepeatId(null);
-        context.setRepeatIdIndex(null, null, 1);
+        nodelist = context.getCurrentNodeset();
+        context.startRepeatId(null);
+        context.setRepeatIdIndex(null, 1);
     }
 
     public void end(XFormsElementContext context, String uri, String localname, String qname) throws SAXException {
-        context.removeRepeatId(null);
+        context.endRepeatId(null);
         for (Iterator i = nodelist.iterator(); i.hasNext();) {
             Node node = (Node) i.next();
             context.getContentHandler().startElement(Constants.XFORMS_NAMESPACE_URI, "item",
                     Constants.XFORMS_PREFIX + ":item", XMLUtils.EMPTY_ATTRIBUTES);
-            sendElement(context, node, "label", labelRef, labelNamespaceContext);
-            sendElement(context, node, "value", copyRef, copyNamespaceContext);
+            sendElement(context, node, "label", labelRef, labelPrefixToURI);
+            sendElement(context, node, "value", copyRef, copyPrefixToURI);
             context.getContentHandler().endElement(Constants.XFORMS_NAMESPACE_URI, "item",
                     Constants.XFORMS_PREFIX + ":item");
         }
@@ -54,24 +58,31 @@ public class Itemset extends XFormsElement {
     }
 
     private void sendElement(XFormsElementContext context, Node node, String localname,
-                             String ref, NamespaceContext namespaceContext) throws SAXException {
-        XPath labelXPath = node.createXPath("string(" + ref + ")");
-        labelXPath.setNamespaceContext(namespaceContext);
-        String value = (String) labelXPath.evaluate(node);
-        context.getContentHandler().startElement(Constants.XFORMS_NAMESPACE_URI, localname,
-                Constants.XFORMS_PREFIX + ":" + localname, XMLUtils.EMPTY_ATTRIBUTES);
-        context.getContentHandler().characters(value.toCharArray(), 0, value.length());
-        context.getContentHandler().endElement(Constants.XFORMS_NAMESPACE_URI, localname,
-                Constants.XFORMS_PREFIX + ":" + localname);
+                             String ref, Map prefixToURI) throws SAXException {
+        PooledXPathExpression expression = XPathCache.getXPathExpression(context.getPipelineContext(),
+                context.getDocumentWrapper().wrap(node), "string(" + ref +  ")",
+                prefixToURI, context.getRepeatIdToIndex());
+        try {
+            String value = (String) expression.evaluateSingle();
+            context.getContentHandler().startElement(Constants.XFORMS_NAMESPACE_URI, localname,
+                    Constants.XFORMS_PREFIX + ":" + localname, XMLUtils.EMPTY_ATTRIBUTES);
+            context.getContentHandler().characters(value.toCharArray(), 0, value.length());
+            context.getContentHandler().endElement(Constants.XFORMS_NAMESPACE_URI, localname,
+                    Constants.XFORMS_PREFIX + ":" + localname);
+        } catch (XPathException e) {
+            throw new OXFException(e);
+        } finally {
+            if (expression != null) expression.returnToPool();
+        }
     }
 
-    public void setLabelRef(String labelRef, NamespaceContext labelNamespaceContext) {
+    public void setLabelRef(String labelRef, Map labelPrefixToURI) {
         this.labelRef = labelRef;
-        this.labelNamespaceContext = labelNamespaceContext;
+        this.labelPrefixToURI = labelPrefixToURI;
     }
 
-    public void setCopyRef(String copyRef, NamespaceContext copyNamespaceContext) {
+    public void setCopyRef(String copyRef, Map copyPrefixToURI) {
         this.copyRef = copyRef;
-        this.copyNamespaceContext = copyNamespaceContext;
+        this.copyPrefixToURI = copyPrefixToURI;
     }
 }

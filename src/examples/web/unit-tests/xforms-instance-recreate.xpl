@@ -24,6 +24,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
         <p:input name="model" href="#model"/>
+        <p:input name="instance" href="#instance"/>
         <p:input name="data" href="#annotated-data"/>
         <p:output name="data" id="xhtml"/>
     </p:processor>
@@ -39,14 +40,13 @@
                                 <name>$submitted</name>
                                 <value>true</value>
                             </parameter>
-                            <xsl:for-each select="//xxforms:hidden | //xhtml:input[@type = 'submit' or @type = 'text']">
-<!--                            <xsl:for-each select="//*[@xxforms:name and @xxforms:value]">-->
+                            <xsl:for-each select="//xhtml:input">
                                 <parameter>
                                     <name>
-                                        <xsl:value-of select="@xxforms:name | @name"/>
+                                        <xsl:value-of select="@name"/>
                                     </name>
                                     <value>
-                                        <xsl:value-of select="@xxforms:value | @value"/>
+                                        <xsl:value-of select="@value"/>
                                     </value>
                                 </parameter>
                             </xsl:for-each>

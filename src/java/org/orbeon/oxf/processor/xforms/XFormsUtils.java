@@ -111,22 +111,6 @@ public class XFormsUtils {
     }
 
     /**
-     * Reset all the "generated" flags to false on the instance.
-     */
-    public static void resetGenerated(Element element) {
-        ((InstanceData) element.getData()).setGenerated(false);
-        for (Iterator i = element.attributes().iterator(); i.hasNext();) {
-            Attribute attribute = (Attribute) i.next();
-            if (!attribute.getNamespaceURI().equals(Constants.XXFORMS_NAMESPACE_URI))
-                ((InstanceData) attribute.getData()).setGenerated(false);
-        }
-        for (Iterator i = element.elements().iterator(); i.hasNext();) {
-            Element child = (Element) i.next();
-            resetGenerated(child);
-        }
-    }
-
-    /**
      * Recursively decorate the element and its attribute with empty instances
      * of <code>InstanceData</code>.
      */

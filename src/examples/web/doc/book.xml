@@ -91,4 +91,7 @@
         <menu-item label="Struts Support" href="model2x-struts"/>
 <!--        <menu-item label="Presentation Server with JSF" href="model2x-jsf"/>-->
     </menu>
+    <menu label="Internals">
+        <menu-item label="XForms" href="internals-xforms"/> 
+    </menu>
 </book>

@@ -44,21 +44,16 @@
             <p:processor name="oxf:xslt"><!-- saxon1 -->
                 <p:input name="config" href="xforms-to-xhtml.xsl"/>
                 <p:input name="model" href="#xforms-model"/>
+                <p:input name="instance" href="#instance"/>
                 <p:input name="data" href="#annotated-data"/>
                 <p:output name="data" id="xhtml-data"/>
-            </p:processor>
-            <!-- Aggregate hidden fields -->
-            <p:processor name="oxf:xslt"> <!-- saxon2 -->
-                <p:input name="config" href="xforms-hidden.xsl"/>
-                <p:input name="data" href="#xhtml-data"/>
-                <p:output name="data" id="xhtml-data-hidden"/>
             </p:processor>
             <p:choose href="#container-type">
                 <p:when test="/request/container-type = 'servlet'">
                     <!-- Handle portlet forms (you can skip this step if you are not including portlets in your page) -->
                     <p:processor name="oxf:xslt"> <!-- saxon3 -->
                         <p:input name="config" href="xforms-portlet-forms.xsl"/>
-                        <p:input name="data" href="#xhtml-data-hidden"/>
+                        <p:input name="data" href="#xhtml-data"/>
                         <p:input name="annotated-data" href="#annotated-data"/>
                         <p:output name="data" id="xformed-data"/>
                     </p:processor>
@@ -66,7 +61,7 @@
                 <p:otherwise>
                     <!-- Don't go through this step if we are implementing a portlet -->
                     <p:processor name="oxf:identity">
-                        <p:input name="data" href="#xhtml-data-hidden"/>
+                        <p:input name="data" href="#xhtml-data"/>
                         <p:output name="data" id="xformed-data"/>
                     </p:processor>
                 </p:otherwise>

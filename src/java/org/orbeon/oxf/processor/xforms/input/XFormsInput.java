@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.Node;
+import org.dom4j.Document;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
@@ -94,18 +95,17 @@ public class XFormsInput extends ProcessorImpl {
                 Instance instance = Instance.createInstanceFromContext(pipelineContext);
 
                 if (instance == null) {
-                    // Read instance input
-                    org.dom4j.Document instanceDom4j = readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE);
-                    if (instanceDom4j.getRootElement() == null)
-                        throw new OXFException("No instance found in XForms model");
-                    instance = new Instance(pipelineContext, instanceDom4j);
-                    final Element instanceElement = instance.getDocument().getRootElement();
-
-                    // Only recreate instance if data was submitted
+                    // Get instance from input or from request
                     if (requestParameters.isSubmitted()) {
-
-                        // Discard text in instance
-                        instance.empty();
+                        instance = new Instance(pipelineContext, requestParameters.getInstance());
+                    } else {
+                        // Get instance from input and create copy as we don't want the copy from the cache
+                        Document templateInstanceFromCache = readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE);
+                        if (templateInstanceFromCache.getRootElement() == null)
+                            throw new OXFException("No instance found in XForms model");
+                        Document templateInstance = XMLUtils.createDOM4JDocument();
+                        templateInstance.add(templateInstanceFromCache.getRootElement().createCopy());
+                        instance = new Instance(pipelineContext, templateInstance);
                     }
 
                     // Extract filtered parameters from instance if any
@@ -116,7 +116,7 @@ public class XFormsInput extends ProcessorImpl {
                         String paramRef = attribute.getValue();
                         // FIXME: Argh, we don't handle namespaces correctly here!
                         // If the param element in the WAC contains namespaces, this won't work!
-                        Node paramNode = XPathUtils.selectSingleNode(instanceElement, paramRef);
+                        Node paramNode = XPathUtils.selectSingleNode(instance.getDocument().getRootElement(), paramRef);
                         if (paramNode != null) {
                             if (filteredParams == null)
                                 filteredParams = new HashMap();
@@ -129,12 +129,15 @@ public class XFormsInput extends ProcessorImpl {
                     }
 
                     // Fill-out instance
-                    String[] paths = requestParameters.getPaths();
-                    for (int i = 0; i < paths.length; i++) {
-                        String path = paths[i];
-                        instance.setValue(path, requestParameters.getValue(path), requestParameters.getType(path), false);
+                    XFormsUtils.setInitialDecoration(instance.getDocument());
+                    int[] ids = requestParameters.getIds();
+                    for (int i = 0; i < ids.length; i++) {
+                        int id = ids[i];
+                        instance.setValue(id, requestParameters.getValue(id), requestParameters.getType(id), false);
                     }
 
+                    // FIXME: will need to modify this as we now use node id instead of node path
+                    /*
                     if (requestParameters.isSubmitted() && filteredParams != null) {
                         for (Iterator i = filteredParams.keySet().iterator(); i.hasNext();) {
                             String nodeName = (String) i.next();
@@ -142,12 +145,12 @@ public class XFormsInput extends ProcessorImpl {
                             instance.setValue(nodeName, nodeValue, null, true);
                         }
                     }
+                    */
                     if (logger.isDebugEnabled())
                         logger.debug("1) Instance recontructed from request:\n"
                                 + XMLUtils.domToString(instance.getDocument()));
 
                     // Run actions
-                    XFormsUtils.setInitialDecoration(instance.getDocument());
                     Action[] actions = requestParameters.getActions();
                     for (int i = 0; i < actions.length; i++) {
                         Action action = actions[i];

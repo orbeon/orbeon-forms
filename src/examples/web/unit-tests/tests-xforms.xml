@@ -20,34 +20,11 @@
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xu="http://www.xmldb.org/xupdate"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xi="http://www.w3.org/2003/XInclude"
     xmlns:xforms="http://www.w3.org/2002/xforms">
-
-    <!-- This test should probably be hand-customized to be clearer -->
-    <test description="XForms to XHTML" name="oxf:pipeline">
-        <input name="config">
-            <p:config>
-                <p:param type="output" name="data"/>
-
-                <p:processor name="oxf:xforms-output">
-                    <p:input name="model" href="oxf:/unit-tests/xforms-to-xhtml/input-model.xml"/>
-                    <p:input name="instance"><dummy/></p:input>
-                    <p:input name="data" href="oxf:/unit-tests/xforms-to-xhtml/output-data.xml"/>
-                    <p:output name="data" id="annotated-data"/>
-                </p:processor>
-                <!-- Transform annotated XForms to XHTML -->
-                <p:processor name="oxf:xslt">
-                    <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
-                    <p:input name="model" href="oxf:/unit-tests/xforms-to-xhtml/input-model.xml"/>
-                    <p:input name="data" href="#annotated-data"/>
-                    <p:output name="data" ref="data"/>
-                </p:processor>
-            </p:config>
-        </input>
-        <output name="data" href="oxf:/unit-tests/xforms-to-xhtml/output-data.xml"/>
-    </test>
 
     <test description="Annotate" name="oxf:xforms-annotate">
         <input name="instance">
@@ -99,7 +76,6 @@
                     </p:input>
                     <p:output name="data" id="xforms-model"/>
                 </p:processor>
-
                 <p:processor name="oxf:xforms-output">
                     <p:input name="model" href="#xforms-model"/>
                     <p:input name="instance">
@@ -113,11 +89,14 @@
                         <html>
                             <body>
                                 <xforms:group ref="/form">
-                                    <xxforms:if test="a = '1'">
-                                        <xforms:input ref="b"/>
+                                    <xxforms:if test="c = 4">
+                                        <xforms:input ref="a" xhtml:id="a"/>
+                                    </xxforms:if>
+                                    <xxforms:if test="a = 1">
+                                        <xforms:input ref="b" xhtml:id="b"/>
                                     </xxforms:if>
                                     <xxforms:if test="count(/form/*) = 3">
-                                        <xforms:input ref="c"/>
+                                        <xforms:input ref="c" xhtml:id="c"/>
                                     </xxforms:if>
                                 </xforms:group>
                             </body>
@@ -125,27 +104,25 @@
                     </p:input>
                     <p:output name="data" id="annotated-data"/>
                 </p:processor>
-                <!-- Transform annotated XForms to XHTML -->
-                <p:processor name="oxf:xslt"><!-- saxon1 -->
+                <p:processor name="oxf:xslt">
                     <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
                     <p:input name="model" href="#xforms-model"/>
                     <p:input name="data" href="#annotated-data"/>
+                    <p:output name="data" id="xhtml"/>
+                </p:processor>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#xhtml"/>
+                    <p:input name="config">
+                        <result xsl:version="2.0">
+                            <xsl:value-of select="//@xhtml:id"/>
+                        </result>
+                    </p:input>
                     <p:output name="data" ref="data"/>
                 </p:processor>
             </p:config>
         </input>
         <output name="data">
-            <html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <body>
-                    <xhtml:form xmlns:xhtml="http://www.w3.org/1999/xhtml" id="wsrp_rewrite_form_1" xxforms:contains-hidden="true" method="post">
-                        <xhtml:input type="hidden" id="wsrp_rewrite_action_1" name="" value=""/>
-                        <xhtml:input type="hidden" name="$submitted" value="true"/>
-                        <xhtml:input type="text" name="b[2]" value="2"/>
-                        <xhtml:input type="text" name="c[3]" value="3"/>
-                        <xxforms:hidden xxforms:name="a[1]" xxforms:value="1"/>
-                    </xhtml:form>
-                </body>
-            </html>
+            <result>b c</result>
         </output>
     </test>
 
@@ -187,13 +164,13 @@
                                 <xforms:group ref="/form">
                                     <xxforms:choose>
                                         <xxforms:when test="a = '1'">
-                                            <xforms:input ref="b"/>
+                                            <xforms:input ref="b" xhtml:id="b"/>
                                         </xxforms:when>
                                         <xxforms:when test="b = '2'">
-                                            <xforms:input ref="c"/>
+                                            <xforms:input ref="c" xhtml:id="c"/>
                                         </xxforms:when>
                                         <xxforms:otherwise>
-                                            <xforms:input ref="d"/>
+                                            <xforms:input ref="d" xhtml:id="d"/>
                                         </xxforms:otherwise>
                                     </xxforms:choose>
                                 </xforms:group>
@@ -207,22 +184,21 @@
                     <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
                     <p:input name="model" href="#xforms-model"/>
                     <p:input name="data" href="#annotated-data"/>
+                    <p:output name="data" id="xhtml"/>
+                </p:processor>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#xhtml"/>
+                    <p:input name="config">
+                        <result xsl:version="2.0">
+                            <xsl:value-of select="//@xhtml:id"/>
+                        </result>
+                    </p:input>
                     <p:output name="data" ref="data"/>
                 </p:processor>
             </p:config>
         </input>
         <output name="data">
-            <html xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                <body>
-                    <xhtml:form xmlns:xhtml="http://www.w3.org/1999/xhtml" id="wsrp_rewrite_form_1" xxforms:contains-hidden="true" method="post">
-                        <xhtml:input type="hidden" id="wsrp_rewrite_action_1" name="" value=""/>
-                        <xhtml:input type="hidden" name="$submitted" value="true"/>
-                        <xhtml:input type="text" name="b[2]" value="2"/>
-                        <xhtml:input type="text" name="c[3]" value="3"/>
-                        <xxforms:hidden xxforms:name="a[1]" xxforms:value="1"/>
-                    </xhtml:form>
-                </body>
-            </html>
+            <result>b</result>
         </output>
     </test>
 
@@ -266,16 +242,16 @@
         </input>
         <output name="out">
             <form>
-                <a:claim a:id="1" xmlns:a="http://orbeon.com/a">
+                <a:claim a:id="1" xmlns:a="http://orbeon.com/a" xmlns:c="http://orbeon.com/c">
                     <b:person xmlns:b="http://orbeon.com/b1">
-                        <c:name xmlns:c="http://orbeon.com/c">
+                        <c:name>
                             <a:first>John</a:first>
                             <b:last xmlns:b="http://orbeon.com/b2" >Smith</b:last>
                         </c:name>
                     </b:person>
-                    <c:address xmlns:c="http://orbeon.com/c">
+                    <c:address>
                         <a:street>850 N. Shoreline Blvd</a:street>
-                        <b:city xmlns:b="http://orbeon.com/b3">Mountain View</b:city>
+                        <b:city xmlns:b="http://orbeon.com/b3" >Mountain View</b:city>
                         <c:state>CA</c:state>
                         <zip>94043</zip>
                         <country>USA</country>
@@ -935,7 +911,6 @@
         </output>
     </test>
 
-
     <test description="Bind And Ref on Controls" name="oxf:pipeline">
         <input name="config" href="oxf:/unit-tests/xforms-instance-recreate.xpl"/>
         <input name="model">
@@ -955,7 +930,6 @@
                         </a>
                     </instance>
                 </xforms:instance>
-
                 <xforms:bind nodeset="/instance/a">
                     <xforms:bind nodeset="b" id="b"/>
                     <xforms:bind nodeset="g" id="g"/>
@@ -963,7 +937,6 @@
                 <xforms:bind nodeset="/instance/a/c" id="c"/>
                 <xforms:bind nodeset="/instance/a/e" id="e"/>
                 <xforms:bind nodeset="/instance/a/h" id="h"/>
-
             </xforms:model>
         </input>
         <input name="view">
@@ -996,7 +969,6 @@
         </output>
     </test>
 
-
     <test description="Doc() in Model Item Properties" name="oxf:pipeline">
         <input name="config" href="oxf:/unit-tests/xforms-instance-recreate.xpl"/>
         <input name="model">
@@ -1010,7 +982,6 @@
                         <e/>
                     </instance>
                 </xforms:instance>
-
                 <xforms:bind nodeset="/instance/a" calculate="doc('company.xml')/company/name"/>
                 <xforms:bind nodeset="/instance/b" constraint="doc('company.xml')/company/name = 'Orbeon'"/>
                 <xforms:bind nodeset="/instance/c" required="doc('company.xml')/company/name = 'Orbeon'"/>
@@ -1032,6 +1003,5 @@
             </instance>
         </output>
     </test>
-
 
 </group>

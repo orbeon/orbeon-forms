@@ -1451,5 +1451,40 @@
             </instance>
         </output>
     </test>
-    
+
+    <test description="Using invalid-bind-ids to display different alert " name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                    xmlns:xforms="http://www.w3.org/2002/xforms"
+                    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model">
+                        <xforms:model/>
+                    </p:input>
+                    <p:input name="instance">
+                        <instance>
+                            <data>1</data>
+                            <data>2</data>
+                            <data>3</data>
+                        </instance>
+                    </p:input>
+                    <p:input name="data">
+                        <xforms:group ref="instance">
+                            <xforms:input ref="data"/>
+                        </xforms:group>
+                    </p:input>
+                    <p:output name="data" id="annotated-data"/>
+                </p:processor>
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href="aggregate('value', #annotated-data#xpointer(string(//xforms:input/@xxforms:value)))"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <value>1</value>
+        </output>
+    </test>
+
 </group>

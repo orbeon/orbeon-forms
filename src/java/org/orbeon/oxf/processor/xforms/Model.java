@@ -49,10 +49,8 @@ import org.orbeon.saxon.xpath.XPathException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Represents information from the XForms model.
@@ -400,79 +398,77 @@ public class Model {
     /**
      * Reconciliate "DOM InstanceData annotations" with "attribute annotations"
      */
-    private void reconciliate(Element element) {
-        InstanceData instanceData = (InstanceData) element.getData();
-
-        // Reconcile invalid bind ids
-        {
-            Attribute attribute = element.attribute(Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME);
-            if (instanceData.getInvalidBindIds() != null || attribute != null) {
-                // Merge
-                String invalidBinds = "";
-                {
-                    Map invalidBindsMap = new HashMap();
-                    if (instanceData.getInvalidBindIds() != null) {
-                        invalidBindsMap.put(instanceData.getInvalidBindIds(), null);
-                    }
-                    if (attribute != null) {
-                        if (attribute.getValue().length() > 0) {
-                            invalidBindsMap.put(attribute.getValue(), null);
-                        }
-                    }
-                    for(Iterator i=invalidBindsMap.keySet().iterator(); i.hasNext();)
-                        invalidBinds += (String) i.next();
-                }
-
-                // Put in DOM and attribute
-                instanceData.setInvalidBindIds(invalidBinds);
-                updateAttribute(element, attribute, Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME, invalidBinds);
-            }
-        }
+    private void reconciliate( final org.dom4j.Element elt ) {
+        final InstanceData instDat = ( InstanceData )elt.getData();
+        final String invldBnds = instDat.getInvalidBindIds();
+        updateAttribute( elt, Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME, invldBnds );
 
         // Reconcile boolean model item properties
-        reconcileBoolean(instanceData.getReadonly(), element, Constants.XXFORMS_READONLY_ATTRIBUTE_QNAME);
-        reconcileBoolean(instanceData.getRelevant(), element, Constants.XXFORMS_RELEVANT_ATTRIBUTE_QNAME);
-        reconcileBoolean(instanceData.getRequired(), element, Constants.XXFORMS_REQUIRED_ATTRIBUTE_QNAME);
-        reconcileBoolean(instanceData.getValid(), element, Constants.XXFORMS_VALID_ATTRIBUTE_QNAME);
-
-        // Recurse
-        for (Iterator i = element.elements().iterator(); i.hasNext();)
-            reconciliate((Element) i.next());
-    }
-
-    private void reconcileBoolean(BooleanModelItemProperty property, Element element, QName qname) {
-        Attribute attribute = element.attribute(qname);
-        if (property.isSet() || attribute != null) {
-            // Merge
-            boolean outcome =
-                    property.isSet() && attribute != null ? property.get() || Boolean.getBoolean(attribute.getValue())
-                    : property.isSet() ? property.get()
-                    : Boolean.valueOf(attribute.getValue()).booleanValue();
-
-            // Set on DOM and attribute
-            property.set(outcome);
-            updateAttribute(element, attribute, qname, Boolean.toString(outcome));
+        reconcileBoolean( instDat.getReadonly(), elt, Constants.XXFORMS_READONLY_ATTRIBUTE_QNAME ); 
+        reconcileBoolean( instDat.getRelevant(), elt, Constants.XXFORMS_RELEVANT_ATTRIBUTE_QNAME );
+        reconcileBoolean( instDat.getRequired(), elt, Constants.XXFORMS_REQUIRED_ATTRIBUTE_QNAME );
+        {
+            // 02/24/2005 d : This is a hack that should go away very shortly, as soon as the 
+            //                schema validation is cleaned up.
+            //                It is here because while we want to keep users from directly
+            //                setting the xxforms:* attributes we currently need use it as the 
+            //                mechanism by which the XFormsValidationProcessor denotes errors.
+            final Attribute errAttr = elt.attribute( Constants.XXFORMS_ERROR_ATTRIBUTE_QNAME );
+            final BooleanModelItemProperty validProp = instDat.getValid();
+            if ( errAttr == null ) {
+                reconcileBoolean( validProp, elt, Constants.XXFORMS_VALID_ATTRIBUTE_QNAME );
+            } else {
+                validProp.set( false );
+                updateAttribute( elt, Constants.XXFORMS_VALID_ATTRIBUTE_QNAME, "false" ); 
+            }
+        }
+        for ( final java.util.Iterator i = elt.elements().iterator(); i.hasNext(); ) {
+            final Object o = i.next();
+            reconciliate( ( org.dom4j.Element )o );
         }
     }
-
-    private void updateAttribute(Element element, Attribute attribute, QName qname, String value) {
-        if (attribute == null) {
-            // Add a namespace declaration if necessary
-            Namespace namespace = element.getNamespaceForPrefix(qname.getNamespacePrefix());
-            if (namespace == null) {
-                element.addNamespace(qname.getNamespacePrefix(), qname.getNamespaceURI());
-            } else if (!namespace.getURI().equals(qname.getNamespaceURI())) {
-                throw new ValidationException("Cannot add attribute to node with 'xxforms' prefix"
-                        + " as the prefix is already mapped to another URI",
-                        XFormsUtils.getInstanceData(element).getLocationData());
-            }
-
-            // Add attribute
-            attribute = UserDataDocumentFactory.getInstance().createAttribute(element, qname, value);
-            attribute.setData(new InstanceData((LocationData) attribute.getData()));
-            element.add(attribute);
+    
+    private void reconcileBoolean
+    ( final BooleanModelItemProperty prp, final org.dom4j.Element elt, final QName qnm ) {
+        final String bstr;
+        if ( prp.isSet() ) {
+            final boolean b = prp.get();
+            bstr = Boolean.toString( b );
         } else {
-            attribute.setValue(value);
+            bstr = null;
+        }
+        updateAttribute( elt, qnm, bstr );
+    }
+
+    private void updateAttribute( final Element elt, final QName qnam, final String val ) {
+        Attribute attr = elt.attribute( qnam );
+        done : if ( val == null && attr != null ) {
+            elt.remove( attr );
+        } else {
+            // Add a namespace declaration if necessary
+            final String pfx = qnam.getNamespacePrefix();
+            final String qnURI = qnam.getNamespaceURI();
+            final Namespace ns = elt.getNamespaceForPrefix( pfx );
+            final String nsURI = ns == null ? null : ns.getURI();
+            if ( ns == null ) {
+                elt.addNamespace( pfx, qnURI );
+            } else if ( !nsURI.equals( qnURI ) ) {
+                final InstanceData instDat = XFormsUtils.getInstanceData( elt );
+                final LocationData locDat = instDat.getLocationData();
+                throw new ValidationException("Cannot add attribute to node with 'xxforms' prefix"
+                        + " as the prefix is already mapped to another URI", locDat );
+            }
+            // Add attribute
+            if ( attr == null ) {
+                final DocumentFactory df = UserDataDocumentFactory.getInstance();
+                attr = df.createAttribute( elt, qnam, val );
+                final LocationData ld = ( LocationData )attr.getData();
+                final InstanceData instDat = new InstanceData( ld );
+                attr.setData( instDat );
+                elt.add( attr );
+            } else {
+                attr.setValue( val );
+            }
         }
     }
 

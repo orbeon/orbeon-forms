@@ -88,7 +88,6 @@
             <result>
                 <xu:update select="/form/message">save-failure</xu:update>
                 <xu:update select="/form/show-errors">true</xu:update>
-                <xu:remove select="/form/document//@*[local-name() = 'error']"/>
             </result>
         </action>
         <!-- Back: Return to the summary page -->
@@ -126,7 +125,6 @@
                 <xu:message><xu:copy-of select="/*"/></xu:message>
                 <xu:update select="/form/message">save-failure</xu:update>
                 <xu:update select="/form/show-errors">true</xu:update>
-                <xu:remove select="/form/document//@*[local-name() = 'error']"/>
             </result>
         </action>
         <!-- Previous page -->

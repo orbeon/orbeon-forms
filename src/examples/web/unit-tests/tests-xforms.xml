@@ -26,21 +26,23 @@
     xmlns:xi="http://www.w3.org/2003/XInclude"
     xmlns:xforms="http://www.w3.org/2002/xforms">
 
-    <test description="Annotate" name="oxf:xforms-annotate">
+    <test description="Annotate" name="oxf:xforms-annotate" >
         <input name="instance">
             <d:form>
                 <d:id>42</d:id>
                 <d:id>4x</d:id>
                 <d:firstname>John</d:firstname>
-                <d:firstname xxforms:valid="false">John</d:firstname>
-                <d:lastname xxforms:valid="true">Smith</d:lastname>
-                <d:zip xxforms:valid="true">4x</d:zip>
+                <d:firstname>John</d:firstname>
+                <d:lastname>Smith</d:lastname>
+                <d:zip>4x</d:zip>
             </d:form>
         </input>
         <input name="model">
             <xforms:model xmlns:d="http://orbeon.org/oxf/xml/document" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <xforms:bind nodeset="/d:form/d:id" type="xs:integer"/>
                 <xforms:bind nodeset="/d:form/d:zip" type="xs:integer"/>
+                <xforms:bind nodeset='/d:form/d:firstname[ 2 ]' constraint='false()' />
+                <xforms:bind nodeset='/d:form/d:lastname[ 1 ]' constraint='true()' />
             </xforms:model>
         </input>
         <output name="instance">
@@ -1244,7 +1246,7 @@
         </output>
     </test>
     
-    <test description="Schema validation with multiple errors" name="oxf:pipeline">
+    <test description="Schema validation with multiple errors" name="oxf:pipeline"  >
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param name="instance" type="output"/>

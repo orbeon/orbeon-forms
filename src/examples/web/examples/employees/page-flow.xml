@@ -85,7 +85,6 @@
             <result>
                 <xu:update select="/form/message">save-failure</xu:update>
                 <xu:update select="/form/show-errors">true</xu:update>
-                <xu:remove select="/form/document//@*[local-name() = 'error']"/>
             </result>
         </action>
         <action when="/*/action = 'back'">

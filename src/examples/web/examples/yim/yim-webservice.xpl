@@ -4,7 +4,7 @@
     <!-- Extract request body as a URI -->
     <p:processor name="oxf:request">
         <p:input name="config">
-            <config stream-type="xs:anyURI" xmlns:xs="http://www.w3.org/1999/XMLSchema">
+            <config stream-type="xs:anyURI" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <include>/request/body</include>
             </config>
         </p:input>

@@ -66,9 +66,9 @@
                     </tr>
                     <tr>
                         <td>content-type</td>
-                        <td>MIME content type, without any attributes</td>
+                        <td>content type, without any attributes</td>
                         <td>
-                            Indicates the MIME type to send to the client (see decision algorithm below).
+                            Indicates the content type to send to the client (see decision algorithm below).
                         </td>
                         <td><code>application/octet-stream</code> for binary mode, <code>text/plain</code> for text mode</td>
                     </tr>
@@ -608,7 +608,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             <title>Legacy HTTP Serializers</title>
             <note>
                 Use of these serializers should be replaced by <a
-                href="processors-converters">converters</a> conntected to the <a
+                href="processors-converters">converters</a> connected to the <a
                 href="#http-serializer">HTTP serializer</a>.
             </note>
             <p>
@@ -627,7 +627,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             <p>
                 All serializers send the cache control HTTP headers, including
                 <code>Last-Modified</code>, <code>Expires</code> and <code>Cache-Control</code>.
-                The MIME content type and content length headers are also supported.
+                The content type and content length headers are also supported.
             </p>
 
             <anchor id="http-configuration"/>
@@ -649,7 +649,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     </tr>
                     <tr>
                         <td>content-type</td>
-                        <td>MIME type sent to the client</td>
+                        <td>content type sent to the client</td>
                         <td>Specific to each serializer</td>
                     </tr>
                     <tr>
@@ -759,8 +759,8 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 <title>XML Serializer</title>
                 <p>
                     This serializer writes XML text. The output is indented with no spaces and
-                    encoded using the UTF-8 character set. The default MIME content type is
-                    <code>text/xml</code>.
+                    encoded using the UTF-8 character set. The default content type is
+                    <code>application/xml</code>.
                 </p>
                 <xml-source>
                     <p:processor name="oxf:xml-serializer">
@@ -782,7 +782,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     The <code>doctype</code> is set to <link
                     href="http://www.w3.org/TR/1998/REC-html40-19980424/sgml/loosedtd.html">HTML
                     4.0 Transitional</link> and the content is indented with no space and encoded
-                    using the UTF-8 character set. The default MIME content type is
+                    using the UTF-8 character set. The default content type is
                     <code>text/html</code>. The following is a simple HTMLSerializer example:
                 </p>
                 <xml-source>
@@ -806,7 +806,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     The Text Serializer's output conforms to the XSLT <code>text</code> semantic.
                     The output is encoded using the UTF-8 character set. This serializer is
                     typically useful for pipelines generating Comma Separated Value (CSV) files.
-                    The default MIME content type is <code>text/plain</code>.
+                    The default content type is <code>text/plain</code>.
                 </p>
                 <xml-source>
                     <p:processor name="oxf:text-serializer">

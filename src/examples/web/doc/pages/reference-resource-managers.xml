@@ -56,7 +56,7 @@
                 </context-param>
             </xml-source>
         </section>
-        <anchor name="flatfile"/>
+        <anchor id="flatfile"/>
         <section>
             <title>Flat File Resource Manager</title>
             <p>

@@ -942,19 +942,30 @@ public class XMLUtils {
 
     /**
      * Extract a QName from an Element and an attribute name. The prefix of the QName must be in
-     * scope.
+     * scope. Return null if the attribute is not found.
      */
     public static QName extractAttributeValueQName(Element element, String attributeName) {
-        String qName = element.attributeValue(attributeName);
-        if (qName == null)
+        return extractTextValueQName(element, element.attributeValue(attributeName));
+    }
+
+    /**
+     * Extract a QName from an Element's string value. The prefix of the QName must be in scope.
+     * Return null if the text is empty.
+     */
+    public static QName extractTextValueQName(Element element) {
+        return extractTextValueQName(element, element.getStringValue());
+    }
+
+    private static QName extractTextValueQName(Element element, String qNameString) {
+        if (qNameString == null)
             return null;
-        qName = qName.trim();
-        if (qName.length() == 0)
+        qNameString = qNameString.trim();
+        if (qNameString.length() == 0)
             return null;
         Map namespaces = XMLUtils.getNamespaceContext(element);
-        int colonIndex = qName.indexOf(':');
-        String prefix = qName.substring(0, colonIndex);
-        String localName = qName.substring(colonIndex + 1);
+        int colonIndex = qNameString.indexOf(':');
+        String prefix = qNameString.substring(0, colonIndex);
+        String localName = qNameString.substring(colonIndex + 1);
         String namespaceURI = (String) namespaces.get(prefix);
         if (namespaceURI == null)
             throw new OXFException("No namespace declaration found for prefix: " + prefix);
@@ -987,7 +998,7 @@ public class XMLUtils {
     }
 
     /**
-     * Cleani-up namespaces. Some tools generate namespace "un-declarations" or the form
+     * Clean-up namespaces. Some tools generate namespace "un-declarations" or the form
      * xmlns:abc="". While this is needed to keep the XML infoset correct, it is illegal to generate
      * such declarations in XML 1.0 (but it is legal in XML 1.1). Technically, this cleanup is
      * incorrect at the DOM and SAX level, so this should be used only in rare occasions, when

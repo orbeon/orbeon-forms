@@ -21,9 +21,15 @@
                     <element name="name">
                         <data type="string"/>
                     </element>
-                    <element name="processor-uri">
-                        <data type="string"/>
-                    </element>
+                    <choice>
+                        <element name="processor-name">
+                            <data type="QName"/>
+                        </element>
+                        <!-- Deprecated -->
+                        <element name="processor-uri">
+                            <data type="string"/>
+                        </element>
+                    </choice>
                     <element name="start-time">
                         <data type="string"/>
                     </element>

@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -27,6 +28,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.task.Task;
 import org.orbeon.oxf.util.task.TaskScheduler;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -49,16 +51,25 @@ public class SchedulerProcessor extends ProcessorImpl {
                     Document document = readInputAsDOM4J(context, input);
 
                     for (Iterator i = XPathUtils.selectIterator(document, "/config/start-task"); i.hasNext();) {
-                        Element element = (Element) i.next();
+                        Element startTaskElement = (Element) i.next();
                         Config config = new Config(Config.START);
-                        config.setName(XPathUtils.selectStringValueNormalize(element, "name"));
+                        config.setName(XPathUtils.selectStringValueNormalize(startTaskElement, "name"));
 
                         // Create new processor definition
                         ProcessorDefinition processorDefinition = new ProcessorDefinition();
                         config.setProcessorDefinition(processorDefinition);
-                        processorDefinition.setUri(XPathUtils.selectStringValueNormalize(element, "processor-uri"));
 
-                        for (Iterator j = XPathUtils.selectIterator(element, "input"); j.hasNext();) {
+                        Element processorNameElement = startTaskElement.element(new QName("processor-name"));
+                        if (processorNameElement != null) {
+                            // Use processor QName
+                            QName processorQName = XMLUtils.extractTextValueQName(processorNameElement);
+                            processorDefinition.setName(processorQName);
+                        } else {
+                            // Deprecated use of processor URI
+                            processorDefinition.setUri(XPathUtils.selectStringValueNormalize(startTaskElement, "processor-uri"));
+                        }
+
+                        for (Iterator j = XPathUtils.selectIterator(startTaskElement, "input"); j.hasNext();) {
                             Element inputElement = (Element) j.next();
                             String name = inputElement.attributeValue("name");
                             String url = inputElement.attributeValue("url");
@@ -73,7 +84,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                             }
                         }
 
-                        String startTimeString = XPathUtils.selectStringValueNormalize(element, "start-time");
+                        String startTimeString = XPathUtils.selectStringValueNormalize(startTaskElement, "start-time");
                         long startTime = 0;
                         if ("now".equalsIgnoreCase(startTimeString)) {
                             startTime = System.currentTimeMillis();
@@ -82,14 +93,14 @@ public class SchedulerProcessor extends ProcessorImpl {
                         }
                         config.setStartTime(startTime);
 
-                        String interval = XPathUtils.selectStringValueNormalize(element, "interval");
+                        String interval = XPathUtils.selectStringValueNormalize(startTaskElement, "interval");
                         try {
                             config.setInterval(Long.parseLong(interval));
                         } catch (NumberFormatException e) {
                             throw new OXFException("Unsupported long value", e);
                         }
 
-                        String sync = XPathUtils.selectStringValueNormalize(element, "synchronized");
+                        String sync = XPathUtils.selectStringValueNormalize(startTaskElement, "synchronized");
                         config.setSynchro(Boolean.valueOf(sync).booleanValue());
 
                         configs.add(config);

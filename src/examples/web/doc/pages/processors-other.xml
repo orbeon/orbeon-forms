@@ -40,6 +40,15 @@
                                         <element name="name">
                                             <data type="string"/>
                                         </element>
+                                        <choice>
+                                            <element name="processor-name">
+                                                <data type="qName"/>
+                                            </element>
+                                            <!-- Deprecated -->
+                                            <element name="processor-uri">
+                                                <data type="string"/>
+                                            </element>
+                                        </choice>
                                         <element name="start-time">
                                             <data type="string"/>
                                         </element>
@@ -51,9 +60,6 @@
                                                 <data type="boolean"/>
                                             </element>
                                         </optional>
-                                        <element name="processor-uri">
-                                            <data type="string"/>
-                                        </element>
                                         <zeroOrMore>
                                             <element name="input">
                                                 <attribute name="name"/>
@@ -124,9 +130,9 @@
                         </tr>
                         <tr>
                             <th>
-                                <code>processor-uri</code>
+                                <code>processor-name</code>
                             </th>
-                            <td>The URI of the processor that is executed when the task runs.</td>
+                            <td>The qualified name of the processor that is executed when the task runs.</td>
                         </tr>
                         <tr>
                             <th>
@@ -153,7 +159,7 @@
                                         <name>myTask</name>
                                         <start-time>now</start-time>
                                         <interval>10000</interval>
-                                        <processor-uri>oxf/processor/pipeline</processor-uri>
+                                        <processor-name>oxf:pipeline</processor-name>
                                         <input name="config" url="oxf:/mytask.xpl"/>
                                     </start-task>
                                 </config>

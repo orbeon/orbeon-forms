@@ -467,7 +467,12 @@
         </section>
         <anchor id="excel"/>
         <section>
-            <title>Excel Processor</title>
+            <title>Excel Processors</title>
+            <note>
+                These processors are deprecated. Please refer to the <a
+                href="processors-converters#xls-converters">Converters</a> section for up-to-date
+                information.
+            </note>
             <p>
                 Presentation Server ships with the <link
                 href="http://jakarta.apache.org/poi/index.html">POI</link> library which allows

@@ -283,12 +283,13 @@
                 href="reference-formats#binary-documents">binary document format</a>.
             </p>
         </section>
-        <section>
-            <title>Chart Converter</title>
-            <p>
-
-            </p>
-        </section>
+<!--        <section>-->
+<!--            <title>Chart Converter</title>-->
+<!--            <p>-->
+<!---->
+<!--            </p>-->
+<!--        </section>-->
+        <anchor id="xls-converters"/>
         <section>
             <title>XLS Converters</title>
             <p>

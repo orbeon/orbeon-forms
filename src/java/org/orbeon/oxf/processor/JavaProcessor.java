@@ -66,6 +66,7 @@ public class JavaProcessor extends ProcessorImpl {
                 return isInputInCache(context, INPUT_CONFIG)
                         ? getInputKey(context, getInput(context)) : null;
             }
+
             public Object getValidityImpl(PipelineContext context) {
                 return isInputInCache(context, INPUT_CONFIG)
                         ? getInputValidity(context, getInput(context)) : null;
@@ -178,43 +179,42 @@ public class JavaProcessor extends ProcessorImpl {
                 final java.util.ArrayList argLst = new java.util.ArrayList();
                 final String[] cmdLine;
                 {
-                    argLst.add( "-g" );
-                    final String cp = buildClassPath( context );
-                    if ( cp != null ) {
-                        argLst.add( "-classpath" );
-                        argLst.add( cp );
+                    argLst.add("-g");
+                    final String cp = buildClassPath(context);
+                    if (cp != null) {
+                        argLst.add("-classpath");
+                        argLst.add(cp);
                     }
-                    if ( config.sourcepath != null && config.sourcepath.length() > 0 ) {
-                        argLst.add( "-sourcepath" );
-                        argLst.add( config.sourcepath );
+                    if (config.sourcepath != null && config.sourcepath.length() > 0) {
+                        argLst.add("-sourcepath");
+                        argLst.add(config.sourcepath);
                     }
-                    argLst.add( "-d" );
+                    argLst.add("-d");
                     final java.io.File tmp = SystemUtils.getTemporaryDirectory();
                     final String tmpPth = tmp.getAbsolutePath();
-                    argLst.add( tmpPth );
-                    final String fnam = config.sourcepath + "/" 
-                        + config.clazz.replace('.', '/') + ".java";
-                    argLst.add( fnam );
+                    argLst.add(tmpPth);
+                    final String fnam = config.sourcepath + "/"
+                            + config.clazz.replace('.', '/') + ".java";
+                    argLst.add(fnam);
 
-                    cmdLine = new String[ argLst.size() ];
-                    argLst.toArray( cmdLine );
+                    cmdLine = new String[argLst.size()];
+                    argLst.toArray(cmdLine);
                 }
-                if ( logger.isDebugEnabled() ) {
+                if (logger.isDebugEnabled()) {
                     logger.debug("Compiling class '" + config.clazz + "'");
-                    logger.debug( "javac " + argLst.toString() );
+                    logger.debug("javac " + argLst.toString());
                 }
                 Throwable thrown = null;
                 int exitCode = 1;
                 try {
-                    exitCode = Main.compile( cmdLine, new PrintWriter(javacOutput));
-				}
-                catch ( final Throwable t ) {
-                	thrown = t;
-				}
+                    exitCode = Main.compile(cmdLine, new PrintWriter(javacOutput));
+                } catch (final Throwable t) {
+                    thrown = t;
+                }
                 if (exitCode != 0) {
                     String javacOutputString = "\n" + javacOutput.toString();
                     javacOutputString = StringUtils.replace(javacOutputString, "\n", "\n    ");
-                    throw new OXFException("Error compiling '" + argLst.toString() + "'" + javacOutputString, thrown );
+                    throw new OXFException("Error compiling '" + argLst.toString() + "'" + javacOutputString, thrown);
                 }
             }
 
@@ -230,8 +230,8 @@ public class JavaProcessor extends ProcessorImpl {
                     logger.debug("Creating classloader for sourcepath '" + config.sourcepath + "'");
                 sourcepath = new Sourcepath();
                 sourcepath.classLoader = new URLClassLoader
-                    (new URL[] {SystemUtils.getTemporaryDirectory().toURL(), new File(config.sourcepath).toURL()},
-                     this.getClass().getClassLoader());
+                        (new URL[]{SystemUtils.getTemporaryDirectory().toURL(), new File(config.sourcepath).toURL()},
+                                this.getClass().getClassLoader());
                 ObjectCache.instance().add(context, sourcepathKey, sourcepathValidity, sourcepath);
             }
 
@@ -246,22 +246,20 @@ public class JavaProcessor extends ProcessorImpl {
             Thread.currentThread().setContextClassLoader(processorClass.getClassLoader());
             return (Processor) processorClass.newInstance();
 
-        } catch ( final java.io.IOException e ) {
+        } catch (final java.io.IOException e) {
             throw new OXFException(e);
-        } catch ( final IllegalAccessException e ) {
+        } catch (final IllegalAccessException e) {
             throw new OXFException(e);
-        } catch ( final InstantiationException e ) {
+        } catch (final InstantiationException e) {
             throw new OXFException(e);
-        } catch ( final ClassNotFoundException e ) {
+        } catch (final ClassNotFoundException e) {
             throw new OXFException(e);
         }
     }
-    
-    
-    
 
-    private String buildClassPath(PipelineContext context) 
-    throws java.io.UnsupportedEncodingException {
+
+    private String buildClassPath(PipelineContext context)
+            throws java.io.UnsupportedEncodingException {
         StringBuffer classpath = new StringBuffer();
         StringBuffer jarpath = new StringBuffer();
 
@@ -292,9 +290,9 @@ public class JavaProcessor extends ProcessorImpl {
 
         // Try to add directory containing current JAR file if WEB-INF/lib was not found
         if (!gotLibDir) {
-        	final String pth = SystemUtils.pathFromLoaders( JavaProcessor.class, "utf-8" );
-        	classpath.append( pth );
-        	if ( !pth.endsWith( java.io.File.pathSeparator ) ) classpath.append( java.io.File.pathSeparatorChar );
+            final String pth = SystemUtils.pathFromLoaders(JavaProcessor.class, "utf-8");
+            classpath.append(pth);
+            if (!pth.endsWith(java.io.File.pathSeparator)) classpath.append(java.io.File.pathSeparatorChar);
         }
 
         for (StringTokenizer tokenizer = new StringTokenizer(jarpath.toString(), PATH_SEPARATOR); tokenizer.hasMoreElements();) {
@@ -316,7 +314,7 @@ public class JavaProcessor extends ProcessorImpl {
         }
 
         if (logger.isDebugEnabled())
-            logger.debug("Classpath: "+ classpath.toString());
+            logger.debug("Classpath: " + classpath.toString());
         return classpath.length() == 0 ? null : classpath.toString();
     }
 

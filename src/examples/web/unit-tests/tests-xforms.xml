@@ -1203,4 +1203,168 @@
         </output>
     </test>
     
+    <test description="Adding xxforms:invalid on elements with invalid attributes" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" >
+                <p:param name="instance" type="output"/>
+                <p:processor name="oxf:xslt-2.0">
+                    <p:input name="data"><dummy/></p:input>
+                    <p:input name="config">
+                        <xforms:model xsl:version="2.0">
+                            <xforms:instance>
+                                <instance>
+                                    <x a="1"/>
+                                    <y a="2"/>
+                                </instance>
+                            </xforms:instance>
+                            <xforms:bind nodeset="/instance/x" constraint="@a = '1'">
+                                <xforms:bind nodeset="@a" constraint=". = '1'"/>
+                            </xforms:bind>
+                            <xforms:bind nodeset="/instance/y" constraint="@a = '1'">
+                                <xforms:bind nodeset="@a" constraint=". = '1'"/>
+                            </xforms:bind>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="xforms-model"/>
+                </p:processor>
+                <p:processor name="oxf:xforms-input">
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="request"><request><parameters/></request></p:input>
+                    <p:input name="filter"><params/></p:input>
+                    <p:input name="matcher-result"><result/></p:input>
+                    <p:output name="data" ref="instance"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="instance">
+            <instance>
+                <x a="1" xxforms:valid="true"/>
+                <y a="2" xxforms:valid="false"/>
+            </instance>
+        </output>
+    </test>
+    
+    <!-- FIXME: Only the first invalid element is marked as invalid. -->
+    <test description="Schema validation with multiple errors" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="instance" type="output"/>
+                <p:processor name="oxf:xforms-input">
+                    <p:input name="model">
+                        <xforms:model schema="form.xsd">
+                            <xforms:instance>
+                                <instance>
+                                    <a>35</a>
+                                    <b>-42</b>
+                                    <c>x</c>
+                                    <d/>
+                                </instance>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:input name="request"><request><parameters/></request></p:input>
+                    <p:input name="filter"><params/></p:input>
+                    <p:input name="matcher-result"><result/></p:input>
+                    <p:output name="data" id="instance"/>
+                </p:processor>
+                <!-- Remove error message added by validator that might 
+                     change from one version to the other  -->
+                <p:processor name="oxf:xslt-2.0">
+                    <p:input name="data" href="#instance"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0">
+                            <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                            <xsl:template match="@xxforms:error"/>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" ref="instance"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="instance">
+            <instance>
+                <a>35</a>
+                <b xxforms:valid="false">42</b>
+                <c>x</c>
+                <d/>
+            </instance>
+        </output>
+    </test>
+
+    <test description="Schema validation of attribute" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors"
+                    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <p:param name="html" type="output"/>
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model">
+                        <xforms:model>
+                            <xforms:instance>
+                                <instance/>
+                            </xforms:instance>
+                            <xforms:bind nodeset="/instance/a/@a" constraint="false()"/>
+                        </xforms:model>
+                    </p:input>
+                    <p:input name="instance">
+                        <instance>
+                            <a a="-1"/>
+                            <b b="2"/>
+                            <c c="-3"/>
+                        </instance>
+                    </p:input>
+                    <p:input name="data">
+                        <xforms:group ref="/instance">
+                            <xforms:input ref="a/@a"/>
+                            <xforms:input ref="b/@b"/>
+                            <xforms:input ref="c/@c"/>
+                        </xforms:group>
+                    </p:input>
+                    <p:output name="data" ref="html"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="html">
+            <instance>
+                <a>35</a>
+                <b xxforms:valid="false">42</b>
+                <c>x</c>
+                <d/>
+            </instance>
+        </output>
+    </test>
+
+    <test description="Evaluate: reference recursive expression" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" >
+                <p:param name="instance" type="output"/>
+
+                <p:processor uri="oxf/processor/pipeline">
+                    <p:input name="config" href="xforms-instance-recreate.xpl"/>
+                    <p:input name="model">
+                        <xforms:model>
+                            <xforms:instance>
+                                <instance>
+                                    <a>1</a>
+                                    <b>2</b>
+                                </instance>
+                            </xforms:instance>
+                            <xforms:bind nodeset="/instance/a"
+                                calculate="concat(/instance/a, /instance/b)"/>
+                        </xforms:model>
+                    </p:input>
+                    <p:input name="view">
+                        <html>
+                            <xforms:group ref="/*"/>
+                        </html>
+                    </p:input>
+                    <p:output name="instance" ref="instance"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="instance">
+            <instance>122</instance>
+        </output>
+    </test>
+    
 </group>

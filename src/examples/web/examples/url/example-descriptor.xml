@@ -12,9 +12,13 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>URL Generator</title>
+    <title>HTML Screen-Scraping</title>
+    <source>news/model.xpl</source>
+    <source>weather/model.xpl</source>
+    <source>weather/model-standalone.xpl</source>
     <source>model.xpl</source>
     <source>view.xsl</source>
+    <source>page-flow.xml</source>
     <description>
         <p>
             PresentationServer loads resources URLs (<code>oxf:</code>, <code>http:</code>,

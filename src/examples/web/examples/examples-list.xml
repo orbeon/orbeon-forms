@@ -109,7 +109,7 @@
         <example id="struts-validation" label="Struts Client-Side Validation" href="/struts/jsType"/>
     </section>
     <section label="Cool Stuff">
-        <example id="url" label="URL Generator"/>
+        <example id="url" label="HTML Screen-Scraping"/>
         <example id="rss" label="Create Your Own RSS Feeds"/>
         <example id="spellchecker" label="Google Spell Checker"/>
         <example id="xml-to-url" label="XML to URL"/>

@@ -13,9 +13,10 @@
 -->
 <example-descriptor>
     <title>XQuery Sandbox</title>
+    <source>xforms-model.xml</source>
     <source>model.xpl</source>
-    <source>form.xml</source>
     <source>view.xsl</source>
+    <source>page-flow.xml</source>
     <source>input.xml</source>
     <description>
         <p>

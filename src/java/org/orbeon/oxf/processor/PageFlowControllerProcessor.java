@@ -104,10 +104,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     _notFoundPageId = notFoundHandlerElement != null ? notFoundHandlerElement.attributeValue("page") : null;
                 }
                 final String notFoundPageId = _notFoundPageId;
-                final String errorPageId; {
-                    Element errorHandlerElement = controllerDocument.getRootElement().element("error-handler");
-                    errorPageId = errorHandlerElement != null ? errorHandlerElement.attributeValue("page") : null;
-                }
+//                final String errorPageId; {
+//                    Element errorHandlerElement = controllerDocument.getRootElement().element("error-handler");
+//                    errorPageId = errorHandlerElement != null ? errorHandlerElement.attributeValue("page") : null;
+//                }
 
                 // Go through all pages to get mapping
                 final Map pageIdToPageElement = new HashMap();

@@ -172,9 +172,8 @@
                     <li>The <code>page</code> elements declare pages or groups of similar pages and
                     define the XForms model, the MVC model, and the MVC view for each page.</li>
 
-                    <li>The <code>epilogue</code>, <code>not-found-handler</code> and
-                    <code>error-handler</code> elements define properties that apply to all the
-                    pages.</li>
+                    <li>The <code>epilogue</code> and <code>not-found-handler</code> elements
+                    define properties that apply to all the pages.</li>
                 </ul>
             </section>
             <section>
@@ -656,11 +655,6 @@
                                         <attribute name="page" type="string"/>
                                     </complexType>
                                 </element>
-                                <element name="error-handler" minOccurs="0">
-                                    <complexType>
-                                        <attribute name="page" type="string"/>
-                                    </complexType>
-                                </element>
                             </sequence>
                             <attribute name="instance-passing" type="c:instance-passing-type" use="optional"/>
                         </complexType>
@@ -674,10 +668,6 @@
                         </unique>
                         <keyref name="result-page-id-ref" refer="c:page-id-unique">
                             <selector xpath="c:page/c:action/c:result"/>
-                            <field xpath="@page"/>
-                        </keyref>
-                        <keyref name="error-handler-page-id-ref" refer="c:page-id-unique">
-                            <selector xpath="c:error-handler"/>
                             <field xpath="@page"/>
                         </keyref>
                         <keyref name="not-found-handler-page-id-ref" refer="c:page-id-unique">

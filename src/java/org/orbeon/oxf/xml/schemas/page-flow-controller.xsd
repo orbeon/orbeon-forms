@@ -92,11 +92,6 @@
                         <attribute name="page" type="string"/>
                     </complexType>
                 </element>
-                <element name="error-handler" minOccurs="0">
-                    <complexType>
-                        <attribute name="page" type="string"/>
-                    </complexType>
-                </element>
             </sequence>
             <attribute name="instance-passing" type="c:instance-passing-type" use="optional"/>
         </complexType>
@@ -110,10 +105,6 @@
         </unique>
         <keyref name="result-page-id-ref" refer="c:page-id-unique">
             <selector xpath="c:page/c:action/c:result"/>
-            <field xpath="@page"/>
-        </keyref>
-        <keyref name="error-handler-page-id-ref" refer="c:page-id-unique">
-            <selector xpath="c:error-handler"/>
             <field xpath="@page"/>
         </keyref>
         <keyref name="not-found-handler-page-id-ref" refer="c:page-id-unique">

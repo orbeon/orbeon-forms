@@ -128,13 +128,6 @@
                         </attribute>
                     </element>
                 </optional>
-                <optional>
-                    <element name="error-handler">
-                        <attribute name="page">
-                            <data type="string"/>
-                        </attribute>
-                    </element>
-                </optional>
             </interleave>
         </element>
     </start>

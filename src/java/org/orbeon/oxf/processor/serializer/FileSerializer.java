@@ -54,7 +54,7 @@ public class FileSerializer extends CachedSerializer {
 
     public static final String DEFAULT_ENCODING = TransformerUtils.DEFAULT_OUTPUT_ENCODING;
     public static final boolean DEFAULT_INDENT = true;
-    public static final int DEFAULT_INDENT_AMOUNT = 0;
+    public static final int DEFAULT_INDENT_AMOUNT = 1;
 
     public static final String DIRECTORY_PROPERTY = "directory";
 

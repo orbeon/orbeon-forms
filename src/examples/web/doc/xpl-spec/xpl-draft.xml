@@ -279,6 +279,16 @@
                     the prefix of the QName.
                 </p>
             </div2>
+            <div2>
+                <head>Namespace</head>
+                <p>
+                    All the elements defined by XPL must be in the
+                    <code>http://www.orbeon.com/oxf/xpl</code> namespace. For consistency, this
+                    specification use the prefix <code>p</code>. It is recommended that authors of
+                    XPL programs use that prefix as well. However the XPL implementation must only
+                    consider the namespace URI of an element to identify it as an XPL element.
+                </p>
+            </div2>
         </div1>
         <div1 id="processors">
             <head>XML Processors</head>
@@ -498,18 +508,19 @@
                             connected output. If the XML processor instance has at least one
                             declared output, the XPL implementation will always give control to the
                             XML processor in association with an output. If the XPL implementation
-                            gives control the XML processor instance in association with an output,
-                            while in control the XML processor instance must "produce" an XML
-                            Infoset associated with that output. If the XPL implementation did not
-                            associate an output, the XML processor does not generate an XML Infoset.
+                            gives control to the XML processor instance in association with an
+                            output, while in control of processing the XML processor instance must
+                            "produce" an XML Infoset associated with that output. If the XPL
+                            implementation does not associate an output, the XML processor does not
+                            generate an XML Infoset.
                         </p>
                     </item>
                     <item>
                         <p>
-                            <emph>Generating an error.</emph> The XML processor instance, when
-                            having control, may generate an error that is propagated to the XPL
-                            implementation. The XPL implementation then raises a dynamic error.
-                            Even if the XPL implementation is expecting a resulting XML Infoset, no
+                            <emph>Generating an error.</emph> The XML processor instance, while in
+                            control of processing, may generate an error that is propagated to the
+                            XPL implementation. The XPL implementation then raises a dynamic error.
+                            Even if the XPL implementation expects a resulting XML Infoset, no
                             such XML Infoset is provided by the XML processor. With the Exception
                             module, the error is considered an exception and may be a recoverable
                             dynamic error. This means that if an exception handler is available for
@@ -519,7 +530,7 @@
                             errors.
                         </p>
                         <p>
-                            Example 1: An XML processor may generate an error if an XML Infosets
+                            Example 1: An XML processor may generate an error if an XML Infoset
                             read on any of its inputs does not conform to a format expected by the
                             XML processor. Similarly, the interaction with other software may cause
                             the XML processor to report errors.
@@ -531,11 +542,11 @@
                     </item>
                     <item>
                         <p>
-                            <emph>Reading inputs.</emph> The XML processor instance, when having
-                            control, may read one or more of its connected inputs. "Reading an
-                            input" means that the XML processor instance asks the XPL implementation
-                            to produce the XML Infoset associated with that particular connected
-                            input.
+                            <emph>Reading inputs.</emph> The XML processor instance, while in
+                            control of processing, may read one or more of its connected inputs.
+                            "Reading an input" means that the XML processor instance asks the XPL
+                            implementation to produce the XML Infoset associated with that
+                            particular connected input.
                         </p>
                     </item>
                     <item>
@@ -550,9 +561,9 @@
                     </item>
                 </ulist>
                 <p>
-                    While in control, an XML processor instance may perform other tasks, like
-                    interacting with other software. Such tasks are outside the scope of the present
-                    specification.
+                    While in control of processing, an XML processor instance may perform other
+                    tasks, like interacting with other software. Such tasks are outside the scope of
+                    the present specification.
                 </p>
                 <p>
                     XPL does not specify the format or API used by the XPL implementation to
@@ -587,9 +598,9 @@
                 </ulist>
                 <note>
                     Some use cases do not require that an XPL program have any inputs or outputs. It
-                    is important to note that information, whether in the form or XML Infosets or
-                    other forms, is not necessarily exchanged with XPL programs through inputs and
-                    outputs, but possibly through other means. For example, an XML processor can access
+                    is important to note that information, whether represented as XML Infosets or
+                    not, is not necessarily exchanged with XPL programs through inputs and outputs,
+                    but possibly through other means. For example, an XML processor can access
                     information by connecting to a relational database and return an XML Infoset to
                     the XPL program.
                 </note>
@@ -651,10 +662,11 @@
                     in document order.
                 </p>
                 <p>
-                    If there is no previous statement, the set of XML Infoset identifiers in scope
-                    for a statement of an XPL program, unless specified otherwise, consists of the
-                    set of identifiers specified by the <el>id</el> attributes of the XPL program
-                    inputs.
+                    If there is no such previous statement, the set of XML Infoset identifiers in
+                    scope for a statement of an XPL program, unless specified otherwise, consists of
+                    the set of identifiers specified by the <el>id</el> attributes of the XPL
+                    program inputs. In other words, this condition applies to the first statement of
+                    an XPL program.
                 </p>
                 <p>
                     In this specification, a statement consists of either a <el>p:processor</el>,

@@ -11,14 +11,6 @@
         </p>
     </div2>
     <div2>
-        <head>Namespace</head>
-        <p>
-            All the elements defined by XPL must be in the
-            <code>http://www.orbeon.com/oxf/xpl</code> namespace. For consistency, XPL elements
-            should use the prefix <code>p</code>. This document assumes that this prefix is used.
-        </p>
-    </div2>
-    <div2>
         <head>Pipeline Module</head>
         <div3>
             <head>The <el>p:pipeline</el> Element</head>
@@ -80,7 +72,7 @@
             <p>
                 The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
-                input.
+                input as per <specref ref="schema-references-processing"/>.
             </p>
         </div3>
         <div3>
@@ -117,7 +109,7 @@
             <p>
                 The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
-                output.
+                output as per <specref ref="schema-references-processing"/>.
             </p>
         </div3>
         <note>
@@ -152,10 +144,9 @@
                 the <el>p:processor</el> element.
             </p>
             <p>
-                More than one <el>p:processor</el> elements with the same <el>name</el>
-                attribute may be used in an XPL program. This translates into using several
-                <termref def="xml-processor-instance">instances</termref> of the XML
-                processor.
+                More than one <el>p:processor</el> element with the same <el>name</el> attribute
+                may be used in an XPL program. This translates into using several <termref
+                def="xml-processor-instance">instances</termref> of the XML processor.
             </p>
             <note>
                 The presence of a <el>p:processor</el> statement in an XML program does not
@@ -179,12 +170,12 @@
                 mandatory <el>name</el> attribute.
             </p>
             <p>
-                If the <el>href</el> attribute is missing, there must be an embedded Infoset as
-                a child of the <el>p:input</el> element. In that case, here must exactly one
-                child element of the <el>p:input</el> element. If no element is present or more
-                than one element is present, a static error must be raised. If the <el>href</el>
-                attribute is present and the <el>p:input</el> element has one or more children,
-                a static error must be raised.
+                If the <el>href</el> attribute is missing, there must be an embedded Infoset as a
+                child of the <el>p:input</el> element. In that case, there must be exactly one child
+                element of the <el>p:input</el> element. If no element is present or more than one
+                element is present, a static error must be raised. If the <el>href</el> attribute is
+                present and the <el>p:input</el> element has one or more children, a static error
+                must be raised.
             </p>
             <p>
                 The Infoset reference contained by the <el>href</el> attribute may refer to
@@ -194,7 +185,7 @@
             <p>
                 The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
-                input.
+                input as per <specref ref="schema-references-processing"/>.
             </p>
             <p>
                 The embedded XML Infoset, if any, is constructed from the single element
@@ -230,7 +221,7 @@
             <p>
                 The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
-                output.
+                output as per <specref ref="schema-references-processing"/>.
             </p>
         </div3>
         <note>
@@ -295,7 +286,7 @@
             <p>
                 The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset produced by the
-                <el>href</el> attribute.
+                <el>href</el> attribute as per <specref ref="schema-references-processing"/>.
             </p>
         </div3>
         <div3>
@@ -330,9 +321,9 @@
 &lt;/p:otherwise&gt;
             </pre>
             <p>
-                A <el>p:otherwise</el> element is always a child of a <el>p:choose</el> element. Any
-                <el>p:when</el> sibling element must all precede a <el>p:otherwise</el> element.
-                There must be exactly zero or one <el>p:otherwise</el> element child of a
+                A <el>p:otherwise</el> element is always a child of a <el>p:choose</el> element. All
+                <el>p:when</el> sibling elements must precede a <el>p:otherwise</el> element. There
+                must be exactly zero or one <el>p:otherwise</el> element child of a
                 <el>p:choose</el> element.
             </p>
         </div3>
@@ -400,7 +391,7 @@
             <p>
                 The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
-                <el>href</el> attribute.
+                <el>href</el> attribute as per <specref ref="schema-references-processing"/>.
             </p>
             <note>
                 The no-collision rule applies for statements within a <el>p:for-each</el>
@@ -447,7 +438,7 @@
             <p>
                 The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset produced by the
-                <el>href</el> attribute.
+                <el>href</el> attribute as per <specref ref="schema-references-processing"/>.
             </p>
         </div3>
     </div2>

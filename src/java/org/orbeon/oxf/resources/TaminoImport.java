@@ -122,12 +122,13 @@ public class TaminoImport {
 
     private void parseArgs(String[] args) {
         Options options = new Options();
-        options.addOption('r', "root", true, "Resource Root", false);
-        options.addOption('u', "url", true, "Cache URL", false);
-        options.addOption('l', "login", true, "Cache Login", false);
-        options.addOption('p', "password", true, "Cache Password", false);
+        options.addOption("r", "root", true, "Resource Root");
+        options.addOption("u", "url", true, "Cache URL");
+        options.addOption("l", "login", true, "Cache Login");
+        options.addOption("p", "password", true, "Cache Password");
         try {
-            CommandLine cmd = options.parse(args, true);
+            CommandLineParser parser = new PosixParser();
+            CommandLine cmd = parser.parse(options, args, true);
 
             resourceDir = cmd.getOptionValue('r', ".");
             url = cmd.getOptionValue('u', DEFAULT_URL);

@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.output.BooleanModelItemProperty;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
+import org.orbeon.oxf.processor.xforms.output.XFormsFunctionLibrary;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
@@ -33,6 +34,7 @@ import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.xpath.StandaloneContext;
 import org.orbeon.saxon.xpath.XPathEvaluator;
 import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.functions.FunctionLibrary;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -55,6 +57,8 @@ public class Model {
     private String action;
     private String encoding;
     private List binds = new ArrayList();
+
+    private FunctionLibrary xformsFunctionLibrary = new XFormsFunctionLibrary();
 
     public Model(PipelineContext pipelineContext) {
         this.pipelineContext = pipelineContext;
@@ -146,7 +150,7 @@ public class Model {
                             // Evaluate "relevant" XPath expression on this node
                             String xpath = "boolean(" + modelBind.getRelevant() + ")";
                             PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                                    documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap());
+                                    documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null, xformsFunctionLibrary);
                             try {
                                 boolean relevant = ((Boolean)expr.evaluateSingle()).booleanValue();
                                 // Mark node
@@ -169,7 +173,7 @@ public class Model {
                             if (node instanceof Element) {
                                 // Compute calculated value
                                 PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                                        documentWrapper.wrap(node), modelBind.getCalculate(), modelBind.getNamespaceMap());
+                                        documentWrapper.wrap(node), modelBind.getCalculate(), modelBind.getNamespaceMap(), null, xformsFunctionLibrary);
                                 try {
                                     List result = expr.evaluate();
                                     // Place in element
@@ -194,7 +198,7 @@ public class Model {
                                 // Compute calculated value and place in attribute
                                 String xpath =  "string(" + modelBind.getCalculate() + ")";
                                 PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                                        documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap());
+                                        documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null, xformsFunctionLibrary);
                                 try {
                                     String value = ((String)expr.evaluateSingle());
                                     XFormsUtils.fillNode(node, value);
@@ -273,7 +277,7 @@ public class Model {
                                 // Evaluate constraint
                                 String xpath = "boolean(" + modelBind.getConstraint() + ")";
                                 PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                                        documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap());
+                                        documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null, xformsFunctionLibrary);
 
                                 try {
                                     Boolean valid = (Boolean)expr.evaluateSingle();
@@ -296,7 +300,7 @@ public class Model {
                             // Evaluate "required" XPath expression on this node
                             String xpath = "boolean(" + modelBind.getRequired() + ")";
                             PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                                    documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap());
+                                    documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null, xformsFunctionLibrary);
 
                             try {
                                 boolean required = ((Boolean)expr.evaluateSingle()).booleanValue();
@@ -323,7 +327,7 @@ public class Model {
                             // Evaluate "readonly" XPath expression on this node
                             String xpath = "boolean(" + modelBind.getReadonly() + ")";
                             PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                                    documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap());
+                                    documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null, xformsFunctionLibrary);
 
                             try {
                                 boolean readonly = ((Boolean)expr.evaluateSingle()).booleanValue();
@@ -423,11 +427,11 @@ public class Model {
 
     private void iterateNodeSet(DocumentWrapper documentWrapper,
                                 ModelBind modelBind, NodeHandler nodeHandler) {
-//        List nodeset = XPathUtils.evaluate(xpathEvaluator, modelBind.getNodeset(), modelBind.getLocationData());
         PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
                 documentWrapper,
                 modelBind.getNodeset(),
-                modelBind.getNamespaceMap());
+                modelBind.getNamespaceMap(),
+                null, xformsFunctionLibrary);
         try {
             List  nodeset = expr.evaluate();
             for (Iterator j = nodeset.iterator(); j.hasNext();) {

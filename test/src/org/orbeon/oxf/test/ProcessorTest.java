@@ -261,7 +261,7 @@ public class ProcessorTest extends TestCase {
      * Remove the element the namespace declaration that are not used
      * in this element or child elements.
      */
-    private void removeUnusedNamespaceDeclarations(Element element) {
+    synchronized private void removeUnusedNamespaceDeclarations(Element element) {
         List usedNamespaces = new ArrayList();
         getUsedNamespaces(usedNamespaces, element);
         List declaredNamespaces = element.declaredNamespaces();

@@ -148,13 +148,15 @@
                     <xml-source>
                         <p:processor name="oxf:scheduler">
                             <p:input name="config">
-                                <start-task>
-                                    <name>myTask</name>
-                                    <start-time>now</start-time>
-                                    <interval>10000</interval>
-                                    <processor-uri>oxf/processor/pipeline</processor-uri>
-                                    <input name="config" url="oxf:/mytask.xpl"/>
-                                </start-task>
+                                <config>
+                                    <start-task>
+                                        <name>myTask</name>
+                                        <start-time>now</start-time>
+                                        <interval>10000</interval>
+                                        <processor-uri>oxf/processor/pipeline</processor-uri>
+                                        <input name="config" url="oxf:/mytask.xpl"/>
+                                    </start-task>
+                                </config>
                             </p:input>
                         </p:processor>
                     </xml-source>

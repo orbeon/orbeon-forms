@@ -91,25 +91,30 @@ public class JavaProcessor extends ProcessorImpl {
                     throw new OXFException("Processor used by Java processor cannot have a config input");
             }
 
-            List inputs = getConnectedInputs();
-            for (Iterator i = inputs.iterator(); i.hasNext();) {
-                final ProcessorInput javaProcessorInput = (ProcessorInput) i.next();
-                String inputName = javaProcessorInput.getName();
+            Map inputMap = getConnectedInputs();
 
-                // Skip our own config input
-                if (inputName.equals(INPUT_CONFIG))
-                    continue;
+            for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
+                String inputName = (String) i.next();
+                List inputsForName = (List) inputMap.get(inputName);
 
-                // Delegate
-                ProcessorInput userProcessorInput = processor.createInput(inputName);
-                ProcessorOutput topOutput = new ProcessorImpl.ProcessorOutputImpl(getClass(), inputName) {
-                    protected void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                        javaProcessorInput.getOutput().read(context, contentHandler);
-                    }
-                };
-                // Connect
-                userProcessorInput.setOutput(topOutput);
-                topOutput.setInput(userProcessorInput);
+                for (Iterator j = inputsForName.iterator(); j.hasNext();) {
+                    final ProcessorInput javaProcessorInput = (ProcessorInput) j.next();
+
+                    // Skip our own config input
+                    if (inputName.equals(INPUT_CONFIG))
+                        continue;
+
+                    // Delegate
+                    ProcessorInput userProcessorInput = processor.createInput(inputName);
+                    ProcessorOutput topOutput = new ProcessorImpl.ProcessorOutputImpl(getClass(), inputName) {
+                        protected void readImpl(PipelineContext context, ContentHandler contentHandler) {
+                            javaProcessorInput.getOutput().read(context, contentHandler);
+                        }
+                    };
+                    // Connect
+                    userProcessorInput.setOutput(topOutput);
+                    topOutput.setInput(userProcessorInput);
+                }
             }
 
             boolean hasOutputs = false;

@@ -266,16 +266,17 @@ public abstract class ProcessorImpl implements Processor {
         return inputsInfo;
     }
 
-    public List getConnectedInputs() {
-        List result = new ArrayList();
-        for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
-            String inputName = (String) i.next();
-            List inputsWithName = (List) inputMap.get(inputName);
-            for (Iterator j = inputsWithName.iterator(); j.hasNext();) {
-                result.add(j.next());
-            }
-        }
-        return result;
+    public Map getConnectedInputs() {
+        return inputMap;
+//        List result = new ArrayList();
+//        for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
+//            String inputName = (String) i.next();
+//            List inputsWithName = (List) inputMap.get(inputName);
+//            for (Iterator j = inputsWithName.iterator(); j.hasNext();) {
+//                result.add(j.next());
+//            }
+//        }
+//        return result;
     }
 
     public ProcessorInputOutputInfo getInputInfo(String name) {
@@ -291,16 +292,17 @@ public abstract class ProcessorImpl implements Processor {
         return outputsInfo;
     }
 
-    public List getConnectedOutputs() {
-        List result = new ArrayList();
-        for (Iterator i = outputMap.keySet().iterator(); i.hasNext();) {
-            String inputName = (String) i.next();
-            List inputsWithName = (List) outputMap.get(inputName);
-            for (Iterator j = inputsWithName.iterator(); j.hasNext();) {
-                result.add(j.next());
-            }
-        }
-        return result;
+    public Map getConnectedOutputs() {
+        return outputMap;
+//        List result = new ArrayList();
+//        for (Iterator i = outputMap.keySet().iterator(); i.hasNext();) {
+//            String inputName = (String) i.next();
+//            List inputsWithName = (List) outputMap.get(inputName);
+//            for (Iterator j = inputsWithName.iterator(); j.hasNext();) {
+//                result.add(j.next());
+//            }
+//        }
+//        return result;
     }
 
     public ProcessorInputOutputInfo getOutputInfo(String name) {

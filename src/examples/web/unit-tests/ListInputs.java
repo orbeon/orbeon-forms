@@ -23,6 +23,7 @@ import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class ListInputs extends SimpleProcessor {
 
@@ -37,19 +38,24 @@ public class ListInputs extends SimpleProcessor {
 
     public void generateList(PipelineContext pipelineContext, ContentHandler contentHandler) {
         try {
-            List inputList = getConnectedInputs();
+            Map inputMap = getConnectedInputs();
 
             contentHandler.startDocument();
             contentHandler.startElement("", "inputs", "inputs", new AttributesImpl());
-            for (Iterator i = inputList.iterator(); i.hasNext();) {
-                ProcessorInput input = (ProcessorInput) i.next();
-                addStringElement(contentHandler, "input", input.getName());
-                readInputAsSAX(pipelineContext, input, new ForwardingContentHandler(contentHandler) {
-                    public void startDocument() {
-                    }
-                    public void endDocument() {
-                    }
-                });
+            for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
+                String inputName = (String) i.next();
+                List inputsForName = (List) inputMap.get(inputName);
+
+                for (Iterator j = inputsForName.iterator(); j.hasNext();) {
+                    ProcessorInput input = (ProcessorInput) j.next();
+                    addStringElement(contentHandler, "input", input.getName());
+                    readInputAsSAX(pipelineContext, input, new ForwardingContentHandler(contentHandler) {
+                        public void startDocument() {
+                        }
+                        public void endDocument() {
+                        }
+                    });
+                }
             }
             contentHandler.endElement("", "inputs", "inputs");
             contentHandler.endDocument();

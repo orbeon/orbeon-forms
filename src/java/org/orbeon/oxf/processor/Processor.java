@@ -18,6 +18,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Base interface implemented by all processors.
@@ -155,18 +156,20 @@ public interface Processor {
     public List getOutputsInfo();
 
     /**
-     * @return  A list of <code>ProcessorInput</code> objects
-     *          corresponding to the inputs currently connected to this
-     *          processor.
+     * @return  A Map containing all the inputs currently connected to this
+     *          processor. Each key in the Map is a String specifying an input
+     *          name. The List associated to the key contains one or more
+     *          <code>ProcessorInput</code> objects.
      */
-    public List getConnectedInputs();
+    public Map getConnectedInputs();
 
     /**
-     * @return  A list of <code>ProcessorOutput</code> objects
-     *          corresponding to the outputs currently connected to this
-     *          processor.
+     * @return  A Map containing all the outputs currently connected to this
+     *          processor. Each key in the Map is a String specifying an output
+     *          name. The List associated to the key contains one or more
+     *          <code>ProcessorOutput</code> objects.
      */
-    public List getConnectedOutputs();
+    public Map getConnectedOutputs();
 
     /**
      * This method is called to trigger the execution of this processor. This

@@ -21,13 +21,13 @@
 	</header>
 	<body>
         <section>
-			<title>New in Version 2.5.4+</title>
+			<title>New in Version 2.6</title>
             <section>
                 <title>BizDoc Application Changes</title>
                 <p>
                     The data access layer of the BizDoc application has been refactored to allow for
                     multiple backends, such as XML databases (currently eXist through the XML:DB
-                    processor) and SQL databases.
+                    processor) and SQL databases (XML stored as string or native XML format).
                 </p>
             </section>
             <section>
@@ -125,13 +125,48 @@
             <section>
                 <title>Email Processor</title>
                 <p>
-                    The <a href="processors-messaging#email">Email processor</a> now supports
-                    binary attachments and controlling character encodings. All MIME parts can be
-                    dynamically generated.
+                    The <a href="processors-messaging#email">Email processor</a> features the
+                    following improvements:
+                </p>
+                <ul>
+                    <li>
+                        <b>Binary attachments:</b> binary files such as images and PDF files can be
+                        attached to an email.
+                    </li>
+                    <li>
+                        <b>Character encoding:</b> character encoding can be specified for text content.
+                    </li>
+                    <li>
+                        <b>Dynamic attachments:</b> attachments can be generated dynamically. It is
+                        for example possible to attach a dynamically generated chart or PDF file.
+                    </li>
+                    <li>
+                        <b>Multipart hierarchy:</b> it is possible to have multiple levels of
+                        multipart messages.
+                    </li>
+                </ul>
+                <p>
+                    In addition, property naming has been revisted. The <code>test-smtp-host</code>
+                    and <code>test-to</code> replace the deprecated <code>host</code> and
+                    <code>forceto</code> properties.
+                </p>
+            </section>
+            <section>
+                <title>Custom Processors</title>
+                <p>
+                    There is a new facility to declare custom processors that does not involve
+                    modifying the original <code>processors.xml</code> file.
+                    <!-- TODO -->
                 </p>
             </section>
 <!--            <section>-->
 <!--                <title>J2SE 5.0 Support</title>-->
+<!--                <p>-->
+<!--                    TODO -->
+<!--                </p>-->
+<!--            </section>-->
+<!--            <section>-->
+<!--                <title>Tomcat 5.0 Support</title>-->
 <!--                <p>-->
 <!--                    TODO -->
 <!--                </p>-->

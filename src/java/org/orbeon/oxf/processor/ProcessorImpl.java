@@ -439,42 +439,35 @@ public abstract class ProcessorImpl implements Processor {
                 + input.getName() + ", " + input.getProcessorClass() + "]"
                 : null;
 
-        if ((!(output instanceof Cacheable)))
-            logger.info("Not Cacheable : " + output);
-
         if (output instanceof Cacheable) {
-            Cacheable c = (Cacheable) output;
+            // Get cache instance
+            Cache cache = ObjectCache.instance();
 
             // Check in cache first
-            Cache cache = ObjectCache.instance();
-            InputCacheKey inputKey = c.getKey(context) == null ? null :
-                    new InputCacheKey(input, c.getKey(context));
-            Object validity = (inputKey != null) ? c.getValidity(context) : null;
-            if (inputKey != null && validity != null) {
-                Object configObject = cache.findValid(context, inputKey, validity);
+            KeyValidity keyValidity = getInputKeyValidity(context, input);
+            if (keyValidity != null) {
+                Object configObject = cache.findValid(context, keyValidity.key, keyValidity.validity);
                 if (configObject != null) {
                     // Return cached object
                     if (logger.isDebugEnabled())
-                        logger.debug("Cache " + debugInfo + ": source cacheable and found for key '" + inputKey + "'. FOUND object: " + configObject);
+                        logger.debug("Cache " + debugInfo + ": source cacheable and found for key '" + keyValidity.key + "'. FOUND object: " + configObject);
                     return configObject;
                 }
             }
 
-            // Read result
+            // Result was not found in cache, read result
             if (logger.isDebugEnabled())
                 logger.debug("Cache " + debugInfo + ": READING.");
             Object result = reader.read(context, input);
 
-            // Cache result if possible
-            if (inputKey == null)
-                inputKey = c.getKey(context) == null ? null :
-                        new InputCacheKey(input, c.getKey(context));
-            if (validity == null)
-                validity = (inputKey != null) ? c.getValidity(context) : null;
-            if (inputKey != null && validity != null) {
+            // Cache new result if possible, asking again for KeyValidity if needed
+            if (keyValidity == null)
+                keyValidity = getInputKeyValidity(context, input);
+
+            if (keyValidity != null) {
                 if (logger.isDebugEnabled())
-                    logger.debug("Cache " + debugInfo + ": source cacheable for key '" + inputKey + "'. STORING object:" + result);
-                cache.add(context, inputKey, validity, result);
+                    logger.debug("Cache " + debugInfo + ": source cacheable for key '" + keyValidity.key + "'. STORING object:" + result);
+                cache.add(context, keyValidity.key, keyValidity.validity, result);
             }
 
             return result;
@@ -630,7 +623,7 @@ public abstract class ProcessorImpl implements Processor {
         }
     }
 
-    public void start(PipelineContext context) {
+    public void start(PipelineContext pipelineContext) {
         throw new ValidationException("Start not supported; processor implemented by '"
                 + getClass().getName() + "'", locationData);
     }
@@ -1140,13 +1133,15 @@ public abstract class ProcessorImpl implements Processor {
      * and getValidity methods to make sure that they don't read the whole
      * config (if we don't already have it) just to return a key/validity.
      */
+    protected boolean isInputInCache(PipelineContext context, ProcessorInput input) {
+        KeyValidity keyValidity = getInputKeyValidity(context, input);
+        if (keyValidity == null)
+            return false;
+        return ObjectCache.instance().findValid(context, keyValidity.key, keyValidity.validity) != null;
+    }
+
     protected boolean isInputInCache(PipelineContext context, String inputName) {
-        OutputCacheKey outputCacheKey = getInputKey(context, getInputByName(inputName));
-        if (outputCacheKey == null) return false;
-        InputCacheKey inputCacheKey = new InputCacheKey(getInputByName(inputName), outputCacheKey);
-        Object inputValidity = getInputValidity(context, getInputByName(inputName));
-        if (inputValidity == null) return false;
-        return ObjectCache.instance().findValid(context, inputCacheKey, inputValidity) != null;
+        return isInputInCache(context, getInputByName(inputName));
     }
 
     /**
@@ -1155,13 +1150,17 @@ public abstract class ProcessorImpl implements Processor {
      *
      * @return  a KeyValidity object containing non-null key and validity, or null
      */
-    protected KeyValidity getInputKeyValidity(PipelineContext context, String inputName) {
-        OutputCacheKey outputCacheKey = getInputKey(context, getInputByName(inputName));
+    protected KeyValidity getInputKeyValidity(PipelineContext context, ProcessorInput input) {
+        OutputCacheKey outputCacheKey = getInputKey(context, input);
         if (outputCacheKey == null) return null;
-        InputCacheKey inputCacheKey = new InputCacheKey(getInputByName(inputName), outputCacheKey);
-        Object inputValidity = getInputValidity(context, getInputByName(inputName));
+        InputCacheKey inputCacheKey = new InputCacheKey(input, outputCacheKey);
+        Object inputValidity = getInputValidity(context, input);
         if (inputValidity == null) return null;
         return new KeyValidity(inputCacheKey, inputValidity);
+    }
+
+    protected KeyValidity getInputKeyValidity(PipelineContext context, String inputName) {
+        return getInputKeyValidity(context, getInputByName(inputName));
     }
 
     /**

@@ -167,7 +167,6 @@ public class MemoryCacheImpl implements Cache {
             context.setAttribute(CONTEXT_KEY, statistics);
         }
 
-
         return statistics;
     }
 

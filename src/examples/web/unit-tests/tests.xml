@@ -39,6 +39,7 @@
     <xi:include href="tests-matchers.xml"/>
     <xi:include href="oxf-rewrite/tests.xml"/>
     <xi:include href="url-generator/tests.xml"/>
+    <xi:include href="cache/cache-tests.xml"/>
 
     <!-- This test should probably be hand-customized to be clearer -->
     <test description="xforms-portlet-forms" name="oxf:xslt">

@@ -1,0 +1,105 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0"
+    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+
+    <start>
+        <element name="script">
+            <element name="processor">
+                <attribute name="name"/>
+                <zeroOrMore>
+                    <element name="input">
+                        <attribute name="name"/>
+                        <choice>
+                            <attribute name="href"/>
+                            <ref name="anyElement"/>
+                        </choice>
+                    </element>
+                </zeroOrMore>
+            </element>
+
+            <zeroOrMore>
+                <interleave>
+                    <optional>
+                        <element name="touch">
+                            <attribute name="url"/>
+                        </element>
+                    </optional>
+                    <optional>
+                        <element name="wait">
+                            <attribute name="delay"/>
+                        </element>
+                    </optional>
+                    <optional>
+                        <element name="cache-value">
+                            <attribute name="output-name"/>
+                            <attribute name="value"/>
+                        </element>
+                    </optional>
+                    <optional>
+                        <element name="assert">
+                            <attribute name="output-name"/>
+                            <choice>
+                                <group>
+                                    <attribute name="condition">
+                                        <value>output-cached</value>
+                                    </attribute>
+                                </group>
+                                <group>
+                                    <attribute name="condition">
+                                        <value>output-not-cached</value>
+                                    </attribute>
+                                </group>
+                                <group>
+                                    <attribute name="condition">
+                                        <value>cached-value-equal</value>
+                                    </attribute>
+                                    <attribute name="value"/>
+                                </group>
+                                <group>
+                                    <attribute name="condition">
+                                        <value>cached-value-not-equal</value>
+                                    </attribute>
+                                    <attribute name="value"/>
+                                </group>
+                            </choice>
+                        </element>
+                    </optional>
+                </interleave>
+            </zeroOrMore>
+
+        </element>
+    </start>
+
+    <define name="anyElement">
+        <interleave>
+            <text/>
+            <optional>
+                <element>
+                    <anyName/>
+                    <zeroOrMore>
+                        <choice>
+                            <attribute>
+                                <anyName/>
+                            </attribute>
+                            <text/>
+                            <ref name="anyElement"/>
+                        </choice>
+                    </zeroOrMore>
+                </element>
+            </optional>
+        </interleave>
+    </define>
+
+</grammar>

@@ -1,0 +1,4 @@
+<test-document>
+    <e1/>
+    <e2 a1="v1" a2="v2"/>
+</test-document>

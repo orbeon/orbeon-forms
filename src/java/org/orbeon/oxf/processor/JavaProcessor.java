@@ -21,6 +21,7 @@ import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
@@ -160,55 +161,17 @@ public class JavaProcessor extends ProcessorImpl {
                     config.clazz = configElement.attributeValue("class");
 
                     // Get source path
-                    String sourcePathElementValue = configElement.attributeValue("sourcepath");
-                    if (sourcePathElementValue == null)
-                        sourcePathElementValue = ".";
-
-                    URL sourcePathURL;
-                    {
-                        try {
-                            // Resolve relative URLs
-                            LocationData locationData = getLocationData();
-                            sourcePathURL = (locationData != null && locationData.getSystemID() != null)
-                                    ? URLFactory.createURL(locationData.getSystemID(), sourcePathElementValue)
-                                    : URLFactory.createURL(sourcePathElementValue);
-                        } catch (MalformedURLException e) {
-                            throw new OXFException("Invalid sourcepath attribute: '" + sourcePathElementValue + "'", e);
-                        }
+                    String sourcePathAttributeValue = configElement.attributeValue("sourcepath");
+                    if (sourcePathAttributeValue == null)
+                        sourcePathAttributeValue = ".";
+                    File sourcePath = getFileFromURL(sourcePathAttributeValue, getLocationData());
+                    if (!sourcePath.isDirectory())
+                        throw new ValidationException("Invalid sourcepath attribute: cannot find directory for URL: " + sourcePathAttributeValue, (LocationData) configElement.getData());
+                    try {
+                        config.sourcepath = sourcePath.getCanonicalPath();
+                    } catch (IOException e) {
+                        throw new ValidationException("Invalid sourcepath attribute: cannot find directory for URL: " + sourcePathAttributeValue, (LocationData) configElement.getData());
                     }
-
-                    // Make sure the protocol is oxf: or file:
-                    String sourcePath;
-                    {
-                        if (sourcePathURL.getProtocol().equals("file")) {
-                            String fileName = sourcePathURL.getFile();
-                            File file = new File(fileName);
-                            if (!file.isDirectory()) {
-                                // Try to decode only if we cannot find the file
-                                try {
-                                    fileName = URLDecoder.decode(fileName, "utf-8");
-                                } catch (UnsupportedEncodingException e) {
-                                    throw new OXFException(e);
-                                }
-                                file = new File(fileName);
-                                if (!file.isDirectory())
-                                    throw new OXFException("Invalid sourcepath attribute: cannot find directory for URL: " + sourcePathElementValue);
-                            }
-                            try {
-                                sourcePath = file.getCanonicalPath();
-                            } catch (IOException e) {
-                                throw new OXFException(e);
-                            }
-                        } else if (sourcePathURL.getProtocol().equals("oxf")) {
-                            // Get real path to source path
-                            String path = sourcePathURL.getFile();
-                            sourcePath = ResourceManagerWrapper.instance().getRealPath(path);
-                        } else {
-                            throw new OXFException("Invalid sourcepath attribute: '" + sourcePathElementValue
-                                    + "'. The Java processor only supports the oxf: and file: protocols for the sourcepath attribute.");
-                        }
-                    }
-                    config.sourcepath = sourcePath;
 
                     return config;
                 }
@@ -348,6 +311,51 @@ public class JavaProcessor extends ProcessorImpl {
             throw new OXFException(e);
         } catch (final ClassNotFoundException e) {
             throw new OXFException(e);
+        }
+    }
+
+    /**
+     * Return a File object based on an URL string that can be relative to the specified
+     * LocationData. The protocols supported are "oxf:" and "file:". If the file doesn't exist, an
+     * exception is thrown.
+     */
+    public static File getFileFromURL(String urlString, LocationData locationData) {
+        URL sourcePathURL;
+        {
+            try {
+                // Resolve relative URLs
+                sourcePathURL = (locationData != null && locationData.getSystemID() != null)
+                        ? URLFactory.createURL(locationData.getSystemID(), urlString)
+                        : URLFactory.createURL(urlString);
+            } catch (MalformedURLException e) {
+                throw new ValidationException("Invalid sourcepath attribute: '" + urlString + "'", e, locationData);
+            }
+        }
+
+        // Make sure the protocol is oxf: or file:
+        if (sourcePathURL.getProtocol().equals("file")) {
+            String fileName = sourcePathURL.getFile();
+            File file = new File(fileName);
+            if (!file.exists()) {
+                // Try to decode only if we cannot find the file
+                try {
+                    fileName = URLDecoder.decode(fileName, "utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    // Should not happen
+                    throw new ValidationException(e, locationData);
+                }
+                file = new File(fileName);
+                if (!file.exists())
+                    throw new ValidationException("Invalid sourcepath attribute: cannot find resource for URL: " + urlString, locationData);
+            }
+            return file;
+        } else if (sourcePathURL.getProtocol().equals("oxf")) {
+            // Get real path to source path
+            String path = sourcePathURL.getFile();
+            return new File(ResourceManagerWrapper.instance().getRealPath(path));
+        } else {
+            throw new ValidationException("Invalid sourcepath attribute: '" + urlString
+                    + "'. The Java processor only supports the oxf: and file: protocols for the sourcepath attribute.", locationData);
         }
     }
 

@@ -21,8 +21,10 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.processor.DOMSerializer;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorUtils;
+import org.orbeon.oxf.processor.XMLProcessorRegistry;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.ResourceManager;
@@ -32,11 +34,6 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentSource;
-import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
-import org.xml.sax.SAXException;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -45,8 +42,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.xml.transform.sax.TransformerHandler;
-import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -130,36 +125,11 @@ public class ProcessorTest extends TestCase {
                     if (groupDescription != null)
                         description = groupDescription + " - " + description;
                 }
-                QName processorName = XMLProcessorRegistry.extractProcessorQName(testNode);
                 currentTestError = "Error when executing test with description: '" + description + "'";
 
-                // Create processor
-                ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorName);
-                if (processorFactory == null)
-                    throw new OXFException("Cannot find processor factory with JNDI name '"
-                            + processorName.getNamespacePrefix() + ":" + processorName.getName() + "'");
-                Processor processor = processorFactory.createInstance(pipelineContext);
+                // Create processor and connect its inputs
+                Processor processor = ProcessorUtils.createProcessorWithInputs(testNode, pipelineContext);
                 processor.setId("Main Test Processor");
-
-                // Connect inputs
-                for (Iterator j = XPathUtils.selectIterator(testNode, "input"); j.hasNext();) {
-                    Node inputNode = (Node) j.next();
-                    String name = XPathUtils.selectStringValue(inputNode, "@name");
-                    if (XPathUtils.selectStringValue(inputNode, "@href") == null) {
-                        // Case of embedded XML
-                        Element originalElement = (Element) ((Element) inputNode).elementIterator().next();
-                        if (originalElement == null)
-                            throw new OXFException("Input content is mandatory");
-                        Element copiedElement = originalElement.createCopy();
-                        addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
-                        DOMGenerator domGenerator = new DOMGenerator(copiedElement);
-                        PipelineUtils.connect(domGenerator, "data", processor, name);
-                    } else {
-                        // Href
-                        URLGenerator urlGenerator = new URLGenerator(XPathUtils.selectStringValue(inputNode, "@href"));
-                        PipelineUtils.connect(urlGenerator, "data", processor, name);
-                    }
-                }
 
                 // Connect outputs
                 List domSerializers = new ArrayList();

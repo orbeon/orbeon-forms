@@ -1,0 +1,6 @@
+<document xmlns:xi="http://www.w3.org/2003/XInclude">
+    <something/>
+    <xi:include href="document2.xml"/>
+<!--    <xi:include href="test3.xml"/>-->
+</document>
+<!-- 9 -->

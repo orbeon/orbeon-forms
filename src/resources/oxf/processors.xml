@@ -464,6 +464,11 @@
         <class name="org.orbeon.oxf.processor.xmldb.XMLDBDeleteProcessor"/>
     </processor>
 
+    <!-- Test processor -->
+    <processor name="oxf:test">
+        <class name="org.orbeon.oxf.processor.test.TestProcessor"/>
+    </processor>
+
     <!-- This is kept only for backward compatibility -->
     <processor name="oxf:webapp-controller" uri="oxf/processor/webapp-controller">
         <class name="org.orbeon.oxf.processor.PageFlowControllerProcessor"/>

@@ -13,10 +13,19 @@
  */
 package org.orbeon.oxf.processor;
 
+import org.dom4j.Element;
 import org.dom4j.Node;
+import org.dom4j.QName;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.processor.generator.URLGenerator;
+import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class ProcessorUtils {
@@ -55,5 +64,32 @@ public class ProcessorUtils {
     public static int selectIntValue(Node node, String expr, int defaultValue) {
         Integer result = XPathUtils.selectIntegerValue(node, expr);
         return (result == null) ? defaultValue : result.intValue();
+    }
+
+    public static Processor createProcessorWithInputs(Element testNode, PipelineContext pipelineContext) {
+        // Create processor
+        QName processorName = XMLProcessorRegistry.extractProcessorQName(testNode);
+        ProcessorFactory processorFactory = ProcessorFactoryRegistry.lookup(processorName);
+        if (processorFactory == null)
+            throw new OXFException("Cannot find processor factory with name '"
+                    + processorName.getNamespacePrefix() + ":" + processorName.getName() + "'");
+        Processor processor = processorFactory.createInstance(pipelineContext);
+
+        // Connect inputs
+        for (Iterator j = XPathUtils.selectIterator(testNode, "input"); j.hasNext();) {
+            Node inputNode = (Node) j.next();
+            String name = XPathUtils.selectStringValue(inputNode, "@name");
+            if (XPathUtils.selectStringValue(inputNode, "@href") == null) {
+                // Case of embedded XML
+                Node data = (Node) ((Element) inputNode).elementIterator().next();
+                DOMGenerator domGenerator = new DOMGenerator(Dom4jUtils.cloneNode(data));
+                PipelineUtils.connect(domGenerator, "data", processor, name);
+            } else {
+                // Href
+                URLGenerator urlGenerator = new URLGenerator(XPathUtils.selectStringValue(inputNode, "@href"));
+                PipelineUtils.connect(urlGenerator, "data", processor, name);
+            }
+        }
+        return processor;
     }
 }

@@ -1114,6 +1114,40 @@
                     </xforms:repeat>
                 </xml-source>
             </section>
+            <section>
+                <title>Message Action</title>
+                <p>
+                    The XForms message action displays a message to the user. Presentation Server being a server-side
+                    XForms implementation, it uses the Javascript <code>alert()</code> function to pop-up a modal dialog box to the
+                    user.
+                    <img print-format="pdf" src="pages/reference-xforms-message.png" style="clear: both; float: right"/>
+                </p>
+                <p>
+                    The message action is supported in <code>xforms:submit</code> elements. Typically, the content of
+                    the <code>message</code> element is the message to render. It can also come from the binding attributes
+                    (<code>ref</code> or <code>bind</code>), or from the linking attribute (<code>src</code>). The order of preference
+                    is the following:
+                    <ul>
+                        <li>Binding attributes</li>
+                        <li>Linking attribute</li>
+                        <li>Inline text</li>
+                    </ul>
+                </p>
+                <note>
+                    <ul>
+                        <li>Due to browsers limitation, the only <code>level</code> of the message is <code>modal</code>. This attribute
+                            is optional.</li>
+                        <li>When using the linking attribute (<code>src</code>, the value must be an absolute URL, starting with
+                        <code>oxf:</code>, <code>http:</code> or other supported protocols.</li>
+                    </ul>
+                </note>
+                <xml-source show-namespaces="false">
+                    <xforms:submit>
+                        <xforms:label>Submit</xforms:label>
+                        <xforms:message ref="taste"/>
+                    </xforms:submit>
+                </xml-source>
+            </section>
         </section>
         <section>
             <title>

@@ -79,14 +79,14 @@
         <xsl:variable name="name" as="xs:string" select="xxforms:submit-name(.)"/>
         <xsl:variable name="name-javascript" as="xs:string" select="replace($name, '''', '\\''')"/>
         <xsl:variable name="form-id" as="xs:string" select="xxforms:form-id(ancestor::xforms:group[last()])"/>
+        <xsl:variable name="message" select="xxforms:message(xforms:message)"/>
         <xsl:choose>
             <xsl:when test="@xxforms:appearance = 'link'">
-                <xhtml:a href="" onclick="{@xhtml:onclick}; document.getElementById('wsrp_rewrite_action_{$form-id}').name += '{$name-javascript}';
+                <xhtml:a href="" onclick="{@xhtml:onclick}; {$message}; document.getElementById('wsrp_rewrite_action_{$form-id}').name += '{$name-javascript}';
                         document.forms['wsrp_rewrite_form_{$form-id}'].submit();
                         event.returnValue=false;
                         return false">
                     <xsl:copy-of select="@* except (@xhtml:onclick | @xxforms:* | @*[namespace-uri() = ''])"/>
-                    <xsl:apply-templates select="xforms:message"/>
                     <xsl:value-of select="xforms:label"/>
                 </xhtml:a>
             </xsl:when>
@@ -94,26 +94,37 @@
                 <xhtml:input type="image" name="{$name}" src="{xxforms:img/@src}" alt="{xforms:label}">
                     <xsl:call-template name="copy-other-attributes"/>
                     <xsl:copy-of select="xxforms:img/@* except xxforms:img/@src"/>
-                    <xsl:apply-templates select="xforms:message"/>
+                    <xsl:if test="$message != ''">
+                        <xsl:attribute name="onclick" select="$message"/>
+                    </xsl:if>
                 </xhtml:input>
             </xsl:when>
             <xsl:otherwise>
                 <xhtml:input type="submit" name="{$name}" value="{xforms:label}">
                     <xsl:call-template name="copy-other-attributes"/>
-                    <xsl:apply-templates select="xforms:message"/>
+                    <xsl:if test="$message != ''">
+                        <xsl:attribute name="onclick" select="$message"/>
+                    </xsl:if>
                 </xhtml:input>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
-    <xsl:template match="xforms:message">
-        <xsl:variable name="message" select="if(@xxforms:value != '') then
-                                                @xxforms:value
-                                             else if(@xxforms:src-value != '') then  
-                                                     @xxforms:src-value
-                                                   else string(.)" as="xs:string"/>
-        <xsl:attribute name="onclick">alert('<xsl:value-of select="$message"/>'); return false;</xsl:attribute>
-    </xsl:template>
+    <xsl:function name="xxforms:message" as="xs:string">
+        <xsl:param name="message" as="element()*"/>
+        <xsl:choose>
+            <xsl:when test="$message">
+                <xsl:value-of>alert('<xsl:value-of select="if($message/@xxforms:value != '') then
+                                                              $message/@xxforms:value
+                                                           else if($message/@xxforms:src-value != '') then
+                                                              $message/@xxforms:src-value
+                                                           else string($message)"/>')</xsl:value-of>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="''"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:function>
 
     <xsl:template match="xforms:select">
         <xsl:variable name="name" as="xs:string" select="xxforms:encrypt-name(@xxforms:name)"/>

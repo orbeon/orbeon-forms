@@ -22,6 +22,10 @@ public class SystemUtils {
         return new File(System.getProperty("java.io.tmpdir")).getAbsoluteFile();
     }
 
+    /**
+     * @param pth	java.io.File.pathSeparator delimited path.
+     * @return	What you think.
+     */
     public static java.io.File[] pathToFiles( final String pth ) {
     	final java.util.ArrayList pthArr = new java.util.ArrayList();
     	final java.util.StringTokenizer st = new java.util.StringTokenizer
@@ -36,13 +40,20 @@ public class SystemUtils {
     	return ret;
     }
     
+    /**
+     * @param	trgt	Receiver of path elements ( as java.io.File ) from pth.
+     * @param	pth		java.io.File.pathSeparator delimited path.
+     */
     public static void gatherPaths( final java.util.Collection trgt, final String pth ) {
     	final java.io.File[] files = pathToFiles( pth );
     	for ( int i = 0; i < files.length; i++ ) {
     		trgt.add( files[ i ] );
     	}
     }
-    
+    /**
+     * @param c	Reciever of java.io.File's gathered from sun.boot.class.path elements
+     * 			as well as the contents of the dirs named in java.ext.dirs.	
+     */
     public static void gatherSystemPaths( java.util.Collection c ) {
     	final String bootcp = System.getProperty( "sun.boot.class.path" );
     	gatherPaths( c, bootcp );
@@ -64,7 +75,14 @@ public class SystemUtils {
     		}
     	}
     }
-    
+    /**
+     * Walks class loader hierarchy of clazz looking for instances of URLClassLoader.
+     * For each found gets file urls and adds, converted, elements to the path.
+     * Note that the more junior a class loader is the later in the path it's 
+     * contribution is. 
+     * @param clazz	Class to try and build a classpath from.
+     * @return	java.io.File.pathSeparator delimited path.
+     */
     public static String pathFromLoaders( final Class clazz ) {
     	final java.util.TreeSet sysPths = new java.util.TreeSet();
     	gatherSystemPaths( sysPths );

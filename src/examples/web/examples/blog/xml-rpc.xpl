@@ -28,7 +28,7 @@
     <!-- Dereference URI and return XML -->
     <p:processor name="oxf:url-generator">
         <p:input name="config" href="aggregate('config', aggregate('url', #request#xpointer(string(/request/body))))"/>
-        <p:output name="data" id="xmlrpc-request" schema-href="xml-rpc/xml-rpc-request.rng"/>
+        <p:output name="data" id="xmlrpc-request" schema-href="schema/xml-rpc-request.rng"/>
     </p:processor>
 
     <!-- TODO: Handle XML-RPC authentication based on username + password -->
@@ -88,7 +88,7 @@
 
     <!-- Generate response -->
     <p:processor name="oxf:xml-serializer">
-        <p:input name="data" href="aggregate('methodResponse', #response)" schema-href="xml-rpc/xml-rpc-response.rng" debug="xxxresponse"/>
+        <p:input name="data" href="aggregate('methodResponse', #response)" schema-href="schema/xml-rpc-response.rng" debug="xxxresponse"/>
         <p:input name="config">
             <config/>
         </p:input>

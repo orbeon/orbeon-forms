@@ -21,6 +21,8 @@
     <p:param type="input" name="params"/>
     <p:param type="output" name="params"/>
 
+    <!-- TODO: Separate data access -->
+
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#params"/>
         <p:input name="config">

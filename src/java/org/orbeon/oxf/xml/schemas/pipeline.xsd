@@ -49,20 +49,6 @@
           <xs:field xpath="@name" />
           <xs:field xpath="@type" />
         </xs:key>
-        <xs:key name="param-key" >
-          <xs:selector xpath="p:param"/>
-          <xs:field xpath="@name" />
-        </xs:key>
-        <xs:keyref name="param-ref" refer="p:param-key">
-          <xs:annotation>
-            <xs:documentation>
-              for statement syntax prevents from trying to enforce anything under them.  Hence this
-              rather limited constraint.
-            </xs:documentation>
-          </xs:annotation>
-          <xs:selector xpath="p:processor/p:output|p:choose/p:when/p:processor/p:output|p:choose/p:otherwise/p:processor/p:output|p:for-each"/>
-          <xs:field xpath="@ref" />
-        </xs:keyref>
         <xs:unique name="output-ids-unique">
           <xs:selector xpath="p:processor/p:output|p:for-each"/>
           <xs:field xpath="@id"/>

@@ -502,6 +502,14 @@
                        2.0.
                     </p>
                 </item>
+                <item>
+                    <p>
+                       Should a test suite be provided? It would probably require definining more
+                       processors, like an XSLT processor, to expand the range of testable features.
+                       Testing could be provided through pipeline inputs and outputs, and/or through
+                       tracing.
+                    </p>
+                </item>
             </olist>
         </div2>
 <!--        <div2>-->

@@ -58,6 +58,16 @@
                                 </group>
                                 <group>
                                     <attribute name="condition">
+                                        <value>output-cacheable</value>
+                                    </attribute>
+                                </group>
+                                <group>
+                                    <attribute name="condition">
+                                        <value>output-not-cacheable</value>
+                                    </attribute>
+                                </group>
+                                <group>
+                                    <attribute name="condition">
                                         <value>cached-value-equal</value>
                                     </attribute>
                                     <attribute name="value"/>

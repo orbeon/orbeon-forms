@@ -66,7 +66,7 @@ import java.util.Properties;
  * o revise support of text/html
  *   o built-in support for HTML could handle src="cid:*" with part/message ids
  * o support text/xml? or just XHTML?
- * o build message with SAX, not DOM, so streaming of input is possible
+ * o build message with SAX, not DOM, so streaming of input is possible [not necessarily a big win]
  */
 public class EmailProcessor extends ProcessorImpl {
 
@@ -345,7 +345,7 @@ public class EmailProcessor extends ProcessorImpl {
         }
     }
 
-    private FileItem handleStreamedPartContent(PipelineContext pipelineContext, SAXSource source, String contentType, String encoding)
+    public static FileItem handleStreamedPartContent(PipelineContext pipelineContext, SAXSource source, String contentType, String encoding)
             throws IOException, TransformerException {
 
         final FileItem fileItem = new DefaultFileItemFactory(RequestGenerator.getMaxMemorySizeProperty(), SystemUtils.getTemporaryDirectory())
@@ -364,7 +364,8 @@ public class EmailProcessor extends ProcessorImpl {
 
         try {
             os = fileItem.getOutputStream();
-            writer = new BufferedWriter(new OutputStreamWriter(os, encoding));
+            if (useWriter)
+                writer = new BufferedWriter(new OutputStreamWriter(os, encoding));
             final OutputStream _os = os;
             final Writer _writer = writer;
             Transformer identity = TransformerUtils.getIdentityTransformer();
@@ -464,7 +465,7 @@ public class EmailProcessor extends ProcessorImpl {
         }
     }
 
-    private SAXSource getSAXSource(Processor processor, PipelineContext pipelineContext, String href, String base, String contentType) {
+    public static SAXSource getSAXSource(Processor processor, PipelineContext pipelineContext, String href, String base, String contentType) {
         try {
             // There are two cases:
             // 1. We read the source as SAX

@@ -1,14 +1,20 @@
 package org.orbeon.oxf.processor.test;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.EmailProcessor;
 import org.orbeon.oxf.processor.ProcessorUtils;
-import org.apache.log4j.Logger;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 
+import javax.xml.transform.sax.SAXSource;
 import java.io.*;
 import java.security.Principal;
 import java.util.*;
@@ -21,6 +27,7 @@ public class TestExternalContext implements ExternalContext  {
 
     private static final Logger logger = LoggerFactory.createLogger(TestExternalContext.class);
 
+    private PipelineContext pipelineContext;
     private Document requestDocument;
 
     private Request request;
@@ -28,7 +35,8 @@ public class TestExternalContext implements ExternalContext  {
 
     private Map attributesMap;
 
-    public TestExternalContext(Document requestDocument) {
+    public TestExternalContext(PipelineContext pipelineContext, Document requestDocument) {
+        this.pipelineContext = pipelineContext;
         this.requestDocument = requestDocument;
     }
 
@@ -38,6 +46,14 @@ public class TestExternalContext implements ExternalContext  {
         private Map parameterMap;
         private Map headerMap;
         private Map headerValuesMap;
+
+        private InputStream bodyInputStream;
+        private String bodyContentType;
+        private String bodyEncoding;
+        private long bodyContentLength;
+        private Reader bodyReader;
+        private boolean getInputStreamCalled;
+        private boolean getREaderCalled;
 
         public Map getAttributesMap() {
             if (attributesMap == null) {
@@ -51,8 +67,9 @@ public class TestExternalContext implements ExternalContext  {
         }
 
         public String getCharacterEncoding() {
-            // NIY
-            return null;
+            if (bodyInputStream == null)
+                setupBody();
+            return bodyEncoding;
         }
 
         public String getContainerType() {
@@ -60,13 +77,101 @@ public class TestExternalContext implements ExternalContext  {
         }
 
         public int getContentLength() {
-            // NIY
-            return 0;
+            if (bodyInputStream == null)
+                setupBody();
+            return (int) bodyContentLength;
         }
 
         public String getContentType() {
-            // NIY
-            return null;
+            if (bodyInputStream == null)
+                setupBody();
+            return bodyContentType;
+        }
+
+        public InputStream getInputStream() throws IOException {
+            if (getREaderCalled)
+                throw new IllegalStateException("Cannot call getInputStream() after getReader() has been called.");
+            if (bodyInputStream == null)
+                setupBody();
+            getInputStreamCalled = true;
+            return bodyInputStream;
+        }
+
+        private void setupBody() {
+            try {
+                Element bodyNode = (Element) XPathUtils.selectSingleNode(requestDocument, "/*/body");
+                if (bodyNode != null) {
+                    String contentTypeAttribute = bodyNode.attributeValue("content-type");
+                    final String contentType = NetUtils.getContentTypeContentType(contentTypeAttribute);
+                    final String charset = NetUtils.getContentTypeCharset(contentTypeAttribute);
+
+                    String hrefAttribute = bodyNode.attributeValue("href");
+                    // TODO: Support same scenarios as Email processor
+                    if (hrefAttribute == null)
+                        throw new OXFException("Inline content not implemented yet.");
+
+                    LocationData locationData = (LocationData) bodyNode.getData();
+                    String systemId = locationData == null ? null : locationData.getSystemID();
+
+                    SAXSource saxSource = EmailProcessor.getSAXSource(null, pipelineContext, hrefAttribute, systemId, contentType);
+                    FileItem content = EmailProcessor.handleStreamedPartContent(pipelineContext, saxSource, contentType, charset);
+
+                    if (!(ProcessorUtils.isTextContentType(contentType) || ProcessorUtils.isXMLContentType(contentType))) {
+                        // This is binary content
+                        if (content instanceof FileItem) {
+                            final FileItem fileItem = (FileItem) content;
+
+                            bodyInputStream = fileItem.getInputStream();
+                            bodyContentType = contentType;
+                            bodyContentLength = fileItem.getSize();
+                        } else {
+                            // TODO
+                            throw new OXFException("Not implemented yet.");
+//                            byte[] data = XMLUtils.base64StringToByteArray((String) content);
+//
+//                            bodyInputStream = new ByteArrayInputStream(data);
+//                            bodyContentType = contentType;
+//                            bodyContentLength = data.length;
+                        }
+                    } else {
+                        // This is text content
+                        if (content instanceof FileItem) {
+                            // The text content was encoded when written to the FileItem
+                            final FileItem fileItem = (FileItem) content;
+
+                            bodyInputStream = fileItem.getInputStream();
+                            bodyContentType = contentType;
+                            bodyEncoding = charset;
+                            bodyContentLength = fileItem.getSize();
+
+                        } else {
+                            // TODO
+                            throw new OXFException("Not implemented yet.");
+
+//                            final String s = (String) content
+//                            byte[] bytes = s.getBytes(charset);
+//
+//                            bodyInputStream = new ByteArrayInputStream(bytes);
+//                            bodyContentType = contentType;
+//                            bodyEncoding = charset;
+//                            bodyContentLength = bytes.length;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                throw new OXFException(e);
+            }
+        }
+
+        public Reader getReader() throws IOException {
+            if (getInputStreamCalled)
+                throw new IllegalStateException("Cannot call getReader() after getInputStream() has been called.");
+            if (bodyInputStream == null)
+                setupBody();
+            if (bodyReader == null)
+                bodyReader = new InputStreamReader(bodyInputStream, bodyEncoding);
+            getREaderCalled = true;
+            return bodyReader;
         }
 
         public String getContextPath() {
@@ -102,11 +207,6 @@ public class TestExternalContext implements ExternalContext  {
                 headerValuesMap = Collections.unmodifiableMap(map);
             }
             return headerValuesMap;
-        }
-
-        public InputStream getInputStream() throws IOException {
-            // NIY
-            return null;
         }
 
         public Locale getLocale() {
@@ -154,11 +254,6 @@ public class TestExternalContext implements ExternalContext  {
 
         public String getQueryString() {
             return XPathUtils.selectStringValueNormalize(requestDocument, "/*/query-string");
-        }
-
-        public Reader getReader() throws IOException {
-            // NIY
-            return null;
         }
 
         public String getRemoteAddr() {

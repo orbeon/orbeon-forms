@@ -406,7 +406,7 @@
     </processor>
 
     <processor name="oxf:xquery" uri="oxf/processor/xquery">
-        <class name="org.orbeon.oxf.processor.transformer.XQueryProcessor"/>
+        <class name="org.orbeon.oxf.processor.transformer.SaxonXQueryProcessor"/>
     </processor>
 
     <!-- Portlet processors -->
@@ -498,6 +498,10 @@
                 </config>
             </input>
         </instantiation>
+    </processor>
+
+    <processor name="oxf:qexo-xquery" uri="oxf/processor/xquery">
+        <class name="org.orbeon.oxf.processor.transformer.QexoXQueryProcessor"/>
     </processor>
 
     <!-- Scratchpad -->

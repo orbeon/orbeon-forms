@@ -214,16 +214,6 @@ public class JavaProcessor extends ProcessorImpl {
                 if (exitCode != 0) {
                     String javacOutputString = "\n" + javacOutput.toString();
                     javacOutputString = StringUtils.replace(javacOutputString, "\n", "\n    ");
-                    System.err.println( "javac-1: " + argLst.toString() );
-                    if ( thrown != null )
-                    {
-                    	thrown.printStackTrace();
-                    }
-                    else
-                    {
-                    	System.out.println( "args: " + argLst.toString() );
-                    	System.out.println( "javac-out: " + javacOutput );
-                    }
                     throw new OXFException("Error compiling '" + argLst.toString() + "'" + javacOutputString, thrown );
                 }
             }
@@ -270,7 +260,8 @@ public class JavaProcessor extends ProcessorImpl {
     
     
 
-    private String buildClassPath(PipelineContext context) {
+    private String buildClassPath(PipelineContext context) 
+    throws java.io.UnsupportedEncodingException {
         StringBuffer classpath = new StringBuffer();
         StringBuffer jarpath = new StringBuffer();
 
@@ -301,7 +292,7 @@ public class JavaProcessor extends ProcessorImpl {
 
         // Try to add directory containing current JAR file if WEB-INF/lib was not found
         if (!gotLibDir) {
-        	final String pth = SystemUtils.pathFromLoaders( JavaProcessor.class );
+        	final String pth = SystemUtils.pathFromLoaders( JavaProcessor.class, "utf-8" );
         	classpath.append( pth );
         	if ( !pth.endsWith( java.io.File.pathSeparator ) ) classpath.append( java.io.File.pathSeparatorChar );
         }

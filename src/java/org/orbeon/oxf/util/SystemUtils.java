@@ -79,11 +79,18 @@ public class SystemUtils {
      * Walks class loader hierarchy of clazz looking for instances of URLClassLoader.
      * For each found gets file urls and adds, converted, elements to the path.
      * Note that the more junior a class loader is the later in the path it's 
-     * contribution is. 
+     * contribution is. <br/>
+     * Also, tries to deal with fact that urls may or may not be encoded.
+     * Converts the urls to java.io.File and checks for existence.  If it
+     * exists file name is used as is.  If not name is URLDecoded.  If the
+     * decoded form exists that that is used.  If neither exists then the
+     * undecoded for is used. 
      * @param clazz	Class to try and build a classpath from.
+     * @param character encoding to use
      * @return	java.io.File.pathSeparator delimited path.
      */
-    public static String pathFromLoaders( final Class clazz ) {
+    public static String pathFromLoaders( final Class clazz, final String enc ) 
+    throws java.io.UnsupportedEncodingException {
     	final java.util.TreeSet sysPths = new java.util.TreeSet();
     	gatherSystemPaths( sysPths );
     	final StringBuffer sbuf = new StringBuffer();
@@ -108,7 +115,24 @@ public class SystemUtils {
 			final String fnam = url.getFile();
 			final java.io.File fil = new java.io.File( fnam );
 			if ( sysPths.contains( fil ) ) continue;
-			sbuf.append( fnam );
+			// 11/14/2004 d : Odd test attempts to deal with fact that
+			// a.) The URLs passed to a URLClassLoader don't have to be encoded
+			//     in general.
+			// b.) The app class loader and the extensions class loader, the
+			//     jdk class loaders responsible for loading classes from classpath
+			//     and the extensions dir respectively, do encode their urls.
+			// c.) java.io.File.toURL doesn't produce encoded urls. ( Perhaps
+			//     a sun bug... )
+			// As you can see given (a) and (c) odds are pretty good that 
+			// should anyone use something other than jdk class loaders we
+			// will end up unencoded urls.
+			if ( !fil.exists() ) {
+				final String unEncNam = java.net.URLDecoder.decode( fnam, enc );
+				final java.io.File unEncFil = new java.io.File( unEncNam );
+				if ( unEncFil.exists() ) sbuf.append( unEncNam );
+			} else {
+				sbuf.append( fnam );
+			}
 			sbuf.append( java.io.File.pathSeparatorChar );
     	}
     	final String ret = sbuf.toString();

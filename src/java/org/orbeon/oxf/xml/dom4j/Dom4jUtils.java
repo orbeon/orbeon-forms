@@ -331,16 +331,6 @@ public class Dom4jUtils {
         return XMLUtils.getDigest( ds );
     }
 
-    public static org.dom4j.Document createNullDocument() {
-        org.dom4j.Document result = DocumentHelper.createDocument();
-        Element nullElement = DocumentHelper.createElement("null");
-        nullElement.addAttribute(new QName(XMLConstants.XSI_NIL_ATTRIBUTE,
-                new Namespace
-                    (XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI)), "true");
-        result.setRootElement(nullElement);
-        return result;
-    }
-    
     /**
      * Clean-up namespaces. Some tools generate namespace "un-declarations" or 
      * the form xmlns:abc="". While this is needed to keep the XML infoset 

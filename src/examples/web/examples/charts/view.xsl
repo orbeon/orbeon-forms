@@ -177,7 +177,7 @@
                          </xhtml:td>
                      </xhtml:tr>
                      <xhtml:tr>
-                         <xhtml:th>Series Title</xhtml:th>
+                         <xhtml:th>Serie Title</xhtml:th>
                          <xhtml:td colspan="5">
                              <xforms:input ref="chart/serie-title"/>
                          </xhtml:td>

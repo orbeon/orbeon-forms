@@ -183,10 +183,10 @@
 
         <xsl:choose>
             <xsl:when test="$tab/@href">
-                <a class="tab" href="{$tab/@href}" f:url-type="action"><xsl:value-of select="$tab/@label"/></a>
+                <a class="subtab" href="{$tab/@href}" f:url-type="action"><xsl:value-of select="$tab/@label"/></a>
             </xsl:when>
             <xsl:otherwise>
-                <span class="tab"><xsl:value-of select="$tab/@label"/></span>
+                <span class="subtab"><xsl:value-of select="$tab/@label"/></span>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>

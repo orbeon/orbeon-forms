@@ -51,7 +51,7 @@
 
             <xforms:group ref="/form" xxforms:show-errors="{/form/show-errors = 'true'}">
 
-                <table title="Employee Detail" class="gridtable">
+                <table title="Employee Detail">
                     <tr>
                         <th valign="middle">Last Name</th>
                         <td>

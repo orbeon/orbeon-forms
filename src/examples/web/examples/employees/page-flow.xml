@@ -128,7 +128,7 @@
     <page id="export-excel" path-info="/example-resources/employees/export-excel" model="export-excel/export-excel-action.xpl"/>
 
     <page path-info="/example-resources/employees/import-ws" model="import-ws/import-ws.xpl"/>
-    <page path-info="/example-resources/employees/import.wsdl" model="import-ws/view-wsdl.xpl"/>
+    <page path-info="/example-resources/employees/import-wsdl" model="import-ws/view-wsdl.xpl"/>
     
     <page path-info="/login" view="login/login-view.xsl"/>
     <page path-info="/login-error" view="login/login-error.xsl"/>

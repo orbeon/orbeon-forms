@@ -75,7 +75,7 @@
                 </li>
             </ul>
             <p>
-                You also need to configure some users and roles:
+                You can also configure some users and roles:
             </p>
             <ul>
                 <li><code>demo-admin</code> role</li>

@@ -146,7 +146,7 @@
                                 </td>
 
                                 <xsl:for-each select="$page-list">
-                                    <td style="width: 1em">
+                                    <td style="width: 1em; text-align: center">
                                         <xsl:choose>
                                             <xsl:when test=". = $current-page-number">
                                                 <xsl:value-of select="."/>
@@ -219,19 +219,21 @@
                         </xforms:submit>
 
                         <!-- Show how the content of the page can depend on the current role -->
-                        <xsl:if test="not($request-security/role = 'demo-admin')">
+                        <xforms:submit>
+                            <xsl:if test="not($request-security/role = 'demo-admin')">
+                                <xsl:attribute name="xhtml:style">color: red; font-weight: bolder</xsl:attribute>
+                            </xsl:if>
+                            <xforms:label>Import Data</xforms:label>
+                            <xforms:setvalue ref="action">import</xforms:setvalue>
+                        </xforms:submit>
 
-                            <xforms:submit>
-                                <xforms:label>Import Data</xforms:label>
-                                <xforms:setvalue ref="action">import</xforms:setvalue>
-                            </xforms:submit>
-
-                            <xforms:submit>
-                                <xforms:label>Import from Excel</xforms:label>
-                                <xforms:setvalue ref="action">excel-import</xforms:setvalue>
-                            </xforms:submit>
-
-                        </xsl:if>
+                        <xforms:submit>
+                            <xsl:if test="not($request-security/role = 'demo-admin')">
+                                <xsl:attribute name="xhtml:style">color: red; font-weight: bolder</xsl:attribute>
+                            </xsl:if>
+                            <xforms:label>Import from Excel</xforms:label>
+                            <xforms:setvalue ref="action">excel-import</xforms:setvalue>
+                        </xforms:submit>
 
                     </xforms:group>
                 </div>

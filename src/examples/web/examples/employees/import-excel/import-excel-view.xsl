@@ -41,7 +41,7 @@
             </xforms:group>
             <p>
                 Uploading an Excel file through this form will send the data in the XML file to the
-                Web service defined by <a href="import.wsdl">this WSDL file</a>.
+                Web service defined by <a href="/example-resources/employees/import-wsdl">this WSDL file</a>.
             </p>
         </div>
     </body>

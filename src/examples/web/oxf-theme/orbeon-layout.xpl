@@ -151,17 +151,26 @@ h1 {
 }
 
 .subtabs {
-    background-image:  url('<xsl:value-of select="context:rewriteRenderURL('/oxf-theme/images/tabbar-blue.png')"/>');
-    background-repeat: repeat-x;
-    height: 23px;
+    background-color: <xsl:value-of select="$xlight-color"/>;
+    color: <xsl:value-of select="$dark-color"/>;
+    font-weight: bolder;
     text-align: left;
-    font-weight: normal;
-    font-size: 8pt;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    font-weight: bold;
-    margin-left: -1em;
-    margin-right: -1em;
+    padding: .2em .5em .2em .5em;
+    margin-top: 0;
+    margin-bottom: 2em;
+    margin-left: -.8em;
+    margin-right: -0.8em;
+    border-bottom: solid 1px <xsl:value-of select="$dark-color"/>;
+    font-size: 10pt;
+    line-height: 180%;
+}
+
+.subtab {
+    margin: 0 0 0 0;
+    padding: 0em 1em 0em 1em;
+    height: 17px;
+    position: relative;
+    border-right: 1px solid white;
 }
 
 .tab {
@@ -172,7 +181,7 @@ h1 {
     position: relative;
     top: 3px;
     border-right: 1px solid white;
- }
+}
 
 .tab:first-child {
     border-left: 1px solid white;

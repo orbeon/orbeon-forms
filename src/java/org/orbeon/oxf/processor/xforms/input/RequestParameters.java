@@ -249,7 +249,8 @@ public class RequestParameters {
                                 if (actionName == null) {
                                     actionName = keyValue[0];
                                 } else {
-                                    actionParameters.put(keyValue[0], URLDecoder.decode(keyValue[1], NetUtils.DEFAULT_URL_ENCODING));
+                                    // We used to do URLDecoder.decode(keyValue[1], NetUtils.DEFAULT_URL_ENCODING) but this was once too many times
+                                    actionParameters.put(keyValue[0], keyValue[1]);
                                 }
                             }
 

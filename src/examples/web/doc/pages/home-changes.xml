@@ -21,6 +21,19 @@
 	</header>
 	<body>
         <section>
+			<title>New in Version 2.5.4</title>
+            <section>
+                <title>Package Name in Examples and Documentation</title>
+                <p>
+                    Some examples and sections of the documentation where still referring to the
+                    class <code>org.orbeon.oxf.processor.pipeline.PipelineContext</code> which has
+                    been moved in <code>org.orbeon.oxf.pipeline.api.PipelineContext</code>. In
+                    particular, this prevented some examples using the Java processor from working
+                    properly.
+                </p>
+            </section>
+        </section>
+        <section>
 			<title>New in Version 2.5.3</title>
             <section>
                 <title>OXF Server Renamed to Orbeon Presentation Server</title>

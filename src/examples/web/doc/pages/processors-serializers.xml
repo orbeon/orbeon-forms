@@ -45,12 +45,9 @@
                 status-code, etc. are ignored.
             </note>
             <p>
-                All serializers send the cache control HTTP headers,
-                including
-                <code>Last-Modified</code>,
-                <code>Expires</code> and
-                <code>Cache-Control</code>. The MIME content type and content
-                length headers are also supported.
+                All serializers send the cache control HTTP headers, including
+                <code>Last-Modified</code>, <code>Expires</code> and <code>Cache-Control</code>.
+                The MIME content type and content length headers are also supported.
             </p>
 
             <anchor id="http-configuration"/>
@@ -103,7 +100,17 @@
                         <tr>
                             <td>system-doctype</td>
                             <td>The system doctype</td>
-                            <td>&quot;http://www.w3.org/TR/html4/loose.dtd&quot; for HTML, none otherwise </td>
+                            <td>&quot;http://www.w3.org/TR/html4/loose.dtd&quot; for HTML, none otherwise</td>
+                        </tr>
+                        <tr>
+                            <td>omit-xml-declaration</td>
+                            <td>Specifies whether an XML declaration must be omitted</td>
+                            <td>false for XML and HTML (i.e. a declaration is output by default), ignored otherwise</td>
+                        </tr>
+                        <tr>
+                            <td>standalone</td>
+                            <td>Specifies whether a standalone document declaration is output</td>
+                            <td>false for XML, ignored otherwise</td>
                         </tr>
                         <tr>
                             <td>encoding</td>
@@ -121,13 +128,22 @@
                             <td>0</td>
                         </tr>
                         <tr>
-                            <td>header</td>
-                            <td>Adds a custom HTTP header to the
-                            response. The nested elements <code>name</code> and
-                            <code>value</code> contain the name and value of the
-                            header, respectively. You can add multiple headers.
+                            <td>cache-control/use-local-cache</td>
+                            <td>
+                                Whether the resulting stream must be locally cached. For documents
+                                or binaries that are large or known to change at every request, it
+                                is recommended to set this to false.
                             </td>
-                            <td>None</td>
+                            <td>true</td>
+                        </tr>
+                        <tr>
+                            <td>header</td>
+                            <td>
+                                Adds a custom HTTP header to the response. The nested elements
+                                <code>name</code> and <code>value</code> contain the name and value
+                                of the header, respectively. You can add multiple headers.
+                            </td>
+                            <td>none</td>
                         </tr>
                     </table>
                 </p>
@@ -140,8 +156,13 @@
                         <version>4.01</version>
                         <public-doctype>-//W3C//DTD HTML 4.01//EN</public-doctype>
                         <system-doctype>http://www.w3.org/TR/html4/strict.dtd</system-doctype>
+                        <omit-xml-declaration>false</omit-xml-declaration>
+                        <standalone>false</standalone>
                         <encoding>utf-8</encoding>
                         <indent-amount>4</indent-amount>
+                        <cache-control>
+                            <use-local-cache>true</use-local-cache>
+                        </cache-control>
                         <header>
                             <name>Content-Disposition</name>
                             <value>attachment; filename=image.jpeg;</value>
@@ -176,14 +197,12 @@
             <section>
                 <title>HTML Serializer</title>
                 <p>
-                    The HTML Serializer's output conforms to the XSLT
-                    <code>html</code> semantic. The <code>doctype</code> is set
-                    to <link
+                    The HTML Serializer's output conforms to the XSLT <code>html</code> semantic.
+                    The <code>doctype</code> is set to <link
                     href="http://www.w3.org/TR/1998/REC-html40-19980424/sgml/loosedtd.html">HTML
-                    4.0 Transitional</link> and the content is indented with no
-                    space and encoded using the ISO-8859-1 character set. The
-                    default MIME content type is <code>text/html</code>. The
-                    following is a simple HTMLSerializer example:
+                    4.0 Transitional</link> and the content is indented with no space and encoded
+                    using the ISO-8859-1 character set. The default MIME content type is
+                    <code>text/html</code>. The following is a simple HTMLSerializer example:
                 </p>
 
                 <xml-source>
@@ -195,10 +214,9 @@
                     </p:processor>
                 </xml-source>
                 <note>
-                    The <link
-                    href="http://www.w3.org/TR/2000/REC-xml-20001006">XML 1.0
-                    Specification</link> prohibits a DOCTYPE definition with
-                    a Public ID and no System ID.
+                    The <link href="http://www.w3.org/TR/2000/REC-xml-20001006">XML 1.0
+                    Specification</link> prohibits a DOCTYPE definition with a Public ID and no
+                    System ID.
                 </note>
 
             </section>
@@ -206,12 +224,10 @@
                 <title>Text Serializer</title>
 
                 <p>
-                    The Text Serializer's output conforms to the XSLT
-                    <code>text</code> semantic. The output is encoded using the
-                    ISO-8859-1 character set. This serializer is typically
-                    useful for pipelines generating Comma Separated Value
-                    (CSV) files. The default MIME content type is
-                    <code>text/plain</code>.
+                    The Text Serializer's output conforms to the XSLT <code>text</code> semantic.
+                    The output is encoded using the ISO-8859-1 character set. This serializer is
+                    typically useful for pipelines generating Comma Separated Value (CSV) files.
+                    The default MIME content type is <code>text/plain</code>.
                 </p>
 
                 <xml-source>
@@ -230,22 +246,22 @@
                 <title>PDF Serializer</title>
                 <p>
                     The PDF Serializer produces PDF documents from an <link
-                    href="http://www.w3.org/TR/xsl/">XSL-FO</link> description
-                    of the page. The default MIME content type is
-                    <code>application/pdf</code>.
+                    href="http://www.w3.org/TR/xsl/">XSL-FO</link> description of the page. The
+                    default MIME content type is <code>application/pdf</code>.
                 </p>
                 <note>
-                    The input document of the FOPSerializer must follow the
-                    <fork
-                    href="http://www.w3.org/TR/2001/REC-xsl-20011015/#">W3C
-                    XSL/FO Recommendation</fork>.
+                    The input document of the FOPSerializer must follow the <fork
+                    href="http://www.w3.org/TR/2001/REC-xsl-20011015/#">W3C XSL/FO
+                    Recommendation</fork>.
                 </note>
                 <p>
-                    The <link href="http://www.faqs.org/rfcs/rfc2183.html">RFC 2183</link> describes the
-                    <code>Content-Disposition</code> HTTP header, used by the browser to decide how to display an attachement.
-                    A value of <code>inline</code> means that the browser will try to use a plugin to display the PDF file.
-                    A value of <code>attachement</code> causes the browser to ask the user to save the file, optionnaly
-                    proposing a file name. The following two example show how this feature is used with the FOP Serializer.
+                    The <link href="http://www.faqs.org/rfcs/rfc2183.html">RFC 2183</link>
+                    describes the <code>Content-Disposition</code> HTTP header, used by the browser
+                    to decide how to display an attachement. A value of <code>inline</code> means
+                    that the browser will try to use a plugin to display the PDF file. A value of
+                    <code>attachement</code> causes the browser to ask the user to save the file,
+                    optionnaly proposing a file name. The following two example show how this
+                    feature is used with the FOP Serializer.
                 </p>
                 <p>Using the PDF plugin:</p>
                 <xml-source>
@@ -324,8 +340,8 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     </p:processor>
                 </xml-source>
                 <note>
-                    The Binary serializer performs streaming. If its input data consists of a stream
-                    of short character SAX events, such as those produced by the <a
+                    The Binary serializer performs streaming. If its input data consists of a
+                    stream of short character SAX events, such as those produced by the <a
                     href="processors-generators#request-generator">Request generator</a> the <a
                     href="processors-generators#url-generator">URL generator</a>, or the <a
                     href="processors-sql#binary-data">SQL processor</a>, it is possible to serialize
@@ -369,11 +385,10 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             <title>File Serializer</title>
             <p>
                 The File Serializer is most useful in a <link
-                href="integration-command-line">command-line application</link>. When executed,
-                this serializer writes its data input into the file specified in the
-                <code>config</code> element. Here is an example:
+                href="integration-command-line">command-line application</link>. When executed, this
+                serializer writes its data input into the file specified in the <code>config</code>
+                element. Here is an example:
             </p>
-
             <xml-source>
                 <p:processor name="oxf:file-serializer">
                     <p:input name="config">
@@ -390,52 +405,37 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     <p:input name="data" href="#html"/>
                 </p:processor>
             </xml-source>
-
             <p>
-                The
-                <code>file</code> element specifies the file to write to.
+                The <code>file</code> element specifies the file to write to.
             </p>
             <p>
-                The
-                <code>directory</code> element is optional. If specified, it
-                is used as a base directory for the
-                <code>file</code> element.
+                The <code>directory</code> element is optional. If specified, it is used as a base
+                directory for the <code>file</code> element.
             </p>
             <p>
-                The
-                <code>content-type</code> element is optional. The default
-                is
-                <code>text/xml</code>. Other valid values are
-                <code>text/html</code> and
+                The <code>content-type</code> element is optional. The default is
+                <code>text/xml</code>. Other valid values are <code>text/html</code> and
                 <code>text/plain</code>.
             </p>
-
             <p>
                 The following optional attributes can also be specified:
-                <code>public-doctype</code>,
-                <code>system-doctype</code>,
-                <code>encoding</code>,
-                <code>indent</code> and
-                <code>indent-amount</code>.
+                <code>public-doctype</code>, <code>system-doctype</code>, <code>encoding</code>,
+                <code>indent</code> and <code>indent-amount</code>.
             </p>
-
         </section>
         <anchor id="SessionSerializer"/>
         <section>
             <title>Session Serializer</title>
-            <p>The Session Serializer stores an
-                XML document into the HTTP session. The root node of the
-                document is used as the session key. See the
-                <link
-                    href="processors-generators#SessionGenerator">SessionGenerator</link>
-                for more information.
+            <p>
+                The Session Serializer stores an XML document into the HTTP session. The root node
+                of the document is used as the session key. See the <link
+                href="processors-generators#SessionGenerator">SessionGenerator</link> for more
+                information.
             </p>
-
-            <p>The following example shows how to store  an XML document into the HTTP session.
-                The session key is the root element, in this case:
-                <code>cart</code>.
+            <p>
+                The following example shows how to store an XML document into the HTTP session. The
+                session key is the root element, in this case: <code>cart</code>.
             </p>
-
             <xml-source>
                 <p:processor name="oxf:session-serializer">
                     <p:input name="data">
@@ -446,19 +446,14 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     </p:input>
                 </p:processor>
             </xml-source>
-
-            <p></p>
-
         </section>
         <section>
             <title>Null Serializer</title>
-            <p>The Null Serializer acts as a black hole. The
-                <code>data</code>
-                input is read and ignored. This processor is useful when a
-                pipeline or a branch of a
+            <p>
+                The Null Serializer acts as a black hole. The <code>data</code> input is read and
+                ignored. This processor is useful when a pipeline or a branch of a
                 <code>p:choose</code> element doesn't have to return any document.
             </p>
-
             <xml-source>
                 <p:processor name="oxf:null-serializer">
                     <p:input name="data" href="#document"/>
@@ -468,17 +463,13 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
 
         <section>
             <title>Flushing the Output Stream</title>
-
-            <p>All serializers (XML, HTML, text, and FOP) will flush their
-                output stream when they encounter the following processing
-                instruction:
-                <code>&lt;?oxf-serializer flush?&gt;</code>
-                <p/>
-                This instruction allows the browser to display a Web page incrementally.
-                Incremental display is typically useful when sending large tables or
-                when the first part of a Web page could be displayed, while the
-                rest of the page cannot until a time consuming action is
-                performed.
+            <p>
+                All serializers (XML, HTML, text, and FOP) will flush their output stream when they
+                encounter the following processing instruction: <code>&lt;?oxf-serializer
+                flush?&gt;</code> <p/> This instruction allows the browser to display a Web page
+                incrementally. Incremental display is typically useful when sending large tables or
+                when the first part of a Web page could be displayed, while the rest of the page
+                cannot until a time consuming action is performed.
             </p>
         </section>
     </body>

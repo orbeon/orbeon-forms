@@ -77,6 +77,15 @@
                     illustrates this capability.
                 </p>
 			</section>
+            <section>
+				<title>New HTTP Serializer Configuration Parameters</title>
+				<p>
+                    The <code>omit-xml-declaration</code>, <code>standalone</code> and
+                    <code>cache-control/use-local-cache</code> configuration parameters of the <a
+                    href="processors-serializers#http-configuration">HTTP serializer</a> are now
+                    documented.
+                </p>
+			</section>
         </section>
         <section>
 			<title>New in Version 2.5.4</title>
@@ -1210,12 +1219,6 @@
                     Oracle <code>XMLType</code> data type. CLOB, BLOB and <code>XMLType</code>
                     support is better documented and comes with examples. [TODO: Document, mention
                     streaming, etc.]
-                </p>
-			</section>
-			<section>
-				<title>Serializers</title>
-				<p>
-                    Serializers now support disabling caching of their output. [TODO: Document]
                 </p>
 			</section>
 			<section>

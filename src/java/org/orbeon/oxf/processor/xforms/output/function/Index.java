@@ -11,6 +11,8 @@ package org.orbeon.oxf.processor.xforms.output.function;
 import org.orbeon.saxon.functions.SystemFunction;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.expr.XPathContext;
+import org.orbeon.saxon.expr.Expression;
+import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.xpath.XPathException;
 import org.orbeon.saxon.value.IntegerValue;
 import org.orbeon.oxf.processor.xforms.output.element.XFormsElementContext;
@@ -21,6 +23,15 @@ public class Index extends SystemFunction {
 
     public Index(XFormsElementContext xformsElementContext) {
         this.xformsElementContext = xformsElementContext;
+    }
+
+
+    /**
+    * preEvaluate: this method suppresses compile-time evaluation by doing nothing
+    * (because the value of the expression depends on the runtime context)
+    */
+    public Expression preEvaluate(StaticContext env) {
+        return this;
     }
 
     public Item evaluateItem(XPathContext c) throws XPathException {

@@ -24,6 +24,7 @@ import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.XPathCacheStandaloneContext;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.orbeon.saxon.om.NodeInfo;
@@ -153,9 +154,9 @@ public class XPathCache {
             PooledXPathExpression expr = (PooledXPathExpression) o;
             expr.setContextNode(contextNode);
 
-            if(variableToValueMap != null) {
-                for(Iterator i = variableToValueMap.keySet().iterator(); i.hasNext();) {
-                    String name = (String)i.next();
+            if (variableToValueMap != null) {
+                for (Iterator i = variableToValueMap.keySet().iterator(); i.hasNext();) {
+                    String name = (String) i.next();
                     expr.setVariable(name, variableToValueMap.get(name));
                 }
             }
@@ -223,8 +224,18 @@ public class XPathCache {
 
             // Create Saxon XPath Evaluator
             XPathEvaluator evaluator = new XPathEvaluator(contextNode.getDocumentRoot());
-            StandaloneContext standaloneContext = (StandaloneContext) evaluator.getStaticContext();
+            StandaloneContext origContext = (StandaloneContext) evaluator.getStaticContext();
 
+            // HACK: Workaround Saxon bug: need to allocate enough Slots to accomodate all variables
+            int numberVariables = 1;  // at least 1 if LetExpression is used
+            int index = 0;
+            while(index != -1) {
+                index = xpathExpression.indexOf("$", index+1);
+                numberVariables++;
+            }
+
+            StandaloneContext standaloneContext = new XPathCacheStandaloneContext(origContext, numberVariables);
+            evaluator.setStaticContext(standaloneContext);
 
 
             // Declare namespaces
@@ -262,5 +273,6 @@ public class XPathCache {
             return true;
         }
     }
+
 
 }

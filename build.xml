@@ -334,7 +334,7 @@
     </junit>
   </target>
 
-  <target name="anthill-release" depends="anthill-build, test-classes, debug-enabled, debug-disabled">
+  <target name="anthill-release" depends="clean, orbeon-dist, test-classes, debug-enabled, debug-disabled">
     <junit fork="yes" haltonerror="yes" haltonfailure="yes">
       <test name="org.orbeon.oxf.test.ProcessorTest"/>
       <formatter type="plain" usefile="false"/>
@@ -350,9 +350,27 @@
         <pathelement location="${tomcat.dir}/common/lib/mail.jar"/>
       </classpath>
     </junit>
+
     <cvs command='rtag TAG_OPS_${release.number} orbeon'
          cvsRoot=':ext:orbeonbld@cvs.sourceforge.net:/cvsroot/orbeon' failonerror='true' />
     
+    <echo message="Deploying to ${deployDir}/${release.number}"/>
+    
+    <mkdir dir="${deployDir}/${release.number}"/>
+    <copy todir="${deployDir}/${release.number}">
+      <fileset dir="${build.distrib.dir}">
+        <include name="*"/>
+      </fileset>
+    </copy>
+
+    <copy file='${deployDir}/buildLogs/oxf-OXF_2_5_BUILD_${version}-build.log' tofile='${deployDir}/${release.number}/build.log' />
+
+    <delete>
+      <fileset dir="${deployDir}">
+        <exclude name="${release.number}/**"/>
+      </fileset>
+    </delete>
+
 
   </target>
 
@@ -617,21 +635,4 @@
 
   </target>
 
-  <target name="anthill-build" depends="clean, orbeon-dist">
-    <echo message="Deploying to ${deployDir}/${release.number}"/>
-    <mkdir dir="${deployDir}/${release.number}"/>
-    <copy todir="${deployDir}/${release.number}">
-      <fileset dir="${build.distrib.dir}">
-        <include name="*"/>
-      </fileset>
-      <fileset dir="${deployDir}/buildLogs">
-        <include name="*build*.log"/>
-      </fileset>
-    </copy>
-    <delete>
-      <fileset dir="${deployDir}">
-        <exclude name="${release.number}/**"/>
-      </fileset>
-    </delete>
-  </target>
 </project>

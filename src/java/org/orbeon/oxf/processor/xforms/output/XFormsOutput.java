@@ -21,13 +21,7 @@ import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.Model;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.processor.xforms.output.element.*;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.XPathUtils;
-import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
 
 public class XFormsOutput extends ProcessorImpl {
 

@@ -467,9 +467,15 @@ public class XMLUtils {
          * org.orbeon.oxf.xml.XMLUtils.getDigest(XMLUtils.java:453)
          * org.orbeon.oxf.xml.XMLUtils.getDigest(XMLUtils.java:423)
          * org.orbeon.oxf.processor.generator.DOMGenerator.<init>(DOMGenerator.java:93)         
-         * This mod brings gc time/app time ratio down from 1.5751878434169833 to 
-         * 0.13878730787644344.
-         * ( 1500 samples, 50 threads, 512M, jdk 1.4.2.06, TC 4.1.30, ops 2.7.2 )
+         *
+         * Before mod
+         *
+         * 1.4.2_06-b03 	P4 2.6 Ghz	/ 	50 th	tc 4.1.30	10510 ms ( 150 mb ), 7124 ( 512 mb ) 	2.131312472239924 ( 150 mb ), 1.7474380872589803 ( 512 mb )
+         *
+         * after mod
+         *
+         * 1.4.2_06-b03 	P4 2.6 Ghz	/ 	50 th	tc 4.1.30	9154 ms ( 150 mb ), 6949 ( 512 mb ) 	1.7316203642295738 ( 150 mb ), 1.479365288194895 ( 512 mb )
+         *
          */
         final DocumentSource ds = new DocumentSource( d );
         final XMLReader rdr = ds.getXMLReader();

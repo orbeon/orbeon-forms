@@ -257,33 +257,6 @@
         </output>
     </test>
 
-    <test description="Encodings when parsing XML" name="oxf:pipeline">
-        <input name="config">
-            <p:config>
-                <p:param name="data" type="output"/>
-                <p:processor name="oxf:saxon7">
-                    <p:input name="data" href="aggregate('root', encoding-iso.xml, encoding-utf8.xml)"/>
-                    <p:input name="config">
-                        <result xsl:version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-                            <xsl:for-each select="/root/root">
-                                <length>
-                                    <xsl:value-of select="string-length(.)"/>
-                                </length>
-                            </xsl:for-each>
-                        </result>
-                    </p:input>
-                    <p:output name="data" ref="data"/>
-                </p:processor>
-            </p:config>
-        </input>
-        <output name="data">
-            <result>
-                <length>1</length>
-                <length>1</length>
-            </result>
-        </output>
-    </test>
-
 <!--    <test description="URL Serializer" name="oxf:pipeline">-->
 <!--        <input name="data">-->
 <!--            <numbers>-->

@@ -12,8 +12,36 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<group description="URL Generator">
-    <test description="URL Generator (oxf: protocol): XML document" name="oxf:url-generator">
+<group description="URL Generator" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+
+    <test description="Encodings when parsing XML" name="oxf:pipeline">
+        <input name="config">
+            <p:config>
+                <p:param name="data" type="output"/>
+                <p:processor name="oxf:saxon7">
+                    <p:input name="data" href="aggregate('root', url-generator/encoding-iso.xml, url-generator/encoding-utf8.xml)"/>
+                    <p:input name="config">
+                        <result xsl:version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                            <xsl:for-each select="/root/root">
+                                <length>
+                                    <xsl:value-of select="string-length(.)"/>
+                                </length>
+                            </xsl:for-each>
+                        </result>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <result>
+                <length>1</length>
+                <length>1</length>
+            </result>
+        </output>
+    </test>
+
+    <test description="oxf: protocol: XML document" name="oxf:url-generator">
         <input name="config">
             <config>
                <url>oxf:/unit-tests/company.xml</url>
@@ -30,7 +58,7 @@
         </output>
     </test>
 
-    <test description="URL Generator (oxf: protocol): XML document converted to text" name="oxf:url-generator">
+    <test description="oxf: protocol: XML document converted to text" name="oxf:url-generator">
         <input name="config">
             <config>
                 <url>oxf:/unit-tests/company.xml</url>
@@ -42,7 +70,7 @@
         </output>
     </test>
 
-    <test description="URL Generator (oxf: protocol): binary document" name="oxf:url-generator">
+    <test description="oxf: protocol: binary document" name="oxf:url-generator">
         <input name="config">
             <config>
                 <url>oxf:/unit-tests/url-generator/ois-powered-80.png</url>
@@ -88,7 +116,7 @@
         </output>
     </test>
 
-    <test description="URL Generator (oxf: protocol): XML document in utf-8" name="oxf:url-generator">
+    <test description="oxf: protocol: XML document in utf-8" name="oxf:url-generator">
         <input name="config">
             <config>
                 <url>oxf:/unit-tests/url-generator/sample-text-utf-8.txt</url>
@@ -127,7 +155,7 @@ Le bruit persistait toujours.
         </output>
     </test>
 
-    <test description="URL Generator" name="oxf:url-generator">
+    <test description="http: protocol: XML document" name="oxf:url-generator">
         <input name="config">
             <config>
                 <url>http://www.scdi.org/~avernet/try/orbeon.xml</url>

@@ -1173,4 +1173,34 @@
         </output>
     </test>
     
+    <test description="Using doc() in dynamic XForms model" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" >
+                <p:param name="instance" type="output"/>
+                <p:processor name="oxf:xslt-2.0">
+                    <p:input name="data"><dummy/></p:input>
+                    <p:input name="config">
+                        <xforms:model xsl:version="2.0">
+                            <xforms:instance>
+                                <instance/>
+                            </xforms:instance>
+                            <xforms:bind nodeset="/instance" calculate="doc('oxf:/unit-tests/company.xml')/company/name"/>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="xforms-model"/>
+                </p:processor>
+                <p:processor name="oxf:xforms-input">
+                    <p:input name="model" href="#xforms-model"/>
+                    <p:input name="request"><request><parameters/></request></p:input>
+                    <p:input name="filter"><params/></p:input>
+                    <p:input name="matcher-result"><result/></p:input>
+                    <p:output name="data" ref="instance"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="instance">
+            <instance>Orbeon</instance>
+        </output>
+    </test>
+    
 </group>

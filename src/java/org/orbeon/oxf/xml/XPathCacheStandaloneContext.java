@@ -377,6 +377,9 @@ public class XPathCacheStandaloneContext extends StandaloneContext {
     private static class XPathCacheURIResolver implements URIResolver {
         public Source resolve(String href, String base) throws TransformerException {
             try {
+                // Saxon Document.makeDoc() changes the base to "" if it is null
+                if ("".equals(base))
+                    base = null;
                 URL url = URLFactory.createURL(base, href);
                 return new SAXSource(XMLUtils.newSAXParser(false).getXMLReader(), new InputSource(url.openStream()));
             } catch (SAXException e) {

@@ -40,7 +40,6 @@
     <xi:include href="oxf-rewrite/tests.xml"/>
     <xi:include href="url-generator/tests.xml"/>
 
-
     <!-- This test should probably be hand-customized to be clearer -->
     <test description="xforms-portlet-forms" name="oxf:xslt">
         <input name="config" href="oxf:/config/xforms-portlet-forms.xsl"/>

@@ -378,23 +378,22 @@ public abstract class XSLTTransformer extends ProcessorImpl {
          * This is context that will resolve any prefix, function, and variable.
          * It is just used to parse XPath expression and get an AST.
          */
-        StandaloneContext dummySaxonXPathContext;
+        private StandaloneContext dummySaxonXPathContext;
+        private final NamePool namePool = new NamePool();
 
         private void initDummySaxonXPathContext() {
             Configuration config = new Configuration();
             config.setHostLanguage(Configuration.XSLT);
-            config.setNamePool(new NamePool() {
-                public synchronized int allocate(String prefix, String uri, String localName) { return 1; }
-                public SchemaType getSchemaType(int fingerprint) { return BuiltInSchemaFactory.getSchemaType(Type.STRING); }
-            });
+            config.setNamePool(namePool);
             dummySaxonXPathContext = new StandaloneContext(config) {
                 {
                     // Dummy Function lib that accepts any name
                     setFunctionLibrary(new FunctionLibrary() {
-                        public Expression bind(int nameCode, String uri, String local, final Expression[] staticArgs)  {
+                        public Expression bind(final int nameCode, String uri, String local, final Expression[] staticArgs)  {
                             return new FunctionCall() {
                                 {
                                     this.argument = staticArgs;
+                                    this.setFunctionNameCode(nameCode);
                                 }
                                 protected void checkArguments(StaticContext env) {};
 
@@ -405,6 +404,8 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                                 public ItemType getItemType() {
                                     return Type.BOOLEAN_TYPE;
                                 }
+
+
                             };
                         }
 
@@ -533,7 +534,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
             Iterator subExpressionsIterator = expression.iterateSubExpressions();
             boolean foundDocFunction = false;
             if (expression instanceof FunctionCall) {
-                String functionName = ((FunctionCall) expression).getDisplayName(dummySaxonXPathContext.getConfiguration().getNamePool());
+                String functionName = ((FunctionCall) expression).getDisplayName(namePool);
                 if ("doc".equals(functionName) || "document".equals(functionName)) {
                     foundDocFunction = true;
                     // Call to doc(...)

@@ -61,7 +61,7 @@
                                 <span style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
                                     <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0em" action="http://www.google.com/custom">
                                         <a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</a> |
-                                        <a href="doc/" f:url-norewrite="true">Documentation</a> |
+                                        <a href="/doc/">Documentation</a> |
                                         <span style="white-space: nowrap">
                                             Search:
                                             <input type="text" name="q" size="10" maxlength="255" value=""/>

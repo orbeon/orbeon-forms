@@ -597,39 +597,39 @@ public class SQLProcessor extends ProcessorImpl {
                         Clob clobValue = null;
                         Blob blobValue = null;
                         if (columnType == Types.DATE) {
-                            Date value = resultSet.getDate(columnName);
+                            Date value = resultSet.getDate(i);
                             if (value != null)
                                 stringValue = ISODateUtils.formatDate(value, ISODateUtils.XS_DATE);
                         } else if (columnType == Types.TIMESTAMP) {
-                            Timestamp value = resultSet.getTimestamp(columnName);
+                            Timestamp value = resultSet.getTimestamp(i);
                             if (value != null)
                                 stringValue = ISODateUtils.formatDate(value, ISODateUtils.XS_DATE_TIME_LONG);
                         } else if (columnType == Types.DECIMAL
                                 || columnType == Types.NUMERIC) {
-                            BigDecimal value = resultSet.getBigDecimal(columnName);
+                            BigDecimal value = resultSet.getBigDecimal(i);
                             stringValue = (resultSet.wasNull()) ? null : value.toString();
                         } else if (columnType == 16) {// Types.BOOLEAN is present from JDK 1.4 only
-                            boolean value = resultSet.getBoolean(columnName);
+                            boolean value = resultSet.getBoolean(i);
                             stringValue = (resultSet.wasNull()) ? null : (value ? "true" : "false");
                         } else if (columnType == Types.INTEGER
                                 || columnType == Types.SMALLINT
                                 || columnType == Types.TINYINT
                                 || columnType == Types.BIGINT) {
-                            long value = resultSet.getLong(columnName);
+                            long value = resultSet.getLong(i);
                             stringValue = (resultSet.wasNull()) ? null : Long.toString(value);
                         } else if (columnType == Types.DOUBLE
                                 || columnType == Types.FLOAT
                                 || columnType == Types.REAL) {
-                            double value = resultSet.getDouble(columnName);
+                            double value = resultSet.getDouble(i);
                             // For XPath 1.0, we have to get rid of the scientific notation
                             stringValue = resultSet.wasNull() ? null : XMLUtils.removeScientificNotation(value);
                         } else if (columnType == Types.CLOB) {
-                            clobValue = resultSet.getClob(columnName);
+                            clobValue = resultSet.getClob(i);
                         } else if (columnType == Types.BLOB) {
-                            blobValue = resultSet.getBlob(columnName);
+                            blobValue = resultSet.getBlob(i);
                         } else {
                             // Assume the type is compatible with getString()
-                            stringValue = resultSet.getString(columnName);
+                            stringValue = resultSet.getString(i);
                         }
                         final boolean nonNullValue = stringValue != null || clobValue != null || blobValue != null;
                         if (nonNullValue || getColumnsAllElements) {

@@ -17,16 +17,16 @@
     <header>
         <title>XML Pipeline Language (XPL)</title>
         <version>Version 1.0</version>
-        <w3c-designation>NOTE-pipeline-20050207</w3c-designation>
+        <w3c-designation>NOTE-pipeline-20050209</w3c-designation>
 <!--        <w3c-doctype>W3C Note</w3c-doctype>-->
         <w3c-doctype>Orbeon Draft Note</w3c-doctype>
         <pubdate>
-            <day>7</day>
+            <day>9</day>
             <month>February</month>
             <year>2005</year>
         </pubdate>
         <publoc>
-            <loc href="http://www.orbeon.com/oxf/2005/NOTE-xpl-20050207/">http://www.orbeon.com/oxf/2005/NOTE-xpl-20050207/</loc>
+            <loc href="http://www.orbeon.com/oxf/2005/NOTE-xpl-20050209/">http://www.orbeon.com/oxf/2005/NOTE-xpl-20050209/</loc>
 <!--            (in-->
 <!--            <loc href="&http-ident;&draft.year;/&doctype;-&nickname;-&iso6.doc.date;/Overview.html">HTML</loc>-->
 <!--            and-->
@@ -875,7 +875,7 @@ fn:current() as <emph>document-node()</emph>
             <div2>
                 <head>Identity Processor</head>
                 <div3>
-                    <head>Interface</head>
+                    <head>Inputs and Outputs</head>
                     <pre>
 &lt;p:processor name="xpl:identity">
     &lt;p:input name="data">...&lt;/p:input>
@@ -903,7 +903,16 @@ fn:current() as <emph>document-node()</emph>
             <div2>
                 <head>Pipeline Processor</head>
                 <div3>
-                    <head>Interface</head>
+                    <head>Rationale</head>
+                    <p>
+                        The Pipeline processor provides support for sub-pipelines in XPL. It allows
+                        XPL programs to be used and manipulated like XML processors. It allows
+                        building the equivalent of functions and procedures in other programming
+                        languages.
+                    </p>
+                </div3>
+                <div3>
+                    <head>Inputs and Outputs</head>
                     <pre>
 &lt;p:processor name="xpl:pipeline">
     &lt;p:input name="pipeline">...&lt;/p:input>
@@ -990,10 +999,12 @@ fn:current() as <emph>document-node()</emph>
                         output <emph>q</emph> with name <code>m</code>.
                     </p>
                     <note>
-                        The Pipeline processor effectively provides support for sub-pipelines in
-                        XPL. It allows XPL programs to be used and manipulated like XML processors.
-                        It allows building the equivalent of functions and procedures in other
-                        programming languages.
+                        An XPL program interpreted by a Pipeline processor instance must behave
+                        according to this specification. In particular, such an XPL program does not
+                        have privileged access to XML Infoset identifiers in scope for the Pipeline
+                        processor. As is the case for any XPL program, the set of XML Identifiers
+                        in scope at the beginning of the program is defined by the pipeline inputs
+                        only.
                     </note>
                     <note>
                         The Pipeline processor provides support for creating XPL program
@@ -1006,7 +1017,7 @@ fn:current() as <emph>document-node()</emph>
             <div2>
                 <head>Null Serializer</head>
                 <div3>
-                    <head>Interface</head>
+                    <head>Inputs and Outputs</head>
                     <pre>
 &lt;p:processor name="xpl:null-serializer">
     &lt;p:input name="data">...&lt;/p:input>

@@ -448,7 +448,14 @@
                         <el>debug</el> attribute on inputs and outputs that has the semantic of
                         logging the XML Infoset going through the associated input or output. It is
                         found that the term "debug" is not appropriate, and that there may be a
-                        better way to construct the tracing facility.
+                        better way to construct the tracing facility. Optionally, this could be
+                        implementation-dependent and controlled by foreign attributes.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                       Should the XPL schema be open, i.e. accept elements and attributes in foreign
+                       namespaces?
                     </p>
                 </item>
                 <item>

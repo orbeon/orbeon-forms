@@ -95,7 +95,6 @@
                         <p:input name="config">
                             <url>oxf:/images/logo.png</url>
                         </p:input>
-                        <p:oupput name="data" id="..."/>
                     </p:processor>
                 </xml-source>
             </section>

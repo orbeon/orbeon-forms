@@ -143,6 +143,7 @@ public class UtilsTest extends TestCase {
     public void testJarPath() {
         String result = SystemUtils.getJarPath(JavaProcessor.class);
         assertNotNull(result);
-        assertTrue(StringUtils.replace(result, "\\", "/").endsWith("build/orbeon-presentation-server-war/WEB-INF/lib"));
+        assertTrue(StringUtils.replace(result, "\\", "/").endsWith("build/orbeon-presentation-server-war/WEB-INF/lib")
+                || StringUtils.replace(result, "\\", "/").endsWith("build/lib"));
     }
 }

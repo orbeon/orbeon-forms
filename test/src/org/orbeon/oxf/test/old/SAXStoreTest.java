@@ -11,7 +11,7 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.test;
+package org.orbeon.oxf.test.old;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -259,8 +259,11 @@ public class SAXStoreTest /*extends TestCase*/ {
 
 /*
   $Log: SAXStoreTest.java,v $
-  Revision 1.1  2004/08/21 20:06:36  ebruchez
-  Initial revision
+  Revision 1.1  2004/11/11 13:18:32  ebruchez
+  Run more than one test class.
+
+  Revision 1.1.1.1  2004/08/21 20:06:36  ebruchez
+  Initial import of Orbeon project
 
   Revision 1.5  2004/08/21 03:48:14  ebruchez
   *** empty log message ***

@@ -154,6 +154,16 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         }
     }
 
+    /*
+     * Examples of datasourceURI / collection / XML:DB collection name combinations:
+     *
+     * 1. xmldb:exist:///
+     *    /db/oxf/adaptive-example
+     *    xmldb:exist:///db/oxf/adaptive-example
+     * 2. xmldb:exist://localhost:8888/oxf/exist-xmlrpc
+     *    /db/oxf/adaptive-example
+     *    xmldb:exist://localhost:8888/oxf/exist-xmlrpc/db/oxf/adaptive-example
+     */
     private Collection getCollection(PipelineContext pipelineContext, Datasource datasource, String collection) {
         ensureDriverRegistered(pipelineContext, datasource);
         try {
@@ -163,9 +173,18 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
             if (!collection.startsWith("/"))
                 throw new OXFException("Collection name must start with a '/': " + collection);
 
+            // This makes sure that we have a correct URI syntax
             URI uri = new URI(datasourceURI.substring(XMLDB_URI_PREFIX.length()));
-            return DatabaseManager.getCollection(XMLDB_URI_PREFIX + uri.getScheme() + "://" + (uri.getAuthority() == null ? "" : uri.getAuthority()) + collection,
-                    datasource.getUsername(), datasource.getPassword());
+
+            // Rebuild a URI string
+            String xmldbCollectionName = XMLDB_URI_PREFIX + uri.getScheme() + "://"
+                    + (uri.getAuthority() == null ? "" : uri.getAuthority())
+                    + (uri.getPath() == null ? "" : uri.getPath());
+            if (xmldbCollectionName.endsWith("/"))
+                xmldbCollectionName = xmldbCollectionName.substring(0, xmldbCollectionName.length() - 1);
+            xmldbCollectionName = xmldbCollectionName + collection;
+
+            return DatabaseManager.getCollection(xmldbCollectionName, datasource.getUsername(), datasource.getPassword());
         } catch (Exception e) {
             throw new OXFException(e);
         }

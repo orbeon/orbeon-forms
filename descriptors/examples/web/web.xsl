@@ -13,7 +13,7 @@
 
     <xsl:template match="/">
         <web-app>
-            <xsl:comment> Initialize a resource manager </xsl:comment>
+            <xsl:comment> Initialize resource manager </xsl:comment>
             <context-param>
                 <param-name>oxf.resources.factory</param-name>
                 <param-value>org.orbeon.oxf.resources.PriorityResourceManagerFactory</param-value>

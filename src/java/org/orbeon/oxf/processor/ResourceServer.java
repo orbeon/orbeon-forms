@@ -17,6 +17,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.resources.ResourceNotFoundException;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -109,6 +110,11 @@ public class ResourceServer extends ProcessorImpl {
                         response.setContentLength(length);
 
                 } catch (IOException e) {
+                    response.setStatus(ExternalContext.SC_NOT_FOUND);
+                    return;
+                } catch (ResourceNotFoundException e) {
+                    // Note: we should really not get this exception here, but an IOException
+                    // However we do actually get it, and so do the same we do for IOException.
                     response.setStatus(ExternalContext.SC_NOT_FOUND);
                     return;
                 }

@@ -206,7 +206,7 @@
         </output>
     </test>
 
-    <test description="XQuery: a little bit of everything" name="oxf:xquery">
+    <test description="XQuery: a little bit of everything" name="oxf:xquery" only="true">
         <input name="data">
             <company>
                 <department id="1" name="HR">
@@ -223,55 +223,49 @@
         </input>
         <input name="config">
             <xquery>
-                declare namespace String = "class:java.lang.String"
+                xquery version "1.0";
+                declare namespace xs = "http://www.w3.org/2001/XMLSchema";
+                declare namespace local = "http://orbeon.org/oxf/xml/local";
 
-                (: Returns the employees of a given department :)
-                define function employees($data, $name) {
-                $data/company/department[@name = $name]/employee
-                }
+                (: Find employees of a certain department :)
+                declare function local:employees($company as element(), $name as xs:string) as element()* {
+                     $company/department[@name = $name]/employee
+                };
 
-                (: Recursive function counting the number of
-                <employee/> elements :)
-                define function countEmployees($e) {
-                typeswitch($e)
-                case element(employee,*) return 1
-                default return for $i in $e/* return sum(countEmployees($i))
-                }
+                (: Compute longest last name :)
+                declare function local:maxLastnameLength($employees as element()*) as xs:integer {
+                    let $lengths :=
+                        for $e in $employees
+                        return string-length($e/@lastname)
+                    return max($lengths)
+                };
 
-                (: Call Java code :)
-                define function maxLastnameLength($employees) {
-                let $lengths :=
-                for $e in $employees
-                return String:length(String:new(string($e/@lastname)))
-                return max($lengths)
-                }
+                let $company := doc('input:data')/*
+                let $hrEmployees := local:employees($company, "HR")
+                let $engineeringEmployees := local:employees($company, "Engineering")
 
-                let $company := doc("#data")
-                let $hrEmployees := employees($company, "HR")
-                let $engineeringEmployees := employees($company, "Engineering")
                 return
-                <mixed-up-company employee-count="{countEmployees($company)}"
-                    max-lastname-length="{maxLastnameLength($company/company/department/employee)}">
-                    {
-                    for $first in $hrEmployees
-                    for $second in $engineeringEmployees
-                    return
-                    <employee firstname="{$first/@firstname}" lastname="{$second/@lastname}"/>
-                    }
-                </mixed-up-company>
+                    <mixed-up-company employee-count="{count($company/department/employee)}"
+                            max-lastname-length="{local:maxLastnameLength($company/department/employee)}">
+                        {
+                            for $first in $hrEmployees
+                            for $second in $engineeringEmployees
+                            return <employee firstname="{$first/@firstname}" lastname="{$second/@lastname}"/>
+                        }
+                    </mixed-up-company>
             </xquery>
         </input>
         <output name="data">
-            <mixed-up-company employee-count="6" max-lastname-length="8">
-                <employee firstname="John" lastname="Vallejo"/>
-                <employee firstname="John" lastname="Wilson"/>
-                <employee firstname="John" lastname="Williams"/>
-                <employee firstname="Peter" lastname="Vallejo"/>
-                <employee firstname="Peter" lastname="Wilson"/>
-                <employee firstname="Peter" lastname="Williams"/>
-                <employee firstname="Carl" lastname="Vallejo"/>
-                <employee firstname="Carl" lastname="Wilson"/>
-                <employee firstname="Carl" lastname="Williams"/>
+            <mixed-up-company max-lastname-length="8" employee-count="6">
+                <employee lastname="Vallejo" firstname="John"/>
+                <employee lastname="Wilson" firstname="John"/>
+                <employee lastname="Williams" firstname="John"/>
+                <employee lastname="Vallejo" firstname="Peter"/>
+                <employee lastname="Wilson" firstname="Peter"/>
+                <employee lastname="Williams" firstname="Peter"/>
+                <employee lastname="Vallejo" firstname="Carl"/>
+                <employee lastname="Wilson" firstname="Carl"/>
+                <employee lastname="Williams" firstname="Carl"/>
             </mixed-up-company>
         </output>
     </test>

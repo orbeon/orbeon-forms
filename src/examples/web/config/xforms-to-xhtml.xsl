@@ -54,12 +54,9 @@
         <!-- NOTE: We do not send the current value of the form element, as it could either be too big, or be just a server-side URL -->
         <xsl:variable name="xxforms-name" select="if (@xxforms:name) then @xxforms:name else ''"/>
         <xsl:variable name="filename-xxforms-name" select="if (xforms:filename/@xxforms:name) then xforms:filename/@xxforms:name else ''"/>
-        <xsl:variable name="filename-xxforms-value" select="if (xforms:filename/@xxforms:value) then xforms:filename/@xxforms:value else ''"/>
         <xsl:variable name="mediatype-xxforms-name" select="if (xforms:mediatype/@xxforms:name) then xforms:mediatype/@xxforms:name else ''"/>
-        <xsl:variable name="mediatype-xxforms-value" select="if (xforms:mediatype/@xxforms:value) then xforms:mediatype/@xxforms:value else ''"/>
         <xsl:variable name="size-xxforms-name" select="if (xxforms:size/@xxforms:name) then xxforms:size/@xxforms:name else ''"/>
-        <xsl:variable name="size-xxforms-value" select="if (xxforms:size/@xxforms:value) then xxforms:size/@xxforms:value else ''"/>
-        <xhtml:input type="file" name="$upload^{xxforms:encrypt-name($xxforms-name)}^{''}^{xxforms:encrypt-name($filename-xxforms-name)}^{$filename-xxforms-value}^{xxforms:encrypt-name($mediatype-xxforms-name)}^{$mediatype-xxforms-value}^{xxforms:encrypt-name($size-xxforms-name)}^{$size-xxforms-value}">
+        <xhtml:input type="file" name="$upload^{$xxforms-name}-{$filename-xxforms-name}-{$mediatype-xxforms-name}-{$size-xxforms-name}">
             <xsl:call-template name="copy-other-attributes"/>
         </xhtml:input>
     </xsl:template>

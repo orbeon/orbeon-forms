@@ -77,7 +77,7 @@
             </optional>
             <optional>
                 <element name="indent-amount">
-                    <data type="integer"/>
+                    <data type="positiveInteger"/>
                 </element>
             </optional>
             <optional>

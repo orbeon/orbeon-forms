@@ -148,17 +148,16 @@ public class XLSSerializer extends HttpBinarySerializer {
                             sourceXPath = sourceXPath.substring(1);
 
                         // Set cell value
-                        Object newObject = sheetElement.selectObject(sourceXPath);
-
                         PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                                wrapper.wrap(newObject), "string()");
+                                wrapper.wrap(sheetElement), "string(" + sourceXPath + ")");
                         String newValue;
                         try {
                             newValue = (String) expr.evaluateSingle();
                         } catch (XPathException e) {
                             throw new OXFException(e);
                         } finally {
-                            expr.returnToPool();
+                            if (expr != null)
+                                expr.returnToPool();
                         }
                         if (newValue == null) {
                             throw new OXFException("Nothing matches the XPath expression '"

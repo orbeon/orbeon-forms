@@ -3,7 +3,7 @@
  * The Apache Software License, Version 1.1
  *
  *
- * Copyright (c) 2000-2004 The Apache Software Foundation.  All rights 
+ * Copyright (c) 2000-2005 The Apache Software Foundation.  All rights 
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -73,9 +73,32 @@ import orbeon.apache.xerces.jaxp.JAXPConstants;
 /**
  * The only real difference between this class and orbeon.apache.xerces.jaxp.SAXParserImpl is
  * that this class constructs an instance of org.orbeon.oxf.xml.XercesSAXParser instead of
- * org.apache.xerces.parsers.SAXParser.  For why this is an improvement see XercesSAXParser.  
+ * org.apache.xerces.parsers.SAXParser.  For why this is an improvement see XercesSAXParser. <br/>
+ * 
+ * 02/16/2005 d : Got rid of 'implements JAXPConstants'.  Aside from this being a stupid pattern,
+ *                it was causing a problem in Tomcat.  Pbm was that in TC the following was 
+ *                happening :
+ *                <ul>
+ *                  <li>TC creates web app contexts, each loaded with a web app loader.</li>
+ *                  <li>Each context tries to get defaults from server/conf/web.xml using 
+ *                      commons-digester.</li>
+ *                  <li>commons-digester uses JAXP to load xml reader.</li>
+ *                  <li>JAXP uses web app loader to load sax parser factory and finds our loader.</li>
+ *                  <li>
+ *                      During the execution of XercesJAXPSAXParserFactoryImpl.class.newInstance()
+ *                      the class XercesJAXPSAXParserFactoryImpl is fully resolved.
+ *                  </li>
+ *                  <li>The above leads to load of this class, XercesJAXPSAXParser, which leads to
+ *                      load of JAXPConstants.
+ *                  </li>
+ *                </ul>
+ *                    
+ *                Now since XercesJAXPSAXParserFactoryImpl.&lt;clinit&gt; hasn't run at the prior
+ *                to the load of JAXPConstants we get NoClassDefFoundException.  ( &lt;clinit&gt;
+ *                adds jars in Class-Path of orbeon.jar manifest to TC's class loader since it
+ *                incorrectly ignores the Class-Path. )
  */
-public class XercesJAXPSAXParser extends javax.xml.parsers.SAXParser implements JAXPConstants {
+public class XercesJAXPSAXParser extends javax.xml.parsers.SAXParser /* implements JAXPConstants */ {
 	
 	static class XercesDefaultValidationErrorHandler extends DefaultHandler {
 	    static private int ERROR_COUNT_LIMIT = 10;
@@ -207,18 +230,18 @@ public class XercesJAXPSAXParser extends javax.xml.parsers.SAXParser implements 
     public void setProperty(String name, Object value)
         throws SAXNotRecognizedException, SAXNotSupportedException
     {
-        if (JAXP_SCHEMA_LANGUAGE.equals(name)) {
+        if (JAXPConstants.JAXP_SCHEMA_LANGUAGE.equals(name)) {
             // JAXP 1.2 support            
-            if ( W3C_XML_SCHEMA.equals(value) ) {
+            if ( JAXPConstants.W3C_XML_SCHEMA.equals(value) ) {
                 //None of the properties will take effect till the setValidating(true) has been called                                                        
                 if( isValidating() ) {
-                    schemaLanguage = W3C_XML_SCHEMA;
+                    schemaLanguage = JAXPConstants.W3C_XML_SCHEMA;
                     xmlReader.setFeature(Constants.XERCES_FEATURE_PREFIX +
                                      Constants.SCHEMA_VALIDATION_FEATURE,
                                      true);
                     // this will allow the parser not to emit DTD-related
                     // errors, as the spec demands
-                    xmlReader.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+                    xmlReader.setProperty(JAXPConstants.JAXP_SCHEMA_LANGUAGE, JAXPConstants.W3C_XML_SCHEMA);
                 }
                 
             } else if (value == null) {
@@ -234,16 +257,16 @@ public class XercesJAXPSAXParser extends javax.xml.parsers.SAXParser implements 
                     SAXMessageFormatter.formatMessage(null, "schema-not-supported", null));
             }
         } 
-        else if(JAXP_SCHEMA_SOURCE.equals(name)) {
-            String val = (String)getProperty(JAXP_SCHEMA_LANGUAGE);
-            if ( val != null && W3C_XML_SCHEMA.equals(val) ) {
+        else if(JAXPConstants.JAXP_SCHEMA_SOURCE.equals(name)) {
+            String val = (String)getProperty(JAXPConstants.JAXP_SCHEMA_LANGUAGE);
+            if ( val != null && JAXPConstants.W3C_XML_SCHEMA.equals(val) ) {
                 xmlReader.setProperty(name, value);
             }
             else {
                 throw new SAXNotSupportedException(
                     SAXMessageFormatter.formatMessage(null, 
                     "jaxp-order-not-supported", 
-                    new Object[] {JAXP_SCHEMA_LANGUAGE, JAXP_SCHEMA_SOURCE}));
+                    new Object[] {JAXPConstants.JAXP_SCHEMA_LANGUAGE, JAXPConstants.JAXP_SCHEMA_SOURCE}));
             }
 		}
 		else {
@@ -258,7 +281,7 @@ public class XercesJAXPSAXParser extends javax.xml.parsers.SAXParser implements 
     public Object getProperty(String name)
         throws SAXNotRecognizedException, SAXNotSupportedException
     {
-        if (JAXP_SCHEMA_LANGUAGE.equals(name)) {
+        if (JAXPConstants.JAXP_SCHEMA_LANGUAGE.equals(name)) {
             // JAXP 1.2 support
             return schemaLanguage;
         } else {

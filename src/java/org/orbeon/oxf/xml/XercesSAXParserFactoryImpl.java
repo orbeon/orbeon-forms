@@ -29,6 +29,7 @@ public class XercesSAXParserFactoryImpl extends SAXParserFactory {
     private static final java.util.Map defaultFeatures;
 
     static {
+        TomcatClasspathFix.applyIfNeedBe();
         final XIncludeParserConfiguration cfg = XercesSAXParser.makeConfig();
         final java.util.Collection ftrs = cfg.getRecognizedFeatures();
         recognizedFeatures = java.util.Collections.unmodifiableCollection( ftrs );
@@ -74,10 +75,9 @@ public class XercesSAXParserFactoryImpl extends SAXParserFactory {
         } catch ( final SAXException se ) {
             // Translate to ParserConfigurationException
             throw new ParserConfigurationException(se.getMessage());
-        } //finally {
+        //} //finally {
         //    System.out.println( "SAXParserFactory.newParser : " + ( System.currentTimeMillis() - strt ) );
-        //}
-
+        }
         return ret;
     }
 }

@@ -23,12 +23,50 @@
         <section>
 			<title>New in Version 2.6</title>
             <section>
-                <title>XForms Upload</title>
-                <p>
-                    The XForms Upload control has been fixed. It comes with an <a
-                    href="/goto-example/xforms-upload">example</a> and is documented in the <a
-                    href="/doc/reference-xforms#upload">XForms reference documentation</a>.
-                </p>
+                <title>XForms</title>
+                <section>
+                    <title>XForms Upload</title>
+                    <p>
+                        The XForms Upload control has been fixed. It comes with an <a
+                        href="/goto-example/xforms-upload">example</a> and is documented in the <a
+                        href="/doc/reference-xforms#upload">XForms reference documentation</a>.
+                    </p>
+                </section>
+                <section>
+                    <title>Itemset Support</title>
+                    <p>
+                        The XForms element <code>&lt;itemset></code> is now supported. You can use it
+                        in conjunction with XForms selection controls
+                        (<code>&lt;xforms:select</code> and <code>&lt;xforms:select1></code>) when
+                        you want the list of items the end-user has to pick from to come from the
+                        instance, instead of being listed in view. For more details, see the <a
+                        href=" reference-xforms#xforms-controls">XForms controls</a> documentation
+                        and the <a href="../goto-example/xforms-selection">Selection Controls</a>
+                        example.
+                    </p>
+                </section>
+                <section>
+                    <title>Support for ref Attribute on Label, Alert, Help, and Hint</title>
+                    <p>
+                        You can now use the <code>ref</code> attribute on
+                        <code>&lt;xforms:label></code>, <code>&lt;xforms:alert></code>,
+                        <code>&lt;xforms:help></code>, and <code>&lt;xforms:hint></code> to have the
+                        displayed message come from the instance instead of being specified in the
+                        view. For more details, see the <a
+                        href="reference-xforms#label-alert-help-hint">Label, Alert, Help, and
+                        Hint</a> documentation.
+                    </p>
+                </section>
+                <section>
+                    <title>Support for ref Attribute on Submit Controls</title>
+                    <p>
+                        You can now bind a submit control (<code>&lt;xforms:submit></code>) to a
+                        node in the instance with the <code>ref</code> attribute. If you do so, the
+                        submit control will only be displayed if the node it is bound to is
+                        relevant. This way you can define in the XForms model rules that specify
+                        when a submit control is to be displayed.
+                    </p>
+                </section>
             </section>
             <section>
                 <title>Improved Request Body and Uploaded Files Support</title>
@@ -39,9 +77,9 @@
                     been changed. It is instead possible to obtain the request body as
                     <code>xs:anyURI</code> or <code>xs:base64Binary</code>. Parsing may then be done
                     using the <a href="processors-generators#url-generator">URL generator</a>. In
-                    addition, the body can now be read several times. This change brings
-                    consistency with the handling of uploaded files, and the support for binary
-                    files thoughout Presentation Server.
+                    addition, the body can now be read several times. This change brings consistency
+                    with the handling of uploaded files, and the support for binary files thoughout
+                    Presentation Server.
                 </p>
                 <p>
                     In a related change, the <a

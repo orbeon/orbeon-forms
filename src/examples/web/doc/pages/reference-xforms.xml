@@ -439,6 +439,7 @@
                 </table>
             </section>
         </section>
+        <a name="xforms-controls"/>
         <section>
             <title>XForms Controls</title>
             <section>
@@ -682,6 +683,7 @@
                     </xforms:select1>
                 </xml-source>
             </section>
+            <a name="label-alert-help-hint"/>
             <section>
                 <title>Label, Alert, Help, and Hint</title>
                 <p>

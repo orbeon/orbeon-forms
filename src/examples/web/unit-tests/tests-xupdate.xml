@@ -12,7 +12,8 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<group description="XUpdate" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xu="http://www.xmldb.org/xupdate" >
+<group description="XUpdate" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xu="http://www.xmldb.org/xupdate">
 
     <test description="Remove, insert-after, insert-before" name="oxf:xupdate">
         <input name="data">
@@ -93,6 +94,60 @@
         </input>
         <output name="data">
             <root attribute="abc"/>
+        </output>
+    </test>
+    
+    <test description="Iterate of nodeset" name="oxf:xupdate">
+        <input name="data">
+            <root xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <source>
+                    <form>
+                        <person/>
+                        <givenName valid="false"/>
+                        <country valid="false"/>
+                    </form>                
+                </source>
+                <target>
+                    <form>
+                        <person/>
+                        <givenName/>
+                        <country/>
+                    </form>                
+                </target>
+            </root>
+        </input>
+        <input name="config">
+            <xu:modifications xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xu:variable name="target" select="/root/target//*"/>
+                <xu:for-each select="/root/source//*">
+                    <xu:variable name="i" select="position()"/>
+                    <xu:variable name="valid" select="@valid"/>
+                    <xu:message><xu:value-of select="$valid"/></xu:message>
+                    <xu:if test="$valid">
+                        <xu:append select="$target[$i]">
+                            <xu:attribute name="xxforms:valid"><xu:value-of select="$valid"/></xu:attribute>
+                        </xu:append>
+                    </xu:if>
+                </xu:for-each>
+            </xu:modifications>
+        </input>
+        <output name="data">
+            <root xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <source>
+                    <form>
+                        <person/>
+                        <givenName valid="false"/>
+                        <country valid="false"/>
+                    </form>                
+                </source>
+                <target>
+                    <form>
+                        <person/>
+                        <givenName xxforms:valid="false"/>
+                        <country xxforms:valid="false"/>
+                    </form>                
+                </target>
+            </root>
         </output>
     </test>
 

@@ -231,14 +231,14 @@
                 <include name="mail-1_3_2.jar"/>
                 <include name="itext-1_02b.jar"/>
                 <include name="itext-xml-1_02.jar"/>
-                <include name="xml-apis-xerces_2_6_2_orbeon.jar"/>
-                <include name="xercesImpl_2_6_2_orbeon.jar"/>
+                <include name="xml-apis-xerces_2_6_2_orbeon.jar"/> 
             </fileset>
             <fileset dir="${build.lib.dir}">
                 <exclude name="jsf-*.jar"/>
             </fileset>
         </copy>
         <copy file='${lib.dir}/commons-logging-1_0_4.jar' todir="${war.dir}/WEB-INF/lib/private" />
+        <copy file='${lib.dir}/xercesImpl_2_6_2_orbeon.jar' todir="${war.dir}/WEB-INF/lib/private" />
         <mkdir dir="${war.dir}/WEB-INF/lib/cli"/>
         <copy todir="${war.dir}/WEB-INF/lib/cli">
             <fileset dir="${lib.dir}">

@@ -4,7 +4,7 @@
 
 ======================================================
 
-Copyright 1999-2004 (C) Orbeon, Inc. All rights reserved.
+Copyright 1999-2005 (C) Orbeon, Inc. All rights reserved.
 
 This README.TXT file covers the following topics:
 
@@ -222,8 +222,8 @@ Software License. The schema is available at the following location:
 Please consult the third-party-licenses directory for more information
 about individual licenses.
 
-Last updated: November 2004
+Last updated: January 2005
 
-Copyright 1999-2004 (C) Orbeon, Inc. All rights reserved.
+Copyright 1999-2005 (C) Orbeon, Inc. All rights reserved.
 
 --

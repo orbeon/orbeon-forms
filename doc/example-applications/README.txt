@@ -5,7 +5,7 @@
 
 ======================================================
 
-Copyright 1999-2004 (C) Orbeon, Inc. All rights reserved.
+Copyright 1999-2005 (C) Orbeon, Inc. All rights reserved.
 
 This README.txt file covers the following topics:
 

@@ -73,6 +73,9 @@
                         <element name="part">
                             <attribute name="name"/>
                             <attribute name="content-type"/>
+                            <optional>
+                                <attribute name="content-disposition"/>
+                            </optional>
                             <choice>
                                 <ref name="anyElement"/>
                                 <text/>

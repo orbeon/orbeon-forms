@@ -19,6 +19,7 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
@@ -86,16 +87,16 @@ public class EmailProcessor extends ProcessorImpl {
             Element textElement = messageElement.element("text");
             Element bodyElement = messageElement.element("body");
             // simple body
-            if(textElement != null)
+            if (textElement != null)
                 message.setText(textElement.getStringValue());
-            else if(bodyElement != null){
+            else if (bodyElement != null) {
                 // MIME parts
                 String multipart = bodyElement.attributeValue("mime-multipart");
-                if(multipart ==null)
+                if (multipart == null)
                     multipart = DEFAULT_MULTIPART;
                 MimeMultipart mimeMultipart = new MimeMultipart(multipart);
-                for(Iterator i = bodyElement.elementIterator("part"); i.hasNext();) {
-                    Element partElement = (Element)i.next();
+                for (Iterator i = bodyElement.elementIterator("part"); i.hasNext();) {
+                    Element partElement = (Element) i.next();
                     String name = partElement.attributeValue("name");
                     String contentType = partElement.attributeValue("content-type");
 
@@ -122,8 +123,21 @@ public class EmailProcessor extends ProcessorImpl {
                     }
 
                     MimeBodyPart part = new MimeBodyPart();
-                    part.setDataHandler(new DataHandler(new SimpleDataSource(name, contentType, content)));
-                    mimeMultipart.addBodyPart(part);
+                    if (contentType != null && !contentType.startsWith("text/")) {
+                        // This is not text content
+                        byte[] data = XMLUtils.base64StringToByteArray(content);
+                        part.setDataHandler(new DataHandler(new SimpleBinaryDataSource(name, contentType, data)));
+                        mimeMultipart.addBodyPart(part);
+                    } else {
+                        // This is text content
+                        part.setDataHandler(new DataHandler(new SimpleTextDataSource(name, contentType, content)));
+                        mimeMultipart.addBodyPart(part);
+                    }
+
+                    // Set content-disposition header
+                    String contentDisposition = partElement.attributeValue("content-disposition");
+                    if (contentDisposition != null)
+                        part.setDisposition(contentDisposition);
                 }
                 message.setContent(mimeMultipart);
             } else {
@@ -150,12 +164,12 @@ public class EmailProcessor extends ProcessorImpl {
                 : new InternetAddress(email, nameElement.getStringValue());
     }
 
-    private class SimpleDataSource implements DataSource{
+    private class SimpleTextDataSource implements DataSource {
         String contentType;
         String text;
         String name;
 
-        public SimpleDataSource(String name, String contentType, String text) {
+        public SimpleTextDataSource(String name, String contentType, String text) {
             this.name = name;
             this.contentType = contentType;
             this.text = text;
@@ -166,7 +180,35 @@ public class EmailProcessor extends ProcessorImpl {
         }
 
         public InputStream getInputStream() throws IOException {
-            return new StringBufferInputStream(text);
+            return new ByteArrayInputStream(text.getBytes());
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public OutputStream getOutputStream() throws IOException {
+            throw new IOException("Write operation not supported");
+        }
+    }
+
+    private class SimpleBinaryDataSource implements DataSource {
+        String contentType;
+        byte[] data;
+        String name;
+
+        public SimpleBinaryDataSource(String name, String contentType, byte[] data) {
+            this.name = name;
+            this.contentType = contentType;
+            this.data = data;
+        }
+
+        public String getContentType() {
+            return contentType;
+        }
+
+        public InputStream getInputStream() throws IOException {
+            return new ByteArrayInputStream(data);
         }
 
         public String getName() {

@@ -89,8 +89,6 @@ public class SQLProcessor extends ProcessorImpl {
     private static final String SQL_TYPE_BLOB = "blob";
     private static final String SQL_TYPE_XMLTYPE = "xmltype";
 
-    private static final Document EMPTY_DOCUMENT = XMLUtils.createDOM4JDocument();
-
     public SQLProcessor() {
         // Mandatory config input
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SQL_NAMESPACE_URI));
@@ -224,7 +222,7 @@ public class SQLProcessor extends ProcessorImpl {
                 throw new OXFException("The data input must be connected when the configuration uses XPath expressions.");
             if (!hasDataInput || !config.useXPathExpressions) {
                 // Just use an empty document
-                data = EMPTY_DOCUMENT;
+                data = XMLUtils.NULL_DOCUMENT;
             } else {
                 // There is a data input connected and there are some XPath epxressions operating on it
                 boolean useXPathContentHandler = false;

@@ -58,6 +58,10 @@ public class ProcessorTest extends TestCase {
     private static final int REPEAT_COUNT = 1;
     private static final String TEST_CONFIG = "oxf.test.config";
 
+    public static void main(String args[]) {
+        junit.textui.TestRunner.run(ProcessorTest.suite());
+    }
+    
     static {
         try {
             // Initialize log4j
@@ -112,6 +116,8 @@ public class ProcessorTest extends TestCase {
             for (; i.hasNext();) {
                 Element testNode = (Element) i.next();
                 Element groupNode = testNode.getParent();
+                if(testNode.attributeValue("ignore") != null)
+                    continue;
                 String description = testNode.attributeValue("description", "");
                 if (groupNode.getName().equals("group")) {
                     String groupDescription = groupNode.attributeValue("description");
@@ -206,6 +212,10 @@ public class ProcessorTest extends TestCase {
         this.expectedDocuments = expectedDocuments;
     }
 
+    protected ProcessorTest(String name) {
+        super(name);
+        this.description = name;
+    }
 
     public String getName() {
         return description;
@@ -273,18 +283,20 @@ public class ProcessorTest extends TestCase {
      *
      * @param result List of String (URI)
      */
-    private void getUsedNamespaces(List result, Element element) {
-        if (!element.getNamespaceURI().equals(""))
-            result.add(element.getNamespaceURI());
-        for (Iterator i = element.attributes().iterator(); i.hasNext();) {
-            Attribute attribute = (Attribute) i.next();
-            if (!attribute.getNamespaceURI().equals("")) {
-                result.add(attribute.getNamespaceURI());
+    synchronized private void getUsedNamespaces(List result, Element element) {
+        if(element != null) {
+            if (!"".equals(element.getNamespaceURI()))
+                result.add(element.getNamespaceURI());
+            for (Iterator i = element.attributes().iterator(); i.hasNext();) {
+                Attribute attribute = (Attribute) i.next();
+                if (!attribute.getNamespaceURI().equals("")) {
+                    result.add(attribute.getNamespaceURI());
+                }
             }
-        }
-        for (Iterator i = element.elements().iterator(); i.hasNext();) {
-            Element child = (Element) i.next();
-            getUsedNamespaces(result, child);
+            for (Iterator i = element.elements().iterator(); i.hasNext();) {
+                Element child = (Element) i.next();
+                getUsedNamespaces(result, child);
+            }
         }
     }
 

@@ -1220,6 +1220,9 @@
 &lt;/p:choose&gt;
                     </pre>
                     <p>
+                        [TODO: Update to support p:output]
+                    </p>
+                    <p>
                         The <el>p:choose</el> element declares a statement used to execute different
                         sequences of statements depending on conditions evaluated during the
                         execution of the XPL program.
@@ -1936,19 +1939,35 @@ xpointer          ::= "#xpointer(" xpath_expression ")"
             <div2>
                 <head>Aggregation</head>
                 <p>
-                    The <code>aggregate()</code> function takes as first argument a string
-                    containing a QName. The QName determines the root element of a new XML Infoset.
+                    The <code>aggregate()</code> function returns a new XML Infoset. In terms of the
+                    XQuery 1.0 and XPath 2.0 Data Model, it can be defined as follows:
                 </p>
+                <pre>
+fn:aggregate($root as <emph>xs:QName</emph>, $included as <emph>item()*</emph>) as <emph>document-node()</emph>
+                </pre>
                 <p>
-                    The following arguments of the function can be of type <code>element()</code> or
-                    <code>element()*</code> [TODO: solve conflict between notion of XML Infoset and
-                    notion of root element of an XML Infoset]
+                    The resulting XML Infoset's document information item contains:
                 </p>
+                <ulist>
+                    <item>
+                        <p>
+                            A document element with the QName specified as the first argument of the
+                            <code>aggregate()</code> function.
+                        </p>
+                    </item>
+                    <item>
+                        <p>
+                            No processing instructions, comments, and document type declaration information.
+                        </p>
+                    </item>
+                </ulist>
                 <p>
-                    The <code>aggregate()</code> functions evaluates to a new XML Infoset with root
-                    element determined by the first argument. The root element has one child
-                    elements per element passed to the function in the following arguments, in the
-                    order they appear.
+                    The second argument of <code>aggregate()</code> is of type <code>item()*</code>,
+                    in other words a sequence of items as defined by <bibref ref="xpath-20"/>, with
+                    the exception that attribute nodes and namespace nodes are not allowed. This is
+                    consistent with the acquired infoset defined in <bibref ref="xinclude"/>. The
+                    Infoset associated with each item of the sequence is added as child information
+                    items to the document element information item.
                 </p>
             </div2>
             <div2>
@@ -2178,13 +2197,15 @@ xpointer          ::= "#xpointer(" xpath_expression ")"
                     <item>
                         <p>
                             <emph>XPath 1.0.</emph> In this case, <bibref ref="xpath-10"/> must be
-                            supported in the <el>test</el> attribute of the <el>p:when</el> element.
+                            supported in the <el>test</el> attribute of the <el>p:when</el> element,
+                            and in the <el>select</el> attribute of the <el>p:for-each</el> element.
                         </p>
                     </item>
                     <item>
                         <p>
                             <emph>XPath 2.0.</emph> In this case, <bibref ref="xpath-20"/> must be
-                            supported in the <el>test</el> attribute of the <el>p:when</el> element.
+                            supported in the <el>test</el> attribute of the <el>p:when</el> element,
+                            and in the <el>select</el> attribute of the <el>p:for-each</el> element.
                         </p>
                     </item>
                 </ulist>
@@ -2716,5 +2737,6 @@ TODO:
     o current() for p:for-each
     o improve "no-collision rule"
     o p:choose: export of identifiers
+    o put p:while and p:try in a "future improvements section"
 
 -->

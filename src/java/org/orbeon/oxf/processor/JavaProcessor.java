@@ -29,10 +29,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.SystemUtils;
 import org.xml.sax.ContentHandler;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.*;
@@ -169,7 +166,7 @@ public class JavaProcessor extends ProcessorImpl {
             boolean fileUpToDate = new File(sourceFile).lastModified() < new File(destinationFile).lastModified();
 
             // Compile
-            if (! fileUpToDate) {
+            if (!fileUpToDate) {
                 if (logger.isDebugEnabled())
                     logger.debug("Compiling class '" + config.clazz + "'");
                 StringWriter javacOutput = new StringWriter();
@@ -227,18 +224,48 @@ public class JavaProcessor extends ProcessorImpl {
         String propClasspath = getPropertySet().getString(CLASSPATH_PROPERTY);
 
         // Add classpath for jproperties if available
-        if(propClasspath != null)
+        if (propClasspath != null)
             classpath.append(propClasspath).append(PATH_SEPARATOR);
 
         // Add jar path from properties
-        if(propJarpath != null)
+        if (propJarpath != null)
             jarpath.append(propJarpath).append(PATH_SEPARATOR);
 
         // Add jar path from webapp if available
         ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        if(externalContext != null) {
-            jarpath.append(externalContext.getRealPath("WEB-INF/lib"));
-            classpath.append(externalContext.getRealPath("WEB-INF/classes")).append(PATH_SEPARATOR);
+        boolean gotLibDir = false;
+        if (externalContext != null) {
+            String webInfLibPath = externalContext.getRealPath("WEB-INF/lib");
+            if (webInfLibPath != null) {
+                jarpath.append(webInfLibPath).append(PATH_SEPARATOR);
+                gotLibDir = true;
+            }
+            String webInfClasses = externalContext.getRealPath("WEB-INF/classes");
+            if (webInfClasses != null)
+                classpath.append(webInfClasses).append(PATH_SEPARATOR);
+        }
+
+        // Try to add directory containing current JAR file
+        if (!gotLibDir) {
+            try {
+                URL url = getClass().getClassLoader().getResource("org/orbeon/oxf/processor/JavaProcessor.class");
+                if (url.getProtocol().equals("jar")) {
+                    String file = url.getFile();
+                    if (file.indexOf("!") != -1)
+                        file = file.substring(0, file.indexOf("!"));
+
+                    if (file.startsWith("file:/"))
+                        file = file.substring("file:/".length());
+
+                    if (logger.isDebugEnabled())
+                        logger.debug("Found current JAR file: " + file);
+                    
+                    File jarDirectory = new File(file).getParentFile();
+                    jarpath.append(jarDirectory.getCanonicalPath()).append(PATH_SEPARATOR);
+                }
+            } catch (IOException e) {
+                throw new OXFException(e);
+            }
         }
 
         for (StringTokenizer tokenizer = new StringTokenizer(jarpath.toString(), PATH_SEPARATOR); tokenizer.hasMoreElements();) {
@@ -259,7 +286,7 @@ public class JavaProcessor extends ProcessorImpl {
             }
         }
 
-        if(logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
             logger.debug("Classpath: "+ classpath.toString());
         return classpath.length() == 0 ? null : classpath.toString();
     }

@@ -52,7 +52,12 @@
     </xsl:template>
 
     <xsl:template match="xforms:upload">
-        <xhtml:input type="file" name="$upload^{xxforms:encrypt-name(@xxforms:name)}^{@xxforms:value}^{xxforms:encrypt-name(xforms:filename/@xxforms:name)}^{xforms:filename/@xxforms:value}^{xxforms:encrypt-name(xforms:mediatype/@xxforms:name)}^{xforms:mediatype/@xxforms:value}^{xxforms:encrypt-name(xxforms:size/@xxforms:name)}^{xforms:size/@xxforms:value}^{xxforms:encrypt-name(@xxforms:name)}^{@xxforms:value}">
+<!--        <xsl:message>-->
+<!--            <form>-->
+<!--                <xsl:copy-of select="."/>-->
+<!--            </form>-->
+<!--        </xsl:message>-->
+        <xhtml:input type="file" name="$upload^{xxforms:encrypt-name(@xxforms:name)}^{@xxforms:value}^{xxforms:encrypt-name(xforms:filename/@xxforms:name)}^{xforms:filename/@xxforms:value}^{xxforms:encrypt-name(xforms:mediatype/@xxforms:name)}^{xforms:mediatype/@xxforms:value}^{xxforms:encrypt-name(xxforms:size/@xxforms:name)}^{xforms:size/@xxforms:value}">
             <xsl:call-template name="copy-other-attributes"/>
         </xhtml:input>
     </xsl:template>

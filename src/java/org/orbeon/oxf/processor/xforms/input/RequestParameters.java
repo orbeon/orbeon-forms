@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.processor.xforms.input;
 
-import org.apache.commons.lang.StringUtils;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.input.action.*;
@@ -52,7 +51,7 @@ public class RequestParameters {
     private Map idToRef = new HashMap();
     private List actions = new ArrayList();
     private Map fileInfos;
-    private boolean processedFiles;
+
 
     private final boolean encryptNames = OXFProperties.instance().getPropertySet().getBoolean
             (Constants.XFORMS_ENCRYPT_NAMES, false).booleanValue();
@@ -218,18 +217,17 @@ public class RequestParameters {
 
                         // Set values on FileInfo element
                         FileInfo fileInfo = getFileInfo(fileInfoNames[0]);
-                        addValue(fileInfoNames[0], value, type, false);
                         fileInfo.value = value;
                         fileInfo.type = type;
 
-                        if (fileInfoNames[1].length() > 0)
+                        if (fileInfoNames[2].length() > 0)
                             fileInfo.filenameRef = fileInfoNames[2];
-                        if (fileInfoNames[3].length() > 0)
+                        if (fileInfoNames[4].length() > 0)
                             fileInfo.mediatypeRef = fileInfoNames[4];
-                        if (fileInfoNames[5].length() > 0)
+                        if (fileInfoNames[6].length() > 0)
                             fileInfo.contentLengthRef = fileInfoNames[6];
-                        if (fileInfoNames[7].length() > 0)
-                            fileInfo.originalValue = fileInfoNames[8];
+                        if (fileInfoNames[1].length() > 0)
+                            fileInfo.originalValue = fileInfoNames[1];
 
                     } else if ("$idRef".equals(name)) {
                         int equalPosition = value.indexOf('=');
@@ -287,11 +285,6 @@ public class RequestParameters {
                         if (name.indexOf('^') != -1) {
                             // Special case: we extract the value from the name (for checkbox and submit)
                             nameValues(name, type, false);
-//                        } else if (type != null) {
-//                            // The only case we have a type is for file uploads
-//                            FileInfo fileInfo = getFileInfo(name);
-//                            fileInfo.value = value;
-//                            fileInfo.type = type;
                         } else {
                             // Normal case
                             addValue(name, value, type, false);
@@ -348,32 +341,39 @@ public class RequestParameters {
                 if (name.startsWith("$upload^"))
                     getFileInfo(name.substring("$upload^".length(), name.indexOf("^", "$upload^".length()))).contentLength = contentLength;
             }
+
+            public void endDocument() {
+                // Complete handling of file uploads
+                if (fileInfos != null) {
+                    for (Iterator i = fileInfos.keySet().iterator(); i.hasNext();) {
+                        String key = (String) i.next();
+                        FileInfo fileInfo = (FileInfo) fileInfos.get(key);
+                        if (fileInfo.hasValue()) {
+                            // If a file was in fact uploaded, set all the file attributes
+                            setValue(fileInfo.fileRef, fileInfo.value, fileInfo.type);
+                            if (fileInfo.filenameRef != null)
+                                setValue(fileInfo.filenameRef, fileInfo.filename, null);
+                            if (fileInfo.mediatypeRef != null)
+                                setValue(fileInfo.mediatypeRef, fileInfo.mediatype, null);
+                            if (fileInfo.contentLengthRef != null)
+                                setValue(fileInfo.contentLengthRef, fileInfo.contentLength, null);
+                        } else {
+                            // Set original value and empty attributes
+                            setValue(fileInfo.fileRef, fileInfo.originalValue, null);
+                            if (fileInfo.filenameRef != null)
+                                setValue(fileInfo.filenameRef, "", null);
+                            if (fileInfo.mediatypeRef != null)
+                                setValue(fileInfo.mediatypeRef, "", null);
+                            if (fileInfo.contentLengthRef != null)
+                                setValue(fileInfo.contentLengthRef, "", null);
+                        }
+                    }
+                }
+            }
         };
     }
 
     public String[] getPaths() {
-        if (!processedFiles) {
-            if (fileInfos != null) {
-                for (Iterator i = fileInfos.keySet().iterator(); i.hasNext();) {
-                    String key = (String) i.next();
-                    FileInfo fileInfo = (FileInfo) fileInfos.get(key);
-                    if (fileInfo.hasValue()) {
-                        // If a file was in fact uploaded, set all the file attributes
-                        setValue(fileInfo.fileRef, fileInfo.value, fileInfo.type);
-                        if (fileInfo.filenameRef != null && fileInfo.filename != null)
-                            setValue(fileInfo.filenameRef, fileInfo.filename, null);
-                        if (fileInfo.mediatypeRef != null && fileInfo.mediatype != null)
-                            setValue(fileInfo.mediatypeRef, fileInfo.mediatype, null);
-                        if (fileInfo.contentLengthRef != null && fileInfo.contentLength != null)
-                            setValue(fileInfo.contentLengthRef, fileInfo.contentLength, null);
-                    } else {
-                        // Set original value
-                        setValue(fileInfo.fileRef, fileInfo.originalValue, null);
-                    }
-                }
-            }
-            processedFiles = true;
-        }
         Set paths = pathToValue.keySet();
         return (String[]) paths.toArray(new String[paths.size()]);
     }

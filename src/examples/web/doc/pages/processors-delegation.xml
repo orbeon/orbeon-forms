@@ -14,7 +14,7 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:delegation="http://orbeon.org/oxf/xml/delegation" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance">
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:delegation="http://orbeon.org/oxf/xml/delegation" xmlns:xsi="http://www.w3.org/1999/XMLSchema-instance" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <header>
         <title>Delegation Processor</title>
     </header>
@@ -24,140 +24,214 @@
             <p>The delegation processor can be used to call existing
                 code available as:</p>
             <ul>
-                <li>an EJB</li>
                 <li>a Web service</li>
+                <li>an EJB</li>
                 <li>a JavaBean</li>
             </ul>
         </section>
         <section>
             <title>Usage</title>
+            <img print-format="pdf" src="pages/processors-delegation.png"/>
             <table ca="|l|p{0.5\textwidth}|">
                 <tr>
                     <th>interface input</th>
-                    <td>This input describes the service to call. The
-                        particulars of the description document will change
-                        depending on the service type (EJB, Web service or
-                        JavaBean). We'll explore each case in the sections
-                        below.</td>
+                    <td>
+		                <p>
+		                	With this input you describes services that you can then call
+		                	in the <code>call</code> input.
+		                	You define one or more <code>service id</code>(s) and maps each one
+		                    of those <code>id</code>(s) to a given Web service, EJB, or JavaBean. You also
+		                    need to provide any information that the delegation processor needs to
+		                    call the service: for instance a JNDI name for an EJB or a class
+		                    name for a JavaBean.
+		                </p>
+		                <p>
+		                	The interface input is the only document with information
+		                    specific to the service type (EJB, Web service or JavaBean).
+		                    This means that if, at some point, a service is moved from, say, a
+		                    JavaBean to an EJB, only the interface will have to be modified
+		                    (not the call input or data output).
+		                </p>
+                    </td>
                 </tr>
                 <tr>
                     <th>call input</th>
-                    <td>A document containing  <code>&lt;delegation:execute&gt;</code> elements. Each <code>&lt;delegation:execute&gt;</code>  element specifies a 					service to be called and the parameters to be sent to	that service.
+                    <td>
+                    	A document containing <code>&lt;delegation:execute&gt;</code> elements.
+                    	Each <code>&lt;delegation:execute&gt;</code> element specifies a 
+						service to be called and the parameters to be sent to that service.
                     </td>
                 </tr>
                 <tr>
                     <th>data output</th>
-                    <td>A document based on the <code>call</code> input where the
+                    <td>
+                    	A document based on the <code>call</code> input where the
                         <code>&lt;delegation:execute&gt;</code> elements have been
-                        replaced with the value returned by the service.</td>
+                        replaced with the value returned by the service.
+                    </td>
                 </tr>
             </table>
-            <img print-format="pdf" src="pages/processors-delegation.png"/>
-            <section>
-                <title>Interface Input</title>
-                <p>This input defines one or more <code>service id</code>(s) and maps each one
-                    of those <code>id</code>(s) to a given EJB, Web service or JavaBean. It also
-                    provides any information that the delegation processor needs to
-                    call the service, for instance a JNDI name for an EJB or a class
-                    name for a JavaBean.</p>
-                <note>The interface input is the only document with information
-                    specific to the service type (EJB, Web service or JavaBean).
-                    This means that if, at some point, a service is moved from, say, a
-                    JavaBean to an EJB, only the interface will have to be modified
-                    (not the call input or data output).</note>
-                <p>For an EJB, the interface simply needs to describe the JNDI
-                    name of the service, e.g.:</p>
-                <xml-source>
-                    <config>
-                        <service id="creditcard-validation" type="stateless-ejb" uri="java:comp/env/ejb/creditcard-validation"/>
-                    </config>
-                </xml-source>
-                <p>
-                    For a Web service, the interface needs to declare the SOAP
-                    endpoint and the namespace URI of each operation. The
-                    <code>encodingStyle</code> attribute on the
-                    <code>operation</code> element is optional. If specified, it
-                    will be sent in the SOAP envelope. The XML fragment you
-                    specify in the <code>execute</code> element (see below) is
-                    sent as is, and you are responsible of making sure that it
-                    is valid according to the encoding style, if you specified
-                    one. The description of the "famous" California Highway
-                    Traffic Web service looks like this:
-                </p>
-                <xml-source>
-                    <config>
-                        <service id="ca-traffic" type="webservice" endpoint="http://services.xmethods.net:80/soap/servlet/rpcrouter">
-                            <operation nsuri="urn:xmethods-CATraffic" name="getTraffic"
-                                encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
-                        </service>
-                    </config>
-                </xml-source>
-                <p>For JavaBeans, only the name of the class needs to
-                    be specified, e.g.:</p>
-                <xml-source>
-                    <config>
-                        <service id="creditcard-validation" type="javabean" uri="com.example.creditcard.Validation"/>
-                    </config>
-                </xml-source>
-            </section>
-            <section>
-                <title>Call Input</title>
-                <p>The content of the call document will be returned
-                    as is in the data output, except for the
-                    <code>&lt;delegation:execute&gt;</code> elements and
-                    their content which will be replaced by the result of
-                    the call to the service. The delegation namespace URI
-                    must be
-                    <code>http://orbeon.org/oxf/xml/delegation</code>.</p>
-                <p>In the example below, we call the CA Highway
-                    Traffic Web service defined earlier to get the traffic
-                    conditions on highway 101:</p>
-                <xml-source>
-                    <traffic>
-                        <highway>101</highway>
-                        <traffic-conditions>
-                            <delegation:execute service="ca-traffic" operation="getTraffic">
-                                <hwynums>101</hwynums>
-                            </delegation:execute>
-                        </traffic-conditions>
-                    </traffic>
-                </xml-source>
-                <p>Web services are based on XML envelopes being
-                    exchanged between the client and the server. In this case, the server will need to check
-                    if the parameter received
-                    (<code>&lt;hwynums&gt;101&lt;/hwynums&gt;</code>) is
-                    valid. On the contrary, EJB and JavaBeans provide
-                    method overloading and the type of each parameter must
-                    be known to call the service. The type is provided to the
-                    Delegation processor by annotating the parameters with
-                    <code>xsi:type</code> attributes, following the W3C
-                    XML Schema standard. In the example below we call the
-                    credit card validation EJB defined earlier:</p>
-                <xml-source>
-                    <delegation:execute service="creditcard-validation" operation="validate">
-                        <number xsi:type="xsd:string">1234567812345678</number>
-                        <amount xsi:type="xsd:double">82.95</amount>
-                    </delegation:execute>
-                </xml-source>
-                <warning>In OXF version 1.5, the only types
-                    supported when calling EJBs or JavaBeans are
-                    <code>xsd:string</code> (mapped to java.lang.String)
-                    and <code>xsd:double</code> (mapped to the primitive
-                    type <code>double</code>).</warning>
-            </section>
-            <section>
-                <title>Data Output</title>
-                <p>The output of the CA Highway Traffic Web service (as
-                    called above), will return a document like:</p>
-                <xml-source>
-                    <traffic>
-                        <highway>101</highway>
-                        <traffic-conditions>
-                            101, NO TRAFFIC RESTRICTIONS ARE REPORTED FOR THIS ROUTE.
-                        </traffic-conditions>
-                    </traffic>
-                </xml-source>
+        </section>
+        <section>
+        	<title>Calling an EJB</title>
+            <p>
+            	You call an EJB with:
+            </p>
+            <xml-source show-namespaces="false">
+			    <p:processor name="oxf:delegation">
+			        <p:input name="interface">
+			            <config>
+	                        <service id="creditcard-validation" type="stateless-ejb" 
+	                        	uri="java:comp/env/ejb/creditcard-validation"/>
+			            </config>
+			        </p:input>
+			        <p:input name="call">
+			            <delegation:execute service="creditcard-validation" operation="validate">
+			            	<number xsi:type="xs:string">1234123412341234</number>
+			            	<type xsi:type="xs:string">visa</type>
+			            </delegation:execute>
+			        </p:input>
+			        <p:output name="data" id="data"/>
+			    </p:processor>
+            </xml-source>
+            <ul>
+            	<li>The <code>interface</code> input declares the EJB that will be called:
+	            	<ul>
+	            		<li>
+	            			The value of the <code>type</code> attribute must be set to 
+	            			<code>stateless-ejb</code>.
+            			</li>
+	            		<li>
+	            			The URI attribute references the JNDI name of the EJB.
+            			</li>
+	        		</ul>
+        		</li>
+        		<li>The <code>call</code> input defines the method to be called and the parameters:
+        			<ul>
+        				<li>
+        					The <code>service</code> attribute references the service id declared
+							in the <code>interface</code> input.
+    					</li>
+    					<li>
+    						Each child element of <code>&lt;delegation:execute></code>
+    						corresponds to an attribute of the method to be called. The name of
+    						each element must match the attribute name, and the value in the
+    						<code>xsi:type</code> attribute must match the attribute type. The
+    						content of the element is the value passed to the EJB method.
+						</li>
+						<li>
+							Note: the only two supported types are: <code>xs:string</code> and
+							<code>xs:double</code>.
+						</li>
+        			</ul>
+    			</li>
+            </ul>
+        </section>
+        <section>
+        	<title>Calling a Web Service</title>
+        	<section>
+        		<title>Example: RPC-Style</title>
+	        	<xml-source show-namespaces="false">
+				    <p:processor name="oxf:delegation">
+				        <p:input name="interface">
+				            <config>
+				                <service id="quotes" type="webservice" style="rpc"
+				                        endpoint="http://www.scdi.org/~avernet/webservice/">
+				                    <operation nsuri="urn:avernet" name="getRandomQuote"
+				                        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>
+				                </service>
+				            </config>
+				        </p:input>
+				        <p:input name="call">
+				            <delegation:execute service="quotes" operation="getRandomQuote"/>
+				        </p:input>
+				        <p:output name="data" ref="data"/>
+				    </p:processor>
+	        	</xml-source>
+        	</section>
+        	<section>
+        		<title>Example: Document-Style</title>
+	        	<xml-source show-namespaces="false">
+				    <p:processor name="oxf:delegation">
+				        <p:input name="interface">
+				            <config>
+				                <service id="stock-quote" type="webservice" style="document"
+				                    endpoint="http://ws.cdyne.com/delayedstockquote/delayedstockquote.asmx">
+				                    <operation name="get-quote" soap-action="http://ws.cdyne.com/GetQuote"/>
+				                </service>
+				            </config>
+				        </p:input>
+				        <p:input name="call">
+				            <delegation:execute service="stock-quote" operation="get-quote" xsl:version="2.0">
+				                <m:GetQuote xmlns:m="http://ws.cdyne.com/">
+				                    <m:StockSymbol><xsl:value-of select="/symbol"/></m:StockSymbol>
+				                    <m:LicenseKey>0</m:LicenseKey>
+				                </m:GetQuote>
+				            </delegation:execute>
+			            </p:input>
+				        <p:output name="data" ref="data"/>
+				    </p:processor>
+	        	</xml-source>
+        	</section>
+        	<section>
+        		<title>Usage</title>
+        		<ul>        		
+        			<li>
+        				The <code>interface</code> input declares the Web service to be called:
+        				<ul>
+        					<li>
+        						Valid values for the style attribute are <code>rpc</code>
+    							and <code>document</code>. The default value if the attribute
+    							is missing is <code>rpc</code>.
+							</li>
+							<li>
+								The <code>id</code> (referenced when Web service is called in
+								the <code>call</code> input) and <code>endpoint</code>
+								(the SOAP endpoint) attributes are mandatory.
+							</li>
+							<li>
+								Declaring the Web service operations is optional for document-style
+								services. You only need to do so if you want to specify a SOAP action
+								for a given operation.
+							</li>
+							<li>
+								Optionally you can declare for each operation the encoding style
+								(<code>encodingStyle</code> attribute) and SOAP action
+								(<code>soap-action</code> attribute).
+							</li>
+        				</ul>
+    				</li>
+    				<li>
+    					In the <code>call</code> input:
+    					<ul>
+    						<li>
+				                The XML fragment you specify in the <code>execute</code> element is
+				                sent as is, and you are responsible of making sure that it
+				                is valid according to the encoding style.
+			                </li>
+			                <li>
+			                	Referencing a specific operation in the <code>operation</code>
+			                	attribute is mandatory for RPC-style services, and is optional
+			                	for document-style services (you only want to do so if you 
+			                	declared specific information about the operation in the 
+			                	<code>interface</code> input).
+		                	</li>
+	                	</ul>
+	                </li>
+                </ul>
             </section>
         </section>
+        <!--
+        <section>
+        	<title>Calling a JavaBean</title>
+            <p>For JavaBeans, only the name of the class needs to
+                be specified, e.g.:</p>
+            <xml-source show-namespaces="false">
+                <config>
+                    <service id="creditcard-validation" type="javabean" uri="com.example.creditcard.Validation"/>
+                </config>
+            </xml-source>
+        </section>
+        -->
     </body>
 </document>

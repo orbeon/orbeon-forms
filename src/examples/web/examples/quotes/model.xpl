@@ -22,7 +22,7 @@
     <p:processor name="oxf:delegation">
         <p:input name="interface">
             <config>
-                <service id="quotes" type="webservice"
+                <service id="quotes" type="webservice" style="rpc"
                         endpoint="http://www.scdi.org/~avernet/webservice/">
                     <operation nsuri="urn:avernet" name="getRandomQuote"
                         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/>

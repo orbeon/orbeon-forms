@@ -70,6 +70,7 @@
         <example id="reports" label="Data in multiple formats"/>
         <example id="charts" label="Charts &amp; Graphs"/>
         <example id="imageserver" label="Image Server"/>
+        <!--<example id="excel" label="Excel Import / Export"/>-->
     </section>
     <section label="Database Access">
         <example id="address-book" label="Address Book"/>
@@ -86,6 +87,7 @@
     <section label="Calling a Web Service">
         <example id="quotes" label="Famous Quotes"/>
         <example id="ca-traffic" label="California Traffic"/>
+        <example id="stock-quote" label="Stock Quote"/>
     </section>
     <section label="Messaging">
         <example id="email" label="Sending Email"/>

@@ -86,7 +86,8 @@
 
             <!-- Override href attribute if necessary -->
             <xsl:if test="$reference-xform-instance">
-                <xsl:variable name="params" select="concat('$instance=', escape-uri(normalize-space($reference-xform-instance/@xxforms:value), true()))"/>
+                <xsl:variable name="params" select="concat('$instance=', escape-uri(normalize-space($reference-xform-instance/@xxforms:value), true()), 
+                    '&amp;', '$key=', escape-uri(normalize-space($reference-xform-key/@xxforms:value), true()))"/>
 
                 <xsl:if test="$params">
                     <xsl:attribute name="href">

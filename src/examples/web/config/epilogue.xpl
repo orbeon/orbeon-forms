@@ -157,7 +157,7 @@
                 <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>
                 <p:output name="data" id="rewritten-data"/>
             </p:processor>
-            <!-- Serialize to HTML -->
+            <!-- Serialize to XML -->
             <p:processor name="oxf:xml-serializer">
                 <p:input name="config">
                     <config>

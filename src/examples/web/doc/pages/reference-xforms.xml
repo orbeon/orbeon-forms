@@ -1279,13 +1279,13 @@
                     <p>
                         For each invalid element, you annotate the element with an attribute
                         <code>myns:invalid="."</code> and for each invalid attribute you annotate
-                        the parent element with an attribute <code>myns:invalid="ns1:attr1"</code>.
+                        the parent element with an attribute <code>myns:invalid="@ns1:attr1"</code>.
                         We use here the attribute <code>myns:invalid</code>, suggesting that you
                         should use a namespace you define for this attribute, but you can use any
                         namespace or name. The value of <code>myns:invalid</code> is a space
                         separated list. For instance, if for the same element, the element content
                         and two attributes are invalid, you will add a the attribute
-                        <code>myns:invalid=". ns1:attr1 ns2:attr2"</code>.
+                        <code>myns:invalid=". @ns1:attr1 @ns2:attr2"</code>.
                     </p>
                     <p>
                         With a model item property, you tell the XForms engine what nodes are
@@ -1297,7 +1297,7 @@
                         <xforms:bind nodeset="//*"
                             constraint="not(@myns:invalid) or not(tokenize(@myns:invalid,' ') = '.')"/>
                         <xforms:bind nodeset="//@*"
-                            constraint="not(@myns:invalid) or not(tokenize(../@myns:invalid, ' ') = name())"/>
+                            constraint="not(@myns:invalid) or not(tokenize(../@myns:invalid, ' ') = concat('@', name()))"/>
                     </xml-source>
                 </section>
             </section>

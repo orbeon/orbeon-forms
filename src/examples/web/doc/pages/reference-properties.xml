@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
     Copyright (C) 2004 Orbeon, Inc.
 
@@ -20,138 +21,60 @@
     </header>
     <body>
         <section>
-            <title>Rationale</title>
-            <p>
-                The Presentation Server properties are used by some processors to configure or
-                customize their behavior. This section describes how the system is configured, and
-                lists all the customizable properties.
-            </p>
+            <title>Overview</title>
+            <ul>
+                <li><p>
+                    <b>Rationale</b> – The Presentation Server properties are used by some
+                    processors to configure or customize their behavior. This section describes how
+                    the system is configured, and lists all the customizable properties.
+                </p></li>
+                <li><p>
+                    <b>Properties File Location</b> – The properties sub-system is initialized after
+                    the <link href="reference-resource-managers">Resource Manager</link> (the
+                    properties being read like any other Presentation Server resources). By default
+                    it tries to load a file from the URL <code>oxf:/properties.xml</code>. This
+                    value can be overridden in the Web application descriptor <code>web.xmxl</code>
+                    with the <code>oxf.properties</code> initialization parameter:
+
+                    <xml-source>
+                        <context-param>
+                            <param-name>oxf.properties</param-name>
+                            <param-value>oxf:/config/properties.xml</param-value>
+                        </context-param>
+                    </xml-source>
+                </p></li>
+                <li><p>
+                    <b>Automatic Reloading</b> – The property file is reloaded every time it is
+                    changed, however some properties are taken into account only when the server is
+                    first started.
+                </p></li>
+                <li><p>
+                    <b>Property types</b> – Properties have a type, which must be one of the
+                    following XML Schema simple types: <code>xs:anyURI</code>,
+                    <code>xs:integer</code>, <code>xs:boolean</code>, <code>xs:QName</code>,
+                    <code>xs:string</code>, <code>xs:date</code>, <code>xs:dateTime</code>.
+                </p></li>
+                <li><p>
+                    <b>System and Processor Properties</b> – There are two types of properties:
+                    system properties that apply to the system as a whole, and processor-specific
+                    properties. For instance, you set the cache size with a global property:
+
+                    <xml-source>
+                        <property as="xs:integer" name="oxf.cache.size" value="200"/>
+                    </xml-source>
+
+                    While setting the maximum amount of byte that can be uploaded to the server is
+                    set with a processor sepecific property. Note the addiitional
+                    <code>processor-name</code> attribute:
+
+                    <xml-source>
+                        <property as="xs:integer" processor-name="oxf:request" name="max-upload-size"  value="100000000"/>
+                    </xml-source>
+                </p></li>
+            </ul>
         </section>
         <section>
-            <title>Initialization</title>
-            <p>
-                The properties sub-system is initialized after the <link
-                href="reference-resource-managers">Resource Manager</link> (the properties being
-                read like any other Presentation Server resources). By default it tries to load a
-                file from the URL <code>oxf:/properties.xml</code>. This value can be overridden in
-                the Web application descriptor <code>web.xml</code> with the
-                <code>oxf.properties</code> initialization parameter:
-            </p>
-            <xml-source>
-                <context-param>
-                    <param-name>oxf.properties</param-name>
-                    <param-value>oxf:/config/properties.xml</param-value>
-                </context-param>
-            </xml-source>
-
-            <note>
-                The properties file is read by an Presentation Server pipeline which means that the
-                file is reloaded dynamically when needed. The changes are immediately available to
-                the application, although some properties are read only during Presentation Server
-                initialization.
-            </note>
-            <p>
-                The properties file supports the following datatypes:
-                <ul>
-                    <li>
-                        <code>string</code>
-                    </li>
-                    <li>
-                        <code>integer</code>
-                    </li>
-                    <li>
-                        <code>boolean</code>
-                    </li>
-                    <li>
-                        <code>date</code>
-                    </li>
-                    <li>
-                        <code>dateTime</code>
-                    </li>
-                </ul>
-            </p>
-
-            <note>
-                Dates are represented as: YYYY-MM-DD. DateTimes are represented as:
-                YYYY-MM-DDTHH:MM:SS.
-            </note>
-
-            <p>
-                The file is validated when loaded. Here is a simple example and the Relax NG schema
-                used.
-            </p>
-            <xml-source>
-<properties>
-    <property type="string" name="my-url" value="oxf:/document.xml"/>
-    <property type="boolean" name="my-boolean" value="true"/>
-    <property type="integer" name="my-integer" value="42"/>
-    <property type="date" name="my-date" value="2002-10-25"/>
-    <property type="dateTime" name="my-dateTime" value="2002-10-25T13:09:40"/>
-</properties>
-            </xml-source>
-            <xml-source>
-<element name="properties"
-    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
-    xmlns="http://relaxng.org/ns/structure/1.0">
-
-    <zeroOrMore>
-        <element name="property">
-            <attribute name="name"/>
-            <choice>
-                <group>
-                    <attribute name="type">
-                        <value>string</value>
-                    </attribute>
-                    <attribute name="value">
-                        <data type="string"/>
-                    </attribute>
-                </group>
-
-                <group>
-                    <attribute name="type">
-                        <value>boolean</value>
-                    </attribute>
-                    <attribute name="value">
-                        <data type="boolean"/>
-                    </attribute>
-                </group>
-
-                <group>
-                    <attribute name="type">
-                        <value>integer</value>
-                    </attribute>
-                    <attribute name="value">
-                        <data type="integer"/>
-                    </attribute>
-                </group>
-
-                <group>
-                    <attribute name="type">
-                        <value>date</value>
-                    </attribute>
-                    <attribute name="value">
-                        <data type="date"/>
-                    </attribute>
-                </group>
-
-                <group>
-                    <attribute name="type">
-                        <value>dateTime</value>
-                    </attribute>
-                    <attribute name="value">
-                        <data type="dateTime"/>
-                    </attribute>
-                </group>
-
-            </choice>
-        </element>
-    </zeroOrMore>
-</element>
-            </xml-source>
-        </section>
-        <section>
-            <title>Properties Reference</title>
-            <p>This section provides descriptions of the available properties.</p>
+            <title>System Properties</title>
             <anchor id="log4j"/>
             <section>
                 <title>oxf.log4j-config</title>
@@ -164,7 +87,7 @@
                         <tr>
                             <th>Type</th>
                             <td>
-                                <code>string</code> (must be a URL)
+                                <code>xs:anyURI</code>
                             </td>
                         </tr>
                         <tr>
@@ -181,21 +104,21 @@
                     href="log4j.dtd.html">Log4J DTD</link>. Here is a sample Log4J configuration:
                 </p>
                 <xml-source>
-<log4j:configuration xmlns:log4j="log4j">
-    <appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
-        <param name="Target" value="System.out"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%-4r [%t] %-5p %c %x - %m%n"/>
-        </layout>
-    </appender>
-    <catagory name="org.orbeon.oxf.processor.DebugProcessor">
-        <priority value="info"/>
-    </catagory>
-    <root>
-        <priority value="error"/>
-        <appender-ref ref="ConsoleAppender"/>
-    </root>
-</log4j:configuration>
+                    <log4j:configuration xmlns:log4j="log4j">
+                        <appender name="ConsoleAppender" class="org.apache.log4j.ConsoleAppender">
+                            <param name="Target" value="System.out"/>
+                            <layout class="org.apache.log4j.PatternLayout">
+                                <param name="ConversionPattern" value="%-4r [%t] %-5p %c %x - %m%n"/>
+                            </layout>
+                        </appender>
+                        <catagory name="org.orbeon.oxf.processor.DebugProcessor">
+                            <priority value="info"/>
+                        </catagory>
+                        <root>
+                            <priority value="error"/>
+                            <appender-ref ref="ConsoleAppender"/>
+                        </root>
+                    </log4j:configuration>
                 </xml-source>
                 <p>
                     If this property is not set, the Log4J initialization is skipped. This is
@@ -216,7 +139,7 @@
                         <tr>
                             <th>Type</th>
                             <td>
-                                <code>integer</code>
+                                <code>xs:integer</code>
                             </td>
                         </tr>
                         <tr>
@@ -257,69 +180,6 @@
                 </p>
             </section>
             <section>
-                <title>oxf.xslt.transformer</title>
-                <p>
-                    <table ca="|l|p{0.5\textwidth}|">
-                        <tr>
-                            <th>Purpose</th>
-                            <td>Choose the XSLT implementation</td>
-                        </tr>
-                        <tr>
-                            <th>Type</th>
-                            <td>
-                                <code>string</code> (either
-                                <code>interpreter</code> or the transformer
-                                factory class name
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Default Value</th>
-                            <td>
-                                <code>interpreter</code>
-                            </td>
-                        </tr>
-                    </table>
-                </p>
-                <p>
-                    This property selects the XSLT engine used by the XSLT
-                    processor. Currently, two choices are available:</p>
-                <ul>
-                    <li>
-                        <code>interpreter</code>: Use the <fork
-                        href="http://xml.apache.org/xalan-j/">Apache
-                        Xalan</fork> XSLT processor.
-                    </li>
-                    <li>
-                        The transformer factory class name, for example
-                        <code>orbeon.apache.xalan.xsltc.trax.TransformerFactoryImpl</code>
-                        for XSLTC
-                    </li>
-                </ul>
-                <p>
-                    Using an XSLT compiler such as XSLTC presents advantages and disadvantages.
-                    XSLTC translets take a few seconds to compile to Java bytecode (and then native
-                    code if the Java VM provides just-in-time compilation) the first time they are
-                    used (like JSP), but are faster on subsequent executions. Regular Xalan
-                    transformations take less time to "compile", but transformations are on average
-                    slower. XSLTC might be preferable when stylesheets change rarely and Xalan is a
-                    good option when stylesheets are generated on the fly or change on a fairly
-                    frequent basis.
-                </p>
-                <warning>
-                    At this point in time, XSLTC is still in early development and cannot be
-                    considered a stable product. Since errors or unexpected behavior may occur, it
-                    is recommended that you use the default Xalan interpreter instead of XSLTC.
-                </warning>
-
-                <note>
-                    This property changes the XSLT implementation for the whole application. It is
-                    possible, and actually recommended in most scenarios, to use specific
-                    transformer implementations locally instead. For more information, visit the <a
-                    href="processors-xslt">XSLT Processor</a> reference.
-                </note>
-
-            </section>
-            <section>
                 <title>oxf.validation.processor</title>
                 <p>
                     <table ca="|l|p{0.5\textwidth}|">
@@ -330,7 +190,7 @@
                         <tr>
                             <th>Type</th>
                             <td>
-                                <code>boolean</code>
+                                <code>xs:boolean</code>
                             </td>
                         </tr>
                         <tr>
@@ -375,38 +235,6 @@
                 </p>
             </section>
             <section>
-                <title>oxf.validation.xforms</title>
-                <p>
-                    <table ca="|l|p{0.5\textwidth}|">
-                        <tr>
-                            <th>Purpose</th>
-                            <td>Controls the XForms instance validation</td>
-                        </tr>
-                        <tr>
-                            <th>Type</th>
-                            <td>
-                                <code>boolean</code>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Default Value</th>
-                            <td>Enabled</td>
-                        </tr>
-                    </table>
-                </p>
-                <p>
-                    The <link href="processors-xforms#xforms-input">XForms Input</link> processor
-                    can optionally validate user input. Although not recommended, it is possible to
-                    disable validation with this property.
-                </p>
-
-                <note>
-                    For the security of your Web application, it is recommended that you
-                    <b>always</b> validate user input with a strongly typed schema.
-                </note>
-
-            </section>
-            <section>
                 <title>oxf.prologue</title>
                 <p>
                     <table ca="|l|p{0.5\textwidth}|">
@@ -416,9 +244,7 @@
                         </tr>
                         <tr>
                             <th>Type</th>
-                            <td>
-                                <code>string</code> (must be a URL)
-                            </td>
+                            <td><code>xs:anyURI</code></td>
                         </tr>
                         <tr>
                             <th>Default Value</th>
@@ -438,185 +264,61 @@
                     processor:
                 </p>
                 <xml-source>
-<processors>
-    <processor name="oxf:myprocessor">
-        <class name="com.company.oxf.MyProcessor"/>
-    </processor>
-</processors>
+                    <processors>
+                        <processor name="oxf:myprocessor">
+                            <class name="com.company.oxf.MyProcessor"/>
+                        </processor>
+                    </processors>
                 </xml-source>
             </section>
-            <!--
             <section>
-                <title>oxf.servlet.inspector.path</title>
+                <title>sax.inspection</title>
                 <p>
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
                             <th>Purpose</th>
-                            <td>Enables Presentation Server's inspector and sets its path.</td>
+                            <td>Enable inspection SAX events</td>
                         </tr>
                         <tr>
                             <th>Type</th>
-                            <td>
-                                <code>string</code>
-                            </td>
+                            <td><code>xs:boolean</code></td>
                         </tr>
                         <tr>
                             <th>Default Value</th>
-                            <td>The inspector is disabled.</td>
-                        </tr>
-                    </table>
-                </p>
-                <p>Presentation Server's inspector shows the last five pipeline executions and
-                the data flowing through the processors. This property sets the
-                inspector's path-info, relative to the web application's context
-                root.</p>
-                <note>Enabling the inspector has an impact on performance. The
-                inspector should be disabled for production use.</note>
-            </section>
-            -->
-            <section>
-                <title>oxf.main-processor.uri</title>
-                <p>
-                    <table ca="|l|p{0.5\textwidth}|">
-                        <tr>
-                            <th>Purpose</th>
-                            <td>Select the application's main processor</td>
-                        </tr>
-                        <tr>
-                            <th>Type</th>
-                            <td>
-                                <code>string</code> (must be a processor URI)
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Default Value</th>
-                            <td>None, must be specified</td>
+                            <td>false</td>
                         </tr>
                     </table>
                 </p>
                 <p>
-                    This property defines the main processor, and associated inputs, created during
-                    initialization. The following processors are the two most commonly used:
-                </p>
-                <ul>
-                    <li>
-                        <code>oxf/processor/pipeline</code> to use the
-                        <link href="reference-xpl-pipelines">Pipeline processor</link>
-                    </li>
-                    <li>
-                        <code>oxf/processor/page-flow</code> to use the
-                        <link href="reference-controller">Page Flow Controller</link>
-                    </li>
-                </ul>
-                <note>
-                    It is recommended to configure the main processor within <code>web.xml</code>.
-                    For more information, visit <a href="integration-packaging">Packaging and
-                    Deployment</a>.
-                </note>
-            </section>
-            <section>
-                <title>oxf.main-processor.input.*</title>
-                <p>
-                    <table ca="|l|p{0.5\textwidth}|">
-                        <tr>
-                            <th>Purpose</th>
-                            <td>Binds the main processor inputs</td>
-                        </tr>
-                        <tr>
-                            <th>Type</th>
-                            <td>
-                                <code>string</code> (must be a URL)
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Default Value</th>
-                            <td>None</td>
-                        </tr>
-                    </table>
+                    SAX is the underlying mechanism in OIS by which processors receive and generate
+                    XML data. Given only the constraints of the SAX API, it is possible for a
+                    processor to generate an invalid sequence of SAX events. Another processor that
+                    receives that invalid sequence of events may or may not be able to deal with it
+                    without throwing an exception. Some processors try to process invalid SAX
+                    events, while others throw exceptions. This means that when a processor
+                    generating an invalid sequence of SAX events is used in a pipeline, the problem
+                    might go unnoticed, or it might cause some other processor downstream to throw
+                    an exception.
                 </p>
                 <p>
-                    This set of properties dynamically binds the main processor inputs. For
-                    example, to bind the <code>config</code> input to a pipeline processor, use the
-                    following declaration:
-                </p>
-                <xml-source>
-<property type="string" name="oxf.main-processor.input.config" value="oxf:/config/pipeline.xml"/>
-                </xml-source>
-                <p>
-                    The <link href="reference-controller">Web App Controller</link> input name is
-                    <code>controller</code>, thus the binding is:
-                </p>
-                <xml-source>
-<property type="string" name="oxf.main-processor.input.controller" value="oxf:/config/page-flow.xml"/>
-                </xml-source>
-                <note>
-                    The current recommendation is to configure the main processor within
-                    <code>web.xml</code>. For more information, visit <a
-                    href="integration-packaging">Packaging and Deployment</a>.
-                </note>
-            </section>
-            <anchor id="error-pipeline"/>
-            <section>
-                <title>oxf.servlet.error.processor</title>
-                <p>
-                    <table ca="|l|p{0.5\textwidth}|">
-                        <tr>
-                            <th>Purpose</th>
-                            <td>Select the application error processor</td>
-                        </tr>
-                        <tr>
-                            <th>Type</th>
-                            <td>
-                                <code>string</code> (must be a processor URI)
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Default Value</th>
-                            <td>No error pipeline is used</td>
-                        </tr>
-                    </table>
+                    To deal more efficiently with those cases, the <code>sax.inspection</code>
+                    property can be set to <code>true</code>. When it is set to true, the pipeline
+                    engine checks the outputs of every processor at runtime and makes sure that
+                    valid SAX events are generated. When an error is detected, an exception is
+                    thrown right away, with information about the processor that generated the
+                    invalid SAX events.
                 </p>
                 <p>
-                    Like <code>oxf.main-processor.uri</code>, this property points to an XPL file
-                    defining a pipeline. That pipeline declares the error pipeline, which is
-                    executed if a problem occurs during the normal execution process. The error
-                    pipeline can be used to log an error or display a user-friendly error message.
-                    For Web applications, if an exception is thrown during the execution of the
-                    error pipeline, or no error pipeline is defined, a static error page is
-                    generated. See <link href="reference-error-pipeline">Error Pipeline</link> for
-                    more information.
+                    There is a performance penalty for enabling SAX events inspection. So this
+                    property should not be enabled on a production system.
                 </p>
             </section>
-            <section>
-                <title>oxf.servlet.error.input.*</title>
-                <p>
-                    <table ca="|l|p{0.5\textwidth}|">
-                        <tr>
-                            <th>Purpose</th>
-                            <td>Binds the error processor's inputs</td>
-                        </tr>
-                        <tr>
-                            <th>Type</th>
-                            <td>
-                                <code>string</code> (must be a URL)
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>Default Value</th>
-                            <td>None</td>
-                        </tr>
-                    </table>
-                </p>
-                <p>
-                    This property serves the same purpose as
-                    <code>oxf.main-processor.input.*</code>, but only for the error pipeline. See
-                    <link href="reference-error-pipeline">Error Pipeline</link> for more
-                    information.
-                </p>
-            </section>
+        </section>
+        <section>
+        <title>Processor Properties</title>
             <anchor id="classpath"/>
             <section>
-                <title>oxf.java.classpath</title>
+                <title>Java Processor – classpath</title>
                 <p>
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
@@ -624,10 +326,12 @@
                             <td>Defines a directory where Java class files are located</td>
                         </tr>
                         <tr>
+                            <th>Processor name</th>
+                            <td><code>oxf:java</code></td>
+                        </tr>
+                        <tr>
                             <th>Type</th>
-                            <td>
-                                <code>string</code>
-                            </td>
+                            <td><code>xs:string</code></td>
                         </tr>
                         <tr>
                             <th>Default Value</th>
@@ -643,7 +347,7 @@
             </section>
             <anchor id="jarpath"/>
             <section>
-                <title>oxf.java.jarpath</title>
+                <title>Java Processor – jarpath</title>
                 <p>
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
@@ -651,10 +355,12 @@
                             <td>Defines a list of directories where JAR files are located</td>
                         </tr>
                         <tr>
+                            <th>Processor name</th>
+                            <td><code>oxf:java</code></td>
+                        </tr>
+                        <tr>
                             <th>Type</th>
-                            <td>
-                                <code>string</code>
-                            </td>
+                            <td><code>xs:string</code></td>
                         </tr>
                         <tr>
                             <th>Default Value</th>
@@ -670,7 +376,7 @@
                 </p>
             </section>
             <section>
-                <title>oxf.email.host</title>
+                <title>Email Processor – host</title>
                 <p>
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
@@ -678,10 +384,12 @@
                             <td>Overrides the SMTP host used to send email throughout the application</td>
                         </tr>
                         <tr>
+                            <th>Processor name</th>
+                            <td><code>oxf:email</code></td>
+                        </tr>
+                        <tr>
                             <th>Type</th>
-                            <td>
-                                <code>string</code>
-                            </td>
+                            <td><code>xs:string</code></td>
                         </tr>
                         <tr>
                             <th>Default Value</th>
@@ -694,7 +402,7 @@
                 </p>
             </section>
             <section>
-                <title>oxf.email.force-to</title>
+                <title>Email Processor – force-to</title>
                 <p>
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
@@ -702,10 +410,12 @@
                             <td>Overrides the recipient of the emails</td>
                         </tr>
                         <tr>
+                            <th>Processor name</th>
+                            <td><code>oxf:email</code></td>
+                        </tr>
+                        <tr>
                             <th>Type</th>
-                            <td>
-                                <code>string</code>
-                            </td>
+                            <td><code>xs:string</code></td>
                         </tr>
                         <tr>
                             <th>Default Value</th>

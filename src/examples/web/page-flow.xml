@@ -31,7 +31,7 @@
     <page id="layout-css" path-info="/oxf-theme/orbeon-layout.cssd" model="/oxf-theme/orbeon-layout.xpl"/>
 
     <!-- Examples portal -->
-    <page path-info="/" model="/examples-portal/page-flow.xpl"/>
+    <page id="home" path-info="/" model="/examples-portal/page-flow.xpl"/>
     <page path-info="/goto-example/.+" matcher="oxf:perl5-matcher" model="/examples-portal/page-flow.xpl"/>
 
     <!-- Dispatch resources for the examples. This is necessary, since portlets cannot serve resources directly. -->

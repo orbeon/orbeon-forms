@@ -22,7 +22,6 @@ import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
@@ -92,30 +91,25 @@ public class JavaProcessor extends ProcessorImpl {
                     throw new OXFException("Processor used by Java processor cannot have a config input");
             }
 
-            Map inputs = getInputs();
-            for (Iterator i = inputs.keySet().iterator(); i.hasNext();) {
-                final String inputName = (String) i.next();
+            List inputs = getConnectedInputs();
+            for (Iterator i = inputs.iterator(); i.hasNext();) {
+                final ProcessorInput javaProcessorInput = (ProcessorInput) i.next();
+                String inputName = javaProcessorInput.getName();
 
                 // Skip our own config input
                 if (inputName.equals(INPUT_CONFIG))
                     continue;
 
-                List inputsWithName = (List) inputs.get(inputName);
-                for (Iterator j = inputsWithName.iterator(); j.hasNext();) {
-                    // This is an input of the Java processor
-                    final ProcessorInput javaProcessorInput = (ProcessorInput) j.next();
-
-                    // Delegate
-                    ProcessorInput userProcessorInput = processor.createInput(inputName);
-                    ProcessorOutput topOutput = new ProcessorImpl.ProcessorOutputImpl(getClass(), inputName) {
-                        protected void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                            javaProcessorInput.getOutput().read(context, contentHandler);
-                        }
-                    };
-                    // Connect
-                    userProcessorInput.setOutput(topOutput);
-                    topOutput.setInput(userProcessorInput);
-                }
+                // Delegate
+                ProcessorInput userProcessorInput = processor.createInput(inputName);
+                ProcessorOutput topOutput = new ProcessorImpl.ProcessorOutputImpl(getClass(), inputName) {
+                    protected void readImpl(PipelineContext context, ContentHandler contentHandler) {
+                        javaProcessorInput.getOutput().read(context, contentHandler);
+                    }
+                };
+                // Connect
+                userProcessorInput.setOutput(topOutput);
+                topOutput.setInput(userProcessorInput);
             }
 
             boolean hasOutputs = false;

@@ -32,6 +32,7 @@
     <xi:include href="tests-transformations.xml"/>
     <xi:include href="tests-converters.xml"/>
     <xi:include href="tests-page-flow.xml"/>
+    <xi:include href="tests-java.xml"/>
 <!--    <xi:include href="tests-tamino.xml"/>-->
 <!--    <xi:include href="tests-ldap.xml"/>-->
 <!--    <xi:include href="tests-email.xml"/>-->

@@ -109,7 +109,7 @@ public abstract class ProcessorImpl implements Processor {
         this.name = name;
     }
 
-    public Map getInputs() {
+    protected Map getInputs() {
         return inputMap;
     }
 
@@ -266,6 +266,18 @@ public abstract class ProcessorImpl implements Processor {
         return inputsInfo;
     }
 
+    public List getConnectedInputs() {
+        List result = new ArrayList();
+        for (Iterator i = inputMap.keySet().iterator(); i.hasNext();) {
+            String inputName = (String) i.next();
+            List inputsWithName = (List) inputMap.get(inputName);
+            for (Iterator j = inputsWithName.iterator(); j.hasNext();) {
+                result.add(j.next());
+            }
+        }
+        return result;
+    }
+
     public ProcessorInputOutputInfo getInputInfo(String name) {
         for (Iterator i = inputsInfo.iterator(); i.hasNext();) {
             ProcessorInputOutputInfo inputInfo = (ProcessorInputOutputInfo) i.next();
@@ -277,6 +289,18 @@ public abstract class ProcessorImpl implements Processor {
 
     public List getOutputsInfo() {
         return outputsInfo;
+    }
+
+    public List getConnectedOutputs() {
+        List result = new ArrayList();
+        for (Iterator i = outputMap.keySet().iterator(); i.hasNext();) {
+            String inputName = (String) i.next();
+            List inputsWithName = (List) outputMap.get(inputName);
+            for (Iterator j = inputsWithName.iterator(); j.hasNext();) {
+                result.add(j.next());
+            }
+        }
+        return result;
     }
 
     public ProcessorInputOutputInfo getOutputInfo(String name) {

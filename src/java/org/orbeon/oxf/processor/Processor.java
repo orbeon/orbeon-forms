@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor;
 
 import org.dom4j.QName;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.util.List;
 
@@ -154,6 +155,20 @@ public interface Processor {
     public List getOutputsInfo();
 
     /**
+     * @return  A list of <code>ProcessorInput</code> objects
+     *          corresponding to the inputs currently connected to this
+     *          processor.
+     */
+    public List getConnectedInputs();
+
+    /**
+     * @return  A list of <code>ProcessorOutput</code> objects
+     *          corresponding to the outputs currently connected to this
+     *          processor.
+     */
+    public List getConnectedOutputs();
+
+    /**
      * This method is called to trigger the execution of this processor. This
      * method can only be called on processor with no outputs (so-called
      * serializers). If this processor has outputs, the method <code>read</code>
@@ -161,7 +176,7 @@ public interface Processor {
      *
      * @param  context  Context in which the processor is executed
      */
-    public void start(org.orbeon.oxf.pipeline.api.PipelineContext context);
+    public void start(PipelineContext context);
 
     /**
      * Resets the processor. This method is called before the processor is
@@ -170,5 +185,5 @@ public interface Processor {
      *
      * @param context Context in which the processor is executed
      */
-    public void reset(org.orbeon.oxf.pipeline.api.PipelineContext context);
+    public void reset(PipelineContext context);
 }

@@ -25,35 +25,59 @@
     xmlns:xi="http://www.w3.org/2003/XInclude"
     xmlns:xforms="http://www.w3.org/2002/xforms">
 
+    <!-- This test should probably be hand-customized to be clearer -->
+    <test description="XForms to XHTML" name="oxf:pipeline">
+        <input name="config">
+            <p:config>
+                <p:param type="output" name="data"/>
+
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model" href="oxf:/unit-tests/xforms-to-xhtml/input-model.xml"/>
+                    <p:input name="instance"><dummy/></p:input>
+                    <p:input name="data" href="oxf:/unit-tests/xforms-to-xhtml/output-data.xml"/>
+                    <p:output name="data" id="annotated-data"/>
+                </p:processor>
+                <!-- Transform annotated XForms to XHTML -->
+                <p:processor name="oxf:xslt">
+                    <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
+                    <p:input name="model" href="oxf:/unit-tests/xforms-to-xhtml/input-model.xml"/>
+                    <p:input name="data" href="#annotated-data"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data" href="oxf:/unit-tests/xforms-to-xhtml/output-data.xml"/>
+    </test>
+
     <test description="Annotate" name="oxf:xforms-annotate">
-            <input name="instance">
-                <d:form>
-                    <d:id>42</d:id>
-                    <d:id>4x</d:id>
-                    <d:firstname>John</d:firstname>
-                    <d:firstname xxforms:valid="false">John</d:firstname>
-                    <d:lastname xxforms:valid="true">Smith</d:lastname>
-                    <d:zip xxforms:valid="true">4x</d:zip>
-                </d:form>
-            </input>
-            <input name="model">
-                <xforms:model>
-                    <xforms:bind nodeset="/d:form/d:id" type="xs:integer"/>
-                    <xforms:bind nodeset="/d:form/d:zip" type="xs:integer"/>
-                </xforms:model>
-            </input>
-            <output name="instance">
-                
-                <d:form xmlns:d="http://orbeon.org/oxf/xml/document" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                    <d:id xxforms:valid="true">42</d:id>
-                    <d:id xxforms:valid="false">4x</d:id>
-                    <d:firstname>John</d:firstname>
-                    <d:firstname xxforms:valid="false">John</d:firstname>
-                    <d:lastname xxforms:valid="true">Smith</d:lastname>
-                    <d:zip xxforms:valid="false">4x</d:zip>
-                </d:form>
-            </output>
-        </test>
+        <input name="instance">
+            <d:form>
+                <d:id>42</d:id>
+                <d:id>4x</d:id>
+                <d:firstname>John</d:firstname>
+                <d:firstname xxforms:valid="false">John</d:firstname>
+                <d:lastname xxforms:valid="true">Smith</d:lastname>
+                <d:zip xxforms:valid="true">4x</d:zip>
+            </d:form>
+        </input>
+        <input name="model">
+            <xforms:model>
+                <xforms:bind nodeset="/d:form/d:id" type="xs:integer"/>
+                <xforms:bind nodeset="/d:form/d:zip" type="xs:integer"/>
+            </xforms:model>
+        </input>
+        <output name="instance">
+            
+            <d:form xmlns:d="http://orbeon.org/oxf/xml/document" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <d:id xxforms:valid="true">42</d:id>
+                <d:id xxforms:valid="false">4x</d:id>
+                <d:firstname>John</d:firstname>
+                <d:firstname xxforms:valid="false">John</d:firstname>
+                <d:lastname xxforms:valid="true">Smith</d:lastname>
+                <d:zip xxforms:valid="false">4x</d:zip>
+            </d:form>
+        </output>
+    </test>
 
     <test description="Conditionals: if" name="oxf:pipeline">
         <input name="config">

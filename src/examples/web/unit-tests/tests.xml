@@ -49,14 +49,6 @@
         <output name="data" href="oxf:/unit-tests/xforms-portlet-forms/output-data.xml"/>
     </test>
 
-    <!-- This test should probably be hand-customized to be clearer -->
-    <test description="xforms-to-xhtml" name="oxf:xslt">
-        <input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
-        <input name="data" href="oxf:/unit-tests/xforms-to-xhtml/input-data.xml"/>
-        <input name="model" href="oxf:/unit-tests/xforms-to-xhtml/input-model.xml"/>
-        <output name="data" href="oxf:/unit-tests/xforms-to-xhtml/output-data.xml"/>
-    </test>
-
     <test description="Identity" name="oxf:identity">
         <input name="data">
             <root>

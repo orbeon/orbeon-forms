@@ -181,7 +181,7 @@ public class RequestGenerator extends ProcessorImpl {
                             }
                         }
                         public void endElement(String uri, String localname, String qName) throws SAXException {
-                            if (REQUEST_PRIVATE_NAMESPACE_URI.equals(uri)) {
+                            if (REQUEST_PRIVATE_NAMESPACE_URI.equals(uri) || localname.equals("body") && uri.equals("")) {
                                 // Ignore end element
                             } else {
                                 super.endElement(uri, localname, qName);

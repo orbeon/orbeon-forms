@@ -138,19 +138,6 @@ public class PortletExternalContext implements ExternalContext {
                     // Decode the multipart data
                     parameterMap = ServletExternalContext.getParameterMapMultipart(pipelineContext, request, null);
 
-                    // HACK HACK for testing
-                    Map tempMap = new HashMap();
-                    for (Iterator i = parameterMap.keySet().iterator(); i.hasNext();) {
-                        String key = (String) i.next();
-                        Object value = parameterMap.get(key);
-                        if (key.startsWith("$portlet$p") || key.startsWith("$portlet$a")) {
-                            String newKey = key.substring(key.indexOf('.') + 1);
-                            tempMap.put(newKey, value);
-                            i.remove();
-                        }
-                    }
-                    parameterMap.putAll(tempMap);
-
                 } else {
                     // Just use native request parameters
                     parameterMap = new HashMap(portletRequest.getParameterMap());

@@ -112,6 +112,8 @@ public class ServletExternalContext implements ExternalContext {
                     // NOTE: We use properties scoped in the Request generator for historical reasons. Not too good.
                     OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet(XMLConstants.REQUEST_PROCESSOR_QNAME);
                     boolean enableInputStreamSaving = propertySet.getBoolean(RequestGenerator.ENABLE_INPUT_STREAM_SAVING_PROPERTY, RequestGenerator.DEFAULT_ENABLE_INPUT_STREAM_SAVING).booleanValue();
+                    enableInputStreamSaving = false;// no longer do this; this was required for upload and portlets, now we do it differently
+
                     ServletInputStreamRepeater localRepeater = null;
                     try {
                         if (enableInputStreamSaving)
@@ -361,7 +363,7 @@ public class ServletExternalContext implements ExternalContext {
                     FileItem fileItem = (FileItem) i.next();
                     if (fileItem.isFormField()) {
                         // Simple form filled: add value to existing values, if any
-                        NetUtils.addValueToStringArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString());
+                        NetUtils.addValueToStringArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString());// FIXME: getString() should use an encoding
                     } else {
                         // It is a file, store the FileItem object
                         uploadParameterMap.put(fileItem.getFieldName(), fileItem);

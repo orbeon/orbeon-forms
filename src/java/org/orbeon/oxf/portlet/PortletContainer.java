@@ -246,7 +246,7 @@ public class PortletContainer implements Serializable {
             portletState.setActionParameters(requestParameters.getUserParameters(portletId));
 
             // Create request and response
-            ActionRequestImpl actionRequest = new ActionRequestImpl(externalContext, portletConfig, portletId, externalContext.getRequest(), portletState);
+            ActionRequestImpl actionRequest = new ActionRequestImpl(pipelineContext, externalContext, portletConfig, portletId, externalContext.getRequest(), portletState);
             ActionResponseImpl actionResponse = new ActionResponseImpl(portletId, externalContext, actionRequest, requestParameters);
 
             // Call the Portlet.processAction(). This can modify the request parameters used in Portlet.render().

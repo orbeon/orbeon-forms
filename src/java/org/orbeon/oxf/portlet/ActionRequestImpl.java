@@ -14,6 +14,8 @@
 package org.orbeon.oxf.portlet;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.servlet.MultipartFormDataBuilder;
 
 import javax.portlet.ActionRequest;
 import java.io.*;
@@ -22,13 +24,17 @@ import java.util.Map;
 
 public class ActionRequestImpl extends PortletRequestImpl implements ActionRequest {
 
+    private PipelineContext pipelineContext;
+    private boolean contentLengthSet = false;
+    private int contentLength;
     private String characterEncoding;
     private InputStream portletInputStream;
     private BufferedReader portletBufferedReader;
 
-    public ActionRequestImpl(ExternalContext externalContext, PortletConfigImpl portletConfig, int portletId,
+    public ActionRequestImpl(PipelineContext pipelineContext, ExternalContext externalContext, PortletConfigImpl portletConfig, int portletId,
                              ExternalContext.Request request, PortletContainer.PortletState portletStatus) {
         super(externalContext, portletConfig, portletId, request, portletStatus);
+        this.pipelineContext = pipelineContext;
     }
 
     public String getCharacterEncoding() {
@@ -36,7 +42,18 @@ public class ActionRequestImpl extends PortletRequestImpl implements ActionReque
     }
 
     public int getContentLength() {
-        return request.getContentLength();
+        if (request.getContentType().startsWith("multipart/form-data") && !contentLengthSet) {
+            MultipartFormDataBuilder multipartFormDataBuilder = new MultipartFormDataBuilder(request.getContentType(), request.getParameterMap(),
+                    new MultipartFormDataBuilder.ParameterNameFilter() {
+                        public String filterParameterName(String name) {
+                            return PortletURLImpl.decodeParameterName(name);
+                        }
+                    });
+            contentLength = (int) multipartFormDataBuilder.getContentLength();// Why does the API only support ints???
+            contentLengthSet = true;
+        }
+
+        return contentLengthSet ? contentLength : request.getContentLength();
     }
 
     public String getContentType() {
@@ -52,9 +69,35 @@ public class ActionRequestImpl extends PortletRequestImpl implements ActionReque
         if (portletBufferedReader != null)
             throw new IllegalStateException("getPortletInputStream() cannot be called if getReader() already called");
 
-        portletInputStream = request.getInputStream();
+        if (request.getContentType().startsWith("multipart/form-data")) {
+            // In this case, we must transform the form data
+            handleMultipartFormData();
+        } else {
+            // We just return the original input stream
+            portletInputStream = request.getInputStream();
+        }
 
         return portletInputStream;
+    }
+
+    private void handleMultipartFormData() throws IOException {
+
+        final MultipartFormDataBuilder multipartFormDataBuilder = new MultipartFormDataBuilder(request.getContentType(), request.getParameterMap(),
+                new MultipartFormDataBuilder.ParameterNameFilter() {
+                    public String filterParameterName(String name) {
+                        return PortletURLImpl.decodeParameterName(name);
+                    }
+                });
+
+        // Make sure to clean-up in the end
+        pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
+            public void contextDestroyed(boolean success) {
+                if (multipartFormDataBuilder != null)
+                    multipartFormDataBuilder.delete();
+            }
+        });
+
+        portletInputStream = multipartFormDataBuilder.getInputStream();
     }
 
     public BufferedReader getReader() throws UnsupportedEncodingException, IOException {

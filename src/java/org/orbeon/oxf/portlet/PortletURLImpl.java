@@ -39,8 +39,10 @@ public class PortletURLImpl implements PortletURL {
     private static final String RENDER_VALUE = "r";
 
     private static final String PARAM_PREFIX = "$portlet$";
-    private static final String USER_PARAM_PREFIX = "p";
-    private static final String ACTION_USER_PARAM_PREFIX = "a";
+    private static final char USER_PARAM_PREFIX_CHAR = 'p';
+    private static final char ACTION_USER_PARAM_PREFIX_CHAR = 'a';
+    private static final String USER_PARAM_PREFIX = "" + USER_PARAM_PREFIX_CHAR;
+    private static final String ACTION_USER_PARAM_PREFIX = "" + ACTION_USER_PARAM_PREFIX_CHAR;
     private static final String CONTAINER_PARAM_PREFIX = "x";
 
     private int portletId;
@@ -189,6 +191,17 @@ public class PortletURLImpl implements PortletURL {
         }
 
         return requestParameters;
+    }
+
+    /**
+     * Decode user form parameter names.
+     */
+    public static String decodeParameterName(String name) {
+        int dotIndex = name.indexOf(".");
+        if (name.startsWith(PARAM_PREFIX) && dotIndex != -1 && (name.charAt(PARAM_PREFIX.length()) == USER_PARAM_PREFIX_CHAR || name.charAt(PARAM_PREFIX.length()) == ACTION_USER_PARAM_PREFIX_CHAR))
+            return name.substring(dotIndex + 1);
+        else
+            return null;
     }
 
     /**

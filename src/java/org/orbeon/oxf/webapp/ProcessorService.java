@@ -31,6 +31,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.io.*;
+import java.util.HashMap;
 
 public class ProcessorService {
 
@@ -156,7 +157,7 @@ public class ProcessorService {
         sb.append("<style>");
         Reader styleReader = null;
         try {
-            ResourceManager resourceManager = new ClassLoaderResourceManagerImpl(this.getClass());
+            ResourceManager resourceManager = new ClassLoaderResourceManagerImpl(new HashMap(), this.getClass());
             styleReader = new InputStreamReader(resourceManager.getContentAsStream("error.css"));
             char[] buffer = new char[1024];
             while (true) {

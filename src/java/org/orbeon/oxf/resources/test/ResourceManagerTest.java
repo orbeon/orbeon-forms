@@ -130,7 +130,7 @@ public class ResourceManagerTest extends TestCase {
         try {
             Properties props = new Properties();
             props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, FlatFileResourceManagerFactory.class.getName());
-            props.setProperty(FlatFileResourceManagerFactory.ROOT_DIR, "src/org/orbeon/oxf/resources/test/import");
+            props.setProperty(FlatFileResourceManagerFactory.ROOT_DIR_PROPERTY, "src/org/orbeon/oxf/resources/test/import");
             ResourceManagerWrapper.init(props);
 
             Node doc = ResourceManagerWrapper.instance().getContentAsDOM("/display/orbeon.xml");
@@ -149,7 +149,7 @@ public class ResourceManagerTest extends TestCase {
 
             Properties props = new Properties();
             props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, FlatFileResourceManagerFactory.class.getName());
-            props.setProperty(FlatFileResourceManagerFactory.ROOT_DIR, "src/org/orbeon/oxf/resources/test/import");
+            props.setProperty(FlatFileResourceManagerFactory.ROOT_DIR_PROPERTY, "src/org/orbeon/oxf/resources/test/import");
             ResourceManagerWrapper.init(props);
 
 
@@ -242,7 +242,7 @@ public class ResourceManagerTest extends TestCase {
         logger.debug("aaa");
         Properties props = new Properties();
         props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, FlatFileResourceManagerFactory.class.getName());
-        props.setProperty(FlatFileResourceManagerFactory.ROOT_DIR, "src/org/orbeon/oxf/resources/test/import");
+        props.setProperty(FlatFileResourceManagerFactory.ROOT_DIR_PROPERTY, "src/org/orbeon/oxf/resources/test/import");
         ResourceManagerWrapper.init(props);
 
         XMLReader reader = ResourceManagerWrapper.instance().getXMLReader();
@@ -292,7 +292,7 @@ public class ResourceManagerTest extends TestCase {
         try {
             Properties props = new Properties();
             props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, FlatFileResourceManagerFactory.class.getName());
-            props.setProperty(FlatFileResourceManagerFactory.ROOT_DIR, "src/org/orbeon/oxf/resources/test/import");
+            props.setProperty(FlatFileResourceManagerFactory.ROOT_DIR_PROPERTY, "src/org/orbeon/oxf/resources/test/import");
             ResourceManagerWrapper.init(props);
 
 

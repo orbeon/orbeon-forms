@@ -19,6 +19,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 
 import java.io.*;
 import java.sql.*;
+import java.util.Map;
 
 /**
  * The database resource manager is able to load resource from a relational
@@ -26,17 +27,15 @@ import java.sql.*;
  *
  * @see DataSourceResourceManagerImpl
  */
-public class DBResourceManagerImpl extends ResourceManagerImpl {
+public class DBResourceManagerImpl extends ResourceManagerBase {
 
     static private Logger logger = LoggerFactory.createLogger(DBResourceManagerImpl.class);
 
     private Connection connection = null;
 
-    public DBResourceManagerImpl() {
-    }
-
-    public DBResourceManagerImpl(Connection conn) {
-        this.connection = conn;
+    public DBResourceManagerImpl(Map props, Connection connection) {
+        super(props);
+        this.connection = connection;
     }
 
     protected Connection getConnection() throws SQLException {

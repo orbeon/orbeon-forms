@@ -22,7 +22,7 @@ public class URLResourceManagerFactory implements ResourceManagerFactoryFunctor 
 
     public static final String BASE_URL = "oxf.resources.url.base";
 
-    Map props;
+    private Map props;
 
     public URLResourceManagerFactory(Map props) {
         this.props = props;

@@ -21,7 +21,7 @@ import java.util.Map;
  */
 public class FlatFileResourceManagerFactory implements ResourceManagerFactoryFunctor {
 
-    public static final String ROOT_DIR = "oxf.resources.flatfile.rootdir";
+    public static final String ROOT_DIR_PROPERTY = "oxf.resources.flatfile.rootdir";
 
     private Map props;
 

@@ -24,25 +24,20 @@ import java.util.Map;
 /**
  * The FlatFile resource manager is able to load resources from a sandbox in a filesystem.
  */
-public class FlatFileResourceManagerImpl extends ResourceManagerImpl {
+public class FlatFileResourceManagerImpl extends ResourceManagerBase {
 
     private static Logger logger = LoggerFactory.createLogger(FlatFileResourceManagerImpl.class);
 
     protected File rootDirectory;
 
     public FlatFileResourceManagerImpl(Map props) throws OXFException {
-        String root = (String) props.get(FlatFileResourceManagerFactory.ROOT_DIR);
+        super(props);
+        String root = (String) props.get(FlatFileResourceManagerFactory.ROOT_DIR_PROPERTY);
         if (root == null)
-            throw new OXFException("Property " + FlatFileResourceManagerFactory.ROOT_DIR + " is null");
+            throw new OXFException("Property " + FlatFileResourceManagerFactory.ROOT_DIR_PROPERTY + " is null");
         rootDirectory = new File(root);
         if (!rootDirectory.isDirectory())
             throw new OXFException("Root directory " + root + " does not refer to a valid directory");
-    }
-
-    /**
-     * Special constructor for subclasses.
-     */
-    protected FlatFileResourceManagerImpl() {
     }
 
     /**

@@ -349,6 +349,7 @@
             <sysproperty key="oxf.resources.flatfile.rootdir" value="${web-examples-src.dir}"/>
             <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FlatFileResourceManagerFactory"/>
             <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
+            <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
             <sysproperty key="oxf.test.config" value="unit-tests/tests.xml"/>
         	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}" />
             <!--            <arg line="-class org.orbeon.oxf.test.ProcessorTest"/>-->

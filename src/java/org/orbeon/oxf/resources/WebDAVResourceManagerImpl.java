@@ -25,17 +25,17 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Map;
 
-
 /**
- *
+ * Simple WebDAV resource manager implementation.
  */
-public class WebDAVResourceManagerImpl extends ResourceManagerImpl {
+public class WebDAVResourceManagerImpl extends ResourceManagerBase {
 
     private HttpURL baseURL;
     private String username;
     private String password;
 
     public WebDAVResourceManagerImpl(Map properties) {
+        super(properties);
         // Read properties
         String baseURLString = getProperty(properties, WebDAVResourceManagerFactory.BASE_URL);
         if (baseURLString == null)

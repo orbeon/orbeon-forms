@@ -28,7 +28,7 @@ import java.util.Map;
  * The URL resource manager is able to load ressources from any
  * URL supported by the JVM.
  */
-public class URLResourceManagerImpl extends ResourceManagerImpl {
+public class URLResourceManagerImpl extends ResourceManagerBase {
 
     private static Logger logger = LoggerFactory.createLogger(URLResourceManagerImpl.class);
 
@@ -36,6 +36,7 @@ public class URLResourceManagerImpl extends ResourceManagerImpl {
 //    protected Map urlCache = Collections.synchronizedMap(new HashMap());
 
     public URLResourceManagerImpl(Map props) throws OXFException {
+        super(props);
         String root = (String) props.get(URLResourceManagerFactory.BASE_URL);
         if (root == null)
             throw new OXFException("Property " + URLResourceManagerFactory.BASE_URL + " must be set.");

@@ -29,7 +29,7 @@ import java.util.zip.ZipInputStream;
  * The secure resource manager is able to load ressources from a secure
  * archive on the filesystem.
  */
-public class SecureResourceManagerImpl extends ResourceManagerImpl {
+public class SecureResourceManagerImpl extends ResourceManagerBase {
 
     private static Logger logger = LoggerFactory.createLogger(SecureResourceManagerImpl.class);
 
@@ -46,6 +46,7 @@ public class SecureResourceManagerImpl extends ResourceManagerImpl {
     protected Map resources;
 
     public SecureResourceManagerImpl(Map props) throws OXFException {
+        super(props);
         String file = (String) props.get(SecureResourceManagerFactory.ARCHIVE_FILE);
         if (file == null)
             throw new OXFException("Property " + SecureResourceManagerFactory.ARCHIVE_FILE + " is null");

@@ -29,25 +29,25 @@ import java.util.Properties;
  */
 public class DataSourceResourceManagerFactory implements ResourceManagerFactoryFunctor {
 
-    public static final String DATASOURCE_PROP = "org.orbeon.oxf.resources.DataSourceResourceManagerFactory.datasource";
+    public static final String DATASOURCE_PROPERTY = "oxf.resources.datasource.jndi-name";
 
-    protected DataSource ds = null;
+    private DataSource datasource = null;
+    private Map props;
 
     public DataSourceResourceManagerFactory(Map props, Context jndiContext) {
-        String dsName = (String) props.get(DATASOURCE_PROP);
+        this.props = props;
+        String dsName = (String) props.get(DATASOURCE_PROPERTY);
         if (dsName == null) {
-            throw new OXFException("Properties " + DATASOURCE_PROP +
-                    " is missing or null");
+            throw new OXFException("Properties " + DATASOURCE_PROPERTY + " is missing or null");
         }
         try {
-            this.ds = (DataSource) jndiContext.lookup(dsName);
+            this.datasource = (DataSource) jndiContext.lookup(dsName);
         } catch (Exception e) {
             throw new OXFException(e);
         }
-        if (ds == null) {
-            throw new OXFException(DATASOURCE_PROP + " does not refer to a valid DataSource");
+        if (datasource == null) {
+            throw new OXFException(DATASOURCE_PROPERTY + " does not refer to a valid DataSource");
         }
-
     }
 
     public DataSourceResourceManagerFactory(Properties props) throws NamingException {
@@ -55,6 +55,6 @@ public class DataSourceResourceManagerFactory implements ResourceManagerFactoryF
     }
 
     public ResourceManager makeInstance() {
-        return new DataSourceResourceManagerImpl(ds);
+        return new DataSourceResourceManagerImpl(props, datasource);
     }
 }

@@ -26,7 +26,7 @@ import java.util.Map;
  * The webapp resource manager is able to load resources from a WAR file. This
  * is very useful when distributing packaged applications.
  */
-public class WebAppResourceManagerImpl extends ResourceManagerImpl {
+public class WebAppResourceManagerImpl extends ResourceManagerBase {
 
     public static final String SERVLET_CONTEXT_KEY = WebAppResourceManagerImpl.class.getName() + "ServletContext";
     public static final String ROOT_DIR = "oxf.resources.webapp.rootdir";
@@ -37,6 +37,7 @@ public class WebAppResourceManagerImpl extends ResourceManagerImpl {
     private String rootDirectory;
 
     public WebAppResourceManagerImpl(Map props) {
+        super(props);
         ServletContext ctx = (ServletContext) props.get(SERVLET_CONTEXT_KEY);
         if (ctx == null)
             throw new OXFException("WebAppResourceManager needs a ServletContext object in its map (key=" + SERVLET_CONTEXT_KEY + ")");

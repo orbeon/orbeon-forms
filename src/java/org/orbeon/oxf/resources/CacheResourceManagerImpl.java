@@ -38,7 +38,7 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.util.Map;
 
-public class CacheResourceManagerImpl extends ResourceManagerImpl {
+public class CacheResourceManagerImpl extends ResourceManagerBase {
 
     private static Logger logger = LoggerFactory.createLogger(CacheResourceManagerImpl.class);
 
@@ -48,6 +48,7 @@ public class CacheResourceManagerImpl extends ResourceManagerImpl {
     private Database db;
 
     public CacheResourceManagerImpl(Map props) throws OXFException {
+        super(props);
         url = (String) props.get(CacheResourceManagerFactory.CACHE_URL);
         if (url == null)
             throw new OXFException("Property " + CacheResourceManagerFactory.CACHE_URL + " is null");

@@ -16,6 +16,7 @@ package org.orbeon.oxf.resources;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Map;
 
 /**
  * Extends the DBResourceManagerImpl to support datasources.
@@ -26,7 +27,8 @@ public class DataSourceResourceManagerImpl extends DBResourceManagerImpl {
 
     private DataSource dataSource;
 
-    public DataSourceResourceManagerImpl(DataSource dataSource) {
+    public DataSourceResourceManagerImpl(Map props, DataSource dataSource) {
+        super(props, null);
         this.dataSource = dataSource;
     }
 

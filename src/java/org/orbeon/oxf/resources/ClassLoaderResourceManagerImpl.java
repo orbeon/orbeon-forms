@@ -20,13 +20,14 @@ import org.orbeon.oxf.util.NetUtils;
 
 import java.io.*;
 import java.net.URL;
+import java.util.Map;
 
 /**
  * The classloader resource manager is able to load resources from a JAR file,
  * or from a directory in the system classpath. It is useful when resources are
  * bundled with an application.
  */
-public class ClassLoaderResourceManagerImpl extends ResourceManagerImpl {
+public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
 
     private static Logger logger = LoggerFactory.createLogger(ClassLoaderResourceManagerImpl.class);
 
@@ -35,14 +36,16 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerImpl {
     /**
      * Initialize this resource manager.
      */
-    public ClassLoaderResourceManagerImpl() {
+    public ClassLoaderResourceManagerImpl(Map props) {
+        super(props);
     }
 
     /**
      * Initialize this resource manager with rooted in the specified class
      * @param clazz a root class
      */
-    public ClassLoaderResourceManagerImpl(Class clazz) {
+    public ClassLoaderResourceManagerImpl(Map props, Class clazz) {
+        super(props);
         this.clazz = clazz;
     }
 

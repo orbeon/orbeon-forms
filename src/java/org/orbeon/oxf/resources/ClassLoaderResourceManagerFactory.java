@@ -27,6 +27,6 @@ public class ClassLoaderResourceManagerFactory implements ResourceManagerFactory
     }
 
     public ResourceManager makeInstance() {
-        return new ClassLoaderResourceManagerImpl();
+        return new ClassLoaderResourceManagerImpl(props);
     }
 }

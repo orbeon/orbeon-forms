@@ -37,12 +37,15 @@ public class DefaultResourceManagerFactory implements ResourceManagerFactoryFunc
     public static final String JDBC_PASSWORD = "org.orbeon.oxf.resources.DBResourceManagerFactory.password";
     public static final String USE_CACHE = "org.orbeon.oxf.resources.FlatFileResourceManagerFactory.useCache";
 
-    String jdbcUrl = null;
-    Properties info = null;
-    String driver = null;
-    Connection connection = null;
+    private String jdbcUrl = null;
+    private Properties info = null;
+    private String driver = null;
+    private Connection connection = null;
+    private Map props;
 
     public DefaultResourceManagerFactory(Map props) throws OXFException {
+        this.props = props;
+
         String url = (String) props.get(JDBC_URL);
         String driver = (String) props.get(JDBC_DRIVER);
         String username = (String) props.get(JDBC_USERNAME);
@@ -92,7 +95,6 @@ public class DefaultResourceManagerFactory implements ResourceManagerFactoryFunc
             logger.fatal("Can't connect to DB", e);
             throw new OXFException("Can't connect to DB", e);
         }
-        return new DBResourceManagerImpl(connection);
+        return new DBResourceManagerImpl(props, connection);
     }
-
 }

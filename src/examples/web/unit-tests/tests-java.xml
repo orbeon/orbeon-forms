@@ -75,4 +75,16 @@
         </output>
     </test>
 
+    <test description="Simple" name="oxf:java">
+        <input name="config">
+            <config sourcepath="oxf:/unit-tests" class="DeepThoughtProcessor"/>
+        </input>
+        <input name="number">
+            <number>21</number>
+        </input>
+        <output name="double">
+            <number>42</number>
+        </output>
+    </test>
+
 </group>

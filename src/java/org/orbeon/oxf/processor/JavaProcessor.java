@@ -32,6 +32,7 @@ import org.xml.sax.ContentHandler;
 import java.io.*;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.net.URLDecoder;
 import java.util.*;
 
 public class JavaProcessor extends ProcessorImpl {
@@ -257,9 +258,11 @@ public class JavaProcessor extends ProcessorImpl {
                     if (file.startsWith("file:/"))
                         file = file.substring("file:/".length());
 
+                    file = URLDecoder.decode(file, "utf-8");
+
                     if (logger.isDebugEnabled())
                         logger.debug("Found current JAR file: " + file);
-                    
+
                     File jarDirectory = new File(file).getParentFile();
                     jarpath.append(jarDirectory.getCanonicalPath()).append(PATH_SEPARATOR);
                 }

@@ -135,18 +135,6 @@
         </output>
     </test>
 
-    <!--    <test description="Java Processor" name="oxf:java">-->
-    <!--        <input name="config">-->
-    <!--            <config processor="DeepThoughtProcessor.java"/>-->
-    <!--        </input>-->
-    <!--        <input name="number">-->
-    <!--            <number>21</number>-->
-    <!--        </input>-->
-    <!--        <output name="double">-->
-    <!--            <number>42</number>-->
-    <!--        </output>-->
-    <!--    </test>-->
-
     <test description="Perl5 Matcher" name="oxf:perl5-matcher">
         <input name="data">
             <text>/a/bc/de.fgh</text>

@@ -171,6 +171,7 @@ public class RequestGenerator extends ProcessorImpl {
                                     } catch (IOException e) {
                                         throw new OXFException(e);
                                     }
+                                    context.bodyFileItem = fileItem;
                                 }
                                 // Serialize the stream into the body element
                                 AttributesImpl newAttributes = new AttributesImpl();

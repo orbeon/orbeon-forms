@@ -53,22 +53,11 @@
             </ul>
             <h2>Installation and Configuration</h2>
             <p>
-                The example should work out of the box except for web service functionality.
+                The example works out of the box except for web service functionality and enhanced
+                authentication and LDAP functionality.
             </p>
             <p>
-                <xsl:choose>
-                    <xsl:when test="not(doc('../ws-config.xml')/*/host)">
-                        <b>Currently, Web Service functionality is not configured.</b> If you
-                        choose to use it, please configure the file <code>ws-config.xml</code>.
-                    </xsl:when>
-                    <xsl:otherwise>
-                        You appear to have configured Web Service functionality by configuring the
-                        file <code>ws-config.xml</code>.
-                    </xsl:otherwise>
-                </xsl:choose>
-            </p>
-            <p>
-                You may also optionally configure the following users and roles:
+                You may optionally configure the following users and roles:
             </p>
             <ul>
                 <li><code>demo-admin</code> role</li>
@@ -108,6 +97,18 @@
                     </security-role>
                 </f:xml-source>
             </f:box>
+            <p>
+                <xsl:choose>
+                    <xsl:when test="not(doc('../ws-config.xml')/*/host)">
+                        <b>Currently, Web Service functionality is not configured.</b> If you
+                        choose to use it, please configure the file <code>ws-config.xml</code>.
+                    </xsl:when>
+                    <xsl:otherwise>
+                        You appear to have configured Web Service functionality by configuring the
+                        file <code>ws-config.xml</code>.
+                    </xsl:otherwise>
+                </xsl:choose>
+            </p>
             <p>
                 <xsl:choose>
                     <xsl:when test="not(doc('../ldap-config.xml')/*/host)">

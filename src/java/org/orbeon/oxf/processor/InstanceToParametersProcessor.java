@@ -13,7 +13,11 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.VisitorSupport;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
@@ -25,7 +29,9 @@ import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Convert an XForms instance into a list of parameters.
@@ -67,7 +73,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                             ((LocationData) instance.getRootElement().getData()).getSystemID());
 
                     // Mark all nodes referenced by XPath expressions
-                    final Object MARKER = new Object();
+                    final Set markedNodes = new HashSet();
                     for (Iterator i = filterElement.elements().iterator(); i.hasNext();) {
                         Element paramElement = (Element) i.next();
                         Attribute refAttribute = paramElement.attribute("ref");
@@ -76,12 +82,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                                 instanceWrapper.wrap(instance), excludeRef,
                                 XMLUtils.getNamespaceContext(paramElement));
                         try {
-                            Node node = (Node) xpath.evaluateSingle();
-                            // Mark node
-                            if (node instanceof Attribute)
-                                ((Attribute) node).setData(MARKER);
-                            else if (node instanceof Element)
-                                ((Element) node).setData(MARKER);
+                            markedNodes.add(xpath.evaluateSingle());
                         } finally {
                             if (xpath != null) xpath.returnToPool();
                         }
@@ -92,13 +93,13 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     instance.accept(new VisitorSupport() {
                         public void visit(Element node) {
                             super.visit(node);
-                            if (node.elements().size() == 0 && node.getData() != MARKER)
+                            if (node.elements().size() == 0 && !markedNodes.contains(node))
                                 allMarked[0] = false;
                         }
 
                         public void visit(Attribute node) {
                             super.visit(node);
-                            if (node.getData() != MARKER)
+                            if (!markedNodes.contains(node))
                                 allMarked[0] = false;
                         }
                     });

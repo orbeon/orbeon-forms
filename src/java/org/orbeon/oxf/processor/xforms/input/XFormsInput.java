@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.xforms.input;
 
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.Processor;
@@ -111,6 +112,8 @@ public class XFormsInput extends ProcessorImpl {
                                 (pipelineContext, INPUT_MATCHER_RESULT).getRootElement().elements("group");
                         final List paramElements = readCacheInputAsDOM4J
                                 (pipelineContext, INPUT_FILTER).getRootElement().elements("param");
+                        if (groupElements.size() != paramElements.size())
+                            throw new OXFException("Number of parameters does not match number of groups in path expression");
                         for (Iterator paramIterator = paramElements.iterator(),
                                 groupIterator = groupElements.iterator(); paramIterator.hasNext();) {
                             Element paramElement = (Element) paramIterator.next();

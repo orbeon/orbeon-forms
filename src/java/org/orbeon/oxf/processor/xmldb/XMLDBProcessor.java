@@ -299,6 +299,9 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
             xpathQueryService.setNamespace(prefix, uri);
         }
 
+        // Log for debug
+        logger.debug(query);
+
         // Execute query
         ResourceSet result;
         if (resourceId == null)

@@ -424,7 +424,7 @@
             <zipfileset dir="${build.temp.dir}/distrib-bizdoc/WEB-INF/resources/bizdoc/schema" prefix="WEB-INF/resources/bizdoc/schema">
                 <include name="*.xml"/>
             </zipfileset>
-            <zipfileset dir="${web-examples-src.dir}/bizdoc" prefix="WEB-INF">
+            <zipfileset dir="descriptors/examples/web/bizdoc" prefix="WEB-INF">
                 <include name="*.xml"/>
             </zipfileset>
         </zip>

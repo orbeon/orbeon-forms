@@ -108,7 +108,7 @@
                     <operation name="methodCall"/>
                 </service>
                 <service id="deep-thought-jb" type="javabean"
-                    class="org.orbeon.oxf.test.DeepThought"/>
+                    class="org.orbeon.oxf.test.DelegationHello"/>
             </config>
         </input>
         <input name="data">

@@ -1,0 +1,149 @@
+<!--
+    Copyright 2004 Orbeon, Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:xu="http://www.xmldb.org/xupdate"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        instance-passing="forward">
+
+    <!-- Files to serve directly -->
+    <files path-info="*.gif"/>
+    <files path-info="*.css"/>
+    <files path-info="*.js"/>
+    <files path-info="*.png"/>
+    <files path-info="*.jpg"/>
+    <files path-info="*.wsdl"/>
+    <files path-info="*.html" mime-type="text/html"/>
+    <files path-info="*.java" mime-type="text/plain"/>
+    <files path-info="*.txt" mime-type="text/plain"/>
+
+    <page id="home" path-info="/employees" view="home/home-view.xsl"/>
+    <page id="home-standalone" path-info="/" view="home/home-view.xsl"/>
+
+    <page id="list-employees" path-info="/employees/list-employees"
+          xforms="list-employees/list-employees-xforms-model.xml"
+          model="list-employees/list-employees-model.xpl"
+          view="list-employees/list-employees-view.xsl">
+        <action when="/*/action = 'import'" action="import/import-employees.xpl">
+        </action>
+        <action when="/*/action = 'cvs-export'" action="import/import-employees.xpl">
+        </action>
+        <action when="/*/action = 'export-excel'">
+            <result page="export-excel"/>
+        </action>
+        <action when="/*/action = 'excel-import'">
+            <result page="excel-import"/>
+        </action>
+        <action when="/*/action = 'add-employee'">
+            <result page="edit-employee"/>
+        </action>
+        <action when="/*/action = 'edit-employee'" action="list-employees/find-employee-action.xpl">
+            <result page="edit-employee">
+                <xu:update select="/form/document">
+                    <xu:copy-of select="document('oxf:action')/employees/*"/>
+                </xu:update>
+            </result>
+        </action>
+        <action when="/*/action = 'show-reports'">
+            <result page="show-reports">
+                <xu:update select="/form/employee-id">
+                    <xu:value-of select="document('oxf:instance')/*/action-employee-id"/>
+                </xu:update>
+            </result>
+        </action>
+        <action when="/*/action = 'delete-employee'" action="list-employees/delete-employee-action.xpl">
+            <result page="list-employees"/>
+        </action>
+        <action when="/*/action = 'export-csv'">
+            <result page="export-csv" instance-passing="redirect">
+            </result>
+        </action>
+    </page>
+    
+    <page id="edit-employee" path-info="/employees/edit-employee"
+        xforms="edit-employee/edit-employee-xforms-model.xml"
+        view="edit-employee/edit-employee-view.xsl">
+        <action when="/*/action = 'save' and not(/*/document//@*[local-name() = 'error'])" action="edit-employee/save-employee.xpl">
+            <result page="edit-employee">
+                <xu:remove select="/*"/>
+                <xu:update select="/">
+                    <xu:copy-of select="document('oxf:instance')/*"/>
+                </xu:update>
+                <xu:update select="/form/action"/>
+                <xu:update select="/form/message">save-success</xu:update>
+            </result>
+        </action>
+        <action when="/*/action = 'save' and /*/document//@*[local-name() = 'error']">
+            <result>
+                <xu:update select="/form/message">save-failure</xu:update>
+                <xu:update select="/form/show-errors">true</xu:update>
+                <xu:remove select="/form/document//@*[local-name() = 'error']"/>
+            </result>
+        </action>
+        <action when="/*/action = 'back'">
+            <result page="list-employees"/>
+        </action>
+    </page>
+
+    <page id="show-reports" path-info="/employees/show-reports"
+        xforms="show-reports/show-reports-xforms-model.xml"
+        model="show-reports/show-reports-model.xpl"
+        view="show-reports/show-reports-view.xsl">
+        <action when="/*/action = 'show-reports'">
+            <result page="show-reports">
+                <xu:update select="/form/employee-id">
+                    <xu:value-of select="document('oxf:instance')/*/employee-id"/>
+                </xu:update>
+            </result>
+        </action>
+        <action when="/*/action = 'edit-employee'" action="list-employees/find-employee-action.xpl">
+            <result page="edit-employee">
+                <xu:update select="/form/document">
+                    <xu:copy-of select="document('oxf:action')/employees/*"/>
+                </xu:update>
+            </result>
+        </action>
+        <action when="/*/action = 'back'">
+            <result page="list-employees"/>
+        </action>
+    </page>
+
+    <page id="excel-import" path-info="/employees/import-excel"
+        xforms="import-excel/import-excel-xforms-model.xml"
+        view="import-excel/import-excel-view.xsl">
+        <action when="/form/action = 'import'" action="import-excel/import-excel-action.xpl">
+            <result page="list-employees" instance-passing="redirect"/>
+        </action>
+    </page>
+
+    <page id="export-csv" path-info="/example-resources/employees/export-csv" model="export-csv/export-csv-model.xpl"/>
+    <page id="export-excel" path-info="/example-resources/employees/export-excel" model="export-excel/export-excel-action.xpl"/>
+
+    <page path-info="/example-resources/employees/import-ws" model="import-ws/import-ws.xpl"/>
+    <page path-info="/example-resources/employees/import.wsdl" model="import-ws/view-wsdl.xpl"/>
+    
+    <page path-info="/login" view="login/login-view.xsl"/>
+    <page path-info="/login-error" view="login/login-error.xsl"/>
+    <page path-info="/logout">
+        <action action="login/logout.xpl">
+            <result page="home" instance-passing="redirect"/>
+        </action>
+    </page>
+
+    <page id="layout-css" path-info="/oxf-theme/orbeon-layout.cssd" model="/oxf-theme/orbeon-layout.xpl"/>
+
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</config>

@@ -151,7 +151,7 @@
                                             <!-- Body -->
                                             <xsl:if test="not($visible-portlet/@window-state = 'minimized')">
                                                 <!-- Encapsulate everything in a div that makes sure URLs won't be rewritten further -->
-                                                <div f:url-norewrite="true">
+                                                <div f:url-norewrite="true" portlet:is-portlet-content="true">
                                                     <xsl:choose>
                                                         <xsl:when test="$visible-portlet/portlet:body/html">
                                                             <!-- When parsing text/html with Tidy, we will have a root HTML element -->

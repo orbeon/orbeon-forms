@@ -52,6 +52,9 @@
     <section label="Document-Centric App">
         <example id="bizdoc" label="The &quot;BizDoc&quot; Example"/>
     </section>
+    <section label="Database App">
+        <example id="employees" label="The &quot;Employee Demo&quot; Example"/>
+    </section>
     <section label="Controlling Page Flow">
         <example id="atm" label="ATM Page Flow"/>
         <example id="counter" label="Counter Page Flow"/>

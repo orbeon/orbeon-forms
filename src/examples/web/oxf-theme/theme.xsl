@@ -20,6 +20,7 @@
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
+    <xsl:include href="formatting.xsl"/>
     <xsl:include href="oxf:/inspector/xml-formatting.xsl"/>
 
     <xsl:template match="/">
@@ -58,27 +59,11 @@
             </head>
             <!-- This gives a little nudge to IE, so IE displays all the borders -->
             <body onload="document.body.innerHTML += ''">
+                <!-- Handle optional tabs -->
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/f:tabs"/>
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
             </body>
         </html>
-    </xsl:template>
-
-    <xsl:template match="f:alerts">
-        <table cellpadding="0" cellspacing="0" border="0" style="background: #FFCCCC; margin: 1em; padding: .5em">
-            <tr>
-                <td valign="top"><img src="/images/error-large.gif"/></td>
-                <td valign="top" style="padding-left: 1em">
-                    Please correct the errors on this page.
-                    <xsl:if test="f:alert">
-                        <ul>
-                            <xsl:for-each select="f:alert">
-                                <li><xsl:copy-of select="node()"/></li>
-                            </xsl:for-each>
-                        </ul>
-                    </xsl:if>
-                </td>
-            </tr>
-        </table>
     </xsl:template>
 
     <xsl:template match="xhtml:p">
@@ -110,20 +95,6 @@
         <input>
             <xsl:apply-templates select="@*|node()"/>
         </input>
-    </xsl:template>
-
-    <xsl:template match="f:source">
-        <pre>
-            <xsl:call-template name="ignore-first-empty-lines">
-                <xsl:with-param name="text" select="."/>
-            </xsl:call-template>
-        </pre>
-    </xsl:template>
-
-    <xsl:template match="f:xml-source">
-        <xsl:apply-templates mode="xml-formatting">
-            <xsl:with-param name="show-namespaces" select="not(@show-namespaces = 'false')"/>
-        </xsl:apply-templates>
     </xsl:template>
 
     <xsl:template name="ignore-first-empty-lines">
@@ -180,95 +151,6 @@
                 <xsl:with-param name="width" select="$width"/>
             </xsl:call-template>
         </xsl:if>
-    </xsl:template>
-
-    <xsl:template match="f:example-header">
-        <xsl:variable name="title" select="@title"/>
-        <xsl:variable name="page" select="*"/>
-
-        <h1 style="margin-bottom: 1em">
-            <xsl:value-of select="$page/title"/>
-        </h1>
-        <table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 2em"><tr><td class="dashedbox">
-            <div class="rightbox" style="float: right">
-                <xsl:for-each select="$page/source">
-                    <nobr>
-                        <xsl:choose>
-                            <xsl:when test="@html = 'true'">
-                                <a href="/{.}.html"><xsl:value-of select="."/></a>
-                            </xsl:when>
-                            <xsl:when test="@html = 'false'">
-                                <a href="/{.}"><xsl:value-of select="."/></a>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <a href="/examples/source?src={$page/path}/{escape-uri(string(.), true())}">
-                                    <xsl:value-of select="string(.)"/>
-                                </a>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </nobr>
-                    <br/>
-                </xsl:for-each>
-            </div>
-            <xsl:variable name="first-p" select="generate-id($page/description/xhtml:p[1])"/>
-            <xsl:for-each select="$page/description/node()">
-                <xsl:choose>
-                    <xsl:when test="generate-id(.) = $first-p">
-                        <p style="margin-top: 0">
-                            <xsl:apply-templates select="node()"/>
-                        </p>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:apply-templates select="."/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:for-each>
-        </td></tr></table>
-    </xsl:template>
-
-    <xsl:template match="f:box">
-        <table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 2em; width: 100%">
-            <tr>
-                <td class="dashedbox">
-                    <xsl:apply-templates/>
-                </td>
-            </tr>
-        </table>
-    </xsl:template>
-
-    <xsl:template match="f:global-errors">
-        <xsl:variable name="display-as-popup" select="true()"/>
-        
-        <xsl:apply-templates select="xhtml:input"/>
-        <xsl:variable name="error-table">
-            <table border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 1em">
-                <xsl:for-each select="xforms:alert">
-                    <tr>
-                        <td><img src="../images/error.gif"/></td>
-                        <td style="padding-left: .2em; color: red" width="100%">
-                            <span class="gen"><xsl:value-of select="@xxforms:error"/></span>
-                        </td>
-                    </tr>
-                </xsl:for-each>
-            </table>
-        </xsl:variable>
-
-        <xsl:choose>
-            <xsl:when test="$display-as-popup">
-                <!-- Open popup with errors -->
-                <xsl:if test="xforms:alert">
-                    <script language="JavaScript">
-                        <xsl:variable name="error-string" select="xmlutils:domToString($error-table/*)"/>
-                        <xsl:variable name="error-one-line" select="replace(replace($error-string, '&#xd;', ''), '&#xa;', '')"/>
-                        window.open('xforms-ubl-popup', '_blank', 'height=200,width=400,status=no,toolbar=no,menubar=no,location=no').error = '<xsl:value-of select="$error-one-line"/>';
-                    </script>
-                </xsl:if>
-            </xsl:when>
-            <xsl:otherwise>
-                <!-- Display error in current page -->
-                <xsl:copy-of select="$error-table/*"/>
-            </xsl:otherwise>
-        </xsl:choose>
     </xsl:template>
 
     <!-- Just copy other "xhtml" elements removing the namespace -->

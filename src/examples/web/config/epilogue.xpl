@@ -146,7 +146,8 @@
                             <xsl:if test="normalize-space(/xhtml:html/xhtml:head/xhtml:title)">
                                 <xsl:value-of select="context:setTitle(normalize-space(/xhtml:html/xhtml:head/xhtml:title))"/>
                             </xsl:if>
-                            <div>
+                            <div xmlns:f="http://orbeon.org/oxf/xml/formatting">
+                                <xsl:apply-templates select="/xhtml:html/xhtml:head/f:tabs"/>
                                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
                             </div>
                         </xsl:template>

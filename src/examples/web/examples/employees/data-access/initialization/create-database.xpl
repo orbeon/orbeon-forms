@@ -1,0 +1,55 @@
+<!--
+    Copyright 2004 Orbeon, Inc.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+          xmlns:sql="http://orbeon.org/oxf/xml/sql"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+    <p:processor name="oxf:sql-output">
+        <p:input name="config">
+            <sql:config>
+                <sql:connection>
+                    <sql:datasource>db</sql:datasource>
+                    <!-- Drop tables if they exist -->
+                    <sql:execute>
+                        <sql:update>drop table demo_employee if exists</sql:update>
+                    </sql:execute>
+                    <!-- Create tables -->
+                    <sql:execute>
+                        <sql:update>
+                            create table demo_employee (
+                                employee_id integer identity primary key,
+                                firstname   varchar (50) not null,
+                                lastname    varchar (50) not null,
+                                phone       varchar (50) null,
+                                title       varchar (50) null,
+                                age         integer null,
+                                manager_id  integer null
+                            )
+                        </sql:update>
+                    </sql:execute>
+                    <dummy/>
+                </sql:connection>
+            </sql:config>
+        </p:input>
+        <p:output name="output" id="dummy"/>
+    </p:processor>
+
+    <p:processor name="oxf:null-serializer">
+        <p:input name="data" href="#dummy"/>
+    </p:processor>
+
+</p:config>

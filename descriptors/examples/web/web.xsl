@@ -56,11 +56,11 @@
                <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
             </context-param>
 
+            <xsl:comment> OXF Class Loader </xsl:comment>
             <context-param>
                 <param-name>oxf.classloader.enable</param-name>
                 <param-value>false</param-value>
             </context-param>
-
             <context-param>
                 <param-name>oxf.classloader.ignore-packages</param-name>
                 <param-value>java. javax. org.apache.log4j. org.xml. org.w3c.</param-value>
@@ -219,7 +219,7 @@
             </servlet>
 
             <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'SQL example'"/>
+                <xsl:with-param name="caption" select="'SQL examples'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>
                 <xsl:with-param name="content">
                     <servlet>
@@ -260,7 +260,7 @@
             </servlet-mapping>
 
             <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'SQL example'"/>
+                <xsl:with-param name="caption" select="'SQL examples'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>
                 <xsl:with-param name="content">
                     <servlet-mapping>
@@ -290,7 +290,7 @@
             -->
 
             <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'SQL example'"/>
+                <xsl:with-param name="caption" select="'SQL examples'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>
                 <xsl:with-param name="content">
                     <resource-ref>

@@ -356,7 +356,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 The URL Serializer mirrors the functionality of the <link
                 href="processors-generators#url-generator">URL Generator</link>. Instead of reading
                 from of URL, it writes its <code>data</code> input as XML in a URL. Note that only
-                the <code>oxf:</code> and <code>http</code> protocols allows writing at this time.
+                the <code>oxf:</code> and <code>http:</code> protocols allows writing at this time.
 
             </p>
             <note>

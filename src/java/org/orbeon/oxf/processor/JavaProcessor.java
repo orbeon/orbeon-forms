@@ -252,24 +252,29 @@ public class JavaProcessor extends ProcessorImpl {
         // Try to add directory containing current JAR file if WEB-INF/lib was not found
         if (!gotLibDir) {
             try {
-                URL url = getClass().getClassLoader().getResource("org/orbeon/oxf/processor/JavaProcessor.class");
+                final String RESOURCE_NAME = "org/orbeon/oxf/processor/JavaProcessor.class";
+                URL url = getClass().getClassLoader().getResource(RESOURCE_NAME);
                 if (url.getProtocol().equals("jar")) {
-                    // The current class is in a JAR file
-                    String file = url.getFile();
-                    if (file.indexOf("!") != -1)
-                        file = file.substring(0, file.indexOf("!"));
+                    if (url.getProtocol().equals("jar")) {
+                        // The current class is in a JAR file
+                        String file = url.getFile();
 
-                    if (file.startsWith("file:/")) {
-                        // JAR protocol refers to a local file
-                        file = file.substring("file:/".length());
-                        file = URLDecoder.decode(file, "utf-8");
+                        int end = file.length() - ("!/".length() + RESOURCE_NAME.length());
+                        final String fileSlash = "file:/";
+                        final int fileSlashLen = fileSlash.length();
+                        if (end > fileSlashLen && file.regionMatches(true, 0, fileSlash, 0, fileSlashLen)) {
+                            file = file.substring(fileSlashLen, end);
 
-                        if (logger.isDebugEnabled())
-                            logger.debug("Found current JAR file: " + file);
+                            file = URLDecoder.decode(file, "utf-8");
 
-                        File jarDirectory = new File(file).getParentFile();
-                        if (jarDirectory.isDirectory())
-                            jarpath.append(jarDirectory.getCanonicalPath()).append(PATH_SEPARATOR);
+                            if (logger.isDebugEnabled())
+                                logger.debug("Found current JAR file: " + file);
+
+                            File jarDirectory = new File(file).getParentFile();
+                            if (jarDirectory.isDirectory())
+                                jarpath.append(jarDirectory.getCanonicalPath())
+                                        .append(PATH_SEPARATOR);
+                        }
                     }
                 }
             } catch (IOException e) {

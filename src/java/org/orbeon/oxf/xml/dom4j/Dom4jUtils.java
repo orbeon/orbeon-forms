@@ -22,7 +22,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.SAXParser;

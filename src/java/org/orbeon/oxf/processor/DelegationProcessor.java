@@ -46,13 +46,11 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.*;
 
 public class DelegationProcessor extends ProcessorImpl {
 
@@ -62,7 +60,7 @@ public class DelegationProcessor extends ProcessorImpl {
             ("type", new org.dom4j.Namespace("xsi", "http://www.w3.org/1999/XMLSchema-instance"));
     private static final String DEFAULT_SELECT_WEB_SERVICE = "/SOAP-ENV:Envelope/SOAP-ENV:Body/*[1]/node()";
     private static final String DEFAULT_SELECT_BUS = "/SOAP-ENV:Envelope/SOAP-ENV:Body/*";
-    private static final Map DEFAULT_SELECT_NAMESPACE_CONTEXT = new HashMap();
+    private static final java.util.Map DEFAULT_SELECT_NAMESPACE_CONTEXT = new java.util.HashMap();
     static {
         DEFAULT_SELECT_NAMESPACE_CONTEXT.put("SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/");
     }
@@ -80,7 +78,7 @@ public class DelegationProcessor extends ProcessorImpl {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(final org.orbeon.oxf.pipeline.api.PipelineContext context, final ContentHandler contentHandler) {
                 final org.orbeon.oxf.pipeline.api.PipelineContext _context = context;
-                final List services = readServices(readInputAsDOM4J(context, INPUT_INTERFACE));
+                final java.util.List services = readServices(readInputAsDOM4J(context, INPUT_INTERFACE));
 
                 readInputAsSAX(context, INPUT_CALL, new ForwardingContentHandler(contentHandler) {
 
@@ -96,7 +94,7 @@ public class DelegationProcessor extends ProcessorImpl {
                             // Find service
                             service = null;
                             String serviceId = attributes.getValue("service");
-                            for (Iterator i = services.iterator(); i.hasNext();) {
+                            for ( java.util.Iterator i = services.iterator(); i.hasNext();) {
                                 ServiceDefinition candidateService = (ServiceDefinition) i.next();
                                 if (candidateService.id.equals(serviceId)) {
                                     service = candidateService;
@@ -111,7 +109,7 @@ public class DelegationProcessor extends ProcessorImpl {
 
                             // Find operation for Web service
                             if (service.type == ServiceDefinition.WEB_SERVICE_TYPE && operationName != null) {
-                                for (Iterator i = service.operations.iterator(); i.hasNext();) {
+                                for (java.util.Iterator i = service.operations.iterator(); i.hasNext();) {
                                     OperationDefinition candidateOperation = (OperationDefinition) i.next();
                                     if (candidateOperation.name.equals(operationName)) {
                                         operation = candidateOperation;
@@ -203,33 +201,33 @@ public class DelegationProcessor extends ProcessorImpl {
                                             resultEnvelope = call.invoke(requestEnvelope);
                                         } else {
                                             // Call bus service
-                                            QueueConnection requestQueueConnection = null;
-                                            QueueSession requestQueueSession = null;
-                                            QueueSender queueSender = null;
+                                            javax.jms.QueueConnection requestQueueConnection = null;
+                                            javax.jms.QueueSession requestQueueSession = null;
+                                            javax.jms.QueueSender queueSender = null;
                                             try {
                                                 requestQueueConnection = JMSUtils.getQueueConnection();
-                                                requestQueueSession = requestQueueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+                                                requestQueueSession = requestQueueConnection.createQueueSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
                                                 queueSender = requestQueueSession.createSender
-                                                        ((Queue) new InitialContext().lookup(JMSUtils.JNDI_SERVICE_PREFIX + service.name));
-                                                ObjectMessage responseMessage = requestQueueSession.createObjectMessage();
+                                                        ((javax.jms.Queue) new InitialContext().lookup(JMSUtils.JNDI_SERVICE_PREFIX + service.name));
+                                                javax.jms.ObjectMessage responseMessage = requestQueueSession.createObjectMessage();
                                                 responseMessage.setObject(requestEnvelope);
 
                                                 // Send message
                                                 if (ServiceDirectory.instance().getServiceByName(service.name).hasOutputs()) {
                                                     // Response expected
-                                                    QueueConnection responseQueueConnection = null;
-                                                    QueueSession responseQueueSession = null;
-                                                    QueueReceiver queueReceiver = null;
+                                                    javax.jms.QueueConnection responseQueueConnection = null;
+                                                    javax.jms.QueueSession responseQueueSession = null;
+                                                    javax.jms.QueueReceiver queueReceiver = null;
                                                     try {
                                                         responseQueueConnection = JMSUtils.getQueueConnection();
-                                                        responseQueueSession = responseQueueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
-                                                        Queue temporaryQueue = responseQueueSession.createTemporaryQueue();
+                                                        responseQueueSession = responseQueueConnection.createQueueSession(false, javax.jms.Session.AUTO_ACKNOWLEDGE);
+                                                        javax.jms.Queue temporaryQueue = responseQueueSession.createTemporaryQueue();
                                                         queueReceiver = responseQueueSession.createReceiver(temporaryQueue);
                                                         responseMessage.setJMSReplyTo(temporaryQueue);
                                                         responseQueueConnection.start();
                                                         queueSender.send(responseMessage);
-                                                        Message message = queueReceiver.receive();
-                                                        resultEnvelope = (SOAPEnvelope) ((ObjectMessage) message).getObject();
+                                                        javax.jms.Message message = queueReceiver.receive();
+                                                        resultEnvelope = (SOAPEnvelope) ((javax.jms.ObjectMessage) message).getObject();
                                                     } finally{
                                                         if (queueReceiver != null) queueReceiver.close();
                                                         if (responseQueueSession != null) responseQueueSession.close();
@@ -275,7 +273,7 @@ public class DelegationProcessor extends ProcessorImpl {
                                                     xpath,
                                                     operation != null && operation.select != null ? operation.selectNamespaceContext : DEFAULT_SELECT_NAMESPACE_CONTEXT);
 
-                                            for (Iterator i = expr.evaluate().iterator(); i.hasNext();) {
+                                            for (java.util.Iterator i = expr.evaluate().iterator(); i.hasNext();) {
 
                                                 // Create document with node from SOAP envelope
                                                 Object result = i.next();
@@ -310,11 +308,11 @@ public class DelegationProcessor extends ProcessorImpl {
                                         domSerializer.start(context);
                                         org.dom4j.Document parametersDocument = domSerializer.getNode(context);
                                         // Get parameter values and types
-                                        List parameterTypes = new ArrayList();
-                                        List parameterValues = new ArrayList();
+                                        java.util.List parameterTypes = new java.util.ArrayList();
+                                        java.util.List parameterValues = new java.util.ArrayList();
 
                                         // Go throught elements
-                                        for (Iterator i = parametersDocument.selectNodes("/parameters/*").iterator(); i.hasNext();) {
+                                        for (java.util.Iterator i = parametersDocument.selectNodes("/parameters/*").iterator(); i.hasNext();) {
                                             org.dom4j.Element parameterElement = (org.dom4j.Element) i.next();
                                             String parameterValue = parameterElement.getText();
                                             String type = parameterElement.attributeValue(xsiType);
@@ -381,8 +379,8 @@ public class DelegationProcessor extends ProcessorImpl {
     /**
      * Calls a method on an object with the reflexion API.
      */
-    private String callMethod(Class clazz, String methodName, List parameterTypes,
-                              Object instance, List parameterValues)
+    private String callMethod(Class clazz, String methodName, java.util.List parameterTypes,
+                              Object instance, java.util.List parameterValues)
             throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         String result;
         Class[] parameterClasses = new Class[parameterTypes.size()];
@@ -395,10 +393,10 @@ public class DelegationProcessor extends ProcessorImpl {
     /**
      * Returns a list of AbstractSercice objects.
      */
-    private List readServices(Document interfaceDocument) {
+    private java.util.List readServices(Document interfaceDocument) {
 
-        List services = new ArrayList();
-        for (Iterator i = interfaceDocument.getRootElement().elements("service").iterator(); i.hasNext();) {
+        java.util.List services = new java.util.ArrayList();
+        for (java.util.Iterator i = interfaceDocument.getRootElement().elements("service").iterator(); i.hasNext();) {
             Element serviceElement = (Element) i.next();
 
             // Create Service Definition
@@ -419,7 +417,7 @@ public class DelegationProcessor extends ProcessorImpl {
             service.style = serviceElement.attributeValue("style");
 
             // Create operations
-            for (Iterator j = XPathUtils.selectIterator(serviceElement, "operation"); j.hasNext();) {
+            for (java.util.Iterator j = XPathUtils.selectIterator(serviceElement, "operation"); j.hasNext();) {
                 Element operationElement = (Element) j.next();
                 OperationDefinition operation = new OperationDefinition();
                 operation.service = service;
@@ -452,7 +450,7 @@ public class DelegationProcessor extends ProcessorImpl {
         public String name;
         public String clazz;
         public String style;
-        public List operations = new ArrayList();
+        public java.util.List operations = new java.util.ArrayList();
     }
 
     private static class OperationDefinition {
@@ -462,6 +460,6 @@ public class DelegationProcessor extends ProcessorImpl {
         public String soapAction;
         public String encodingStyle;
         public String select;
-        public Map selectNamespaceContext;
+        public java.util.Map selectNamespaceContext;
     }
 }

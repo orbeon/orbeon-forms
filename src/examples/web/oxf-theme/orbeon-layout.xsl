@@ -266,8 +266,8 @@ a:hover {
     font-size: 9pt;
     font-weight: bold;
     padding: .2em .5em .2em .5em;
-    margin-left: -1em;
-    margin-right: -1em;
+    margin-left: -0.6em;
+    margin-right: .5em;
     margin-top: 2em;
     margin-bottom: 1em;
     border-bottom: solid 1px &dark-color;;

@@ -104,6 +104,14 @@
                 </p>
             </section>
             <section>
+                <title>Page Flow</title>
+                <p>
+                    XSLT views in <a href="reference-controller">Page Flow</a> can now access the
+                    XForms instance using <code>document('oxf:instance')</code> or
+                    <code>doc('oxf:instance')</code>.
+                </p>
+            </section>
+            <section>
                 <title>Email Processor</title>
                 <p>
                     The <a href="processors-messaging#email">Email processor</a> now supports

@@ -450,26 +450,17 @@
             </fileset>
         </copy>
 
-        <!-- don't care if this fails.  do care if subsequent ssh commands fail though. -->
-        <exec executable='ssh'>
-            <arg value='${forge-ssh-id}'/>
-            <arg value='rm'/>
-            <arg value='-rf'/>
-            <arg value='${unstbl-bld-dst}*'/>
+        <prroperty 'unstable-site' location='/var/tmp/tomcat/ops-unstable/' />
+        <mkdir dir="${unstbl-bld-dst}/${release.number}"/>
+        <copy file='${deployDir}/${release.number}/orbeon.war' todir='${unstbl-bld-dst}/${release.number}'/>
+        <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${unstbl-bld-dst}/${release.number}'/>
+
+        <exec executable='sh' failonerror='true' >
+          <arg value='sh' />
+          <arg value='${build.root}/update-unstable.sh' />
         </exec>
 
-        <exec executable='ssh' failonerror='true'>
-            <arg value='${forge-ssh-id}'/>
-            <arg value='mkdir'/>
-            <arg value='-p'/>
-            <arg value='${unstbl-bld-dst}${release.number}'/>
-        </exec>
-
-        <exec executable='scp' failonerror='true'>
-            <arg value='-q'/>
-            <arg value='${deployDir}/${release.number}/orbeon.war'/>
-            <arg value='${forge-ssh-id}:${unstbl-bld-dst}${release.number}/'/>
-        </exec>
+        <delete dir="${unstbl-bld-dst}/${release.number}"/>
 
         <!-- copy log file last -->
         <exec executable='scp' failonerror='true'>

@@ -14,9 +14,9 @@
         <head>Namespace</head>
         <p>
             All the elements defined by XPL must be in the
-            <code>http://www.orbeon.com/oxf/pipeline</code> namespace [TODO: a
-            company-agnostic namespace must be chosen]. For consistency, XPL elements should
-            use the prefix <code>p</code>. This document assumes that this prefix is used.
+            <code>http://www.orbeon.com/oxf/pipeline</code> namespace. For consistency, XPL
+            elements should use the prefix <code>p</code>. This document assumes that this prefix is
+            used.
         </p>
     </div2>
     <div2>
@@ -116,57 +116,6 @@ schema-href? = <emph>aaa</emph> /&gt;
             <el>p:processor</el> element. In that context, they support different
             attributes and content.
         </note>
-        <!--
-        <div3>
-            <head>The <el>p:param</el> element</head>
-            <p>
-                <el>
-                    &lt;p:param
-                        name = <emph>aaa</emph>
-                        type = <emph>aaa</emph> /&gt;
-                </el>
-            </p>
-            <p>
-                [TODO: it should be considered whether the <el>p:param</el> element should be
-                replaced by <el>p:input</el> and <el>p:output</el>.]
-            </p>
-            <p>
-                [TODO: it should be considered whether pipeline outputs should be referred to by
-                <el>href</el> / <el>id</el> attributes instead of the current <el>name</el>
-                <el>ref</el>. This would make the language more consistent.]
-            </p>
-            <p>
-                The <el>p:param</el> element defines exactly one XPL program input or
-                output. Zero, one or more <el>p:param</el> elements can be children elements
-                of the <el>p:pipeline</el> element. They must occur before any other
-                element in the XPL program.
-            </p>
-            <p>
-                The <el>type</el> attribute is mandatory and can have a value of either
-                <code>input</code> or <code>output</code>. A <el>p:param</el> element with a
-                value of <code>input</code> defines an XPL program input. A <el>p:param</el>
-                element with a value of <code>output</code> defines an XPL program output.
-            </p>
-            <p>
-                The <el>name</el> attribute is mandatory. There cannot be two inputs with the
-                same name or two outputs with the same name, but it is possible to have an
-                output and an input with the same name.
-            </p>
-            <p>
-                Every input name defines an XML Infoset identifier that may be later
-                referenced with the <el>href</el> attribute on <el>p:input</el> elements within
-                <el>p:processor</el> elements.
-            </p>
-            <p>
-                Every output name defines an identifier that must be referenced with the
-                <el>ref</el> attribute on <el>p:output</el> elements within
-                <el>p:processor</el> elements. There cannot be a <el>p:output</el> element
-                defining a name identical to an <el>id</el> attribute on a <el>p:output</el>
-                element within a <el>p:processor</el> element. The XPL implementation must
-                throw a static error if such a condition is encountered.
-            </p>
-        </div3>
-        -->
     </div2>
     <div2>
         <head>Processor Module</head>
@@ -329,12 +278,9 @@ schema-href? = <emph>aaa</emph> &gt;
             <pre>
 &lt;p:choose
 href = <emph>infoset-reference</emph> &gt;
-&lt;!-- Content: (p:when*, p:otherwise?) --&gt;
+&lt;!-- Content: (p:output*, p:when+, p:otherwise?) --&gt;
 &lt;/p:choose&gt;
             </pre>
-            <p>
-                [TODO: Update to support p:output]
-            </p>
             <p>
                 The <el>p:choose</el> element declares a statement used to execute different
                 sequences of statements depending on conditions evaluated during the
@@ -352,9 +298,28 @@ href = <emph>infoset-reference</emph> &gt;
                 mandatory <el>href</el> attribute of the <el>p:choose</el> element.
             </p>
             <p>
-                The set of XML Infoset identifiers exposed by a <el>p:choose</el> statement
-                consists of the set of identifiers exported by all branches, as detailed
-                below.
+                The set of XML Infoset identifiers exposed by a <el>p:choose</el> statement is
+                defined by the nested <el>p:output</el> elements if any. If no <el>p:output</el>
+                element is present, no XML Infoset identifier is exposed by the <el>p:choose</el>
+                statement.
+            </p>
+        </div3>
+        <div3>
+            <head>The <el>p:output</el> element</head>
+            <pre>
+&lt;p:output id = <emph>ncname</emph> href = <emph>infoset-reference</emph> /&gt;
+            </pre>
+            <p>
+                The <el>p:output</el> element defines what XML Infoset identifers are exposed by the
+                parent <el>p:choose</el> element. Each <el>p:output</el> element must have an
+                <el>id</el> attribute which defines an XML Infoset identifier to expose.
+            </p>
+            <p>
+                [TODO: Is this what we want to have, or do we just want to have the id attribute and
+                it has visibility inside as well as outside?] The mandatory <el>href</el> attribute
+                determines the XML Infoset exposed. The Infoset reference may refer to XML Infoset
+                identifiers scoped on the parent <el>p:choose</el> element as well as to XML Infoset
+                identifiers scoped in the branches of the <el>p:choose</el> statement.
             </p>
         </div3>
         <div3>
@@ -366,9 +331,9 @@ test = <emph>expression</emph> &gt;
 &lt;/p:when&gt;
             </pre>
             <p>
-                A <el>p:when</el> element is always a child of a <el>p:choose</el> element.
-                A sequence of multiple <el>p:when</el> elements can be present under a
-                single <el>p:choose</el> element.
+                A <el>p:when</el> element is always a child of a <el>p:choose</el> element. A
+                sequence of multiple <el>p:when</el> elements can be present under a single
+                <el>p:choose</el> element. There must be at least one <el>p:when</el> element.
             </p>
             <p>
                 The mandatory <el>test</el> attribute contains an XPath expression. The result
@@ -389,10 +354,10 @@ test = <emph>expression</emph> &gt;
 &lt;/p:otherwise&gt;
             </pre>
             <p>
-                A <el>p:otherwise</el> element is always a child of a <el>p:choose</el>
-                element. If any <el>p:when</el> siblings are present, they must all precede
-                a <el>p:otherwise</el> element. There must be exactly zero or one
-                <el>p:otherwise</el> element child of a <el>p:choose</el> element.
+                A <el>p:otherwise</el> element is always a child of a <el>p:choose</el> element. Any
+                <el>p:when</el> sibling element must all precede a <el>p:otherwise</el> element.
+                There must be exactly zero or one <el>p:otherwise</el> element child of a
+                <el>p:choose</el> element.
             </p>
         </div3>
         <div3>
@@ -407,36 +372,18 @@ test = <emph>expression</emph> &gt;
                 <el>p:choose</el> element.
             </p>
             <p>
-                The set of scoped XML Infoset identifiers after the last statement of a
-                branch are subject to the following conditions:
+                The set of scoped XML Infoset identifiers after the last statement of a branch must
+                contain the XML Infoset idenfiers refered by all the <el>p:output</el> element's
+                <el>href</el> attribute that are not in scope for the parent <el>p:choose</el>
+                statement.
             </p>
-            <ulist>
-                <item>
-                    <p>
-                        <emph>Consistency.</emph> The set of XML Infoset identifiers not
-                        connected inside a branch must be consistent among all branches.
-                        This means for example that if the first branch of a
-                        <el>p:choose</el> element has two non-connected outputs identifiers
-                        such as <code>output1</code> and <code>output2</code>, then all
-                        other branches must export the same outputs identifiers.
-                    </p>
-                </item>
-                <item>
-                    <p>
-                        <emph>Exposed XML Infoset identifiers.</emph> The set of XML
-                        Infoset identifiers not connected inside a branch defines the set of
-                        exposed identifiers for the <el>p:choose</el> statement.
-                    </p>
-                </item>
-            </ulist>
             <p>
-                A static error must be raised if any of those conditions is not met.
+                A static error must be raised if this condition is not met.
             </p>
             <note>
-                The no-collision rule applies for statements within a branch. In other words
-                an XML Infoset identifier exposed by a statement within a branch cannot
-                override an identifier scoped for the corresponding <el>p:choose</el>
-                element.
+                The no-collision rule applies for statements within a branch. In other words an XML
+                Infoset identifier exposed by a statement within a branch cannot override an
+                identifier scoped for the corresponding <el>p:choose</el> element.
             </note>
         </div3>
     </div2>

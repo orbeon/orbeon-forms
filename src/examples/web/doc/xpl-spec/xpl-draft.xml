@@ -634,9 +634,6 @@
                     nested statements. For example, <el>p:choose</el> may contain one or more
                     <el>p:processor</el> elements.
                 </p>
-                <p>
-                    [TODO: update this with rest of repeat module and exception module.]
-                </p>
             </div2>
             <div2 id="statements-sequence">
                 <head>Sequence of Statements</head>

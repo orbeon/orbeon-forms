@@ -172,8 +172,8 @@
 
             <p>
                 Presentation Server utilizes a <link
-                href="processors-generators#BeanGenerator">BeanGenerator</link> to serialize beans
-                from the request or session into XML. This process makes use of the <link
+                href="processors-generators#bean-generator">Bean generator</link> to serialize
+                beans from the request or session into XML. This process makes use of the <link
                 href="http://castor.exolab.org/">Castor XML Marshaller</link>.
             </p>
 

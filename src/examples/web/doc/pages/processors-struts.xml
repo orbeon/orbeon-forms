@@ -55,7 +55,7 @@
             <title>Struts Action Form Generator</title>
             <warning>
                 This processor is deprecated as of version 1.5.2. The Struts integration uses the
-                <link href="processors-generators#BeanGenerator">BeanGenerator</link> and <link
+                <link href="processors-generators#bean-generator">Bean generator</link> and <link
                 href="#StrutsActionErrorsGenerator">StrutsActionErrorsGenerator</link>.
             </warning>
             <p>

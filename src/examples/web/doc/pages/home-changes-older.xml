@@ -1125,7 +1125,7 @@ select * from ps_book
                         <link href="processors-other#ResourceServer">Resource Server</link>
                     </li>
                     <li>The
-                        <link href="processors-generators#BeanGenerator">Bean Generator</link>
+                        <link href="processors-generators#bean-generator">Bean Generator</link>
                     </li>
                     <li>The
                         <link href="processors-struts#StrutsActionErrorsGenerator">Struts ActionError Generator</link>

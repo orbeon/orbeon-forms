@@ -178,6 +178,16 @@
                 </p>
             </section>
             <section>
+                <title>Scope Generator</title>
+                <p>
+                    The <a href="processors-generators#scope-generator">Scope generator</a> is now
+                    able to marshall regular JavaBeans in addition to XML stored as Strings, as well
+                    as W3C and dom4j documents. This functionality deprecates the <a
+                    href="processors-generators#bean-generator">Bean generator</a>. These two
+                    processors previously had some overlap in functionality.
+                </p>
+            </section>
+            <section>
                 <title>Error Processor</title>
                 <p>
                     The error processor now follows the same configuration mechanism as the main

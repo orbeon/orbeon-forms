@@ -40,7 +40,7 @@
             <pre>
 &lt;p:input
     name = <emph>ncname</emph>
-    id? = <emph>ncname</emph>
+    infoset? = <emph>ncname</emph>
     schema-uri? = <emph>uri-reference</emph>
     schema-href? = <emph>uri-reference</emph> /&gt;
             </pre>
@@ -57,14 +57,14 @@
                 It is a static error if two inputs have the same name.
             </p>
             <p>
-                The <el>id</el> attribute is optional. It is an XML Infoset identifier that
+                The <el>infoset</el> attribute is optional. It is an XML Infoset identifier that
                 identifies the XML Infoset associated with the input for use within the XPL
                 program. In particular, the XML Infoset may be referenced with the
-                <el>href</el> attribute on <el>p:input</el> elements within
+                <el>infosetref</el> attribute on <el>p:input</el> elements within
                 <el>p:processor</el> elements.
             </p>
             <p>
-                If the <el>id</el> attribute is missing, the XPL program cannot read the
+                If the <el>infoset</el> attribute is missing, the XPL program cannot read the
                 input. It may make sense to declare an XPL program input without reading it
                 so that external users of the XPL program are aware that the input may be
                 used in a future version of the program.
@@ -80,7 +80,7 @@
             <pre>
 &lt;p:output
     name = <emph>ncname</emph>
-    href = <emph>infoset-reference</emph>
+    infosetref = <emph>infoset-reference</emph>
     schema-uri? = <emph>uri-reference</emph>
     schema-href? = <emph>uri-reference</emph> /&gt;
             </pre>
@@ -98,11 +98,11 @@
                 two outputs have the same name.
             </p>
             <p>
-                The <el>href</el> attribute is mandatory. It identifies the XML Infoset that
+                The <el>infosetref</el> attribute is mandatory. It identifies the XML Infoset that
                 must be produced by the XPL program in association with the output.
             </p>
             <p>
-                The Infoset reference contained by the <el>href</el> attribute may refer to
+                The Infoset reference contained by the <el>infosetref</el> attribute may refer to
                 any XML Infoset identifier in scope after the last statement of the XPL program.
                 See <specref ref="infoset-reference"/> for the detailed syntax.
             </p>
@@ -134,7 +134,7 @@
             </p>
             <p>
                 The set of XML Infoset identifiers exposed by a <el>p:processor</el>
-                statement consists of the set of identifiers declared with the <el>id</el>
+                statement consists of the set of identifiers declared with the <el>infoset</el>
                 attribute on the nested <el>p:output</el> elements, if any.
             </p>
             <p>
@@ -159,7 +159,7 @@
             <pre>
 &lt;p:input
     name = <emph>ncname</emph>
-    href? = <emph>infoset-reference</emph>
+    infosetref? = <emph>infoset-reference</emph>
     schema-uri? = <emph>uri-reference</emph>
     schema-href? = <emph>uri-reference</emph> &gt;
     &lt;!-- Content: (embedded-infoset)? --&gt;
@@ -170,15 +170,15 @@
                 mandatory <el>name</el> attribute.
             </p>
             <p>
-                If the <el>href</el> attribute is missing, there must be an embedded Infoset as a
+                If the <el>infosetref</el> attribute is missing, there must be an embedded Infoset as a
                 child of the <el>p:input</el> element. In that case, there must be exactly one child
                 element of the <el>p:input</el> element. If no element is present or more than one
-                element is present, a static error must be raised. If the <el>href</el> attribute is
+                element is present, a static error must be raised. If the <el>infosetref</el> attribute is
                 present and the <el>p:input</el> element has one or more children, a static error
                 must be raised.
             </p>
             <p>
-                The Infoset reference contained by the <el>href</el> attribute may refer to
+                The Infoset reference contained by the <el>infosetref</el> attribute may refer to
                 any XML Infoset identifier in scope for the parent <el>p:processor</el>. See
                 <specref ref="infoset-reference"/> for the detailed syntax.
             </p>
@@ -198,7 +198,7 @@
             <pre>
 &lt;p:output
     name = <emph>ncname</emph>
-    id = <emph>ncname</emph>
+    infoset = <emph>ncname</emph>
     schema-uri? = <emph>uri-reference</emph>
     schema-href? = <emph>uri-reference</emph> &gt;
 &lt;/p:output&gt;
@@ -209,7 +209,7 @@
                 attribute.
             </p>
             <p>
-                The mandatory <el>id</el> element assigns an XML Infoset identifier with
+                The mandatory <el>infoset</el> element assigns an XML Infoset identifier with
                 the particular output.
             </p>
             <p>
@@ -236,7 +236,7 @@
             <head>The <el>p:choose</el> Element</head>
             <pre>
 &lt;p:choose
-    href = <emph>infoset-reference</emph> &gt;
+    infosetref = <emph>infoset-reference</emph> &gt;
     &lt;!-- Content: (p:output*, p:when+, p:otherwise?) --&gt;
 &lt;/p:choose&gt;
             </pre>
@@ -254,7 +254,7 @@
             <p>
                 Conditions are expressed by children <el>p:when</el> elements using XPath
                 expressions. They are applied to an XML Infoset determined by the
-                mandatory <el>href</el> attribute of the <el>p:choose</el> element.
+                mandatory <el>infosetref</el> attribute of the <el>p:choose</el> element.
             </p>
             <p>
                 The set of XML Infoset identifiers exposed by a <el>p:choose</el> statement is
@@ -267,18 +267,18 @@
             <head>The <el>p:output</el> Element</head>
             <pre>
 &lt;p:output
-    id = <emph>ncname</emph>
-    href = <emph>infoset-reference</emph>
+    infoset = <emph>ncname</emph>
+    infosetref = <emph>infoset-reference</emph>
     schema-uri? = <emph>uri-reference</emph>
     schema-href? = <emph>uri-reference</emph> /&gt;
             </pre>
             <p>
                 The <el>p:output</el> element defines what XML Infoset identifers are exposed by the
                 parent <el>p:choose</el> element. Each <el>p:output</el> element must have an
-                <el>id</el> attribute which defines an XML Infoset identifier to expose.
+                <el>infoset</el> attribute which defines an XML Infoset identifier to expose.
             </p>
             <p>
-                The mandatory <el>href</el> attribute determines the XML Infoset exposed. The
+                The mandatory <el>infosetref</el> attribute determines the XML Infoset exposed. The
                 Infoset reference may refer to XML Infoset identifiers scoped on the parent
                 <el>p:choose</el> element as well as to XML Infoset identifiers scoped in the
                 branches of the <el>p:choose</el> statement.
@@ -286,7 +286,7 @@
             <p>
                 The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset produced by the
-                <el>href</el> attribute as per <specref ref="schema-references-processing"/>.
+                <el>infosetref</el> attribute as per <specref ref="schema-references-processing"/>.
             </p>
         </div3>
         <div3>
@@ -341,7 +341,7 @@
             <p>
                 The set of scoped XML Infoset identifiers after the last statement of a branch must
                 contain the XML Infoset idenfiers referred by all the <el>p:output</el> element's
-                <el>href</el> attribute.
+                <el>infosetref</el> attribute.
             </p>
             <p>
                 A static error must be raised if this condition is not met.
@@ -359,7 +359,7 @@
             <head>The <el>p:for-each</el> Element</head>
             <pre>
 &lt;p:for-each
-    href = <emph>infoset-reference</emph>
+    infosetref = <emph>infoset-reference</emph>
     select = <emph>expression</emph>
     schema-href? <emph>uri-reference</emph>
     schema-uri? <emph>uri-reference</emph> &gt;
@@ -373,7 +373,7 @@
             </p>
             <p>
                 The set of exposed XML Infoset identifiers consists of the single identifier
-                defined by the optional embedded <el>p:output</el> element's <el>id</el>
+                defined by the optional embedded <el>p:output</el> element's <el>infoset</el>
                 attribute. If there is no embedded <el>p:output</el> attribute, the set is
                 empty.
             </p>
@@ -391,7 +391,7 @@
             <p>
                 The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset associated with the
-                <el>href</el> attribute as per <specref ref="schema-references-processing"/>.
+                <el>infosetref</el> attribute as per <specref ref="schema-references-processing"/>.
             </p>
             <note>
                 The no-collision rule applies for statements within a <el>p:for-each</el>
@@ -404,8 +404,8 @@
             <head>The <el>p:output</el> Element</head>
             <pre>
 &lt;p:output
-    href = <emph>infoset-reference</emph>
-    id = <emph>ncname</emph>
+    infosetref = <emph>infoset-reference</emph>
+    infoset = <emph>ncname</emph>
     schema-uri? = <emph>uri-reference</emph>
     schema-href? = <emph>uri-reference</emph> &gt;
 &lt;/p:output&gt;
@@ -416,14 +416,14 @@
                 <el>p:for-each</el> statement.
             </p>
             <p>
-                The mandatory <el>id</el> element exposes an XML Infoset identifier. The
+                The mandatory <el>infoset</el> element exposes an XML Infoset identifier. The
                 identifier must follow the no-collision rule. This means that the identifier
                 must not be present in the set of scoped XML Infoset identifiers for the
                 parent <el>p:for-each</el> statement. The XPL implementation must raise a
                 static error if a collision is detected.
             </p>
             <p>
-                The mandatory <el>href</el> attribute determines the XML Infoset exposed.
+                The mandatory <el>infosetref</el> attribute determines the XML Infoset exposed.
                 The Infoset reference may refer to XML Infoset identifiers scoped on the
                 parent <el>p:for-each</el> element as well as to XML Infoset identifiers
                 scoped after the last statement of the sequence of statements embedded
@@ -431,14 +431,14 @@
             </p>
             <p>
                 For the second category of XML Infoset identifiers, each identifier used by
-                the expression in the <el>href</el> attribute refers to a sequence of XML
+                the expression in the <el>infosetref</el> attribute refers to a sequence of XML
                 Infosets rather than a single XML Infoset as is usually the case. See
                 <specref ref="for-each-execution"/>.
             </p>
             <p>
                 The optional <el>schema-href</el> and <el>schema-uri</el> are documented in <specref
                 ref="schema-references-syntax"/>. They validate the XML Infoset produced by the
-                <el>href</el> attribute as per <specref ref="schema-references-processing"/>.
+                <el>infosetref</el> attribute.
             </p>
         </div3>
     </div2>

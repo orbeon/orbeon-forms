@@ -359,7 +359,7 @@
                 <head>Instances</head>
                 <p>
                     <termdef id="xml-processor-instance" term="XML processor instance">
-                        An <term>XML processor instance</term> designate a specific use of a
+                        An <term>XML processor instance</term> designates a specific use of a
                         processor in a pipeline.
                     </termdef>
                 </p>
@@ -446,8 +446,8 @@
                     </item>
                 </ulist>
                 <p>
-                    In the following table "N/A" is used designate combinations that do not exist
-                    according the above definitions.
+                    In the following table "N/A" is used to designate combinations that do not exist
+                    according to the above definitions.
                 </p>
                 <p>
                     <table border="1" align="center">
@@ -530,7 +530,7 @@
                             errors.
                         </p>
                         <p>
-                            Example 1: An XML processor may generate an error if an XML Infoset
+                            Example 1: An XML processor may generate an error if the XML Infoset
                             read on any of its inputs does not conform to a format expected by the
                             XML processor. Similarly, the interaction with other software may cause
                             the XML processor to report errors.
@@ -615,8 +615,8 @@
                     ref="output-invariance"/>.
                 </termdef>
                 <p>
-                    In XPL, XML Infoset identifiers are exposed by statements using the <el>id</el>
-                    attribute.
+                    In XPL, XML Infoset identifiers are exposed by statements using the
+                    <el>infoset</el> attribute.
                 </p>
             </div2>
             <div2 id="statements">
@@ -638,7 +638,7 @@
                             identifiers exposed by the statement. There cannot be an intersection
                             between the scoped XML Infoset identifiers and the exposed XML Infoset
                             identifiers. For example, a statement can attempt to expose, with an
-                            <el>id</el> attribute on a <el>p:output</el> element, an XML Infoset
+                            <el>infoset</el> attribute on a <el>p:output</el> element, an XML Infoset
                             identifier already present in the set of scoped XML Infoset identifiers.
                             Such a condition must raise a static error. This is referred to as the
                             <emph>no-collision rule</emph>.
@@ -664,7 +664,7 @@
                 <p>
                     If there is no such previous statement, the set of XML Infoset identifiers in
                     scope for a statement of an XPL program, unless specified otherwise, consists of
-                    the set of identifiers specified by the <el>id</el> attributes of the XPL
+                    the set of identifiers specified by the <el>infoset</el> attributes of the XPL
                     program inputs. In other words, this condition applies to the first statement of
                     an XPL program.
                 </p>
@@ -752,11 +752,11 @@
                 (BNF)-like syntax:
             </p>
             <pre>
-href              ::= ( local_reference | uri_reference | aggregation | current ) [ xpointer ]
-local_reference   ::= "#" id
+infosetref        ::= ( local_reference | uri_reference | aggregation | current ) [ xpointer ]
+local_reference   ::= "#" infosetid
 aggregation       ::= "aggregate(" qname "," agg_parameter_1 [", " agg_parameter_2 ...] ")"
 current           ::= "current()"
-agg_parameter     ::= href [ "," agg_parameter ]
+agg_parameter     ::= infosetref [ "," agg_parameter ]
 xpointer          ::= "#xpointer(" xpath_expression ")"
             </pre>
             <div2>

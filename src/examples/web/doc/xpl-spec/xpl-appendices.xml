@@ -472,13 +472,6 @@
                 </item>
                 <item>
                     <p>
-                       The standard for actual XML identifiers is now <el>xml:id</el>, but the use
-                       of the attribute <el>id</el> in XPL as XML Infoset identifier may be
-                       confusing to newcomers.
-                    </p>
-                </item>
-                <item>
-                    <p>
                        Should the XPL schema be open, i.e. accept elements and attributes in foreign
                        namespaces?
                     </p>
@@ -494,16 +487,16 @@
                 </item>
                 <item>
                     <p>
-                       Another solution to the schema reference question could be to looks at using
+                       Another solution to the schema reference question could be to look at using
                        XML catalogs.
                     </p>
                 </item>
                 <item>
                     <p>
-                       Pipeline inputs could provide a default XML Infoset using the <el>href</el>
+                       Pipeline inputs could provide a default XML Infoset using the <el>infosetref</el>
                        attribute. This would implicitly define such pipeline inputs as optional
                        static inputs. If connected from outside, the XML Infoset referred to by the
-                       <el>href</el> attribute is ignored. If not connected, the XML Infoset
+                       <el>infosetref</el> attribute is ignored. If not connected, the XML Infoset
                        referred to internally is used.
                     </p>
                 </item>

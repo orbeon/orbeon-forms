@@ -24,7 +24,7 @@
     <div2 id="output-invariance">
         <head>Output Invariance</head>
         <p>
-            Multiple statements may consume XML Infoset in an XPL program by referencing the same
+            Multiple statements may consume XML Infosets in an XPL program by referencing the same
             XML Infoset identifier. These consumers may request the XML Infoset at different times
             during program execution. The XPL implementation must make sure that the XML Infoset
             read by those different processors is the same for a given execution of a sequence of
@@ -47,7 +47,7 @@
             <item>
                 <p>
                     The <el>p:input</el> element contains an embedded XML Infoset, or has a
-                    valid <el>href</el> attribute. See <specref ref="infoset-reference"/>.
+                    valid <el>infosetref</el> attribute. See <specref ref="infoset-reference"/>.
                 </p>
             </item>
         </ulist>
@@ -249,7 +249,7 @@
         </p>
         <p>
             After the initialization phase, the XPL implementation may request XML Infosets
-            associated with XPL program outputs. To achieve this, <el>href</el> attribute associated
+            associated with XPL program outputs. To achieve this, <el>infosetref</el> attribute associated
             with the XPL program output to read is evaluated. This may cause requesting one or more
             XML Infosets exposed by the sequence of statements, therefore executing one or more read
             phases on the sequence of statements.
@@ -267,7 +267,7 @@
             <item>
                 <p>
                     Obtaining the XML Infoset associated with the <el>p:choose</el>
-                    element's <el>href</el> attribute. The expression is evaluated, and may
+                    element's <el>infosetref</el> attribute. The expression is evaluated, and may
                     cause requesting one or more XML Infosets in scope.
                 </p>
             </item>
@@ -317,7 +317,7 @@
             <item>
                 <p>
                     Obtaining the XML Infoset associated with the <el>p:for-each</el>
-                    element's <el>href</el> attribute. The expression is evaluated, and may
+                    element's <el>infosetref</el> attribute. The expression is evaluated, and may
                     cause requesting one or more scoped XML Infosets.
                 </p>
             </item>
@@ -347,7 +347,7 @@
             <item>
                 <p>
                     If there is a nested <el>p:output</el> element, the expression on the
-                    <el>href</el> attribute of the embedded <el>p:output</el> element,
+                    <el>infosetref</el> attribute of the embedded <el>p:output</el> element,
                     called the <emph>output expression</emph>, must be evaluated. It may
                     refer to XML Infoset identifiers of two types:
                 </p>
@@ -378,7 +378,7 @@
                     When the embedded sequence of statements has been executed a number of
                     times equal to the number of elements in the iteration sequence, the
                     output expression must have produced a complete XML Infoset. That XML
-                    Infoset is associated with the identifier on the <el>id</el> attribute
+                    Infoset is associated with the identifier on the <el>infoset</el> attribute
                     of the <el>p:output</el> element.
                 </p>
             </item>

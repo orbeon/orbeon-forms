@@ -25,7 +25,7 @@
             <section>
                 <title>XForms</title>
                 <section>
-                    <anchor id="2.6-xforms"/>
+                    <a name="2.6-xforms"/>
                     <title>XForms Upload</title>
                     <p>
                         The XForms Upload control has been fixed. It comes with an <a

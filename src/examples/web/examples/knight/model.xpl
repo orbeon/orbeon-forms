@@ -18,7 +18,7 @@
     <p:param type="output" name="data"/>
 
     <!-- We encapsulate tour.xsl so that we can set a parameter -->
-     <p:processor name="oxf:xslt">
+    <p:processor name="oxf:xslt">
         <p:input name="data" href="#instance"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">

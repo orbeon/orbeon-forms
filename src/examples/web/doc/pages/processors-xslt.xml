@@ -18,7 +18,7 @@
           xmlns:xforms="http://www.w3.org/2002/xforms"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <header>
-        <title>XSLT and TrAX Processors</title>
+        <title>XSLT and JAXP Processors</title>
     </header>
     <body>
         <section>
@@ -39,7 +39,8 @@
                 <li>Saxon 8.1.1 (supporting a large subset of XSLT 2.0)</li>
             </ul>
 
-            <p>Additionally, Presentation Server can use any JAXP (TrAX) compliant transformer.</p>
+            <p>Additionally, Presentation Server can use any Java API for XML Processing (JAXP)
+            compliant transformer.</p>
         </section>
         <section>
             <title>Usage</title>
@@ -85,27 +86,27 @@
                     <tr>
                         <td>oxf:generic-xslt-1.0</td>
                         <td>XSLT 1.0</td>
-                        <td>Any TrAX XSLT 1.0 transformer</td>
+                        <td>Any JAXP (TrAX) XSLT 1.0 transformer</td>
                     </tr>
                     <tr>
                         <td>oxf:generic-xslt-2.0</td>
                         <td>XSLT 2.0</td>
-                        <td>Any TrAX XSLT 2.0 transformer</td>
+                        <td>Any JAXP (TrAX) XSLT 2.0 transformer</td>
                     </tr>
                     <tr>
                         <td>oxf:xslt-1.0</td>
                         <td>XSLT 1.0</td>
-                        <td>Default TrAX XSLT 1.0 transformer (currently Xalan)</td>
+                        <td>Default JAXP (TrAX) XSLT 1.0 transformer (currently Xalan)</td>
                     </tr>
                     <tr>
                         <td>oxf:xslt-2.0</td>
                         <td>XSLT 2.0</td>
-                        <td>Default TrAX XSLT 2.0 transformer (currently Saxon 8)</td>
+                        <td>Default JAXP (TrAX) XSLT 2.0 transformer (currently Saxon 8)</td>
                     </tr>
                     <tr>
                         <td>oxf:trax</td>
                         <td>Any</td>
-                        <td>Any TrAX transformer</td>
+                        <td>Any JAXP (TrAX) transformer</td>
                     </tr>
                 </table>
             </p>
@@ -151,8 +152,8 @@
                     <link
                         href="http://java.sun.com/j2se/1.4.2/docs/api/javax/xml/transform/TransformerFactory.html">
                         <code>TransformerFactory</code>
-                    </link>. For example, you can use the TrAX transformer
-                    to interface Presentation Server with a new hypothetical transformer (MyTrans):
+                    </link>. For example, you can use the TrAX transformer to interface
+                    Presentation Server with a new hypothetical transformer (MyTrans):
 
 
                     <xml-source>
@@ -259,6 +260,48 @@
                     <new-root>ab</new-root>
                 </xml-source>
             </section>
+        </section>
+        <section>
+            <title>Passing Parameters to XSLT Stylesheets</title>
+            <p>
+                XSLT supports <code>xsl:param</code> elements at the top level of a stylesheet. They
+                allow passing parameters to the stylesheet, without modifying the stylesheet
+                itself. With API such as JAXP, a programmer can associate values to those
+                parameters, making them available to the stylesheet during execution.
+            </p>
+            <p>
+                XPL does not have a particular mechanism to set such stylesheet parameters, but a
+                very simple workaround allows setting them. Assume you have a stylesheet with a
+                <code>start</code> parameter, in a file called <code>my-stylesheet.xsl</code>:
+            </p>
+            <xml-source>
+                <xsl:transform>
+                    <xsl:param name="start" select="'a1'"/>
+                    <comment>...</comment>
+                </xsl:transform>
+            </xml-source>
+            <p>
+                To set the <code>start</code> parameter with XPL, simply encapsulate the
+                <code>my-stylesheet.xsl</code> stylesheet as follows:
+            </p>
+            <xml-source>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#stylesheet-input"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0">
+                            <xsl:import href="my-stylesheet.xsl"/>
+                            <xsl:param name="start" select="'a2'"/>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="stylesheet-output"/>
+                </p:processor>
+            </xml-source>
+            <p>
+                The rules of XSLT's <code>import</code> statement will make sure that the imported
+                stylesheet, <code>my-stylesheet.xsl</code>, receives the <code>start</code>
+                parameter with the value "a2", as overridden in the importing stylesheet. Of course,
+                the value does not have to be static, it can be computed dynamically as well.
+            </p>
         </section>
         <section>
             <title>Streaming Transformations for XML (STX)</title>

@@ -11,18 +11,19 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-            xmlns:xforms="http://www.w3.org/2002/xforms"
-            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-            xmlns:f="http://orbeon.org/oxf/xml/formatting"
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xsl:version="2.0">
-    <xhtml:head><xhtml:title>Google Spell Checker</xhtml:title></xhtml:head>
-    <xhtml:body>
+<html xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns="http://www.w3.org/1999/xhtml"
+        xsl:version="2.0">
+    <head><title>Google Spell Checker</title></head>
+    <body>
         <xforms:group ref="form">
             <xsl:choose>
                 <xsl:when test="/null">
-                    <table border="0" cellpadding="10" cellspacing="0">
+                    <table>
                         <tr>
                             <td valign="top">Enter the text to spellcheck:</td>
                             <td colspan="2">
@@ -46,14 +47,14 @@
                     </table>
                 </xsl:when>
                 <xsl:when test="/error">
-                    <xhtml:p>
+                    <p>
                         <font color="red"><xsl:value-of select="."/></font>
-                    </xhtml:p>
+                    </p>
                 </xsl:when>
                 <xsl:otherwise>
-                    <table border="0" cellpadding="10" cellspacing="0">
+                    <table class="gridtable">
                         <tr>
-                            <td>Corrected text:</td>
+                            <th>Corrected text:</th>
                             <td class="bodytd">
                                 <xsl:for-each select="/correction/word">
                                     <xsl:if test="position() > 1">
@@ -78,5 +79,5 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xforms:group>
-    </xhtml:body>
-</xhtml:html>
+    </body>
+</html>

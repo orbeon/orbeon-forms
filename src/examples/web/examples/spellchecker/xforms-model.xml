@@ -11,11 +11,15 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:xu="http://www.xmldb.org/xupdate">
-
-    <page path-info="/spellchecker" xforms="xforms-model.xml" model="model.xpl" view="view.xsl"/>
-
-    <epilogue url="oxf:/config/epilogue.xpl"/>
-
-</config>
+<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+    <xforms:instance>
+        <form>
+            <action/>
+            <text>Presentation Server is the most avanced XML plaform for
+building e-business applications based on industy standards
+(W3C, OASIS, JCP) and proven Java/J2EE technologies. It
+stands out in a crowd of existing J2EE frameworks by fully
+leveraging the ubiquity and the fleibility of XML.</text>
+        </form>
+    </xforms:instance>
+</xforms:model>

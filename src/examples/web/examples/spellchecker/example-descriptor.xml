@@ -13,7 +13,8 @@
 -->
 <example-descriptor>
     <title>Google Spell Checker</title>
-    <source>form.xml</source>
+    <source>page-flox.xml</source>
+    <source>xforms-model.xml</source>
     <source>model.xpl</source>
     <source>check.xpl</source>
     <source>view.xsl</source>

@@ -22,7 +22,7 @@
     <property name="lib.dir" location="lib"/>
     <property name='forge-ssh-id' value='orbeonbld2@shell.forge.objectweb.org' />
     <property name='unstbl-bld-dst' value='/var/lib/gforge/nightlybuilds/pres-server/pres-server/' />
-    <property name='local-repos' value='/home/cvs/objectweb-src/orbeon' />
+    <property name='local-repos' value=':local:/home/cvs/objectweb-src' />
 
     <fileset id='war.libs' dir="${lib.dir}">
         <include name="dom4j-1_4_orbeon.jar"/>
@@ -439,7 +439,7 @@
 
 
         <cvs command='tag TAG_OPS_${ops-version}'
-            cvsRoot=':local:${local-repos}' failonerror='true'/>
+            cvsRoot='${local-repos}' failonerror='true'/>
 
         <echo message="Deploying to ${deployDir}/${release.number}"/>
 

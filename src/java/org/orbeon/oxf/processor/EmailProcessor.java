@@ -235,9 +235,9 @@ public class EmailProcessor extends ProcessorImpl {
             // Content of the part is inline
 
             // In the cases of text/html and XML, there must be exactly one root element
-            boolean needsRootElement = "text/html".equals(contentType) || ProcessorUtils.isXMLContentType(contentType);
+            boolean needsRootElement = "text/html".equals(contentType);// || ProcessorUtils.isXMLContentType(contentType);
             if (needsRootElement && partOrBodyElement.elements().size() != 1)
-                throw new ValidationException("The <part> element must contain exactly one element for text/html and XML",
+                throw new ValidationException("The <body> or <part> element must contain exactly one element for text/html",
                         (LocationData) partOrBodyElement.getData());
 
             // Create Document and convert it into a String

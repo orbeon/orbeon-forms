@@ -175,24 +175,21 @@
             <item>
                 <p>
                     A list of statements in the sequence that do not have any connected output is
-                    established in document order (in the order they appear in the XPL
-                    program). Each statement in the list is then <emph>initialized</emph> in
-                    that order.
+                    established in document order (in the order they appear in the XPL program).
+                    Each statement in the list is then <emph>initialized</emph> in that order.
                 </p>
             </item>
             <item>
                 <p>
-                    During the initialization of an statement, that statement may read one
-                    or more of its inputs. When doing so, control is passed to the XPL
-                    implementation again. The XPL implementation must then obtain the XML
-                    Infoset associated with that input, possibly by evaluating an
-                    expression. That expression may refer to one or more XML Infoset
-                    identifier. The XPL implementation must obtain those XML Infoset
-                    identifiers in turn, by executing read phases on the statements exposing
+                    During the initialization of a statement, that statement may read one or more
+                    of its inputs. When doing so, control is passed to the XPL implementation again.
+                    The XPL implementation must then obtain the XML Infoset associated with that
+                    input, possibly by evaluating an expression. That expression may refer to one or
+                    more XML Infoset identifier. The XPL implementation must obtain those XML
+                    Infoset identifiers in turn, by executing read phases on the statements exposing
                     those identifiers. When XML Infosets associated with all the XML Infoset
-                    identifiers used by the expression are obtained, the XML Infoset
-                    associated with the input is complete, and control is returned to the
-                    statement.
+                    identifiers used by the expression are obtained, the XML Infoset associated with
+                    the input is complete, and control is returned to the statement.
                 </p>
             </item>
         </olist>
@@ -211,13 +208,12 @@
             </item>
             <item>
                 <p>
-                    The XML Infoset associated with the XML Infoset identifier
-                    <emph>i</emph> is requested from the statement by starting a read phase. The
-                    XPL implementation may decide to store the XML Infoset to fulfill
-                    further requests associated with <emph>i</emph>, and return the stored
-                    XML Infoset when possible. How this is achieve is implementation
-                    dependent, but in all cases output invariance must be guaranteed. See
-                    <specref ref="output-invariance"/>.
+                    The XML Infoset associated with the XML Infoset identifier <emph>i</emph> is
+                    requested from the statement by starting a read phase. The XPL implementation
+                    may decide to store the XML Infoset to fulfill further requests associated with
+                    <emph>i</emph>, and return the stored XML Infoset when possible. How this is
+                    achieved is implementation dependent, but in all cases output invariance must
+                    be guaranteed. See <specref ref="output-invariance"/>.
                 </p>
             </item>
             <item>
@@ -284,9 +280,9 @@
             </item>
             <item>
                 <p>
-                    If the branches export at least XML Infoset identifier, the selected
-                    branch is considered a sequence of statements and is executed like a regular
-                    sequence of statements.
+                    If the branches export at least one XML Infoset identifier, the selected branch
+                    is considered a sequence of statements and is executed like a regular sequence
+                    of statements.
                 </p>
             </item>
         </ulist>

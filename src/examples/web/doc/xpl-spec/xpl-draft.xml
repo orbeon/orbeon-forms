@@ -371,22 +371,22 @@
                 </p>
                 <p>
                     <termdef id="static-input-output" term="static input or output">
-                        A <term>static input or output</term> designate an input or output defined by an
+                        A <term>static input or output</term> is an input or output defined by an
                         <termref def="xml-processor">XML processor</termref> before the execution of
                         the <termref def="xpl-program">XPL program</termref>.
                     </termdef>
                 </p>
                 <p>
                     <termdef id="connected-input-output" term="connected input of output">
-                        A <term>connected input or output</term> designate an input or output of an XML
+                        A <term>connected input or output</term> is an input or output of an XML
                         processor instance declared in an <termref def="xpl-program">XPL
                         program</termref>.
                     </termdef>
                 </p>
                 <p>
                     <termdef id="dynamic-input-output" term="dynamic input of output">
-                        A <term>dynamic input or output</term> designate a connected input or output of
-                        an XML processor instance which is not defined by the XML processor before the
+                        A <term>dynamic input or output</term> is a connected input or output of an
+                        XML processor instance which is not defined by the XML processor before the
                         execution of the <termref def="xpl-program">XPL program</termref>
                     </termdef>
                 </p>
@@ -397,32 +397,32 @@
                     <item>
                         <p>
                             <emph>A set of inputs each identified by a name.</emph> No two inputs
-                            input may have the same name. The set of inputs may be empty.
+                            may have the same name. The set of inputs may be empty.
                         </p>
                     </item>
                     <item>
                         <p>
                             <emph>A set of outputs each identified by a name.</emph> No two outputs
-                            output may have the same name. The set of outputs may be empty.
+                            may have the same name. The set of outputs may be empty.
                         </p>
                     </item>
                 </ulist>
                 <p>
-                    For each static input or output, the XML processor defines if the input or
+                    For each static input or output, the XML processor defines whether the input or
                     output is:
                 </p>
                 <ulist>
                     <item>
                         <p>
-                            <emph>Mandatory.</emph> Such input or output must be connected in an XPL
-                            program. The XPL implementation should raise a static error if a
+                            <emph>Mandatory.</emph> Such an input or output must be connected in an
+                            XPL program. The XPL implementation should raise a static error if a
                             statically defined mandatory input or output is not connected for a
                             given XML processor instance.
                         </p>
                     </item>
                     <item>
                         <p>
-                            <emph>Optional.</emph> Such input or output may or may not be connected
+                            <emph>Optional.</emph> Such an input or output may or may not be connected
                             in an XPL program.
                         </p>
                     </item>
@@ -715,9 +715,8 @@
             <pre>
 href              ::= ( local_reference | uri_reference | aggregation | current ) [ xpointer ]
 local_reference   ::= "#" id
-aggregation       ::= "aggregate(" root_element_qname "," agg_parameter ")"
+aggregation       ::= "aggregate(" qname "," agg_parameter_1 [", " agg_parameter_2 ...] ")"
 current           ::= "current()"
-root_element_name ::= "'"  name "'"
 agg_parameter     ::= href [ "," agg_parameter ]
 xpointer          ::= "#xpointer(" xpath_expression ")"
             </pre>
@@ -795,12 +794,14 @@ fn:aggregate($root as <emph>xs:QName</emph>, $arg1 as <emph>node()*</emph>, ...)
                     </item>
                 </ulist>
                 <p>
-                    The following arguments of <code>aggregate()</code> are of type
-                    <code>node()*</code>, in other words a sequence of nodes as defined by <bibref
-                    ref="xpath-20"/>, with the exception that attribute nodes and namespace nodes
-                    are not allowed. This is consistent with the acquired Infoset defined in <bibref
-                    ref="xinclude"/>. The Infoset associated with each node in the sequence is added
-                    as child information items to the document element information item.
+                    The <code>aggregate()</code> function can take, in additoin to the first element
+                    specifying the QName, one or more additonal arguments. Each of those arguments
+                    is of type <code>node()*</code>, in other words a sequence of nodes as defined
+                    by <bibref ref="xpath-20"/>, with the exception that attribute nodes and
+                    namespace nodes are not allowed. The types returned are consistent with the
+                    acquired Infoset defined in <bibref ref="xinclude"/>. The Infoset associated
+                    with each node in the sequence is added as child information items to the
+                    document element information item.
                 </p>
             </div2>
             <div2>
@@ -840,7 +841,7 @@ fn:current() as <emph>document-node()</emph>
                     processor library, that must be implemented by any conformant implementation.
                     All the XML processors are identified with a <termref
                     def="qname">QName</termref> with URI
-                    <code>http://www.orbeon.com/oxf/pipeline</code>. The recommended namespace
+                    <code>http://www.orbeon.com/oxf/xpl/standard</code>. The recommended namespace
                     prefix for that QName is <code>xpl</code>.
                 </p>
             </div2>
@@ -857,7 +858,7 @@ fn:current() as <emph>document-node()</emph>
                     <p>
                         The Identity processor is identified by a <termref
                         def="qname">QName</termref> with URI
-                        <code>http://www.orbeon.com/oxf/pipeline</code> and local name
+                        <code>http://www.orbeon.com/oxf/xpl/standard</code> and local name
                         <code>identity</code>. It statically exposes an input called <el>data</el>
                         and an output called <el>data</el> as well.
                     </p>
@@ -884,7 +885,7 @@ fn:current() as <emph>document-node()</emph>
                     <p>
                         The Pipeline processor is identified by a <termref
                         def="qname">QName</termref> with URI
-                        <code>http://www.orbeon.com/oxf/pipeline</code> and local name
+                        <code>http://www.orbeon.com/oxf/xpl/standard</code> and local name
                         <code>pipeline</code>. It statically exposes an input called
                         <el>pipeline</el>. It may also dynamically expose other inputs and outputs
                         as defined below.
@@ -904,9 +905,9 @@ fn:current() as <emph>document-node()</emph>
                         does, the Pipeline processor must raise a dynamic error.
                     </p>
                     <p>
-                        The Pipeline processor must connect the inputs of <emph>p</emph> to it's
-                        own inputs with the same names, as follows. For each input <emph>i</emph>
-                        of <emph>p</emph> with name <code>n</code>:
+                        The Pipeline processor must connect the inputs of <emph>p</emph> to its own
+                        inputs with the same names, as follows. For each input <emph>i</emph> of
+                        <emph>p</emph> with name <code>n</code>:
                     </p>
                     <ulist>
                         <item>
@@ -987,7 +988,7 @@ fn:current() as <emph>document-node()</emph>
                     <p>
                         The Null Serializer processor is identified by a <termref
                         def="qname">QName</termref> with URI
-                        <code>http://www.orbeon.com/oxf/pipeline</code> and local name
+                        <code>http://www.orbeon.com/oxf/xpl/standard</code> and local name
                         <code>null-serializer</code>. It statically exposes an input called
                         <el>data</el>.
                     </p>
@@ -1089,7 +1090,7 @@ fn:current() as <emph>document-node()</emph>
                             <emph>XPath 2.0.</emph> In this case, <bibref ref="xpath-20"/> must be
                             supported. In this case XPL is the <emph>host language</emph>. It should
                             not provide any in-scope schema definitions in the static context; it
-                            shoud provide the types defined by XML Schema as in-scope type
+                            should provide the types defined by XML Schema as in-scope type
                             definitions in the static context; it should not provide any in-scope
                             variable.
                         </p>

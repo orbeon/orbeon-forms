@@ -404,10 +404,10 @@
                             <p>It can appear confusing to users, especially beginners.</p>
                         </item>
                         <item>
-                            <p>Some use cases imvolving such processors are difficult to implement.</p>
+                            <p>Some use cases involving such processors are difficult to implement.</p>
                         </item>
                         <item>
-                            <p>Some use cases involving the controled order of execution of such
+                            <p>Some use cases involving the controlled order of execution of such
                             processors are difficult to implement.</p>
                         </item>
                     </ulist>

@@ -14,9 +14,8 @@
         <head>Namespace</head>
         <p>
             All the elements defined by XPL must be in the
-            <code>http://www.orbeon.com/oxf/pipeline</code> namespace. For consistency, XPL
-            elements should use the prefix <code>p</code>. This document assumes that this prefix is
-            used.
+            <code>http://www.orbeon.com/oxf/xpl</code> namespace. For consistency, XPL elements
+            should use the prefix <code>p</code>. This document assumes that this prefix is used.
         </p>
     </div2>
     <div2>
@@ -101,10 +100,10 @@ schema-href? = <emph>uri-reference</emph> /&gt;
                 XPL program.
             </p>
             <p>
-                The <el>name</el> attribute is mandatory. It identifies the output to
-                external users of the XPL program. There cannot be two output with the same
-                name, but it is possible to have an output and an input with the same name.
-                It is a static error if two outputs have the same name.
+                The <el>name</el> attribute is mandatory. It identifies the output to external users
+                of the XPL program. There cannot be two outputs with the same name, but it is
+                possible to have an output and an input with the same name. It is a static error if
+                two outputs have the same name.
             </p>
             <p>
                 The <el>href</el> attribute is mandatory. It identifies the XML Infoset that
@@ -349,9 +348,8 @@ test = <emph>expression</emph> &gt;
             </p>
             <p>
                 The set of scoped XML Infoset identifiers after the last statement of a branch must
-                contain the XML Infoset idenfiers refered by all the <el>p:output</el> element's
-                <el>href</el> attribute that are not in scope for the parent <el>p:choose</el>
-                statement.
+                contain the XML Infoset idenfiers referred by all the <el>p:output</el> element's
+                <el>href</el> attribute.
             </p>
             <p>
                 A static error must be raised if this condition is not met.
@@ -373,7 +371,7 @@ href = <emph>infoset-reference</emph>
 select = <emph>expression</emph>
 schema-href? <emph>uri-reference</emph>
 schema-uri? <emph>uri-reference</emph> &gt;
-&lt;!-- Content: (p:output?, (p:processor or p:choose or p:for-each)*) --&gt;
+&lt;!-- Content: (p:output?, (p:processor | p:choose | p:for-each)*) --&gt;
 &lt;/p:for-each&gt;
             </pre>
             <p>

@@ -389,7 +389,6 @@
                 This appendix identifies open issues with this specification:
             </p>
             <olist>
-
                 <item>
                     <p>
                         While the execution model for processors with outputs has been well
@@ -437,6 +436,16 @@
                 </item>
                 <item>
                     <p>
+                       The reuse of <el>p:input</el> and <el>p:output</el> in multiple places may
+                       appear confusing. Pipeline inputs and outputs could use <el>p:with-input</el>
+                       and <el>p:with-output</el>. Reuse between <el>p:processor</el>,
+                       <el>p:choose</el> and <el>p:for-each</el> is subject to discussion. A
+                       proliferation of names and increase in syntactic overhead are probably not
+                       desirable.
+                    </p>
+                </item>
+                <item>
+                    <p>
                         XPL must have a company-agnostic namespace used for the elements of its
                         syntax and for the Standard XML Processor Library. This can be done once the
                         specification has found a host organization.
@@ -449,7 +458,23 @@
                         logging the XML Infoset going through the associated input or output. It is
                         found that the term "debug" is not appropriate, and that there may be a
                         better way to construct the tracing facility. Optionally, this could be
-                        implementation-dependent and controlled by foreign attributes.
+                        implementation-dependent and controlled by foreign attributes. The current
+                        thinking is that an attribute named <el>trace</el> could be standardized.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                       The use of <code>#</code> to refer to XML Infosets may not be in line with
+                       the accepted use of such because in XPL there is a notion of scoping. An
+                       alternative way of refererring to XML Infoset identifiers may have to be
+                       proposed.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                       The standard for actual XML identifiers is now <el>xml:id</el>, but the use
+                       of the attribute <el>id</el> in XPL as XML Infoset identifier may be
+                       confusing to newcomers.
                     </p>
                 </item>
                 <item>
@@ -465,6 +490,12 @@
                        convention? Because XSLT 2.0 is based on XML Schema, <el>namespace</el>
                        refers to a schema for that namespace. Right now in XPL, it is just a
                        convenient indirection.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                       Another solution to the schema reference question could be to looks at using
+                       XML catalogs.
                     </p>
                 </item>
                 <item>

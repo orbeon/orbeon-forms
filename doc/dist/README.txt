@@ -43,6 +43,9 @@ The source code is distributed under the terms of the GNU Lesser
 General Public License (LGPL).  The full text of the license is
 available at http://www.gnu.org/copyleft/lesser.html.
 
+This software is OSI Certified Open Source Software.
+OSI Certified is a certification mark of the Open Source Initiative.
+
 The documentation is subject to the following terms:
 
     * Conversion to other formats is allowed, but the actual content
@@ -57,7 +60,6 @@ The documentation is subject to the following terms:
 See section 9 for more details about the licenses of included
 third-party software.
 
-Please contact Orbeon at info@orbeon.com for more information.
 
 ************************************
 3. New Features
@@ -150,6 +152,10 @@ Here are some pointers to useful information related to this release.
       orbeon-user mailing-list:
 
         http://sourceforge.net/mail/?group_id=116683
+
+    * For commercial support and licensing alternatives, please contact:
+
+        info@orbeon.com
 
 
 ************************************

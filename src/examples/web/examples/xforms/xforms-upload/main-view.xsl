@@ -20,7 +20,7 @@
     <xhtml:head><xhtml:title>XForms Upload</xhtml:title></xhtml:head>
     <xhtml:body>
         <xsl:variable name="uploaded" select="/result/urls/url != ''" as="xs:boolean"/>
-        <xsl:variable name="container-type" select="/result/request/container-type" as="xs:string"/>
+        <xsl:variable name="in-portlet" select="/result/request/container-type = 'portlet'" as="xs:boolean"/>
         <xsl:if test="/result/message">
             <p style="color: red">
                 <xsl:value-of select="/result/message"/>
@@ -69,7 +69,7 @@
                     <td>
 
                         <xf:submit>
-                            <xsl:if test="$container-type = 'portlet'">
+                            <xsl:if test="$in-portlet">
                                 <xsl:attribute name="xhtml:disabled">true</xsl:attribute>
                             </xsl:if>
                             <xf:label>Upload</xf:label>
@@ -77,12 +77,20 @@
                         </xf:submit>
                     </td>
                     <td>
-                        This works only outside of the portal. Click
-                        <xf:submit xxf:appearance="link">
-                            <xf:label>here</xf:label>
-                            <xf:setvalue ref="action">goto-simple-upload</xf:setvalue>
-                        </xf:submit>
-                        to try.
+                        This works only outside of the portal.
+                        <xsl:choose>
+                            <xsl:when test="$in-portlet">
+                                Click
+                                <xf:submit xxf:appearance="link">
+                                    <xf:label>here</xf:label>
+                                    <xf:setvalue ref="action">goto-simple-upload</xf:setvalue>
+                                </xf:submit>
+                                to try.
+                            </xsl:when>
+                            <xsl:otherwise>
+                                You can try it now.
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </td>
                 </tr>
                 <tr>

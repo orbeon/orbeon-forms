@@ -16,7 +16,7 @@
 
     <page path-info="/example-resources/xml-to-url/doc" model="url-to-xml.xpl"/>
 
-    <page path-info="*" xforms="form.xml" model="model.xpl" view="view.xsl"/>
+    <page path-info="*" xforms="xforms-model.xml" model="model.xpl" view="view.xsl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

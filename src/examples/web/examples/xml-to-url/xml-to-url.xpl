@@ -27,7 +27,10 @@
 
     <p:processor name="oxf:request">
         <p:input name="config">
-            <config><include>/*</include></config>
+            <config>
+                <include>/*</include>
+                <exclude>/request/body</exclude>
+            </config>
         </p:input>
         <p:output name="data" id="request"/>
     </p:processor>

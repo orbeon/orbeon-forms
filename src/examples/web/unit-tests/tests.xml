@@ -36,6 +36,7 @@
 <!--    <xi:include href="tests-tamino.xml"/>-->
 <!--    <xi:include href="tests-ldap.xml"/>-->
     <xi:include href="tests-email.xml"/>
+    <xi:include href="tests-matchers.xml"/>
     <xi:include href="oxf-rewrite/tests.xml"/>
     <xi:include href="url-generator/tests.xml"/>
 
@@ -132,36 +133,6 @@
                 </ultimate-answer-1>
                 <ultimate-answer-2>Congratulations John!</ultimate-answer-2>
             </answers>
-        </output>
-    </test>
-
-    <test description="Perl5 Matcher" name="oxf:perl5-matcher">
-        <input name="data">
-            <text>/a/bc/de.fgh</text>
-        </input>
-        <input name="config">
-            <regexp>/./(.*)/([^\.]*)\.fgh</regexp>
-        </input>
-        <output name="data">
-            <result>
-                <matches>true</matches>
-                <group>bc</group>
-                <group>de</group>
-            </result>
-        </output>
-    </test>
-
-    <test description="Glob Matcher" name="oxf:glob-matcher">
-        <input name="data">
-            <text>/a/bc/de.fgh</text>
-        </input>
-        <input name="config">
-            <regexp>/?/*/de.fgh</regexp>
-        </input>
-        <output name="data">
-            <result>
-                <matches>true</matches>
-            </result>
         </output>
     </test>
 

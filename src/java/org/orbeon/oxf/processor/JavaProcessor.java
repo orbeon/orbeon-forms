@@ -249,25 +249,28 @@ public class JavaProcessor extends ProcessorImpl {
                 classpath.append(webInfClasses).append(PATH_SEPARATOR);
         }
 
-        // Try to add directory containing current JAR file
+        // Try to add directory containing current JAR file if WEB-INF/lib was not found
         if (!gotLibDir) {
             try {
                 URL url = getClass().getClassLoader().getResource("org/orbeon/oxf/processor/JavaProcessor.class");
                 if (url.getProtocol().equals("jar")) {
+                    // The current class is in a JAR file
                     String file = url.getFile();
                     if (file.indexOf("!") != -1)
                         file = file.substring(0, file.indexOf("!"));
 
-                    if (file.startsWith("file:/"))
+                    if (file.startsWith("file:/")) {
+                        // JAR protocol refers to a local file
                         file = file.substring("file:/".length());
+                        file = URLDecoder.decode(file, "utf-8");
 
-                    file = URLDecoder.decode(file, "utf-8");
+                        if (logger.isDebugEnabled())
+                            logger.debug("Found current JAR file: " + file);
 
-                    if (logger.isDebugEnabled())
-                        logger.debug("Found current JAR file: " + file);
-
-                    File jarDirectory = new File(file).getParentFile();
-                    jarpath.append(jarDirectory.getCanonicalPath()).append(PATH_SEPARATOR);
+                        File jarDirectory = new File(file).getParentFile();
+                        if (jarDirectory.isDirectory())
+                            jarpath.append(jarDirectory.getCanonicalPath()).append(PATH_SEPARATOR);
+                    }
                 }
             } catch (IOException e) {
                 throw new OXFException(e);

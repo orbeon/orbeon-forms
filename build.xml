@@ -283,6 +283,8 @@
         <xslt in="build.xml" style="${descriptors.dir}/web.xsl" out="${war.dir}/WEB-INF/web.xml" force="true">
             <param name="target" expression="${target}"/>
             <param name="build-root" expression="${build.root}"/>
+            <param name="build-root" expression="${build.root}"/>
+            <param name="version-number" expression="${version.number}"/>
         </xslt>
         <!-- Override web.xml with local-web.xml when present -->
         <copy file="${descriptors.dir}/devel/local-web.xml" tofile="${war.dir}/WEB-INF/web.xml"

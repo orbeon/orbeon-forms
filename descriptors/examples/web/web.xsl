@@ -6,6 +6,7 @@
     <!-- Target can be: devel, war, install -->
     <xsl:param name="target"/>
     <xsl:param name="build-root"/>
+    <xsl:param name="version-number"/>
 
     <xsl:output method="xml" indent="yes" xslt:indent-amount="4"
         doctype-public="-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
@@ -13,6 +14,12 @@
 
     <xsl:template match="/">
         <web-app>
+            <display-name>Orbeon PresentationServer <xsl:value-of select="$version-number"/></display-name>
+            <description>
+                Orbeon PresentationServer is an open-source J2EE-based platform used to build
+                XML-centric web applications with standard technologies like XForms, XSLT, and XML
+                pipelines.
+            </description>
             <xsl:comment> Initialize resource manager </xsl:comment>
             <context-param>
                 <param-name>oxf.resources.factory</param-name>

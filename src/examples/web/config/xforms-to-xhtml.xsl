@@ -85,7 +85,7 @@
                         document.forms['wsrp_rewrite_form_{$form-id}'].submit();
                         event.returnValue=false;
                         return false">
-        	        <xsl:copy-of select="@* except (@xhtml:onclick | @xxforms:* | @*[namespace-uri() = ''])"/>
+                    <xsl:copy-of select="@* except (@xhtml:onclick | @xxforms:* | @*[namespace-uri() = ''])"/>
                     <xsl:value-of select="xforms:label"/>
                 </xhtml:a>
             </xsl:when>
@@ -216,6 +216,15 @@
         </xsl:choose>
     </xsl:template>
 
+    <!-- Display label -->
+    <xsl:template match="xforms:*[xforms:label and not(local-name() = ('submit', 'item', 'itemset'))]" priority="7">
+        <xsl:value-of select="if (xforms:label/@xxforms:value != '') 
+            then xforms:label/@xxforms:value else xforms:label"/>
+        <xsl:text>:</xsl:text>
+        <xsl:next-match/>
+    </xsl:template>
+    <xsl:template match="xforms:label"/>
+
     <!-- Alert -->
     <xsl:template match="xforms:*[@xxforms:valid = 'false' and local-name() != 'group']" priority="4">
         <xsl:param name="show-errors" tunnel="yes"/>
@@ -247,9 +256,9 @@
                     <xsl:for-each select="$invalid-controls">
                         <xsl:if test="xforms:alert">
                             <f:alert>
-                        	<xsl:value-of select="if (xforms:alert/@xxforms:value != '') 
-                    		    then xforms:alert/@xxforms:value else xforms:alert"/>
-                	    </f:alert>
+                            <xsl:value-of select="if (xforms:alert/@xxforms:value != '') 
+                                then xforms:alert/@xxforms:value else xforms:alert"/>
+                        </f:alert>
                         </xsl:if>
                     </xsl:for-each>
                 </f:alerts>
@@ -277,9 +286,9 @@
                                     <tr>
                                         <td valign="top"><img src="IMAGEURL"/></td>
                                         <td valign="top" style="padding-left: 1em">
-                                    	    <xsl:copy-of select="if (xforms:help/@xxforms:value != '') 
-                                        	then string(xforms:help/@xxforms:value) else xforms:help/node()"/>
-                                    	</td>
+                                            <xsl:copy-of select="if (xforms:help/@xxforms:value != '') 
+                                            then string(xforms:help/@xxforms:value) else xforms:help/node()"/>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td colspan="2" align="right" style="padding-top: .5em">
@@ -360,7 +369,7 @@
             <xhtml:input type="hidden" name="$submitted" value="true"/>
             <!-- Generate hidden fields for alert, hint, help, and label with a ref -->
             <xsl:for-each select=".//xforms:alert[@ref] | .//xforms:hint[@ref] | .//xforms:help[@ref] | .//xforms:label[@ref]">
-	        <xhtml:input type="hidden" name="{@xxforms:name}" value="{@xxforms:value}"/>
+            <xhtml:input type="hidden" name="{@xxforms:name}" value="{@xxforms:value}"/>
             </xsl:for-each>
             <xsl:apply-templates>
                 <xsl:with-param name="show-errors" select="@xxforms:show-errors" tunnel="yes"/>
@@ -377,22 +386,22 @@
     <xsl:template match="xforms:*[@xxforms:relevant = 'false']" priority="6">
         <xsl:apply-templates select="." mode="no-rendering"/>
     </xsl:template>
-
+    
     <!-- Just display value if readonly -->
     <xsl:template match="xforms:*[@xxforms:readonly = 'true']" priority="2">
-    	<xsl:variable name="value" select="@xxforms:value"/>
-    	<xsl:choose>
-			<xsl:when test="local-name() = 'select1'">
-				<xsl:value-of select=".//xforms:item[xforms:value = $value]/xforms:label"/>
-			</xsl:when>
-			<xsl:when test="local-name() = 'select'">
-				<xsl:value-of select="string-join(.//xforms:item[xforms:value = tokenize($value, ' ')]/xforms:label, ', ')"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:value-of select="@xxforms:value"/>
-			</xsl:otherwise>
-    	</xsl:choose>
-    	<xsl:apply-templates select="." mode="no-rendering"/>
+        <xsl:variable name="value" select="@xxforms:value"/>
+        <xsl:choose>
+            <xsl:when test="local-name() = 'select1'">
+                <xsl:value-of select=".//xforms:item[xforms:value = $value]/xforms:label"/>
+            </xsl:when>
+            <xsl:when test="local-name() = 'select'">
+                <xsl:value-of select="string-join(.//xforms:item[xforms:value = tokenize($value, ' ')]/xforms:label, ', ')"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="@xxforms:value"/>
+            </xsl:otherwise>
+        </xsl:choose>
+        <xsl:apply-templates select="." mode="no-rendering"/>
     </xsl:template>
 
     <!-- If we do not render a control, we need to output a hidden field instead -->

@@ -25,26 +25,25 @@
     </appender> 
 
     <!-- Hub appender for studio to connect to. -->
-    <!-- 
-    <appender name="studio-appender" class="org.apache.log4j.net.SocketHubAppender">
+    <appender name="StudioAppender" class="org.apache.log4j.net.SocketHubAppender">
         <param name="Port" value="4445"/>
         <param name="LocationInfo" value="true"/> 
     </appender>
-    -->
 
-<!--    <appender name="FileAppender" class="org.apache.log4j.FileAppender">-->
-<!--        <param name="File" value="l:/OXF/oxf.log"/>-->
-<!--        <param name="Append" value="false" />-->
-<!--        <layout class="org.apache.log4j.PatternLayout">-->
-<!--            <param name="ConversionPattern" value="%t %-5p %c{2} - %m%n"/>-->
-<!--        </layout>-->
-<!--    </appender>-->
+    <appender name="FileAppender" class="org.apache.log4j.FileAppender">
+        <param name="File" value="C:/oxf.log"/>
+        <param name="Append" value="false" />
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%t %-5p %c{2} - %m%n"/>
+        </layout>
+    </appender>
 
     <!-- This is the root logger -->
     <root>
         <priority value="info"/>
         <appender-ref ref="ConsoleAppender"/>
-        <!-- <appender-ref ref="studio-appender"/> -->
+        <!--<appender-ref ref="StudioAppender"/>-->
+        <!--<appender-ref ref="FileAppender"/>-->
     </root>
 
 </log4j:configuration>

@@ -2000,7 +2000,7 @@ Le bruit persistait toujours.
         </output>
     </test>
 
-    <test description="XForms NS Prefixes" name="oxf:pipeline">
+    <test description="XForms NS Prefixes" name="oxf:pipeline" only="true">
         <input name="config" xmlns:a="http://orbeon.com/a" xmlns:b="http://orbeon.com/b" xmlns:c="http://orbeon.com/c">
             <p:config>
                 <p:param type="output" name="out"/>
@@ -2011,7 +2011,7 @@ Le bruit persistait toujours.
                             <xforms:submission method="post"/>
                             <xforms:instance>
                                 <form>
-                                    <a:claim>
+                                    <a:claim a:id="1">
                                         <b:person>
                                             <c:name>
                                                 <a:first/>
@@ -2036,7 +2036,7 @@ Le bruit persistait toujours.
                 <p:processor uri="oxf/processor/identity">
                     <p:input name="data">
                         <form>
-                            <a:claim>
+                            <a:claim a:id="1">
                                 <b:person>
                                     <c:name>
                                         <a:first>John</a:first>
@@ -2053,7 +2053,7 @@ Le bruit persistait toujours.
                             </a:claim>
                         </form>
                     </p:input>
-            <p:output name="data" id="instance"/>
+                    <p:output name="data" id="instance"/>
                 </p:processor>
 
 
@@ -2082,8 +2082,12 @@ Le bruit persistait toujours.
                                         </parameter>
                                         <xsl:for-each select="//xxforms:hidden">
                                             <parameter>
-                                                <name><xsl:value-of select="@xxforms:name"/></name>
-                                                <value><xsl:value-of select="@xxforms:value"/></value>
+                                                <name>
+                                                    <xsl:value-of select="@xxforms:name"/>
+                                                </name>
+                                                <value>
+                                                    <xsl:value-of select="@xxforms:value"/>
+                                                </value>
                                             </parameter>
                                         </xsl:for-each>
                                     </parameters>
@@ -2095,20 +2099,20 @@ Le bruit persistait toujours.
                 </p:processor>
 
                 <p:processor name="oxf:xforms-input">
-                     <p:input name="model" href="#model"/>
-                     <p:input name="request" href="#request"/>
-                     <p:input name="filter">
-                          <null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-                     </p:input>
-                     <p:input name="instance" href="#model#xpointer(xforms:model/xforms:instance/form)"/>
-                     <p:output name="data" ref="out"/>
-                 </p:processor>
+                    <p:input name="model" href="#model"/>
+                    <p:input name="request" href="#request"/>
+                    <p:input name="filter">
+                        <null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+                    </p:input>
+                    <p:input name="instance" href="#model#xpointer(xforms:model/xforms:instance/form)"/>
+                    <p:output name="data" ref="out"/>
+                </p:processor>
 
             </p:config>
         </input>
         <output name="out">
             <form>
-                <a:claim xmlns:a="http://orbeon.com/a">
+                <a:claim a:id="1" xmlns:a="http://orbeon.com/a">
                     <b:person xmlns:b="http://orbeon.com/b">
                         <c:name xmlns:c="http://orbeon.com/c">
                             <a:first>John</a:first>

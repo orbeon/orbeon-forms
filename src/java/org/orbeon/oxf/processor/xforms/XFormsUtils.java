@@ -99,7 +99,7 @@ public class XFormsUtils {
             } else if (node instanceof Attribute) {
                 // Insert attribute name
                 Attribute attribute = (Attribute) node;
-                name.append("@").append(XPathUtils.putNamespaceInName(attribute.getNamespaceURI(), attribute.getNamespacePrefix(), attribute.getQualifiedName(), true));
+                name.append("@").append(XPathUtils.putNamespaceInName(attribute.getNamespaceURI(), attribute.getNamespacePrefix(), attribute.getName(), true));
                 node = attribute.getParent();
             } else {
                 throw new OXFException("Only element and attributes can be referenced");

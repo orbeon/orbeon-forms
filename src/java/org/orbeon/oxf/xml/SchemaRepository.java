@@ -17,6 +17,8 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.portlet.processor.PortletContainerProcessor;
 import org.orbeon.oxf.portlet.processor.PortletIncludeGenerator;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.tamino.TaminoProcessor;
+import org.orbeon.oxf.processor.tamino.TaminoQueryProcessor;
 import org.orbeon.oxf.processor.generator.*;
 import org.orbeon.oxf.processor.pipeline.AggregatorProcessor;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
@@ -82,8 +84,8 @@ public class SchemaRepository {
         schemas.put(MSVValidationProcessor.ORBEON_ERROR_NS, "schemas/validation-config.rng");
         schemas.put(DirectoryGenerator.DIRECTORY_GENERATOR_NAMESPACE_URI, "schemas/directory-generator-config.rng");
         // Tamino schemas
-//        schemas.put(TaminoProcessor.TAMINO_CONFIG_URI, PROCESSORS_SCHEMA_PATH + "tamino/tamino-config.rng");
-//        schemas.put(TaminoQueryProcessor.TAMINO_QUERY_URI, PROCESSORS_SCHEMA_PATH + "tamino/tamino-query.rng");
+        schemas.put(TaminoProcessor.TAMINO_CONFIG_URI, PROCESSORS_SCHEMA_PATH + "tamino/tamino-config.rng");
+        schemas.put(TaminoQueryProcessor.TAMINO_QUERY_URI, PROCESSORS_SCHEMA_PATH + "tamino/tamino-query.rng");
         // XML:DB schemas
         schemas.put(XMLDBProcessor.XMLDB_DATASOURCE_URI, PROCESSORS_SCHEMA_PATH + "xmldb/xmldb-processor-datasource.rng");
         schemas.put(XMLDBProcessor.XMLDB_QUERY_URI, PROCESSORS_SCHEMA_PATH + "xmldb/xmldb-processor-query.rng");

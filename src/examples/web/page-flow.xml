@@ -83,24 +83,6 @@
     <page path-info="/examples/oxfmark-vms"
         model="/oxfmark/vms.xpl"/>
 
-    <!-- TEST -->
-    <page path-info="/dmv*" model="/examples/erik/dmv/page-flow.xpl"/>
-    <page path-info="/url*" model="/examples/erik/url/url1.xpl"/>
-
-    <page path-info="/outputs" model="/examples/erik/evdv-outputs/test.xpl"/>
-
-    <page id="teleflex-test-1" path-info="/teleflex-test-1" view="/examples/erik/upload-test/view.xml" xforms="/examples/erik/upload-test/xforms-model.xml">
-        <action when="/form/action = 'upload'" action="/examples/erik/upload-test/do-upload.xpl">
-            <result page="teleflex-test-2" instance-passing="forward"/>
-        </action>
-    </page>
-
-    <page id="teleflex-test-2" path-info="/teleflex-test-2" model="/examples/erik/upload-test/other-model.xpl" view="/examples/erik/upload-test/view.xml" xforms="/examples/erik/upload-test/xforms-model.xml">
-        <action when="/form/action = 'upload'" action="/examples/erik/upload-test/do-upload.xpl">
-            <result page="teleflex-test-1" instance-passing="redirect"/>
-        </action>
-    </page>
-
     <!-- Not Found and Error pages -->
     <page id="not-found" path-info="/not-found" view="/config/not-found.xml"/>
 

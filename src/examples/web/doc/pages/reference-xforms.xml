@@ -663,6 +663,24 @@
                         </td>
                     </tr>
                 </table>
+                <p>
+                    In the examples above, the labels and values for the <code>select</code> and
+                    <code>select1</code> controls are declared in the control element with multiple
+                    <code>&lt;xforms:item></code> elements. Alternatively the label/value pairs can
+                    be pulled out from the instance, instead of being declared in XForms control.
+                    As shown in the code below from the <a
+                    href="/goto-example/xforms-selection">XForms Selection Controls</a> example,
+                    you do this by using the <code>&lt;xforms:itemset></code> element, instead of
+                    using <code>&lt;xforms:item></code> elements:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:select1 ref="document/payment" appearance="minimal">
+                        <xforms:itemset nodeset="/form/data/payments/payment">
+                            <xforms:label ref="@label"/>
+                            <xforms:copy ref="@value"/>
+                        </xforms:itemset>
+                    </xforms:select1>
+                </xml-source>
             </section>
             <section>
                 <title>Label, Alert, Help, and Hint</title>
@@ -741,6 +759,21 @@
                         </td>
                     </tr>
                 </table>
+                <p>
+                    In the examples above, the text displayed is directly in the
+                    <code>&lt;xforms:label></code>, <code>&lt;xforms:alert></code>,
+                    <code>&lt;xforms:help></code>, or <code>&lt;xforms:hint></code> element.
+                    Alternatively that text can come from the XForms instance by having a
+                    <code>ref</code> attribute on any one of those elements. The <code>ref</code>
+                    references a node in the instant that contains the text. This is illustrated in
+                    the code below from the <a href="/goto-example/xforms-text">XForms Text
+                    Controls</a> example:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:secret ref="secret">
+                        <xforms:alert ref="@alert"/>
+                    </xforms:secret>
+                </xml-source>
             </section>
             <a name="upload"/>
             <section>
@@ -749,7 +782,7 @@
                     The preferred way to handle file uploads with Presentation Server is to use
                     XForms. For this purpose, use the XForms Upload control:
                 </p>
-                <xml-source>
+                <xml-source show-namespaces="false">
                     <xforms:upload ref="files/file[1]">
                         <xforms:filename ref="@filename"/>
                         <xforms:mediatype ref="@mediatype"/>

@@ -31,6 +31,8 @@
         <p:output name="data" id="xmlrpc-request" schema-href="xml-rpc/xml-rpc-request.rng"/>
     </p:processor>
 
+    <!-- TODO: Handle XML-RPC authentication based on username + password -->
+
     <!-- Dispatch request -->
     <p:choose href="#xmlrpc-request" debug="xxxrequest">
         <p:when test="/methodCall/methodName = 'blogger.getUsersBlogs'">

@@ -33,6 +33,17 @@
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../data-access/get-recent-posts.xpl"/>
         <p:input name="query" href="aggregate('query', #instance#xpointer(/*/*))"/>
+        <p:output name="posts" id="posts"/>
+    </p:processor>
+
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../data-access/get-categories.xpl"/>
+        <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username|/*/blog-id))"/>
+        <p:output name="categories" id="categories"/>
+    </p:processor>
+
+    <p:processor name="oxf:identity">
+        <p:input name="data" href="aggregate('model', #posts, #categories)"/>
         <p:output name="posts" ref="data"/>
     </p:processor>
 

@@ -40,6 +40,7 @@
         <p:output name="post" id="post"/>
     </p:processor>
 
+    <!-- Convert content of description -->
     <p:processor name="oxf:xml-converter" xmlns:p="http://www.orbeon.com/oxf/pipeline">
          <p:input name="config">
              <config>

@@ -20,6 +20,9 @@
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns="http://www.w3.org/1999/xhtml">
 
+    <xsl:variable name="posts" select="/*/posts" as="element()"/>
+    <xsl:variable name="categories" select="/*/categories" as="element()"/>
+
     <head>
         <title>Recent Posts for
             <xsl:value-of select="doc('input:instance')/*/username"/>
@@ -27,7 +30,18 @@
     </head>
     <body>
         <div id="maincontent">
-            <xsl:for-each select="/posts/post[published = 'true']">
+
+            Categories:
+            <xsl:for-each select="$categories/category">
+                <xsl:if test="position() > 1">
+                    |
+                </xsl:if>
+                <a href="xxx/{id}">
+                    <xsl:value-of select="name"/>
+                </a>
+            </xsl:for-each>
+
+            <xsl:for-each select="$posts/post[published = 'true']">
                 <div>
                     <h2>
                         <a href="/blog/{doc('input:instance')/*/username}/post/{post-id}">

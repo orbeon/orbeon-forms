@@ -21,50 +21,58 @@
     <p:param type="input" name="params"/>
     <p:param type="output" name="params"/>
 
+    <!-- Format query -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#params"/>
         <p:input name="config">
-            <xdb:query collection="/db/orbeon/blog-example/blogs" create-collection="true" xsl:version="2.0">
-                xquery version "1.0";
-                <params>
-                    <param>
-                        <value>
-                            <array>
-                                <data>
-                                {
-                                for $i in /blog[username = '<xsl:value-of select="/params/param[2]/value/string"/>'
-                                           and id = '<xsl:value-of select="/params/param[1]/value/string"/>']/categories/category
-                                return
-                                    <value>
-                                        <struct>
-                                            <member>
-                                                <name>description</name>
-                                                <value>{xs:string($i/name)}</value>
-                                            </member>
-                                            <member>
-                                                <name>htmlUrl</name>
-                                                <value>xxx/{count(preceding-sibling::category) + 1}</value>
-                                            </member>
-                                            <member>
-                                                <name>rssUrl</name>
-                                                <value>xxx/{count(preceding-sibling::category) + 1}</value>
-                                            </member>
-                                        </struct>
-                                    </value>
-                                }
-                                </data>
-                            </array>
-                        </value>
-                    </param>
-                </params>
-            </xdb:query>
+            <query xsl:version="2.0">
+                <username><xsl:value-of select="/params/param[2]/value/string"/></username>
+                <blog-id><xsl:value-of select="/params/param[1]/value/string"/></blog-id>
+            </query>
         </p:input>
         <p:output name="data" id="query"/>
     </p:processor>
 
-    <p:processor name="oxf:xmldb-query">
-        <p:input name="datasource" href="../datasource.xml"/>
+    <!-- Call data access -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../data-access/get-categories.xpl"/>
         <p:input name="query" href="#query"/>
+        <p:output name="categories" id="categories"/>
+    </p:processor>
+
+    <!-- Format response -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#categories"/>
+        <p:input name="config">
+            <params xsl:version="2.0">
+                <param>
+                    <value>
+                        <array>
+                            <data>
+                                <xsl:for-each select="/categories/category">
+                                    <value>
+                                        <struct>
+                                            <member>
+                                                <name>description</name>
+                                                <value><xsl:value-of select="name"/></value>
+                                            </member>
+                                            <member>
+                                                <name>htmlUrl</name>
+                                                <value>xxx/<xsl:value-of select="id"/></value>
+                                            </member>
+                                            <member>
+                                                <name>rssUrl</name>
+                                                <value>xxx/<xsl:value-of select="id"/></value>
+                                            </member>
+                                        </struct>
+                                    </value>
+                                </xsl:for-each>
+                            </data>
+                        </array>
+                    </value>
+                </param>
+            </params>
+        </p:input>
         <p:output name="data" ref="params"/>
     </p:processor>
 

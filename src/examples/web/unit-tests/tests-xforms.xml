@@ -1011,10 +1011,10 @@
         <output name="instance">
             <instance>
                 <a>Orbeon</a>
-                <b xxforms:valid="true"/>
-                <c xxforms:required="true" xxforms:valid="false"/>
-                <d xxforms:readonly="true"/>
-                <e xxforms:relevant="true"/>
+                <b xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="true"/>
+                <c xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:required="true" xxforms:valid="false"/>
+                <d xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true"/>
+                <e xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:relevant="true"/>
             </instance>
         </output>
     </test>

@@ -26,6 +26,7 @@ import java.io.Writer;
  */
 public class ContentHandlerWriter extends Writer {
     private ContentHandler contentHandler;
+    private boolean supportFlush;
 
     private char[] singleChar = new char[1];
 
@@ -33,14 +34,21 @@ public class ContentHandlerWriter extends Writer {
         this.contentHandler = contentHandler;
     }
 
+    public ContentHandlerWriter(ContentHandler contentHandler, boolean supportFlush) {
+        this(contentHandler);
+        this.supportFlush = supportFlush;
+    }
+
     public void close() throws IOException {
     }
 
     public void flush() throws IOException {
-        try {
-            contentHandler.processingInstruction("oxf-serializer", "flush");
-        } catch (SAXException e) {
-            throw new OXFException(e);
+        if (supportFlush) {
+            try {
+                contentHandler.processingInstruction("oxf-serializer", "flush");
+            } catch (SAXException e) {
+                throw new OXFException(e);
+            }
         }
     }
 

@@ -106,6 +106,15 @@
             </ul>
         </section>
         <section>
+            <title>Performance Improvements</title>
+            <p>
+                Memory usages has been improved, which leads to significant performance improvements
+                under heavy load or when the JVM is running with a relatively small heap, as the JVM
+                spends less time doing garbage collection. Our testing show performance improvement
+                that range from 5% to 20%.
+            </p>
+        </section>
+        <section>
             <title>Misc Bug Fixes</title>
             <ul>
                 <li>

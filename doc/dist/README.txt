@@ -93,6 +93,7 @@ application servers:
 
     * Apache Tomcat 4.1.30 with JDK 1.4.2
     * Apache Tomcat 5.0.25 alpha with JDK 1.4.2
+    * Apache Tomcat 5.5.4 with JDK 1.4.2 and JDK 1.5.0
     * BEA WebLogic Server 8.1
     * IBM WebSphere 5.1
 

@@ -51,6 +51,25 @@
                 </p>
             </section>
             <section>
+				<title>Standard Representation of Binary and Text Documents</title>
+                <p>
+                    In Presentation Server <a href="reference-xpl-pipelines">XPL and pipelines</a>
+                    only deal with XML documents. In order to handle non-XML data in pipelines such
+                    as binary and text documents, Presentation Server defines <a
+                    href="reference-formats">two standard XML document formats</a> to embed binary
+                    and text documents within an XML infoset. This solution has the benefit of
+                    keeping XPL simple by limiting it to pure XML infosets, while allowing XPL to
+                    conveniently manipulate any binary and text document.
+                </p>
+                <p>
+                    These document formats are widely used by processors such as the <a
+                    href="processors-generators#url-generator">URL generator</a>, the <a
+                    href="processors-serializers#http-serializer">HTTP serializer</a>, the <a
+                    href="processors-messaging#email-processor">Email processor</a>, and <a
+                    href="processors-converters">converters</a>.
+                </p>
+			</section>
+            <section>
 				<title>URL Generator</title>
                 <section>
                     <title>Binary Mode</title>
@@ -88,9 +107,8 @@
                         The new architecture introduces <a
                         href="processors-converters">converters</a> in charge of the first task, and
                         plain <a href="processors-serializers">serializers</a> in charge of the
-                        second task. It also standardize the mechanism to encapsulate text documents
-                        and binary documents into XML documents. This mechanism is used by the URL
-                        generator, converters, and serializers.
+                        second task. It relies on the <a href="reference-formats">standard
+                        representation</a> for binary and texts documents.
                     </p>
                     <p>
                         Backward compatibility for existing serializers is kept, but it is
@@ -140,6 +158,10 @@
                 <p>
                     It is now possible to visualize each document as XML from the user interface.
                 </p>
+            </section>
+            <section>
+                <title>New "Employees" Example</title>
+                <!-- TODO -->
             </section>
             <section>
                 <title>Page Flow</title>

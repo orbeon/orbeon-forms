@@ -12,8 +12,8 @@ This README.TXT file covers the following topics:
     2. Licenses
     3. New Features
     4. Software Prerequisites
-    5. Installing the Presentation Server
-    6. Compiling the Presentation Server
+    5. Installing Presentation Server
+    6. Compiling Presentation Server
     7. More Information
     8. Known Issues
     9. Third-Party Software
@@ -27,9 +27,9 @@ For more information, visit:
 1. About Orbeon Presentation Server
 ************************************
 
-The Orbeon Presentation Server is an MVC Framework for building
+Orbeon Presentation Server is an MVC Framework for building
 Composite Web applications from XML sources using XForms. While
-similar to Apache Cocoon, the Orbeon Presentation Server benefits from
+similar to Apache Cocoon, Orbeon Presentation Server benefits from
 richer controller semantics, standardized forms processing using W3C
 XForms, and tight integration with XPL, a full-featured pipeline
 processing language for XML.
@@ -40,7 +40,7 @@ processing language for XML.
 ************************************
 
 The source code is distributed under the terms of the GNU Lesser
-General Public License (LGPL).  The full text of the license is
+General Public License (LGPL). The full text of the license is
 available at http://www.gnu.org/copyleft/lesser.html.
 
 This software is OSI Certified Open Source Software.
@@ -78,7 +78,7 @@ or in this distribution under:
 4. Software Prerequisites
 ************************************
 
-The Orbeon Presentation Server is supported on the following
+Orbeon Presentation Server is supported on the following
 application servers:
 
     * Apache Tomcat 4.1.30 with JDK 1.4.2
@@ -88,7 +88,7 @@ application servers:
 
 
 ************************************
-5. Installing the Presentation Server
+5. Installing Presentation Server
 ************************************
 
     * Download the Presentation Server zip or tgz archive from
@@ -122,7 +122,7 @@ application server of choice. In the Presentation Server
 documentation, you will find detailed installation instructions for
 several servlet containers / applications servers.
 
-More detailed information on installing the Presentation Server can be
+More detailed information on installing Presentation Server can be
 found in the documentation under OIS_HOME/doc/ in the "Installation
 Instructions" section, or directly online:
 
@@ -130,10 +130,10 @@ Instructions" section, or directly online:
 
 
 ************************************
-6. Compiling the Presentation Server
+6. Compiling Presentation Server
 ************************************
 
-For information about compiling the Presentation Server, please visit:
+For information about compiling Presentation Server, please visit:
 
   http://www.orbeon.com/community/getting-involved
 
@@ -212,7 +212,7 @@ Software License. The schema is available at the following location:
 Please consult the third-party-licenses directory for more
 information about individual licenses.
 
-Last updated: October 2004
+Last updated: November 2004
 
 Copyright 1999-2004 (C) Orbeon, Inc. All rights reserved.
 

@@ -20,7 +20,7 @@
       xmlns="http://www.w3.org/1999/xhtml">
 
     <head>
-        <title>Employee Demo Home</title>
+        <title>Employees Example Home</title>
         <tabs xmlns="http://orbeon.org/oxf/xml/formatting">
             <tab label="Home" selected="true"/>
             <tab label="Employees" selected="false" href="/employees/list-employees"/>
@@ -30,7 +30,7 @@
     <body>
         <div id="maincontent">
             <p>
-                Welcome to the Employee Demo application!
+                Welcome to the Employees example application!
             </p>
             <h2>What is it?</h2>
             <p>

@@ -419,7 +419,7 @@
                         <td>message()</td>
                     </tr>
                     <tr>
-                        <th>Saxon 7</th>
+                        <th>Saxon 7 and 8</th>
                         <td>http://www.orbeon.com/oxf/struts</td>
                         <td>oxf:/oxf/struts/struts-support-saxon7.xsl</td>
                         <td>message()</td>
@@ -531,7 +531,7 @@
                         <td>javascript()</td>
                     </tr>
                     <tr>
-                        <th>Saxon 7</th>
+                        <th>Saxon 7 and 8</th>
                         <td>http://www.orbeon.com/oxf/struts</td>
                         <td>oxf:/oxf/struts/struts-support-saxon7.xsl</td>
                         <td>javascript()</td>

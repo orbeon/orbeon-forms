@@ -147,7 +147,8 @@ public interface Processor {
      * @return  A read-only Map containing all the inputs currently connected
      *          to this processor. Each key in the Map is a String specifying
      *          an input name. The List associated to the key contains one or
-     *          more <code>ProcessorInput</code> objects.
+     *          more <code>ProcessorInput</code> objects. This is particularly
+     *          useful to detect whether optional inputs are connected.
      */
     public Map getConnectedInputs();
 
@@ -155,7 +156,8 @@ public interface Processor {
      * @return  A read-only Map containing all the outputs currently connected
      *          to this processor. Each key in the Map is a String specifying
      *          an output name. The List associated to the key contains one or
-     *          more <code>ProcessorOutput</code> objects.
+     *          more <code>ProcessorOutput</code> objects. This is particularly
+     *          useful to detect whether optional outputs are connected.
      */
     public Map getConnectedOutputs();
 

@@ -30,7 +30,7 @@
                 </xforms:submit>
             </xhtml:p>
         </xforms:group>
-        <xsl:if test="document('oxf:instance')/highway != ''">
+        <xsl:if test="document('input:instance')/highway != ''">
             <pre><xsl:value-of select="/return"/></pre>
         </xsl:if>
     </xhtml:body>

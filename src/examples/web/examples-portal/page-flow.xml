@@ -21,7 +21,7 @@
         <action>
             <result page="home">
                 <xu:update select="/form/example-id">
-                    <xu:value-of select="document('oxf:instance')/form/example-id"/>
+                    <xu:value-of select="document('input:instance')/form/example-id"/>
                 </xu:update>
                 <xu:update select="/form/visible-portlet">OXFExamplesPortlet</xu:update>
             </result>

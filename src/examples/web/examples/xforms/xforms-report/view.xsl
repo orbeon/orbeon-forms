@@ -20,8 +20,8 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-    <xsl:variable name="instance" as="element()" select="document('oxf:instance')/form"/>
-    <xsl:variable name="display-column" as="xs:string*" select="tokenize(document('oxf:instance')/form/display-column, ' ')"/>
+    <xsl:variable name="instance" as="element()" select="document('input:instance')/form"/>
+    <xsl:variable name="display-column" as="xs:string*" select="tokenize(document('input:instance')/form/display-column, ' ')"/>
 
     <xsl:template match="/">
         <xhtml:html>
@@ -114,7 +114,7 @@
                                     <xhtml:p>XForms instance:</xhtml:p>
                                     <xhtml:p>
                                         <f:xml-source>
-                                            <xsl:copy-of select="document('oxf:instance')/form"/>
+                                            <xsl:copy-of select="document('input:instance')/form"/>
                                         </f:xml-source>
                                     </xhtml:p>
                                 </td>

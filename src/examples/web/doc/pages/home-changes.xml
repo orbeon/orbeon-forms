@@ -369,7 +369,7 @@
                 <title>Page Flow</title>
                 <p>
                     XSLT views in <a href="reference-controller">Page Flow</a> can now access the
-                    XForms instance using <code>document('oxf:instance')</code> or
+                    XForms instance using <code>document('input:instance')</code> or
                     <code>doc('oxf:instance')</code>. In the past, it was often necessary for the
                     model to aggregate its output with the XForms instance to make both documents
                     accessible from the view.

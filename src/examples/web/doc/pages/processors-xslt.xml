@@ -14,7 +14,9 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:xforms="http://www.w3.org/2002/xforms"
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <header>
         <title>XSLT and TrAX Processors</title>
     </header>
@@ -34,7 +36,7 @@
                 <li>Xalan 2.5.1 Interpreter</li>
                 <li>Xalan 2.5.1 Compiler (XSLTC)</li>
                 <li>Saxon 6.5.2 </li>
-                <li>Saxon 7.9.1 (supporting a large subset of XSLT 2.0)</li>
+                <li>Saxon 8.1.1 (supporting a large subset of XSLT 2.0)</li>
             </ul>
 
             <p>Additionally, Presentation Server can use any JAXP (TrAX) compliant transformer.</p>
@@ -51,53 +53,62 @@
             <p>
                 <table>
                     <tr>
-                        <th>Processor URI</th>
-                        <th>XSLT Implementation</th>
+                        <th>Processor Name</th>
+                        <th>Language</th>
+                        <th>Implementation</th>
                     </tr>
                     <tr>
                         <td>oxf:xslt</td>
-                        <td>Saxon 7.9.1</td>
+                        <td>XSLT 2.0</td>
+                        <td>Saxon 8.1.1</td>
                     </tr>
                     <tr>
                         <td>oxf:xalan</td>
+                        <td>XSLT 1.0</td>
                         <td>Xalan 2.5.1 Interpreter</td>
                     </tr>
                     <tr>
                         <td>oxf:xsltc</td>
+                        <td>XSLT 1.0</td>
                         <td>Xalan 2.5.1 Compiler</td>
                     </tr>
                     <tr>
                         <td>oxf:saxon</td>
+                        <td>XSLT 1.0</td>
                         <td>Saxon 6.5.2</td>
                     </tr>
                     <tr>
-                        <td>oxf:saxon7</td>
-                        <td>Saxon 7.9.1</td>
+                        <td>oxf:saxon8</td>
+                        <td>XSLT 2.0</td>
+                        <td>Saxon 8.1.1</td>
                     </tr>
                     <tr>
                         <td>oxf:generic-xslt-1.0</td>
+                        <td>XSLT 1.0</td>
                         <td>Any TrAX XSLT 1.0 transformer</td>
                     </tr>
                     <tr>
                         <td>oxf:generic-xslt-2.0</td>
+                        <td>XSLT 2.0</td>
                         <td>Any TrAX XSLT 2.0 transformer</td>
                     </tr>
                     <tr>
                         <td>oxf:xslt-1.0</td>
+                        <td>XSLT 1.0</td>
                         <td>Default TrAX XSLT 1.0 transformer (currently Xalan)</td>
                     </tr>
                     <tr>
                         <td>oxf:xslt-2.0</td>
-                        <td>Default TrAX XSLT 2.0 transformer (currently Saxon 7)</td>
+                        <td>XSLT 2.0</td>
+                        <td>Default TrAX XSLT 2.0 transformer (currently Saxon 8)</td>
                     </tr>
                     <tr>
                         <td>oxf:trax</td>
+                        <td>Any</td>
                         <td>Any TrAX transformer</td>
                     </tr>
                 </table>
             </p>
-
-
             <p>
                 <table ca="|p{0.2\textwidth}|p{0.4\textwidth}|">
                     <tr>
@@ -120,19 +131,19 @@
                         <th>data output</th>
                         <td>The result of the transformation</td>
                     </tr>
+                    <tr>
+                        <th>user-defined inputs</th>
+                        <td>The processor may support user-defined inputs</td>
+                    </tr>
                 </table>
             </p>
 
             <section>
                 <title>Transformer Input</title>
                 <p>
-                    The
-                    <code>transformer</code> is mandatory only when using
-                    the
-                    <code>oxf:generic-xslt-1.0</code>,
-                    <code>oxf:generic-xslt-2.0</code> or the
-                    <code>oxf:trax</code> processor URI. It is implied
-                    otherwise.
+                    The <code>transformer</code> is mandatory only when using the
+                    <code>oxf:generic-xslt-1.0</code>, <code>oxf:generic-xslt-2.0</code> or the
+                    <code>oxf:trax</code> processor URI. It is implied otherwise.
                 </p>
 
                 <p>
@@ -145,7 +156,7 @@
 
 
                     <xml-source>
-                        <p:processor uri="oxf/transformer/trax">
+                        <p:processor name="oxf:trax">
                             <p:input name="transformer">
                                 <config>
                                     <class>com.mytrans.TransformerFactoryImpl</class>
@@ -187,8 +198,10 @@
             </section>
             <section>
                 <title>Data Input</title>
-                <p> The data input contains the XML source document. The example
-                    below works with the stylesheet shown above:</p>
+                <p>
+                    The data input contains the source XML document. The example below works with
+                    the stylesheet shown above:
+                </p>
                 <xml-source>
                     <root>
                         <a>a</a>
@@ -196,10 +209,52 @@
                     </root>
                 </xml-source>
             </section>
+            <anchor id="user-defined"/>
+            <section>
+                <title>User-Defined Inputs</title>
+                <p>
+                    XSLT transformers support reading <a
+                    href="reference-xpl-pipelines#optional">optional user-defined inputs</a> through
+                    the XSLT and XPath <code>document()</code> and <code>doc()</code> functions. For
+                    example:
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:xslt">
+                        <p:input name="config">
+                            <address-book xsl:version="2.0">
+                                <xsl:variable name="document-1" select="doc('file:/document-1.xml')"/>
+                                <xsl:variable name="document-2" select="doc('input:my-input')"/>
+                                <comment> ... </comment>
+                            </address-book>
+                        </p:input>
+                        <p:input name="data" href="#some-id"/>
+                        <p:input name="my-input" href="#some-other-id"/>
+                        <p:output name="data" id="address-book"/>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    In this example, the XPath expression <code>doc('file:/document-1.xml')</code>
+                    instructs the XSLT transformer to read the document stored at
+                    <code>oxf:/document-1.xml</code> and make it accessible through the variable
+                    named <code>document-1</code>. This is standard XSLT and XPath 2.0.
+                </p>
+                <p>
+                    The second variable, <code>document-2</code>, is assigned using a similar XPath
+                    expression, but it uses a URI with a particular syntax: it starts with the
+                    scheme <code>input:</code>. This instructs the XSLT transformer to read the
+                    processor input called <code>my-input</code>. This input is connected to the
+                    XSLT processor with <code>&lt;p:input name="my-input"
+                    href="#some-other-id"/></code>. In this case, it is up to the user of the XSLT
+                    processor to connect additional inputs as she sees fit, as long as their names
+                    don't conflit with mandatory input and output names.
+                </p>
+            </section>
             <section>
                 <title>Data Output</title>
-                <p> The data output contains the transformation result. The following
-                    XML is the result of the above transformation:</p>
+                <p>
+                    The data output produces the result of the transformation. The following XML is
+                    the result of the above transformation:
+                </p>
                 <xml-source>
                     <new-root>ab</new-root>
                 </xml-source>

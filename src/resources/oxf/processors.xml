@@ -143,7 +143,7 @@
         </instantiation>
     </processor>
 
-    <processor name="oxf:saxon7" uri="oxf/processor/saxon7">
+    <processor name="oxf:saxon8">
         <instantiation name="oxf:generic-xslt-2.0">
             <input name="transformer">
                 <config>
@@ -479,6 +479,16 @@
 
     <processor name="oxf:sql-output" uri="oxf/processor/sql-output">
         <class name="org.orbeon.oxf.processor.sql.SQLOutputProcessor"/>
+    </processor>
+
+    <processor name="oxf:saxon7" uri="oxf/processor/saxon7">
+        <instantiation name="oxf:generic-xslt-2.0">
+            <input name="transformer">
+                <config>
+                    <class>org.orbeon.saxon.TransformerFactoryImpl</class>
+                </config>
+            </input>
+        </instantiation>
     </processor>
 
     <!-- Scratchpad -->

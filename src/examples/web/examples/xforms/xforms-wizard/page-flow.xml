@@ -19,7 +19,7 @@
           view="step1-firstname.xml">
         <action when="/form/action = 'next'">
             <result page="xforms-wizard-lastname">
-                <xu:update select="/form/user"><xu:copy-of select="document('oxf:instance')/form/user/*"/></xu:update>
+                <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
             </result>
         </action>
     </page>
@@ -29,12 +29,12 @@
           view="step2-lastname.xml">
         <action when="/form/action = 'previous'">
             <result page="xforms-wizard-firstname">
-                <xu:update select="/form/user"><xu:copy-of select="document('oxf:instance')/form/user/*"/></xu:update>
+                <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
             </result>
         </action>
         <action when="/form/action = 'next'">
             <result page="xforms-wizard-ssn">
-                <xu:update select="/form/user"><xu:copy-of select="document('oxf:instance')/form/user/*"/></xu:update>
+                <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
             </result>
         </action>
     </page>
@@ -44,12 +44,12 @@
           view="step3-ssn.xml">
         <action when="/form/action = 'previous'">
             <result page="xforms-wizard-lastname">
-                <xu:update select="/form/user"><xu:copy-of select="document('oxf:instance')/form/user/*"/></xu:update>
+                <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
             </result>
         </action>
         <action when="/form/action = 'finish'">
             <result page="xforms-wizard-summary">
-                <xu:update select="/form/user"><xu:copy-of select="document('oxf:instance')/form/user/*"/></xu:update>
+                <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
             </result>
         </action>
     </page>

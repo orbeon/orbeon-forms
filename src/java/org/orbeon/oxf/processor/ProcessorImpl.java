@@ -67,7 +67,8 @@ public abstract class ProcessorImpl implements Processor {
     private List outputsInfo = new ArrayList();
 
     private LocationData locationData;
-    public static final String PROCESSOR_INPUT_SCHEME = "oxf:";
+    public static final String PROCESSOR_INPUT_SCHEME_OLD = "oxf:";
+    public static final String PROCESSOR_INPUT_SCHEME = "input:";
 
     /**
      * Return a property set for this processor.
@@ -661,7 +662,9 @@ public abstract class ProcessorImpl implements Processor {
      */
     public static boolean isProcessorInputScheme(String uri) {
         // NOTE: The check on the hash is for backward compatibility
-        return uri.startsWith("#") || (uri.startsWith(PROCESSOR_INPUT_SCHEME) && !uri.startsWith(PROCESSOR_INPUT_SCHEME + "/"));
+        return uri.startsWith("#")
+                || (uri.startsWith(PROCESSOR_INPUT_SCHEME) && !uri.startsWith(PROCESSOR_INPUT_SCHEME + "/"))
+                || (uri.startsWith(PROCESSOR_INPUT_SCHEME_OLD) && !uri.startsWith(PROCESSOR_INPUT_SCHEME_OLD + "/"));
     }
 
     /**
@@ -673,6 +676,8 @@ public abstract class ProcessorImpl implements Processor {
             return uri.substring(1);
         } else if (uri.startsWith(PROCESSOR_INPUT_SCHEME) && !uri.startsWith(PROCESSOR_INPUT_SCHEME + "/")) {
             return uri.substring(PROCESSOR_INPUT_SCHEME.length());
+        } else if (uri.startsWith(PROCESSOR_INPUT_SCHEME_OLD) && !uri.startsWith(PROCESSOR_INPUT_SCHEME_OLD + "/")) {
+            return uri.substring(PROCESSOR_INPUT_SCHEME_OLD.length());
         } else {
             return null;
         }

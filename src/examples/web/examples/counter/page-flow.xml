@@ -18,7 +18,7 @@
         <action when="/instance/action = 'increment'" action="increment.xsl">
             <result>
                 <xu:update select="/instance/counter">
-                    <xu:value-of select="document('oxf:action')/new-value/text()"/>
+                    <xu:value-of select="document('input:action')/new-value/text()"/>
                 </xu:update>
             </result>
         </action>

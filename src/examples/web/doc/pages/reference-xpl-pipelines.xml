@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
     Copyright (C) 2004 Orbeon, Inc.
 
@@ -14,7 +15,9 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:xforms="http://www.w3.org/2002/xforms"
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     <header>
         <title>XPL and Pipelines</title>
     </header>
@@ -22,10 +25,33 @@
         <section>
             <title>Introduction</title>
             <p>
-                This section describes the XML Pipeline Definition Language (XPL) used by
-                Presentation Server. The XPL interpreter is actually itself implemented as an XML
-                processor, the Pipeline processor. For an introduction to pipelines, see <link
-                href="Tutorial.pdf">Orbeon Presentation Server Tutorial</link>.
+                XPL is a powerful declarative language for processing XML using a pipeline
+                metaphor. XML documents enter a pipeline, are efficiently processed by one or more
+                processors as specified by XPL instructions, and are then output for further
+                processing, display, or storage. XPL features advanced capabilities such as document
+                aggregation, conditionals (“if” conditions), loops, schema validation, and
+                sub-pipelines.
+            </p>
+            <p>
+                XPL pipelines are built up from smaller components called XML processors. An XML
+                processor is a software component which consumes and produces XML documents. New XML
+                processors are most often written in Java. But most often developers do not need to
+                write their own processors because Presentation Server comes standard with a
+                comprehensive library. XPL orchestrates these to create business logic, similar to
+                the way Java code “orchestrates” method calls within a Java object.
+            </p>
+            <p>
+                For an step-by-step introduction to pipelines, see <link href="Tutorial.pdf">Orbeon
+                Presentation Server Tutorial</link>.
+            </p>
+        </section>
+        <section>
+            <title>XPL Interpreter</title>
+            <p>
+                The XPL interpreter is itself implemented as an XML processor, called the Pipeline
+                processor. This processor reads a pipeline definition following the XPL syntax on
+                its <code>config</code> input, and assembles a pipeline according to that
+                definition. It is then able to run the pipeline when called.
             </p>
         </section>
         <section>
@@ -95,9 +121,10 @@
                 pipeline are. Each input and output has a name. There cannot be two inputs with the
                 same name or two outputs with the same name, but it is possible to have an output
                 and an input with the same name. Every input name defines an id that can be later
-                referenced with the <link href="#href">href attribute</link> such as when connecting
-                processors. The output names can be referenced with the <code>ref</code> attribute
-                on <link href="#processor"> <code>&lt;p:output&gt;</code> </link>.
+                referenced with the <link href="#href-attribute"><code>href</code> attribute</link>
+                such as when connecting processors. The output names can be referenced with the
+                <code>ref</code> attribute on <link href="#processor"> <code>&lt;p:output&gt;</code>
+                </link>.
             </p>
             <img print-format="pdf" src="pages/reference-xpl-pipelines-param.png"/>
             <p>
@@ -165,31 +192,47 @@
                         For backward compatibility, the <code>uri</code> attribute is still supported.
                     </note>
                 </li>
-                <li><p>
-                    The <code>&lt;p:input&gt;</code> element connects the input of the processor to
-                    an inline document in the <code>&lt;p:input&gt;</code> element or to another
-                    document referenced with the <code>href</code> attribute.
-                </p></li>
+                <li>
+                    <p>
+                        The <code>&lt;p:input&gt;</code> element connects the input of the processor
+                        with the name specified with the <code>name</code> attribute to one of:
+                    </p>
+                    <ul>
+                        <li>
+                            an inline XML document embedded in the <code>&lt;p:input&gt;</code> element
+                        </li>
+                        <li>
+                            an XML document obtained according to the <link href="#href-attribute">full
+                            syntax of the <code>href</code> attribute</link>, for example:
+                            <ul>
+                                <li><code>href="#some-id"</code></li>
+                                <li><code>href="oxf:/my-document.xml"</code></li>
+                                <li><code>href="aggregate('document', #some-id,
+                                oxf:/my-document.xml#xpointer(/*/*))"</code></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
                 <li><p>
                     The <code>&lt;p:output&gt;</code> element defines an <code>id</code>
                     corresponding to that output with the <code>id</code> attribute or connects the
-                    output to a processor output with the <code>ref</code> attribute.
+                    output to a pipeline output with the <code>ref</code> attribute.
                 </p></li>
                 <li><p>
                     Optionally, <code>&lt;p:input&gt;</code> and <code>&lt;p:output&gt;</code> can
                     have a <code>schema-href</code> or <code>schema-uri</code> attribute. Those
                     attributes specify a schema that is used by the Pipeline processor to validate
                     the corresponding input or output. <code>schema-href</code> references a
-                    document using the <link href="#href"> <code>href</code></link> syntax.
-                    <code>schema-uri</code> specifies the URI of a schema that is mapped to a
-                    specific schema in the <link href="reference-properties">Presentation Server
+                    document using the <link href="#href-attribute"><code>href</code></link>
+                    syntax. <code>schema-uri</code> specifies the URI of a schema that is mapped to
+                    a specific schema in the <link href="reference-properties">Presentation Server
                     properties file</link>.
                 </p></li>
                 <li><p>
                     Optionally, <code>&lt;p:input&gt;</code> and <code>&lt;p:output&gt;</code> can
                     have a <code>debug</code> attribute. When this attribute is present, the
                     document that passes through that input or output is logged with Log4J. This is
-                    useful during development to see the XML going through the pipeline.
+                    useful during development to watch XML documents going through the pipeline.
                 </p></li>
             </ul>
             <p>
@@ -420,7 +463,7 @@
                 </li>
             </ul>
         </section>
-        <anchor id="href"/>
+        <anchor id="href-attribute"/>
         <section>
             <title>href attribute</title>
             <p>
@@ -546,6 +589,230 @@
                     represented as:
                 </p>
                 <img print-format="pdf" src="pages/reference-xpl-pipelines-tee.png"/>
+            </section>
+        </section>
+        <section>
+            <title>Processor Inputs and Outputs</title>
+            <section>
+                <title>Declared Inputs and Outputs</title>
+                <p>
+                    XPL processors declare a certain number of inputs and outputs. Those inputs and
+                    outputs constitute the <i>interface</i> of the processor, in the same way that
+                    methods in object-oriented programming languages like Java expose parameters.
+                    For example, the XSLT processor expects:
+                </p>
+                <ul>
+                    <li>a <code>config</code> input receiving an XSLT stylesheet definition</li>
+                    <li>a <code>data</code> input receiving the XML document to transform</li>
+                    <li>a <code>data</code> output producing the transformed XML document</li>
+                </ul>
+                <p>
+                    You know what inputs and outputs to connect for a given processor by consulting
+                    the documentation for that processor. This is similar to looking up a method
+                    signature in an object-oriented programming language.
+                </p>
+            </section>
+            <section>
+                <title>Connecting Inputs and Outputs</title>
+                <p>
+                    Consider the following XSLT processor instance in a pipeline:
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:xslt">
+                        <p:input name="config" href="stylesheet.xsl"/>
+                        <p:input name="data" schema-href="oxf:/address-book-schema.xml">
+                            <address-book>
+                                <card>
+                                    <name>John Smith</name>
+                                    <email>js@example.com</email>
+                                </card>
+                                <card>
+                                    <name>Fred Bloggs</name>
+                                    <email>fb@example.net</email>
+                                </card>
+                            </address-book>
+                        </p:input>
+                        <p:output name="data" id="address-book"/>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    Both its <code>config</code> and <code>data</code> inputs are said to be
+                    connected, because the <code>&lt;p:processor></code> element for the XSLT
+                    processor has <code>&lt;p:input></code> elements for both those inputs, and they
+                    each refer to an XML document:
+                </p>
+                <ul>
+                    <li>In the first case, a resource called <code>stylesheet.xsl</code></li>
+                    <li>In the second case, an inline document with root element <code>address-book</code></li>
+                </ul>
+                <p>
+                    There are other ways to connect inputs, for example:
+                </p>
+                <xml-source>
+                    <p:config>
+                        <comment> Pipeline input called "my-input" </comment>
+                        <p:param name="my-input" type="input"/>
+                        <comment> First XSLT transformation </comment>
+                        <p:processor name="oxf:xslt">
+                            <p:input name="config" href="stylesheet-1.xsl"/>
+                            <p:input name="data" href="#my-input"/>
+                            <p:output name="data" id="address-book"/>
+                        </p:processor>
+                        <comment> Second XSLT transformation </comment>
+                        <p:processor name="oxf:xslt">
+                            <p:input name="config" href="stylesheet-2.xsl"/>
+                            <p:input name="data" href="#address-book"/>
+                            <p:output name="data" id="phone-list"/>
+                        </p:processor>
+                        <comment> ... </comment>
+                    </p:config>
+                </xml-source>
+                <p>
+                    In this case:
+                </p>
+                <ul>
+                    <li>
+                        The <code>data</code> input of the first XSLT processor instance is
+                        connected to the <code>my-input</code> input of the pipeline.
+                    </li>
+                    <li>
+                        The <code>data</code> input of the second XSLT processor instance is
+                        connected to the <code>address-book</code> output of the first XSLT
+                        processor instance.
+                    </li>
+                </ul>
+                <p>
+                    The example above shows that the <code>address-book</code> output of the first
+                    XSLT processor instance is connected to the input of a following processor. A
+                    processor output can also be connected to a pipeline output, as follows:
+                </p>
+                <xml-source>
+                    <p:config>
+                        <comment> Pipeline input called "my-input" </comment>
+                        <p:param name="my-input" type="input"/>
+                        <comment> Pipeline output called "my-output" </comment>
+                        <p:param name="my-output" type="output"/>
+                        <comment> XSLT transformation </comment>
+                        <p:processor name="oxf:xslt">
+                            <p:input name="config" href="stylesheet-1.xsl"/>
+                            <p:input name="data" href="#my-input"/>
+                            <p:output name="data" ref="my-output"/>
+                        </p:processor>
+                    </p:config>
+                </xml-source>
+                <p>
+                    In this case, the <code>data</code> output of the XSLT processor is connected to
+                    the <code>my-output</code> output of the containing pipeline.
+                </p>
+                <p>
+                    To sum up, a processor input can be connected to:
+                </p>
+                <ul>
+                    <li>a resource XML document</li>
+                    <li>an inline XML document</li>
+                    <li>the output of another processor</li>
+                    <li>a pipeline input</li>
+                    <li>a combination of the above through the <link href="#href-attribute">full
+                    syntax of the <code>href</code> attribute</link></li>
+                </ul>
+                <p>
+                    A processor output can be connected to:
+                </p>
+                <ul>
+                    <li>the input of another processor with the <code>id</code> attribute</li>
+                    <li>a pipeline output with the <code>ref</code> attribute</li>
+                </ul>
+            </section>
+            <anchor id="optional"/>
+            <section>
+                <title>Mandatory and Optional Inputs and Outputs</title>
+                <p>
+                    Some inputs and outputs are <i>required</i> by a processor. This means that you
+                    have to declare <code>&lt;p:input></code> and <code>&lt;p:output></code>
+                    elements with the appropriate <code>name</code> attribute within the
+                    <code>&lt;p:processor></code> element corresponding to that processor, and to
+                    connect those inputs and outputs as discussed in the previous section. Most
+                    processors require all their inputs and outputs to be connected.
+                </p>
+                <p>
+                    Some processors on the other hand may declare some inputs and outputs as
+                    <i>optional</i>. This means that the user of the processor may or may not
+                    connect an input or output if it is not necessary to do so. For example, the SQL
+                    processor declares an optional <code>datasource</code> input. If the
+                    <code>datasource</code> input is needed by the user, it must be connected:
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:sql">
+                        <p:input name="datasource" href="my-datasource.xml"/>
+                        <p:input name="data" href="#some-data"/>
+                        <p:input name="config">
+                            <config>
+                                ...
+                            </config>
+                        </p:input>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    On the other hand, if the user of the SQL processor does not require an
+                    external datasource document, she can simply not connect the
+                    <code>datasource</code> input:
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:sql">
+                        <p:input name="data" href="#some-data"/>
+                        <p:input name="config">
+                            <config>
+                                ...
+                            </config>
+                        </p:input>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    It is entirely up to each processor to determine which inputs and outputs are
+                    mandatory or optional, and how and when they are read.
+                </p>
+                <p>
+                    Note that a processor may decide whether an input must be connected depending on
+                    the content of other inputs, for example the SQL processor does not require the
+                    <code>datasource</code> input if its <code>config</code> input already refers to
+                    a J2EE datasource. On the contrary, if it does not refer to such a datasource,
+                    it requires the <code>datasource</code> input to be connected. If it is not,
+                    the processor generates an error at runtime.
+                </p>
+            </section>
+            <section>
+                <title>Referring to Inputs and Outputs with URIs</title>
+                <p>
+                    In certain cases, the user must refer from a processor configuration to
+                    particular processor inputs and outputs. It is recommended to support the
+                    <code>input:</code> and <code>output:</code> URI schemes for this purpose, for
+                    example:
+                </p>
+                <ul>
+                    <li>To refer to a processor input named <code>my-input</code>, use the URI: <code>input:my-input</code></li>
+                    <li>To refer to a processor output named <code>my-output</code>, use the URI: <code>output:my-output</code></li>
+                </ul>
+                <p>
+                    For concrete examples, please refer to the <a
+                    href="processors-xslt#user-defined">XSLT processor</a> or the <a
+                    href="processors-messaging#out-of-line-parts">Email processor</a>
+                    documentation.
+                </p>
+                <p>
+                    While there is no requirement for processor configurations to follow this URI
+                    convention, it is highly recommended to do so whenever possible to ensure
+                    consistency. In Presentation Server, several processors make use of it,
+                    including:
+                </p>
+                <ul>
+                    <li>The XSLT processor</li>
+                    <li>The XUpdate processor</li>
+                    <li>The Email processor</li>
+                </ul>
+                <p>
+                    Currently, no standard processor within Presentation Server makes uses of the
+                    <code>output:</code> scheme.
+                </p>
             </section>
         </section>
     </body>

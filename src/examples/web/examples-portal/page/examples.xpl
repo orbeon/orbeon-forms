@@ -35,8 +35,8 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 
                 <xsl:variable name="instance" select="/*" as="element()"/>
-                <xsl:variable name="portlets" select="document('oxf:aggregated-portlets')/*/portlet:portlets/portlet:portlet" as="element()*"/>
-                <xsl:variable name="portal-status" select="document('oxf:portal-status')" as="document-node()"/>
+                <xsl:variable name="portlets" select="document('input:aggregated-portlets')/*/portlet:portlets/portlet:portlet" as="element()*"/>
+                <xsl:variable name="portal-status" select="document('input:portal-status')" as="document-node()"/>
 
                 <xsl:variable name="examples-list" select="document('oxf:/examples/examples-list.xml')" as="document-node()"/>
 

@@ -49,14 +49,14 @@
         <action when="/*/action = 'edit-employee'" action="list-employees/find-employee-action.xpl">
             <result page="edit-employee">
                 <xu:update select="/form/document">
-                    <xu:copy-of select="document('oxf:action')/employees/*"/>
+                    <xu:copy-of select="document('input:action')/employees/*"/>
                 </xu:update>
             </result>
         </action>
         <action when="/*/action = 'show-reports'">
             <result page="show-reports">
                 <xu:update select="/form/employee-id">
-                    <xu:value-of select="document('oxf:instance')/*/action-employee-id"/>
+                    <xu:value-of select="document('input:instance')/*/action-employee-id"/>
                 </xu:update>
             </result>
         </action>
@@ -75,7 +75,7 @@
             <result page="edit-employee">
                 <xu:remove select="/*"/>
                 <xu:update select="/">
-                    <xu:copy-of select="document('oxf:instance')/*"/>
+                    <xu:copy-of select="document('input:instance')/*"/>
                 </xu:update>
                 <xu:update select="/form/action"/>
                 <xu:update select="/form/message">save-success</xu:update>
@@ -100,14 +100,14 @@
         <action when="/*/action = 'show-reports'">
             <result page="show-reports">
                 <xu:update select="/form/employee-id">
-                    <xu:value-of select="document('oxf:instance')/*/employee-id"/>
+                    <xu:value-of select="document('input:instance')/*/employee-id"/>
                 </xu:update>
             </result>
         </action>
         <action when="/*/action = 'edit-employee'" action="list-employees/find-employee-action.xpl">
             <result page="edit-employee">
                 <xu:update select="/form/document">
-                    <xu:copy-of select="document('oxf:action')/employees/*"/>
+                    <xu:copy-of select="document('input:action')/employees/*"/>
                 </xu:update>
             </result>
         </action>

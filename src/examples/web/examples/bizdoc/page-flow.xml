@@ -36,10 +36,10 @@
         <action when="/form/action = 'show-detail'" action="summary/find-document-action.xpl">
             <result page="detail-1">
                 <xu:update select="/form/document-id">
-                    <xu:value-of select="document('oxf:action')/document-info/document-id"/>
+                    <xu:value-of select="document('input:action')/document-info/document-id"/>
                 </xu:update>
                 <xu:update select="/form/document">
-                    <xu:copy-of select="document('oxf:action')/document-info/document/*"/>
+                    <xu:copy-of select="document('input:action')/document-info/document/*"/>
                 </xu:update>
             </result>
         </action>
@@ -47,10 +47,10 @@
         <action when="/form/action = 'new-document'" action="summary/new-document-action.xpl">
             <result page="detail-1">
                 <xu:update select="/form/document-id">
-                    <xu:value-of select="document('oxf:action')/document-info/document-id"/>
+                    <xu:value-of select="document('input:action')/document-info/document-id"/>
                 </xu:update>
                 <xu:update select="/form/document">
-                    <xu:copy-of select="document('oxf:action')/document-info/document/*"/>
+                    <xu:copy-of select="document('input:action')/document-info/document/*"/>
                 </xu:update>
             </result>
         </action>
@@ -62,7 +62,7 @@
         <action when="/form/action = 'show-xml'" action="summary/find-document-action.xpl">
             <result page="xml-detail" instance-passing="redirect-exit-portal">
                 <xu:update select="/form/document-id">
-                    <xu:value-of select="document('oxf:action')/document-info/document-id"/>
+                    <xu:value-of select="document('input:action')/document-info/document-id"/>
                 </xu:update>
             </result>
         </action>
@@ -77,7 +77,7 @@
             <result page="detail-1">
                 <xu:remove select="/*"/>
                 <xu:update select="/">
-                    <xu:copy-of select="document('oxf:instance')/*"/>
+                    <xu:copy-of select="document('input:instance')/*"/>
                 </xu:update>
                 <xu:update select="/form/action"/>
                 <xu:update select="/form/message">save-success</xu:update>
@@ -99,10 +99,10 @@
         <action when="/form/action = 'next'">
             <result page="detail-2">
                 <xu:update select="/form/document-id">
-                    <xu:value-of select="document('oxf:instance')/*/document-id"/>
+                    <xu:value-of select="document('input:instance')/*/document-id"/>
                 </xu:update>
                 <xu:update select="/form/document">
-                    <xu:copy-of select="document('oxf:instance')/*/document/*"/>
+                    <xu:copy-of select="document('input:instance')/*/document/*"/>
                 </xu:update>
             </result>
         </action>
@@ -114,7 +114,7 @@
             <result page="detail-2">
                 <xu:remove select="/*"/>
                 <xu:update select="/">
-                    <xu:copy-of select="document('oxf:instance')/*"/>
+                    <xu:copy-of select="document('input:instance')/*"/>
                 </xu:update>
                 <xu:update select="/form/action"/>
                 <xu:update select="/form/message">save-success</xu:update>
@@ -132,10 +132,10 @@
         <action when="/form/action = 'back'">
             <result page="detail-1">
                 <xu:update select="/form/document-id">
-                    <xu:value-of select="document('oxf:instance')/*/document-id"/>
+                    <xu:value-of select="document('input:instance')/*/document-id"/>
                 </xu:update>
                 <xu:update select="/form/document">
-                    <xu:copy-of select="document('oxf:instance')/*/document/*"/>
+                    <xu:copy-of select="document('input:instance')/*/document/*"/>
                 </xu:update>
             </result>
         </action>

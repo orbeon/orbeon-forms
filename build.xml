@@ -352,7 +352,14 @@
 
     <target name="anthill-release" depends="clean, orbeon-dist, test-classes, debug-enabled, debug-disabled">
         <junit fork="yes" haltonerror="yes" haltonfailure="yes">
-            <test name="org.orbeon.oxf.test.ProcessorTest"/>
+<!--            <test name="org.orbeon.oxf.test.ProcessorTest"/>-->
+
+            <batchtest>
+                <fileset dir="${test-src.dir}">
+                    <include name="org/orbeon/oxf/test/*Test*.java"/>
+                </fileset>
+            </batchtest>
+            
             <formatter type="plain" usefile="false"/>
             <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
             <sysproperty key="oxf.resources.flatfile.rootdir" value="/usr/local/anthill/work/orbeon/${web-examples-src.dir}"/>

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <header>
+        <title>Changes</title>
+    </header>
+    <body>
+        <section>
+            <title>New in Version 2.7</title>
+            <section>
+                <title>eXist Native XML Database</title>
+                <p>
+                    Presentation Server ships with the latest stable version of eXist
+                    (eXist-1.0b2-build-1107). This fixes the issue of connecting to an external
+                    eXist instance. Here is an example <code>datasource.xml</code> to connect to a
+                    standalone eXist:
+                </p>
+                <xml-source>
+                    <datasource>
+                        <comment> Specify the driver for the eXist database </comment>
+                        <driver-class-name>org.exist.xmldb.DatabaseImpl</driver-class-name>
+                        <comment> Example of URL for a non-embedded use </comment>
+                        <uri>xmldb:exist://localhost:8080/exist/xmlrpc</uri>
+                    </datasource>
+                </xml-source>
+            </section>
+            <section>
+                <title>SQL Processor</title>
+                <p>
+                    The SQL processor now supports external datasource definitions using the
+                    optional <code>datasource</code> input. Those directly refer to connections
+                    without using JNDI names mapped by the container. This allows examples to work
+                    out of the box. This is an example of datasource definition:
+                </p>
+                <xml-source>
+                    <datasource>
+                        <comment> Specify the driver for the database </comment>
+                        <driver-class-name>org.hsqldb.jdbcDriver</driver-class-name>
+                        <comment> This causes the use of the embedded database </comment>
+                        <uri>jdbc:hsqldb:file:orbeondb</uri>
+                        <comment> Optional username and password </comment>
+                        <username>sa</username>
+                        <password></password>
+                    </datasource>
+                </xml-source>
+                <p>
+                    Presentation Server ships with a recent version of HSQLDB (version 1.7.2.8).
+                </p>
+                <p>
+                    The SQL processor now supports reading <code>BINARY</code>, <code>VARBINARY
+                    </code>and <code>LONGVARBINARY</code> columns in addition to <code>BLOB</code>.
+                </p>
+                <p>
+                    The SQL processor's <code>data</code> input and output are now optional. This
+                    removes the need for "dummy" input content or Null serializers with the SQL
+                    processor.
+                </p>
+            </section>
+            <section>
+                <title>Examples</title>
+                <p>
+                    All the examples using the SQL processor now work out of the box without
+                    configuring datasources at the application server or servlet container level.
+                    This includes the following examples:
+                </p>
+                <ul>
+                    <li>Address Book</li>
+                    <li>Employees</li>
+                    <li>Data in multiple formats</li>
+                    <li>XForms Upload</li>
+                    <li>Email</li>
+                </ul>
+            </section>
+            <section>
+                <title>Saxon Upgraded to Version 8.1.1</title>
+                <p>
+                    TODO
+                </p>
+            </section>
+            <section>
+                <title>XPath Improvements</title>
+                <p>
+                    TODO
+                </p>
+            </section>
+            <section>
+                <title>JBoss Support</title>
+                <p>
+                    TODO
+                </p>
+            </section>
+            <section>
+                <title>XForms</title>
+                <section>
+                    <title>xxforms:hidden Extension Control</title>
+                    <p>
+                        The XForms extension control <code>xxforms:hidden</code> is supported again
+                        and documented.
+                    </p>
+                </section>
+                <section>
+                    <title>Compliance Matrix</title>
+                    <p>
+                        A <a href="reference-xforms-compliance">compliance matrix</a> is now
+                        available.
+                    </p>
+                </section>
+                <section>
+                    <title>Other XForms Improvements</title>
+                    <p>
+                        TODO
+                    </p>
+                </section>
+            </section>
+            <section>
+                <title>URL generator</title>
+                <section>
+                    <title>Relative URLs</title>
+                    <p>
+                        The <a href="processors-generators-url">URL generator</a> now supports
+                        URLs relative to the location where the generator is used, instead of just
+                        absolute URLs.
+                    </p>
+                </section>
+                <section>
+                    <title>XInclude Dependencies</title>
+                    <p>
+                        The <a href="processors-generators-url">URL generator</a> also deals
+                        correctly with XInclude dependencies. For example, if a file called
+                        <code>file1.xml</code> includes a file called <code>file2.xml</code>, which in
+                        turn includes a file called <code>file3.xml</code>, and you modify
+                        <code>file3.xml</code>, then <code>file1.xml</code> is re-read automatically.
+                        Of course, this works with other dependency scenarios as well!
+                    </p>
+                </section>
+            </section>
+            <section>
+                <title>User-Defined Processor Inputs</title>
+                <p>
+                    User-defined processor inputs, used by several processors including the XSLT
+                    processor and the Email processor, are now documented (<a
+                    href="reference-xpl-pipelines#optional">XPL documentation</a>, <a
+                    href="processors-xslt#user-defined">XSLT documentation</a>). The URI schemes to
+                    access user-defined inputs and outputs are now <code>input:</code> and
+                    <code>output:</code>, to avoid confusion with the <code>oxf:</code> scheme used
+                    for the Presentation Server resource manager sandbox.
+                </p>
+            </section>
+            <section>
+                <title>Java Processor</title>
+                <p>
+                    The <a href="processors-java">Java processor</a> now works correctly in command
+                    line mode. It also supports relative source paths and supports specifying
+                    alternate compilers.
+                </p>
+            </section>
+            <section>
+                <title>Email Processor</title>
+                <p>
+                    The <a href="processors-messaging-email">Email processor</a> now supports
+                    <code>Cc</code> and <code>Bcc</code> recipients. See the <a
+                    href="/goto-example/email">Email example</a> for an illustration.
+                </p>
+            </section>
+            <section>
+                <title>Scope Generator</title>
+                <p>
+                    The <a href="processors-generators#scope-generator">Scope generator</a> is now
+                    able to marshall regular JavaBeans in addition to XML stored as Strings, W3C
+                    and dom4j documents. This functionality deprecates the <a
+                    href="processors-generators#bean-generator">Bean generator</a>. These two
+                    processors previously had some overlap in functionality.
+                </p>
+            </section>
+            <section>
+                <title>Error Processor</title>
+                <p>
+                    The error processor now follows the same configuration mechanism as the main
+                    processor. The following property names have been deprecated:
+                </p>
+                <ul>
+                    <li><code>oxf.servlet.error.processor.uri</code></li>
+                    <li><code>oxf.servlet.error.input.*</code></li>
+                </ul>
+                <p>
+                    The new names are as follows:
+                </p>
+                <ul>
+                    <li><code>oxf.error-processor.name</code></li>
+                    <li><code>oxf.error-processor.input.*</code></li>
+                </ul>
+                <p>
+                    Visit <a href="integration-packaging#error-processor">Packaging and
+                    Deployment</a> for more information on configuring the error processor, as well
+                    as <a href="reference-error-pipeline">Error Pipeline</a> for information about
+                    creating an error pipeline.
+                </p>
+            </section>
+        </section>
+    </body>
+</document>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launchConfiguration type="orbeon.oxfstudio.eclipse.ui.OXFAppLaunchConfigurationDelegate">
+<stringAttribute key="process_factory_id" value="orbeon.oxfstudio.eclipse.server.ProcessFactory"/>
+<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
+<listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
+<listEntry value="org.eclipse.debug.ui.launchGroup.debug"/>
+</listAttribute>
+<stringAttribute key="orbeon.oxfstudio.eclipsej2ee_prj_name" value="oxf"/>
+<booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
+</launchConfiguration>

@@ -194,7 +194,7 @@
                         recoverable error occurs, this specification allows the XPL implementation
                         either to signal the error (by reporting the error condition and terminating
                         execution) in the basic profile or to take a defined recovery action and
-                        continue processing when the exception module is available.
+                        continue processing when the Exception module is available.
                     </termdef>
                 </p>
 <!--                <p>-->
@@ -484,7 +484,7 @@
                             having control, may generate an error that is propagated to the XPL
                             implementation. The XPL implementation then raises a dynamic error.
                             Even if the XPL implementation is expecting a resulting XML Infoset, no
-                            such XML Infoset is provided by the XML processor. With the exception
+                            such XML Infoset is provided by the XML processor. With the Exception
                             module, the error is considered an exception and may be a recoverable
                             dynamic error. This means that if an exception handler is available for
                             that exception, it can be caught and processing may resume. Otherwise,
@@ -961,6 +961,18 @@ fn:current() as <emph>document-node()</emph>
                         any, the Pipeline processor must execute a read phase on the XPL program's
                         output <emph>q</emph> with name <code>m</code>.
                     </p>
+                    <note>
+                        The Pipeline processor effectively provides support for sub-pipelines in
+                        XPL. It allows XPL programs to be used and manipulated like XML processors.
+                        It allows building the equivalent of functions and procedures in other
+                        programming languages.
+                    </note>
+                    <note>
+                        The Pipeline processor provides support for creating XPL program
+                        dynamically. For example, an XSLT processor could generate an XML Infoset
+                        that is a valid XPL program, and send it to the <code>pipeline</code> input
+                        of an instance of Pipeline processor.
+                    </note>
                 </div3>
             </div2>
             <div2>
@@ -1075,7 +1087,11 @@ fn:current() as <emph>document-node()</emph>
                     <item>
                         <p>
                             <emph>XPath 2.0.</emph> In this case, <bibref ref="xpath-20"/> must be
-                            supported.
+                            supported. In this case XPL is the <emph>host language</emph>. It should
+                            not provide any in-scope schema definitions in the static context; it
+                            shoud provide the types defined by XML Schema as in-scope type
+                            definitions in the static context; it should not provide any in-scope
+                            variable.
                         </p>
                     </item>
                 </ulist>
@@ -1094,6 +1110,28 @@ fn:current() as <emph>document-node()</emph>
                 </p>
             </div2>
         </div1>
+        <div1 id="future">
+            <head>Future Improvements</head>
+            <p>
+                This section lists improvements that should be added to a future version of this
+                specification.
+            </p>
+            <div2>
+                <head>Exception Module</head>
+                <p>
+                    The Exception module will support exception handling, based on a model found in
+                    other programming languages such as Java or WS-BPEL. Exception handling
+                    provides a good model to handle dynamic errors.
+                </p>
+            </div2>
+            <div2>
+                <head>Repeat Module <el>p:while</el> Element</head>
+                <p>
+                    The <el>p:while</el> statement will provide a repetition statement based on the
+                    idea of a repetition until a certain condition is reached.
+                </p>
+            </div2>
+        </div1>
     </body>
     <xi:include href="xpl-appendices.xml"/>
 </spec>
@@ -1101,10 +1139,8 @@ fn:current() as <emph>document-node()</emph>
 <!--
 
 TODO:
-    o improve [Relationship with the W3C Note 28 February 2002]
     o Refer to ncname definition: http://www.w3.org/TR/REC-xml-names/#NT-NCName
-    o mention sub-pipelines (in xpl:pipeline?)
-    o check XPath 2.0 spec and "host language"
-    o put p:while and p:try in a "future improvements section"
-    o threading: mention?
+    o should probably be more explicit about the role of XPL as host language for XPath, in
+      particular about how the static and dynamic contexts are setup.
+
 -->

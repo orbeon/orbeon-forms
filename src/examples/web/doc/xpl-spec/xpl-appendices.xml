@@ -139,9 +139,9 @@
     <div1 id="relationship">
         <head> Relationship with Other Specifications (Non-Normative)</head>
         <p>
-            This section discusses the relationship of XPL with other relevant specifications.
-            It is not normative, but is there to acknowledge that those specifications were
-            taken into account and to highlight similarities and differences.
+            This section discusses the relationship of XPL with other relevant specifications. It is
+            not normative, but is there to acknowledge that those specifications were taken into
+            account and to highlight similarities and differences.
         </p>
         <div2>
             <head>February 2002 XML Pipeline Definition Language W3C Note</head>
@@ -149,9 +149,9 @@
                 Work on XPL started in 2002 independently from <bibref
                 ref="xml-pipeline-definition"/>, a W3C Note published in February 2002. The
                 similarities between XPL and the W3C Note may appear startling. This is easily
-                explained by the fact that both initiatives aimed at solving a similar problem.
-                The similarities however remain mostly at the surface. XPL has a different
-                processing model, and proposes constructs different from those of the W3C Note.
+                explained by the fact that both initiatives aimed at solving a similar problem. The
+                similarities however remain mostly at the surface. XPL has a different processing
+                model, and proposes constructs different from those of the W3C Note.
             </p>
             <p>
                 XPL does:
@@ -166,12 +166,12 @@
             <ulist>
                 <item>
                     <p>
-                        XPL does not follow a "build system" approach with concepts such as
-                        "targets" being "up to date". Rather, an XPL pipeline is executed, and
-                        may return zero, one or more XML Infosets. This approach is closer from
-                        the approach followed by most programming languages. Further, it is
-                        thought that the concept of target is not necessary: choosing two
-                        different targets can be reduced to choosing two different pipelines.
+                        XPL does not follow a build system approach with concepts such as "targets"
+                        being "up to date". Rather, an XPL pipeline is executed, and may return
+                        zero, one or more XML Infosets. This approach is closer from the approach
+                        followed by most programming languages. Further, it is thought that the
+                        concept of target is not necessary: choosing two different targets can be
+                        reduced to choosing two different pipelines.
                     </p>
                 </item>
                 <item>
@@ -182,44 +182,37 @@
                 </item>
                 <item>
                     <p>
-                        XPL does not allow for elements from foreign vocabularies except as a
-                        convenience in the particular case of embedded processor input Infosets.
+                        XPL does not specify how "processes" ("processors" in the XPL terminology)
+                        are defined (W3C Note's process definitions). Such definitions are outside
+                        the scope of XPL and left to language implementors. The only assumption is
+                        that processors are declared and that they expose an XML qualified name
+                        (QName) that identifies them.
                     </p>
                 </item>
                 <item>
                     <p>
-                        XPL does not specify how "processes" ("processors" in the XPL
-                        terminology) are defined (W3C Note's process definitions). Such
-                        definitions are outside the scope of XPL and left to language
-                        implementors. The only assumption is that processors are declared and
-                        that they expose an XML qualified name (QName) that identifies them.
+                        XPL processors only support inputs and outputs that are XML Infosets. There
+                        is no concept of additional parameters (W3C Note <el>p:param</el>) to pass
+                        to processors. The rationale for this decision is that it is always possible
+                        to pass such parameters in the form of an XML Infoset.
                     </p>
                 </item>
                 <item>
                     <p>
-                        XPL processors only support inputs and outputs that are XML Infosets.
-                        There is no concept of additional parameters (W3C Note
-                        <el>p:param</el>) to pass to processors. The rationale for this
-                        decision is that it is always possible to pass such parameters in the
-                        form of an XML Infoset.
+                        XPL does not limit the types of Infosets produced by processors.
                     </p>
                 </item>
                 <item>
                     <p>
-                    XPL does not limit the types of Infosets produced by processors.
+                        XPL pipelines either entirely succeed or entirely fail (basic profile). When
+                        exception handling is added (Exception module), exceptions are handled
+                        accordingly.
                     </p>
                 </item>
                 <item>
                     <p>
-                        XPL pipelines either entirely succeed or entirely fail (basic profile).
-                        When exception handling is added (exception module), exceptions are
-                        handled accordingly.
-                    </p>
-                </item>
-                <item>
-                    <p>
-                    There is no "p:document" element. Instead, a particular processor, such as
-                    the identity processor, can be used for the same purpose.
+                        There is no <el>p:document</el> element. Instead, a particular processor,
+                        such as the identity processor, can be used for the same purpose.
                     </p>
                 </item>
             </ulist>
@@ -234,11 +227,11 @@
             <ulist>
                 <item>
                     <p>
-                        <emph>The language must be rich enough to address practical
-                        interoperability concerns.</emph> To achieve this goal, the language
-                        cannot be simplistic and needs to implement a number of basic features.
-                        The XPL specification defines a basic profile, and a number of modules
-                        that can be optionally implemented. [YES]
+                        <emph>The language must be rich enough to address practical interoperability
+                        concerns.</emph> To achieve this goal, the language cannot be simplistic and
+                        needs to implement a number of basic features. The XPL specification defines
+                        a basic profile, and a number of modules that can be optionally implemented.
+                        XPL fulfills this requirement.
                     </p>
                 </item>
                 <item>
@@ -246,120 +239,124 @@
                         <emph>The language should be as small and simple as possible.</emph> XPL
                         supports a fairly small set of features and the basic concepts remain
                         simple. Whenever possible, existing specifications are leveraged (XPath,
-                        for example). In addition XPL, like XSLT before it, may be written by
-                        hand, so the language should be reasonably concise. The notion of
+                        XPointer, for example). In addition XPL, like XSLT before it, may be written
+                        by hand, so the language tries to be reasonably concise. The notion of
                         modules allows implementors to start small and then add more advanced
-                        features. [YES]
+                        features. XPL fulfills this requirement.
                     </p>
                 </item>
                 <item>
                     <p>
-                        <emph>The language must allow the inputs, outputs, and other parameters
-                        of a components to be specified.</emph> In this specification, the
-                        language only uses XML Infosets to pass inputs and parameters to as
-                        component. It is thought that this makes XPL simpler. Our interpretation
-                        is that this is compatible with the requirement. [YES]
+                        <emph>The language must allow the inputs, outputs, and other parameters of a
+                        components to be specified.</emph> In this specification, the language only
+                        uses XML Infosets to pass inputs and parameters to as component. It is
+                        thought that this makes XPL simpler. Our interpretation is that this is
+                        compatible with the requirement. XPL fulfills this requirement.
                     </p>
                 </item>
                 <item>
                     <p>
                         <emph>The language must define the basic minimal set of mandatory input
                         processing options and associated error reporting options required to
-                        achieve interoperability.</emph> Currently, XPL does not have any
-                        error handling facilities. It is thought that the best way of achieving
-                        this is to implement exception handling. [NO, YES soon]
+                        achieve interoperability.</emph> XPL supports static and dynamic errors. XPL
+                        fulfills this requirement.
                     </p>
                 </item>
                 <item>
                     <p>
-                        <emph>Given a set of components and a set of documents, the language
-                        must allow the order of processing to be specified.</emph> XPL
-                        determines an implicit execution order. The order is predictable up to a
-                        certain level. Additional constraints would make the language more
-                        complex, but if needed, could be added. [?]
+                        <emph>Given a set of components and a set of documents, the language must
+                        allow the order of processing to be specified.</emph> XPL determines an
+                        execution order. Some details of the processing model are currently in the
+                        list of open issues, and will be addressed. XPL will fulfill this
+                        requirement.
                     </p>
                 </item>
                 <item>
                     <p>
-                        <emph>It should be relatively easy to implement a conformant
-                        implementation of the language, but it should also be possible to build
-                        a sophisticated implementation that can perform parallel operations,
-                        lazy or greedy processing, and other optimizations.</emph> [YES]
+                        <emph>It should be relatively easy to implement a conformant implementation
+                        of the language, but it should also be possible to build a sophisticated
+                        implementation that can perform parallel operations, lazy or greedy
+                        processing, and other optimizations.</emph> XPL fulfills this requirement.
                     </p>
                 </item>
                 <item>
                     <p>
-                        <emph>The model should be extensible enough so that applications can
-                        define new processes and make them a component in a pipeline.</emph>
-                        [YES]
+                        <emph>The model should be extensible enough so that applications can define
+                        new processes and make them a component in a pipeline.</emph> XPL fulfills
+                        this requirement.
                     </p>
                 </item>
                 <item>
                     <p>
-                        <emph>The model must provide mechanisms for addressing error handling
-                        and fallback behaviors.</emph> [SEE ERROR REPORTING ABOVE]
+                        <emph>The model must provide mechanisms for addressing error handling and
+                        fallback behaviors.</emph> The Exception module will be designed for this
+                        purpose. XPL will fulfill this requirement.
                     </p>
                 </item>
                 <item>
                     <p>
                         <emph>The model could allow conditional processing so that different
-                        components are selected depending on run-time evaluation.</emph> [YES]
+                        components are selected depending on run-time evaluation.</emph> XPL
+                        fulfills this requirement.
                     </p>
                 </item>
                 <item>
                     <p>
                         <emph>The model should not prohibit the existence of streaming
-                        pipelines.</emph> [YES]
+                        pipelines.</emph> XPL fulfills this requirement.
                     </p>
                 </item>
                 <item>
                     <p>
                         <emph>The model should allow multiple inputs and multiple outputs for a
-                        component.</emph> [YES]
+                        component.</emph> XPL fulfills this requirement.
                     </p>
                 </item>
                 <item>
                     <p>
                         <emph>The model should allow any data set conforming to one of the W3C
-                        standards, such as XML 1.1, XSLT 1.0, XML Query 1.0, etc., to be
-                        specified as an input or output of a component.</emph> How this should
-                        be interpreted is not clear. Limiting inputs and outputs to XML Infosets
-                        makes the language simpler, while still not prohibiting passing non-XML
-                        Infoset data by encapsulating it within an XML Infoset, be it a simple
-                        root element containing character data. [YES]
+                        standards, such as XML 1.1, XSLT 1.0, XML Query 1.0, etc., to be specified
+                        as an input or output of a component.</emph> How this should be interpreted
+                        is not clear. Limiting inputs and outputs to XML Infosets makes the language
+                        simpler, while still not prohibiting passing non-XML Infoset data by
+                        encapsulating it within an XML Infoset, be it a simple root element
+                        containing character data. The interpretation is that XPL fulfills this
+                        requirement.
                     </p>
                 </item>
                 <item>
                     <p>
-                        <emph>Information should be passed between components in a standard way,
-                        for example, as one of the data sets conforming to an industry
-                        standard.</emph> This is not a clear requirement. Each component
-                        defines the Infosets it produces and generates, and it should not be up
-                        to the pipeline language to define what they are. However, XPL supports
-                        inline validation able to enforce such constraints. [YES?]
+                        <emph>Information should be passed between components in a standard way, for
+                        example, as one of the data sets conforming to an industry standard.</emph>
+                        This is not a clear requirement. Each component defines the Infosets it
+                        produces and generates, and it should not be up to the pipeline language to
+                        define what they are. However, XPL supports inline validation able to
+                        enforce such constraints. The interpretation is that XPL fulfills this
+                        requirement.
                     </p>
                 </item>
                 <item>
                     <p>
-                        <emph>The language should be expressed in XML.</emph> [YES]
+                        <emph>The language should be expressed in XML.</emph> XPL fulfills this
+                        requirement.
                     </p>
                 </item>
                 <item>
                     <p>
                         <emph>The pipeline language should be declarative, not based on
-                        APIs.</emph> [YES]
+                        APIs.</emph> XPL fulfills this requirement.
                     </p>
                 </item>
                 <item>
                     <p>
                         <emph>The model should be neutral with respect to implementation
-                        language.</emph> [YES]
+                        language.</emph> XPL fulfills this requirement.
                     </p>
                 </item>
             </ulist>
             <p>
-                It should be noted that XPL provides more than the minimal requirements above,
-                and that in addition, the use cases of that Note can all be satisfied by XPL.
+                It should be noted that XPL provides more than the minimal requirements above, and
+                that in addition, the use cases of the Note can all be satisfied by XPL.
             </p>
         </div2>
         <div2>
@@ -368,12 +365,12 @@
                 [TODO]
             </p>
         </div2>
-        <div2>
-            <head>SXPipe</head>
-            <p>
-                [TODO]
-            </p>
-        </div2>
+<!--        <div2>-->
+<!--            <head>SXPipe</head>-->
+<!--            <p>-->
+<!--                [TODO]-->
+<!--            </p>-->
+<!--        </div2>-->
     </div1>
     <div1>
         <head>Schema for XPL</head>
@@ -461,6 +458,11 @@
                        convention? Because XSLT 2.0 is based on XML Schema, <el>namespace</el>
                        refers to a schema for that namespace. Right now in XPL, it is just a
                        convenient indirection.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                       Should the Pipeline processor be renamed the XPL processor?
                     </p>
                 </item>
             </olist>

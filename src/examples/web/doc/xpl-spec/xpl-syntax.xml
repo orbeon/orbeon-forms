@@ -22,7 +22,7 @@
     <div2>
         <head>Pipeline Module</head>
         <div3>
-            <head>The <el>p:pipeline</el> element</head>
+            <head>The <el>p:pipeline</el> Element</head>
             <pre>
 &lt;p:pipeline
 version = "1.0" &gt;
@@ -45,7 +45,7 @@ version = "1.0" &gt;
             </p>
         </div3>
         <div3>
-            <head>The <el>p:input</el> element</head>
+            <head>The <el>p:input</el> Element</head>
             <pre>
 &lt;p:input
 name = <emph>ncname</emph>
@@ -85,7 +85,7 @@ schema-href? = <emph>uri-reference</emph> /&gt;
             </p>
         </div3>
         <div3>
-            <head>The <el>p:output</el> element</head>
+            <head>The <el>p:output</el> Element</head>
             <pre>
 &lt;p:output
 name = <emph>ncname</emph>
@@ -130,7 +130,7 @@ schema-href? = <emph>uri-reference</emph> /&gt;
     <div2>
         <head>Processor Module</head>
         <div3>
-            <head>The <el>p:processor</el> element</head>
+            <head>The <el>p:processor</el> Element</head>
             <pre>
 &lt;p:processor
 name = <emph>qname</emph> &gt;
@@ -165,7 +165,7 @@ name = <emph>qname</emph> &gt;
             </note>
         </div3>
         <div3>
-            <head>The <el>p:input</el> element</head>
+            <head>The <el>p:input</el> Element</head>
             <pre>
 &lt;p:input
 name = <emph>ncname</emph>
@@ -204,7 +204,7 @@ schema-href? = <emph>uri-reference</emph> &gt;
             </p>
         </div3>
         <div3>
-            <head>The <el>p:output</el> element</head>
+            <head>The <el>p:output</el> Element</head>
             <pre>
 &lt;p:output
 name = <emph>ncname</emph>
@@ -243,7 +243,7 @@ schema-href? = <emph>uri-reference</emph> &gt;
     <div2>
         <head>Choose Module</head>
         <div3>
-            <head>The <el>p:choose</el> element</head>
+            <head>The <el>p:choose</el> Element</head>
             <pre>
 &lt;p:choose
 href = <emph>infoset-reference</emph> &gt;
@@ -274,7 +274,7 @@ href = <emph>infoset-reference</emph> &gt;
             </p>
         </div3>
         <div3>
-            <head>The <el>p:output</el> element</head>
+            <head>The <el>p:output</el> Element</head>
             <pre>
 &lt;p:output id = <emph>ncname</emph>
           href = <emph>infoset-reference</emph>
@@ -299,7 +299,7 @@ href = <emph>infoset-reference</emph> &gt;
             </p>
         </div3>
         <div3>
-            <head>The <el>p:when</el> element</head>
+            <head>The <el>p:when</el> Element</head>
             <pre>
 &lt;p:when
 test = <emph>expression</emph> &gt;
@@ -323,7 +323,7 @@ test = <emph>expression</emph> &gt;
             </p>
         </div3>
         <div3>
-            <head>The <el>p:otherwise</el> element</head>
+            <head>The <el>p:otherwise</el> Element</head>
             <pre>
 &lt;p:otherwise&gt;
 &lt;!-- Content: (p:processor | p:choose | p:for-each)* --&gt;
@@ -366,7 +366,7 @@ test = <emph>expression</emph> &gt;
     <div2>
         <head>Repeat Module</head>
         <div3>
-            <head>The <el>p:for-each</el> element</head>
+            <head>The <el>p:for-each</el> Element</head>
             <pre>
 &lt;p:for-each
 href = <emph>infoset-reference</emph>
@@ -411,7 +411,7 @@ schema-uri? <emph>uri-reference</emph> &gt;
             </note>
         </div3>
         <div3>
-            <head>The <el>p:output</el> element</head>
+            <head>The <el>p:output</el> Element</head>
             <pre>
 &lt;p:output
 href = <emph>infoset-reference</emph>
@@ -451,18 +451,6 @@ schema-href? = <emph>uri-reference</emph> &gt;
                 <el>href</el> attribute.
             </p>
         </div3>
-        <div3>
-            <head>The <el>p:while</el> element</head>
-            <p>
-                [TODO]
-            </p>
-        </div3>
-    </div2>
-    <div2>
-        <head>Exception Module</head>
-        <p>
-            [TODO]
-        </p>
     </div2>
     <div2 id="schema-references-syntax">
         <head>Schema References</head>

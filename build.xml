@@ -614,6 +614,9 @@
             <fileset dir="${build.distrib.dir}">
                 <include name="*"/>
             </fileset>
+            <fileset dir="${deployDir}">
+                <include name="*.log"/>
+            </fileset>
         </copy>
         <delete>
             <fileset dir="${deployDir}">

@@ -18,15 +18,13 @@ import org.dom4j.Element;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.oxf.Handler;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.TransformerUtils;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
@@ -45,18 +43,16 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Generates SAX events from a document fetched from an URL.
- *
+ * <p/>
  * NOTE: For XML content-type and encoding related questions, check out the following draft
  * document:
- *
- *   http://www.faqs.org/rfcs/rfc3023.html
- *   http://www.ietf.org/internet-drafts/draft-murata-kohn-lilley-xml-00.txt
+ * <p/>
+ * http://www.faqs.org/rfcs/rfc3023.html
+ * http://www.ietf.org/internet-drafts/draft-murata-kohn-lilley-xml-00.txt
  */
 public class URLGenerator extends ProcessorImpl {
 
@@ -79,14 +75,12 @@ public class URLGenerator extends ProcessorImpl {
     private static final int DEFAULT_CACHE_EXPIRATION = CACHE_EXPIRATION_LAST_MODIFIED;
 
     private static final String DEFAULT_TEXT_DOCUMENT_ELEMENT = "document";
-    private static final String DEFAULT_TEXT_LINE_ELEMENT = "line";
-
     private static final String DEFAULT_BINARY_DOCUMENT_ELEMENT = "document";
 
     public static final String URL_NAMESPACE_URI = "http://www.orbeon.org/oxf/xml/url";
     public static final String VALIDATING_PROPERTY = "validating";
 
-    private Config config;
+    private ConfigURIReferences localConfigURIReferences;
 
     public URLGenerator() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, URL_NAMESPACE_URI));
@@ -95,7 +89,7 @@ public class URLGenerator extends ProcessorImpl {
 
     public URLGenerator(String url) {
         try {
-            this.config = new Config(URLFactory.createURL(url));
+            this.localConfigURIReferences = new ConfigURIReferences(new Config(URLFactory.createURL(url)));
             addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
         } catch (MalformedURLException e) {
             throw new OXFException(e);
@@ -103,12 +97,12 @@ public class URLGenerator extends ProcessorImpl {
     }
 
     public URLGenerator(URL url) {
-        this.config = new Config(url);
+        this.localConfigURIReferences = new ConfigURIReferences(new Config(url));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
     public URLGenerator(URL url, String contentType, boolean forceContentType) {
-        this.config = new Config(url, contentType, forceContentType);
+        this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
@@ -207,33 +201,42 @@ public class URLGenerator extends ProcessorImpl {
 //        }
 
         public String toString() {
-            return "[" + getURL().toExternalForm() + "|" + getContentType() + "|" + getEncoding() + "|"  + isValidating() + "|" + isForceContentType()
+            return "[" + getURL().toExternalForm() + "|" + getContentType() + "|" + getEncoding() + "|" + isValidating() + "|" + isForceContentType()
                     + "|" + isForceEncoding() + "|" + isIgnoreConnectionEncoding() + "|" + tidyConfig + "]";
         }
     }
 
+    private static class ConfigURIReferences {
+        public ConfigURIReferences(Config config) {
+            this.config = config;
+        }
+
+        public Config config;
+        public URIReferences uriReferences;
+    }
+
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
 
                 // Read config input into a URL, cache if possible
-                Config config = URLGenerator.this.config != null ? URLGenerator.this.config :
-                        (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
-                            public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
+                ConfigURIReferences configURIReferences = URLGenerator.this.localConfigURIReferences != null ? localConfigURIReferences :
+                        (ConfigURIReferences) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+                            public Object read(PipelineContext context, ProcessorInput input) {
                                 Element configElement = readInputAsDOM4J(context, input).getRootElement();
 
                                 // shortcut if the url is direct child of config
                                 String url = configElement.getTextTrim();
-                                if(url != null && !url.equals("") ) {
+                                if (url != null && !url.equals("")) {
                                     try {
-                                        return new Config(URLFactory.createURL(url));
+                                        return new ConfigURIReferences(new Config(URLFactory.createURL(url)));
                                     } catch (MalformedURLException e) {
                                         throw new OXFException(e);
                                     }
                                 }
 
                                 // We have the /config/url syntax
-                                url =  XPathUtils.selectStringValueNormalize(configElement, "/config/url");
+                                url = XPathUtils.selectStringValueNormalize(configElement, "/config/url");
 
                                 // Get content-type
                                 String contentType = XPathUtils.selectStringValueNormalize(configElement, "/config/content-type");
@@ -274,8 +277,8 @@ public class URLGenerator extends ProcessorImpl {
                                     // Use location data if present so that relative URLs can be supported
                                     LocationData locationData = getLocationData();
                                     URL fullURL = (locationData != null && locationData.getSystemID() != null)
-                                        ? URLFactory.createURL(locationData.getSystemID(), url)
-                                        : URLFactory.createURL(url);
+                                            ? URLFactory.createURL(locationData.getSystemID(), url)
+                                            : URLFactory.createURL(url);
 
                                     // Create configuration
                                     Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
@@ -283,46 +286,49 @@ public class URLGenerator extends ProcessorImpl {
                                             tidyConfig);
                                     if (logger.isDebugEnabled())
                                         logger.debug("Read configuration: " + config.toString());
-                                    return config;
+                                    return new ConfigURIReferences(config);
                                 } catch (MalformedURLException e) {
                                     throw new OXFException(e);
                                 }
                             }
                         });
                 try {
-                    // Never accept a null url
-                    if (config.getURL() == null)
+                    // Never accept a null URL
+                    if (configURIReferences.config.getURL() == null)
                         throw new OXFException("Missing configuration.");
                     // Create unique key and validity for the document
-                    CacheKey key = new InternalCacheKey(URLGenerator.this, "urlDocument", config.toString());
+                    CacheKey key = new InternalCacheKey(URLGenerator.this, "urlDocument", configURIReferences.config.toString());
 
                     // Resource from cache
                     Object cachedResource = null;
                     // Check if we can directly serve the resource from cache
-//                    if (config.cacheExpiration != CACHE_EXPIRATION_LAST_MODIFIED) {
+//                    if (configURIReferences.config.cacheExpiration != CACHE_EXPIRATION_LAST_MODIFIED) {
 //                        // We don't use the last-modified header, but instead we use an expiration value set by the user
-//                        long cacheExpiration = (config.cacheExpiration < 0) ? config.cacheExpiration : config.cacheExpiration * 1000; // time is in msb
+//                        long cacheExpiration = (configURIReferences.config.cacheExpiration < 0) ? configURIReferences.config.cacheExpiration : configURIReferences.config.cacheExpiration * 1000; // time is in msb
 //                        cachedResource = ObjectCache.instance().findValidWithExpiration(context, key, cacheExpiration);
 //                        if (cachedResource != null)
 //                            ((SAXStore) cachedResource).replay(contentHandler);
 //                    }
 
                     if (cachedResource == null) {
-                        // We were unable to just replay from cache without accessing the resource
+                        // We are unable to just replay from cache without accessing the resource
 
                         // Decide whether to use read from the special oxf: handler or the generic URL handler
-                        ResourceHandler handler = Handler.PROTOCOL.equals(config.getURL().getProtocol())
-                                ? (ResourceHandler) new OXFResourceHandler(config)
-                                : (ResourceHandler) new URLResourceHandler(config);
+                        ResourceHandler handler = null;
                         try {
-                            Object validity = handler.getValidity();
-                            cachedResource = ObjectCache.instance().findValid(context, key, validity);
+                            // We use the same validity as for the output
+                            Object validity = getValidityImpl(pipelineContext);
+                            cachedResource = ObjectCache.instance().findValid(pipelineContext, key, validity);
                             if (cachedResource != null) {
                                 // Just replay the cached resource
                                 // NOTE: should we do this only with config.isCacheUseLocalCache() = true?
                                 ((SAXStore) cachedResource).replay(contentHandler);
                             } else {
                                 // We need to read the resource
+
+                                handler = Handler.PROTOCOL.equals(configURIReferences.config.getURL().getProtocol())
+                                    ? (ResourceHandler) new OXFResourceHandler(configURIReferences.config)
+                                    : (ResourceHandler) new URLResourceHandler(configURIReferences.config);
 
                                 // Find content-type to use. If the config says to force the
                                 // content-type, we use the content-type provided by the user.
@@ -332,35 +338,45 @@ public class URLGenerator extends ProcessorImpl {
                                 // provide a content-type for example to read HTML documents with
                                 // the file: protocol.
                                 String contentType;
-                                if (config.isForceContentType()) {
-                                    contentType = config.getContentType();
+                                if (configURIReferences.config.isForceContentType()) {
+                                    contentType = configURIReferences.config.getContentType();
                                 } else {
                                     contentType = handler.getResourceContentType();
                                     if (contentType == null)
-                                        contentType = config.getContentType();
+                                        contentType = configURIReferences.config.getContentType();
                                     if (contentType == null)
                                         contentType = ProcessorUtils.DEFAULT_CONTENT_TYPE;
                                 }
 
                                 // Create store for caching if necessary
-                                ContentHandler output = config.isCacheUseLocalCache() ? new SAXStore(contentHandler) : contentHandler;
+                                ContentHandler output = configURIReferences.config.isCacheUseLocalCache() ? new SAXStore(contentHandler) : contentHandler;
 
-                                //System.out.println("XXX " + config.toString() + " XXX " + handler.getResourceContentType());
+                                //System.out.println("XXX " + configURIReferences.config.toString() + " XXX " + handler.getResourceContentType());
 
                                 // Read resource
                                 if (ProcessorUtils.HTML_CONTENT_TYPE.equals(contentType)) {
                                     handler.readHTML(output);
+                                    configURIReferences.uriReferences = null;
                                 } else if (ProcessorUtils.isXMLContentType(contentType)) {
-                                    handler.readXML(output);
+                                    LocalXIncludeListener localXIncludeListener = new LocalXIncludeListener();
+                                    XIncludeHandler.setXIncludeListener(localXIncludeListener);
+                                    try {
+                                        handler.readXML(pipelineContext, output);
+                                    } finally {
+                                        XIncludeHandler.setXIncludeListener(null);
+                                    }
+                                    localXIncludeListener.updateCache(pipelineContext, configURIReferences);
                                 } else if (ProcessorUtils.isTextContentType(contentType)) {
                                     handler.readText(output, contentType);
+                                    configURIReferences.uriReferences = null;
                                 } else {
                                     handler.readBinary(output, contentType);
+                                    configURIReferences.uriReferences = null;
                                 }
 
                                 // Cache the resource
-                                if (config.isCacheUseLocalCache())
-                                    ObjectCache.instance().add(context, key, validity, output);
+                                if (configURIReferences.config.isCacheUseLocalCache())
+                                    ObjectCache.instance().add(pipelineContext, key, validity, output);
                             }
                         } finally {
                             if (handler != null)
@@ -373,50 +389,79 @@ public class URLGenerator extends ProcessorImpl {
                     LocationData locationData = e.getLocationData();
                     // The system id may not be set
                     if (locationData == null || locationData.getSystemID() == null)
-                        e.setLocationData(new LocationData(config.getURL().toExternalForm(), -1, -1));
+                        e.setLocationData(new LocationData(configURIReferences.config.getURL().toExternalForm(), -1, -1));
 
                     throw e;
 
                 } catch (OXFException e) {
                     throw e;
                 } catch (Exception e) {
-                    throw new ValidationException(e, new LocationData(config.getURL().toExternalForm(), -1, -1));
+                    throw new ValidationException(e, new LocationData(configURIReferences.config.getURL().toExternalForm(), -1, -1));
                 }
             }
 
-            private Config getConfig(org.orbeon.oxf.pipeline.api.PipelineContext context) {
-                // Make sure the input is cacheable
-                OutputCacheKey outputKey = getInputKey(context, getInputByName(INPUT_CONFIG));
-                if (outputKey == null) return null;
-                InputCacheKey key = new InputCacheKey(getInputByName(INPUT_CONFIG), outputKey);
-                Object validity = getInputValidity(context, getInputByName(INPUT_CONFIG));
-                if (validity == null) return null;
-                // Try to find resource manager key in cache
-                Config config = (Config) ObjectCache.instance().findValid(context, key, validity);
-                if (logger.isDebugEnabled())
-                    if (config != null)
-                        logger.debug("Config found: " + config.toString());
-                    else
-                        logger.debug("Config not found");
-                return config;
-            }
-
-            public OutputCacheKey getKeyImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {
-                Config config = URLGenerator.this.config != null ? URLGenerator.this.config : getConfig(context);
-                return (config != null) ? new OutputCacheKey(this, config.toString()) : null;
-            }
-
-            public Object getValidityImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {
-                Config config = URLGenerator.this.config != null ? URLGenerator.this.config : getConfig(context);
+            public OutputCacheKey getKeyImpl(PipelineContext context) {
                 try {
-                    // We need the config to do more
-                    if (config == null || config.getURL() == null)
+                    ConfigURIReferences configURIReferences = getConfigURIReferences(context);
+                    if (configURIReferences == null)
                         return null;
 
-                    ResourceHandler handler = Handler.PROTOCOL.equals(config.getURL().getProtocol())
-                            ? (ResourceHandler) new OXFResourceHandler(config)
-                            : (ResourceHandler) new URLResourceHandler(config);
+                    List keys = new ArrayList();
 
+                    // Handle config if read as input
+                    if (localConfigURIReferences == null) {
+                        KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
+                        keys.add(configKeyValidity.key);
+                    }
+                    // Handle main document
+                    keys.add(new OutputCacheKey(this, configURIReferences.config.toString()));
+                    // Handle dependencies if any
+                    if (configURIReferences.uriReferences != null) {
+                        for (Iterator i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
+                            URIReference uriReference = (URIReference) i.next();
+                            keys.add(new InternalCacheKey(URLGenerator.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm()));
+                        }
+                    }
+
+                    return new OutputCacheKey(this, keys);
+                } catch (MalformedURLException e) {
+                    throw new OXFException(e);
+                }
+            }
+
+            public Object getValidityImpl(PipelineContext context) {
+                try {
+                    ConfigURIReferences configURIReferences = getConfigURIReferences(context);
+                    if (configURIReferences == null)
+                        return null;
+
+                    List validities = new ArrayList();
+
+                    // Handle config if read as input
+                    if (localConfigURIReferences == null) {
+                        KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
+                        validities.add(configKeyValidity.validity);
+                    }
+                    // Handle main document
+                    validities.add(getHandlerValidity(configURIReferences.config.getURL()));
+                    // Handle dependencies if any
+                    if (configURIReferences.uriReferences != null) {
+                        for (Iterator i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
+                            URIReference uriReference = (URIReference) i.next();
+                            validities.add(getHandlerValidity(URLFactory.createURL(uriReference.context, uriReference.spec)));
+                        }
+                    }
+                    return validities;
+                } catch (IOException e) {
+                    throw new OXFException(e);
+                }
+            }
+
+            private Object getHandlerValidity(URL url) {
+                try {
+                    ResourceHandler handler = Handler.PROTOCOL.equals(url.getProtocol())
+                            ? (ResourceHandler) new OXFResourceHandler(new Config(url))
+                            : (ResourceHandler) new URLResourceHandler(new Config(url));
                     try {
                         // FIXME: this can potentially be very slow with some URLs
                         return handler.getValidity();
@@ -424,10 +469,33 @@ public class URLGenerator extends ProcessorImpl {
                         if (handler != null)
                             handler.destroy();
                     }
-
                 } catch (IOException e) {
+                    // If the file no longer exists, for example, we don't want to throw, just to invalidate
+                    // An exception will be thrown if necessary when the document is actually read
                     return null;
                 }
+            }
+
+
+            private ConfigURIReferences getConfigURIReferences(PipelineContext context) {
+                // Check if config is external
+                if (localConfigURIReferences != null)
+                    return localConfigURIReferences;
+
+                // Make sure the config input is cacheable
+                KeyValidity keyValidity = getInputKeyValidity(context, INPUT_CONFIG);
+                if (keyValidity == null)
+                    return null;
+
+                // Try to find resource manager key in cache
+                ConfigURIReferences config = (ConfigURIReferences) ObjectCache.instance().findValid(context, keyValidity.key, keyValidity.validity);
+                if (logger.isDebugEnabled()) {
+                    if (config != null)
+                        logger.debug("Config found: " + config.toString());
+                    else
+                        logger.debug("Config not found");
+                }
+                return config;
             }
         };
         addOutput(name, output);
@@ -436,12 +504,19 @@ public class URLGenerator extends ProcessorImpl {
 
     private interface ResourceHandler {
         public Object getValidity() throws IOException;
+
         public String getResourceContentType() throws IOException;
+
         public String getConnectionEncoding() throws IOException;
+
         public void destroy() throws IOException;
+
         public void readHTML(ContentHandler output) throws IOException;
+
         public void readText(ContentHandler output, String contentType) throws IOException;
-        public void readXML(ContentHandler output) throws IOException;
+
+        public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException;
+
         public void readBinary(ContentHandler output, String contentType) throws IOException;
     }
 
@@ -473,7 +548,7 @@ public class URLGenerator extends ProcessorImpl {
                 logger.debug("OXF Protocol: Using ResourceManager for key " + getKey());
 
             long result = ResourceManagerWrapper.instance().lastModified(getKey());
-             // Zero and negative values often have a special meaning, make sure to normalize here
+            // Zero and negative values often have a special meaning, make sure to normalize here
             return (result <= 0) ? null : new Long(result);
         }
 
@@ -508,7 +583,7 @@ public class URLGenerator extends ProcessorImpl {
             URLResourceHandler.readText(inputStream, getExternalEncoding(), output, contentType);
         }
 
-        public void readXML(ContentHandler output) throws IOException {
+        public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {
             if (getExternalEncoding() != null) {
                 // The encoding is set externally, either forced by the user, or set by the connection
                 inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
@@ -528,6 +603,21 @@ public class URLGenerator extends ProcessorImpl {
             if (resourceManagerKey == null)
                 resourceManagerKey = config.getURL().getFile();
             return resourceManagerKey;
+        }
+    }
+
+    private static class LocalXIncludeListener implements XIncludeHandler.XIncludeListener {
+
+        private URIReferences uriReferences;
+
+        public void inclusion(String base, String href) {
+            if (uriReferences == null)
+                uriReferences = new URIReferences();
+            uriReferences.references.add(new URIReference(base, href));
+        }
+
+        public void updateCache(PipelineContext pipelineContext, ConfigURIReferences configURIReferences) {
+            configURIReferences.uriReferences = uriReferences;
         }
     }
 
@@ -618,7 +708,7 @@ public class URLGenerator extends ProcessorImpl {
             readBinary(urlConn.getInputStream(), output, contentType);
         }
 
-        public void readXML(ContentHandler output) throws IOException {
+        public void readXML(PipelineContext pipelineContext, ContentHandler output) throws IOException {
             openConnection();
             // Read the resource from the resource manager and parse it as XML
             try {
@@ -725,5 +815,19 @@ public class URLGenerator extends ProcessorImpl {
                 throw new OXFException(e);
             }
         }
+    }
+
+    private static class URIReference {
+        public URIReference(String context, String spec) {
+            this.context = context;
+            this.spec = spec;
+        }
+
+        public String context;
+        public String spec;
+    }
+
+    private static class URIReferences {
+        public List references = new ArrayList();
     }
 }

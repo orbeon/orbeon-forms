@@ -82,15 +82,14 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 Transformer transformer = null;
                 TransformerHandler transformerHandler = null;
                 try {
-
-                    // Get uri references from cache
-                    KeyValidity configKeyValidity = getConfigKeyValidity(context);
+                    // Get URI references from cache
+                    KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
                     URIReferences uriReferences = getURIReferences(context, configKeyValidity);
 
                     // Get transformer from cache
                     if (uriReferences != null) {
                         KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(context, configKeyValidity, uriReferences);
-                        if (stylesheetKeyValidity.key != null && stylesheetKeyValidity.validity != null)
+                        if (stylesheetKeyValidity != null)
                             transformer = (Transformer) ObjectCache.instance()
                                     .findValid(context, stylesheetKeyValidity.key, stylesheetKeyValidity.validity);
                     }
@@ -179,9 +178,9 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
             protected CacheKey getLocalKey(PipelineContext context) {
                 try {
-                    KeyValidity configKeyValidity = getConfigKeyValidity(context);
+                    KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
                     URIReferences uriReferences = getURIReferences(context, configKeyValidity);
-                    if (uriReferences == null || uriReferences.hasDynamicDocumentReferences || configKeyValidity.key == null)
+                    if (uriReferences == null || uriReferences.hasDynamicDocumentReferences)
                         return null;
                     List keys = new ArrayList();
                     keys.add(configKeyValidity.key);
@@ -190,7 +189,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     allURIReferences.addAll(uriReferences.documentReferences);
                     for (Iterator i = allURIReferences.iterator(); i.hasNext();) {
                         URIReference uriReference = (URIReference) i.next();
-                        keys.add(new InternalCacheKey(XSLTTransformer.this, "urlDocument", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm()));
+                        keys.add(new InternalCacheKey(XSLTTransformer.this, "xsltURLReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm()));
                     }
                     return new InternalCacheKey(XSLTTransformer.this, keys);
                 } catch (MalformedURLException e) {
@@ -200,9 +199,9 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
             protected Object getLocalValidity(PipelineContext context) {
                 try {
-                    KeyValidity configKeyValidity = getConfigKeyValidity(context);
+                    KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
                     URIReferences uriReferences = getURIReferences(context, configKeyValidity);
-                    if (uriReferences == null || uriReferences.hasDynamicDocumentReferences || configKeyValidity.validity == null)
+                    if (uriReferences == null || uriReferences.hasDynamicDocumentReferences)
                         return null;
                     List validities = new ArrayList();
                     validities.add(configKeyValidity.validity);
@@ -220,41 +219,30 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 }
             }
 
-            private KeyValidity getConfigKeyValidity(PipelineContext context) {
-                KeyValidity result = new KeyValidity();
-                ProcessorInput input = getInputByName(INPUT_CONFIG);
-                Cacheable cacheable = (Cacheable) input.getOutput();
-                result.key = cacheable.getKey(context) == null ? null :
-                        new InputCacheKey(input, cacheable.getKey(context));
-                result.validity = (result.key != null) ? cacheable.getValidity(context) : null;
-                return result;
-            }
-
             private URIReferences getURIReferences(PipelineContext context, KeyValidity configKeyValidity) {
-                return configKeyValidity.key != null && configKeyValidity.validity != null ?
-                        (URIReferences) ObjectCache.instance().findValid
-                        (context, configKeyValidity.key, configKeyValidity.validity) : null;
+                if (configKeyValidity == null)
+                    return null;
+                return (URIReferences) ObjectCache.instance().findValid(context, configKeyValidity.key, configKeyValidity.validity);
             }
 
             private KeyValidity createStyleSheetKeyValidity(PipelineContext context, KeyValidity configKeyValidity, URIReferences uriReferences) {
                 try {
-                    KeyValidity result = new KeyValidity();
-                    if (configKeyValidity.key != null && configKeyValidity.validity != null) {
-                        List keys = new ArrayList();
-                        List validities = new ArrayList();
-                        keys.add(configKeyValidity.key);
-                        validities.add(configKeyValidity.validity);
-                        for (Iterator i = uriReferences.stylesheetReferences.iterator(); i.hasNext();) {
-                            URIReference uriReference = (URIReference) i.next();
-                            URL url = URLFactory.createURL(uriReference.context, uriReference.spec);
-                            keys.add(new InternalCacheKey(XSLTTransformer.this, "urlDocument", url.toExternalForm()));
-                            Processor urlGenerator = new URLGenerator(url);
-                            validities.add(((ProcessorOutputImpl)urlGenerator.createOutput(OUTPUT_DATA)).getValidity(context));
-                        }
-                        result.key = new InternalCacheKey(XSLTTransformer.this, keys);
-                        result.validity = validities;
+                    if (configKeyValidity == null)
+                        return null;
+
+                    List keys = new ArrayList();
+                    List validities = new ArrayList();
+                    keys.add(configKeyValidity.key);
+                    validities.add(configKeyValidity.validity);
+                    for (Iterator i = uriReferences.stylesheetReferences.iterator(); i.hasNext();) {
+                        URIReference uriReference = (URIReference) i.next();
+                        URL url = URLFactory.createURL(uriReference.context, uriReference.spec);
+                        keys.add(new InternalCacheKey(XSLTTransformer.this, "xsltURLReference", url.toExternalForm()));
+                        Processor urlGenerator = new URLGenerator(url);
+                        validities.add(((ProcessorOutputImpl) urlGenerator.createOutput(OUTPUT_DATA)).getValidity(context));//FIXME: can we do better? See URL generator.
                     }
-                    return result;
+
+                    return new KeyValidity(new InternalCacheKey(XSLTTransformer.this, keys), validities);
                 } catch (MalformedURLException e) {
                     throw new OXFException(e);
                 }
@@ -339,13 +327,13 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
 
                         // Put in cache: configKey -> uriReferences
-                        KeyValidity configKeyValidty = getConfigKeyValidity(context);
-                        if (configKeyValidty.key != null && configKeyValidty.validity != null)
+                        KeyValidity configKeyValidty = getInputKeyValidity(context, INPUT_CONFIG);
+                        if (configKeyValidty != null)
                             ObjectCache.instance().add(context, configKeyValidty.key, configKeyValidty.validity, uriReferences);
 
                         // Put in cache: (configKey, uriReferences.stylesheetReferences) -> transformer
                         KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(context, configKeyValidty, uriReferences);
-                        if (stylesheetKeyValidity.key != null && stylesheetKeyValidity.validity != null)
+                        if (stylesheetKeyValidity != null)
                             ObjectCache.instance().add(context, stylesheetKeyValidity.key, stylesheetKeyValidity.validity, transformer);
                     }
 
@@ -602,10 +590,4 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         public String transformerType;
         public String systemId;
     }
-
-    private static class KeyValidity {
-        public CacheKey key;
-        public Object validity;
-    }
-
 }

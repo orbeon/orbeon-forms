@@ -456,18 +456,18 @@
 
         <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${deployDir}/${release.number}/build.log'/>
     	
-    	<exec executable='ln' >
-    		<arg value='-s' />
-    		<arg value='-f' />
-    		<arg value='${deployDir}/${release.number}/orbeon.war' />
-    		<arg value='${user.home}/webapps/orbeon.war' />
-    	</exec>
-
-        <delete>
-            <fileset dir="${deployDir}">
-                <exclude name="${release.number}/**"/>
-            </fileset>
-        </delete>
+<!--    	<exec executable='ln' >-->
+<!--    		<arg value='-s' />-->
+<!--    		<arg value='-f' />-->
+<!--    		<arg value='${deployDir}/${release.number}/orbeon.war' />-->
+<!--    		<arg value='${user.home}/webapps/orbeon.war' />-->
+<!--    	</exec>-->
+<!---->
+<!--        <delete>-->
+<!--            <fileset dir="${deployDir}">-->
+<!--                <exclude name="${release.number}/**"/>-->
+<!--            </fileset>-->
+<!--        </delete>-->
 
 
     </target>

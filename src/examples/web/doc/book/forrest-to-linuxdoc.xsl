@@ -144,7 +144,7 @@
     <xsl:template match="/">
         <book>
             <titlepag>
-                <title>Orbeon Presentation Server User Manual version 2.7.1</title>
+                <title>Orbeon Presentation Server User Manual version 2.7.2</title>
                 <author>Orbeon, Inc.</author>
                 <date>January 11 2005</date>
                 <abstract>

@@ -16,7 +16,6 @@
     <page id="enter-pin" path-info="/atm" xforms="enter-pin-form.xml" view="enter-pin-view.xsl">
         <action id="enter" when="/form/action = 'submit'" action="enter-pin-action.xsl">
             <result id="valid" when="/valid = 'true'" page="view-account"/>
-            <result id="invalid" when="/valid = 'false'"/>
         </action>
     </page>
 

@@ -382,6 +382,13 @@ select first_name, last_name
                 </p>
 
                 <p>
+                    <code>sql:get-columns</code> supports an <code>all-elements</code> attribute.
+                    If set to <code>true</code>, an element is output for a column even if that
+                    column returns a null value. If missing or set to <code>false</code>, no element
+                    is output for a null column.
+                </p>
+
+                <p>
                     The namespace prefix, if specified, must have been mapped to a namespace URI.
                 </p>
 

@@ -78,27 +78,7 @@
                 </section>
             </section>
             <section>
-                <title>Improved Request Body and Uploaded Files Support</title>
-                <p>
-                    It was possible in the past with the <a
-                    href="processors-generators#request-generator">Request generator</a> to obtain
-                    the request body, which was automatically parsed as XML. This behavior has now
-                    been changed. It is instead possible to obtain the request body as
-                    <code>xs:anyURI</code> or <code>xs:base64Binary</code>. Parsing may then be done
-                    using the <a href="processors-generators#url-generator">URL generator</a>. In
-                    addition, the body can now be read several times. This change brings consistency
-                    with the handling of uploaded files, and the support for binary files thoughout
-                    Presentation Server.
-                </p>
-                <p>
-                    In a related change, the <a
-                    href="processors-generators#request-generator">Request generator</a> now
-                    supports specifying whether uploaded files or the request body must be generated
-                    as <code>xs:anyURI</code> or <code>xs:base64Binary</code>.
-                </p>
-            </section>
-            <section>
-				<title>Standard Representation of Binary and Text Documents</title>
+                <title>Standard Representation of Binary and Text Documents</title>
                 <p>
                     In Presentation Server <a href="reference-xpl-pipelines">XPL and pipelines</a>
                     only deal with XML documents. In order to handle non-XML data such as binary and
@@ -115,7 +95,29 @@
                     href="processors-messaging#email-processor">Email processor</a>, and <a
                     href="processors-converters">converters</a>.
                 </p>
-			</section>
+            </section>
+            <section>
+                <title>Improved Request Body and Uploaded Files Support</title>
+                <p>
+                    It was possible in the past with the <a
+                    href="processors-generators#request-generator">Request generator</a> to obtain
+                    the request body, which was automatically parsed as XML. This behavior has now
+                    been changed. It is instead possible to obtain the request body as
+                    <code>xs:anyURI</code> or <code>xs:base64Binary</code> (<a
+                    href="reference-formats#binary-documents">standard binary document format</a>).
+                    Parsing may then be done using the <a
+                    href="processors-generators#url-generator">URL generator</a>. In addition, the
+                    body can now be read several times. This change brings consistency with the
+                    handling of uploaded files, and the support for binary files thoughout
+                    Presentation Server.
+                </p>
+                <p>
+                    In a related change, the <a
+                    href="processors-generators#request-generator">Request generator</a> now
+                    supports specifying whether uploaded files or the request body must be generated
+                    as <code>xs:anyURI</code> or <code>xs:base64Binary</code>.
+                </p>
+            </section>
             <section>
 				<title>URL Generator</title>
                 <section>
@@ -135,6 +137,18 @@
                         href="/goto-example/employees">Exmployees example</a> illustrates this
                         capability.
                     </p>
+                </section>
+                <section>
+                    <title>XML Content Type</title>
+                    <p>
+                        The <a href="processors-generators#url-generator">URL generator</a> now
+                        correctly detects as XML the following content types:
+                    </p>
+                    <ul>
+                        <li><code>application/xml</code>, the recommended content type for XML</li>
+                        <li><code>text/xml</code>, the now deprecated content type for XML</li>
+                        <li>content types ending with <code>+xml</code> such as <code>image/svg+xml</code></li>
+                    </ul>
                 </section>
 			</section>
             <section>
@@ -174,6 +188,11 @@
                         this capability. The HTTP serializer can be used for example in conjunction
                         with <a href="processors-converters">converters</a> and the URL generator.
                     </p>
+                    <p>
+                        The <a href="processors-serializers#http-serializer">HTTP serializer</a>
+                        uses the recommended <code>application/xml</code> content type by default
+                        rather than <code>text/xml</code>.
+                    </p>
                 </section>
                 <section>
                     <title>New Configuration Parameters</title>
@@ -188,44 +207,47 @@
                 </section>
 			</section>
             <section>
-                <title>BizDoc Application Changes</title>
-                <p>
-                    The data access layer of the BizDoc application has been refactored to support
-                    the following backends:
-                </p>
-                <ul>
-                    <li>
-                        <b>XML databases:</b> XML documents are accessed through the XML:DB
-                        processors. Currently, the backend assumes the built-in open source eXist
-                        database.
-                    </li>
-                    <li>
-                        <b>SQL databases:</b> XML documents are accessed as a text or native XML
-                        format.
-                    </li>
-                </ul>
-                <p>
-                    It is now possible to visualize each document as XML from the user interface.
-                </p>
-            </section>
-            <section>
-                <title>New "Employees" Example</title>
-                <p>
-                    The new <a href="/goto-example/employees">Employees example application</a>
-                    illustrates the following aspects of Presentation Server:
-                </p>
-                <ul>
-                    <li>CRUD operations, paging and sorting with a SQL backend</li>
-                    <li>XForms controls and validation with XML Schema</li>
-                    <li>XForms upload control</li>
-                    <li>Reading plain text files</li>
-                    <li>Using the Java processor</li>
-                    <li>Exporting Comma-Separated Values (CSV) files</li>
-                    <li>Exporting and importing Excel files</li>
-                    <li>Calling and implementing Web Service</li>
-                    <li>Authentication (login / logout) and roles</li>
-                    <li>LDAP access</li>
-                </ul>
+                <title>Examples</title>
+                <section>
+                    <title>BizDoc Application Changes</title>
+                    <p>
+                        The data access layer of the BizDoc application has been refactored to support
+                        the following backends:
+                    </p>
+                    <ul>
+                        <li>
+                            <b>XML databases:</b> XML documents are accessed through the XML:DB
+                            processors. Currently, the backend assumes the built-in open source eXist
+                            database.
+                        </li>
+                        <li>
+                            <b>SQL databases:</b> XML documents are accessed as a text or native XML
+                            format.
+                        </li>
+                    </ul>
+                    <p>
+                        It is now possible to visualize each document as XML from the user interface.
+                    </p>
+                </section>
+                <section>
+                    <title>New "Employees" Example</title>
+                    <p>
+                        The new <a href="/goto-example/employees">Employees example application</a>
+                        illustrates the following aspects of Presentation Server:
+                    </p>
+                    <ul>
+                        <li>CRUD operations, paging and sorting with a SQL backend</li>
+                        <li>XForms controls and validation with XML Schema</li>
+                        <li>XForms upload control</li>
+                        <li>Reading plain text files</li>
+                        <li>Using the Java processor</li>
+                        <li>Exporting Comma-Separated Values (CSV) files</li>
+                        <li>Exporting and importing Excel files</li>
+                        <li>Calling and implementing Web Service</li>
+                        <li>Authentication (login / logout) and roles</li>
+                        <li>LDAP access</li>
+                    </ul>
+                </section>
             </section>
             <section>
                 <title>Page Flow</title>
@@ -288,18 +310,18 @@
                     now included. It supports basic authentication.
                 </p>
             </section>
-<!--            <section>-->
-<!--                <title>J2SE 5.0 Support</title>-->
-<!--                <p>-->
-<!--                    TODO -->
-<!--                </p>-->
-<!--            </section>-->
-<!--            <section>-->
-<!--                <title>Tomcat 5.0 Support</title>-->
-<!--                <p>-->
-<!--                    TODO -->
-<!--                </p>-->
-<!--            </section>-->
+            <section>
+                <title>J2SE 5.0 Support</title>
+                <p>
+                    TODO
+                </p>
+            </section>
+            <section>
+                <title>Tomcat 5.0 Support</title>
+                <p>
+                    TODO
+                </p>
+            </section>
         </section>
         <section>
 			<title>Version 2.5</title>

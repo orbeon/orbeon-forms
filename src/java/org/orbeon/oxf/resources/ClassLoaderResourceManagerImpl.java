@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.resources;
 
+import java.util.jar.JarEntry;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -83,71 +84,171 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
      * @param key A Resource Manager key
      * @return a timestamp
      */
-    protected long lastModifiedImpl(String key) {
+    protected long lastModifiedImpl( final String key ) {
         /*
-         * Opening JarURLConnections is expensive.  When possible just use the time stamp of the jar 
-         * file.
-         * Wrt expensive, delta in heap dump info below is amount of bytes allocated during the 
-         * handling of a single request to '/' in the examples app. i.e. The trace below was 
-         * responsible for creating 300k of garbage during the handing of a single request to '/'.
+         * Slower implentations are commented out below.  Left them in place so we don't
+         * re-implentment them...
          * 
-         * delta: 303696 live: 1017792 alloc: 1264032 trace: 381205 class: byte[]
-         * 
-         * TRACE 381205:
-         * java.io.BufferedInputStream.<init>(BufferedInputStream.java:178)
-         * java.io.BufferedInputStream.<init>(BufferedInputStream.java:158)
-         * sun.net.www.protocol.file.FileURLConnection.connect(FileURLConnection.java:70)
-         * sun.net.www.protocol.file.FileURLConnection.initializeHeaders(FileURLConnection.java:90)
-         * sun.net.www.protocol.file.FileURLConnection.getHeaderField(FileURLConnection.java:126)
-         * sun.net.www.protocol.jar.JarURLConnection.getHeaderField(JarURLConnection.java:178)
-         * java.net.URLConnection.getHeaderFieldDate(URLConnection.java:597)
-         * java.net.URLConnection.getLastModified(URLConnection.java:526)
-         * org.orbeon.oxf.util.NetUtils.getLastModified(NetUtils.java:119)
-         * org.orbeon.oxf.resources.ClassLoaderResourceManagerImpl.lastModifiedImpl(ClassLoaderResourceManagerImpl.java:89)
-         * org.orbeon.oxf.resources.ResourceManagerBase.lastModified(ResourceManagerBase.java:299)
-         * org.orbeon.oxf.resources.PriorityResourceManagerImpl$5.run(PriorityResourceManagerImpl.java:125)
-         * org.orbeon.oxf.resources.PriorityResourceManagerImpl.delegate(PriorityResourceManagerImpl.java:232)
-         * org.orbeon.oxf.resources.PriorityResourceManagerImpl.lastModified(PriorityResourceManagerImpl.java:123)
-         * org.orbeon.oxf.processor.generator.URLGenerator$OXFResourceHandler.getValidity(URLGenerator.java:553)
-         * org.orbeon.oxf.processor.generator.URLGenerator$1.getHandlerValidity(URLGenerator.java:470)
-         * 
-         * This mod brings gc time/app time ratio down from 1.778586943371413 to 1.5751878434169833.
-         * ( 1500 samples, 50 threads, 512M, jdk 1.4.2.06, TC 4.1.30, ops 2.7.2 )
+         * Old impl was generating 303K of garbage per request to / in the examples app.
+         *  
          */
-        try {
-            java.net.URL resource = getResource( key );
-            if (resource == null)
-                throw new ResourceNotFoundException("Cannot read from file " + key);
-
-            final String pth;
-            final String jrPth = SystemUtils.getJarFilePath( resource );
-            if ( jrPth == null ) {
-                final String prot = resource.getProtocol();
-                if ( "file".equalsIgnoreCase( prot ) ) {
-                    pth = resource.getPath();
+        final long ret;
+        done : try {
+            java.net.URL url = getResource( key );
+            if ( url == null ) {
+                throw new ResourceNotFoundException( "Cannot read from file " + key );
+            }
+            final java.net.URLConnection uc = url.openConnection();
+            if ( uc instanceof java.net.JarURLConnection ) {
+                final JarEntry je 
+                    = ( ( java.net.JarURLConnection )uc ).getJarEntry();
+                ret = je.getTime();
+                break done;
+            } 
+            final String prot = url.getProtocol();
+            if ( "file".equalsIgnoreCase( prot ) ) {
+                final String fnam = url.getPath();
+                final java.io.File f = new java.io.File( fnam );
+                if ( f.exists() ) {
+                    ret = f.lastModified();
                 } else {
-                    pth = null;
+                    final String fnamDec = java.net.URLDecoder.decode( fnam, "utf-8" );
+                    final java.io.File fdec = new java.io.File( fnamDec );
+                    ret = f.lastModified();
                 }
             } else {
-                pth = jrPth;
+                final long l = NetUtils.getLastModified( uc );
+                ret = l == 0 ? 1 : l;
             }
-
-            long lm;
-            if ( pth == null ) {
-                lm = NetUtils.getLastModified(resource.openConnection());
-            } else {
-                final java.io.File f = new java.io.File( pth );
-                lm = f.exists() ? f.lastModified() : 0;
-            }
-
-            // If the class loader cannot determine this, we assume that the
-            // file will not change.
-            if (lm == 0) lm = 1;
-            return lm;
-        } catch (java.io.IOException e) {
-            throw new OXFException(e);
+        } catch ( final java.io.IOException e ) {
+            throw new OXFException( e );
         }
+        return ret;
     }
+
+//    /**
+//     * Gets the last modified timestamp for the specified resource
+//     * @param key A Resource Manager key
+//     * @return a timestamp
+//     */
+//    protected long lastModifiedImplOld(String key) {
+//        try {
+//            java.net.URL resource = (clazz == null ? getClass() : clazz).getResource(((clazz == null && !key.startsWith("/")) ? "/" : "") + key);
+//            if (resource == null)
+//                throw new ResourceNotFoundException("Cannot read from file " + key);
+//            long lm = NetUtils.getLastModified(resource.openConnection());
+//            // If the class loader cannot determine this, we assume that the
+//            // file will not change.
+//            if (lm == 0) lm = 1;
+//            return lm;
+//        } catch (java.io.IOException e) {
+//            throw new OXFException(e);
+//        }
+//    }
+//
+//    protected long lastModifiedImpl2( final String key ) {
+//        try {
+//            final long ret;
+//            java.net.URL url = getResource( key );
+//            if ( url == null ) {
+//                throw new ResourceNotFoundException( "Cannot read from file " + key );
+//            }
+//            final String prot = url.getProtocol();
+//            if ( "jar".equalsIgnoreCase( prot ) ) {
+//                final java.net.JarURLConnection jc 
+//                    = ( java.net.JarURLConnection )url.openConnection();
+////                System.out.println( "dan jar: " + jc.getUseCaches() + " " + url );
+//                final JarEntry je = jc.getJarEntry();
+//                ret = je.getTime();
+//            } else if ( "file".equalsIgnoreCase( prot ) ) {
+////                System.out.println( "dan file: " + url );
+//                final String fnam = url.getPath();
+//                final java.io.File f = new java.io.File( fnam );
+//                if ( f.exists() ) {
+//                    ret = f.lastModified();
+//                } else {
+//                    final String fnamDec = java.net.URLDecoder.decode( fnam, "utf-8" );
+//                    final java.io.File fdec = new java.io.File( fnamDec );
+//                    ret = f.lastModified();
+//                }
+//            } else {
+////                System.out.println( "dan other: " + url );
+//                final java.net.URLConnection uc = url.openConnection();
+//                final long l = NetUtils.getLastModified( uc );
+//                ret = l == 0 ? 1 : l;
+//            }
+//            return ret;
+//        } catch ( final java.io.IOException e ) {
+//            throw new OXFException( e );
+//        }
+//    }
+//
+//    protected long lastModifiedImpl1(String key) {
+//        /*
+//         * Opening JarURLConnections is expensive.  When possible just use the time stamp of the jar 
+//         * file.
+//         * Wrt expensive, delta in heap dump info below is amount of bytes allocated during the 
+//         * handling of a single request to '/' in the examples app. i.e. The trace below was 
+//         * responsible for creating 300k of garbage during the handing of a single request to '/'.
+//         * 
+//         * delta: 303696 live: 1017792 alloc: 1264032 trace: 381205 class: byte[]
+//         * 
+//         * TRACE 381205:
+//         * java.io.BufferedInputStream.<init>(BufferedInputStream.java:178)
+//         * java.io.BufferedInputStream.<init>(BufferedInputStream.java:158)
+//         * sun.net.www.protocol.file.FileURLConnection.connect(FileURLConnection.java:70)
+//         * sun.net.www.protocol.file.FileURLConnection.initializeHeaders(FileURLConnection.java:90)
+//         * sun.net.www.protocol.file.FileURLConnection.getHeaderField(FileURLConnection.java:126)
+//         * sun.net.www.protocol.jar.JarURLConnection.getHeaderField(JarURLConnection.java:178)
+//         * java.net.URLConnection.getHeaderFieldDate(URLConnection.java:597)
+//         * java.net.URLConnection.getLastModified(URLConnection.java:526)
+//         * org.orbeon.oxf.util.NetUtils.getLastModified(NetUtils.java:119)
+//         * org.orbeon.oxf.resources.ClassLoaderResourceManagerImpl.lastModifiedImpl(ClassLoaderResourceManagerImpl.java:89)
+//         * org.orbeon.oxf.resources.ResourceManagerBase.lastModified(ResourceManagerBase.java:299)
+//         * org.orbeon.oxf.resources.PriorityResourceManagerImpl$5.run(PriorityResourceManagerImpl.java:125)
+//         * org.orbeon.oxf.resources.PriorityResourceManagerImpl.delegate(PriorityResourceManagerImpl.java:232)
+//         * org.orbeon.oxf.resources.PriorityResourceManagerImpl.lastModified(PriorityResourceManagerImpl.java:123)
+//         * org.orbeon.oxf.processor.generator.URLGenerator$OXFResourceHandler.getValidity(URLGenerator.java:553)
+//         * org.orbeon.oxf.processor.generator.URLGenerator$1.getHandlerValidity(URLGenerator.java:470)
+//         * 
+//         * This mod brings gc time/app time ratio down from 1.778586943371413 to 1.5751878434169833.
+//         * ( 1500 samples, 50 threads, 512M, jdk 1.4.2.06, TC 4.1.30, ops 2.7.2 )
+//         */
+//        try {
+//            java.net.URL resource = getResource( key );
+//            if (resource == null)
+//                throw new ResourceNotFoundException("Cannot read from file " + key);
+//
+//            final java.io.File fil;
+//            final java.io.File jrFil = SystemUtils.getJarFilePath( resource );
+//            if ( jrFil == null ) {
+//                final String prot = resource.getProtocol();
+//                if ( "file".equalsIgnoreCase( prot ) ) {
+//                	final String pth = resource.getPath();
+//                	final java.io.File f = new java.io.File( pth );
+//                	fil  = f.exists() ? f : null;
+//                } else {
+//                    fil = null;
+//                }
+//            } else {
+//                fil = jrFil;
+//            }
+//
+//            long lm;
+//            if ( fil == null ) {
+//                lm = NetUtils.getLastModified(resource.openConnection());
+//            } else {
+//                lm = fil.lastModified();
+//            }
+//
+//            // If the class loader cannot determine this, we assume that the
+//            // file will not change.
+//            if (lm == 0) lm = 1;
+//            return lm;
+//        } catch (java.io.IOException e) {
+//            throw new OXFException(e);
+//        }
+//    }
 
     /**
      * Returns the length of the file denoted by this abstract pathname.

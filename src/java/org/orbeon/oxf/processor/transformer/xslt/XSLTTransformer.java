@@ -13,13 +13,19 @@
  */
 package org.orbeon.oxf.processor.transformer.xslt;
 
+import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.apache.log4j.Logger;
 import org.dom4j.Node;
-import org.orbeon.oxf.cache.*;
+import org.orbeon.oxf.cache.CacheKey;
+import org.orbeon.oxf.cache.InternalCacheKey;
+import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.processor.transformer.URIResolverListener;
@@ -27,17 +33,15 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.functions.*;
 import org.orbeon.saxon.expr.*;
+import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.om.NamePool;
-import org.orbeon.saxon.type.BuiltInSchemaFactory;
 import org.orbeon.saxon.type.ItemType;
-import org.orbeon.saxon.type.SchemaType;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.xpath.StandaloneContext;
-import org.orbeon.saxon.xpath.XPathException;
 import org.orbeon.saxon.xpath.StaticError;
+import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.*;
 
 import javax.xml.transform.Templates;
@@ -54,8 +58,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import orbeon.apache.xml.utils.NamespaceSupport2;
 
 public abstract class XSLTTransformer extends ProcessorImpl {
 

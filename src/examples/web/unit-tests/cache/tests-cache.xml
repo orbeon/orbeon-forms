@@ -73,6 +73,79 @@
         </input>
     </test>
 
+    <test description="URL Generator Configuration Change" name="oxf:test">
+        <input name="config">
+            <script>
+                <!-- Initial config -->
+                <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <url>cache/document3.xml</url>
+                        </config>
+                    </input>
+                </processor>
+                <touch url="cache/document3.xml"/>
+                <wait delay="2090"/>
+                <cache-value output-name="data" value="v1"/>
+                <assert output-name="data" condition="cached-value-equal" value="v1"/>
+                <!-- Change config -->
+                <wait delay="2090"/>
+                <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <url>cache/document3.xml</url>
+                            <content-type>application/xml</content-type>
+                            <force-content-type>true</force-content-type>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v2"/>
+                <assert output-name="data" condition="cached-value-equal" value="v2"/>
+                <!-- Check that both configs cache -->
+                <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <url>cache/document3.xml</url>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="cached-value-equal" value="v1"/>
+                <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <url>cache/document3.xml</url>
+                            <content-type>application/xml</content-type>
+                            <force-content-type>true</force-content-type>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="cached-value-equal" value="v2"/>
+                <!-- Check that both are invalidated -->
+                <touch url="cache/document3.xml"/>
+                <wait delay="2090"/>
+                <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <url>cache/document3.xml</url>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+                <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config">
+                        <config>
+                            <url>cache/document3.xml</url>
+                            <content-type>application/xml</content-type>
+                            <force-content-type>true</force-content-type>
+                        </config>
+                    </input>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+            </script>
+        </input>
+    </test>
+
     <test description="Simple XSLT" name="oxf:test">
         <input name="config">
             <script>
@@ -84,18 +157,90 @@
                 <wait delay="2090"/>
                 <cache-value output-name="data" value="v1"/>
                 <assert output-name="data" condition="cached-value-equal" value="v1"/>
+                <!-- Touch input document -->
                 <touch url="cache/document1.xml"/>
                 <wait delay="2090"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v2"/>
                 <assert output-name="data" condition="output-cached"/>
                 <assert output-name="data" condition="cached-value-equal" value="v2"/>
+                <!-- Touch stylesheet -->
                 <touch url="cache/stylesheet1.xsl"/>
                 <wait delay="2090"/>
                 <assert output-name="data" condition="output-not-cached"/>
                 <cache-value output-name="data" value="v3"/>
                 <assert output-name="data" condition="output-cached"/>
                 <assert output-name="data" condition="cached-value-equal" value="v3"/>
+            </script>
+        </input>
+    </test>
+
+    <test description="XSLT With doc(), document() and imports " name="oxf:test">
+        <input name="config">
+            <script>
+                <processor name="oxf:xslt" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                    <input name="config" href="cache/stylesheet2.xsl"/>
+                    <input name="data" href="cache/document1.xml"/>
+                </processor>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v1"/>
+                <assert output-name="data" condition="cached-value-equal" value="v1"/>
+                <touch url="cache/document1.xml"/>
+                <wait delay="2090"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v2"/>
+                <assert output-name="data" condition="cached-value-equal" value="v2"/>
+                <!-- Touch doc()'ed file -->
+                <assert output-name="data" condition="output-cached"/>
+                <touch url="cache/document4.xml"/>
+                <wait delay="2090"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v3"/>
+                <assert output-name="data" condition="cached-value-equal" value="v3"/>
+                <!-- Touch document()'ed file -->
+                <assert output-name="data" condition="output-cached"/>
+                <touch url="cache/document5.xml"/>
+                <wait delay="2090"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v4"/>
+                <assert output-name="data" condition="cached-value-equal" value="v4"/>
+                <!-- Touch imported file -->
+                <assert output-name="data" condition="output-cached"/>
+                <touch url="cache/stylesheet3.xsl"/>
+                <wait delay="2090"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v5"/>
+                <assert output-name="data" condition="cached-value-equal" value="v5"/>
+                <!-- Touch imported file -->
+                <assert output-name="data" condition="output-cached"/>
+                <touch url="cache/stylesheet4.xsl"/>
+                <wait delay="2090"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v6"/>
+                <assert output-name="data" condition="cached-value-equal" value="v6"/>
+                <!-- Touch imported file (second level) -->
+                <assert output-name="data" condition="output-cached"/>
+                <touch url="cache/stylesheet5.xsl"/>
+                <wait delay="2090"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v7"/>
+                <assert output-name="data" condition="cached-value-equal" value="v7"/>
+                <!-- Touch file XIncluded from main stylesheet -->
+                <assert output-name="data" condition="output-cached"/>
+                <touch url="cache/stylesheet-fragment1.xml"/>
+                <wait delay="2090"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v8"/>
+                <assert output-name="data" condition="cached-value-equal" value="v8"/>
+                <!-- Touch file XIncluded from main stylesheet (second level) -->
+                <assert output-name="data" condition="output-cached"/>
+                <touch url="cache/document1.xml"/>
+                <wait delay="2090"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v9"/>
+                <assert output-name="data" condition="cached-value-equal" value="v9"/>
+                <!-- Touch file XIncluded from depending stylesheet -->
+                <!-- Touch file XIncluded from doc()'ed file -->
             </script>
         </input>
     </test>
@@ -320,7 +465,7 @@
                     </input>
                 </processor>
                 <assert output-name="data" condition="output-not-cached"/>
-                <!-- The following doesn't work because one is <null/> and the other <null></null> -->
+                <!-- The following doesn't work because one is <null/> and the other <null></null> - bug of the test framework! -->
 <!--                <assert output-name="data" condition="output-equals">-->
 <!--                    <null xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:nil="true"/>-->
 <!--                </assert>-->
@@ -439,8 +584,8 @@
         </input>
     </test>
 
-    <!-- TODO: XSLT with imports, doc(), document(), what about doc() w/ XInclude? -->
-    <!-- TODO: URL gen: modify config -->
+    <!-- TODO: XSLT with doc() w/ XInclude, or import w/ XInclude -->
     <!-- TODO: Request gen: upload + body -->
     <!-- TODO: Bean gen -->
+    <!-- TODO: XSLT be able to check whether stylesheets are reloaded or not-->
 </group>

@@ -1448,12 +1448,10 @@ public class SQLProcessor extends ProcessorImpl {
                                                     // Make sure we create a Document from the Element if we have one
                                                     Document xmlFragmentDocument = (value instanceof Element) ? DocumentHelper.createDocument(((Element) value).createCopy()) : null;
 
-                                                    // Retrieve serialization property
-                                                    boolean serializeXML11 = getInterpreterContext().getPropertySet().getBoolean("serialize-xml-11", false).booleanValue();
-
                                                     // Convert document into an XML String if necessary
                                                     if (value instanceof Element && !SQL_TYPE_XMLTYPE.equals(sqlType)) {
                                                         // Convert Document into a String
+                                                        boolean serializeXML11 = getInterpreterContext().getPropertySet().getBoolean("serialize-xml-11", false).booleanValue();
                                                         value = XMLUtils.domToString(XMLUtils.adjustNamespaces(xmlFragmentDocument, serializeXML11), false, false);
                                                     }
                                                     if (SQL_TYPE_XMLTYPE.equals(sqlType)) {
@@ -1467,6 +1465,7 @@ public class SQLProcessor extends ProcessorImpl {
 //                                                            TransformerUtils.getIdentityTransformer().transform(new DocumentSource(xmlFragmentDocument), domResult);xxx
 //                                                            org.w3c.dom.Node node = domResult.getNode();
 
+                                                            boolean serializeXML11 = getInterpreterContext().getPropertySet().getBoolean("serialize-xml-11", false).booleanValue();
                                                             String stringValue = XMLUtils.domToString(XMLUtils.adjustNamespaces(xmlFragmentDocument, serializeXML11), false, false);
 
                                                             // TEMP HACK: Oracle seems to have a problem with XMLType instanciated from a DOM, so we pass a String

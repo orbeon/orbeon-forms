@@ -128,7 +128,13 @@
 
     <xsl:template match="xforms:select">
         <xsl:variable name="name" as="xs:string" select="xxforms:encrypt-name(@xxforms:name)"/>
-        <xsl:variable name="values" as="xs:string*" select="tokenize(@xxforms:value, ' ')"/>
+        <xsl:variable name="values" as="xs:string*" select="tokenize(@xxforms:value, '\s+')"/>
+
+        <xsl:variable name="open" select="@selection = 'open'" as="xs:boolean"/>
+        <xsl:variable name="item-values" select="descendant::xforms:item/xforms:value" as="node()*"/>
+        <xsl:variable name="other-value" select="for $sopen in $values
+        return if( not(empty(index-of($item-values, $sopen))) ) then () else $sopen"/>
+
         <xsl:choose>
             <xsl:when test="not(@appearance) or @appearance = 'compact'">
                 <xhtml:select name="{$name}" multiple="multiple">
@@ -138,6 +144,8 @@
                         <xsl:with-param name="values" select="$values" tunnel="yes"/>
                         <xsl:with-param name="appearance" select="if (@appearance) then xs:string(@appearance) else 'compact'" tunnel="yes"/>
                         <xsl:with-param name="select-type" select="'select'" tunnel="yes"/>
+                        <xsl:with-param name="open" select="$open" tunnel="yes"/>
+                        <xsl:with-param name="other-value" select="$other-value" tunnel="yes"/>
                     </xsl:apply-templates>
                 </xhtml:select>
             </xsl:when>
@@ -147,15 +155,27 @@
                     <xsl:with-param name="values" select="$values" tunnel="yes"/>
                     <xsl:with-param name="appearance" select="xs:string(@appearance)" tunnel="yes"/>
                     <xsl:with-param name="select-type" select="'select'" tunnel="yes"/>
+                    <xsl:with-param name="open" select="$open" tunnel="yes"/>
+                    <xsl:with-param name="other-value" select="$other-value" tunnel="yes"/>
                 </xsl:apply-templates>
             </xsl:otherwise>
         </xsl:choose>
         <xxforms:hidden xxforms:name="{@xxforms:name}" xxforms:value=""/>
+        <xsl:call-template name="other-control">
+            <xsl:with-param name="name" select="$name"/>
+            <xsl:with-param name="open" select="$open"/>
+            <xsl:with-param name="other-value" select="$other-value"/>
+        </xsl:call-template>
     </xsl:template>
 
     <xsl:template match="xforms:select1">
         <xsl:variable name="name" as="xs:string" select="xxforms:encrypt-name(@xxforms:name)"/>
         <xsl:variable name="value" as="xs:string" select="@xxforms:value"/>
+
+        <xsl:variable name="open" select="@selection = 'open'" as="xs:boolean"/>
+        <xsl:variable name="item-values" select="descendant::xforms:item/xforms:value" as="node()*"/>
+        <xsl:variable name="other-value" select="for $sopen in tokenize($value, '\s+')
+        return if( not(empty(index-of($item-values, $sopen))) ) then () else $sopen"/>
 
         <xsl:choose>
             <xsl:when test="not(@appearance) or @appearance = 'compact' or @appearance = 'minimal'">
@@ -166,6 +186,8 @@
                         <xsl:with-param name="value" select="$value" tunnel="yes"/>
                         <xsl:with-param name="appearance" select="if (@appearance) then xs:string(@appearance) else 'compact'" tunnel="yes"/>
                         <xsl:with-param name="select-type" select="'select1'" tunnel="yes"/>
+                        <xsl:with-param name="open" select="$open" tunnel="yes"/>
+                        <xsl:with-param name="other-value" select="$other-value" tunnel="yes"/>
                     </xsl:apply-templates>
                 </xhtml:select>
             </xsl:when>
@@ -175,9 +197,32 @@
                     <xsl:with-param name="value" select="$value" tunnel="yes"/>
                     <xsl:with-param name="appearance" select="xs:string(@appearance)" tunnel="yes"/>
                     <xsl:with-param name="select-type" select="'select1'" tunnel="yes"/>
+                    <xsl:with-param name="open" select="$open" tunnel="yes"/>
+                    <xsl:with-param name="other-value" select="$other-value" tunnel="yes"/>
                 </xsl:apply-templates>
             </xsl:otherwise>
         </xsl:choose>
+        <xsl:call-template name="other-control">
+            <xsl:with-param name="name" select="$name"/>
+            <xsl:with-param name="open" select="$open"/>
+            <xsl:with-param name="other-value" select="$other-value"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xsl:template name="other-control">
+        <xsl:param name="name" as="xs:string"/>
+        <xsl:param name="open" as="xs:boolean"/>
+        <xsl:param name="other-value"/>
+
+        <xsl:if test="$open">
+            &#160;
+            <xhtml:input id="{$name}_OTHER" name="{$name}" xhtml:value="{$other-value}">
+                <xsl:if test="empty($other-value)">
+                    <xsl:attribute name="xhtml:disabled">true</xsl:attribute>
+                </xsl:if>
+                <xsl:call-template name="copy-other-attributes"/>
+            </xhtml:input>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template match="xforms:item">
@@ -186,19 +231,30 @@
         <xsl:param name="value" as="xs:string" select="''" tunnel="yes"/>
         <xsl:param name="appearance" as="xs:string?" tunnel="yes"/>
         <xsl:param name="select-type" as="xs:string" tunnel="yes"/>
-
+        <xsl:param name="open" as="xs:boolean" select="false()" tunnel="yes"/>
+        <xsl:param name="other-value" select="()" tunnel="yes"/>
         <xsl:choose>
             <xsl:when test="$select-type = 'select'">
                 <xsl:choose>
                     <xsl:when test="$appearance = 'compact'">
                         <!-- List -->
-                        <xhtml:option value="{xforms:value}">
+                        <xhtml:option value="{xforms:value}"
+                            onclick="getElementById('{$name}_OTHER').disabled = true">
                             <xsl:call-template name="copy-other-attributes"/>
                             <xsl:if test="$values = xs:string(xforms:value)">
                                 <xsl:attribute name="selected" select="'selected'"/>
                             </xsl:if>
                             <xsl:value-of select="xforms:label"/>
                         </xhtml:option>
+                         <xsl:if test="$open and position() = last()">
+                            <xhtml:option value=""
+                                onclick="getElementById('{$name}_OTHER').disabled = false">
+                                <xsl:if test="not(empty($other-value))">
+                                    <xsl:attribute name="selected">selected</xsl:attribute>
+                                </xsl:if>
+                                Other
+                            </xhtml:option>
+                        </xsl:if>
                     </xsl:when>
                     <xsl:otherwise>
                         <!-- Check box -->
@@ -209,6 +265,15 @@
                             </xsl:if>
                             <xsl:value-of select="xforms:label"/>
                         </xhtml:input>
+                        <xsl:if test="$open and position() = last()">
+                            <xhtml:input type="checkbox" name="{$name}^{escape-uri('', true())}" value="on"
+                                onclick="e = getElementById('{$name}_OTHER'); e.disabled = !e.disabled">
+                                <xsl:if test="not(empty($other-value))">
+                                    <xsl:attribute name="checked">checked</xsl:attribute>
+                                </xsl:if>
+                                Other
+                            </xhtml:input>
+                        </xsl:if>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:when>
@@ -216,23 +281,43 @@
                 <xsl:choose>
                     <xsl:when test="$appearance = 'compact' or $appearance = 'minimal'">
                         <!-- Combo box -->
-                        <xhtml:option value="{xforms:value}">
+                        <xhtml:option value="{xforms:value}"
+                            onclick="getElementById('{$name}_OTHER').disabled = true">
                             <xsl:call-template name="copy-other-attributes"/>
                             <xsl:if test="$value = xs:string(xforms:value)">
                                 <xsl:attribute name="selected" select="'selected'"/>
                             </xsl:if>
                             <xsl:value-of select="xforms:label"/>
                         </xhtml:option>
+                        <xsl:if test="$open and position() = last()">
+                            <xhtml:option value=""
+                                onclick="getElementById('{$name}_OTHER').disabled = false">
+                                <xsl:if test="not(empty($other-value))">
+                                    <xsl:attribute name="selected">selected</xsl:attribute>
+                                </xsl:if>
+                                Other
+                            </xhtml:option>
+                        </xsl:if>
                     </xsl:when>
                     <xsl:otherwise>
                         <!-- Radio button -->
-                        <xhtml:input type="radio" name="{$name}" value="{xforms:value}">
+                        <xhtml:input type="radio" name="{$name}" value="{xforms:value}"
+                            onclick="getElementById('{$name}_OTHER').disabled = true">
                             <xsl:call-template name="copy-other-attributes"/>
                             <xsl:if test="$value = xs:string(xforms:value)">
                                 <xsl:attribute name="checked" select="'checked'"/>
                             </xsl:if>
                             <xsl:value-of select="xforms:label"/>
                         </xhtml:input>
+                        <xsl:if test="$open and position() = last()">
+                            <xhtml:input type="radio" name="{$name}" value=""
+                                onclick="getElementById('{$name}_OTHER').disabled = false">
+                                <xsl:if test="not(empty($other-value))">
+                                    <xsl:attribute name="checked">checked</xsl:attribute>
+                                </xsl:if>
+                                Other
+                            </xhtml:input>
+                        </xsl:if>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:otherwise>
@@ -457,7 +542,7 @@
 
     <xsl:function name="xxforms:submit-name">
         <xsl:param name="submit-control" as="element()"/>
-        
+
         <xsl:variable name="action-strings" as="xs:string*">
             <xsl:for-each select="$submit-control/(xforms:setvalue | xforms:insert | xforms:delete)">
                 <!-- Optional parameters -->

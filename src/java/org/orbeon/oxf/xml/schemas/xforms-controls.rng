@@ -316,6 +316,14 @@
                 </choice>
             </attribute>
         </optional>
+        <optional>
+            <attribute name="selection">
+                <choice>
+                    <value>open</value>
+                    <value>closed</value>
+                </choice>
+            </attribute>
+        </optional>
         <interleave>
             <ref name="xforms-common"/>
             <choice>

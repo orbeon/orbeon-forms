@@ -407,7 +407,7 @@
     <exec executable='scp' failonerror='true' >
       <arg value='-q' />
       <arg value='${deployDir}/buildLogs/oxf-${version}-build.log' />
-      <arg value='orbeonbld@shell.sourceforge.net:/home/groups/o/or/orbeon/htdocs/unstable-blds/presentation-server/${release.number}/' />
+      <arg value='orbeonbld@shell.sourceforge.net:/home/groups/o/or/orbeon/htdocs/unstable-blds/presentation-server/${release.number}/build.log' />
     </exec>
 
     <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${deployDir}/${release.number}/build.log' />

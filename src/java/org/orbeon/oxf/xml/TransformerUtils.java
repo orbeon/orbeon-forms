@@ -35,8 +35,12 @@ public class TransformerUtils {
     public static final String IDENTITY_TYPE = SAXON_BUILTIN_TRANSFORMER_TYPE;
     public static final String DEFAULT_TYPE = SAXON_BUILTIN_TRANSFORMER_TYPE;
 
-    private static final String XALAN_INDENT_AMOUNT = "{http://xml.apache.org/xslt}indent-amount";
-    private static final String XALAN_CONTENT_HANDLER = "{http://xml.apache.org/xslt}content-handler";
+//    private static final String XALAN_INDENT_AMOUNT = "{http://xml.apache.org/xslt}indent-amount";
+//    private static final String XALAN_CONTENT_HANDLER = "{http://xml.apache.org/xslt}content-handler";
+
+    public static final String SAXON_INDENT_AMOUNT = "{http://saxon.sf.net/}indent-spaces";
+
+    public static final String INDENT_AMOUNT = SAXON_INDENT_AMOUNT;
 
     private static Map transformerFactories = new HashMap();
 
@@ -157,8 +161,8 @@ public class TransformerUtils {
         transformer.setOutputProperty(OutputKeys.METHOD, "xml");
         transformer.setOutputProperty(OutputKeys.VERSION, "1.0");
         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-        transformer.setOutputProperty(XALAN_INDENT_AMOUNT, "0");
-        transformer.setOutputProperty(XALAN_CONTENT_HANDLER, "orbeon.apache.xml.serializer.ToXMLStream");
+        transformer.setOutputProperty(INDENT_AMOUNT, "0");
+//        transformer.setOutputProperty(XALAN_CONTENT_HANDLER, "orbeon.apache.xml.serializer.ToXMLStream");
     }
 
     public static void applyOutputProperties(Transformer transformer,
@@ -182,7 +186,8 @@ public class TransformerUtils {
         if (encoding != null && !"".equals(encoding))
             transformer.setOutputProperty(OutputKeys.ENCODING, encoding);
         transformer.setOutputProperty(OutputKeys.INDENT, indent ? "yes" : "no");
-        transformer.setOutputProperty(XALAN_INDENT_AMOUNT, String.valueOf(indentAmount));
+        if (indent)
+            transformer.setOutputProperty(INDENT_AMOUNT, String.valueOf(indentAmount));
         transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, omitXMLDeclaration ? "yes" : "no");
         if (standalone != null)
             transformer.setOutputProperty(OutputKeys.STANDALONE, standalone.booleanValue() ? "yes" : "no");

@@ -29,7 +29,7 @@ public abstract class CachedSerializer extends ProcessorImpl {
     public static final String SERIALIZER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/serializer";
     public static final String DEFAULT_ENCODING = TransformerUtils.DEFAULT_OUTPUT_ENCODING;
     public static final boolean DEFAULT_INDENT = true;
-    public static final int DEFAULT_INDENT_AMOUNT = 0;
+    public static final int DEFAULT_INDENT_AMOUNT = 1;// changed to 1 because Saxon fails with 0
     public static final int DEFAULT_ERROR_CODE = 0;
     public static final boolean DEFAULT_EMPTY = false;
     public static final boolean DEFAULT_CACHE_USE_LOCAL_CACHE = true;

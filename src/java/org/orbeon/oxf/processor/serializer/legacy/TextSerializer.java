@@ -44,8 +44,8 @@ public class TextSerializer extends HttpTextSerializer {
                 getEncoding(config, null, DEFAULT_ENCODING),
                 true,
                 null,
-                config.indent,
-                config.indentAmount);
+                false,
+                DEFAULT_INDENT_AMOUNT);
         identity.setResult(new StreamResult(writer));
         readInputAsSAX(context, INPUT_DATA, new SerializerContentHandler(identity, writer, isSerializeXML11()));
     }

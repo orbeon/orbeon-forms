@@ -126,7 +126,7 @@
                     <tr>
                         <td>indent-amount</td>
                         <td>Specifies the number of indentation space</td>
-                        <td>0 (ignored for text method)</td>
+                        <td>1 (ignored for text method)</td>
                     </tr>
                 </table>
                 <p>

@@ -18,7 +18,7 @@
         <action when="/myform/action = 'next'">
             <result page="display-name">
                 <xu:update select="/myform/first-name">
-                    <xu:value-of select="document('oxf:instance')/myform/first-name"/>
+                    <xu:value-of select="doc('oxf:instance')/myform/first-name"/>
                 </xu:update>
             </result>
         </action>
@@ -28,7 +28,7 @@
         <action when="/myform/action = 'back'">
             <result page="ask-name">
                 <xu:update select="/myform/first-name">
-                    <xu:value-of select="document('oxf:instance')/myform/first-name"/>
+                    <xu:value-of select="doc('oxf:instance')/myform/first-name"/>
                 </xu:update>
             </result>
         </action>

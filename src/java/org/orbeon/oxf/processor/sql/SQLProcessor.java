@@ -1449,7 +1449,7 @@ public class SQLProcessor extends ProcessorImpl {
                                                     // Convert document into an XML String if necessary
                                                     if (value instanceof Element && !SQL_TYPE_XMLTYPE.equals(sqlType)) {
                                                         // Convert Document into a String
-                                                        value = XMLUtils.domToString(xmlFragmentDocument, false, false);
+                                                        value = XMLUtils.domToString(XMLUtils.adjustNamespaces(xmlFragmentDocument, false), false, false);
                                                     }
                                                     if (SQL_TYPE_XMLTYPE.equals(sqlType)) {
                                                         // Set DOM using native XML type
@@ -1462,7 +1462,7 @@ public class SQLProcessor extends ProcessorImpl {
 //                                                            TransformerUtils.getIdentityTransformer().transform(new DocumentSource(xmlFragmentDocument), domResult);xxx
 //                                                            org.w3c.dom.Node node = domResult.getNode();
 
-                                                            String stringValue = XMLUtils.domToString(xmlFragmentDocument, false, false);
+                                                            String stringValue = XMLUtils.domToString(XMLUtils.adjustNamespaces(xmlFragmentDocument, false), false, false);
 
                                                             // TEMP HACK: Oracle seems to have a problem with XMLType instanciated from a DOM, so we pass a String
 //                                                            org.w3c.dom.Node node = XMLUtils.stringToDOM(stringValue);

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.serializer;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -34,7 +33,7 @@ public class SerializerContentHandler extends NamespaceCleanupContentHandler {
     private OutputStream os;
 
     public SerializerContentHandler(ContentHandler contentHandler) {
-        super(contentHandler);
+        super(contentHandler, false);
     }
 
     public SerializerContentHandler(ContentHandler contentHandler, Writer writer) {

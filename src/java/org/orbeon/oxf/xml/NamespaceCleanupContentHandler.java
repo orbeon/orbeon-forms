@@ -12,10 +12,11 @@ import org.xml.sax.SAXException;
  */
 public class NamespaceCleanupContentHandler extends ForwardingContentHandler {
 
-    private static final boolean filterNamespaceEvents = true;
+    private boolean filterNamespaceEvents;
 
-    public NamespaceCleanupContentHandler(ContentHandler contentHandler) {
+    public NamespaceCleanupContentHandler(ContentHandler contentHandler, boolean xml11) {
         super(contentHandler);
+        this.filterNamespaceEvents = !xml11;
     }
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {

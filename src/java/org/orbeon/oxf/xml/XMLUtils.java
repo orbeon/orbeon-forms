@@ -29,6 +29,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.*;
@@ -982,6 +984,27 @@ public class XMLUtils {
             return qName.getName();
         else
             return "{" + qName.getNamespaceURI() + "}" + qName.getName();
+    }
+
+    /**
+     * Cleani-up namespaces. Some tools generate namespace "un-declarations" or the form
+     * xmlns:abc="". While this is needed to keep the XML infoset correct, it is illegal to generate
+     * such declarations in XML 1.0 (but it is legal in XML 1.1). Technically, this cleanup is
+     * incorrect at the DOM and SAX level, so this should be used only in rare occasions, when
+     * serializing certain documents to XML 1.0.
+     */
+    public static org.dom4j.Document adjustNamespaces(org.dom4j.Document document, boolean xml11) {
+        if (xml11)
+            return document;
+        LocationSAXWriter writer = new LocationSAXWriter();
+        LocationSAXContentHandler ch = new LocationSAXContentHandler();
+        writer.setContentHandler(new NamespaceCleanupContentHandler(ch, xml11));
+        try {
+            writer.write(document);
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
+        return ch.getDocument();
     }
 
     public interface Attribute {

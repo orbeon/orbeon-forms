@@ -24,10 +24,10 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
-import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xmldb.api.DatabaseManager;
@@ -92,20 +92,6 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
     private Config readConfig(Document configDocument) {
         Config config = new Config();
 
-        // Normalize document
-        // NOTE: This is done because sometimes namespace declarations look funny, and the database
-        // cannot parse the document. This should probably not be fixed here, but getting to the
-        // root of the problem is difficult.
-        LocationSAXWriter writer = new LocationSAXWriter();
-        LocationSAXContentHandler ch = new LocationSAXContentHandler();
-        writer.setContentHandler(ch);
-        try {
-            writer.write(configDocument);
-        } catch (SAXException e) {
-            throw new OXFException(e);
-        }
-        configDocument = ch.getDocument();
-
         Element rootElement = configDocument.getRootElement();
         config.setOperation(rootElement.getName());
         config.setCollection(rootElement.attributeValue("collection"));
@@ -130,7 +116,10 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
 //        readInputAsSAX(pipelineContext, INPUT_CONFIG, new SAXDebuggerProcessor.DebugContentHandler(new ForwardingContentHandler(null, false)));
          return (Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_QUERY), new CacheableInputReader() {
             public Object read(PipelineContext context, ProcessorInput input) {
-                return readConfig(readInputAsDOM4J(context, INPUT_QUERY));
+                // Use readInputAsSAX so that we can filter namespaces
+                LocationSAXContentHandler ch = new LocationSAXContentHandler();
+                readInputAsSAX(context, input, new NamespaceCleanupContentHandler(ch, false));
+                return readConfig(ch.getDocument());
             }
         });
     }
@@ -213,7 +202,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
             for (ResourceIterator i = result.getIterator(); i.hasMoreResources();) {
                 Resource resource = i.nextResource();
                 if (resource instanceof XMLResource) {
-                    ((XMLResource) resource).getContentAsSAX(new CleanerContentHandler(contentHandler));
+                    ((XMLResource) resource).getContentAsSAX(new DatabaseReadContentHandler(contentHandler));
                 } else if (resource instanceof BinaryResource) {
                     XMLUtils.inputStreamToBase64Characters(new ByteArrayInputStream((byte[]) resource.getContent()), contentHandler);
                 } else {
@@ -225,43 +214,43 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         }
     }
 
-    private static class EmptyResourceSet implements ResourceSet {
-        public void addResource(Resource resource) throws XMLDBException {
-            throw new UnsupportedOperationException();
-        }
-
-        public void clear() throws XMLDBException {
-            throw new UnsupportedOperationException();
-        }
-
-        public ResourceIterator getIterator() throws XMLDBException {
-            return new ResourceIterator() {
-                public boolean hasMoreResources() {
-                    return false;
-                }
-
-                public Resource nextResource() {
-                    return null;
-                }
-            };
-        }
-
-        public Resource getMembersAsResource() throws XMLDBException {
-            return null;
-        }
-
-        public Resource getResource(long l) throws XMLDBException {
-            return null;
-        }
-
-        public long getSize() throws XMLDBException {
-            return 0;
-        }
-
-        public void removeResource(long l) throws XMLDBException {
-            throw new UnsupportedOperationException();
-        }
-    }
+//    private static class EmptyResourceSet implements ResourceSet {
+//        public void addResource(Resource resource) throws XMLDBException {
+//            throw new UnsupportedOperationException();
+//        }
+//
+//        public void clear() throws XMLDBException {
+//            throw new UnsupportedOperationException();
+//        }
+//
+//        public ResourceIterator getIterator() throws XMLDBException {
+//            return new ResourceIterator() {
+//                public boolean hasMoreResources() {
+//                    return false;
+//                }
+//
+//                public Resource nextResource() {
+//                    return null;
+//                }
+//            };
+//        }
+//
+//        public Resource getMembersAsResource() throws XMLDBException {
+//            return null;
+//        }
+//
+//        public Resource getResource(long l) throws XMLDBException {
+//            return null;
+//        }
+//
+//        public long getSize() throws XMLDBException {
+//            return 0;
+//        }
+//
+//        public void removeResource(long l) throws XMLDBException {
+//            throw new UnsupportedOperationException();
+//        }
+//    }
 
     private ResourceSet executeQuery(PipelineContext pipelineContext, Datasource datasource, String collectionName, boolean createCollection, String resourceId, String query, Map namespaceContext) throws XMLDBException {
         Collection collection = getCollection(pipelineContext, datasource, collectionName);
@@ -335,7 +324,7 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
 
             // Write to the resource
             ContentHandler contentHandler = xmlResource.setContentAsSAX();
-            readInputAsSAX(pipelineContext, input, contentHandler);
+            readInputAsSAX(pipelineContext, input, new NamespaceCleanupContentHandler(contentHandler, false));
 
             // Store resource
             collection.storeResource(xmlResource);
@@ -541,11 +530,11 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
      * Clean-up the SAX output. Some databases, such as eXist, output incorrect SAX that causes
      * issues down the line.
      */
-    public static class CleanerContentHandler extends ForwardingContentHandler {
+    public static class DatabaseReadContentHandler extends ForwardingContentHandler {
 
         private int startDocumentLevel = 0;
 
-        public CleanerContentHandler(ContentHandler contentHandler) {
+        public DatabaseReadContentHandler(ContentHandler contentHandler) {
             super(contentHandler);
         }
 

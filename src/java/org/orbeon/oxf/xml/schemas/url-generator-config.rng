@@ -33,7 +33,7 @@
                         <optional>
                             <element name="content-type">
                                 <data type="string">
-                                    <param name="pattern">[a-zA-Z\-]+/[a-zA-Z\-]+</param>
+                                    <param name="pattern">[\p{IsBasicLatin}-[&#09;- ()&lt;>@,;:\\"/\[\]=?]]+/[\p{IsBasicLatin}-[&#09;- ()&lt;>@,;:\\"/\[\]=?]]+</param>
                                 </data>
                             </element>
                         </optional>

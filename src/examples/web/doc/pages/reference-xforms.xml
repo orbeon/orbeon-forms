@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE document [
+    <!ENTITY full "<td style='background: #66FF99'>Fully supported</td>">
+    <!ENTITY partial "<td style='background: #FFFF66'>Partially supported</td>">
+    <!ENTITY future "<td style='background: #FFCC99'>Not supported yet</td>">
+    <!ELEMENT document (ANY)>
+]>
 <!--
     Copyright (C) 2004 Orbeon, Inc.
 
@@ -15,13 +21,7 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml">
-
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <header>
         <title>XForms</title>
     </header>
@@ -73,10 +73,10 @@
                         </p>
                         <xml-source>
                             <credit-card>
-                                <type></type>
-                                <number></number>
-                                <expiration-month></expiration-month>
-                                <expiration-year></expiration-year>
+                                <type/>
+                                <number/>
+                                <expiration-month/>
+                                <expiration-year/>
                             </credit-card>
                         </xml-source>
                         <p>
@@ -125,24 +125,22 @@
             </section>
             <section>
                 <title>Processing Model</title>
-                <img print-format="pdf" src="pages/reference-xforms-model-controls.png"
-                    style="clear: both; float: right"/>
+                <img print-format="pdf" src="pages/reference-xforms-model-controls.png" style="clear: both; float: right"/>
                 <p>
                     XForms exposes two main components that are distinct but designed to closely
                     work with one another:
                 </p>
                 <ul>
                     <li>
-                        <b>XForms model</b> – The XForms model defines the data that needs to be
+                        <b>XForms model</b> _ The XForms model defines the data that needs to be
                         captured and the constraints on this data.
                     </li>
                     <li>
-                        <b>XForms controls</b> – XForms controls are widgets, like a text field or a
+                        <b>XForms controls</b> _ XForms controls are widgets, like a text field or a
                         drop down combo box. They are generally used in an XHTML page to define the
                         visual representation of a form. </li>
                 </ul>
-                <img print-format="pdf" src="pages/reference-xforms-operation-model.png"
-                    style="clear: both; float: right"/>
+                <img print-format="pdf" src="pages/reference-xforms-operation-model.png" style="clear: both; float: right"/>
                 <p>
                     At a high level, an application interacts with an end-user through the
                     following steps:
@@ -150,21 +148,16 @@
                 <ol>
                     <li>The application generates an XHTML page that contains XForms controls, and
                     provides an XForms model for that page.</li>
-
                     <li>The XForms engine processes the XForms controls and sends a HTML page to the
                     end-user's browser.</li>
-
                     <li>The end-user fills out the form.</li>
-
                     <li>The XForms engine creates an XML document (called the XForms instance)
                     based on the values entered by the end-user, and sends this document to the
                     application.</li>
-
                     <li>The application performs its business logic based in the XForms
                     instance.</li>
                 </ol>
-                <img print-format="pdf" src="pages/reference-xforms-operation-model.png"
-                    style="clear: both; float: right"/>
+                <img print-format="pdf" src="pages/reference-xforms-operation-model.png" style="clear: both; float: right"/>
                 <p>
                     As we can see, your role as the author of an Presentation Server application is:
                 </p>
@@ -175,8 +168,7 @@
                 </ul>
                 <p>
                     In this chapter we will explore the first two of the three aspects above. You
-                    hook-up your backend logic for a page in your application page flow. The <a
-                    href="reference-controller">Page Flow Controller</a> documentation details how
+                    hook-up your backend logic for a page in your application page flow. The <a href="reference-controller">Page Flow Controller</a> documentation details how
                     this is done.
                 </p>
             </section>
@@ -193,9 +185,12 @@
                 valid:" line. This example is fully implemented with 3 XML files:
             </p>
             <ul>
-                <li><a href="../examples/source?src=examples/xforms/xforms-credit-card/xforms-model.xml">xforms-model.xml</a>: the XForms model</li>
-                <li><a href="../examples/source?src=examples/xforms/xforms-credit-card/view.xml">view.xml</a>: the XHTML view using XForms controls</li>
-                <li><a href="../examples/source?src=examples/xforms/xforms-credit-card/page-flow.xml">page-flow.xml</a>: declared the page and references the two files above</li>
+                <li>
+                    <a href="../examples/source?src=examples/xforms/xforms-credit-card/xforms-model.xml">xforms-model.xml</a>: the XForms model</li>
+                <li>
+                    <a href="../examples/source?src=examples/xforms/xforms-credit-card/view.xml">view.xml</a>: the XHTML view using XForms controls</li>
+                <li>
+                    <a href="../examples/source?src=examples/xforms/xforms-credit-card/page-flow.xml">page-flow.xml</a>: declared the page and references the two files above</li>
             </ul>
             <p>
                 We will here focus on the XForms model (xforms-model.xml) which is the most
@@ -247,7 +242,6 @@
                     <li>To check that the expiration month is valid (integer between 1 and 12)</li>
                     <li>To check that the expiration year is valid (4 digit number)</li>
                     <li>To display the "verification code" text field only if the card type is Visa or MasterCard</li>
-
                     <li>To determine, through calculation, if the credit card is valid. The result
                     of this calculation is either "true" or "false" and this value is displayed at
                     the bottom of the bottom of the form.</li>
@@ -328,8 +322,7 @@
                         <code>&lt;xforms:bind nodeset="/credit-card/valid" calculate="..."/></code>.
                         <p>
                             The XPath expression checking that the credit card number is valid has
-                            not been included here but you can see it in the <a
-                            href="../examples/source?src=examples/xforms/xforms-credit-card/xforms-model.xml">xforms-model.xml</a>.
+                            not been included here but you can see it in the <a href="../examples/source?src=examples/xforms/xforms-credit-card/xforms-model.xml">xforms-model.xml</a>.
                         </p>
                     </li>
                 </ol>
@@ -354,7 +347,7 @@
                             <ul>
                                 <li>
                                     <p>
-                                        <b>required</b> – You can specify in the
+                                        <b>required</b> _ You can specify in the
                                         <code>required</code> attribute an XPath expression that
                                         determines if a value is required. The XPath can be as
                                         simple as <code>true()</code>, or more complex and depend on
@@ -364,7 +357,7 @@
                                 </li>
                                 <li>
                                     <p>
-                                        <b>type</b> – In the <code>type</code> attribute you can
+                                        <b>type</b> _ In the <code>type</code> attribute you can
                                         specify a W3C XML Schema simple type. The <code>type</code>
                                         attribute works in association with the
                                         <code>required</code> attribute: even if a type is
@@ -372,14 +365,25 @@
                                         will only depend on the whether the value is required.
                                     </p>
                                     <table>
-                                        <tr><th/><th>Required</th><th>Not required</th></tr>
-                                        <tr><th>Value is empty</th><td>Invalid</td><td>Valid</td></tr>
-                                        <tr><th>Value is not empty</th><td colspan="2">Validated according to<br/>specified simple type</td></tr>
+                                        <tr>
+                                            <th/>
+                                            <th>Required</th>
+                                            <th>Not required</th>
+                                        </tr>
+                                        <tr>
+                                            <th>Value is empty</th>
+                                            <td>Invalid</td>
+                                            <td>Valid</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Value is not empty</th>
+                                            <td colspan="2">Validated according to<br/>specified simple type</td>
+                                        </tr>
                                     </table>
                                 </li>
                                 <li>
                                     <p>
-                                        <b>constraint</b> – In the <code>constraint</code> you can
+                                        <b>constraint</b> _ In the <code>constraint</code> you can
                                         write any XPath 2.0 expression that returns a boolean
                                         value. If false is returned, then the value is considered
                                         invalid, otherwise it is considered valid.
@@ -394,7 +398,7 @@
                             <ul>
                                 <li>
                                     <p>
-                                        <b>calculate</b> – The content of the element or attribute
+                                        <b>calculate</b> _ The content of the element or attribute
                                         will be set to the result of the evaluation of the XPath 2.0
                                         expression in the <code>calculate</code> attribute. This
                                         way you can automatically compute some values in the XForms
@@ -419,7 +423,7 @@
                             <ul>
                                 <li>
                                     <p>
-                                        <b>readonly</b> – If the XPath 2.0 expression in
+                                        <b>readonly</b> _ If the XPath 2.0 expression in
                                         <code>readonly</code> evaluates to true, the control will be
                                         displayed in non-editable mode. Typically, in an XHTML user
                                         interface only the current value is displayed, instead of
@@ -428,7 +432,7 @@
                                 </li>
                                 <li>
                                     <p>
-                                        <b>relevant</b> – If the XPath 2.0 expression in
+                                        <b>relevant</b> _ If the XPath 2.0 expression in
                                         <code>relevant</code> evaluates to false, the control will
                                         not be displayed at all.
                                     </p>
@@ -459,7 +463,9 @@
                             field bound to the <code>&lt;number></code> element, which a child of
                             <code>&lt;credit-card></code>, with:
                         </p>
-                        <xml-source show-namespaces="false"><xforms:input ref="/credit-card/number"/></xml-source>
+                        <xml-source show-namespaces="false">
+                            <xforms:input ref="/credit-card/number"/>
+                        </xml-source>
                     </li>
                     <li>
                         <p>
@@ -485,7 +491,9 @@
                     </tr>
                     <tr>
                         <th>Text field</th>
-                        <td><img src="pages/reference-xforms-input.png"/></td>
+                        <td>
+                            <img src="pages/reference-xforms-input.png"/>
+                        </td>
                         <td>
                             <xml-source border="false" show-namespaces="false">
                                 <xforms:input ref="text"/>
@@ -497,7 +505,9 @@
                     </tr>
                     <tr>
                         <th>Password field</th>
-                        <td><img src="pages/reference-xforms-secret.png"/></td>
+                        <td>
+                            <img src="pages/reference-xforms-secret.png"/>
+                        </td>
                         <td>
                             <xml-source border="false" show-namespaces="false">
                                 <xforms:secret ref="secret"/>
@@ -509,7 +519,9 @@
                     </tr>
                     <tr>
                         <th>Text area</th>
-                        <td><img src="pages/reference-xforms-textarea.png"/></td>
+                        <td>
+                            <img src="pages/reference-xforms-textarea.png"/>
+                        </td>
                         <td>
                             <xml-source border="false" show-namespaces="false">
                                 <xforms:textarea ref="textarea"/>
@@ -521,7 +533,9 @@
                     </tr>
                     <tr>
                         <th>Radio buttons</th>
-                        <td><img src="pages/reference-xforms-radio.png"/></td>
+                        <td>
+                            <img src="pages/reference-xforms-radio.png"/>
+                        </td>
                         <td>
                             <xml-source border="false" show-namespaces="false">
                                 <xforms:select1 ref="carrier" appearance="full">
@@ -542,7 +556,9 @@
                     </tr>
                     <tr>
                         <th>Combo box</th>
-                        <td><img src="pages/reference-xforms-combobox.png"/></td>
+                        <td>
+                            <img src="pages/reference-xforms-combobox.png"/>
+                        </td>
                         <td>
                             <xml-source border="false" show-namespaces="false">
                                 <xforms:select1 ref="payment" appearance="minimal">
@@ -563,7 +579,9 @@
                     </tr>
                     <tr>
                         <th>Check boxes</th>
-                        <td><img src="pages/reference-xforms-checkbox.png"/></td>
+                        <td>
+                            <img src="pages/reference-xforms-checkbox.png"/>
+                        </td>
                         <td>
                             <xml-source border="false" show-namespaces="false">
                                 <xforms:select ref="wrapping" appearance="full">
@@ -586,7 +604,9 @@
                     </tr>
                     <tr>
                         <th>List</th>
-                        <td><img src="pages/reference-xforms-list.png"/></td>
+                        <td>
+                            <img src="pages/reference-xforms-list.png"/>
+                        </td>
                         <td>
                             <xml-source border="false" show-namespaces="false">
                                 <xforms:select ref="taste" appearance="compact">
@@ -607,7 +627,9 @@
                     </tr>
                     <tr>
                         <th>Submit button</th>
-                        <td><img src="pages/reference-xforms-submit-button.png"/></td>
+                        <td>
+                            <img src="pages/reference-xforms-submit-button.png"/>
+                        </td>
                         <td>
                             <xml-source border="false" show-namespaces="false">
                                 <xforms:submit>
@@ -621,7 +643,9 @@
                     </tr>
                     <tr>
                         <th>Submit link</th>
-                        <td><img src="pages/reference-xforms-submit-link.png"/></td>
+                        <td>
+                            <img src="pages/reference-xforms-submit-link.png"/>
+                        </td>
                         <td>
                             <xml-source border="false" show-namespaces="false">
                                 <xforms:submit xxforms:appearance="link">
@@ -635,7 +659,9 @@
                     </tr>
                     <tr>
                         <th>Submit image</th>
-                        <td><img src="pages/reference-xforms-submit-image.png"/></td>
+                        <td>
+                            <img src="pages/reference-xforms-submit-image.png"/>
+                        </td>
                         <td>
                             <xml-source border="false" show-namespaces="false">
                                 <xforms:submit xxforms:appearance="image">
@@ -649,7 +675,9 @@
                     </tr>
                     <tr>
                         <th>Upload</th>
-                        <td><img src="pages/reference-xforms-upload-image.png"/></td>
+                        <td>
+                            <img src="pages/reference-xforms-upload-image.png"/>
+                        </td>
                         <td>
                             <xml-source border="false" show-namespaces="false">
                                 <xforms:upload ref="files/file[1]">
@@ -669,8 +697,7 @@
                     <code>select1</code> controls are declared in the control element with multiple
                     <code>&lt;xforms:item></code> elements. Alternatively the label/value pairs can
                     be pulled out from the instance, instead of being declared in XForms control.
-                    As shown in the code below from the <a
-                    href="/goto-example/xforms-selection">XForms Selection Controls</a> example,
+                    As shown in the code below from the <a href="/goto-example/xforms-selection">XForms Selection Controls</a> example,
                     you do this by using the <code>&lt;xforms:itemset></code> element, instead of
                     using <code>&lt;xforms:item></code> elements:
                 </p>
@@ -754,7 +781,9 @@
                                 <xforms:secret ref="secret">
                                     <xforms:help>
                                         Make sure you enter a valid password.
-                                        <p><i>The password is 42.</i></p>
+                                        <p>
+                                            <i>The password is 42.</i>
+                                        </p>
                                     </xforms:help>
                                 </xforms:secret>
                             </xml-source>
@@ -805,13 +834,11 @@
                 </p>
                 <ul>
                     <li>As a URL, by specifying the type <code>xs:anyURI</code>.</li>
-
                     <li>As Base64-encoded text, by specifying the type
                     <code>xs:base64Binary</code>. Base64 is a mechanism to encode any binary data
                     using a 65-character subset of US-ASCII. Using this mechanism allows embedding
                     binary data into XML documents, at the typical cost of taking 50% more space
-                    than the original binary data. For more information, please refer to the <a
-                    href="http://www.ietf.org/rfc/rfc2045.txt">RFC</a>.</li>
+                    than the original binary data. For more information, please refer to the <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC</a>.</li>
                 </ul>
                 <note>
                     It is mandatory to specify either one of <code>xs:anyURI</code> or
@@ -823,9 +850,12 @@
                     about an uploaded file:
                 </p>
                 <ul>
-                    <li><code>xforms:filename</code>: stores the file name sent by the user agent</li>
-                    <li><code>xforms:mediatype</code>: store the media type sent by the user agent</li>
-                    <li><code>xxforms:size</code>: stores the actual size in bytes of the uploaded data</li>
+                    <li>
+                        <code>xforms:filename</code>: stores the file name sent by the user agent</li>
+                    <li>
+                        <code>xforms:mediatype</code>: store the media type sent by the user agent</li>
+                    <li>
+                        <code>xxforms:size</code>: stores the actual size in bytes of the uploaded data</li>
                 </ul>
                 <p>
                     Note that the file name and the media type are provided by the user agent
@@ -895,9 +925,7 @@
                 </p>
                 <xml-source show-namespaces="false">
                     <xsl:template match="xforms:input">
-                        <xhtml:input type="text"
-                            name="{xxforms:encrypt-name(@xxforms:name)}"
-                            value="{@xxforms:value}">
+                        <xhtml:input type="text" name="{xxforms:encrypt-name(@xxforms:name)}" value="{@xxforms:value}">
                             <xsl:call-template name="copy-other-attributes"/>
                         </xhtml:input>
                     </xsl:template>
@@ -914,9 +942,7 @@
                             <xsl:value-of select="xforms:label"/>
                             <xsl:text>: </xsl:text>
                         </xsl:if>
-                        <xhtml:input type="text"
-                                name="{xxforms:encrypt-name(@xxforms:name)}"
-                                value="{@xxforms:value}">
+                        <xhtml:input type="text" name="{xxforms:encrypt-name(@xxforms:name)}" value="{@xxforms:value}">
                             <xsl:call-template name="copy-other-attributes"/>
                         </xhtml:input>
                     </xsl:template>
@@ -994,8 +1020,7 @@
                     the end-user. To do so, you can tell the XForms engine to set values in the
                     XForms instance when a submit control is activated with an
                     <code>&lt;xforms:setvalue></code> element child of the corresponding
-                    <code>&lt;xforms:submit></code> element. The <a
-                    href="../goto-example/xforms-submit">XForms Submit Example</a> illustrates
+                    <code>&lt;xforms:submit></code> element. The <a href="../goto-example/xforms-submit">XForms Submit Example</a> illustrates
                     this. For instance, the content of the <code>&lt;clicked></code> and
                     <code>&lt;taste></code> elements are set with:
                 </p>
@@ -1022,8 +1047,7 @@
                     The Insert and Delete actions are typically used in conjunctions with XForms
                     repeat: when you create a page with a repeating structure (e.g. purchase order
                     lines) you typically want to enable the end-user to insert a new line, and to
-                    delete existing lines. The annotated screenshot of the <a
-                    href="/goto-example/xforms-ubl">UBL Order</a> example shows which submit
+                    delete existing lines. The annotated screenshot of the <a href="/goto-example/xforms-ubl">UBL Order</a> example shows which submit
                     controls are implemented with XForms insert and XForms delete.
                 </p>
                 <img src="pages/reference-xforms-insert-delete.png"/>
@@ -1070,12 +1094,10 @@
                     The <code>index()</code> function takes one attribute of type
                     <code>xs:string</code>, which is a reference to a "repeat id". Repeat ids are
                     declared with the <code>id</code> attribute on the
-                    <code>&lt;xforms:repeat></code> element. In the snippet below taken from the <a
-                    href="/goto-example/xforms-ubl">UBL Order example</a>, with
+                    <code>&lt;xforms:repeat></code> element. In the snippet below taken from the <a href="/goto-example/xforms-ubl">UBL Order example</a>, with
                     <code>at="index('lineSet')"</code> we refer to the position of the current line
                     in the XForms repeat with an <code>id="lineSet"</code> attribute. Repeat ids
-                    become particularly important when you have nested repeats, as shown in the <a
-                    href="/goto-example/xforms-repeat">XForms repeat example</a>.
+                    become particularly important when you have nested repeats, as shown in the <a href="/goto-example/xforms-repeat">XForms repeat example</a>.
                 </p>
                 <p>
                     Note that when you reference a repeat id with the <code>index()</code> function
@@ -1117,7 +1139,7 @@
                     <ul>
                         <li>
                             <p>
-                                <code>xxforms:if</code> — Enables the content if, and only if the XPath expression contained
+                                <code>xxforms:if</code> _ Enables the content if, and only if the XPath expression contained
                                 in the <code>test</code> attribute evaluates to true.
                             </p>
                             <p>
@@ -1134,7 +1156,7 @@
                         </li>
                         <li>
                             <p>
-                                <code>xxforms:choose</code> — Contains a sequence of at least one <code>xxforms:when</code>
+                                <code>xxforms:choose</code> _ Contains a sequence of at least one <code>xxforms:when</code>
                                 element, optionnally followed by a <code>xxforms:otherwise</code>. Each <code>xxforms:when</code>
                                 which <code>test</code> attribute evaluate to true is enabled. If all evaluate to false, the
                                 <code>xxforms:otherwise</code> content is enabled.
@@ -1200,6 +1222,581 @@
                     getElementById</a>).
                 </p>
             </section>
+        </section>
+        <section>
+            <title>Conformance</title>
+            <table>
+                <tr>
+                    <th colspan="3">XForms Specification Section</th>
+                    <th>Comment</th>
+                    <th>Conformance</th>
+                </tr>
+                <tr>
+                    <td rowspan="4"><a href="http://www.w3.org/TR/xforms/slice2.html">2. Introduction to XForms</a></td>
+                    <td colspan="2"><a href="http://www.w3.org/TR/xforms/slice2.html#concepts-xhtml">2.1 An Example</a></td>
+                    <td/>
+                    &full;
+                </tr>
+                <tr>
+                    <td colspan="2"><a href="http://www.w3.org/TR/xforms/slice2.html#concepts-xml-instance-data">2.2 Providing XML Instance Data</a></td>
+                    <td/>
+                    &full;
+                </tr>
+                <tr>
+                    <td colspan="2"><a href="http://www.w3.org/TR/xforms/slice2.html#concepts-model">2.3 Constraining Values</a></td>
+                    <td>
+                        Data entered by the user can be checked by specifying a schema in the XForms
+                        model (the schema is then used to validate the instance), or by declaring a
+                        <code>relevant</code>, <code>constraint</code>, or <code>type</code> model
+                        item property in the XForms model. However, it is not yet possible to have
+                        an inline schema in the XForms model, and reference a type declared in this
+                        schema in a <code>type</code> model item property.
+                        
+                        <p>
+                            [RFE <a href="http://tinyurl.com/5cavs">1076200</a>]<br/>
+                            [RFE <a href="http://tinyurl.com/63ya2">1076207</a>]
+                        </p>
+                    </td>
+                    &partial;
+                </tr>
+                <tr>
+                    <td colspan="2"><a href="http://www.w3.org/TR/xforms/slice2.html#concepts-multiple">2.4 Multiple Forms per Document</a></td>
+                    <td>
+                        You can have multiple forms in a given page; however you can only have one
+                        XForms model per page. If you have multiple forms on the same page, all the
+                        controls on the page will be bound to the nodes in the same XForms instance.
+                        
+                        <p>
+                            [RFE <a href="http://tinyurl.com/4jbd7">1076212</a>]<br/>
+                            [RFE <a href="http://tinyurl.com/3py3m">1076217</a>]
+                        </p>
+                    </td>
+                    &partial;
+                </tr>
+                <tr>
+                    <td rowspan="12"><a href="http://www.w3.org/TR/xforms/slice3.html">3. Document Structure</a></td>
+                    <td colspan="2"><a href="http://www.w3.org/TR/xforms/slice3.html#structure-namespace">3.1 The XForms Namespace</a></td>
+                    <td/>
+                    &full;
+                </tr>
+                <tr>
+                    <td rowspan="5"><a href="http://www.w3.org/TR/xforms/slice3.html#structure-attrs">3.2 XForms Core Attribute Collections</a></td>
+                    <td><a href=">http://www.w3.org/TR/xforms/slice3.html#structure-attrs-common">3.2.1 Common Attributes</a></td>
+                    <td/>
+                    &full;
+                </tr>
+                <tr>
+                    <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-attrs-link">3.2.2 Linking Attributes</a></td>
+                    <td>[RFE <a href="http://tinyurl.com/4xj6p">1076243</a>]</td>
+                    &future;
+                </tr>
+                <tr>
+                    <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-attrs-single-node">3.2.3 Single-Node Binding Attributes</a></td>
+                    <td>
+                        Only the <code>ref</code> attribute is supported. The <code>bind</code> and
+                        <code>model</code> attributes are not supported.
+                    
+                        <p>
+                            [RFE <a href="http://tinyurl.com/6k68e">1059115</a>]<br/>
+                            [RFE <a href="http://tinyurl.com/4jbd7">1076212</a>]
+                        </p>
+                    </td>
+                    &partial;
+                </tr>
+                <tr>
+                    <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-attrs-nodeset">3.2.4 Node-Set Binding Attributes</a></td>
+                    <td>
+                        Only the <code>nodeset</code> attribute is supported. The <code>bind</code> and
+                        <code>model</code> attributes are not supported.
+                    
+                        <p>
+                            [RFE <a href="http://tinyurl.com/6k68e">1059115</a>]<br/>
+                            [RFE <a href="http://tinyurl.com/4jbd7">1076212</a>]
+                        </p>
+                    </td>
+                    &partial;
+                </tr>
+                <tr>    
+                    <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-attrs-mip">3.2.5 Model Item Property Attributes</a></td>
+                    <td>
+                        Model item properties are supported on the <code>&lt;xforms:bind></code>
+                        elements but not on XForms controls. For details on support for individual
+                        model item properties, see section 6.1.
+                        
+                        <p>
+                            [RFE <a href="http://tinyurl.com/4fvy3">1076359</a>]
+                        </p>
+                    </td>
+                    &partial;
+                </tr>
+                <tr>
+                    <td rowspan="4"><a href="http://www.w3.org/TR/xforms/slice3.html#structure-abstract">3.3 The XForms Core Module</a></td>
+                    <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-model">3.3.1 The model Element</a></td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-model-instance">3.3.2 The instance Element</a></td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-model-submission">3.3.3 The submission Element</a></td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-bind-element">3.3.4 The bind Element</a></td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td colspan="2"><a href="http://www.w3.org/TR/xforms/slice3.html#module-mustUnderstand">3.4 The XForms MustUnderstand Module</a></td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td><a href="http://www.w3.org/TR/xforms/slice3.html#module-extension">3.5 The XForms Extension Module</a></td>
+                    <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-extension">3.5.1 The extension Element</a></td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td colspan="3">4 Processing Model</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td colspan="3">5 Datatypes</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td rowspan="8">6 Model Item Properties</td>
+                    <td rowspan="7">6.1 Model Item Property Definitions</td>
+                    <td>6.1.1 The type Property</td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td>6.1.2 The readonly Property</td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td>6.1.3 The required Property</td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td>6.1.4 The relevant Property</td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td>6.1.5 The calculate Property</td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td>6.1.6 The constraint Property</td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td>6.1.7 The p3ptype Property</td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td>6.2 Schema Constraints</td>
+                    <td>6.2.1 Atomic Datatype</td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td rowspan="25">7 XPath Expressions in XForms</td>
+                    <td colspan="2">7.1 XPath Datatypes</td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td colspan="2">7.2 Feature string for the hasFeature method call</td>
+                    <td/>
+                    &partial;
+                </tr>
+                <tr>
+                    <td colspan="2">7.3 Instance Data</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td colspan="2">7.4 Evaluation Context</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td rowspan="5">7.5 Binding Expressions</td>
+                    <td>7.5.1 Dynamic Dependencies</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.5.2 Model Binding Expressions</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.5.3 UI Binding Expressions</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.5.4 UI Binding in other XML vocabularies</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.5.5 Binding Examples</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td colspan="2">7.6 XForms Core Function Library</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td rowspan="2">7.7 Boolean Functions</td>
+                    <td>7.7.1 The boolean-from-string() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.7.2 The if() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td rowspan="5">7.8 Number Functions</td>
+                    <td>7.8.1 The avg() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.8.2 The min() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.8.3 The max() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.8.4 The count-non-empty() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.8.5 The index() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.9 String Functions</td>
+                    <td>7.9.1 The property() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td rowspan="5">7.10 Date and Time Functions</td>
+                    <td>7.10.1 The now() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.10.2 The days-from-date() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.10.3 The seconds-from-dateTime() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.10.4 The seconds() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.10.5 The months() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>7.11 Node-set Functions</td>
+                    <td>7.11.1 The instance() Function</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td colspan="2">7.12 Extension Functions</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td rowspan="20">8 Form Controls</td>
+                    <td rowspan="11">8.1 The XForms Form Controls Module</td>
+                    <td>8.1.1 Implementation Requirements Common to All Form Controls</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.1.2 The input Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.1.3 The secret Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.1.4 The textarea Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.1.5 The output Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.1.6 The upload Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.1.7 The range Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.1.8 The trigger Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.1.9 The submit Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.1.10 The select Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.1.11 The select1 Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td rowspan="3">8.2 Common Markup for Selection Controls</td>
+                    <td>8.2.1 The choices Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.2.2 The item Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.2.3 The value Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td rowspan="6">8.3 Additional Elements</td>
+                    <td>8.3.1 The filename Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.3.2 The mediatype Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.3.3 The label Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.3.4 The help Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.3.5 The hint Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>8.3.6 The alert Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td rowspan="14">9 XForms User Interface</td>
+                    <td>9.1 The XForms Group Module</td>
+                    <td>9.1.1 The group Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>    
+                    <td rowspan="3">9.2 The XForms Switch Module</td>
+                    <td>9.2.1 The switch Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>9.2.2 The case Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>9.2.3 The toggle Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td rowspan="10">9.3 The XForms Repeat Module</td>
+                    <td>9.3.1 The repeat Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>9.3.2 Creating Repeating Structures Via Attributes</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>9.3.3 The itemset Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>9.3.4 The copy Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>9.3.5 The insert Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>9.3.6 The delete Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>9.3.7 The setindex Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>9.3.8 Repeat Processing</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>9.3.9 Nested Repeats</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>9.3.10 User Interface Interaction</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td rowspan="13">10 XForms Actions</td>
+                    <td rowspan="13">10.1 The XForms Action Module</td>
+                    <td>10.1.1 The action Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>10.1.2 The dispatch Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>10.1.3 The rebuild Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>10.1.4 The recalculate Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>10.1.5 The revalidate Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>10.1.6 The refresh Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>10.1.7 The setfocus Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>10.1.8 The load Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>10.1.9 The setvalue Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>10.1.10 The send Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>10.1.11 The reset Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>10.1.12 The message Element</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td>10.1.13 Actions insert, delete and setindex</td>
+                    <td/>
+                    &future;
+                </tr>
+                <tr>
+                    <td colspan="3">11 Submit</td>
+                    <td/>
+                    &future;
+                </tr>
+            </table>
         </section>
     </body>
 </document>

@@ -13,15 +13,21 @@
  */
 package org.orbeon.oxf.processor.converter;
 
-import org.orbeon.oxf.processor.serializer.legacy.XSLFOSerializer;
-import org.orbeon.oxf.processor.serializer.legacy.XSLFOSerializer;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.serializer.legacy.XSLFOSerializer;
 
 /**
  * Converts XML in XSL:FO format into a binary format, usually PDF
  */
 public class XSLFOConverter extends XSLFOSerializer {
+
+    public static final String XSLFO_CONVERTER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/converter/xslfo-config";
+
     public XSLFOConverter() {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
+    }
+
+    protected String getConfigSchemaNamespaceURI() {
+        return XSLFO_CONVERTER_CONFIG_NAMESPACE_URI;
     }
 }

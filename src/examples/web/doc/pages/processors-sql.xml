@@ -484,7 +484,7 @@ select first_name, last_name
     <sql:row-results>
         <employee>
             <sql:get-columns format="xml">
-                <exclude>first_name</exclude>
+                <sql:exclude>first_name</sql:exclude>
             </sql:get-columns>
         </employee>
     </sql:row-results>

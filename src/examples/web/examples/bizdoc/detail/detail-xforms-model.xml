@@ -27,10 +27,10 @@
                 <xi:include href="../schema/empty-instance.xml"/>
             </document>
         </form>
-    </xforms:instance>
-    <xforms:submission method="post"/>
+    </xforms:instance> <xforms:submission method="post"/>
     <!-- This bind element handles the empty repeat entry necessary to add new entries with xforms:repeat -->
-    <xforms:bind nodeset="/form/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child" relevant="count(following-sibling::claim:child) > 0"/>
+    <xforms:bind nodeset="/form/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child"
+        relevant="count(following-sibling::claim:child) > 0"/>
     <!-- This bind element handles calculated values -->
     <xforms:bind nodeset="/form/document/claim:claim/claim:insured-info/claim:claim-info/claim:rate"
                  calculate="if (/form/document/claim:claim/claim:insured-info/claim:person-info/claim:birth-date castable as xs:date)

@@ -25,7 +25,7 @@
     </head>
     <body>
         <div id="maincontent">
-            <xforms:group ref="/form" xxforms:show-errors="{/form/show-errors = 'true'}">
+            <xforms:group ref="/form" xxforms:show-errors="{doc('input:instance')/form/show-errors = 'true'}">
                 <xi:include href="../summary/view-logo.xml"/>
                 <xi:include href="detail-view-header.xml"/>
                 <xforms:group ref="document">

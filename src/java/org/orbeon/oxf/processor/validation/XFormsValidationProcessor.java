@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.validation;
 
+import com.sun.msv.verifier.jarv.Const;
 import com.sun.msv.verifier.jarv.TheFactoryImpl;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
@@ -26,7 +27,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.xforms.Constants;
-import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
@@ -132,6 +132,7 @@ public class XFormsValidationProcessor extends ProcessorImpl {
                                                 return i;
                                             }
                                         });
+                                        verifierFactory.setFeature( Const.PANIC_MODE_FEATURE, false );
                                         InputSource is = new InputSource(new StringReader(XMLUtils.domToString(schemaDoc)));
                                         is.setSystemId(schemaSystemId);
 

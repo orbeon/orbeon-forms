@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.validation;
 
+import com.sun.msv.verifier.jarv.Const;
 import com.sun.msv.verifier.jarv.TheFactoryImpl;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
@@ -129,6 +130,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
                                                 return i;
                                             }
                                         });
+                                        verifierFactory.setFeature( Const.PANIC_MODE_FEATURE, false );
                                         InputSource is = new InputSource(new StringReader(XMLUtils.domToString(schemaDoc)));
                                         is.setSystemId(schemaSystemId);
 

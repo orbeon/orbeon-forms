@@ -1244,7 +1244,6 @@
         </output>
     </test>
     
-    <!-- FIXME: Only the first invalid element is marked as invalid. -->
     <test description="Schema validation with multiple errors" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -1285,8 +1284,8 @@
             <instance>
                 <a>35</a>
                 <b xxforms:valid="false">-42</b>
-                <c>x</c>
-                <d/>
+                <c xxforms:valid="false">x</c>
+                <d xxforms:valid="false" />
             </instance>
         </output>
     </test>

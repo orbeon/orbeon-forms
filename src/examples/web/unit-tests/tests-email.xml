@@ -42,7 +42,7 @@
     </test>
 
     <!-- Check that if multipart/* is used, the body contains at least one part -->
-    <test description="Negative Validation 1" name="oxf:validation">
+    <test  description="Negative Validation 1" name="oxf:validation">
         <input name="schema" href="oxf:/org/orbeon/oxf/xml/schemas/email.rng"/>
         <input name="config">
             <config><decorate>true</decorate></config>
@@ -76,6 +76,7 @@
                 <subject>Hello</subject>
                 <body content-type="multipart/alternative">This is simple body content
                     <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error unexpected character literal(schema: null)" system-id="oxf:unit-tests/tests.xml" line="38" column="41"/>
+                    <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error uncompleted content model. expecting: &lt;part&gt;(schema: null)" system-id="oxf:unit-tests/tests.xml" line="38" column="41"/>
                 </body>
             </message>
         </output>
@@ -119,6 +120,7 @@
                 <body content-type="multipart/alternative">
                     <part name="text" content-type="multipart/related">This is simple body content
                         <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error unexpected character literal(schema: null)" system-id="oxf:unit-tests/tests.xml" line="38" column="41"/>
+                        <v:error xmlns:v="http://orbeon.org/oxf/xml/validation" message="Error uncompleted content model. expecting: &lt;part&gt;(schema: null)" system-id="oxf:unit-tests/tests.xml" line="38" column="41"/>
                     </part>
                 </body>
             </message>

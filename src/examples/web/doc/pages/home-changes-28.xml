@@ -36,7 +36,7 @@
                         You can use multiple <code>&lt;xforms:alert></code> for internatinalization
                         by adding on each <code>&lt;xforms:alert></code> an <code>xml:lang</code>
                         attribute (e.g. <code>xml:lang="en"</code>, <code>xml:lang="fr"</code>) and
-                        selecting in your theme the appropriate messate to display for the current
+                        selecting in your theme the appropriate message to display for the current
                         user based on his prefered language.
                     </p>
                 </li>
@@ -45,44 +45,49 @@
                         XForms schema validation can now be used to <a
                         href="http://tinyurl.com/5l7q8">validate attributes in the XForms
                         instance</a>. Note that the <code>xxforms:valid="false"</code> attribute is
-                        only added on invalid elements in the XForms instance. The XForms engine
-                        does not annotate the XForms instance for invalid attributes.
+                        still only added on invalid elements in the XForms instance. The XForms
+                        engine does not annotate the XForms instance for invalid attributes.
                     </p>
                 </li>
                 <li>
                     <p>
-                        Instance node of type <code>xs:date</code> and <code>xs:time</code> bound to an
-                        XForms input control are rendered with an <a
-                        href="http://tinyurl.com/6wu6p">approriate date or time widget</a>. You set the
-                        type of a node in the XForms instance with a <code>&lt;xforms:bind
+                        Instance node of type <code>xs:date</code> and <code>xs:time</code> bound to
+                        an XForms input control are rendered with an <a
+                        href="http://tinyurl.com/6wu6p">approriate date or time widget</a>. You set
+                        the type of an instance node with a <code>&lt;xforms:bind
                         nodeset="/path/to/your/node" type="xs:date"/></code> in your XForms model.
                     </p>
                 </li>
                 <li>
                     <p>
-                        As the XForms engine validates the XForms instance with a schema or
+                        As the XForms engine validates the XForms instance with a schema and
                         evaluates the model item properties on the instance, it annotates the
-                        XForms instance with attributes using the <code>xxforms</code> prefix. For
+                        instance with attributes using the <code>xxforms</code> prefix. For
                         instance, if an element is validated, an attribute
                         <code>xxforms:valid="true|false"</code> is added on the element. In previous
-                        versions of PresentationServer you could override value set the XForms
-                        engine in the MVC model or MVC view by modifying the value of those
-                        attributes in the instance. As the XForms instance can be modified in the
-                        MVC model and view, the model item properties are reevaluated and the
-                        instance revalidated with the schema after the view, in the epilogue. At the
-                        point, for instance, if there is a <code>xxforms:valid="false"</code> in the
-                        instance, but the validation with the schema and model item properties
-                        returns "true", the XForms engine does not know if the content of the
-                        element was modified in the MVC model or view and the error corrected (in
-                        which case the element should be considered valid), or if the
+                        versions of PresentationServer you could override the value set by the
+                        XForms engine in the MVC model or MVC view by modifying the value of those
+                        attributes in the instance. As the instance can be modified in the MVC
+                        model and view, the model item properties are reevaluated and the instance
+                        revalidated with the schema after the MVC view, in the epilogue. At that
+                        point, for example, if there is a <code>xxforms:valid="false"</code>
+                        attribute on a given element, but validation with the schema and model
+                        item properties returns "true", the XForms engine does not know if the
+                        content of the element was modified in the MVC model or view and the error
+                        corrected (in which case the element should be considered valid), or if the
                         <code>xxforms:valid="false"</code> was added by the MVC model or view to
                         tell the XForms engine that this elemet is invalid (in which case the
                         element should be considered invalid).
                     </p>
                     <p>
-                        To solve this problem, the XForms engine does not perform any merging
-                        anymore. All the annotations on the XForms instance in the extension
-                        namespace are readonly.
+                        To solve this problem, starting with PresentationServer 2.8, you cannot
+                        override the annotations added by the XForms engine on the instance. Those
+                        annotations should be considered read-only. Instead, to instruct the XForms
+                        engine that a given node is invalid, use the method described in the <a
+                        href="reference-xforms#custom-validation">Custom Validation</a> section of
+                        the XForms reference. The benefit of this method is that it does not require
+                        the use of proprietary XForms extensions and that it can be used on elements
+                        as well as attributes.
                     </p>
                 </li>
             </ul>
@@ -105,13 +110,17 @@
             <ul>
                 <li>
                     <a href="http://tinyurl.com/5eq9d">XUpdate removing attributes and namespace
-                    declarations</a> - When using the <code>&lt;xu:xupdate></code> instruction to
+                    declarations</a> &#8213; When using the <code>&lt;xu:xupdate></code> instruction to
                     update the content of an element, the existing attributes and namespaces of the
                     element were incorrectly removed.
                 </li>
                 <li>
-                    <a href="http://tinyurl.com/47eqg">XForms xhtml:onclick attribute</a> - The
-                    attribute xhtml:onclick on XForms submit control was ignored.
+                    <a href="http://tinyurl.com/47eqg">XForms xhtml:onclick attribute</a> &#8213;
+                    The attribute xhtml:onclick on XForms submit control was ignored.
+                </li>
+                <li>
+                    <a href="http://tinyurl.com/5hqzy">Rendering issues of the documentation under
+                    Safari</a> &#8213; Those issues have been solved.
                 </li>
             </ul>
         </section>

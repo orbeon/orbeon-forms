@@ -1253,5 +1253,54 @@
                 </p>
             </section>
         </section>
+        <section>
+            <title>Usage Patterns</title>
+            <a name="custom-validation"/>
+            <section>
+                <title>Custom Validation</title>
+                <section>
+                    <title>Pattern description</title>
+                    <p>
+                        Validation of an instance can be done with XForms built-in mechanisms,
+                        specifically using model items properties or a W3C schema. In some case, it
+                        is desiderable to perform some other type of validation. For instance, one
+                        might want to delegate validation to a web service. In this case the
+                        application has to "tell" the XForms engine which nodes in the instance are
+                        invalid, so the XForms engine can display the appropriate alerts if XForms
+                        controls are bound to those nodes. Note that we are talking about validation
+                        here as this is the most frequent scenario, but this pattern applies as well
+                        to the all the other model item properties evaluated with an XPath
+                        expression: <code>relevant</code>, <code>required</code>, and
+                        <code>readonly</code>.
+                    </p>
+                </section>
+                <section>
+                    <title>Implementation</title>
+                    <p>
+                        For each invalid element, you annotate the element with an attribute
+                        <code>myns:invalid="."</code> and for each invalid attribute you annotate
+                        the parent element with an attribute <code>myns:invalid="ns1:attr1"</code>.
+                        We use here the attribute <code>myns:invalid</code>, suggesting that you
+                        should use a namespace you define for this attribute, but you can use any
+                        namespace or name. The value of <code>myns:invalid</code> is a space
+                        separated list. For instance, if for the same element, the element content
+                        and two attributes are invalid, you will add a the attribute
+                        <code>myns:invalid=". ns1:attr1 ns2:attr2"</code>.
+                    </p>
+                    <p>
+                        With a model item property, you tell the XForms engine what nodes are
+                        invalid based on the content of the <code>myns:invalid</code> attributes.
+                        You define two <code>&lt;xforms:bind></code> in your XForms model: one for
+                        elements and the other for attributes:
+                    </p>
+                    <xml-source show-namespaces="false">
+                        <xforms:bind nodeset="//*"
+                            constraint="not(@myns:invalid) or not(tokenize(@myns:invalid,' ') = '.')"/>
+                        <xforms:bind nodeset="//@*"
+                            constraint="not(@myns:invalid) or not(tokenize(../@myns:invalid, ' ') = name())"/>
+                    </xml-source>
+                </section>
+            </section>
+        </section>
     </body>
 </document>

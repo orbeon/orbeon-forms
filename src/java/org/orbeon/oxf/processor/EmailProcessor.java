@@ -257,7 +257,7 @@ public class EmailProcessor extends ProcessorImpl {
             // Create Document and convert it into a String
             Element rootElement = (Element)(needsRootElement ? partOrBodyElement.elements().get(0) : partOrBodyElement);
             Document partDocument = DocumentHelper.createDocument();
-            partDocument.setRootElement((Element) Dom4jUtils.cloneNode(rootElement));
+            partDocument.setRootElement((Element) Dom4jUtils.cloneElement(rootElement));
             content = handleInlinePartContent(partDocument, contentType);
         }
 

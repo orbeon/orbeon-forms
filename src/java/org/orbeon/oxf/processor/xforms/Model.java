@@ -265,7 +265,7 @@ public class Model {
                 Element instanceContainer = modelElement.element(new QName("instance", Constants.XFORMS_NAMESPACE));
                 if (instanceContainer != null) {
                     Element initialInstanceRoot = (Element)
-                            Dom4jUtils.cloneNode((Element) instanceContainer.elements().get(0));
+                            Dom4jUtils.cloneElement((Element) instanceContainer.elements().get(0));
                     initialInstance = DocumentHelper.createDocument();
                     initialInstance.setRootElement(initialInstanceRoot);
                 }
@@ -548,7 +548,7 @@ public class Model {
                                     for (Iterator k = result.iterator(); k.hasNext();) {
                                         Object resultItem = k.next();
                                         if (resultItem instanceof Node) {
-                                            elementNode.add(Dom4jUtils.cloneNode(elementNode));
+                                            elementNode.add(Dom4jUtils.cloneElement(elementNode));
                                         } else if(resultItem instanceof Item) {
                                             elementNode.add(DocumentFactory.getInstance().createText(((Item)resultItem).getStringValue()));
                                         } else {

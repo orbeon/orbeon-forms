@@ -104,6 +104,6 @@ public class Insert implements Action {
 
         // Actually do the insertion
         atElementSiblings.add(POSITION_BEFORE.equals(position) ? atElementIndex : atElementIndex + 1,
-                Dom4jUtils.cloneNode(elementToDuplicate));
+                Dom4jUtils.cloneElement(elementToDuplicate));
     }
 }

@@ -480,7 +480,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     Document paramsDocument = DocumentHelper.createDocument(DocumentHelper.createElement("params"));
                     for (Iterator j = params.iterator(); j.hasNext();) {
                         Element paramElement = (Element) j.next();
-                        paramsDocument.getRootElement().add(Dom4jUtils.cloneNode(paramElement));
+                        paramsDocument.getRootElement().add(Dom4jUtils.cloneElement(paramElement));
                     }
                     addInput(new ASTInput("filter", paramsDocument));
                     addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));

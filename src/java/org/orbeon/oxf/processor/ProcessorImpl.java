@@ -66,17 +66,8 @@ public abstract class ProcessorImpl implements Processor {
     private List inputsInfo = new ArrayList();
     private List outputsInfo = new ArrayList();
 
-    private String systemId;
     private LocationData locationData;
     public static final String PROCESSOR_INPUT_SCHEME = "oxf:";
-
-    public String getSystemId() {
-        return systemId;
-    }
-
-    public void setSystemId(String systemId) {
-        this.systemId = systemId;
-    }
 
     /**
      * Return a property set for this processor.

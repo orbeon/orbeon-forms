@@ -31,7 +31,7 @@
     <p:for-each href="#documents" select="/*/document">
 
         <p:processor name="oxf:url-generator">
-            <p:input name="config" href="aggregate('config', aggregate('url', current()#xpointer(concat('oxf:/bizdoc/schema/', string(/)))))"/>
+            <p:input name="config" href="aggregate('config', aggregate('url', current()#xpointer(concat('../schema/', string(/)))))"/>
             <p:output name="data" id="file"/>
         </p:processor>
 

@@ -38,7 +38,7 @@ import java.util.Map;
 /**
  * A DOMGenerator reads an input from a Node, and outputs SAX events.
  */
-public class DOMGenerator extends org.orbeon.oxf.processor.ProcessorImpl {
+public class DOMGenerator extends ProcessorImpl {
 
     private Document document;
 

@@ -271,7 +271,14 @@ public class URLGenerator extends ProcessorImpl {
 
                                 // Create configuration object
                                 try {
-                                    Config config = new Config(URLFactory.createURL(url), contentType, forceContentType, encoding, forceEncoding,
+                                    // Use location data if present so that relative URLs can be supported
+                                    LocationData locationData = getLocationData();
+                                    URL fullURL = (locationData != null && locationData.getSystemID() != null)
+                                        ? URLFactory.createURL(locationData.getSystemID(), url)
+                                        : URLFactory.createURL(url);
+
+                                    // Create configuration
+                                    Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
                                             ignoreConnectionEncoding, validating, headers, cacheUseLocalCache, cacheAlwaysRevalidate, cacheExpiration,
                                             tidyConfig);
                                     if (logger.isDebugEnabled())

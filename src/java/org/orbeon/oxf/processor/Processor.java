@@ -44,18 +44,6 @@ public interface Processor {
     public void setId(String id);
 
     /**
-     * TODO: Document.
-     * @return
-     */
-    public String getSystemId();
-
-    /**
-     * TODO: Document. 
-     * @param systemId
-     */
-    public void setSystemId(String systemId);
-
-    /**
      * When this processor is created based on a declaration in an XML document, the LocationData
      * provides information about the location of this declaration. Typically, if this processor
      * corresponds to a <p:processor> a PDL file, the LocationData holds information regarding the

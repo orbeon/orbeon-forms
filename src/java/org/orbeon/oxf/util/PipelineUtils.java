@@ -20,7 +20,6 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.XMLConstants;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
-import org.w3c.dom.Node;
 
 public class PipelineUtils {
 
@@ -29,13 +28,6 @@ public class PipelineUtils {
         ProcessorInput input = consumer.createInput(inputName);
         output.setInput(input);
         input.setOutput(output);
-    }
-
-    public static Processor createDOMGenerator(Node config, Object validity) {
-        DOMGenerator domGenerator = new DOMGenerator(config, validity);
-        domGenerator.setId("N/A");
-        domGenerator.setName(XMLConstants.DOM_GENERATOR_PROCESSOR_QNAME);
-        return domGenerator;
     }
 
     public static Processor createDOMGenerator(org.dom4j.Node config, Object validity) {

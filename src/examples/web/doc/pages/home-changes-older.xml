@@ -100,7 +100,7 @@
                 <title>HTTP Serializers</title>
                 <p>
                     The <a
-                        href="processors-serializers#http-serializer">HTTP
+                        href="processors-serializers-http">HTTP
                         Serializers</a> can add custom headers to the HTTP response.
                 </p>
             </section>

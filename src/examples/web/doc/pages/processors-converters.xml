@@ -28,7 +28,7 @@
                 Converters are processors converting XML documents from one format to another. For
                 example, the standard HTML converter documented below converts an XML document into
                 an HTML document. This HTML document can then be sent to a web browser using the <a
-                href="processors-serializers#http-serializer">HTTP serializer</a>, or attached to an
+                href="processors-serializers-http">HTTP serializer</a>, or attached to an
                 email with the <a href="processors-messaging#email-processor">Email processor</a>.
             </p>
             <p>

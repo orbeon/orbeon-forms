@@ -348,7 +348,7 @@ a:hover {
 }
 
 .tree-section .tree-section {
-    padding-top: 1em;
+    padding-top: 0em;
     font-weight: bold;
     font-style: italic;
     color: #555555;

@@ -40,12 +40,15 @@
         <menu-item label="Processor API" href="reference-processor-api"/>
     </menu>
     <menu label="Processor Reference">
-        <menu label="Generating XML">
+        <menu label="Producing XML">
             <menu-item label="URL Generator" href="processors-generators-url"/>
             <menu-item label="Request Generator" href="processors-generators-request"/>
             <menu-item label="Other Generators" href="processors-generators"/>
         </menu>
-        <menu-item label="Serializers" href="processors-serializers"/>
+        <menu label="Serializing XML">
+            <menu-item label="HTTP Serializers" href="processors-serializers-http"/>
+            <menu-item label="Other Serializers" href="processors-serializers"/>
+        </menu>
         <menu-item label="Converters" href="processors-converters"/>
         <menu-item label="XSLT and TrAX" href="processors-xslt"/>
         <menu-item label="XUpdate" href="processors-xupdate"/>

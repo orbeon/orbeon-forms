@@ -860,7 +860,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                         </li>
                         <li>
                             <p>
-                                <a href="processors-serializers#http-serializer">HTTP
+                                <a href="processors-serializers-http">HTTP
                                 serializer</a>: can convert Base64-encoded input according to the
                                 <a href="reference-formats#binary-documents">binary document
                                 format</a> into a binary stream.

@@ -187,7 +187,7 @@ This is line three of the input document!
                 processors that do not require storing the entire stream of data in memory, for
                 example the <a href="processors-sql#binary-data">SQL processor</a> (with an
                 appropriate configuration to stream BLOBs), or the <a
-                href="processors-serializers#http-serializer">HTTP serializer</a>.
+                href="processors-serializers-http">HTTP serializer</a>.
             </note>
         </section>
         <section>
@@ -229,7 +229,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 processors that do not require storing the entire stream of data in memory, for
                 example the <a href="processors-sql#binary-data">SQL processor</a> (with an
                 appropriate configuration to stream BLOBs), or the <a
-                href="processors-serializers#http-serializer">HTTP serializer</a>.
+                href="processors-serializers-http">HTTP serializer</a>.
             </note>
         </section>
         <section>

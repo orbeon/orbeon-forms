@@ -252,7 +252,7 @@
                 <p>
                     These document formats are widely used by processors such as the <a
                     href="processors-generators-url">URL generator</a>, the <a
-                    href="processors-serializers#http-serializer">HTTP serializer</a>, the <a
+                    href="processors-serializers-http">HTTP serializer</a>, the <a
                     href="processors-messaging#email-processor">Email processor</a>, and <a
                     href="processors-converters">converters</a>.
                 </p>
@@ -345,7 +345,7 @@
                 <section>
                     <title>HTTP Serializer</title>
                     <p>
-                        A new serializer, the <a href="processors-serializers#http-serializer">HTTP
+                        A new serializer, the <a href="processors-serializers-http">HTTP
                         serializer</a>, supports decoding of binary or text data, and sending the
                         resulting stream to an HTTP client. The <a
                         href="/goto-example/xforms-upload">XForms Upload example</a> illustrates
@@ -353,7 +353,7 @@
                         with <a href="processors-converters">converters</a> and the URL generator.
                     </p>
                     <p>
-                        The <a href="processors-serializers#http-serializer">HTTP serializer</a>
+                        The <a href="processors-serializers-http">HTTP serializer</a>
                         uses the recommended <code>application/xml</code> content type by default
                         rather than <code>text/xml</code>.
                     </p>
@@ -365,7 +365,7 @@
                         configuration parameters of the <a
                         href="processors-converters#xml-converter">XML converter</a> are now
                         documented. The <code>cache-control/use-local-cache</code> configuration
-                        parameter of the <a href="processors-serializers#http-serializer">HTTP
+                        parameter of the <a href="processors-serializers-http">HTTP
                         serializer</a> is now documented.
                     </p>
                 </section>

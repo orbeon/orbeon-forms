@@ -610,7 +610,7 @@
 <!--            </ol>-->
 <!--        </section>-->
         <section>
-            <title>Installing OXF on JBoss 3.2.6 and 4.0.0</title>
+            <title>Installing Presentation Server on JBoss 3.2.6 and 4.0.0</title>
             <ol>
                 <li>Assuming that <code>JBOSS_HOME</code> represents the location of your JBoss
                 installation: create a new <code>JBOSS_HOME/server/default/deploy/orbeon.war</code>

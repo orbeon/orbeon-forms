@@ -326,7 +326,7 @@
         </junit>
     </target>
 
-    <target name="anthill-test" depends="jars, test-classes, debug-enabled, debug-disabled">
+    <target name="anthill-test" depends="anthill, test-classes, debug-enabled, debug-disabled">
         <junit fork="yes" haltonerror="yes" haltonfailure="yes">
             <test name="org.orbeon.oxf.test.ProcessorTest"/>
             <formatter type="plain" usefile="false"/>

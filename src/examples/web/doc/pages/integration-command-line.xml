@@ -33,10 +33,10 @@
             <title>Command Line Interface</title>
             <p>
                 Presentation Server ships with a command line interface (CLI). The easiest way to
-                run it is to use the executable <code>orbeon.jar</code> file and pass it a pipeline
+                run it is to use the executable <code>cli-orbeon.jar</code> file and pass it a pipeline
                 file:
             </p>
-            <source>java -jar orbeon.jar pipeline.xpl</source>
+            <source>java -jar cli-orbeon.jar pipeline.xpl</source>
             <p>
                 In this case, a pipeline can use relative URLs, or, if using absolute URLs, can use
                 either the <code>file:</code> protocol to access files or, equivalently, the
@@ -49,21 +49,21 @@
                 applications. In such cases, specify a resource manager root directory with the
                 <code>-r</code> option, for example:
             </p>
-            <source>java -jar orbeon.jar -r . oxf:/pipeline.xpl</source>
+            <source>java -jar cli-orbeon.jar -r . oxf:/pipeline.xpl</source>
             <p>
                 or:
             </p>
-            <source>java -jar orbeon.jar -r C:/my-example oxf:/pipeline.xpl</source>
+            <source>java -jar cli-orbeon.jar -r C:/my-example oxf:/pipeline.xpl</source>
             <p>
                 When specifying a resource manager root directory, it is mandatory to use a protocol
                 and an absolute path within the sandbox, as shown above.
             </p>
             <note>
-                Presentation Server's jar file (<code>orbeon.jar</code>) is executable via the
+                Presentation Server's jar file (<code>cli-orbeon.jar</code>) is executable via the
                 <code>java -jar</code> mechanism. However, it depends on a number of libraries that
-                must be in the same directory as <code>orbeon.jar</code>. It is recommended to
-                expand the WAR file, and refer to the <code>orbeon.jar</code> file under the WAR
-                file's <i>WEB-INF/lib</i> directory.
+                must be in the 'lib' directory beneath the directory containing <code>cli-orbeon.jar</code>. It is recommended to
+                expand the WAR file, and refer to the <code>cli-orbeon.jar</code> file under the WAR
+                file's <i>WEB-INF</i> directory.
             </note>
         </section>
         <section>
@@ -75,11 +75,11 @@
                 following the explanations above, for example, from the <code>simple</code>
                 directory:
             </p>
-            <source>java -jar /path/to/orbeon-war/WEB-INF/lib/orbeon.jar stdout.xpl</source>
+            <source>java -jar /path/to/orbeon-war/WEB-INF/cli-orbeon.jar stdout.xpl</source>
             <p>
                 or, from the <code>transform</code> directory:
             </p>
-            <source>java -jar /path/to/orbeon-war/WEB-INF/lib/orbeon.jar transform.xpl</source>
+            <source>java -jar /path/to/orbeon-war/WEB-INF/cli-orbeon.jar transform.xpl</source>
             <p>
                 Notice that those two example pipelines use serializers, for example:
             </p>

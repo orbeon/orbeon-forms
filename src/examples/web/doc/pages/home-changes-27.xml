@@ -344,5 +344,14 @@
                 </p>
             </section>
         </section>
+        <section>
+            <title>Command Line Interface</title>
+            <p>
+                The command to invoke is now <br/>
+                <code>java -jar cli-orbeon.jar ...</code> <br/>
+                instead of<br/>
+                <code>java -jar orbeon.jar ...</code>
+            </p>
+        </section>
     </body>
 </document>

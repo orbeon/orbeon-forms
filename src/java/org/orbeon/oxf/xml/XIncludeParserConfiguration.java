@@ -247,6 +247,11 @@ public class XIncludeParserConfiguration extends XML11Configuration {
     	// here so need to remove PARSER_SETTING in case the feature set is passed
     	// back in to Xerces.
     	ret.remove( PARSER_SETTINGS );
+        // 2/16/2004 d : Xerces special cases  http://xml.org/sax/features/namespaces and 
+        //               http://xml.org/sax/features/namespace-prefixes and consequently they
+        //               won't be available unless we add them manually.
+        ret.add( "http://xml.org/sax/features/namespace-prefixes" );
+        ret.add( "http://xml.org/sax/features/namespaces" );
     	return ret;
     	
     }

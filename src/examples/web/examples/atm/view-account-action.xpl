@@ -24,16 +24,25 @@
 
     <p:choose href="aggregate('root', #instance, #balance)">
         <p:when test="/root/balance >= /root/amount">
-            <p:processor name="oxf:session-serializer" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+            <!-- Use the Scope serializer to store the "balance" document into the session -->
+            <p:processor name="oxf:scope-serializer">
+                <p:input name="config">
+                    <config>
+                        <key>balance</key>
+                        <scope>session</scope>
+                    </config>
+                </p:input>
                 <p:input name="data" href="aggregate('balance',
                     aggregate('root', #instance, #balance)#xpointer(/root/balance - /root/amount))"/>
             </p:processor>
+            <!-- Return success -->
             <p:processor name="oxf:identity">
                 <p:input name="data"><success>true</success></p:input>
                 <p:output name="data" ref="data"/>
             </p:processor>
         </p:when>
         <p:otherwise>
+            <!-- Return failure -->
             <p:processor name="oxf:identity">
                 <p:input name="data"><success>false</success></p:input>
                 <p:output name="data" ref="data"/>

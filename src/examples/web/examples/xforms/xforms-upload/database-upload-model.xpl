@@ -28,7 +28,7 @@
                         <sql:execute>
                             <sql:query>
                                 select blob_column from oxf_blob_table
-                                 where id = <sql:param type="xs:int" select="string(/)"/><!-- /form/image-id -->
+                                 where id = <sql:param type="xs:int" select="string(/form/image-id)"/>
                             </sql:query>
                             <sql:results>
                                 <result>

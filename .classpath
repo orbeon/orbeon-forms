@@ -43,7 +43,6 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/saxpath-dev_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/struts-1_1.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/xalan-2_5_1_orbeon.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/xercesImpl_2_6_2_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/xml-apis-xerces_2_6_2_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/xsdlib-20031020.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/xsltc-2_5_1_orbeon.jar"/>
@@ -75,5 +74,6 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/xmldb-exist_1_0b2_build_1107.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/antlr-2_7_4_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/antlr-2_7_4.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/private/xercesImpl_2_6_2_orbeon.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>

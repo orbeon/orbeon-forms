@@ -39,13 +39,42 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import java.lang.reflect.InvocationTargetException; 
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.*;
+import java.util.jar.JarFile;   
+import java.util.jar.Manifest;
 
 
 public class InitUtils {
-    
+       
+    /**
+     * This is just used by static block below.
+     * @param mf
+     * @param base
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    private static void processManifest( final Manifest mf, final String base ) 
+    throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        final java.util.jar.Attributes attrs = mf.getMainAttributes();
+        final String cp = attrs.getValue( "Class-Path" );
+        if ( cp != null ) {
+            final ClassLoader ldr = InitUtils.class.getClassLoader();
+            final Class ldrCls = ldr.getClass(); 
+            final Method mthd = ldrCls.getMethod( "addRepository", new Class[] { String.class } );
+            for ( java.util.StringTokenizer st = new java.util.StringTokenizer( cp );
+                  st.hasMoreTokens(); ) {
+                final String tkn = st.nextToken();
+                // Only care about cp entries that have a path cause tomcat will have
+                // already added the ones without a path.
+                if ( tkn.indexOf( '/' ) == -1 ) continue;
+                final String cpEnt = base + tkn + "!/"; 
+                mthd.invoke( ldr, new Object[] { cpEnt } );
+            }
+        }
+    }
     /*
      * Work around broken Tomcat loader if need be
      * According to servlet spec and j2ee spec the container should honor 
@@ -66,26 +95,44 @@ public class InitUtils {
         try {
             final ClassLoader ldr = InitUtils.class.getClassLoader();
             final Class ldrCls = ldr.getClass(); 
-            if ( "org.apache.catalina.loader.WebappClassLoader".equals( ldrCls.getName() ) ) {
-                final Method mthd = ldrCls.getMethod( "addRepository", new Class[] { String.class } );
+            final String ldrClsName = ldrCls.getName();
+            if ( "org.apache.catalina.loader.WebappClassLoader".equals( ldrClsName ) ) {
                 final java.net.URL url = InitUtils.class.getResource
                         ( "/org/orbeon/oxf/pipeline/InitUtils.class" );
-                final java.net.URLConnection uc = url.openConnection();
-                if ( uc instanceof java.net.JarURLConnection ) {
+                final String proto = url.getProtocol();
+                done : if ( "jar".equalsIgnoreCase( proto ) ) {
+                    final java.net.URLConnection uc = url.openConnection();
                     final java.net.JarURLConnection juc = ( java.net.JarURLConnection )uc;
                     final java.util.jar.Manifest mf = juc.getManifest();
-                    final java.util.jar.Attributes attrs = mf.getMainAttributes();
-                    final String cp = attrs.getValue( "Class-Path" );
+                    if ( mf == null ) break done;
                     final String surl = url.toString();
                     int idxSep = surl.lastIndexOf( "!/" );
                     final int idxEnd = surl.lastIndexOf( '/', idxSep );
                     final String base = surl.substring( 0, idxEnd + 1 );
-                    for ( java.util.StringTokenizer st = new java.util.StringTokenizer( cp ); 
-                          st.hasMoreTokens(); ) {
-                        final String tkn = st.nextToken() + "!/";
-                        if ( tkn.indexOf( '/' ) == -1 ) continue;
-                        final String cpEnt = base + tkn;
-                        mthd.invoke( ldr, new Object[] { cpEnt } );
+                    processManifest( mf, base );
+                } else if ( "file".equalsIgnoreCase( proto ) ) {
+                    // Assume InitUtils was found in WEB-INF/classes and that in WEB-INF/lib
+                    // there is a jar ( e.g. orbeon.jar ) that will have a manifest we 
+                    // care about.  ( So yes in this case we process many more manifests
+                    // than in the above case.
+                    final String sPth = url.getPath();
+                    final String sPthLC = sPth.toLowerCase();
+                    final String webInf = "/web-inf/";
+                    final int webInfIdx = sPthLC.lastIndexOf( webInf );
+                    if ( webInfIdx == -1 ) break done;
+                    final int end = webInfIdx + webInf.length();
+                    final String base = sPth.substring( 0, end ) + "lib/";
+                    final java.io.File libDir = new java.io.File( base );
+                    final java.io.File[] files = libDir.listFiles();
+                    final String baseURL = "jar:file:" + base;
+                    for ( int i = 0; i < files.length; i++ ) {
+                        final java.io.File file = files[ i ];
+                        final String fnam = file.getName();
+                        if ( !fnam.endsWith( ".jar" ) ) continue;
+                        final JarFile jar = new JarFile( file );
+                        final Manifest mf = jar.getManifest();
+                        if ( mf == null ) continue;
+                        processManifest( mf, baseURL );
                     }
                 }
             }
@@ -210,7 +257,7 @@ public class InitUtils {
         } else {
             processor = ProcessorFactoryRegistry.lookup(processorDefinition.getUri()).createInstance(pipelineContext);
         }
-        for (Iterator i = processorDefinition.getEntries().keySet().iterator(); i.hasNext();) {
+        for (java.util.Iterator i = processorDefinition.getEntries().keySet().iterator(); i.hasNext();) {
             String name = (String) i.next();
             Object o = processorDefinition.getEntries().get(name);
 
@@ -290,13 +337,13 @@ public class InitUtils {
         }
     }
 
-    public static Map getContextInitParametersMap(ServletContext servletContext) {
-        Map contextInitParameters = new HashMap();
-        for (Enumeration e = servletContext.getInitParameterNames(); e.hasMoreElements();) {
+    public static java.util.Map getContextInitParametersMap(ServletContext servletContext) {
+        java.util.Map contextInitParameters = new java.util.HashMap();
+        for (java.util.Enumeration e = servletContext.getInitParameterNames(); e.hasMoreElements();) {
             String name = (String) e.nextElement();
             contextInitParameters.put(name, servletContext.getInitParameter(name));
         }
-        return Collections.unmodifiableMap(contextInitParameters);
+        return java.util.Collections.unmodifiableMap(contextInitParameters);
     }
 
     public static ProcessorDefinition getDefinitionFromServletContext(ServletContext servletContext, String uriNamePropertyPrefix, String inputPropertyPrefix) {
@@ -310,7 +357,7 @@ public class InitUtils {
     /**
      * Create a ProcessorDefinition from a Map. Only Map.get() and Map.keySet() are used.
      */
-    public static ProcessorDefinition getDefinitionFromMap(Map map, String uriNamePropertyPrefix, String inputPropertyPrefix) {
+    public static ProcessorDefinition getDefinitionFromMap(java.util.Map map, String uriNamePropertyPrefix, String inputPropertyPrefix) {
         ProcessorDefinition processorDefinition = null;
         String processorURI = (String) map.get(uriNamePropertyPrefix + "uri");
         Object processorName = map.get(uriNamePropertyPrefix + "name");
@@ -320,12 +367,12 @@ public class InitUtils {
             processorDefinition.setUri(processorURI);
             // Support both xs:string or xs:QName for processor name
             processorDefinition.setName((processorName instanceof String) ? XMLUtils.explodedQNameToQName((String) processorName) : (QName) processorName);
-            for (Iterator i = map.keySet().iterator(); i.hasNext();) {
+            for (java.util.Iterator i = map.keySet().iterator(); i.hasNext();) {
                 String name = (String) i.next();
                 if (name.startsWith(inputPropertyPrefix)) {
                     Object value = map.get(name);
                     // Support both xs:string and xs:anyURI for processor input
-                    String stringValue = (value instanceof String) ? (String) value : ((URL) value).toExternalForm();
+                    String stringValue = (value instanceof String) ? (String) value : ((java.net.URL) value).toExternalForm();
                     processorDefinition.addInput(name.substring(inputPropertyPrefix.length()), stringValue);
                 }
             }
@@ -344,8 +391,8 @@ public class InitUtils {
                     return OXFProperties.instance().getPropertySet().getObject(s);
                 }
 
-                public Enumeration getAttributeNames() {
-                    return Collections.enumeration(OXFProperties.instance().getPropertySet().keySet());
+                public java.util.Enumeration getAttributeNames() {
+                    return java.util.Collections.enumeration(OXFProperties.instance().getPropertySet().keySet());
                 }
 
                 public void removeAttribute(String s) {
@@ -369,7 +416,7 @@ public class InitUtils {
                     return servletContext.getInitParameter(s);
                 }
 
-                public Enumeration getAttributeNames() {
+                public java.util.Enumeration getAttributeNames() {
                     return servletContext.getInitParameterNames();
                 }
 
@@ -394,7 +441,7 @@ public class InitUtils {
                     return httpSession.getAttribute(s);
                 }
 
-                public Enumeration getAttributeNames() {
+                public java.util.Enumeration getAttributeNames() {
                     return httpSession.getAttributeNames();
                 }
 
@@ -419,7 +466,7 @@ public class InitUtils {
                     return httpServletRequest.getAttribute(s);
                 }
 
-                public Enumeration getAttributeNames() {
+                public java.util.Enumeration getAttributeNames() {
                     return httpServletRequest.getAttributeNames();
                 }
 

@@ -26,16 +26,15 @@
        - @param namespaces  A sequence of namespaces, which prefix can be used
                             in the XPath expression
       -->
-	<xsl:function name="function:evaluate">
+	<xsl:function name="function:evaluate" as="node()*">
         <xsl:param name="node" as="node()"/>
         <xsl:param name="select" as="xs:string"/>
         <xsl:param name="namespaces" as="node()*"/>
 
-        <!-- HACK: We have to force the evaluation of $xpath here, otherwise Saxon gets confused -->
-        <xsl:sequence select="if ($select) then () else ()"/>
+        <xsl:variable name="evaluator" select="evaluator:new($node)"/>
 
-        <xsl:variable name="evaluator" select="evaluator:new()"/>
         <xsl:value-of select="evaluator:set-context-node($evaluator, $node)"/>
+
         <xsl:variable name="context" select="evaluator:get-static-context($evaluator)"/>
         <xsl:for-each select="$namespaces">
             <xsl:value-of select="context:declare-namespace($context, local-name(), .)"/>

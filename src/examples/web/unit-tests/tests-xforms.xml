@@ -92,12 +92,14 @@
                                     <xxforms:if test="a = '1'">
                                         <xforms:input ref="b"/>
                                     </xxforms:if>
-                                    <xforms:input ref="c"/>
+                                    <xxforms:if test="count(/form/*) = 3">
+                                        <xforms:input ref="c"/>
+                                    </xxforms:if>
                                 </xforms:group>
                             </body>
                         </html>
                     </p:input>
-                    <p:output name="data" id="annotated-data" debug="aa"/>
+                    <p:output name="data" id="annotated-data"/>
                 </p:processor>
                 <!-- Transform annotated XForms to XHTML -->
                 <p:processor name="oxf:xslt"><!-- saxon1 -->

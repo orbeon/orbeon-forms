@@ -27,6 +27,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.functions.*;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.om.NamePool;
 import org.orbeon.saxon.type.BuiltInSchemaFactory;
@@ -36,6 +37,7 @@ import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.xpath.StandaloneContext;
 import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.xpath.StaticError;
 import org.xml.sax.*;
 
 import javax.xml.transform.Templates;
@@ -52,6 +54,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
+import orbeon.apache.xml.utils.NamespaceSupport2;
 
 public abstract class XSLTTransformer extends ProcessorImpl {
 
@@ -389,24 +393,59 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         static final StandaloneContext dummySaxonXPathContext;
         static {
             Configuration config = new Configuration();
-            config.setTargetNamePool(new NamePool() {
+            config.setHostLanguage(Configuration.XSLT);
+            config.setNamePool(new NamePool() {
                 public synchronized int allocate(String prefix, String uri, String localName) { return 1; }
                 public SchemaType getSchemaType(int fingerprint) { return BuiltInSchemaFactory.getSchemaType(Type.STRING); }
             });
             dummySaxonXPathContext = new StandaloneContext(config) {
-                public String getURIForPrefix(String prefix) { return "dummy"; }
-                public boolean isImportedSchema(String namespace) { return true; }
-                public Expression bindFunction(final String qname, final Expression[] arguments) throws XPathException {
-                    return new FunctionCall() {
-                        { setArguments(arguments); }
-                        protected void checkArguments(StaticContext env) {}
-                        public String getName() { return qname; }
-                        protected int computeCardinality() { return arguments.length; }
-                        public ItemType getItemType() { return null; }
-                    };
+                {
+                    FunctionLibraryList lib = new FunctionLibraryList();
+                    // Dummy Function lib that accepts any name
+                    lib.addFunctionLibrary(new FunctionLibrary() {
+                        public Expression bind(int nameCode, String uri, String local, final Expression[] staticArgs)  {
+                            return new FunctionCall() {
+                                {
+                                    this.argument = staticArgs;
+                                }
+                                protected void checkArguments(StaticContext env) {};
+
+                                protected int computeCardinality() {
+                                    return this.argument.length;
+                                }
+
+                                public ItemType getItemType() {
+                                    return Type.BOOLEAN_TYPE;
+                                }
+                            };
+                        }
+
+                        public boolean isAvailable(int fingerprint, String uri, String local, int arity) {
+                            return true;
+                        }
+                    });
+
+                    setFunctionLibrary(lib);
                 }
-                public VariableDeclaration bindVariable(int fingerprint) throws XPathException {
-                    return declareVariable("dummy", "dummy");
+
+                public boolean isAvailable(int fingerprint, String uri, String local, int arity) {
+                    return true;
+                }
+
+
+                public String getURIForPrefix(String prefix) {
+                    return namespaces.getURI(prefix);
+                }
+
+                public boolean isImportedSchema(String namespace) { return true; }
+
+                // Dummy var decl to allow any name
+                public VariableDeclaration bindVariable(int fingerprint) throws StaticError {
+                    try {
+                        return declareVariable("dummy", "dummy");
+                    }catch(XPathException e) {
+                        throw new StaticError(e);
+                    }
                 }
             };
         }
@@ -414,6 +453,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         private Locator locator;
         private URIReferences uriReferences = new URIReferences();
         private String systemId;
+        private static final NamespaceSupport2 namespaces = new NamespaceSupport2();
 
         public StylesheetForwardingContentHandler() {
             super();
@@ -436,7 +476,14 @@ public abstract class XSLTTransformer extends ProcessorImpl {
             super.setDocumentLocator(locator);
         }
 
+
+        public void startPrefixMapping(String prefix, String uri) throws SAXException {
+            namespaces.declarePrefix(prefix, uri);
+            super.startPrefixMapping(prefix, uri);
+        }
+
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+            namespaces.pushContext();
             // Save system id
             if (systemId == null && locator != null)
                 systemId = locator.getSystemId();
@@ -464,7 +511,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                 // Analyze XPath expression to find dependencies on URIs
                 if (xpathString != null) {
                     try {
-                        Expression expression = ExpressionTool.make(xpathString, dummySaxonXPathContext, 0, -1);
+                        Expression expression = ExpressionTool.make(xpathString, dummySaxonXPathContext, 0, -1, 0);
                         visitExpression(expression);
                     } catch (XPathException e) {
                         logger.error("Original exception", e);
@@ -476,23 +523,42 @@ public abstract class XSLTTransformer extends ProcessorImpl {
             super.startElement(uri, localname, qName, attributes);
         }
 
+
+        public void endElement(String uri, String localname, String qName) throws SAXException {
+            super.endElement(uri, localname, qName);
+            namespaces.popContext();
+        }
+
+        public void endDocument() throws SAXException {
+            super.endDocument();
+            namespaces.popContext();
+        }
+
+        public void startDocument() throws SAXException {
+            namespaces.pushContext();
+            super.startDocument();
+        }
+
         private void visitExpression(Expression expression) {
-            Expression[] subExpressions = expression.getSubExpressions();
+            Iterator subExpressionsIterator = expression.iterateSubExpressions();
             boolean foundDocFunction = false;
             if (expression instanceof FunctionCall) {
-                String functionName = ((FunctionCall) expression).getName();
+                String functionName = ((FunctionCall) expression).getDisplayName(dummySaxonXPathContext.getConfiguration().getNamePool());
                 if ("doc".equals(functionName) || "document".equals(functionName)) {
                     foundDocFunction = true;
                     // Call to doc(...)
-                    if (subExpressions.length == 1 && subExpressions[0] instanceof StringValue) {
-                        // doc(...) call just contains a string, record the URI
-                        String uri = ((StringValue) subExpressions[0]).getStringValue();
-                        // We don't need to worry here about reference to the processor inputs
-                        if (!isProcessorInputScheme(uri)) {
-                            URIReference uriReference = new URIReference();
-                            uriReference.context = locator.getSystemId();
-                            uriReference.spec = uri;
-                            uriReferences.documentReferences.add(uriReference);
+                    if (subExpressionsIterator.hasNext()) {
+                        Object value =  subExpressionsIterator.next();
+                        if(value instanceof StringValue) {
+                            // doc(...) call just contains a string, record the URI
+                            String uri = ((StringValue) value).getStringValue();
+                            // We don't need to worry here about reference to the processor inputs
+                            if (!isProcessorInputScheme(uri)) {
+                                URIReference uriReference = new URIReference();
+                                uriReference.context = locator.getSystemId();
+                                uriReference.spec = uri;
+                                uriReferences.documentReferences.add(uriReference);
+                            }
                         }
                     } else {
                         // doc(...) call contains something more complex
@@ -503,8 +569,8 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
             if (!foundDocFunction) {
                 // Recurse in subexpressions
-                for (int i = 0; i < subExpressions.length; i++) {
-                    visitExpression(subExpressions[i]);
+                for (Iterator i = expression.iterateSubExpressions() ;i.hasNext();) {
+                    visitExpression((Expression)i.next());
                 }
             }
         }

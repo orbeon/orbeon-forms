@@ -18,15 +18,17 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils"
     xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:saxon="http://saxon.sf.net/">
 
     <xsl:variable name="blue" select="'#283c68'"/>
     <xsl:variable name="light-blue" select="'#88acc8'"/>
     <xsl:variable name="orange" select="'#FF9900'"/>
     <xsl:variable name="light-gray" select="'#c8dce8'"/>
     <xsl:variable name="dark-gray" select="'#88acc8'"/>
+
+    <xsl:output name="html" method="html"/>
 
     <xsl:template match="f:alerts">
         <table cellpadding="0" cellspacing="0" border="0" style="background: #FFCCCC; margin: 1em; padding: .5em">
@@ -213,8 +215,11 @@
                 <!-- Open popup with errors -->
                 <xsl:if test="xforms:alert">
                     <script language="JavaScript">
-                        <xsl:variable name="error-string" select="xmlutils:domToString($error-table/*)"/>
+<!--                        <xsl:variable name="error-string" select="xmlutils:domToString($error-table/*)"/>-->
+                        <xsl:variable name="error-string" select="saxon:serialize($error-table/*, 'html')"/>
                         <xsl:variable name="error-one-line" select="replace(replace($error-string, '&#xd;', ''), '&#xa;', '')"/>
+<!--                        <xsl:variable name="error-string">111</xsl:variable>-->
+<!--                        <xsl:variable name="error-one-line" select="replace(replace($error-string, '&#xd;', ''), '&#xa;', '')"/>-->
                         window.open('xforms-ubl-popup', '_blank', 'height=200,width=400,status=no,toolbar=no,menubar=no,location=no').error = '<xsl:value-of select="$error-one-line"/>';
                     </script>
                 </xsl:if>

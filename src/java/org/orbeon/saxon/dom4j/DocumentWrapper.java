@@ -2,7 +2,11 @@ package org.orbeon.saxon.dom4j;
 import org.orbeon.saxon.om.DocumentInfo;
 import org.orbeon.saxon.om.NamePool;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.type.Type;
+import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.event.Receiver;
 import org.dom4j.Document;
 
 /**
@@ -18,6 +22,7 @@ public class DocumentWrapper extends NodeWrapper implements DocumentInfo {
     protected NamePool namePool;
     protected String baseURI;
     protected int documentNumber;
+    protected Configuration configuration;
 
     /**
      * Create a Saxon wrapper for a JDOM document
@@ -93,6 +98,29 @@ public class DocumentWrapper extends NodeWrapper implements DocumentInfo {
 
     public String[] getUnparsedEntity(String name) {
         return null;
+    }
+
+    /**
+     * Get the configuration previously set using setConfiguration
+     */
+
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
+    /**
+     * Set the configuration, which defines the name pool used for all names in this document.
+     * This is always called after a new
+     * document has been created. The implementation must register the name pool with the document,
+     * so that it can be retrieved using getNamePool(). It must also call NamePool.allocateDocumentNumber(),
+     * and return the relevant document number when getDocumentNumber() is subsequently called.
+     *
+     * @param config The configuration to be used
+     */
+
+    public void setConfiguration(Configuration config) {
+        this.configuration = config;
+        documentNumber = config.getNamePool().allocateDocumentNumber(this);
     }
 
 

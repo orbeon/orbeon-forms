@@ -29,6 +29,8 @@ import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.xpath.StandaloneContext;
 import org.orbeon.saxon.xpath.XPathEvaluator;
 import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.expr.XPathContextMajor;
+import org.orbeon.saxon.expr.XPathContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -217,7 +219,9 @@ public class Model {
                                 String nodeStringValue = node.getStringValue();
                                 if (XFormsUtils.getInstanceData(node).getRequired().get() || nodeStringValue.length() != 0) {
                                     try {
-                                        new StringValue(nodeStringValue).convert(requiredType);
+                                        StringValue stringValue = new StringValue(nodeStringValue);
+                                        XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration()); 
+                                        stringValue.convert(requiredType, xpContext);
                                         markValidity(true, node, modelBind.getId());
                                     } catch (XPathException e) {
                                         markValidity(false, node, modelBind.getId());

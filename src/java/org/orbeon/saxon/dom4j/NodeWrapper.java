@@ -6,6 +6,9 @@ import org.orbeon.saxon.pattern.NodeTest;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.UntypedAtomicValue;
 import org.orbeon.saxon.style.StandardNames;
+import org.orbeon.saxon.xpath.*;
+import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.Configuration;
 import org.dom4j.*;
 
 import javax.xml.transform.TransformerException;
@@ -428,7 +431,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                 if (n == null) {
                     break;
                 }
-                if (n.isSameNode(this)) {
+                if (n.isSameNodeInfo(this)) {
                     index = ix;
                     return index;
                 }
@@ -664,8 +667,8 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
     * Copy this node to a given outputter (deep copy)
     */
 
-    public void copy(Receiver out, int whichNamespaces, boolean copyAnnotations) throws TransformerException {
-        Navigator.copy(this, out, docWrapper.namePool, whichNamespaces, copyAnnotations);
+    public void copy(Receiver out, int whichNamespaces, boolean copyAnnotations, int locationId) throws XPathException {
+        Navigator.copy(this, out, docWrapper.getNamePool(), whichNamespaces, copyAnnotations, locationId);
     }
 
     /**
@@ -677,7 +680,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
     */
 
     public void outputNamespaceNodes(Receiver out, boolean includeAncestors)
-        throws TransformerException {
+        throws XPathException {
         if (nodeKind==Type.ELEMENT) {
             NamePool pool = docWrapper.getNamePool();
             AxisIterator enm = iterateAxis(Axis.NAMESPACE);
@@ -686,7 +689,7 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
                 if (wrapper == null) {
                     break;
                 }
-                if (!includeAncestors && !wrapper.getParent().isSameNode(this)) {
+                if (!includeAncestors && !wrapper.getParent().isSameNodeInfo(this)) {
                     break;
                 }
                 Namespace ns = (Namespace)wrapper.node;
@@ -901,6 +904,43 @@ public class NodeWrapper implements NodeInfo, VirtualNode, SiblingCountingNode {
     } // end of class ChildEnumeration
 
 
+
+    /**
+     * Determine whether this is the same node as another node.
+     * Note: a.isSameNodeInfo(b) if and only if generateId(a)==generateId(b).
+     * This method has the same semantics as isSameNode() in DOM Level 3, but
+     * works on Saxon NodeInfo objects rather than DOM Node objects.
+     *
+     * @param other the node to be compared with this node
+     * @return true if this NodeInfo object and the supplied NodeInfo object represent
+     *         the same node in the tree.
+     */
+
+    public boolean isSameNodeInfo(NodeInfo other) {
+        if (!(other instanceof NodeWrapper)) {
+            return false;
+        }
+        NodeWrapper ow = (NodeWrapper)other;
+        if (node instanceof Namespace) {
+            return this.getLocalPart().equals(ow.getLocalPart()) && this.getParent().isSameNodeInfo(ow.getParent());
+        }
+        return node.equals(ow.node);
+    }
+
+    /**
+     * Get the typed value of the item
+     *
+     * @param config the configuration: this is needed because it provides access
+     *               to schema information needed to interpret the type annotation
+     * @return the typed value of the item. In general this will be a sequence
+     * @throws org.orbeon.saxon.xpath.XPathException
+     *          where no typed value is available, e.g. for
+     *          an element with complex content
+     */
+
+    public SequenceIterator getTypedValue(Configuration config) throws XPathException {
+        return SingletonIterator.makeIterator(new UntypedAtomicValue(getStringValue()));
+    }
 }
 
 //

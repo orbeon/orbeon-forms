@@ -208,7 +208,7 @@
                 <include name="mondrian-0_5_orbeon.jar"/>
                 <include name="junit.jar"/>
                 <include name="saxon-6_5_2.jar"/>
-                <include name="saxon-7_9_1_orbeon.jar"/>
+                <include name="saxon-8_1_1_orbeon.jar"/>
                 <include name="joost-20030623_orbeon.jar"/>
                 <include name="batik-all-1_5.jar"/>
                 <include name="avalon*"/>

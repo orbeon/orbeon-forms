@@ -42,13 +42,13 @@
                          </xhtml:td>
                      </xhtml:tr>
                      <xhtml:tr>
-                         <xhtml:th>Serie 1 Title</xhtml:th>
+                         <xhtml:th>Series 1 Title</xhtml:th>
                          <xhtml:td colspan="5">
                              <xforms:input ref="chart/value[1]/@title" xhtml:size="8"/>
                          </xhtml:td>
                      </xhtml:tr>
                      <xhtml:tr>
-                         <xhtml:th>Serie 1 Values</xhtml:th>
+                         <xhtml:th>Series 1 Values</xhtml:th>
                          <xhtml:td>
                              <xforms:input ref="data/values1/val1" xhtml:size="3"/>
                          </xhtml:td>
@@ -66,13 +66,13 @@
                          </xhtml:td>
                      </xhtml:tr>
                      <xhtml:tr>
-                         <xhtml:th>Serie 2 Title</xhtml:th>
+                         <xhtml:th>Series 2 Title</xhtml:th>
                          <xhtml:td colspan="5">
                              <xforms:input ref="chart/value[2]/@title" xhtml:size="8"/>
                          </xhtml:td>
                      </xhtml:tr>
                      <xhtml:tr>
-                         <xhtml:th>Serie 2 Values</xhtml:th>
+                         <xhtml:th>Series 2 Values</xhtml:th>
                          <xhtml:td>
                              <xforms:input ref="data/values2/val1" xhtml:size="3"/>
                          </xhtml:td>

@@ -13,15 +13,21 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
+import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.Attribute;
+import org.dom4j.io.SAXReader;
 import org.dom4j.util.UserDataElement;
 import org.dom4j.util.UserDataAttribute;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 import java.util.Iterator;
 import java.util.Map;
+
+import javax.xml.parsers.SAXParser;
 
 public class Dom4jUtils {
 
@@ -43,6 +49,19 @@ public class Dom4jUtils {
         } else {
             return cloneNodeWorker(node);
         }
+    }
+    /**
+     * Replacment for DocumentHelper.parseText.  DocumentHelper.parseText is creates work for GC
+     * because it relies on JAXP. 
+     */
+    public static org.dom4j.Document parseText( final String s ) 
+    throws SAXException, DocumentException {
+        final SAXParser sxPrs = XMLUtils.newSAXParser();
+        final XMLReader xr = sxPrs.getXMLReader();
+        final SAXReader sxRdr = new SAXReader( xr );
+        final java.io.StringReader strRdr = new java.io.StringReader( s );
+        final org.dom4j.Document ret = sxRdr.read( strRdr );
+        return ret;
     }
 
     private static Node cloneNodeWorker(Node node) {
@@ -72,4 +91,6 @@ public class Dom4jUtils {
             return (Node) node.clone();
         }
     }
+
+
 }

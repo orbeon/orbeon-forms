@@ -31,6 +31,7 @@ import org.orbeon.oxf.xml.dom4j.DocumentDelegate;
 import org.orbeon.oxf.xml.dom4j.ElementDelegate;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.xml.sax.SAXException;
 
 import java.net.MalformedURLException;
 import java.util.HashMap;
@@ -147,10 +148,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addStatement(new ASTProcessorCall(XMLConstants.REQUEST_PROCESSOR_QNAME) {{
                         Document config = null;
                         try {
-                            config = DocumentHelper.parseText
-                                    ("<config><include>/request/request-path</include></config>");
+                            config = Dom4jUtils.parseText
+                                ( "<config><include>/request/request-path</include></config>" );
                         } catch (DocumentException e) {
                             throw new OXFException(e);
+                        } catch ( final SAXException e ) {
+                            throw new OXFException( e );
                         }
                         addInput(new ASTInput("config", config));
                         addOutput(request);
@@ -162,11 +165,13 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addStatement(new ASTProcessorCall(XMLConstants.REQUEST_PROCESSOR_QNAME) {{
                         Document config = null;
                         try {
-                            config = DocumentHelper.parseText
+                            config = Dom4jUtils.parseText
                                     ("<config><include>/request/parameters</include></config>");
 //                                    ("<config xmlns:xs='http://www.w3.org/2001/XMLSchema' stream-type='xs:anyURI'><include>/request/parameters</include></config>");
                         } catch (DocumentException e) {
                             throw new OXFException(e);
+                        } catch ( final SAXException e ) {
+                            throw new OXFException( e );
                         }
                         addInput(new ASTInput("config", config));
                         addOutput(requestWithParameters);
@@ -846,10 +851,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     when.addStatement(new ASTProcessorCall(XMLConstants.SCOPE_SERIALIZER_PROCESSOR_QNAME) {{
                         Document config = null;
                         try {
-                            config = DocumentHelper.parseText
+                            config = Dom4jUtils.parseText
                                     ("<config><key>" + Instance.REQUEST_INSTANCE_DOCUMENT + "</key><scope>request</scope></config>");
                         } catch (DocumentException e) {
                             throw new OXFException(e);
+                        } catch ( final SAXException e ) {
+                            throw new OXFException( e );
                         }
                         addInput(new ASTInput("data", new ASTHrefId(internalXUpdatedInstance)));
                         addInput(new ASTInput("config", config));

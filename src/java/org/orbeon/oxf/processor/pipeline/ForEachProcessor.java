@@ -80,8 +80,10 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                     if (! refsWithNoId[i].equals(CURRENT))
                         addInputInfo(new ProcessorInputOutputInfo(refsWithNoId[i]));
                 }
-                astPipeline.addParam(new ASTParam(ASTParam.OUTPUT, idOrRef));
-                addOutputInfo(new ProcessorInputOutputInfo(idOrRef));
+                if (idOrRef != null) {
+                    astPipeline.addParam(new ASTParam(ASTParam.OUTPUT, idOrRef));
+                    addOutputInfo(new ProcessorInputOutputInfo(idOrRef));
+                }
                 if (logger.isDebugEnabled()) {
                     ASTDocumentHandler astDocumentHandler = new ASTDocumentHandler();
                     astPipeline.walk(astDocumentHandler);

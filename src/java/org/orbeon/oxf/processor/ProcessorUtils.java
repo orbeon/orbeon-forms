@@ -23,10 +23,14 @@ import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.resources.URLFactory;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 public class ProcessorUtils {
     public static final String XML_CONTENT_TYPE1 = "text/xml";
@@ -77,16 +81,28 @@ public class ProcessorUtils {
 
         // Connect inputs
         for (Iterator j = XPathUtils.selectIterator(testNode, "input"); j.hasNext();) {
-            Node inputNode = (Node) j.next();
-            String name = XPathUtils.selectStringValue(inputNode, "@name");
-            if (XPathUtils.selectStringValue(inputNode, "@href") == null) {
+            Element inputElement = (Element) j.next();
+            String name = XPathUtils.selectStringValue(inputElement, "@name");
+            if (XPathUtils.selectStringValue(inputElement, "@href") == null) {
                 // Case of embedded XML
-                Node data = (Node) ((Element) inputNode).elementIterator().next();
+                Node data = (Node) ((Element) inputElement).elementIterator().next();
                 DOMGenerator domGenerator = new DOMGenerator(Dom4jUtils.cloneNode(data));
                 PipelineUtils.connect(domGenerator, "data", processor, name);
             } else {
                 // Href
-                URLGenerator urlGenerator = new URLGenerator(XPathUtils.selectStringValue(inputNode, "@href"));
+                LocationData locationData = (LocationData) inputElement.getData();
+                String url = XPathUtils.selectStringValue(inputElement, "@href");
+                URL fullURL;
+                try {
+                    fullURL = (locationData != null && locationData.getSystemID() != null)
+                                                ? URLFactory.createURL(locationData.getSystemID(), url)
+                                                : URLFactory.createURL(url);
+                } catch (MalformedURLException e) {
+                    throw new OXFException(e);
+                }
+
+                URLGenerator urlGenerator = new URLGenerator(fullURL);
+                urlGenerator.setLocationData(locationData);
                 PipelineUtils.connect(urlGenerator, "data", processor, name);
             }
         }

@@ -11,9 +11,15 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<document xmlns:xi="http://www.w3.org/2003/XInclude">
-    <something/>
-    <xi:include href="document2.xml"/>
-<!--    <xi:include href="test3.xml"/>-->
-</document>
-<!-- 9 -->
+<xsl:stylesheet version="2.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+
+    <xsl:template match="/">
+        <xsl:copy-of select="/"/>
+    </xsl:template>
+</xsl:stylesheet>

@@ -71,4 +71,33 @@
             </script>
         </input>
     </test>
+
+    <test description="Simple XSLT" name="oxf:test">
+        <input name="config">
+            <script>
+                <processor name="oxf:xslt">
+                    <input name="config" href="cache/stylesheet1.xsl"/>
+                    <input name="data" href="cache/document1.xml"/>
+                </processor>
+                <touch url="cache/document1.xml"/>
+                <wait delay="2090"/>
+                <cache-value output-name="data" value="v1"/>
+                <assert output-name="data" condition="cached-value-equal" value="v1"/>
+                <touch url="cache/document1.xml"/>
+                <wait delay="2090"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v2"/>
+                <assert output-name="data" condition="output-cached"/>
+                <assert output-name="data" condition="cached-value-equal" value="v2"/>
+                <touch url="cache/stylesheet1.xsl"/>
+                <wait delay="2090"/>
+                <assert output-name="data" condition="output-not-cached"/>
+                <cache-value output-name="data" value="v3"/>
+                <assert output-name="data" condition="output-cached"/>
+                <assert output-name="data" condition="cached-value-equal" value="v3"/>
+            </script>
+        </input>
+    </test>
+
+    <!-- TODO: complex XSLT (imports, doc(), document()), URL gen: modify config -->
 </group>

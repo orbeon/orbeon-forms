@@ -156,12 +156,14 @@
                             <b>2</b>
                             <c>3</c>
                             <d>4</d>
+                            <e>5</e>
                         </form>
                     </p:input>
                     <p:input name="data">
                         <html>
                             <body>
                                 <xforms:group ref="/form">
+                                    <!-- Should select first when -->
                                     <xxforms:choose>
                                         <xxforms:when test="a = '1'">
                                             <xforms:input ref="b" xhtml:id="b"/>
@@ -171,6 +173,19 @@
                                         </xxforms:when>
                                         <xxforms:otherwise>
                                             <xforms:input ref="d" xhtml:id="d"/>
+                                        </xxforms:otherwise>
+                                    </xxforms:choose>
+
+                                    <!-- Should select otherwise -->
+                                    <xxforms:choose>
+                                        <xxforms:when test="a = '2'">
+                                            <xforms:input ref="b" xhtml:id="b"/>
+                                        </xxforms:when>
+                                        <xxforms:when test="b = '1'">
+                                            <xforms:input ref="c" xhtml:id="c"/>
+                                        </xxforms:when>
+                                        <xxforms:otherwise>
+                                            <xforms:input ref="e" xhtml:id="e"/>
                                         </xxforms:otherwise>
                                     </xxforms:choose>
                                 </xforms:group>
@@ -198,7 +213,7 @@
             </p:config>
         </input>
         <output name="data">
-            <result>b</result>
+            <result>b e</result>
         </output>
     </test>
 

@@ -459,13 +459,22 @@
     </xsl:template>
 
     <xsl:template match="xxforms:choose">
-        <xsl:variable name="when-true" select="xxforms:when[@xxforms:value = 'true']"/>
-        <xsl:for-each select="$when-true">
-            <xsl:apply-templates select="node()"/>
-        </xsl:for-each>
-        <xsl:if test="count($when-true) = 0">
-            <xsl:apply-templates select="xxforms:otherwise/node()"/>
-        </xsl:if>
+        <xsl:variable name="when-true" select="xxforms:when[@xxforms:value = 'true']" as="element()*"/>
+        <xsl:choose>
+            <xsl:when test="count($when-true) = 0">
+                <xsl:apply-templates select="xxforms:otherwise/node()"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:apply-templates select="$when-true[1]"/>
+            </xsl:otherwise>
+        </xsl:choose>
+
+<!--        <xsl:for-each select="$when-true">-->
+<!--            <xsl:apply-templates select="node()"/>-->
+<!--        </xsl:for-each>-->
+<!--        <xsl:if test="count($when-true) = 0">-->
+<!--            <xsl:apply-templates select="xxforms:otherwise/node()"/>-->
+<!--        </xsl:if>-->
     </xsl:template>
 
     <!-- Root Group Module -->

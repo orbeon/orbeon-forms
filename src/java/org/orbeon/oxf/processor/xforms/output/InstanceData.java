@@ -29,6 +29,7 @@ public class InstanceData {
     private BooleanModelItemProperty required = new BooleanModelItemProperty(false);
     private BooleanModelItemProperty readonly = new BooleanModelItemProperty(false);
     private BooleanModelItemProperty valid = new BooleanModelItemProperty(true);
+    private TypeModelItemProperty type = new TypeModelItemProperty();
     private int id = -1;
     private String invalidBindIds = null;
     private Map idToNodeMap;
@@ -65,6 +66,10 @@ public class InstanceData {
 
     public BooleanModelItemProperty getValid() {
         return valid;
+    }
+
+    public TypeModelItemProperty getType() {
+        return type;
     }
 
     public String getInvalidBindIds() {

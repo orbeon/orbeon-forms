@@ -37,6 +37,8 @@ public class Constants {
     public static final QName XXFORMS_REQUIRED_ATTRIBUTE_QNAME = new QName(XXFORMS_REQUIRED_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
     public static final String XXFORMS_READONLY_ATTRIBUTE_NAME = "readonly";
     public static final QName XXFORMS_READONLY_ATTRIBUTE_QNAME = new QName(XXFORMS_READONLY_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
+    public static final String XXFORMS_TYPE_ATTRIBUTE_NAME = "type";
+    public static final QName XXFORMS_TYPE_ATTRIBUTE_QNAME = new QName(XXFORMS_TYPE_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
     public static final String XXFORMS_NODE_IDS_ATTRIBUTE_NAME = "node-ids";
     public static final QName XXFORMS_NODE_IDS_ATTRIBUTE_QNAME = new QName(XXFORMS_READONLY_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
     public static final String XFORMS_PASSWORD = "oxf.xforms.password";

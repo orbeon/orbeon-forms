@@ -342,7 +342,7 @@
                             <ul>
                                 <li>
                                     <p>
-                                        <b>required</b> _ You can specify in the
+                                        <b>required</b> &#8213; You can specify in the
                                         <code>required</code> attribute an XPath expression that
                                         determines if a value is required. The XPath can be as
                                         simple as <code>true()</code>, or more complex and depend on
@@ -352,7 +352,7 @@
                                 </li>
                                 <li>
                                     <p>
-                                        <b>type</b> _ In the <code>type</code> attribute you can
+                                        <b>type</b> &#8213; In the <code>type</code> attribute you can
                                         specify a W3C XML Schema simple type. The <code>type</code>
                                         attribute works in association with the
                                         <code>required</code> attribute: even if a type is
@@ -375,10 +375,32 @@
                                             <td colspan="2">Validated according to<br/>specified simple type</td>
                                         </tr>
                                     </table>
+                                    <p>
+                                        <img src="pages/date-time.png" style="clear: both; float: right"/>
+                                           In Addition, two XML schema types have special behavior:
+                                        <ul>
+                                            <li>
+                                                <p><b><code>xs:date</code></b> &#8213; 
+                                                    The input field is complemented by a pop-up calendar. The user can enter a date manually, 
+                                                    or use the calendar to select a date in the past or in the future. The calendar is customizable 
+                                                    by the application developer by editing the following file: 
+                                                    <code>oxf-theme/javascript/calendar.js</code>
+                                               </p>
+                                            </li>
+                                            <li>
+                                                <p><b><code>xs:time</code></b> &#8213; 
+                                                    The input field is broken up into three fields: hours, minutes, and seconds. Javascript validation 
+                                                    verifies the user's entries, and prevents non-numeric characters, as well as overflowing values (hours 
+                                                    greater than 23, minutes and seconds over 59). The Javascript code is customizable in the following file:
+                                                    <code>oxf-theme/javascript/time-utils.js</code>
+                                                </p>
+                                            </li>
+                                        </ul>
+                                    </p>
                                 </li>
                                 <li>
                                     <p>
-                                        <b>constraint</b> _ In the <code>constraint</code> you can
+                                        <b>constraint</b> &#8213; In the <code>constraint</code> you can
                                         write any XPath 2.0 expression that returns a boolean
                                         value. If false is returned, then the value is considered
                                         invalid, otherwise it is considered valid.
@@ -393,7 +415,7 @@
                             <ul>
                                 <li>
                                     <p>
-                                        <b>calculate</b> _ The content of the element or attribute
+                                        <b>calculate</b> &#8213; The content of the element or attribute
                                         will be set to the result of the evaluation of the XPath 2.0
                                         expression in the <code>calculate</code> attribute. This
                                         way you can automatically compute some values in the XForms
@@ -418,7 +440,7 @@
                             <ul>
                                 <li>
                                     <p>
-                                        <b>readonly</b> _ If the XPath 2.0 expression in
+                                        <b>readonly</b> &#8213; If the XPath 2.0 expression in
                                         <code>readonly</code> evaluates to true, the control will be
                                         displayed in non-editable mode. Typically, in an XHTML user
                                         interface only the current value is displayed, instead of
@@ -427,7 +449,7 @@
                                 </li>
                                 <li>
                                     <p>
-                                        <b>relevant</b> _ If the XPath 2.0 expression in
+                                        <b>relevant</b> &#8213; If the XPath 2.0 expression in
                                         <code>relevant</code> evaluates to false, the control will
                                         not be displayed at all.
                                     </p>

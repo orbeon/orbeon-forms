@@ -26,11 +26,72 @@
     <xsl:variable name="model" select="doc('input:model')/xforms:model" as="element()"/>
 
     <!-- Form Controls -->
+    <xsl:template name="show-date-picker">
+        <xsl:param name="input"/>
+        
+        <xsl:variable name="id" select="translate($input/@xxforms:name, '$^+-*/=', '_______')"/>
+        <xhtml:input type="text" id="{$id}" name="{$input/@xxforms:name}" value="{$input/@xxforms:value}">
+                <xsl:copy-of select="$input/@* except ($input/@xxforms:* | $input/@*[namespace-uri() = ''])"/>
+        </xhtml:input> 
+        <input type="image" src="/images/showCalendar.gif" value="Date"
+            onclick="showCalendar('', '{$id}'); return false;"/>
+        <div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"/>
+    </xsl:template>
 
-    <xsl:template match="xforms:input">
-        <xhtml:input type="text" name="{@xxforms:name}" value="{@xxforms:value}">
-            <xsl:call-template name="copy-other-attributes"/>
+    <xsl:template name="show-time-picker">
+        <xsl:param name="input"/>
+        
+        <xsl:variable name="id" select="translate($input/@xxforms:name, '$^+-*/=', '_______')"/>
+        <xsl:variable name="hour"><xsl:value-of select="$id"/>_hh</xsl:variable>
+        <xsl:variable name="minute"><xsl:value-of select="$id"/>_mm</xsl:variable>
+        <xsl:variable name="second"><xsl:value-of select="$id"/>_ss</xsl:variable>
+        
+        <xhtml:input type="hidden" id="{$id}" name="{$input/@xxforms:name}" value="{$input/@xxforms:value}"/>
+        
+        <xhtml:input type="text" size="2" maxlength="2" id="{$hour}"
+            xhtml:onKeyUp="checkHour(this); 
+                                        movebox(this, document.getElementById('{$minute}'),2);
+                                        updateTimeField(document.getElementById('{$id}'), document.getElementById('{$hour}'), document.getElementById('{$minute}'), document.getElementById('{$second}'));">:
+            <xsl:copy-of select="$input/@* except ($input/@xxforms:* | $input/@*[namespace-uri() = ''])"/>
         </xhtml:input>
+        <xhtml:input type="text" size="2" maxlength="2" id="{$minute}"
+            xhtml:onKeyUp="checkMinute(this); 
+                                        movebox(this, document.getElementById('{$second}'),2);
+                                        updateTimeField(document.getElementById('{$id}'), document.getElementById('{$hour}'), document.getElementById('{$minute}'), document.getElementById('{$second}'));">:
+            <xsl:copy-of select="$input/@* except ($input/@xxforms:* | $input/@*[namespace-uri() = ''])"/>
+        </xhtml:input>
+        <xhtml:input type="text" size="2" maxlength="2" id="{$second}"
+            xhtml:onKeyUp="checkSecond(this);
+                                        updateTimeField(document.getElementById('{$id}'), document.getElementById('{$hour}'), document.getElementById('{$minute}'), document.getElementById('{$second}'));">
+            <xsl:copy-of select="$input/@* except ($input/@xxforms:* | $input/@*[namespace-uri() = ''])"/>
+        </xhtml:input>
+        <xhtml:script>
+                updateComponents(document.getElementById('<xsl:value-of select="$id"/>'), document.getElementById('<xsl:value-of select="$hour"/>'), document.getElementById('<xsl:value-of select="$minute"/>'), document.getElementById('<xsl:value-of select="$second"/>'));
+        </xhtml:script>
+
+    </xsl:template>
+    
+    <xsl:template match="xforms:input">
+        <xsl:choose>
+            <!-- Display a overlib calendar -->
+            <xsl:when test="@xxforms:type = 'xs:date'">
+                <xsl:call-template name="show-date-picker">
+                    <xsl:with-param name="input" select="."/>
+                </xsl:call-template>
+            </xsl:when>
+            <!-- Display a custome time picker -->
+            <xsl:when test="@xxforms:type = 'xs:time'">
+                <xsl:call-template name="show-time-picker">
+                    <xsl:with-param name="input" select="."/>
+                </xsl:call-template>
+            </xsl:when>
+
+            <xsl:otherwise>
+                <xhtml:input type="text" name="{@xxforms:name}" value="{@xxforms:value}">
+                    <xsl:call-template name="copy-other-attributes"/>
+                </xhtml:input>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="xforms:secret">

@@ -11,16 +11,21 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+<xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema">
     <xforms:instance>
         <form>
             <text>35</text>
             <secret>42</secret>
             <textarea>The world is but a canvas for the imagination.</textarea>
             <label>Hello, World!</label>
+            <date/>
+            <time/>            
         </form>
     </xforms:instance>
     <xforms:bind nodeset="/form/text" constraint="number(.) >= 0"/>
     <xforms:bind nodeset="/form/secret" constraint="string(.) = '42'"/>
     <xforms:bind nodeset="/form/textarea" constraint="string-length(.) > 10"/>
+    <xforms:bind nodeset="/form/date" type="xs:date"/>
+    <xforms:bind nodeset="/form/time" type="xs:time"/>
 </xforms:model>

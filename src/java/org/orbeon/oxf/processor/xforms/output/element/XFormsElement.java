@@ -26,6 +26,7 @@ import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.style.StandardNames;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -118,6 +119,11 @@ public class XFormsElement {
             boolean positionPresent = attributes.getIndex(Constants.XXFORMS_NAMESPACE_URI, "position") != -1;
             if (refPresent || bindPresent || nodesetPresent || positionPresent) {
                 InstanceData currentNodeInstanceData = XFormsUtils.getInstanceData(context.getCurrentSingleNode());
+
+                int typeCode = currentNodeInstanceData.getType().get();
+                if(typeCode != 0)
+                    addExtensionAttribute(newAttributes, Constants.XXFORMS_TYPE_ATTRIBUTE_NAME,
+                            StandardNames.getPrefix(typeCode) + ":" + StandardNames.getLocalName(typeCode));
                 addExtensionAttribute(newAttributes, Constants.XXFORMS_READONLY_ATTRIBUTE_NAME,
                         Boolean.toString(currentNodeInstanceData.getReadonly().get()));
                 addExtensionAttribute(newAttributes, Constants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,

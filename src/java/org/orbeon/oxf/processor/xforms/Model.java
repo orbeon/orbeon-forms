@@ -274,6 +274,10 @@ public class Model {
                                     throw new ValidationException("Invalid type '" + modelBind.getType() + "'",
                                             modelBind.getLocationData());
 
+                                // Pass-through the type value
+                                 InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
+                                instanceData.getType().set(requiredType);
+
                                 // Try to perform casting
                                 String nodeStringValue = node.getStringValue();
                                 if (XFormsUtils.getInstanceData(node).getRequired().get() || nodeStringValue.length() != 0) {

@@ -54,10 +54,13 @@
                         <xsl:value-of select="."/>
                     </script>
                 </xsl:for-each>
+                <script type="text/javascript" src="/oxf-theme/javascript/calendar.js"/>
+                <script type="text/javascript" src="/oxf-theme/javascript/overlib_mini.js"/>
+                <script type="text/javascript" src="/oxf-theme/javascript/time-utils.js"/>
                 <script type="text/javascript" src="/oxf-theme/style/theme.js"/>
             </head>
             <!-- This gives a little nudge to IE, so IE displays all the borders -->
-            <body onload="document.body.innerHTML += ''">
+            <body onload="document.body.innerHTML += ''; ">
                 <!-- Handle optional tabs -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:head/f:tabs"/>
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>

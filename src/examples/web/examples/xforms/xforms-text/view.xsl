@@ -15,7 +15,9 @@
             xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
             xsl:version="2.0">
-    <xhtml:head><xhtml:title>XForms Text Controls</xhtml:title></xhtml:head>
+    <xhtml:head>
+        <xhtml:title>XForms Text Controls</xhtml:title>
+    </xhtml:head>
     <xhtml:body>
         <xforms:group ref="/form">
             <table border="0" cellpadding="10" cellspacing="0">
@@ -48,6 +50,21 @@
                         </xforms:textarea>
                     </td>
                 </tr>
+                
+                <tr>
+                    <td align="right">Date:</td>
+                    <td>
+                        <xforms:input ref="date"/>
+                    </td>
+                </tr>
+                
+                <tr>
+                       <td align="right">Time:</td>
+                       <td>
+                           <xforms:input ref="time"/>
+                        </td>
+               </tr>
+                               
                 <tr>
                     <td/>
                     <td>

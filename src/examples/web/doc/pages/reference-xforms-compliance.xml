@@ -558,11 +558,6 @@
                 <tr>
                     <td><a href="http://www.w3.org/TR/2003/REC-xforms-20031014/slice8.html#ui-input">8.1.2 The input Element</a></td>
                     <td>
-                        Dates and times are rendered using the regular textfield widget, instead
-                        of using a more specific date or time specific widget. Note that using a
-                        date or time-specific widget is not mandated by the XForms specification.
-
-                        <p>[RFE <a href="http://tinyurl.com/4n7xc">1078712</a>]</p>
                     </td>
                     &full;
                 </tr>

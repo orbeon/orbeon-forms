@@ -266,6 +266,9 @@ public class JavaProcessor extends ProcessorImpl {
             throw new OXFException(e);
         }
     }
+    
+    
+    
 
     private String buildClassPath(PipelineContext context) {
         StringBuffer classpath = new StringBuffer();
@@ -298,12 +301,9 @@ public class JavaProcessor extends ProcessorImpl {
 
         // Try to add directory containing current JAR file if WEB-INF/lib was not found
         if (!gotLibDir) {
-            String pathToCurrentJarDir = SystemUtils.getJarPath(getClass());
-            if (pathToCurrentJarDir != null) {
-                if (logger.isDebugEnabled())
-                    logger.debug("Found current JAR directory: " + pathToCurrentJarDir);
-                jarpath.append(pathToCurrentJarDir).append(PATH_SEPARATOR);
-            }
+        	final String pth = SystemUtils.pathFromLoaders( JavaProcessor.class );
+        	classpath.append( pth );
+        	if ( !pth.endsWith( java.io.File.pathSeparator ) ) classpath.append( java.io.File.pathSeparatorChar );
         }
 
         for (StringTokenizer tokenizer = new StringTokenizer(jarpath.toString(), PATH_SEPARATOR); tokenizer.hasMoreElements();) {

@@ -56,6 +56,9 @@
     <!-- Standalone XForms Upload example -->
     <page path-info="/xforms-upload*" model="/examples/xforms/xforms-upload/page-flow.xpl"/>
 
+    <!-- Standalone Weather page-scraping example -->
+    <page path-info="/weather*" model="/examples/url/weather/model.xpl"/>
+
     <!-- Struts and JSF -->
     <page path-info="/faces/*" model="/jsf/config/model.xpl"/>
     <page path-info="/examples/jsf*" model="/jsf/config/model.xpl"/>

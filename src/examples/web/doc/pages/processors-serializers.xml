@@ -214,6 +214,11 @@
 KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
 </document>
                     </xml-source>
+                    <p>
+                        An optional <code>content-type</code> attribute provides information about
+                        the content type of the document. This attribute may be used to set the HTTP
+                        <code>content-type</code> header, as discussed above.
+                    </p>
                 </section>
                 <section>
                     <title>Example</title>
@@ -290,6 +295,16 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
     complète la grave harmonie.
 </document>
                     </xml-source>
+                    <p>
+                        An optional <code>content-type</code> attribute provides information about
+                        the content type of the document. This attribute may be used to set the HTTP
+                        <code>content-type</code> header, as discussed above. In text mode, the
+                        <code>content-type</code> attribute can also have a <code>charset</code>
+                        parameter providing a hint at the preferred character encoding for the text,
+                        as discussed below, for example <code>text/plain; charset=iso-8859-1</code>.
+                        Note that the XML input document infoset internally represents characters
+                        in Unicode and therefore does not require encoding information.
+                    </p>
                 </section>
                 <section>
                     <title>Character Encoding</title>
@@ -317,6 +332,9 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                             Use <code>utf-8</code>.
                         </li>
                     </ol>
+                </section>
+                <section>
+                    <title>Example</title>
                     <p>
                         Here is an example connecting the <a
                         href="processors-generators#url-generator">URL generator</a> to the

@@ -47,7 +47,7 @@
     </processor>
 
     <processor name="oxf:request" uri="oxf/processor/request">
-        <class name="org.orbeon.oxf.processor.generator.NewRequestGenerator"/>
+        <class name="org.orbeon.oxf.processor.generator.RequestGenerator"/>
     </processor>
 
     <processor name="oxf:request-security" uri="oxf/processor/request-security">
@@ -309,7 +309,7 @@
     </processor>
 
     <processor name="oxf:scope-generator" uri="oxf/processor/scope-generator">
-        <class name="org.orbeon.oxf.processor.scope.NewScopeGenerator"/>
+        <class name="org.orbeon.oxf.processor.scope.ScopeGenerator"/>
     </processor>
 
     <processor name="oxf:scope-serializer" uri="oxf/processor/scope-serializer">
@@ -382,7 +382,7 @@
     </processor>
 
     <processor name="oxf:bean-generator" uri="oxf/processor/bean-generator">
-        <class name="org.orbeon.oxf.processor.generator.NewBeanGenerator"/>
+        <class name="org.orbeon.oxf.processor.generator.BeanGenerator"/>
     </processor>
 
     <processor name="oxf:xls-generator" uri="oxf/processor/xls-generator">

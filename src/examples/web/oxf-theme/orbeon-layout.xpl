@@ -442,14 +442,14 @@ ul {
     color: <xsl:value-of select="$dark-color"/>;
     text-align: center;
     padding: .3em;
-	border:	1px solid <xsl:value-of select="$light-color"/>;
+    border:    1px solid <xsl:value-of select="$light-color"/>;
 }
 .gridtable td {
     background-color: #ffffff;
     color: black;
     padding: .2em;
-	border:	1px solid <xsl:value-of select="$light-color"/>;
-    margin:	0px;
+    border:    1px solid <xsl:value-of select="$light-color"/>;
+    margin:    0px;
 }
 
 .dashedbox {
@@ -471,34 +471,17 @@ ul {
 .xferrtable td { border: 0; margin: 0px; padding: 0px; color: red }
 .xfhelptable   { margin: 0px }
 
-<!--
 @media print {
-    @page {
-       margin-left: 1.5cm;
-       margin-right: 1.5cm;
-       margin-top: 2cm;
-       margin-bottom: 2cm;
-    }
-
-	#main1 {
-	    background: white;
-	}
-   #main {
-    border-right: 0px;
-    border-left: 0px;
-    border-bottom:0px;
-   }
-   #leftcontent { visibility: collapse }
-   #rightcontent { visibility: collapse;}
-   .tabs { visibility: collapse }
-   .tab { visibility: collapse }
-   #cleaner { visibility: collapse }
-   #banner { visibility: collapse;}
-   #maincontent { position: relative; top: -2cm; left: -3.5cm; width: 15cm;}
-   #maincontent p {width: 100%;  margin: 2em 0 0 0; padding: 0}
-   #maincontent h1 {background-image: none;}
+    #main { border: none; }
+    #leftcontent { display: none }
+    #rightcontent { display: none }
+    .tabs { display: none }
+    .tab { display: none }
+    #cleaner { display: none }
+    #banner { display: none}
+    #xmaincontent { position: relative; top: -2cm; left: -3.5cm; width: 15cm;}
+    #main #maincontent { margin: 0; }
 }
--->
                     </root>
                 </xsl:template>
             </xsl:stylesheet>

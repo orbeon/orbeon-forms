@@ -30,9 +30,8 @@
             <ul>
                 <li>
                     <b>Binary document:</b> any document that can be represented as a stream of
-                    bytes. Any document can actually be represented as a stream of bytes, however,
-                    some document formats are almost always represented this way: images, sounds,
-                    PDF documents, etc.
+                    bytes. In general this is the case of any document, but some document formats
+                    are almost always represented this way: images, sounds, PDF documents, etc.
                 </li>
                 <li>
                     <b>Text documents:</b> any document that can be represented as a stream of

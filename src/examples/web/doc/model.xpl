@@ -29,11 +29,30 @@
     </p:processor>
 
     <!-- Generate page -->
+    <!-- 9/7/2004 d : When we re-org'd the doc we broke links from external sites.  -->
+    <!--              OT asked for a work around that would at least keep link from -->
+    <!--              http://www.w3.org/MarkUp/Forms/ working, hence this special   -->
+    <!--              casing of 'processors-xforms'. -->
+    <p:choose  href="#instance">
+      <p:when  test="/form/page = 'processors-xforms'">
+        <p:processor name="oxf:url-generator">
+            <p:input name="config" >
+               <config>
+                 <url>oxf:/doc/pages/reference-xforms.xml</url>
+				 <content-type>text/xml</content-type>                 
+               </config>
+            </p:input>
+            <p:output name="data" id="body"/>
+        </p:processor>
+      </p:when>
+      <p:otherwise>
     <p:processor name="oxf:url-generator">
         <p:input name="config" href="aggregate('config',
             #instance#xpointer(concat('oxf:/doc/pages/', /form/page, '.xml')))"/>
         <p:output name="data" id="body"/>
     </p:processor>
+      </p:otherwise>
+    </p:choose>
 
     <p:choose href="#request">
         <p:when test="count(/request/parameters/parameter[name = '/form/pdf']) = 1">

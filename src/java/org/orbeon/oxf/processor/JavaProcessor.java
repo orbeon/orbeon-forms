@@ -35,6 +35,9 @@ import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.util.*;
 
+/**
+ * The Java processor dynamically creates processors by compiling Java files on the fly.
+ */
 public class JavaProcessor extends ProcessorImpl {
 
     static private Logger logger = LoggerFactory.createLogger(JavaProcessor.class);

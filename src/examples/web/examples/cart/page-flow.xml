@@ -15,7 +15,7 @@
         xmlns:xu="http://www.xmldb.org/xupdate">
 
     <page id="session" path-info="/cart" xforms="form.xml" model="model.xpl" view="view.xsl">
-        <action when="/form/action = 'add'" action="add.xpl/"/>
+        <action when="/form/action = 'add'" action="add.xpl"/>
         <action when="/form/action = 'clear'" action="clear.xpl"/>
     </page>
 

@@ -15,13 +15,13 @@
           xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <p:param name="instance" type="input" debug="instance"/>
-    <p:param name="data" type="output" debug="output"/>
+    <p:param name="instance" type="input"/>
+    <p:param name="data" type="output"/>
 
     <!-- Upload all the files -->
     <p:for-each href="#instance" select="/*/files/file" ref="data" root="urls">
 
-        <p:choose href="current()" debug="current">
+        <p:choose href="current()">
             <p:when test="/file != '' and /file/@size &lt;= 160000">
                 <!-- File size is reasonable -->
 
@@ -29,7 +29,7 @@
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="read-uri.xpl"/>
                     <p:input name="uri" href="aggregate('uri', current()#xpointer(string(/file)))"/>
-                    <p:output name="data" id="file" debug="file"/>
+                    <p:output name="data" id="file"/>
                 </p:processor>
 
                 <!-- Create the configuration of the Delegation processor -->

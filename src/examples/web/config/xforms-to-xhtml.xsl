@@ -52,12 +52,13 @@
     </xsl:template>
 
     <xsl:template match="xforms:upload">
-<!--        <xsl:message>-->
-<!--            <form>-->
-<!--                <xsl:copy-of select="."/>-->
-<!--            </form>-->
-<!--        </xsl:message>-->
-        <xhtml:input type="file" name="$upload^{xxforms:encrypt-name(@xxforms:name)}^{@xxforms:value}^{xxforms:encrypt-name(xforms:filename/@xxforms:name)}^{xforms:filename/@xxforms:value}^{xxforms:encrypt-name(xforms:mediatype/@xxforms:name)}^{xforms:mediatype/@xxforms:value}^{xxforms:encrypt-name(xxforms:size/@xxforms:name)}^{xforms:size/@xxforms:value}">
+        <xsl:message>
+            <form>
+                <xsl:copy-of select="."/>
+            </form>
+        </xsl:message>
+        <!-- NOTE: We do not send the current value of the form element, as it could either be too big, or be just a server-side URL -->
+        <xhtml:input type="file" name="$upload^{xxforms:encrypt-name(@xxforms:name)}^{''}^{xxforms:encrypt-name(xforms:filename/@xxforms:name)}^{xforms:filename/@xxforms:value}^{xxforms:encrypt-name(xforms:mediatype/@xxforms:name)}^{xforms:mediatype/@xxforms:value}^{xxforms:encrypt-name(xxforms:size/@xxforms:name)}^{xforms:size/@xxforms:value}">
             <xsl:call-template name="copy-other-attributes"/>
         </xhtml:input>
     </xsl:template>

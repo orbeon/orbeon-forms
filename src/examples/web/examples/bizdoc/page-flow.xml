@@ -60,19 +60,16 @@
         </action>
         <!-- View XML -->
         <action when="/form/action = 'show-xml'" action="summary/find-document-action.xpl">
-            <result page="xml-detail">
+            <result page="xml-detail" instance-passing="redirect-exit-portal">
                 <xu:update select="/form/document-id">
                     <xu:value-of select="document('oxf:action')/document-info/document-id"/>
-                </xu:update>
-                <xu:update select="/form/document">
-                    <xu:copy-of select="document('oxf:action')/document-info/document/*"/>
                 </xu:update>
             </result>
         </action>
     </page>
 
     <!-- Show XML document -->
-    <page id="xml-detail" path-info="/dmv/xml-detail" xforms="detail/detail-xforms-model.xml" model="detail/xml-detail-model.xpl"/>
+    <page id="xml-detail" path-info="/example-resources/bizdoc/xml-detail" xforms="detail/xml-detail-xforms-model.xml" model="detail/xml-detail-model.xpl"/>
 
     <page id="detail-1" path-info="/bizdoc/detail-1" xforms="detail/detail-xforms-model.xml" model="detail/debug-model.xpl" view="detail/detail-view-1.xsl">
         <!-- Save the current document and documemnt is valid -->

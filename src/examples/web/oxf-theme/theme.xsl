@@ -266,7 +266,7 @@
         </xsl:choose>
     </xsl:template>
 
-    <!-- Just copy other "d" elements removing the namespace -->
+    <!-- Just copy other "xhtml" elements removing the namespace -->
     <xsl:template match="xhtml:*">
         <xsl:element name="{local-name()}">
             <xsl:apply-templates select="@*|node()"/>

@@ -1,0 +1,9 @@
+<xf:model xmlns:xf="http://www.w3.org/2002/xforms"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xf:instance>
+        <form>
+            <image-id/>
+        </form>
+    </xf:instance>
+</xf:model>

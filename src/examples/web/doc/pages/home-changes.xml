@@ -138,7 +138,7 @@
                     <p>
                         The <a href="processors-generators#url-generator">URL generator</a> now
                         supports reading text files. The <a
-                        href="/goto-example/employees">Exmployees example</a> illustrates this
+                        href="/goto-example/employees">Employees example</a> illustrates this
                         capability.
                     </p>
                 </section>

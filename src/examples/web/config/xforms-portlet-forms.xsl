@@ -37,20 +37,8 @@
     <!-- Match outer xforms:group element -->
     <xsl:variable name="reference-xform" select="($annotated-data//xforms:group)[1]" as="element()?"/>
 
-    <xsl:variable name="reference-xform-name-values" as="xs:string*">
-        <xsl:for-each select="$reference-xform//(xforms:* | xxforms:hidden)[@xxforms:name and @xxforms:value]">
-            <xsl:sequence select="if (encrypt-names) then xforms-utils:encrypt(@xxforms:name) else @xxforms:name"/>
-            <xsl:sequence select="escape-uri(@xxforms:value, true())"/>
-        </xsl:for-each>
-    </xsl:variable>
-
-    <xsl:variable name="reference-xform-name-values-assigned" as="xs:string*">
-        <xsl:for-each select="$reference-xform-name-values">
-            <xsl:variable name="position" select="position()"/>
-            <xsl:if test="$position mod 2 = 1">
-                <xsl:sequence select="concat(., '=', $reference-xform-name-values[$position + 1])"/>
-            </xsl:if>
-        </xsl:for-each>
+    <xsl:variable name="reference-xform-instance" as="element()?">
+        <xsl:copy-of select="$reference-xform//xxforms:hidden[@xxforms:name = '$instance' and @xxforms:value != '']"/>
     </xsl:variable>
 
     <!-- Main template -->
@@ -78,12 +66,9 @@
                 <xsl:with-param name="portlet-id" select="@portlet:form-portlet-id" tunnel="yes"/>
             </xsl:apply-templates>
 
-            <!-- Add hidden field with non-portlet form data so that a non-portlet form instance can be regenerated -->
-            <xsl:if test="$reference-xform-name-values">
-                <xsl:variable name="reference-xform-name-values-joined" as="xs:string"
-                    select="string-join($reference-xform-name-values, '^')"/>
-                <input type="hidden" name="$hidden" value="{if (xforms-utils:is-hidden-encryption-enabled())
-                        then xforms-utils:encrypt(string($reference-xform-name-values-joined)) else $reference-xform-name-values-joined}"/>
+            <!-- Add hidden field with outer XForms instance data so that a non-portlet form instance can be regenerated -->
+            <xsl:if test="$reference-xform-instance">
+                <xhtml:input type="hidden" name="$instance" value="{$reference-xform-instance/@xxforms:value}"/>
             </xsl:if>
         </xsl:copy>
     </xsl:template>
@@ -93,19 +78,22 @@
         <xsl:copy>
             <xsl:copy-of select="@*"/>
 
-            <xsl:variable name="params" select="string-join($reference-xform-name-values-assigned, '&amp;')"/>
+            <!-- Override href attribute if necessary -->
+            <xsl:if test="$reference-xform-instance">
+                <xsl:variable name="params" select="concat('$instance=', escape-uri(normalize-space($reference-xform-instance/@xxforms:value), true()))"/>
 
-            <xsl:if test="$params">
-                <xsl:attribute name="href">
-                    <xsl:choose>
-                        <xsl:when test="contains(@href, '?')">
-                            <xsl:value-of select="concat(@href, '&amp;', $params)"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="concat(@href, '?', $params)"/>
-                        </xsl:otherwise>
-                    </xsl:choose>
-                </xsl:attribute>
+                <xsl:if test="$params">
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains(@href, '?')">
+                                <xsl:value-of select="concat(@href, '&amp;', $params)"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="concat(@href, '?', $params)"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                </xsl:if>
             </xsl:if>
 
             <xsl:apply-templates mode="#current"/>

@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.xmldb;
 
+import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
@@ -21,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -47,6 +49,8 @@ import java.util.Map;
  * See also the eXist Javadocs at http://exist.sourceforge.net/api/index.html.
  */
 public abstract class XMLDBProcessor extends ProcessorImpl {
+
+    static Logger logger = LoggerFactory.createLogger(XMLDBProcessor.class);
 
     public static final String INPUT_DATASOURCE = "datasource";
     public static final String INPUT_QUERY = "query";
@@ -279,6 +283,14 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
         }
         if (xpathQueryService == null)
             throw new OXFException("XML:DB " + XPATH_SERVICE_NAME + " does not exist.");
+
+        // Configure service (this is particular for eXist)
+        // TODO: Should be configurable, but with what mechanism? 
+        try {
+            xpathQueryService.setProperty("highlight-matches", "no");
+        } catch (Exception e) {
+            logger.debug("Unable to set eXist highlight-matches", e);
+        }
 
         // Set namespaces
         for (Iterator i = namespaceContext.keySet().iterator(); i.hasNext();) {

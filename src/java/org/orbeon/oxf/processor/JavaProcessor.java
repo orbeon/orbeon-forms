@@ -173,25 +173,48 @@ public class JavaProcessor extends ProcessorImpl {
 
             // Compile
             if (!fileUpToDate) {
-                if (logger.isDebugEnabled())
-                    logger.debug("Compiling class '" + config.clazz + "'");
                 StringWriter javacOutput = new StringWriter();
-                final String[] cmdLine = new String[]
-                { "-g", "-classpath", buildClassPath(context), "-sourcepath", 
-                  config.sourcepath, "-d", 
-				  SystemUtils.getTemporaryDirectory().getAbsolutePath(),
-				  config.sourcepath + "/" + config.clazz.replace('.', '/') + ".java" 
-				};
-                for ( int i = 0; i < cmdLine.length; i++ )
+
+                final java.util.ArrayList argLst = new java.util.ArrayList();
+                final String[] cmdLine;
                 {
-                	if ( cmdLine[ i ] == null ) throw new IllegalArgumentException( "arg[ " + i + " ]" );
+                    argLst.add( "-g" );
+                    final String cp = buildClassPath( context );
+                    if ( cp != null ) {
+                        argLst.add( "-classpath" );
+                        argLst.add( cp );
+                    }
+                    if ( config.sourcepath != null && config.sourcepath.length() > 0 ) {
+                        argLst.add( "-sourcepath" );
+                        argLst.add( config.sourcepath );
+                    }
+                    argLst.add( "-d" );
+                    final java.io.File tmp = SystemUtils.getTemporaryDirectory();
+                    final String tmpPth = tmp.getAbsolutePath();
+                    argLst.add( tmpPth );
+                    final String fnam = config.sourcepath + "/" 
+                        + config.clazz.replace('.', '/') + ".java";
+                    argLst.add( fnam );
+
+                    cmdLine = new String[ argLst.size() ];
+                    argLst.toArray( cmdLine );
                 }
-                int success = Main.compile( cmdLine,
-                        new PrintWriter(javacOutput));
-                if (success != 0) {
+                if ( logger.isDebugEnabled() ) {
+                    logger.debug("Compiling class '" + config.clazz + "'");
+                    logger.debug( "javac " + argLst.toString() );
+                }
+                Throwable thrown = null;
+                int exitCode = 1;
+                try {
+                    exitCode = Main.compile( cmdLine, new PrintWriter(javacOutput));
+				}
+                catch ( final Throwable t ) {
+                	thrown = t;
+				}
+                if (exitCode != 0) {
                     String javacOutputString = "\n" + javacOutput.toString();
                     javacOutputString = StringUtils.replace(javacOutputString, "\n", "\n    ");
-                    throw new OXFException("Error compiling '" + config.clazz + "'" + javacOutputString);
+                    throw new OXFException("Error compiling '" + argLst.toString() + "'" + javacOutputString, thrown );
                 }
             }
 

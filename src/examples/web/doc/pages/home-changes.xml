@@ -40,6 +40,48 @@
                 </xml-source>
             </section>
             <section>
+                <title>SQL Processor</title>
+                <p>
+                    The SQL processor now supports external datasource declarations using the
+                    optional <code>datasource</code> input. Such datasources can directly refer to
+                    connections without using JNDI names mapped by the container. This allows
+                    examples to work out of the box. This is an example of datasource description:
+                </p>
+                <xml-source>
+                    <datasource>
+                        <comment> Specify the driver for the database </comment>
+                        <driver-class-name>org.hsqldb.jdbcDriver</driver-class-name>
+                        <comment> This causes the use of the embedded database </comment>
+                        <uri>jdbc:hsqldb:file:orbeondb</uri>
+                        <comment> Optional username and password </comment>
+                        <username>sa</username>
+                        <password></password>
+                    </datasource>
+                </xml-source>
+                <p>
+                    Presentation Server ships with a recent version of HSQLDB (version 1.7.2.8).
+                </p>
+                <p>
+                    The SQL processor now supports reading <code>BINARY</code>, <code>VARBINARY
+                    </code>and <code>LONGVARBINARY</code> columns in addition to <code>BLOB</code>.
+                </p>
+            </section>
+            <section>
+                <title>Examples</title>
+                <p>
+                    All the examples using the SQL processor now work out of the box without
+                    configuring datasources at the application server or servlet container level.
+                    This includes the following examples:
+                </p>
+                <ul>
+                    <li>Address Book</li>
+                    <li>Employees</li>
+                    <li>Data in multiple formats</li>
+                    <li>XForms Upload</li>
+                    <li>Email</li>
+                </ul>
+            </section>
+            <section>
                 <title>Saxon Upgraded to Version 8.1.1</title>
                 <p>
                     TODO
@@ -47,6 +89,12 @@
             </section>
             <section>
                 <title>XPath Improvements</title>
+                <p>
+                    TODO
+                </p>
+            </section>
+            <section>
+                <title>JBoss Support</title>
                 <p>
                     TODO
                 </p>

@@ -443,6 +443,7 @@ ul {
 .tinyinput { width: 5em; }
 .smallinput { width: 8em; }
 
+<!--
 @media print {
     @page {
        margin-left: 1.5cm;
@@ -451,6 +452,9 @@ ul {
        margin-bottom: 2cm;
     }
 
+	#main1 {
+	    background: white;
+	}
    #main {
     border-right: 0px;
     border-left: 0px;
@@ -462,11 +466,11 @@ ul {
    .tab { visibility: collapse }
    #cleaner { visibility: collapse }
    #banner { visibility: collapse;}
-<!--   #maincontent { position: fixed; top: -9; left: -160; width: 100%;}-->
    #maincontent { position: relative; top: -2cm; left: -3.5cm; width: 15cm;}
    #maincontent p {width: 100%;  margin: 2em 0 0 0; padding: 0}
    #maincontent h1 {background-image: none;}
 }
+-->
                     </root>
                 </xsl:template>
             </xsl:stylesheet>

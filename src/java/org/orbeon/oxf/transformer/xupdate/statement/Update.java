@@ -16,11 +16,13 @@ package org.orbeon.oxf.transformer.xupdate.statement;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import javax.xml.transform.URIResolver;
 import java.util.Collections;
@@ -44,7 +46,7 @@ public class Update extends Statement {
             Object toInsert = Utils.execute(uriResolver, node, variableContext, statements);
             if (node instanceof Element) {
                 Element parent = (Element) node;
-                parent.clearContent();
+                Dom4jUtils.clearElementContent(parent);
                 Utils.insert(getLocationData(), parent, 0, toInsert);
             } else if (node instanceof Document) {
                 Document parent = (Document) node;

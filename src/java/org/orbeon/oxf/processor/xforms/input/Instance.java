@@ -30,6 +30,7 @@ import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.xpath.XPathException;
@@ -122,7 +123,7 @@ public class Instance {
             if (currentType != null && !currentType.equals(type)) { // FIXME: prefixes of type name could be different!
                 // There is a different type already, do a conversion
                 value = convertUploadTypes(value, type, currentType);
-                element.clearContent();
+                Dom4jUtils.clearElementContent(element);
             } else if (currentType == null) {
                 // There is no type, convert to default type
                 if (!DEFAULT_UPLOAD_TYPE.equals(type)) // FIXME: prefixes of type name could be different!

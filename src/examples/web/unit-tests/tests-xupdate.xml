@@ -151,23 +151,27 @@
         </output>
     </test>
 
-    <test description="Keep unused namespace mappings in xu:copy-of" name="oxf:pipeline">
+    <test description="Keep unused namespace mappings in xu:copy-of and xu:value-of" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="result"/>
                 <p:processor name="oxf:xupdate">
                     <p:input name="data">
-                        <a/>
+                        <a>
+                            <b/>
+                            <c xmlns:xs="http://www.w3.org/2001/XMLSchema"/>
+                        </a>
                     </p:input>
                     <p:input name="other">
-                        <b xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                            xsi:type="xs:string">string</b>
+                        <d xmlns:xs="http://www.w3.org/2001/XMLSchema">string</d>
                     </p:input>
                     <p:input name="config">
                         <xu:modifications xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
-                            <xu:update select="/a">
-                                <xu:copy-of select="doc('input:other')/b"/>
+                            <xu:update select="/a/b">
+                                <xu:copy-of select="doc('input:other')/d"/>
+                            </xu:update>
+                            <xu:update select="/a/c">
+                                <xu:value-of select="doc('input:other')/d"/>
                             </xu:update>
                         </xu:modifications>
                     </p:input>
@@ -177,7 +181,12 @@
                     <p:input name="data" href="#xupdate"/>
                     <p:input name="config">
                         <result xsl:version="2.0">
-                            <xsl:value-of select="namespace-uri-for-prefix('xs', /a/b)"/>
+                            <copy-of>
+                                <xsl:value-of select="namespace-uri-for-prefix('xs', /a/b/d)"/>
+                            </copy-of>
+                            <value-of>
+                                <xsl:value-of select="namespace-uri-for-prefix('xs', /a/c)"/>
+                            </value-of>
                         </result>
                     </p:input>
                     <p:output name="data" ref="result"/>
@@ -185,7 +194,10 @@
             </p:config>
         </input>
         <output name="result">
-            <result>http://www.w3.org/2001/XMLSchema</result>
+            <result>
+                <copy-of>http://www.w3.org/2001/XMLSchema</copy-of>
+                <value-of>http://www.w3.org/2001/XMLSchema</value-of>
+            </result>
         </output>
     </test>
 

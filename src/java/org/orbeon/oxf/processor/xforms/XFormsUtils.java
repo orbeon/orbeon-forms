@@ -29,6 +29,7 @@ import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -62,7 +63,7 @@ public class XFormsUtils {
         if (node instanceof Element) {
             Element elementnode = (Element) node;
             // Remove current content
-            elementnode.clearContent();
+            Dom4jUtils.clearElementContent(elementnode);
             // Put text node with value
             elementnode.add(DocumentFactory.getInstance().createText(value));
         } else if (node instanceof Attribute) {

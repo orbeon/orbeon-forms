@@ -199,7 +199,7 @@ public class Model {
                                     List result = expr.evaluate();
                                     // Place in element
                                     Element elementNode = (Element) node;
-                                    elementNode.clearContent();
+                                    Dom4jUtils.clearElementContent(elementNode);
                                     for (Iterator k = result.iterator(); k.hasNext();) {
                                         Object resultItem = k.next();
                                         if (resultItem instanceof Node) {

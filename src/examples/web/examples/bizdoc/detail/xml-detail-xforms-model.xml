@@ -14,11 +14,9 @@
 <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
               xmlns:xi="http://www.w3.org/2003/XInclude"
               xmlns:claim="http://orbeon.org/oxf/examples/bizdoc/claim"
-              schema="form-schema.xsd">
+              schema="../data-access/document-id.rng">
     <xforms:instance>
-        <form>
-            <document-id/>
-        </form>
+        <document-id/>
     </xforms:instance>
     <xforms:submission method="post"/>
 </xforms:model>

@@ -61,7 +61,7 @@
         <!-- View XML -->
         <action when="/form/action = 'show-xml'" action="summary/find-document-action.xpl">
             <result page="xml-detail" instance-passing="redirect-exit-portal">
-                <xu:update select="/form/document-id">
+                <xu:update select="/document-id">
                     <xu:value-of select="document('input:action')/document-info/document-id"/>
                 </xu:update>
             </result>

@@ -107,7 +107,7 @@
                     <tr>
                         <td>message/body/part/*</td>
                         <td>1</td>
-                        <td>Thr content of the body part. Use a CDATA section for HTML</td>
+                        <td>The content of the body part. Use a CDATA section for HTML</td>
                     </tr>
                 </table>
                 <p>

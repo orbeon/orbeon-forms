@@ -63,7 +63,6 @@
 	<classpathentry kind="lib" path="lib/servlet-2_3-4_0_4.jar"/>
 	<classpathentry kind="var" path="JRE_JCE"/>
 	<classpathentry kind="lib" path="lib/activation-1_0_2.jar"/>
-	<classpathentry kind="lib" path="lib/mailapi-1_3.jar"/>
 	<classpathentry kind="var" path="JDK_TOOL"/>
 	<classpathentry kind="lib" path="lib/ant-1_5_4.jar"/>
 	<classpathentry kind="lib" path="lib/classes12.jar"/>
@@ -71,5 +70,7 @@
 	<classpathentry kind="lib" path="lib/commons-dbcp-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/jing-2003_01_31.jar"/>
 	<classpathentry kind="lib" path="lib/ejb-2_0.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/mailapi-1_3_2.jar"/>
+	<classpathentry kind="lib" path="lib/TaminoAPI4J.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>

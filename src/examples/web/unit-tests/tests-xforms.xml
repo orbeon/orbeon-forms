@@ -1489,6 +1489,40 @@
         </output>
     </test>
 
+    <test description="Allow appearance attribute on textarea" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:validation">
+                    <p:input name="schema" href="/org/orbeon/oxf/xml/schemas/xforms-controls.rng"/>
+                    <p:input name="config">
+                        <config>
+                            <decorate>true</decorate>
+                        </config>
+                    </p:input>
+                    <p:input name="data" href="xforms-validation.xml"/>
+                    <p:output name="data" id="validated"/>
+                </p:processor>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#validated"/>
+                    <p:input name="config">
+                        <result xsl:version="2.0">
+                            <xsl:for-each select="//v:error" xmlns:v="http://orbeon.org/oxf/xml/validation">
+                                <error line="{@line}"/>
+                            </xsl:for-each>
+                        </result>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <result>
+                <error line="5"/>
+            </result>
+        </output>
+    </test>
+
     <!--
         The test works, which means it throws an exception. We have no way to test that at this
         point since we don't have the support for exceptions in XPL yet.

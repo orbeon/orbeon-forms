@@ -308,15 +308,6 @@
     <define name="selects">
         <ref name="single-node-binding"/>
         <optional>
-            <attribute name="appearance">
-                <choice>
-                    <value>full</value>
-                    <value>compact</value>
-                    <value>minimal</value>
-                </choice>
-            </attribute>
-        </optional>
-        <optional>
             <attribute name="selection">
                 <choice>
                     <value>open</value>
@@ -420,6 +411,15 @@
     </define>
 
     <define name="xforms-common">
+        <optional>
+            <attribute name="appearance">
+                <choice>
+                    <value>full</value>
+                    <value>compact</value>
+                    <value>minimal</value>
+                </choice>
+            </attribute>
+        </optional>
         <ref name="non-xforms-attributes"/>
         <ref name="xforms-common-elements"/>
     </define>

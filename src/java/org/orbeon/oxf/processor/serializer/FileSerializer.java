@@ -285,7 +285,7 @@ public class FileSerializer extends CachedSerializer {
                 if (!read[0]) {
                     if (logger.isDebugEnabled())
                         logger.debug("Serializer output cached");
-                    filter.replay(context);
+                    filter.replay(fileOutputStream);
                 }
             } else {
                 // Caching is not enabled

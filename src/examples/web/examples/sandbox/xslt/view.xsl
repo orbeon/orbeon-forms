@@ -30,7 +30,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <th align="right">XPL</th>
+                    <th align="right">XSLT</th>
                     <td style="padding: 1em">
                         <xforms:textarea ref="xslt" xhtml:style="width: 100%" xhtml:rows="23"/>
                         <p>

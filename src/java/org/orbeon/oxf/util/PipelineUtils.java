@@ -35,14 +35,14 @@ public class PipelineUtils {
         input.setOutput(output);
     }
 
-    public static Processor createDOMGenerator
+    public static DOMGenerator createDOMGenerator
     ( final org.dom4j.Element cfg, final String id, final Object v, final String sid ) {
         final DOMGenerator ret = new DOMGenerator( cfg, id, v, sid );
         configDOMGenerator( ret );
         return ret;
     }
 
-    public static Processor createDOMGenerator
+    public static DOMGenerator createDOMGenerator
     ( final org.dom4j.Document cfg, final String id, final Object v, final String sid ) {
         final DOMGenerator ret = new DOMGenerator( cfg, id, v, sid );
         configDOMGenerator( ret );

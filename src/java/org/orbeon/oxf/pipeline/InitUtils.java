@@ -172,7 +172,7 @@ public class InitUtils {
                 final LocationData ld = ( LocationData )elt.getData();
                 final String lsid = ld == null ? null : ld.getSystemID();
                 final String sid = lsid == null ? DOMGenerator.DefaultContext : lsid;
-                Processor domGenerator = PipelineUtils.createDOMGenerator
+                DOMGenerator domGenerator = PipelineUtils.createDOMGenerator
                     ( elt, "init input", DOMGenerator.ZeroValidity, sid );
                 PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, processor, name);
             } else

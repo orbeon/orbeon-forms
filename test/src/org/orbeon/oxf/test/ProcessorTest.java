@@ -98,7 +98,7 @@ public class ProcessorTest extends TestCase {
             XMLProcessorRegistry registry = new XMLProcessorRegistry();
             final String fname = "processors.xml";
             final org.dom4j.Document doc = resourceManager.getContentAsDOM4J( fname );
-            final Processor config = PipelineUtils.createDOMGenerator
+            final DOMGenerator config = PipelineUtils.createDOMGenerator
                 ( doc, fname, DOMGenerator.ZeroValidity, fname );
             PipelineUtils.connect( config, "data", registry, "config" );
             registry.start(pipelineContext);

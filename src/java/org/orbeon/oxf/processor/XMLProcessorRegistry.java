@@ -19,6 +19,7 @@ import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -133,7 +134,7 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                                         final org.dom4j.Element e = ( org.dom4j.Element )XPathUtils
                                             .selectSingleNode( config, "*" );
                                         final String sid = Dom4jUtils.makeSystemId( e );
-                                        final Processor dg = PipelineUtils.createDOMGenerator
+                                        final DOMGenerator dg = PipelineUtils.createDOMGenerator
                                                 ( e, "input from registry", cfgVldty, sid );
                                         PipelineUtils.connect(dg, OUTPUT_DATA, baseProcessor, name);
                                     }

@@ -509,6 +509,14 @@
                 </item>
                 <item>
                     <p>
+                       Default pipeline inputs could support a "merge" feature to merge default
+                       documents with documents actually passed to the pipeline. Such a feature
+                       would allow merging data in more complex XML processor configurations to
+                       provide finer-grained defaults.
+                    </p>
+                </item>
+                <item>
+                    <p>
                        Should the Pipeline processor be renamed the XPL processor?
                     </p>
                 </item>

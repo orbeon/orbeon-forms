@@ -277,6 +277,16 @@
         </output>
     </test>
 
+<!--    <test description="XInclude with 2001 namespace (recommended one)" name="oxf:identity" only="true"-->
+<!--            xmlns:xi2001="http://www.w3.org/2001/XInclude">-->
+<!--        <input name="data">-->
+<!--            <xi2001:include href="note.xml"/>-->
+<!--        </input>-->
+<!--        <output name="data">-->
+<!--            <xi2001:include href="note.xml"/>-->
+<!--        </output>-->
+<!--    </test>-->
+
     <!-- TODO: -->
 <!--    <test description="Page Flow Controller: 'when' on 'result' with no action" name="oxf:page-flow" only="true">-->
 <!--        <input name="controller">-->

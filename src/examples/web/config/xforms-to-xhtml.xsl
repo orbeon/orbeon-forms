@@ -48,6 +48,7 @@
 
     <xsl:template match="xforms:output">
         <xsl:value-of select="@xxforms:value"/>
+        <xhtml:input type="hidden" name="{@xxforms:name}" value="{@xxforms:value}"/>
     </xsl:template>
 
     <xsl:template match="xforms:upload">

@@ -21,6 +21,54 @@
     </header>
     <body>
         <section>
+            <title>New in Version 2.6.1</title>
+            <section>
+                <title>eXist Native XML Database</title>
+                <p>
+                    Presentation Server ships with the latest stable version of eXist
+                    (eXist-1.0b2-build-1107). This fixes the issue of connecting to an external
+                    eXist instance. Here is an example <code>datasource.xml</code> to connect to a
+                    standalone eXist:
+                </p>
+                <xml-source>
+                    <datasource>
+                        <comment> Specify the driver for the eXist database </comment>
+                        <driver-class-name>org.exist.xmldb.DatabaseImpl</driver-class-name>
+                        <comment> Example of URL for a non-embedded use </comment>
+                        <uri>xmldb:exist://localhost:8080/exist/xmlrpc</uri>
+                    </datasource>
+                </xml-source>
+            </section>
+            <section>
+                <title>Saxon Upgraded to Version 8.1.1</title>
+                <p>
+                    TODO
+                </p>
+            </section>
+            <section>
+                <title>XPath Improvements</title>
+                <p>
+                    TODO
+                </p>
+            </section>
+            <section>
+                <title>XForms Improvements</title>
+                <section>
+                    <title>xxforms:hidden</title>
+                    <p>
+                        The XForms extension <code>xxforms:hidden</code> is supported again and
+                        documented.
+                    </p>
+                </section>
+                <section>
+                    <title>Other XForms Improvements</title>
+                    <p>
+                        TODO
+                    </p>
+                </section>
+            </section>
+        </section>
+        <section>
             <title>New in Version 2.6</title>
             <section>
                 <a name="2.6-xforms"/>

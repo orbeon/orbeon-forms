@@ -20,21 +20,33 @@ import org.dom4j.Element;
 import org.dom4j.XPath;
 import org.orbeon.oro.text.regex.*;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.serializer.HttpBinarySerializer;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.XLSUtils;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Iterator;
 
-public class XLSSerializer extends ProcessorImpl {
+public class XLSSerializer extends HttpBinarySerializer {
 
     private static Pattern FORMAT_XPATH;
+
+    public static String DEFAULT_CONTENT_TYPE = "application/vnd.ms-excel";
+    public static final String TO_XLS_CONVERTER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/converter/to-xls";
+
+    protected String getDefaultContentType() {
+        return DEFAULT_CONTENT_TYPE;
+    }
+
+    protected String getConfigSchemaNamespaceURI() {
+        return TO_XLS_CONVERTER_CONFIG_NAMESPACE_URI;
+    }
 
     static {
         try {
@@ -49,15 +61,15 @@ public class XLSSerializer extends ProcessorImpl {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
     }
 
-    public void start(final PipelineContext context) {
+    protected void readInput(final PipelineContext pipelineContext, ProcessorInput input, Config config, OutputStream outputStream) {
         try {
             final PatternMatcher matcher = new Perl5Matcher();
-            Document dataDocument = readInputAsDOM4J(context, INPUT_DATA);
-            Document configDocument = readInputAsDOM4J(context, INPUT_CONFIG);
+            Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
+            Document configDocument = readInputAsDOM4J(pipelineContext, INPUT_CONFIG);
 
             // Read template sheet
             String templateName = configDocument.getRootElement().attributeValue("template");
-            String fileName = configDocument.getRootElement().attributeValue("filename");
+            //String fileName = configDocument.getRootElement().attributeValue("filename");
             InputStream templateInputStream = URLFactory.createURL(templateName).openStream();
             final HSSFWorkbook workbook = new HSSFWorkbook(new POIFSFileSystem(templateInputStream));
             final HSSFDataFormat dataFormat = workbook.createDataFormat();
@@ -119,7 +131,7 @@ public class XLSSerializer extends ProcessorImpl {
 
                         // Set cell value
                         Object newObject = sheetElement.selectObject(sourceXPath);
-                        XPath xpath = XPathCache.createCacheXPath(context, "string()");
+                        XPath xpath = XPathCache.createCacheXPath(pipelineContext, "string()");
                         String newValue = (String) xpath.evaluate(newObject);
                         if (newValue == null) {
                             throw new OXFException("Nothing matches the XPath expression '"
@@ -152,21 +164,9 @@ public class XLSSerializer extends ProcessorImpl {
 
             workbook.removeSheetAt(0);
 
-            // Write in byte array, so we can determine the file size
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            workbook.write(byteArrayOutputStream);
-
-            // Send to user
-
-            ExternalContext externalContext = (ExternalContext) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.EXTERNAL_CONTEXT);
-            ExternalContext.Response response = externalContext.getResponse();
-            response.setContentType("application/vnd.ms-excel");
-            response.setHeader("Content-Disposition", "attachment;filename=" + fileName != null ? fileName : "export.xls");
-            response.setContentLength(byteArrayOutputStream.size());
-            response.getOutputStream().write(byteArrayOutputStream.toByteArray());
-            response.getOutputStream().flush();
-
-        } catch (java.io.IOException e) {
+            // Write out the workbook
+            workbook.write(outputStream);
+        } catch (IOException e) {
             throw new OXFException(e);
         }
     }

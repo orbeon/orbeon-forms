@@ -26,6 +26,7 @@
         <p:output name="data" id="table"/>
     </p:processor>
 
+    <!-- Format workbook -->
     <p:processor name="oxf:xslt">
         <p:input name="config">
             <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -42,13 +43,28 @@
         <p:output name="data" id="workbook"/>
     </p:processor>
 
-    <p:processor name="oxf:xls-serializer">
+    <!-- Convert to XLS -->
+    <p:processor name="oxf:to-xls-converter">
         <p:input name="config">
-            <config template="oxf:/examples/reports/report.xls" filename="report.xls">
+            <config template="oxf:/examples/reports/report.xls">
                 <repeat-row row-num="2" for-each="*/*/*/*[position() > 1]"/>
             </config>
         </p:input>
         <p:input name="data" href="#workbook"/>
+        <p:output name="data" id="xls-binary"/>
+    </p:processor>
+
+    <!-- Serialize -->
+    <p:processor name="oxf:http-serializer">
+        <p:input name="data" href="#xls-binary"/>
+        <p:input name="config">
+            <config>
+                <header>
+                   <name>Content-Disposition</name>
+                    <value>attachment; filename=report.xls</value>
+                </header>
+            </config>
+        </p:input>
     </p:processor>
 
 </p:config>

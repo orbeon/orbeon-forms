@@ -31,12 +31,12 @@
     <!-- Convert file to XML -->
     <p:processor name="oxf:from-xls-converter">
         <p:input name="data" href="#xls-binary"/>
-        <p:output name="data" id="xls"/>
+        <p:output name="data" id="workbook"/>
     </p:processor>
 
     <!-- Build WS call -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#xls"/>
+        <p:input name="data" href="#workbook"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                 <xsl:template match="/">

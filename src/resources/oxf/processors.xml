@@ -252,8 +252,8 @@
         <class name="org.orbeon.oxf.processor.converter.FromXLSConverter"/>
     </processor>
 
-    <processor name="oxf:xls-converter">
-        <class name="org.orbeon.oxf.processor.converter.XLSConverter"/>
+    <processor name="oxf:to-xls-converter">
+        <class name="org.orbeon.oxf.processor.converter.ToXLSConverter"/>
     </processor>
 
     <!-- True serializers -->

@@ -38,7 +38,7 @@ import java.io.InputStream;
 import java.util.StringTokenizer;
 
 /**
- *
+ * Convert from a binary XLS (Excel) file to XML. 
  */
 public class FromXLSConverter extends ProcessorImpl {
 

@@ -13,21 +13,15 @@
  */
 package org.orbeon.oxf.processor.converter;
 
-import org.orbeon.oxf.processor.serializer.legacy.JFreeChartSerializer;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.serializer.legacy.XLSSerializer;
 
 /**
- * Converts XML into a binary chart image.
+ * Converts XML into a binary Excel format.
  */
-public class JFreeChartConverter extends JFreeChartSerializer {
+public class ToXLSConverter extends XLSSerializer {
 
-    public static final String CHART_CONVERTER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/converter/chart-config";
-
-    public JFreeChartConverter() {
+    public ToXLSConverter() {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
-    }
-
-    protected String getConfigSchemaNamespaceURI() {
-        return CHART_CONVERTER_CONFIG_NAMESPACE_URI;
     }
 }

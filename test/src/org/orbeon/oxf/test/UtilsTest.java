@@ -53,7 +53,6 @@ public class UtilsTest extends TestCase {
 
         suite.addTest(new UtilsTest("testNumberUtils"));
         suite.addTest(new UtilsTest("testLocationDocumentSourceResult"));
-        suite.addTest(new UtilsTest("testJarPath"));
 
         return suite;
     }

@@ -64,6 +64,7 @@ public class WebAppContext {
 
     private WebAppContext(ServletContext servletContext) {
         try {
+            LoggerFactory.initBasicLogger();
             logger.info("Starting Presentation Server Release " + Version.getVersion());
 
             // Remember Servlet context

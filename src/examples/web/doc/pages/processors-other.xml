@@ -211,12 +211,11 @@
                 &lt;lastname>Smith&lt;/lastname>
                 &lt;/employee></source>
             <p>
-                The URI of the Debug processor is <code>oxf/processor/debug</code>. Using
-                <code>debug</code> attributes in pipelines is a shortcut for actually inserting the
-                Debug processor in the pipeline. And in fact, the Pipeline processor will insert a
+                Using <code>debug</code> attributes in pipelines is a shortcut for actually
+                inserting the Debug processor in the pipeline: the Pipeline processor will insert a
                 Debug processor when encountering <code>debug</code> attributes. By changing the
-                <code>processors.xml</code> you can map the <code>oxf/processor/debug</code> URI to
-                your own "debug processor" and this processor will be called when you use
+                <code>processors.xml</code> you can map the <code>oxf:debug</code> processor to your
+                own "Debug processor" and this processor will be called when you use
                 <code>debug</code> attributes in pipelines. If you decide to implement your own
                 debug processor, note that it must have the same interface as the default Debug
                 processor that comes with Presentation Server.

@@ -22,6 +22,8 @@
     <xsl:include href="formatting.xsl"/>
     <xsl:include href="oxf:/inspector/xml-formatting.xsl"/>
 
+    <xsl:variable name="request" select="doc('input:request')" as="document-node()"/>
+
     <xsl:template match="/">
         <html>
             <head>

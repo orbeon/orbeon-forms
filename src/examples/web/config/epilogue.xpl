@@ -21,14 +21,15 @@
     <p:param type="input" name="instance"/>
     <p:param type="input" name="xforms-model"/>
 
-    <!-- Get container type -->
+    <!-- Get request information -->
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
                 <include>/request/container-type</include>
+                <include>/request/request-path</include>
             </config>
         </p:input>
-        <p:output name="data" id="container-type"/>
+        <p:output name="data" id="request"/>
     </p:processor>
 
     <!-- Annotate XForms elements and generate XHTML if necessary -->
@@ -48,7 +49,7 @@
                 <p:input name="data" href="#annotated-data"/>
                 <p:output name="data" id="xhtml-data"/>
             </p:processor>
-            <p:choose href="#container-type">
+            <p:choose href="#request">
                 <p:when test="/request/container-type = 'servlet'">
                     <!-- Handle portlet forms (you can skip this step if you are not including portlets in your page) -->
                     <p:processor name="oxf:xslt"> <!-- saxon3 -->
@@ -75,7 +76,7 @@
         </p:otherwise>
     </p:choose>
 
-    <p:choose  href="#container-type">
+    <p:choose  href="#request">
         <p:when test="/request/container-type = 'servlet'">
             <!-- Servlet -->
             <p:choose href="#xformed-data">
@@ -98,30 +99,39 @@
                     <!-- Apply theme -->
                     <p:processor name="oxf:xslt"> <!-- saxon4 -->
                         <p:input name="data" href="#xformed-data"/>
+                        <p:input name="request" href="#request"/>
                         <p:input name="config" href="oxf:/oxf-theme/theme.xsl"/>
                         <p:output name="data" id="themed-data"/>
                     </p:processor>
                     <!-- Rewrite all URLs in HTML and XHTML documents -->
                     <p:processor name="oxf:xslt"><!-- saxon5 -->
                         <p:input name="data" href="#themed-data"/>
-                        <p:input name="container-type" href="#container-type"/>
+                        <p:input name="container-type" href="#request"/>
                         <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>
                         <p:output name="data" id="rewritten-data"/>
                     </p:processor>
                     <!-- Output regular HTML doctype -->
-                    <p:processor name="oxf:html-serializer">
+                    <p:processor name="oxf:html-converter">
                         <p:input name="config">
                             <config>
                                 <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
                                 <version>4.01</version>
                                 <encoding>utf-8</encoding>
+                            </config>
+                        </p:input>
+                        <p:input name="data" href="#rewritten-data"/>
+                        <p:output name="data" id="converted"/>
+                    </p:processor>
+                    <p:processor name="oxf:http-serializer">
+                        <p:input name="config">
+                            <config>
                                 <header>
                                     <name>Cache-Control</name>
                                     <value>post-check=0, pre-check=0</value>
                                 </header>
                             </config>
                         </p:input>
-                        <p:input name="data" href="#rewritten-data"/>
+                        <p:input name="data" href="#converted"/>
                     </p:processor>
                 </p:otherwise>
             </p:choose>
@@ -131,6 +141,7 @@
             <!-- Extract a fragment and apply theme -->
             <p:processor name="oxf:xslt"> <!-- saxon4 -->
                 <p:input name="data" href="#xformed-data"/>
+                <p:input name="request" href="#request"/>
                 <p:input name="config">
                     <xsl:stylesheet version="1.0"
                             xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -153,7 +164,7 @@
             <!-- Rewrite all URLs in HTML and XHTML documents -->
             <p:processor name="oxf:xslt"><!-- saxon5 -->
                 <p:input name="data" href="#themed-data"/>
-                <p:input name="container-type" href="#container-type"/>
+                <p:input name="container-type" href="#request"/>
                 <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>
                 <p:output name="data" id="rewritten-data"/>
             </p:processor>

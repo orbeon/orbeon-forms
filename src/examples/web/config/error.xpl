@@ -20,7 +20,7 @@
         <p:output name="data" id="exception"/>
     </p:processor>
 
-    <!-- Apply stylesheet -->
+    <!-- Format exception page -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#exception"/>
         <p:input name="config">
@@ -145,18 +145,33 @@
         <p:output name="data" id="document"/>
     </p:processor>
 
+    <!-- Get some request information -->
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config>
+                <include>/request/container-type</include>
+                <include>/request/request-path</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="request"/>
+    </p:processor>
+
+    <!-- Apply theme -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#document"/>
+        <p:input name="request" href="#request"/>
         <p:input name="config" href="oxf:/oxf-theme/theme.xsl"/>
         <p:output name="data" id="themed"/>
     </p:processor>
 
+    <!-- Rewrite all URLs in HTML and XHTML documents -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#themed"/>
         <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>
         <p:output name="data" id="html"/>
     </p:processor>
 
+    <!-- Serialize -->
     <p:processor name="oxf:html-serializer">
         <p:input name="config">
             <config>

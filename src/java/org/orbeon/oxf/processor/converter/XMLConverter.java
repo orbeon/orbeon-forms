@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.converter;
 
-import org.orbeon.oxf.processor.serializer.XMLSerializer;
+import org.orbeon.oxf.processor.serializer.legacy.XMLSerializer;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 
 /**

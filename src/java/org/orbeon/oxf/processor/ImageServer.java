@@ -24,6 +24,7 @@ import org.dom4j.Node;
 import org.orbeon.oxf.cache.SoftCacheImpl;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
@@ -70,13 +71,13 @@ public class ImageServer extends ProcessorImpl {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_IMAGE, IMAGE_SERVER_IMAGE_NAMESPACE_URI));
     }
 
-    public void start(org.orbeon.oxf.pipeline.api.PipelineContext context) {
+    public void start(PipelineContext pipelineContext) {
 
-        ExternalContext externalContext = (ExternalContext) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.EXTERNAL_CONTEXT);
+        ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.EXTERNAL_CONTEXT);
         ExternalContext.Response response = externalContext.getResponse();
         try {
             // Read configuration
-            Node config = readCacheInputAsDOM4J(context, INPUT_CONFIG);
+            Node config = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
 
             String imageDirectoryString = XPathUtils.selectStringValueNormalize(config, "/config/image-directory");
             imageDirectoryString = imageDirectoryString.replace('\\', '/');
@@ -98,7 +99,7 @@ public class ImageServer extends ProcessorImpl {
             String cachePathEncoding = XPathUtils.selectStringValueNormalize(config, "/config/cache/path-encoding");
 
             // Read request info
-            Node imageConfig = readCacheInputAsDOM4J(context, INPUT_IMAGE);
+            Node imageConfig = readCacheInputAsDOM4J(pipelineContext, INPUT_IMAGE);
 
             // Read URL
             String urlString = XPathUtils.selectStringValueNormalize(imageConfig, "/image/url");

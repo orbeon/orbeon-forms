@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.converter;
 
-import org.orbeon.oxf.processor.serializer.JFreeChartSerializer;
+import org.orbeon.oxf.processor.serializer.legacy.JFreeChartSerializer;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 
 /**

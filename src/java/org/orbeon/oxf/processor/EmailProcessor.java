@@ -24,9 +24,9 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.RequestGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.ProcessorOutputXMLReader;
 import org.orbeon.oxf.xml.TransformerUtils;
@@ -57,14 +57,16 @@ import java.util.Iterator;
 import java.util.Properties;
 
 /**
- * This processor allows sending emails. It supports multipart messages and attachments.
+ * This processor allows sending emails. It supports multipart messages and inline as well as
+ * out-of-line attachments.
  *
- * See also: http://java.sun.com/products/javamail/FAQ.html
+ * For some useful JavaMail information: http://java.sun.com/products/javamail/FAQ.html
  *
  * TODO:
- * o build message with SAX, not DOM, so streaming of input is possible (P2)
  * o revise support of text/html
- * o support text/xml
+ *   o built-in support for HTML could handle src="cid:*" with part/message ids
+ * o support text/xml? or XHTML?
+ * o build message with SAX, not DOM, so streaming of input is possible
  */
 public class EmailProcessor extends ProcessorImpl {
 
@@ -89,6 +91,10 @@ public class EmailProcessor extends ProcessorImpl {
         try {
             Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
             Element messageElement = dataDocument.getRootElement();
+
+            // Get system id (will likely be null if document is generated dynamically)
+            LocationData locationData = (LocationData) messageElement.getData();
+            String dataInputSystemId = locationData.getSystemID();
 
             // Set SMTP host
             Properties properties = new Properties();
@@ -174,7 +180,8 @@ public class EmailProcessor extends ProcessorImpl {
                         // Content of the part is not inline
 
                         // Generate a Document from the source
-                        SAXSource source = getSAXSource(EmailProcessor.this, pipelineContext, src, null, contentType);// TODO: Set base URL
+
+                        SAXSource source = getSAXSource(EmailProcessor.this, pipelineContext, src, dataInputSystemId, contentType);
                         content = handleStreamedPartContent(pipelineContext, source, contentType, charset);
                     } else {
                         // Content of the part is inline

@@ -1135,7 +1135,7 @@ select * from ps_book
                         <link href="processors-generators#BeanGenerator">Bean Generator</link>
                     </li>
                     <li>The
-                        <link href="processors-generators#StrutsActionErrorsGenerator">Struts ActionError Generator</link>
+                        <link href="processors-struts#StrutsActionErrorsGenerator">Struts ActionError Generator</link>
                     </li>
                 </ul>
 

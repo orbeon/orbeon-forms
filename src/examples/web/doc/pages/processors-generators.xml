@@ -28,419 +28,6 @@
                 several generators as described below.
             </p>
         </section>
-        <anchor id="request-generator"/>
-        <section>
-            <title>Request Generator</title>
-            <p>
-                This generator streams XML from the current HTTP request. It can serialize request
-                attributes including headers, parameters, query strings, user and server
-                information.
-            </p>
-            <note>
-                The Request generator can be used as the first component in a Web application
-                pipeline. It is recommended to use the <a href="reference-controller">Page Flow
-                Controller</a> and XForms whenever possible, but there are cases where additional
-                data from the request may be necessary.
-            </note>
-            <section>
-                <title>Configuration</title>
-                <p>
-                    The Request generator takes a mandatory configuration to select which request
-                    attribute to display. This configuration consists of a series of
-                    <code>include</code> and <code>exclude</code> elements containing XPath expressions
-                    selecting a number of element from the request tree. Those expressions can be as
-                    complex as any regular XPath 1.0 expression that returns a single node or a
-                    node-set. However, it is recommended to keep those expressions as simple as
-                    possible. One known limitation is that it is not possible to test on the
-                    <code>value</code> element of uploaded files, as well as the content of the request
-                    body.
-                </p>
-                <p>
-                    Sample Configuration:
-                </p>
-                <xml-source>
-                    <config>
-                        <include>/request/path-info</include>
-                        <include>/request/headers</include>
-                        <include>/request/parameters/parameter[starts-with(name, 'document-id')]</include>
-                        <exclude>/request/parameters/parameter[name = 'document-id-dummy']</exclude>
-                    </config>
-                </xml-source>
-                <p>
-                    The full attribute tree is:
-                </p>
-                <xml-source>
-                    <request>
-                        <content-length>-1</content-length>
-                        <parameters>
-                            <parameter>
-                                <name>id</name>
-                                <value>12</value>
-                            </parameter>
-                            <parameter>
-                                <name>print</name>
-                                <value>false</value>
-                            </parameter>
-                        </parameters>
-                        <body/>
-                        <protocol>HTTP/1.1</protocol>
-                        <remote-addr>127.0.0.1</remote-addr>
-                        <remote-host>localhost</remote-host>
-                        <scheme>http</scheme>
-                        <server-name>localhost</server-name>
-                        <server-port>8080</server-port>
-                        <secure>false</secure>
-                        <context-path>/oxf</context-path>
-                        <headers>
-                            <header>
-                                <name>host</name>
-                                <value>localhost:8080</value>
-                            </header>
-                            <header>
-                                <name>user-agent</name>
-                                <value>Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.1) Gecko/20020826</value>
-                            </header>
-                            <header>
-                                <name>accept-language</name>
-                                <value>en-us, en;q=0.50</value>
-                            </header>
-                            <header>
-                                <name>accept-encoding</name>
-                                <value>gzip, deflate, compress;q=0.9</value>
-                            </header>
-                            <header>
-                                <name>accept-charset</name>
-                                <value>ISO-8859-1, utf-8;q=0.66, *;q=0.66</value>
-                            </header>
-                            <header>
-                                <name>keep-alive</name>
-                                <value>300</value>
-                            </header>
-                            <header>
-                                <name>connection</name>
-                                <value>keep-alive</value>
-                            </header>
-                            <header>
-                                <name>referer</name>
-                                <value>http://localhost:8080/oxf/</value>
-                            </header>
-                            <header>
-                                <name>cookie</name>
-                                <value>JSESSIONID=DA6E64FC1E6DFF0499B5D6F46A32186A</value>
-                            </header>
-                        </headers>
-                        <method>GET</method>
-                        <path-info>/doc/home-welcome</path-info>
-                        <request-path>/doc/home-welcome</request-path>
-                        <path-translated>C:\orbeon\projects\OXF\build\oxf-war\doc\home-welcome</path-translated>
-                        <requested-session-id>DA6E64FC1E6DFF0499B5D6F46A32186A</requested-session-id>
-                        <request-uri>/oxf/doc/home-welcome</request-uri>
-                        <servlet-path/>
-                    </request>
-                </xml-source>
-                <note>
-                    Presentation Server adds a request attribute: the <code>request-path</code>. This
-                    attribute is defined as a concatenation of the <code>servlet-path</code> and the
-                    <code>path-info</code>. This is useful because both original attributes are
-                    frequently mixed up and often change depending on the application server or its
-                    configuration.
-                </note>
-                <warning>
-                    This generator excludes all attributes by default. To obtain the whole attributes
-                    tree (as shown in the example above), you must explicitly include
-                    <code>/request</code>:
-                    <xml-source border="false">
-                        <p:processor name="oxf:request">
-                            <p:input name="config">
-                                <config>
-                                    <include>/request</include>
-                                </config>
-                            </p:input>
-                            <p:output name="data" id="request"/>
-                        </p:processor>
-                    </xml-source>
-                </warning>
-            </section>
-            <section>
-                <title>Request Body</title>
-                <p>
-                    When the request includes <code>/request/body</code>, the Request generator
-                    retrieves the body of the request sent to the application server. The content of
-                    the body is made available as the following data types:
-                </p>
-                <ul>
-                    <li>If the attribute <code>stream-type</code> on the <code>config</code> element
-                    is set to <code>xs:anyURI</code>, an URI is returned as the value of the
-                    <code>/request/body</code> element.</li>
-
-                    <li>If the attribute <code>stream-type</code> on the <code>config</code> element
-                    is set to <code>xs:base64Binary</code>, the content of the request encoded as
-                    Base64 is returned as the value of the <code>/request/body</code> element.</li>
-
-                    <li>Otherwise, the content of the <code>/request/body</code> is set as either
-                    <code>xs:anyURI</code> if the request body is large, or
-                    <code>xs:base64Binary</code> if the request body is small.</li>
-                </ul>
-                <p>
-                    Examples of configuration:
-                </p>
-                <xml-source>
-                    <config stream-type="xs:anyURI">
-                        <include>/request/body</include>
-                    </config>
-                </xml-source>
-                <xml-source>
-                    <config stream-type="xs:base64Binary">
-                        <include>/request/body</include>
-                    </config>
-                </xml-source>
-                <p>
-                    The resulting data type is always set on the body element, for example:
-                </p>
-                <xml-source>
-                    <request>
-                        <body xsi:type="xs:anyURI">file:/C:/Tomcat/temp/upload_00000005.tmp</body>
-                    </request>
-                </xml-source>
-                <warning>
-                    Reading the request body is incompatible with reading HTML forms posted with the
-                    <code>multipart/form-data</code> encoding, typically used when uploading files.
-                    In such a case, you should read either only the request body, or only the
-                    request parameters.
-                </warning>
-            </section>
-            <section>
-                <title>Uploaded Files</title>
-                <p>
-                    Uploaded files are stored into <code>parameter</code> elements, like any other
-                    form parameter. The rules for the data type used are the same as for the request
-                    body (see above), the data type depending on the <code>stream-type</code>
-                    attribute and the size of the uploaded files:
-                </p>
-                <xml-source>
-                    <config stream-type="xs:anyURI">
-                        <include>/request/parameters</include>
-                    </config>
-                </xml-source>
-                <p>
-                    The <code>parameter</code> element for an uploaded file contains the following
-                    elements in addition to the <code>name</code> and <code>value</code> elements
-                    use for other parameters:
-                </p>
-                <ul>
-                    <li><code>filename</code>: stores the file name sent by the user agent</li>
-                    <li><code>content-type</code>: store the media type sent by the user agent</li>
-                    <li><code>content-length</code>: stores the actual size in bytes of the uploaded data</li>
-                </ul>
-                <p>
-                    A resulting uploaded file may look as follows:
-                </p>
-                <xml-source>
-                    <request>
-                        <parameters>
-                            <parameter>
-                                <name>upload-form-element-name</name>
-                                <filename>photo.jpg</filename>
-                                <content-type>image/jpeg</content-type>
-                                <content-length>2345</content-length>
-                                <value xsi:type="xs:anyURI">file:/C:/Tomcat/temp/upload_00000005.tmp</value>
-                            </parameter>
-                        </parameters>
-                    </request>
-                </xml-source>
-            </section>
-            <warning>
-                The URL stored as the value of the upload or request body is temporary and only
-                valid for the duration of the current request. It is only accessible from the server
-                side, and will not be accessible from a client such as a web browser. It is not
-                guaranteed to be a <code>file:</code> URL, only that it can be read with
-                Presentation Server's <a href="#url-generator">URL generator</a>.
-            </warning>
-        </section>
-
-        <anchor id="ExceptionGenerator"/>
-        <section>
-            <title>Exception Generator</title>
-            <p>
-                The Exception generator is usually used in an <link
-                href="reference-error-pipeline">error pipeline</link>. It serializes an exception
-                into XML. The following shows an XML stream resulting from an exception.
-            </p>
-            <xml-source>
-                <exceptions>
-                    <exception>
-                        <type>class org.orbeon.oxf.common.OXFException</type>
-                        <message>Cannot read from file /doc/pages/test</message>
-                        <stack-trace>stack trace</stack-trace>
-                    </exception>
-                    <exception>more exceptions</exception>
-                </exceptions>
-            </xml-source>
-            <p>
-                A typical error pipeline should include an Exception generator followed by one or
-                more transformation(s), and an HTML serializer.
-            </p>
-            <xml-source>
-                <p:processor name="oxf:exception">
-                    <p:output name="data" id="exception"/>
-                </p:processor>
-            </xml-source>
-        </section>
-
-        <anchor id="StrutsActionFormGenerator"/>
-        <section>
-            <title>Struts Action Form Generator</title>
-
-            <warning>This processor is deprecated as of version 1.5.2. The
-                Struts integration uses the
-                <link
-                    href="#BeanGenerator">BeanGenerator</link> and
-                <link
-                    href="#StrutsActionErrorsGenerator">StrutsActionErrorsGenerator</link>.
-            </warning>
-
-            <p>
-                The Struts Action Form generator allows Presentation Server to be used with the
-                <fork href="http://jakarta.apache.org/struts/">Jakarta Struts</fork> framework. In
-                this configuration, Struts is used for the back-end, generating beans that are
-                serialized by this generator. One or more Presentation Server pipeline(s) are called
-                to generate the front-end views. See <link href="model2x-struts">Using Presentation
-                Server with Struts</link> for more information.
-            </p>
-            <xml-source>
-                <p:processor name="oxf:struts">
-                    <p:output name="data" id="struts"/>
-                </p:processor>
-            </xml-source>
-        </section>
-
-        <anchor id="BeanGenerator"/>
-        <section>
-            <title>Bean Generator</title>
-
-            <p>
-                The Bean generator serializes objects in the HTTP request or session to XML. If an
-                object is a W3C Document (<code>org.w3c.dom.Document</code>), the XML for this
-                document is sent as-is. Otherwise, the object is assumed to be a JavaBean and is
-                serialized to XML with <link href="http://castor.exolab.org">Castor XML</link>.
-                This generator takes two inputs:
-            </p>
-
-            <section>
-                <title>Configuration</title>
-
-                <p>
-                    The configuration input describes which bean to serialize, and two optional
-                    sources. The sources can be <code>request</code>, <code>session</code> or both.
-                    If both are specified, they are tried in order. In the example below, the
-                    request is searched for the <code>guess</code> bean. If not found, the session
-                    is tried.
-                </p>
-
-                <xml-source>
-                    <p:input name="config">
-                        <config>
-                            <attribute>guess</attribute>
-                            <source>request</source>
-                            <source>session</source>
-                        </config>
-                    </p:input>
-                </xml-source>
-
-                <p>Here is the RelaxNG schema:</p>
-                <xml-source>
-                    <element name="config"
-                        datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
-                        xmlns="http://relaxng.org/ns/structure/1.0">
-
-                        <interleave>
-
-                            <oneOrMore>
-                                <element name="attribute">
-                                    <data type="string"/>
-                                </element>
-                            </oneOrMore>
-
-                            <interleave>
-                                <optional>
-                                    <element name="source">
-                                        <value>request</value>
-                                    </element>
-                                </optional>
-                                <optional>
-                                    <element name="source">
-                                        <value>session</value>
-                                    </element>
-                                </optional>
-                            </interleave>
-
-                        </interleave>
-
-                    </element>
-                </xml-source>
-            </section>
-
-            <section>
-                <title>Mapping Input</title>
-
-                <p>
-                    This input specifies the Castor mapping file. See <link
-                    href="http://castor.exolab.org/xml-mapping.html">Castor Documentation</link>
-                    for more information on the mapping file. In most instances, the default mapping
-                    is sufficient:
-                </p>
-
-                <xml-source>
-                    <p:input name="mapping">
-                        <mapping/>
-                    </p:input>
-                </xml-source>
-            </section>
-
-            <section>
-                <title>Output</title>
-
-                <p>
-                    The output document contains a <code>beans</code> root node. Each serialized
-                    bean is a child of the root node. The example above generates the following
-                    document:
-                </p>
-
-                <xml-source>
-                    <beans>
-                        <guess useraguess="0">
-                            <message>Hello</message>
-                        </guess>
-                    </beans>
-                </xml-source>
-
-            </section>
-
-        </section>
-
-        <anchor id="StrutsActionErrorsGenerator"/>
-        <section>
-            <title>Struts ActionErrors Generator</title>
-
-            <p>
-                The Struts ActionErrors generator looks in the request for a Struts ActionErrors
-                instance. Struts stores this object whenever an ActionForm's validate() method
-                returns a non-null value. This generator takes no configuration and its output looks
-                like the following:</p>
-
-            <xml-source>
-                <errors>
-                    <error property="errors.header">The following errors where found:</error>
-                    <error property="userGuess">You entered 110. The number must be between 0 and 100</error>
-                    <error property="errors.footer">Please try again.</error>
-                </errors>
-            </xml-source>
-
-            <note>
-                This generator uses the Struts application resources if available.
-            </note>
-        </section>
-
         <anchor id="url-generator"/>
         <section>
             <title>URL Generator</title>
@@ -820,7 +407,235 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </p>
             </section>
         </section>
+        <anchor id="request-generator"/>
+        <section>
+            <title>Request Generator</title>
+            <p>
+                This generator streams XML from the current HTTP request. It can serialize request
+                attributes including headers, parameters, query strings, user and server
+                information.
+            </p>
+            <note>
+                The Request generator can be used as the first component in a Web application
+                pipeline. It is recommended to use the <a href="reference-controller">Page Flow
+                Controller</a> and XForms whenever possible, but there are cases where additional
+                data from the request may be necessary.
+            </note>
+            <section>
+                <title>Configuration</title>
+                <p>
+                    The Request generator takes a mandatory configuration to select which request
+                    attribute to display. This configuration consists of a series of
+                    <code>include</code> and <code>exclude</code> elements containing XPath expressions
+                    selecting a number of element from the request tree. Those expressions can be as
+                    complex as any regular XPath 1.0 expression that returns a single node or a
+                    node-set. However, it is recommended to keep those expressions as simple as
+                    possible. One known limitation is that it is not possible to test on the
+                    <code>value</code> element of uploaded files, as well as the content of the request
+                    body.
+                </p>
+                <p>
+                    Sample Configuration:
+                </p>
+                <xml-source>
+                    <config>
+                        <include>/request/path-info</include>
+                        <include>/request/headers</include>
+                        <include>/request/parameters/parameter[starts-with(name, 'document-id')]</include>
+                        <exclude>/request/parameters/parameter[name = 'document-id-dummy']</exclude>
+                    </config>
+                </xml-source>
+                <p>
+                    The full attribute tree is:
+                </p>
+                <xml-source>
+                    <request>
+                        <content-length>-1</content-length>
+                        <parameters>
+                            <parameter>
+                                <name>id</name>
+                                <value>12</value>
+                            </parameter>
+                            <parameter>
+                                <name>print</name>
+                                <value>false</value>
+                            </parameter>
+                        </parameters>
+                        <body/>
+                        <protocol>HTTP/1.1</protocol>
+                        <remote-addr>127.0.0.1</remote-addr>
+                        <remote-host>localhost</remote-host>
+                        <scheme>http</scheme>
+                        <server-name>localhost</server-name>
+                        <server-port>8080</server-port>
+                        <secure>false</secure>
+                        <context-path>/oxf</context-path>
+                        <headers>
+                            <header>
+                                <name>host</name>
+                                <value>localhost:8080</value>
+                            </header>
+                            <header>
+                                <name>user-agent</name>
+                                <value>Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.1) Gecko/20020826</value>
+                            </header>
+                            <header>
+                                <name>accept-language</name>
+                                <value>en-us, en;q=0.50</value>
+                            </header>
+                            <header>
+                                <name>accept-encoding</name>
+                                <value>gzip, deflate, compress;q=0.9</value>
+                            </header>
+                            <header>
+                                <name>accept-charset</name>
+                                <value>ISO-8859-1, utf-8;q=0.66, *;q=0.66</value>
+                            </header>
+                            <header>
+                                <name>keep-alive</name>
+                                <value>300</value>
+                            </header>
+                            <header>
+                                <name>connection</name>
+                                <value>keep-alive</value>
+                            </header>
+                            <header>
+                                <name>referer</name>
+                                <value>http://localhost:8080/oxf/</value>
+                            </header>
+                            <header>
+                                <name>cookie</name>
+                                <value>JSESSIONID=DA6E64FC1E6DFF0499B5D6F46A32186A</value>
+                            </header>
+                        </headers>
+                        <method>GET</method>
+                        <path-info>/doc/home-welcome</path-info>
+                        <request-path>/doc/home-welcome</request-path>
+                        <path-translated>C:\orbeon\projects\OXF\build\oxf-war\doc\home-welcome</path-translated>
+                        <requested-session-id>DA6E64FC1E6DFF0499B5D6F46A32186A</requested-session-id>
+                        <request-uri>/oxf/doc/home-welcome</request-uri>
+                        <servlet-path/>
+                    </request>
+                </xml-source>
+                <note>
+                    Presentation Server adds a request attribute: the <code>request-path</code>. This
+                    attribute is defined as a concatenation of the <code>servlet-path</code> and the
+                    <code>path-info</code>. This is useful because both original attributes are
+                    frequently mixed up and often change depending on the application server or its
+                    configuration.
+                </note>
+                <warning>
+                    This generator excludes all attributes by default. To obtain the whole attributes
+                    tree (as shown in the example above), you must explicitly include
+                    <code>/request</code>:
+                    <xml-source border="false">
+                        <p:processor name="oxf:request">
+                            <p:input name="config">
+                                <config>
+                                    <include>/request</include>
+                                </config>
+                            </p:input>
+                            <p:output name="data" id="request"/>
+                        </p:processor>
+                    </xml-source>
+                </warning>
+            </section>
+            <section>
+                <title>Request Body</title>
+                <p>
+                    When the request includes <code>/request/body</code>, the Request generator
+                    retrieves the body of the request sent to the application server. The content of
+                    the body is made available as the following data types:
+                </p>
+                <ul>
+                    <li>If the attribute <code>stream-type</code> on the <code>config</code> element
+                    is set to <code>xs:anyURI</code>, an URI is returned as the value of the
+                    <code>/request/body</code> element.</li>
 
+                    <li>If the attribute <code>stream-type</code> on the <code>config</code> element
+                    is set to <code>xs:base64Binary</code>, the content of the request encoded as
+                    Base64 is returned as the value of the <code>/request/body</code> element.</li>
+
+                    <li>Otherwise, the content of the <code>/request/body</code> is set as either
+                    <code>xs:anyURI</code> if the request body is large, or
+                    <code>xs:base64Binary</code> if the request body is small.</li>
+                </ul>
+                <p>
+                    Examples of configuration:
+                </p>
+                <xml-source>
+                    <config stream-type="xs:anyURI">
+                        <include>/request/body</include>
+                    </config>
+                </xml-source>
+                <xml-source>
+                    <config stream-type="xs:base64Binary">
+                        <include>/request/body</include>
+                    </config>
+                </xml-source>
+                <p>
+                    The resulting data type is always set on the body element, for example:
+                </p>
+                <xml-source>
+                    <request>
+                        <body xsi:type="xs:anyURI">file:/C:/Tomcat/temp/upload_00000005.tmp</body>
+                    </request>
+                </xml-source>
+                <warning>
+                    Reading the request body is incompatible with reading HTML forms posted with the
+                    <code>multipart/form-data</code> encoding, typically used when uploading files.
+                    In such a case, you should read either only the request body, or only the
+                    request parameters.
+                </warning>
+            </section>
+            <section>
+                <title>Uploaded Files</title>
+                <p>
+                    Uploaded files are stored into <code>parameter</code> elements, like any other
+                    form parameter. The rules for the data type used are the same as for the request
+                    body (see above), the data type depending on the <code>stream-type</code>
+                    attribute and the size of the uploaded files:
+                </p>
+                <xml-source>
+                    <config stream-type="xs:anyURI">
+                        <include>/request/parameters</include>
+                    </config>
+                </xml-source>
+                <p>
+                    The <code>parameter</code> element for an uploaded file contains the following
+                    elements in addition to the <code>name</code> and <code>value</code> elements
+                    use for other parameters:
+                </p>
+                <ul>
+                    <li><code>filename</code>: stores the file name sent by the user agent</li>
+                    <li><code>content-type</code>: store the media type sent by the user agent</li>
+                    <li><code>content-length</code>: stores the actual size in bytes of the uploaded data</li>
+                </ul>
+                <p>
+                    A resulting uploaded file may look as follows:
+                </p>
+                <xml-source>
+                    <request>
+                        <parameters>
+                            <parameter>
+                                <name>upload-form-element-name</name>
+                                <filename>photo.jpg</filename>
+                                <content-type>image/jpeg</content-type>
+                                <content-length>2345</content-length>
+                                <value xsi:type="xs:anyURI">file:/C:/Tomcat/temp/upload_00000005.tmp</value>
+                            </parameter>
+                        </parameters>
+                    </request>
+                </xml-source>
+            </section>
+            <warning>
+                The URL stored as the value of the upload or request body is temporary and only
+                valid for the duration of the current request. It is only accessible from the server
+                side, and will not be accessible from a client such as a web browser. It is not
+                guaranteed to be a <code>file:</code> URL, only that it can be read with
+                Presentation Server's <a href="#url-generator">URL generator</a>.
+            </warning>
+        </section>
         <anchor id="scope-generator"/>
         <section>
             <title>Scope Generator</title>
@@ -891,7 +706,96 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 with session scope instead.
             </note>
         </section>
+        <anchor id="BeanGenerator"/>
+        <section>
+            <title>Bean Generator</title>
+            <p>
+                The Bean generator serializes objects in the HTTP request or session to XML. If an
+                object is a W3C Document (<code>org.w3c.dom.Document</code>), the XML for this
+                document is sent as-is. Otherwise, the object is assumed to be a JavaBean and is
+                serialized to XML with <link href="http://castor.exolab.org">Castor XML</link>.
+                This generator takes two inputs:
+            </p>
+            <section>
+                <title>Configuration</title>
+                <p>
+                    The configuration input describes which bean to serialize, and two optional
+                    sources. The sources can be <code>request</code>, <code>session</code> or both.
+                    If both are specified, they are tried in order. In the example below, the
+                    request is searched for the <code>guess</code> bean. If not found, the session
+                    is tried.
+                </p>
+                <xml-source>
+                    <p:input name="config">
+                        <config>
+                            <attribute>guess</attribute>
+                            <source>request</source>
+                            <source>session</source>
+                        </config>
+                    </p:input>
+                </xml-source>
+                <p>Here is the RelaxNG schema:</p>
+                <xml-source>
+                    <element name="config"
+                        datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+                        xmlns="http://relaxng.org/ns/structure/1.0">
 
+                        <interleave>
+
+                            <oneOrMore>
+                                <element name="attribute">
+                                    <data type="string"/>
+                                </element>
+                            </oneOrMore>
+
+                            <interleave>
+                                <optional>
+                                    <element name="source">
+                                        <value>request</value>
+                                    </element>
+                                </optional>
+                                <optional>
+                                    <element name="source">
+                                        <value>session</value>
+                                    </element>
+                                </optional>
+                            </interleave>
+
+                        </interleave>
+
+                    </element>
+                </xml-source>
+            </section>
+            <section>
+                <title>Mapping Input</title>
+                <p>
+                    This input specifies the Castor mapping file. See <link
+                    href="http://castor.exolab.org/xml-mapping.html">Castor Documentation</link>
+                    for more information on the mapping file. In most instances, the default mapping
+                    is sufficient:
+                </p>
+                <xml-source>
+                    <p:input name="mapping">
+                        <mapping/>
+                    </p:input>
+                </xml-source>
+            </section>
+            <section>
+                <title>Output</title>
+                <p>
+                    The output document contains a <code>beans</code> root node. Each serialized
+                    bean is a child of the root node. The example above generates the following
+                    document:
+                </p>
+                <xml-source>
+                    <beans>
+                        <guess useraguess="0">
+                            <message>Hello</message>
+                        </guess>
+                    </beans>
+                </xml-source>
+            </section>
+        </section>
         <anchor id="RequestSecurityGenerator"/>
         <section>
             <title>Request Security Generator</title>
@@ -1030,6 +934,34 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     </p:processor>
                 </xml-source>
             </section>
+        </section>
+        <anchor id="ExceptionGenerator"/>
+        <section>
+            <title>Exception Generator</title>
+            <p>
+                The Exception generator is usually used in an <link
+                href="reference-error-pipeline">error pipeline</link>. It serializes an exception
+                into XML. The following shows an XML stream resulting from an exception.
+            </p>
+            <xml-source>
+                <exceptions>
+                    <exception>
+                        <type>class org.orbeon.oxf.common.OXFException</type>
+                        <message>Cannot read from file /doc/pages/test</message>
+                        <stack-trace>stack trace</stack-trace>
+                    </exception>
+                    <exception>more exceptions</exception>
+                </exceptions>
+            </xml-source>
+            <p>
+                A typical error pipeline should include an Exception generator followed by one or
+                more transformation(s), and an HTML serializer.
+            </p>
+            <xml-source>
+                <p:processor name="oxf:exception">
+                    <p:output name="data" id="exception"/>
+                </p:processor>
+            </xml-source>
         </section>
     </body>
 </document>

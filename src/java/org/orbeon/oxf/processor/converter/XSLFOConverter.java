@@ -13,7 +13,8 @@
  */
 package org.orbeon.oxf.processor.converter;
 
-import org.orbeon.oxf.processor.serializer.XSLFOSerializer;
+import org.orbeon.oxf.processor.serializer.legacy.XSLFOSerializer;
+import org.orbeon.oxf.processor.serializer.legacy.XSLFOSerializer;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 
 /**

@@ -33,7 +33,7 @@ import java.io.*;
 
 /**
  * FIXME: This should be merged with the HTTP serializers. There is way too much code duplication
- * between the two codebases.
+ * between the two code bases.
  */
 public class FileSerializer extends CachedSerializer {
 

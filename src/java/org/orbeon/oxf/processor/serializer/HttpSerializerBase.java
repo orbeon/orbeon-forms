@@ -229,27 +229,27 @@ public abstract class HttpSerializerBase extends CachedSerializer {
      */
     protected static class Config {
         // HTTP-specific configuration
-        int statusCode = DEFAULT_STATUS_CODE;
-        int errorCode = DEFAULT_ERROR_CODE;
-        String contentType;
-        boolean forceContentType = DEFAULT_FORCE_CONTENT_TYPE;
-        boolean ignoreDocumentContentType = DEFAULT_IGNORE_DOCUMENT_CONTENT_TYPE;
-        String encoding = DEFAULT_ENCODING;
-        boolean forceEncoding = DEFAULT_FORCE_ENCODING;
-        boolean ignoreDocumentEncoding = DEFAULT_IGNORE_DOCUMENT_ENCODING;
-        List headers;
-        boolean cacheUseLocalCache = DEFAULT_CACHE_USE_LOCAL_CACHE;
-        boolean empty = DEFAULT_EMPTY;
+        public int statusCode = DEFAULT_STATUS_CODE;
+        public int errorCode = DEFAULT_ERROR_CODE;
+        public String contentType;
+        public boolean forceContentType = DEFAULT_FORCE_CONTENT_TYPE;
+        public boolean ignoreDocumentContentType = DEFAULT_IGNORE_DOCUMENT_CONTENT_TYPE;
+        public String encoding = DEFAULT_ENCODING;
+        public boolean forceEncoding = DEFAULT_FORCE_ENCODING;
+        public boolean ignoreDocumentEncoding = DEFAULT_IGNORE_DOCUMENT_ENCODING;
+        public List headers;
+        public boolean cacheUseLocalCache = DEFAULT_CACHE_USE_LOCAL_CACHE;
+        public boolean empty = DEFAULT_EMPTY;
 
         // XML / HTML / Text configuration
-        String method;
-        String version;
-        String publicDoctype;
-        String systemDoctype;
-        boolean omitXMLDeclaration = DEFAULT_OMIT_XML_DECLARATION;
-        boolean standalone = DEFAULT_STANDALONE;
-        boolean indent = DEFAULT_INDENT;
-        int indentAmount = DEFAULT_INDENT_AMOUNT;
+        public String method;
+        public String version;
+        public String publicDoctype;
+        public String systemDoctype;
+        public boolean omitXMLDeclaration = DEFAULT_OMIT_XML_DECLARATION;
+        public boolean standalone = DEFAULT_STANDALONE;
+        public boolean indent = DEFAULT_INDENT;
+        public int indentAmount = DEFAULT_INDENT_AMOUNT;
 
         public void addHeader(String name, String value){
             if (headers == null) headers = new ArrayList();

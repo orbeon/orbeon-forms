@@ -263,31 +263,31 @@
 
     <!-- Legacy serializers -->
     <processor name="oxf:xml-serializer" uri="oxf/processor/xml-serializer">
-        <class name="org.orbeon.oxf.processor.serializer.XMLSerializer"/>
+        <class name="org.orbeon.oxf.processor.serializer.legacy.XMLSerializer"/>
     </processor>
 
     <processor name="oxf:html-serializer" uri="oxf/processor/html-serializer">
-        <class name="org.orbeon.oxf.processor.serializer.HTMLSerializer"/>
+        <class name="org.orbeon.oxf.processor.serializer.legacy.HTMLSerializer"/>
     </processor>
 
     <processor name="oxf:text-serializer" uri="oxf/processor/text-serializer">
-        <class name="org.orbeon.oxf.processor.serializer.TextSerializer"/>
+        <class name="org.orbeon.oxf.processor.serializer.legacy.TextSerializer"/>
     </processor>
 
     <processor name="oxf:xslfo-serializer" uri="oxf/processor/xslfo-serializer">
-        <class name="org.orbeon.oxf.processor.serializer.XSLFOSerializer"/>
+        <class name="org.orbeon.oxf.processor.serializer.legacy.XSLFOSerializer"/>
     </processor>
 
     <processor name="oxf:chart-serializer" uri="oxf/processor/chart-serializer">
-        <class name="org.orbeon.oxf.processor.serializer.JFreeChartSerializer"/>
+        <class name="org.orbeon.oxf.processor.serializer.legacy.JFreeChartSerializer"/>
     </processor>
 
     <processor name="oxf:svg-serializer" uri="oxf/processor/svg-serialzier">
-        <class name="org.orbeon.oxf.processor.serializer.SVGSerializer"/>
+        <class name="org.orbeon.oxf.processor.serializer.legacy.SVGSerializer"/>
     </processor>
 
     <processor name="oxf:xls-serializer" uri="oxf/processor/xls-serializer">
-        <class name="org.orbeon.oxf.processor.serializer.XLSSerializer"/>
+        <class name="org.orbeon.oxf.processor.serializer.legacy.XLSSerializer"/>
     </processor>
 
     <!-- Chart info processor -->
@@ -470,7 +470,7 @@
     </processor>
 
     <processor name="oxf:pdf-serializer" uri="oxf/processor/pdf-serializer">
-        <class name="org.orbeon.oxf.processor.serializer.XSLFOSerializer"/>
+        <class name="org.orbeon.oxf.processor.serializer.legacy.XSLFOSerializer"/>
     </processor>
 
     <!-- Saxon profiling (test only) -->

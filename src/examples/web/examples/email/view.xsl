@@ -24,6 +24,16 @@
     <body>
         <xforms:group>
             <p>
+                <xsl:choose>
+                    <xsl:when test="status = 'success'">
+                        <span style="color: green">Email sent!</span>
+                    </xsl:when>
+                    <xsl:when test="status = 'failure'">
+                        <span style="color: red">Please correct the validation errors before submitting the form.</span>
+                    </xsl:when>
+                </xsl:choose>
+            </p>
+            <p>
                 Please fill-out the mandatory fields below and submit the form. An email will be
                 send will the body specified, as well as several attachments:
             </p>
@@ -76,16 +86,6 @@
                 <xforms:submit xxforms:appearance="button">
                     <xforms:label>Send an Email!</xforms:label>
                 </xforms:submit>
-            </p>
-            <p>
-                <xsl:choose>
-                    <xsl:when test="status = 'success'">
-                        <span style="color: green">Email sent!</span>
-                    </xsl:when>
-                    <xsl:when test="status = 'failure'">
-                        <span style="color: red">Please correct the validation errors before submitting the form.</span>
-                    </xsl:when>
-                </xsl:choose>
             </p>
         </xforms:group>
     </body>

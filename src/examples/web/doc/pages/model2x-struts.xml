@@ -321,7 +321,7 @@
                         a Struts ActionError generator. If no errors are available, an empty
                         <code>errors</code> element is generated. The error messages come from the
                         Struts application resources and can be internationalized. Refer to the
-                        <link href="processors-generators#StrutsActionErrorsGenerator">Struts
+                        <link href="processors-struts#StrutsActionErrorsGenerator">Struts
                         ActionError documentation</link> for more information.
                     </li>
                 </ul>

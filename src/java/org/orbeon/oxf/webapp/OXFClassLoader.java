@@ -53,7 +53,7 @@ public class OXFClassLoader extends URLClassLoader {
                             // Return OXFClassLoader
                             URL[] urls = buildClassPath(webAppExternalContext);
                             String[] ignorePackages = buildIgnorePackages(webAppExternalContext);
-                            classLoader = new OXFClassLoader(urls, ignorePackages, OXFClassLoader.class.getClassLoader());
+                            classLoader = new OXFClassLoader(urls, OXFClassLoader.class.getClassLoader(), ignorePackages);
                         } else {
                             // Otherwise return Class Loader that loaded the OXFClassLoader class
                             classLoader = OXFClassLoader.class.getClassLoader();
@@ -92,7 +92,15 @@ public class OXFClassLoader extends URLClassLoader {
         return result;
     }
 
-    private OXFClassLoader(URL[] urls, String[] ignorePackages, ClassLoader parent) {
+    /**
+     * Constructor to use internally, or for command-line and embedded mode. For web applications,
+     * use getClassLoader() instead.
+     *
+     * @param urls            classpath
+     * @param ignorePackages  names of packages to ingore
+     * @param parent          parent classloader
+     */
+    public OXFClassLoader(URL[] urls, ClassLoader parent, String[] ignorePackages) {
         super(urls, parent);
         this.ignorePackages = ignorePackages;
     }

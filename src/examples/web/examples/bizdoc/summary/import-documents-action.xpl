@@ -54,7 +54,7 @@
 
         <!-- Call the data access layer -->
         <p:processor name="oxf:pipeline">
-            <p:input name="config" href="../data-access/exist/create-document.xpl"/>
+            <p:input name="config" href="../data-access/delegate/create-document.xpl"/>
             <p:input name="document-info" href="#document-info"/>
         </p:processor>
 

@@ -15,14 +15,11 @@ package org.orbeon.oxf.test;
 
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.apache.commons.lang.StringUtils;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.orbeon.oxf.processor.JavaProcessor;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.util.NumberUtils;
-import org.orbeon.oxf.util.SystemUtils;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;

@@ -18,12 +18,9 @@ import org.jaxen.FunctionContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.SecureUtils;
 
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 public class SetValue implements Action {

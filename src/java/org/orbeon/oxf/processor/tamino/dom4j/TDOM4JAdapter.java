@@ -20,7 +20,6 @@ import com.softwareag.tamino.db.api.common.*;
 import com.softwareag.tamino.db.api.io.TStreamReadException;
 import com.softwareag.tamino.db.api.io.TStreamWriteException;
 import com.softwareag.tamino.db.api.namespace.TInoNamespace;
-import com.softwareag.tamino.db.api.namespace.TNamespaceObject;
 import com.softwareag.tamino.db.api.objectModel.TXMLObject;
 import org.dom4j.*;
 import org.dom4j.io.OutputFormat;

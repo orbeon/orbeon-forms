@@ -14,8 +14,6 @@
 package org.orbeon.oxf.util;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.cache.Cache;

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.xforms.input.action;
 
 import org.dom4j.Document;
-import org.dom4j.Element;
 import org.dom4j.Node;
 import org.jaxen.FunctionContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -22,7 +21,6 @@ import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.util.SecureUtils;
 
-import java.util.List;
 import java.util.Map;
 
 public class Delete implements Action {

@@ -78,7 +78,9 @@ public class XMLUtils {
 
     private static DocumentBuilderFactory documentBuilderFactory;
     private static Map documentBuilders = null;
-    private static DocumentFactory dom4jFactory = UserDataDocumentFactory.getInstance();
+    
+    private static UserDataDocumentFactory dom4jFactory 
+        = ( UserDataDocumentFactory )UserDataDocumentFactory.getInstance();
 
     private static SAXParserFactory nonValidatingSAXParserFactory;
     private static SAXParserFactory validatingSAXParserFactory;

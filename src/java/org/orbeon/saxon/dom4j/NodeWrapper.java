@@ -6,12 +6,10 @@ import org.orbeon.saxon.pattern.NodeTest;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.UntypedAtomicValue;
 import org.orbeon.saxon.style.StandardNames;
-import org.orbeon.saxon.xpath.*;
 import org.orbeon.saxon.xpath.XPathException;
 import org.orbeon.saxon.Configuration;
 import org.dom4j.*;
 
-import javax.xml.transform.TransformerException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;

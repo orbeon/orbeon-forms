@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.converter;
 
 import org.orbeon.oxf.processor.serializer.legacy.SVGSerializer;
-import org.orbeon.oxf.processor.serializer.legacy.SVGSerializer;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 
 /**

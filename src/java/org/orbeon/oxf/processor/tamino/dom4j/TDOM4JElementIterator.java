@@ -13,10 +13,8 @@
  */
 package org.orbeon.oxf.processor.tamino.dom4j;
 
-import com.softwareag.tamino.db.api.common.TException;
 import com.softwareag.tamino.db.api.objectModel.TIteratorException;
 import com.softwareag.tamino.db.api.objectModel.TNoSuchXMLObjectException;
-import com.softwareag.tamino.db.api.objectModel.TXMLObject;
 import com.softwareag.tamino.db.api.objectModel.TXMLObjectIterator;
 import org.dom4j.Element;
 

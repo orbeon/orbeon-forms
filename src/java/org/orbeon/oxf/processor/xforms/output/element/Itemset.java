@@ -10,18 +10,13 @@ package org.orbeon.oxf.processor.xforms.output.element;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.AttributesImpl;
 import org.orbeon.oxf.processor.xforms.Constants;
-import org.orbeon.oxf.processor.xforms.XFormsUtils;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.saxon.xpath.XPathException;
 import org.dom4j.Node;
-import org.dom4j.XPath;
-import org.jaxen.NamespaceContext;
 
 import java.util.Map;
 import java.util.Iterator;

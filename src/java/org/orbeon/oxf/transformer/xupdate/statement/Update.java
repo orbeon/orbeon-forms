@@ -16,7 +16,6 @@ package org.orbeon.oxf.transformer.xupdate.statement;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.Node;
 import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.transformer.xupdate.Statement;

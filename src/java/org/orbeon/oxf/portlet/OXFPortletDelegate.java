@@ -21,7 +21,6 @@ import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.portlet.*;
 import java.io.IOException;

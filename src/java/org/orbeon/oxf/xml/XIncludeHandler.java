@@ -1,7 +1,6 @@
 package org.orbeon.oxf.xml;
 
 import orbeon.apache.xerces.impl.Constants;
-import orbeon.apache.xerces.xni.parser.XMLParserConfiguration;
 import orbeon.apache.xerces.xni.XMLAttributes;
 import orbeon.apache.xerces.xni.XNIException;
 

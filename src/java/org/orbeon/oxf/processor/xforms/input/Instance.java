@@ -79,6 +79,11 @@ public class Instance {
         if ("".equals(path))
             return;
 
+        // Adjust null values
+        // NOTE: We get nulls here when no value is specified for a given request parameter 
+        if (value == null)
+            value = "";
+
         Element currentElement = instance.getRootElement();
         if (".".equals(path)) {
             // Just have a root element

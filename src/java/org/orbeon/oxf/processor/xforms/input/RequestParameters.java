@@ -202,16 +202,35 @@ public class RequestParameters {
                         if (value.length() > 0)
                             nameValues(value, type, encryptHiddenValues);
                     } else if (name.startsWith("$upload^")) {
-                        String[] fileInfo = StringUtils.split(name.substring("$upload^".length()), "^");
-                        addValue(fileInfo[0], value, type, false);
-                        if (fileInfo[1].length() > 0) 
-                            getFileInfo(fileInfo[0]).filenameRef = fileInfo[2];
-                        if (fileInfo[3].length() > 0)
-                            getFileInfo(fileInfo[0]).mediatypeRef = fileInfo[4];
-                        if (fileInfo[5].length() > 0)
-                            getFileInfo(fileInfo[0]).contentLengthRef = fileInfo[6];
-                        if (fileInfo[7].length() > 0)
-                            getFileInfo(fileInfo[0]).originalValue = fileInfo[8];
+                        // Handle the case of the upload element
+
+                        // Split encoded name
+                        String s = name.substring("$upload^".length());
+                        String[] fileInfoNames = new String[10];
+                        int startIndex = 0;
+                        int endIndex = -1;
+                        int count = 0;
+                        while ((endIndex = s.indexOf('^', startIndex)) != -1) {
+                            fileInfoNames[count++] = s.substring(startIndex, endIndex);
+                            startIndex = endIndex + 1;
+                        }
+                        fileInfoNames[count++] = s.substring(startIndex);
+
+                        // Set values on FileInfo element
+                        FileInfo fileInfo = getFileInfo(fileInfoNames[0]);
+                        addValue(fileInfoNames[0], value, type, false);
+                        fileInfo.value = value;
+                        fileInfo.type = type;
+
+                        if (fileInfoNames[1].length() > 0)
+                            fileInfo.filenameRef = fileInfoNames[2];
+                        if (fileInfoNames[3].length() > 0)
+                            fileInfo.mediatypeRef = fileInfoNames[4];
+                        if (fileInfoNames[5].length() > 0)
+                            fileInfo.contentLengthRef = fileInfoNames[6];
+                        if (fileInfoNames[7].length() > 0)
+                            fileInfo.originalValue = fileInfoNames[8];
+
                     } else if ("$idRef".equals(name)) {
                         int equalPosition = value.indexOf('=');
                         String id = value.substring(0, equalPosition);
@@ -268,11 +287,11 @@ public class RequestParameters {
                         if (name.indexOf('^') != -1) {
                             // Special case: we extract the value from the name (for checkbox and submit)
                             nameValues(name, type, false);
-                        } else if (type != null) {
-                            // The only case we have a type is for file uploads
-                            FileInfo fileInfo = getFileInfo(name);
-                            fileInfo.value = value;
-                            fileInfo.type = type;
+//                        } else if (type != null) {
+//                            // The only case we have a type is for file uploads
+//                            FileInfo fileInfo = getFileInfo(name);
+//                            fileInfo.value = value;
+//                            fileInfo.type = type;
                         } else {
                             // Normal case
                             addValue(name, value, type, false);
@@ -317,17 +336,17 @@ public class RequestParameters {
 
             private void filename(String filename) {
                 if (name.startsWith("$upload^"))
-                    getFileInfo(name).filename = filename;
+                    getFileInfo(name.substring("$upload^".length(), name.indexOf("^", "$upload^".length()))).filename = filename;
             }
 
             private void contentType(String contentType) {
                 if (name.startsWith("$upload^"))
-                    getFileInfo(name).mediatype = contentType;
+                    getFileInfo(name.substring("$upload^".length(), name.indexOf("^", "$upload^".length()))).mediatype = contentType;
             }
 
             private void contentLength(String contentLength) {
                 if (name.startsWith("$upload^"))
-                    getFileInfo(name).contentLength = contentLength;
+                    getFileInfo(name.substring("$upload^".length(), name.indexOf("^", "$upload^".length()))).contentLength = contentLength;
             }
         };
     }

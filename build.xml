@@ -19,7 +19,7 @@
         <property name="project.name" value="orbeon"/>
 
         <tstamp/>
-        <property name="version.number" value="2.5.3+"/>
+        <property name="version.number" value="2.5.4+"/>
         <loadfile property="release.number" srcFile="oxf.version"/>
         <echo message="Building Orbeon Presentation Server ${release.number}"/>
 

@@ -21,6 +21,17 @@
 	</header>
 	<body>
         <section>
+			<title>New in Version 2.5.4+</title>
+            <section>
+                <title>BizDoc Application Changes</title>
+                <p>
+                    The data access layer of the BizDoc application has been refactored to allow for
+                    multiple backends, such as XML databases (currently eXist through the XML:DB
+                    processor) and SQL databases.
+                </p>
+            </section>
+        </section>
+        <section>
 			<title>New in Version 2.5.4</title>
             <section>
                 <title>Package Name in Examples and Documentation</title>

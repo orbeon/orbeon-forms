@@ -362,7 +362,7 @@ a:hover {
 .tree-items, .tree-items-selected {
     margin-left: 0em;
     padding-left: 1em;
-    list-style-type: none;
+    list-style-type: none; // This does not see to have an effect on Safari
     color: black;
     font-weight: normal;
     font-style: normal;

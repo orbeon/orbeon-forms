@@ -84,6 +84,12 @@ public class LDAPProcessor extends ProcessorImpl {
                             config.setPassword(password != null ? password : getPropertySet().getString(PASSWORD_PROPERTY));
                             config.setProtocol(protocol != null ? protocol : getPropertySet().getString(PROTOCOL_PROPERTY));
 
+                            // The password and bind DN are allowed to be blank
+                            if (password == null)
+                                config.setPassword("");
+                            if (bindDN == null)
+                                config.setBindDN("");
+
                             config.setRootDN(XPathUtils.selectStringValueNormalize(doc, "/config/root-dn"));
 
                             for (Iterator i = XPathUtils.selectIterator(doc, "/config/attribute"); i.hasNext();) {

@@ -186,7 +186,7 @@
                 <include name="commons-cli-1_0.jar"/>
                 <include name="commons-fileupload-1.0.jar"/>
                 <include name="commons-beanutils-1_5.jar"/>
-                <include name="commons-pool-1.1.jar"/>
+                <include name="commons-pool-1.2.jar"/>
                 <include name="commons-discovery-0_2.jar"/>
                 <include name="axis-1_1-axis.jar"/>
                 <include name="axis-1_1-jaxrpc.jar"/>

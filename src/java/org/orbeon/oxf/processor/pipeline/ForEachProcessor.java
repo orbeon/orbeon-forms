@@ -28,8 +28,11 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -236,22 +239,26 @@ public class ForEachProcessor extends ProcessorImpl implements AbstractProcessor
                 if (state.domGenerators == null) {
                     Document dataInput = readInputAsDOM4J(context, getInputByName(FOR_EACH_DATA_INPUT));
                     state.domGenerators = new ArrayList();
-                    XPath xPath = XPathCache.createCacheXPath(context, select);
-                    xPath.setNamespaceContext(new SimpleNamespaceContext(namespaceContext));
-                    List nodes = xPath.selectNodes(dataInput);
-                    for (Iterator i = nodes.iterator(); i.hasNext();) {
-                        Node node = (Node) i.next();
-                        if (!(node instanceof Element))
-                            throw new OXFException("Select expression '" + select
-                                    + "' did not return a sequence of elements. One node was a '"
-                                    + node.getNodeTypeName() + "'");
-                        DOMGenerator domGenerator = new DOMGenerator(node);
-                        domGenerator.createOutput(OUTPUT_DATA);
-                        state.domGenerators.add(domGenerator);
+                    PooledXPathExpression expr = XPathCache.getXPathExpression(context,
+                            new DocumentWrapper(dataInput, null),
+                            select, namespaceContext);
+                    try {
+                        for (Iterator i = expr.evaluate().iterator(); i.hasNext();) {
+                            Node node = (Node) i.next();
+                            if (!(node instanceof Element))
+                                throw new OXFException("Select expression '" + select
+                                        + "' did not return a sequence of elements. One node was a '"
+                                        + node.getNodeTypeName() + "'");
+                            DOMGenerator domGenerator = new DOMGenerator(node);
+                            domGenerator.createOutput(OUTPUT_DATA);
+                            state.domGenerators.add(domGenerator);
+                        }
+                        if (internalKey != null && internalValidity != null)
+                            ObjectCache.instance().add(context,
+                                    internalKey, internalValidity, state.domGenerators);
+                    } catch (XPathException e) {
+                        throw new OXFException(e);
                     }
-                    if (internalKey != null && internalValidity != null)
-                        ObjectCache.instance().add(context,
-                                internalKey, internalValidity, state.domGenerators);
                 }
             }
         }

@@ -23,13 +23,13 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.util.Base64ContentHandler;
-import org.orbeon.oxf.util.ISODateUtils;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.util.*;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.xpath.*;
+import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -680,9 +680,11 @@ public class SQLProcessor extends ProcessorImpl {
     }
 
     private static class ValueOfCopyOfInterpreter extends InterpreterContentHandler {
+        DocumentWrapper wrapper;
 
         public ValueOfCopyOfInterpreter(SQLProcessorInterpreterContext interpreterContext) {
             super(interpreterContext, false);
+            this.wrapper = new DocumentWrapper(interpreterContext.getCurrentNode().getDocument(), null);
         }
 
         public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -727,7 +729,18 @@ public class SQLProcessor extends ProcessorImpl {
                         if ("value-of".equals(localname)) {
                             // Get string value
 //                            String stringValue = interpreterContext.getInput().createXPath(".").valueOf(result);
-                            String stringValue = XPathCache.createCacheXPath(null, ".").valueOf(result);
+//                            String stringValue = XPathCache.createCacheXPath(null, ".").valueOf(result);
+                            PooledXPathExpression expr = XPathCache.getXPathExpression(interpreterContext.getPipelineContext(),
+                                    wrapper.wrap(result), "string(.)");
+                            String stringValue;
+                            try {
+                                stringValue = (String)expr.evaluateSingle();
+                            } catch (XPathException e) {
+                                throw new OXFException(e);
+                            } finally {
+                                if(expr != null)
+                                    expr.returnToPool();
+                            }
                             output.characters(stringValue.toCharArray(), 0, stringValue.length());
                         } else {
                             LocationSAXWriter saxw = new LocationSAXWriter();
@@ -741,7 +754,18 @@ public class SQLProcessor extends ProcessorImpl {
                         if ("value-of".equals(localname)) {
                             // Get string value
 //                            String stringValue = interpreterContext.getInput().createXPath(".").valueOf(result);
-                            String stringValue = XPathCache.createCacheXPath(null, ".").valueOf(result);
+//                            String stringValue = XPathCache.createCacheXPath(null, ".").valueOf(result);
+                              PooledXPathExpression expr = XPathCache.getXPathExpression(interpreterContext.getPipelineContext(),
+                                      wrapper.wrap(result), "string(.)");
+                            String stringValue;
+                            try {
+                                stringValue = (String)expr.evaluateSingle();
+                            } catch (XPathException e) {
+                                throw new OXFException(e);
+                            } finally {
+                                if(expr != null)
+                                    expr.returnToPool();
+                            }
                             output.characters(stringValue.toCharArray(), 0, stringValue.length());
                         } else {
                             LocationSAXWriter saxw = new LocationSAXWriter();

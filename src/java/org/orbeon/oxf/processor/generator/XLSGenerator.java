@@ -17,29 +17,30 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.commons.fileupload.DiskFileUpload;
 import org.dom4j.Document;
 import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
-import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.XMLConstants;
+import org.orbeon.oxf.util.Base64;
+import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XLSUtils;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.XMLConstants;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.StringTokenizer;
 import java.net.URL;
+import java.util.StringTokenizer;
 
 /**
  * NOTE: This generator depends on the Servlet API.
@@ -63,8 +64,10 @@ public class XLSGenerator extends ProcessorImpl {
                     {
                         final String NO_FILE = "No file was uploaded";
                         Document requestDocument  = readInputAsDOM4J(context, INPUT_REQUEST);
-                        Element valueElement = (Element) XPathCache.createCacheXPath(context,
-                                "/request/parameters/parameter[1]/value").evaluate(requestDocument);
+                        PooledXPathExpression expr = XPathCache.getXPathExpression(context,
+                                new DocumentWrapper(requestDocument, null),
+                                "/request/parameters/parameter[1]/value");
+                        Element valueElement = (Element) expr.evaluateSingle();
                         if (valueElement == null) throw new OXFException(NO_FILE);
                         String type = valueElement.attributeValue(XMLConstants.XSI_TYPE_QNAME);
                         if (type == null) throw new OXFException(NO_FILE);
@@ -89,7 +92,8 @@ public class XLSGenerator extends ProcessorImpl {
                     // Generate XML from Excel file
                     DOMGenerator domGenerator = new DOMGenerator(extractFromXLS(new ByteArrayInputStream(fileContent)));
                     domGenerator.createOutput(OUTPUT_DATA).read(context, contentHandler);
-
+                } catch (XPathException xpe) {
+                    throw new OXFException(xpe);
                 } catch (IOException e) {
                     throw new OXFException(e);
                 }

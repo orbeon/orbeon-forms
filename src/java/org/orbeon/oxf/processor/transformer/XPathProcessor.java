@@ -16,16 +16,17 @@ package org.orbeon.oxf.processor.transformer;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.dom4j.XPath;
-import org.jaxen.SimpleNamespaceContext;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
-import org.orbeon.oxf.xml.OXFFunctionContext;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -52,7 +53,7 @@ public class XPathProcessor extends ProcessorImpl {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
             public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, ContentHandler contentHandler) {
 
-                XPath xpath = (XPath) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+               Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                     public Object read(final org.orbeon.oxf.pipeline.api.PipelineContext context, final ProcessorInput input) {
                         Document config = readInputAsDOM4J(context, INPUT_CONFIG);
 
@@ -64,16 +65,22 @@ public class XPathProcessor extends ProcessorImpl {
                                     namespaceElement.attributeValue("uri"));
                         }
 
-                        // Create xpath object
-                        XPath xpath = XPathCache.createCacheXPath(context, (String) config.selectObject("string(/config/xpath)"));
-                        xpath.setNamespaceContext(new SimpleNamespaceContext(namespaces));
-                        xpath.setFunctionContext(new OXFFunctionContext());
-                        return xpath;
+                        // Create xpath object   (Jaxen)
+//                        XPath xpath = XPathCache.createCacheXPath(context, (String) config.selectObject("string(/config/xpath)"));
+//                        xpath.setNamespaceContext(new SimpleNamespaceContext(namespaces));
+//                        xpath.setFunctionContext(new OXFFunctionContext());
+//                        return xpath;
+
+                        return  new Config(namespaces, (String) config.selectObject("string(/config/xpath)"));
                     }
                 });
 
-                List results = xpath.selectNodes(readCacheInputAsDOM4J(context, INPUT_DATA));
+//                List results = xpath.selectNodes(readCacheInputAsDOM4J(context, INPUT_DATA));
+                DocumentWrapper wrapper = new DocumentWrapper(readCacheInputAsDOM4J(context, INPUT_DATA), null);
+                PooledXPathExpression xpath = null;
                 try {
+                    xpath = XPathCache.getXPathExpression(context, wrapper, config.getExpression(), config.getNamespaces());
+                    List results = xpath.evaluate();
                     contentHandler.startDocument();
                     // WARNING: Here we break the rule that processors must output valid XML documents, because
                     // we potentially output several root nodes. This works because the XPathProcessor is always
@@ -106,12 +113,44 @@ public class XPathProcessor extends ProcessorImpl {
                         }
                     }
                     contentHandler.endDocument();
+                }catch (XPathException xpe) {
+                    throw new OXFException(xpe);
                 } catch (SAXException e) {
                     throw new ValidationException(e, locationData);
+                }finally{
+                    if(xpath != null)
+                        xpath.returnToPool();
                 }
             }
         };
         addOutput(name, output);
         return output;
+    }
+
+    protected static class Config {
+        private Map namespaces;
+        private String expression;
+
+        public Config(Map namespaces, String expression) {
+            this.namespaces = namespaces;
+            this.expression = expression;
+        }
+
+        public String getExpression() {
+            return expression;
+        }
+
+        public void setExpression(String expression) {
+            this.expression = expression;
+        }
+
+        public Map getNamespaces() {
+            return namespaces;
+        }
+
+        public void setNamespaces(Map namespaces) {
+            this.namespaces = namespaces;
+        }
+
     }
 }

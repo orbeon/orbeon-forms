@@ -17,7 +17,6 @@ import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.XPath;
 import org.orbeon.oro.text.regex.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -25,13 +24,17 @@ import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.serializer.HttpBinarySerializer;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XLSUtils;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.xpath.XPathException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
+import java.util.List;
 
 public class XLSSerializer extends HttpBinarySerializer {
 
@@ -65,6 +68,8 @@ public class XLSSerializer extends HttpBinarySerializer {
         try {
             final PatternMatcher matcher = new Perl5Matcher();
             Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
+            final DocumentWrapper wrapper = new DocumentWrapper(dataDocument, null);
+
             Document configDocument = readInputAsDOM4J(pipelineContext, INPUT_CONFIG);
 
             // Read template sheet
@@ -76,7 +81,20 @@ public class XLSSerializer extends HttpBinarySerializer {
             templateInputStream.close();
 
             int sheetIndex = 0;
-            for (Iterator i = dataDocument.selectNodes("/workbook/sheet").iterator(); i.hasNext();) {
+
+            PooledXPathExpression expr = null;
+            List nodes = null;
+            try {
+                expr = XPathCache.getXPathExpression(pipelineContext,
+                        wrapper, "/workbook/sheet");
+                nodes = expr.evaluate();
+            } catch (XPathException e) {
+                throw new OXFException(e);
+            } finally {
+                if(expr != null)
+                    expr.returnToPool();
+            }
+            for (Iterator i = nodes.iterator(); i.hasNext();) {
 
                 final Element sheetElement = (Element) i.next();
                 HSSFSheet sheet = workbook.cloneSheet(0);
@@ -131,8 +149,17 @@ public class XLSSerializer extends HttpBinarySerializer {
 
                         // Set cell value
                         Object newObject = sheetElement.selectObject(sourceXPath);
-                        XPath xpath = XPathCache.createCacheXPath(pipelineContext, "string()");
-                        String newValue = (String) xpath.evaluate(newObject);
+                        
+                        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                                wrapper.wrap(newObject), "string()");
+                        String newValue;
+                        try {
+                            newValue = (String)expr.evaluateSingle();
+                        } catch (XPathException e) {
+                            throw new OXFException(e);
+                        } finally {
+                            expr.returnToPool();
+                        }
                         if (newValue == null) {
                             throw new OXFException("Nothing matches the XPath expression '"
                                     + sourceXPath + "' in the input document");

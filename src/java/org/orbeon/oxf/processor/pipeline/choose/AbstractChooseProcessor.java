@@ -166,9 +166,13 @@ public class AbstractChooseProcessor extends ProcessorImpl implements AbstractPr
             if (astWhen.getNode() != null && astWhen.getNamespaces().size() != 0) {
                 throw new ValidationException("ASTWhen cannot have both a node and namespaces defined", astWhen.getLocationData());
             }
-            branchNamespaces.add(new SimpleNamespaceContext(astWhen.getNode() != null
+            // jaxen stuff
+//            branchNamespaces.add(new SimpleNamespaceContext(astWhen.getNode() != null
+//                    ? XMLUtils.getNamespaceContext((Element) astWhen.getNode())
+//                    : astWhen.getNamespaces()));
+            branchNamespaces.add(astWhen.getNode() != null
                     ? XMLUtils.getNamespaceContext((Element) astWhen.getNode())
-                    : astWhen.getNamespaces()));
+                    : astWhen.getNamespaces());
 
             // Add an identity processor to connect the output of the branch to
             // the <param type="output"> of the pipeline

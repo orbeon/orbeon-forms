@@ -390,8 +390,9 @@ public abstract class XSLTTransformer extends ProcessorImpl {
          * This is context that will resolve any prefix, function, and variable.
          * It is just used to parse XPath expression and get an AST.
          */
-        static final StandaloneContext dummySaxonXPathContext;
-        static {
+        StandaloneContext dummySaxonXPathContext;
+
+        private void initDummySaxonXPathContext() {
             Configuration config = new Configuration();
             config.setHostLanguage(Configuration.XSLT);
             config.setNamePool(new NamePool() {
@@ -400,9 +401,8 @@ public abstract class XSLTTransformer extends ProcessorImpl {
             });
             dummySaxonXPathContext = new StandaloneContext(config) {
                 {
-                    FunctionLibraryList lib = new FunctionLibraryList();
                     // Dummy Function lib that accepts any name
-                    lib.addFunctionLibrary(new FunctionLibrary() {
+                    setFunctionLibrary(new FunctionLibrary() {
                         public Expression bind(int nameCode, String uri, String local, final Expression[] staticArgs)  {
                             return new FunctionCall() {
                                 {
@@ -425,7 +425,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
                     });
 
-                    setFunctionLibrary(lib);
+
                 }
 
                 public boolean isAvailable(int fingerprint, String uri, String local, int arity) {
@@ -453,14 +453,16 @@ public abstract class XSLTTransformer extends ProcessorImpl {
         private Locator locator;
         private URIReferences uriReferences = new URIReferences();
         private String systemId;
-        private static final NamespaceSupport2 namespaces = new NamespaceSupport2();
+        private final NamespaceSupport2 namespaces = new NamespaceSupport2();
 
         public StylesheetForwardingContentHandler() {
             super();
+            initDummySaxonXPathContext();
         }
 
         public StylesheetForwardingContentHandler(ContentHandler contentHandler) {
             super(contentHandler);
+            initDummySaxonXPathContext();
         }
 
         public URIReferences getURIReferences() {

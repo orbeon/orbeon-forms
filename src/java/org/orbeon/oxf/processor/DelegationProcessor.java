@@ -22,17 +22,16 @@ import org.apache.axis.message.SOAPEnvelope;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Text;
-import org.dom4j.XPath;
 import org.dom4j.io.DOMReader;
 import org.dom4j.io.DOMWriter;
 import org.dom4j.io.SAXContentHandler;
-import org.jaxen.SimpleNamespaceContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.generator.SAXStoreGenerator;
 import org.orbeon.oxf.servicedirectory.ServiceDirectory;
 import org.orbeon.oxf.util.JMSUtils;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.SAXStore;
@@ -40,23 +39,20 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import javax.jms.*;
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.*;
 
 public class DelegationProcessor extends ProcessorImpl {
 
@@ -264,19 +260,22 @@ public class DelegationProcessor extends ProcessorImpl {
                                             }
 
                                             // Send body from result envelope
-                                            XPath xpath = XPathCache.createCacheXPath(context,
+                                            LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
+                                            locationSAXWriter.setContentHandler(contentHandler);
+                                            Document resultEnvelopeDOM4j = new DOMReader().read(resultEnvelope.getAsDocument());
+
+                                            String xpath =
                                                     operation != null && operation.select != null
                                                     ? operation.select
                                                     : service.type == ServiceDefinition.WEB_SERVICE_TYPE
                                                     ? DEFAULT_SELECT_WEB_SERVICE
-                                                    : DEFAULT_SELECT_BUS);
-                                            xpath.setNamespaceContext(new SimpleNamespaceContext(
-                                                    operation != null && operation.select != null
-                                                    ? operation.selectNamespaceContext : DEFAULT_SELECT_NAMESPACE_CONTEXT));
-                                            LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
-                                            locationSAXWriter.setContentHandler(contentHandler);
-                                            Document resultEnvelopeDOM4j = new DOMReader().read(resultEnvelope.getAsDocument());
-                                            for (Iterator i = xpath.selectNodes(resultEnvelopeDOM4j).iterator(); i.hasNext();) {
+                                                    : DEFAULT_SELECT_BUS;
+                                            PooledXPathExpression expr = XPathCache.getXPathExpression(context,
+                                                    new DocumentWrapper(resultEnvelopeDOM4j, null),
+                                                    xpath,
+                                                    operation != null && operation.select != null ? operation.selectNamespaceContext : DEFAULT_SELECT_NAMESPACE_CONTEXT);
+
+                                            for (Iterator i = expr.evaluate().iterator(); i.hasNext();) {
 
                                                 // Create document with node from SOAP envelope
                                                 Object result = i.next();

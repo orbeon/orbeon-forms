@@ -15,16 +15,17 @@ package org.orbeon.oxf.processor.pipeline.choose;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.dom4j.Node;
-import org.dom4j.XPath;
-import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.cache.Cacheable;
 import org.orbeon.oxf.cache.OutputCacheKey;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.OXFFunctionContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
 
 import java.util.*;
@@ -170,16 +171,36 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
                 break;
             }
             // Try to cache the XPath expressions
-            String xpathExpression = "boolean(" + condition + ")";
-            XPath xpath = XPathCache.createCacheXPath(context, xpathExpression);
-
-            xpath.setFunctionContext(new OXFFunctionContext());
-            xpath.setNamespaceContext((NamespaceContext) branchNamespaces.get(branchIndex));
-            if (((Boolean) xpath.evaluate(refNode)).booleanValue()) {
-                selectedBranch = branchIndex;
-                break;
+//            String xpathExpression = "boolean(" + condition + ")";
+//            XPath xpath = XPathCache.createCacheXPath(context, xpathExpression);
+//
+//            xpath.setFunctionContext(new OXFFunctionContext());
+//            xpath.setNamespaceContext((NamespaceContext) branchNamespaces.get(branchIndex));
+//            if (((Boolean) xpath.evaluate(refNode)).booleanValue()) {
+//                selectedBranch = branchIndex;
+//                break;
+//            }
+            DocumentWrapper wrapper = new DocumentWrapper(refNode.getDocument(), null);
+            PooledXPathExpression expr = null;
+            Map namespaces = (Map)branchNamespaces.get(branchIndex);
+            try {
+                expr = XPathCache.getXPathExpression(context, wrapper, "boolean(" + condition + ")", namespaces);
+                if( ((Boolean)expr.evaluateSingle()).booleanValue()) {
+                    selectedBranch = branchIndex;
+                    break;
+                }
+                branchIndex++;
+            } catch (XPathException e) {
+                throw new OXFException(e);
+            }finally{
+                try {
+                    if(expr != null)
+                        expr.returnToPool();
+                } catch (Exception e) {
+                    throw new OXFException(e);
+                }
             }
-            branchIndex++;
+
         }
 
         if (selectedBranch == -1) {

@@ -546,7 +546,7 @@
                             <xsl:template match="/">
                                 <form>
                                     <count><xsl:value-of select="count(/form/sub-tasks/task)"/></count>
-                                    <xsl:apply-templates select="/form/sub-tasks/task[1]"/>
+                                    <xsl:apply-templates select="/form/sub-tasks/task[2]"/>
                                 </form>
                             </xsl:template>
     
@@ -575,7 +575,7 @@
                         <day>11</day>
                         <year>2004</year>
                     </date>
-                    <task-id>1</task-id>
+                    <task-id>2</task-id>
                     <parent-task-id>826</parent-task-id>
                     <task-type-code>FS</task-type-code>
                     <task-status-code>A</task-status-code>
@@ -590,7 +590,7 @@
                     <rec-num/>
                     <lodge-id>1</lodge-id>
                     <district-id/>
-                    <task-name>Form a 2004 (1)</task-name>
+                    <task-name>Form a 2004 (2)</task-name>
                     <description>Form a 2004</description>
                     <seqn>0</seqn>
                     <start-date>

@@ -327,12 +327,13 @@ public class XPathUtils {
         return path;
     }
 
-    public static XPathExpression xpath2WithFullURI(DocumentWrapper documentWrapper, Map repeatIdToIndex, String xpath) {
-        Map prefixToURIMap = new HashMap();
-        String xpathExpression = xpathWithFullURIString(xpath, prefixToURIMap);
-        return XPathCache.createCacheXPath20(null, documentWrapper, null, xpathExpression, 
-                prefixToURIMap, repeatIdToIndex, null);
-    }
+    // Apparently no longer in use
+//    public static XPathExpression xpath2WithFullURI(DocumentWrapper documentWrapper, Map repeatIdToIndex, String xpath) {
+//        Map prefixToURIMap = new HashMap();
+//        String xpathExpression = xpathWithFullURIString(xpath, prefixToURIMap);
+//        return XPathCache.createCacheXPath20(null, documentWrapper, null, xpathExpression,
+//                prefixToURIMap, repeatIdToIndex, null);
+//    }
 
     /**
      * Example:

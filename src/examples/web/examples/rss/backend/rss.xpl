@@ -15,7 +15,8 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:function="http://www.orbeon.com/xslt-function"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:saxon="http://saxon.sf.net/">
 
     <p:param name="rss-feed-descriptor" type="input"/>
     <p:param name="data" type="output"/>
@@ -50,22 +51,23 @@
                         </channel>
                         <!-- Items -->
                         <items>
-                            <xsl:for-each select="function:evaluate(/*, $descriptor/items-xpath, ())/.">
+                            <xsl:for-each select="saxon:evaluate($descriptor/items-xpath)">
+                                <xsl:message>current: <xsl:copy-of select="."/></xsl:message>
                                 <xsl:variable name="item" select="."/>
                                 <item>
                                     <title>
-                                        <xsl:value-of select="function:evaluate($item, $descriptor/items-title-xpath, ())"/>
+                                        <xsl:value-of select="saxon:evaluate($descriptor/items-title-xpath)"/>
                                     </title>
                                     <link>
-                                        <xsl:variable name="url" select="string(function:evaluate($item, $descriptor/items-url-xpath, ())/.)" as="xs:string"/>
+                                        <xsl:variable name="url" select="string(saxon:evaluate($descriptor/items-url-xpath))" as="xs:string"/>
                                         <xsl:value-of select="if (starts-with($url, 'http:')) then $url else concat($descriptor/channel-link, $url)"/>
                                     </link>
                                     <guid isPermaLink="false">
-                                        <xsl:value-of select="function:evaluate($item, $descriptor/items-title-xpath, ())"/>
+                                        <xsl:value-of select="saxon:evaluate($descriptor/items-title-xpath)"/>
                                     </guid>
                                     <xsl:if test="$descriptor/items-description-xpath != ''">
                                         <description>
-                                            <xsl:copy-of select="function:evaluate($item, $descriptor/items-description-xpath, ())"/>
+                                            <xsl:copy-of select="saxon:evaluate($descriptor/items-description-xpath)"/>
                                         </description>
                                     </xsl:if>
                                 </item>

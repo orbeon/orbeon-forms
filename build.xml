@@ -185,7 +185,7 @@
         <include name="commons-cli-1.0.jar"/>
         <include name="commons-fileupload-1.0.jar"/>
         <include name="commons-beanutils-1_5.jar"/>
-        <include name="commons-logging-1_0_3.jar"/>
+        <include name="commons-logging-1_0_4.jar"/>
         <include name="commons-pool-1.1.jar"/>
         <include name="commons-discovery-0_2.jar"/>
         <include name="axis-1_1-axis.jar"/>
@@ -200,6 +200,7 @@
         <include name="hsqldb-1_7_1.jar"/>
         <include name="jfreechart*"/>
         <include name="jcommon*"/>
+        <!-- <include name="activation-1_0_2.jar"/> --> <!-- Tomcat 4 has this but not tomcat 5, so put it back -->
 <!--        <include name="ymsg9-v0_51.jar"/>-->
         <include name="jtidy-04aug2000r7.jar"/>
         <include name="kawa-1_7.jar"/>
@@ -640,7 +641,7 @@
     <unzip src="lib/commons-collections-2_0.jar" dest="build/oxfmark/lib"/>
     <unzip src="lib/commons-lang-1_0-b1.jar" dest="build/oxfmark/lib"/>
     <unzip src="lib/commons-beanutils-1_5.jar" dest="build/oxfmark/lib"/>
-    <unzip src="lib/commons-logging-1_0_3.jar" dest="build/oxfmark/lib"/>
+    <unzip src="lib/commons-logging-1_0_4.jar" dest="build/oxfmark/lib"/>
     <unzip src="lib/commons-fileupload-1.0-beta-1.jar" dest="build/oxfmark/lib"/>
     <unzip src="lib/jakarta-oro-2_0_6.jar" dest="build/oxfmark/lib"/>
     <unzip src="lib/msv-20031020.jar" dest="build/oxfmark/lib"/>

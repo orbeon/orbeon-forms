@@ -1,0 +1,8 @@
+<project name='x' default='y' >
+  <target name='anthill' >
+    <java jar='/opt/anthill/lib/ant1.5.1/ant.jar' fork='yes' failonerror='true' >
+      <arg>anthill</arg>
+      <env key='CVS_RSH' value='ssh' />
+    </java>
+  </target>
+</project>

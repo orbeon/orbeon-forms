@@ -222,11 +222,11 @@
                 <xsl:next-match/>
             </xsl:when>
             <xsl:otherwise>
-                <xhtml:table border="0" cellpadding="0" cellspacing="0" style="margin: 0">
+                <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xferrtable">
                     <xhtml:tr>
                         <xhtml:td><xsl:next-match/></xhtml:td>
-                        <xhtml:td style="padding-left: 1em; color: red">
-                            <xhtml:img src="/images/error.gif"/>
+                        <xhtml:td>
+                            <xhtml:img src="/images/error.gif" style="margin: 5px"/>
                         </xhtml:td>
                     </xhtml:tr>
                 </xhtml:table>
@@ -255,7 +255,7 @@
 
     <!-- Help, Hint -->
     <xsl:template match="xforms:*[xforms:help]" priority="3">
-        <xhtml:table border="0" cellpadding="0" cellspacing="0" style="margin: 0px">
+        <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xfhelptable">
             <xhtml:tr>
                 <!-- Display control -->
                 <xhtml:td><xsl:next-match/></xhtml:td>

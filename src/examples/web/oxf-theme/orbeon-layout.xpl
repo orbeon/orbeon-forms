@@ -443,6 +443,11 @@ ul {
 .tinyinput { width: 5em; }
 .smallinput { width: 8em; }
 
+<!-- Styles used by xforms-to-xhtml.xsl -->
+.xferrtable    { border: 0; margin: 0px; padding: 0px }
+.xferrtable td { border: 0; margin: 0px; padding: 0px; color: red }
+.xfhelptable   { margin: 0px }
+
 <!--
 @media print {
     @page {

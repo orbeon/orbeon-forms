@@ -388,6 +388,14 @@
                 <optional>
                     <attribute name="prefix"/>
                 </optional>
+                <optional>
+                    <attribute name="all-elements">
+                        <choice>
+                            <value>false</value>
+                            <value>true</value>
+                        </choice>
+                    </attribute>
+                </optional>
                 <zeroOrMore>
                     <element name="sql:exclude">
                         <text/>

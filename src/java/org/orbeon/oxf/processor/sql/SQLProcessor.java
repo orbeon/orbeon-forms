@@ -421,6 +421,7 @@ public class SQLProcessor extends ProcessorImpl {
         private int getColumnsLevel;
         private String getColumnsFormat;
         private String getColumnsPrefix;
+        private boolean getColumnsAllElements;
         private boolean inExclude;
         private StringBuffer getColumnsCurrentExclude;
         private Map getColumnsExcludes;
@@ -444,6 +445,7 @@ public class SQLProcessor extends ProcessorImpl {
                     getColumnsLevel = level;
                     getColumnsFormat = attributes.getValue("format");
                     getColumnsPrefix = attributes.getValue("prefix");
+                    getColumnsAllElements = "true".equals(attributes.getValue("all-elements"));
                 } else if ("get-column".equals(localname)) {
                     String type = attributes.getValue("type");
                     String columnName = attributes.getValue("column");
@@ -629,7 +631,8 @@ public class SQLProcessor extends ProcessorImpl {
                             // Assume the type is compatible with getString()
                             stringValue = resultSet.getString(columnName);
                         }
-                        if (stringValue != null || clobValue != null || blobValue != null) {
+                        final boolean nonNullValue = stringValue != null || clobValue != null || blobValue != null;
+                        if (nonNullValue || getColumnsAllElements) {
                             // Format element name
                             String elementName = columnName;
                             if ("xml".equals(getColumnsFormat)) {
@@ -637,29 +640,31 @@ public class SQLProcessor extends ProcessorImpl {
                                 elementName = elementName.replace('_', '-');
                             } else if (getColumnsFormat != null)
                                 throw new ValidationException("Invalid get-columns format: " + getColumnsFormat, new LocationData(getDocumentLocator()));
-                            // Output value
                             String elementQName = (outputElementURI.equals("")) ? elementName : getColumnsPrefix + ":" + elementName;
                             ContentHandler output = interpreterContext.getOutput();
                             output.startElement(outputElementURI, elementName, elementQName, XMLUtils.EMPTY_ATTRIBUTES);
-                            if (clobValue == null && blobValue == null) {
-                                // Just output the String value as characters
-                                char[] localCharValue = stringValue.toCharArray();
-                                output.characters(localCharValue, 0, localCharValue.length);
-                            } else if (clobValue != null) {
-                                // Clob: convert the Reader into characters
-                                Reader reader = clobValue.getCharacterStream();
-                                try {
-                                    XMLUtils.readerToCharacters(reader, output);
-                                } finally {
-                                    reader.close();
-                                }
-                            } else {
-                                // Blob: convert the InputStream into characters in Base64
-                                InputStream is = blobValue.getBinaryStream();
-                                try {
-                                    XMLUtils.inputStreamToBase64Characters(is, output);
-                                } finally {
-                                    is.close();
+                            // Output value if non-null
+                            if (nonNullValue) {
+                                if (clobValue == null && blobValue == null) {
+                                    // Just output the String value as characters
+                                    char[] localCharValue = stringValue.toCharArray();
+                                    output.characters(localCharValue, 0, localCharValue.length);
+                                } else if (clobValue != null) {
+                                    // Clob: convert the Reader into characters
+                                    Reader reader = clobValue.getCharacterStream();
+                                    try {
+                                        XMLUtils.readerToCharacters(reader, output);
+                                    } finally {
+                                        reader.close();
+                                    }
+                                } else {
+                                    // Blob: convert the InputStream into characters in Base64
+                                    InputStream is = blobValue.getBinaryStream();
+                                    try {
+                                        XMLUtils.inputStreamToBase64Characters(is, output);
+                                    } finally {
+                                        is.close();
+                                    }
                                 }
                             }
                             output.endElement(outputElementURI, elementName, elementQName);

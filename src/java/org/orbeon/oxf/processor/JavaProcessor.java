@@ -128,16 +128,17 @@ public class JavaProcessor extends ProcessorImpl {
             }
 
             boolean hasOutputs = false;
-
+            Map outputMap = getConnectedOutputs();
             // Connect processor outputs
-            for (Iterator i = processor.getOutputsInfo().iterator(); i.hasNext();) {
+            for (Iterator i = outputMap.keySet().iterator(); i.hasNext();) {
                 hasOutputs = true;
-                ProcessorInputOutputInfo outputInfo = (ProcessorInputOutputInfo) i.next();
-                ProcessorOutput processorOutput = processor.createOutput(outputInfo.getName());
-                ProcessorInput bottomInput = new ProcessorImpl.ProcessorInputImpl(getClass(), outputInfo.getName());
+                String outputName = (String) i.next();
+
+                ProcessorOutput processorOutput = processor.createOutput(outputName);
+                ProcessorInput bottomInput = new ProcessorImpl.ProcessorInputImpl(getClass(), outputName);
                 processorOutput.setInput(bottomInput);
                 bottomInput.setOutput(processorOutput);
-                state.bottomInputs.put(outputInfo.getName(), bottomInput);
+                state.bottomInputs.put(outputName, bottomInput);
             }
 
             // Start processor if required

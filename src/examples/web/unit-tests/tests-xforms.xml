@@ -1487,4 +1487,33 @@
         </output>
     </test>
 
+    <!--
+        The test works, which means it throws an exception. We have no way to test that at this
+        point since we don't have the support for exceptions in XPL yet.
+    -->
+<!--    <test description="Group to throw an exception if bound to empty nodeset" name="oxf:pipeline" only="true">-->
+<!--        <input name="config">-->
+<!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors"-->
+<!--                    xmlns:xforms="http://www.w3.org/2002/xforms"-->
+<!--                    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">-->
+<!--                <p:param type="output" name="annotated-data"/>-->
+<!--                <p:processor name="oxf:xforms-output">-->
+<!--                    <p:input name="model">-->
+<!--                        <xforms:model/>-->
+<!--                    </p:input>-->
+<!--                    <p:input name="instance">-->
+<!--                        <instance/>-->
+<!--                    </p:input>-->
+<!--                    <p:input name="data">-->
+<!--                        <xforms:group ref="/gaga"/>-->
+<!--                    </p:input>-->
+<!--                    <p:output name="data" ref="annotated-data"/>-->
+<!--                </p:processor>-->
+<!--            </p:config>-->
+<!--        </input>-->
+<!--        <output name="annotated-data">-->
+<!--            <dummy/>-->
+<!--        </output>-->
+<!--    </test>-->
+
 </group>

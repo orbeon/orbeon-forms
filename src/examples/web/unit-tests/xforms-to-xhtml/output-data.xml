@@ -29,7 +29,7 @@
                     <th align="right" valign="middle">Gender</th>
                     <td>
                         <xhtml:div title="Gender" style="padding: 0px; margin: 0px">
-                            <xhtml:table border="0" cellpadding="0" cellspacing="0" style="margin: 0px">
+                            <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xfhelptable">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <div style="width: 200px">
@@ -50,7 +50,7 @@
                     <th align="right" valign="middle">Birth Date</th>
                     <td>
                         <xhtml:div title="Birth Date" style="padding: 0px; margin: 0px">
-                            <xhtml:table border="0" cellpadding="0" cellspacing="0" style="margin: 0px">
+                            <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xfhelptable">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xhtml:input type="text" name="document[5]/{http://orbeon.org/oxf/examples/bizdoc/claim}claim/{http://orbeon.org/oxf/examples/bizdoc/claim}insured-info/{http://orbeon.org/oxf/examples/bizdoc/claim}person-info[2]/{http://orbeon.org/oxf/examples/bizdoc/claim}birth-date[2]" value="1972-10-01" xhtml:style="width: 200px"/>
@@ -67,7 +67,7 @@
                     <th align="right" valign="middle">Marital Status</th>
                     <td>
                         <xhtml:div title="Marital Status" style="padding: 0px; margin: 0px">
-                            <xhtml:table border="0" cellpadding="0" cellspacing="0" style="margin: 0px">
+                            <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xfhelptable">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xhtml:select name="document[5]/{http://orbeon.org/oxf/examples/bizdoc/claim}claim/{http://orbeon.org/oxf/examples/bizdoc/claim}insured-info/{http://orbeon.org/oxf/examples/bizdoc/claim}person-info[2]/{http://orbeon.org/oxf/examples/bizdoc/claim}marital-status-code[3]" xhtml:style="width: 200px">
@@ -92,7 +92,7 @@
                     <th align="right" valign="middle">Occupation</th>
                     <td>
                         <xhtml:div title="Occupation" style="padding: 0px; margin: 0px">
-                            <xhtml:table border="0" cellpadding="0" cellspacing="0" style="margin: 0px">
+                            <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xfhelptable">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xhtml:input type="text" name="document[5]/{http://orbeon.org/oxf/examples/bizdoc/claim}claim/{http://orbeon.org/oxf/examples/bizdoc/claim}insured-info/{http://orbeon.org/oxf/examples/bizdoc/claim}person-info[2]/{http://orbeon.org/oxf/examples/bizdoc/claim}occupation[4]" value="Manager" xhtml:style="width: 200px"/>
@@ -109,7 +109,7 @@
                     <th>Comments</th>
                     <td colspan="4">
                         <xhtml:div title="Comments" style="padding: 0px; margin: 0px">
-                            <xhtml:table border="0" cellpadding="0" cellspacing="0" style="margin: 0px">
+                            <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xfhelptable">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xhtml:textarea name="document[5]/{http://orbeon.org/oxf/examples/bizdoc/claim}claim/{http://orbeon.org/oxf/examples/bizdoc/claim}insured-info/{http://orbeon.org/oxf/examples/bizdoc/claim}family-info[3]/{http://orbeon.org/oxf/examples/bizdoc/claim}comments[2]" xhtml:style="width: 200px; height: 10em; font-family: Verdana;">No comments at this point!</xhtml:textarea>
@@ -132,7 +132,7 @@
                 <tr>
                     <td>
                         <xhtml:div title="Birth Date" style="padding: 0px; margin: 0px">
-                            <xhtml:table border="0" cellpadding="0" cellspacing="0" style="margin: 0px">
+                            <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xfhelptable">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xhtml:input type="text" name="document[5]/{http://orbeon.org/oxf/examples/bizdoc/claim}claim/{http://orbeon.org/oxf/examples/bizdoc/claim}insured-info/{http://orbeon.org/oxf/examples/bizdoc/claim}family-info[3]/{http://orbeon.org/oxf/examples/bizdoc/claim}children[1]/{http://orbeon.org/oxf/examples/bizdoc/claim}child[1]/{http://orbeon.org/oxf/examples/bizdoc/claim}birth-date[1]" value="2003-02-02"/>
@@ -146,7 +146,7 @@
                     </td>
                     <td>
                         <xhtml:div title="First Name" style="padding: 0px; margin: 0px">
-                            <xhtml:table border="0" cellpadding="0" cellspacing="0" style="margin: 0px">
+                            <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xfhelptable">
                                 <xhtml:tr>
                                     <xhtml:td>
                                         <xhtml:input type="text" name="document[5]/{http://orbeon.org/oxf/examples/bizdoc/claim}claim/{http://orbeon.org/oxf/examples/bizdoc/claim}insured-info/{http://orbeon.org/oxf/examples/bizdoc/claim}family-info[3]/{http://orbeon.org/oxf/examples/bizdoc/claim}children[1]/{http://orbeon.org/oxf/examples/bizdoc/claim}child[1]/{http://orbeon.org/oxf/examples/bizdoc/claim}first-name[2]" value="Marco"/>
@@ -179,7 +179,7 @@
                                 <th>Accident Type</th>
                                 <td colspan="4">
                                     <xhtml:div title="Accident Type" style="padding: 0px; margin: 0px">
-                                        <xhtml:table border="0" cellpadding="0" cellspacing="0" style="margin: 0px">
+                                        <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xfhelptable">
                                             <xhtml:tr>
                                                 <xhtml:td>
                                                     <xhtml:select name="document[5]/{http://orbeon.org/oxf/examples/bizdoc/claim}claim/{http://orbeon.org/oxf/examples/bizdoc/claim}insured-info/{http://orbeon.org/oxf/examples/bizdoc/claim}claim-info[4]/{http://orbeon.org/oxf/examples/bizdoc/claim}accident-type[1]" xhtml:style="width: 200px">
@@ -201,7 +201,7 @@
                                 <th>Accident Date</th>
                                 <td colspan="4">
                                     <xhtml:div title="Accident Date" style="padding: 0px; margin: 0px">
-                                        <xhtml:table border="0" cellpadding="0" cellspacing="0" style="margin: 0px">
+                                        <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xfhelptable">
                                             <xhtml:tr>
                                                 <xhtml:td>
                                                     <xhtml:input type="text" name="document[5]/{http://orbeon.org/oxf/examples/bizdoc/claim}claim/{http://orbeon.org/oxf/examples/bizdoc/claim}insured-info/{http://orbeon.org/oxf/examples/bizdoc/claim}claim-info[4]/{http://orbeon.org/oxf/examples/bizdoc/claim}accident-date[2]" value="2004-07-06" xhtml:style="width: 200px"/>
@@ -218,7 +218,7 @@
                                 <th>Calculated Rate</th>
                                 <td colspan="4">
                                     <xhtml:div title="Claim Rate" style="padding: 0px; margin: 0px">
-                                        <xhtml:table border="0" cellpadding="0" cellspacing="0" style="margin: 0px">
+                                        <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xfhelptable">
                                             <xhtml:tr>
                                                 <xhtml:td>10
                                                     <xxforms:hidden xxforms:name="document[5]/{http://orbeon.org/oxf/examples/bizdoc/claim}claim/{http://orbeon.org/oxf/examples/bizdoc/claim}insured-info/{http://orbeon.org/oxf/examples/bizdoc/claim}claim-info[4]/{http://orbeon.org/oxf/examples/bizdoc/claim}rate[3]" xxforms:value="10"/>

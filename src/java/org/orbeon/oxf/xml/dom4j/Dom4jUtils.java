@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
-import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
 import org.dom4j.util.UserDataElement;
 import org.dom4j.util.UserDataAttribute;

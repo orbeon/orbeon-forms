@@ -1171,4 +1171,8 @@ public class XMLUtils {
         str = StringUtils.replace(str, "'", "&#39;");
         return str;
     }
+    static public String toString( final Locator loc ) {
+        return loc.getSystemId()+ ", line " + loc.getLineNumber() + ", column " 
+               + loc.getColumnNumber();
+    }
 }

@@ -58,11 +58,9 @@ public class Insert implements Action {
 
         // Determine where to insert the duplicated element
         int atValue;
-        {
-            atValue = Integer.parseInt(at) - 1;
-            if (atValue < 0) atValue = 0;
-            if (atValue >= ids.length) atValue = ids.length - 1;
-        }
+        atValue = Integer.parseInt(at) - 1;
+        if (atValue < 0) atValue = 0;
+        if (atValue >= ids.length) atValue = ids.length - 1;
 
         // Get element at "at" position
         final Element atElement;

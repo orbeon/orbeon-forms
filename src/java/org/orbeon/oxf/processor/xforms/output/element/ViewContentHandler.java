@@ -124,7 +124,7 @@ public class ViewContentHandler extends ForwardingContentHandler {
     }
 
     public void characters(char[] chars, int start, int length) throws SAXException {
-        if (recordMode == true) {
+        if (recordMode) {
             repeatSAXStore.characters(chars, start,  length);
         } else  {
             super.characters(chars, start, length);

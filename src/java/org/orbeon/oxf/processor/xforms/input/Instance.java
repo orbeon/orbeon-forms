@@ -100,7 +100,7 @@ public class Instance {
 
     private void setAttributeValue(Attribute attribute, String value) {
         // Handle xsi:type if needed
-        if (XMLConstants.XSI_TYPE_QNAME.equals(attribute.getNamespaceURI()) && !"".equals(attribute.getParent().getText())) {
+        if (XMLConstants.XSI_TYPE_QNAME.getNamespaceURI().equals(attribute.getNamespaceURI()) && !"".equals(attribute.getParent().getText())) {
             // This is a type attribute and we already have content
             String currentType = attribute.getParent().attributeValue(XMLConstants.XSI_TYPE_QNAME);
             if (currentType != null && !currentType.equals(value)) { // FIXME: prefixes of type name could be different!
@@ -169,7 +169,7 @@ public class Instance {
     public static Instance createInstanceFromContext(PipelineContext pipelineContext) {
         ExternalContext.Request request = getRequest(pipelineContext);
         ScopeStore instanceContextStore = (ScopeStore) request.getAttributesMap().get(REQUEST_INSTANCE_DOCUMENT);
-        return (instanceContextStore == null || instanceContextStore.getSaxStore() == null) ? null : new Instance(pipelineContext, instanceContextStore.getSaxStore().getDocument());
+        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new Instance(pipelineContext, instanceContextStore.getSaxStore().getDocument());
     }
 
     private static ExternalContext.Request getRequest(PipelineContext context) {

@@ -94,13 +94,11 @@ public class Model {
             }
 
             // Get values from attributes on root element
-            {
-                id = modelElement.attributeValue("id");
-                schema = modelElement.attributeValue("schema");
-                if (schema != null) {
-                    String systemID = ((LocationData) modelElement.getData()).getSystemID();
-                    schema = URLFactory.createURL(systemID, schema).toString();
-                }
+            id = modelElement.attributeValue("id");
+            schema = modelElement.attributeValue("schema");
+            if (schema != null) {
+                String systemID = ((LocationData) modelElement.getData()).getSystemID();
+                schema = URLFactory.createURL(systemID, schema).toString();
             }
 
             // Get info from <xforms:submission> element
@@ -212,7 +210,7 @@ public class Model {
                                     for (Iterator k = result.iterator(); k.hasNext();) {
                                         Object resultItem = k.next();
                                         if (resultItem instanceof Node) {
-                                            elementNode.add(((Node) elementNode.clone()));
+                                            elementNode.add((Node) elementNode.clone());
                                         } else if(resultItem instanceof Item) {
                                             elementNode.add(DocumentFactory.getInstance().createText(((Item)resultItem).getStringValue()));
                                         } else {
@@ -233,7 +231,7 @@ public class Model {
                                         documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
                                         xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
                                 try {
-                                    String value = ((String)expr.evaluateSingle());
+                                    String value = (String) expr.evaluateSingle();
                                     XFormsUtils.fillNode(node, value);
                                 } catch (XPathException e) {
                                     throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
@@ -347,7 +345,7 @@ public class Model {
                                 throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
                             } finally {
                                 if(expr != null)
-                                    expr.returnToPool();;
+                                    expr.returnToPool();
                             }
                         }
                     });
@@ -429,7 +427,7 @@ public class Model {
                         }
                     }
                     for(Iterator i=invalidBindsMap.keySet().iterator(); i.hasNext();)
-                        invalidBinds = invalidBinds + (String)i.next();
+                        invalidBinds += (String) i.next();
                 }
 
                 // Put in DOM and attribute
@@ -508,7 +506,7 @@ public class Model {
     }
     
     private interface NodeHandler {
-    	public void handleNode(Node node);
+    	void handleNode(Node node);
     }
     
     /**

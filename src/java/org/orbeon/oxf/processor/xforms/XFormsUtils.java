@@ -64,48 +64,6 @@ public class XFormsUtils {
         }
     }
 
-    /**
-     * Generates a normalized XPath expression pointing to the given node
-     * (element or attribute). The XPath expression is relative to the root
-     * element.
-     */
-    public static String getNameForNode(Node node, boolean annotateElement) {
-
-        StringBuffer name = new StringBuffer();
-        if (annotateElement)
-            XFormsUtils.getInstanceData(node).setGenerated(true);
-        while (true) {
-            if (node instanceof Element) {
-                Element element = (Element) node;
-                if (node.getParent() == null) {
-                    // We are at the root
-                    if (name.length() == 0) {
-                        name.append(".");
-                    }
-                    break;
-                } else {
-                    // Insert element name
-                    if (name.length() > 0) name.insert(0, "/");
-                    List siblings = element.getParent().elements();
-                    if (siblings.size() > 1) {
-                        int position = siblings.indexOf(element);
-                        name.insert(0, "[" + (position + 1) + "]");
-                    }
-                    name.insert(0, XPathUtils.putNamespaceInName(element.getNamespaceURI(), element.getNamespacePrefix(), element.getName(), false));
-                    node = element.getParent();
-                }
-            } else if (node instanceof Attribute) {
-                // Insert attribute name
-                Attribute attribute = (Attribute) node;
-                name.append("@").append(XPathUtils.putNamespaceInName(attribute.getNamespaceURI(), attribute.getNamespacePrefix(), attribute.getName(), true));
-                node = attribute.getParent();
-            } else {
-                throw new OXFException("Only element and attributes can be referenced");
-            }
-        }
-        return name.toString();
-    }
-
     public static InstanceData getInstanceData(Node node) {
         return node instanceof Element
             ? (InstanceData) ((Element) node).getData()
@@ -140,56 +98,6 @@ public class XFormsUtils {
             Element child = (Element) i.next();
             setInitialDecorationWorker(child, currentId, idToNodeMap);
         }
-    }
-
-    /**
-     * Canonicalize a path of the form "a/b/../../c/./d/". The string may start and end with a
-     * "/". Occurrences of "..." or other similar patterns are ignored.
-     */
-    public static String canonicalizeRef(String path) {
-
-        // Parse the path
-        Stack elements = new Stack();
-        int index = 0;
-        int lastIndex = 0;
-        for (;;) {
-            int slashIndex = path.indexOf('/', index);
-            if (slashIndex == -1)
-                slashIndex = path.length();
-            int braceIndex = path.indexOf('{', index);
-            // Skip until after the closing brace if a brace is found
-            if (braceIndex != -1 && braceIndex < slashIndex) {
-                int closingBraceIndex = path.indexOf('}', braceIndex + 1);
-                if (closingBraceIndex == -1)
-                    throw new OXFException("Missing closing brace in ref: " + path);
-                index = closingBraceIndex + 1;
-                continue;
-            }
-            // A valid "/" was found, or this is the end of the path
-            String element = path.substring(lastIndex, slashIndex);
-            index = lastIndex = slashIndex + 1;
-            if (element.equals("..")) {
-                elements.pop();
-            } else if (element.equals(".")) {
-                ;// Do nothing
-            } else if (!"".equals(element) || elements.size() > 0) {
-                elements.push(element);
-            }
-            if (slashIndex == path.length())
-                break;
-        }
-
-        StringBuffer sb = new StringBuffer();
-        int count = 0;
-        for (Iterator i = elements.iterator(); i.hasNext(); count++) {
-            String s = (String) i.next();
-            if (count > 0 || path.startsWith("/"))
-                sb.append("/");
-            sb.append(s);
-        }
-        if (path.endsWith("/"))
-            sb.append("/");
-        return sb.toString();
     }
 
     public static boolean isNameEncryptionEnabled() {

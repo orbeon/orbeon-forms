@@ -38,7 +38,7 @@ public class XFormsAnnotate extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
 
                 try {
                     // Extract info from model

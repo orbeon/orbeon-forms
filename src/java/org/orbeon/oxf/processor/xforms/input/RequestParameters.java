@@ -21,6 +21,7 @@ import org.orbeon.oxf.processor.xforms.input.action.Delete;
 import org.orbeon.oxf.processor.xforms.input.action.Insert;
 import org.orbeon.oxf.processor.xforms.input.action.SetIndex;
 import org.orbeon.oxf.processor.xforms.input.action.SetValue;
+import org.orbeon.oxf.processor.xforms.input.action.Set;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.NetUtils;
@@ -55,7 +56,7 @@ public class RequestParameters {
         actionClasses.put("delete", Delete.class);
         actionClasses.put("setvalue", SetValue.class);
         actionClasses.put("setindex", SetIndex.class);
-        actionClasses.put("set", org.orbeon.oxf.processor.xforms.input.action.Set.class);
+        actionClasses.put("set", Set.class);
     }
 
     private Map idToValue = new HashMap();

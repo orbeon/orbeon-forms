@@ -121,9 +121,15 @@ public class XFormsElementContext {
 
     public List getCurrentNodeset() {
         Object current = nodesetStack.peek();
-        if (!(current instanceof List))
-            throw new ValidationException("Current context is a node, a nodelist is expected",
-                    new LocationData(locator));
+        if (!(current instanceof List)) {
+            // We have a node if we are in a repeat. In this case look one level deeper in the stack.
+            if (nodesetStack.size() > 1 && nodesetStack.get(1) instanceof List) {
+                current = nodesetStack.get(1);
+            } else {
+                throw new ValidationException("Current context is a node, a nodelist is expected",
+                        new LocationData(locator));
+            }
+        }
         return (List) current;
     }
 
@@ -324,9 +330,7 @@ public class XFormsElementContext {
         if (repeatId != null)
             repeatIdToIndex.put(repeatId, indexObj);
 
-        // variableName is null when iterating over an xf:itemset
-        if(variableName != null)
-            variablesValue.put(variableName, indexObj);
+        variablesValue.put(variableName, indexObj);
     }
 
     public void removeRepeatId(String repeatId) {

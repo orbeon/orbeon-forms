@@ -77,6 +77,6 @@ public class Repeat extends XFormsElement {
         lastIndex = numberAttribute == null ? nodeset.size()
                 : Math.min(nodeset.size(), currentIndex + Integer.parseInt(numberAttribute) - 1);
 
-        super.start(context, uri, localname, qname, attributes);
+        context.getContentHandler().startElement(uri, localname, qname, attributes);
     }
 }

@@ -2000,7 +2000,7 @@ Le bruit persistait toujours.
         </output>
     </test>
 
-    <test description="XForms NS Prefixes" name="oxf:pipeline" only="true">
+    <test description="XForms NS Prefixes" name="oxf:pipeline">
         <input name="config" xmlns:a="http://orbeon.com/a" xmlns:b="http://orbeon.com/b" xmlns:c="http://orbeon.com/c">
             <p:config>
                 <p:param type="output" name="out"/>

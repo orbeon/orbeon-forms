@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal ENABLEDELAYEDEXPANSION
 
 @rem There is some funkiness wrt set command in a for statement in an if 
 @rem block when setlocal is true.  Consequently set set bld_root up here

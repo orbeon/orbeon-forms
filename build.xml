@@ -105,8 +105,8 @@
       <exclude name="org/orbeon/faces/**/*.java"/>
       <exclude name="org/orbeon/faces11/**/*.java"/>
       <exclude name="org/orbeon/oxf/resources/Cache*"/>
-      <exclude name="org/orbeon/oxf/resources/Tamino*"/>
-      <exclude name="org/orbeon/oxf/processor/tamino/**/*.java"/>
+<!--      <exclude name="org/orbeon/oxf/resources/Tamino*"/>-->
+<!--      <exclude name="org/orbeon/oxf/processor/tamino/**/*.java"/>-->
       <!--            <exclude name="org/orbeon/oxf/processor/xmldb/**"/>-->
       <!--            <exclude name="org/orbeon/oxf/portlet/**/*.java"/>-->
       <!--            <exclude name="org/orbeon/oxf/pipeline/processors/FOP*"/>-->

@@ -22,7 +22,6 @@ import org.orbeon.oxf.processor.pipeline.PipelineConfig;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.serializer.legacy.HTMLSerializer;
-import org.orbeon.oxf.processor.serializer.legacy.HTMLSerializer;
 import org.orbeon.oxf.processor.xforms.input.Instance;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.transformer.xupdate.Constants;
@@ -811,30 +810,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             final boolean doServerSideRedirect = _instancePassing != null && _instancePassing.equals(INSTANCE_PASSING_FORWARD);
             final boolean doRedirectExitPortal = _instancePassing != null && _instancePassing.equals(INSTANCE_PASSING_REDIRECT_PORTAL);
 
-            if (otherXForms != null && paramsDocument != null) {
-                // Do redirect passing parameters from internalXUpdatedInstance and modify URL if needed
-                // FIXME: This does not handle server-side or portal-exit redirects
-                final ASTOutput parametersOutput = new ASTOutput(null, "parameters");
-                when.addStatement(new ASTProcessorCall(XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
-                    addInput(new ASTInput("filter", paramsDocument));
-                    addOutput(new ASTOutput("data", parametersOutput));
-                }});
-                final ASTOutput redirectDataOutput = new ASTOutput(null, "redirect-data");
-                when.addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("config", new ASTHrefURL("oxf:/oxf/private/page-flow/reverse-params.xpl")));
-                    addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
-                    addInput(new ASTInput("instance-params", new ASTHrefId(parametersOutput)));
-                    addInput(new ASTInput("params", paramsDocument));
-                    addInput(new ASTInput("path-info", new DocumentDelegate
-                            (new ElementDelegate("path-info") {{ setText(forwardPathInfo); }} )));
-                    addOutput(new ASTOutput("redirect-data", redirectDataOutput));
-                }});
-
-                when.addStatement(new ASTProcessorCall(XMLConstants.REDIRECT_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", new ASTHrefId(redirectDataOutput)));// {{setDebug("redirect 1");}}
-                }});
-            } else {
+            {
                 // Do redirect passing parameters from internalXUpdatedInstance without modifying URL
                 final ASTOutput parametersOutput = (otherXForms != null) ? new ASTOutput(null, "parameters") : null;
                 if (otherXForms != null) {
@@ -880,13 +856,34 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     }});
                 }
                 // Aggregate redirect-url config
-                final ASTHrefAggregate redirectURLAggregate = new ASTHrefAggregate("redirect-url", new ASTHrefId(forwardPathInfoOutput),
-                        new ASTHrefId(isServerSideRedirectOutput), new ASTHrefId(isRedirectExitPortal));
-                if (otherXForms != null) // Pass parameters only if needed
-                    redirectURLAggregate.getHrefs().add(new ASTHrefId(parametersOutput));
+                final ASTHref redirectURLData;
+                if (paramsDocument != null) {
+                    // Params document - things are little more complicated, so we delegate
+                    final ASTOutput redirectDataOutput = new ASTOutput(null, "redirect-data");
+
+                    final ASTHrefAggregate redirectDataAggregate = new ASTHrefAggregate("redirect-url", new ASTHrefId(forwardPathInfoOutput),
+                            new ASTHrefId(isServerSideRedirectOutput), new ASTHrefId(isRedirectExitPortal));
+                    redirectDataAggregate.getHrefs().add(new ASTHrefId(parametersOutput));
+
+                    when.addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
+                        addInput(new ASTInput("config", new ASTHrefURL("oxf:/oxf/private/page-flow/reverse-params.xpl")));
+                        addInput(new ASTInput("redirect-data", redirectDataAggregate));
+                        addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
+                        addInput(new ASTInput("params", paramsDocument));// ok
+                        addOutput(new ASTOutput("redirect-data", redirectDataOutput));
+                    }});
+                    redirectURLData = new ASTHrefId(redirectDataOutput);
+                } else {
+                    // No params document, we can simply aggregate with XPL
+                    final ASTHrefAggregate redirectDataAggregate = new ASTHrefAggregate("redirect-url", new ASTHrefId(forwardPathInfoOutput),
+                            new ASTHrefId(isServerSideRedirectOutput), new ASTHrefId(isRedirectExitPortal));
+                    if (otherXForms != null) // Pass parameters only if needed
+                        redirectDataAggregate.getHrefs().add(new ASTHrefId(parametersOutput));
+                    redirectURLData = redirectDataAggregate;
+                }
                 // Execute the redirect
                 when.addStatement(new ASTProcessorCall(XMLConstants.REDIRECT_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", redirectURLAggregate));// {{setDebug("redirect 2");}}
+                    addInput(new ASTInput("data", redirectURLData));// {{setDebug("redirect 2");}}
                 }});
             }
         }

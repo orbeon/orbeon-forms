@@ -232,24 +232,33 @@
                 <p:param type="output" name="out"/>
                 <p:processor uri="oxf/processor/pipeline">
                     <p:input name="config" href="xforms-instance-recreate.xpl"/>
-                    <p:input name="instance">
-                        <form>
-                            <a:claim a:id="1" xmlns:a="http://orbeon.com/a" xmlns:c="http://orbeon.com/c">
-                                <b:person xmlns:b="http://orbeon.com/b1">
-                                    <c:name>
-                                        <a:first>John</a:first>
-                                        <b:last xmlns:b="http://orbeon.com/b2" >Smith</b:last>
-                                    </c:name>
-                                </b:person>
-                                <c:address>
-                                    <a:street>850 N. Shoreline Blvd</a:street>
-                                    <b:city xmlns:b="http://orbeon.com/b3" >Mountain View</b:city>
-                                    <c:state>CA</c:state>
-                                    <zip>94043</zip>
-                                    <country>USA</country>
-                                </c:address>
-                            </a:claim>
-                        </form>
+                    <p:input name="model">
+                        <xforms:model xsl:version="2.0">
+                            <xforms:instance>
+                                <form>
+                                    <a:claim a:id="1" xmlns:a="http://orbeon.com/a" xmlns:c="http://orbeon.com/c">
+                                        <b:person xmlns:b="http://orbeon.com/b1">
+                                            <c:name>
+                                                <a:first>John</a:first>
+                                                <b:last xmlns:b="http://orbeon.com/b2" >Smith</b:last>
+                                            </c:name>
+                                        </b:person>
+                                        <c:address>
+                                            <a:street>850 N. Shoreline Blvd</a:street>
+                                            <b:city xmlns:b="http://orbeon.com/b3" >Mountain View</b:city>
+                                            <c:state>CA</c:state>
+                                            <zip>94043</zip>
+                                            <country>USA</country>
+                                        </c:address>
+                                    </a:claim>
+                                </form>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:input name="view">
+                        <html>
+                            <xforms:group ref="/*"/>
+                        </html>
                     </p:input>
                     <p:output name="instance" ref="out"/>
                 </p:processor>
@@ -266,7 +275,7 @@
                     </b:person>
                     <c:address xmlns:c="http://orbeon.com/c">
                         <a:street>850 N. Shoreline Blvd</a:street>
-                        <b:city xmlns:b="http://orbeon.com/b3" >Mountain View</b:city>
+                        <b:city xmlns:b="http://orbeon.com/b3">Mountain View</b:city>
                         <c:state>CA</c:state>
                         <zip>94043</zip>
                         <country>USA</country>
@@ -640,6 +649,34 @@
         </input>
         <output name="data">
             <value>1</value>
+        </output>
+    </test>
+    
+    <test description="Relative URL in xforms:delete" name="oxf:pipeline">
+        <input name="config" href="oxf:/unit-tests/xforms-instance-recreate.xpl"/>
+        <input name="model">
+            <xforms:model id="form">
+                <xforms:instance>
+                    <instance>
+                        <a/>
+                        <b/>
+                        <c/>
+                    </instance>
+                </xforms:instance>
+            </xforms:model>
+        </input>
+        <input name="view">
+            <xforms:group ref="/instance">
+                <xforms:submit>
+                    <xforms:delete nodeset="*" at="2"/>
+                </xforms:submit>
+            </xforms:group>
+        </input>
+        <output name="instance">
+            <instance>
+                <a/>
+                <c/>
+            </instance>
         </output>
     </test>
 </group>

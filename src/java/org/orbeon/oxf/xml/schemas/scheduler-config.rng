@@ -11,54 +11,74 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<element name="config"
-    datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
-    xmlns="http://relaxng.org/ns/structure/1.0">
-    <interleave>
-        <zeroOrMore>
-            <element name="start-task">
-                <interleave>
-                    <element name="name">
-                        <data type="string"/>
-                    </element>
-                    <choice>
-                        <element name="processor-name">
-                            <data type="QName"/>
-                        </element>
-                        <!-- Deprecated -->
-                        <element name="processor-uri">
-                            <data type="string"/>
-                        </element>
-                    </choice>
-                    <element name="start-time">
-                        <data type="string"/>
-                    </element>
-                    <element name="interval">
-                        <data type="long"/>
-                    </element>
-                    <optional>
-                        <element name="synchronized">
-                            <data type="boolean"/>
-                        </element>
-                    </optional>
-                    <zeroOrMore>
-                        <element name="input">
-                            <attribute name="name"/>
+<grammar 
+  datatypeLibrary='http://www.w3.org/2001/XMLSchema-datatypes'
+  xmlns='http://relaxng.org/ns/structure/1.0'
+>
+    <start>
+        <ref name='config' />
+    </start>
+    
+    <define name='config' >
+        <element name='config' >
+            <interleave>
+                <zeroOrMore>
+                    <element name='start-task'>
+                        <interleave>
+                            <element name='name'>
+                                <data type='string'/>
+                            </element>
                             <choice>
-                                <attribute name="url"/>
-                                <data type="string"/>
+                                <element name='processor-name'>
+                                    <data type='QName'/>
+                                </element>
                             </choice>
+                            <element name='start-time'>
+                                <data type='string'/>
+                            </element>
+                            <element name='interval'>
+                                <data type='long'/>
+                            </element>
+                            <optional>
+                                <element name='synchronized'>
+                                    <data type='boolean'/>
+                                </element>
+                            </optional>
+                            <zeroOrMore>
+                                <element name='input'>
+                                    <attribute name='name'/>
+                                    <choice>
+                                        <attribute name='url'/>
+                                        <ref name='anyElement'/>
+                                    </choice>
+                                </element>
+                            </zeroOrMore>
+                        </interleave>
+                    </element>
+                </zeroOrMore>
+                <zeroOrMore>
+                    <element name='stop-task'>
+                        <element name='name'>
+                            <data type='string'/>
                         </element>
-                    </zeroOrMore>
-                </interleave>
-            </element>
-        </zeroOrMore>
-        <zeroOrMore>
-            <element name="stop-task">
-                <element name="name">
-                    <data type="string"/>
-                </element>
-            </element>
-        </zeroOrMore>
-    </interleave>
-</element>
+                    </element>
+                </zeroOrMore>
+            </interleave>
+        </element>
+    </define>
+    
+    <define name='anyElement'>
+        <element>
+            <anyName/>
+            <zeroOrMore>
+                <choice>
+                    <attribute>
+                        <anyName/>
+                    </attribute>
+                    <text/>
+                    <ref name='anyElement'/>
+                </choice>
+            </zeroOrMore>
+        </element>
+    </define>
+</grammar>

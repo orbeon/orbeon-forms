@@ -29,6 +29,7 @@ import org.orbeon.oxf.util.task.Task;
 import org.orbeon.oxf.util.task.TaskScheduler;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -69,16 +70,20 @@ public class SchedulerProcessor extends ProcessorImpl {
                             processorDefinition.setUri(XPathUtils.selectStringValueNormalize(startTaskElement, "processor-uri"));
                         }
 
-                        for (Iterator j = XPathUtils.selectIterator(startTaskElement, "input"); j.hasNext();) {
+                        for ( final Iterator j = XPathUtils.selectIterator(startTaskElement, "input"); j.hasNext();) {
                             Element inputElement = (Element) j.next();
                             String name = inputElement.attributeValue("name");
                             String url = inputElement.attributeValue("url");
                             if (url != null) {
                                 processorDefinition.addInput(name, url);
                             } else {
-                                Iterator it = inputElement.elementIterator();
-                                if (it.hasNext())
-                                    processorDefinition.addInput(name, (Element) it.next());
+                                final Iterator it = inputElement.elementIterator();
+                                if ( it.hasNext() ) {
+                                    final org.dom4j.Element srcElt = ( org.dom4j.Element )it.next();
+                                    final org.dom4j.Element elt 
+                                        = Dom4jUtils.cloneElement( srcElt ); 
+                                    processorDefinition.addInput( name, elt );
+                                }
                                 else
                                     throw new OXFException("Node not found input element");
                             }

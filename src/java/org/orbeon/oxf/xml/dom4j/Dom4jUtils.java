@@ -31,20 +31,29 @@ public class Dom4jUtils {
      * Clone a node, making sure that we copy all the declared namespace of
      * the source.
      */
-    public static org.dom4j.Node cloneNode(org.dom4j.Node node) {
-        if (node instanceof org.dom4j.Element) {
-            org.dom4j.Element originalElement = (org.dom4j.Element) node;
-            Map namespaceContext = XMLUtils.getNamespaceContext(originalElement);
-            org.dom4j.Element resultElement = (org.dom4j.Element) cloneNodeWorker(originalElement);
-            for (Iterator i = namespaceContext.keySet().iterator(); i.hasNext();) {
-                String prefix = (String) i.next();
-                if (resultElement.getNamespaceForPrefix(prefix) == null)
-                    resultElement.addNamespace(prefix, (String) namespaceContext.get(prefix));
-            }
-            return resultElement;
+    public static org.dom4j.Node cloneNode( final org.dom4j.Node n ) {
+        final org.dom4j.Node ret;
+        if ( n.getNodeType() == org.dom4j.Node.ELEMENT_NODE ) {
+            ret = cloneElement( ( org.dom4j.Element )n );
         } else {
-            return cloneNodeWorker(node);
+            ret = cloneNodeWorker( n );
         }
+        return ret;
+    }
+    /**
+     * Clone a node, making sure that we copy all the declared namespace of
+     * the source.
+     */
+    public static org.dom4j.Element cloneElement( final org.dom4j.Element e ) {
+        final Map namespaceContext = XMLUtils.getNamespaceContext( e );
+        final org.dom4j.Element ret = (org.dom4j.Element) cloneNodeWorker( e );
+        for ( final Iterator i = namespaceContext.keySet().iterator(); i.hasNext(); ) {
+            final String pfx = ( String )i.next();
+            if ( ret.getNamespaceForPrefix( pfx ) == null ) {
+                ret.addNamespace(pfx, ( String )namespaceContext.get( pfx ) );
+            }
+        }
+        return ret;
     }
     /**
      * Replacment for DocumentHelper.parseText.  DocumentHelper.parseText is creates work for GC

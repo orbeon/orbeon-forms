@@ -232,19 +232,14 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                     if (output.getId() == null && output.getRef() == null)
                         throw new OXFException("Either one of id or ref must be specified on output " + output.getName());
 
-                    if (output.getRef() != null) {
-                        ProcessorOutput pout = block.connectProcessorToBottomInput
-                                (output.getNode(), processor, output.getName(), output.getRef());
-                        setDebugAndSchema(pout, output);
-                        setBreakpointKey(pout, output);
-                    }
-
-                    if (output.getId() != null) {
-                        ProcessorOutput pout = processor.createOutput(output.getName());
+                    ProcessorOutput pout = processor.createOutput(output.getName());
+                    if (output.getId() != null)
                         block.declareOutput(output.getNode(), output.getId(), pout);
-                        setDebugAndSchema(pout, output);
-                        setBreakpointKey(pout, output);
-                    }
+                    if (output.getRef() != null)
+                        block.connectProcessorToBottomInput
+                                (output.getNode(), output.getName(), output.getRef(), pout);
+                    setDebugAndSchema(pout, output);
+                    setBreakpointKey(pout, output);
                 }
 
                 // Make sure at least one of the outputs is connected
@@ -363,10 +358,11 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 for (Iterator j = processor.getOutputsInfo().iterator(); j.hasNext();) {
                     String outputName = ((ProcessorInputOutputInfo) j.next()).getName();
                     foundOutput = true;
-                    if (chooseProcessor.getOutputsByParamRef().contains(outputName))
-                        block.connectProcessorToBottomInput(choose.getNode(), processor, outputName, outputName);
+                    ProcessorOutput pout = processor.createOutput(outputName);
                     if (chooseProcessor.getOutputsById().contains(outputName))
-                        block.declareOutput(choose.getNode(), outputName, processor.createOutput(outputName));
+                        block.declareOutput(choose.getNode(), outputName, pout);
+                    if (chooseProcessor.getOutputsByParamRef().contains(outputName))
+                        block.connectProcessorToBottomInput(choose.getNode(), outputName, outputName, pout);
                 }
 
             } else if (statement instanceof ASTForEach) {
@@ -397,23 +393,14 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 }
 
                 // Connect output
-                String outputName = null;
-                if (forEach.getId() != null) {
-                    outputName = forEach.getId();
-                    ProcessorOutput forEachOutput;
-                    if (forEach.getRef() != null) {
-                        block.connectProcessorToBottomInput(forEach.getNode(), processor, forEach.getId(), forEach.getRef());
-                        forEachOutput = processor.getOutputByName(forEach.getId());
-                    } else {
-                        forEachOutput = processor.createOutput(forEach.getId());
-                    }
-                    block.declareOutput(forEach.getNode(), forEach.getId(), forEachOutput);
-                } else if (forEach.getRef() != null) {
-                    outputName = forEach.getRef();
-                    block.connectProcessorToBottomInput(forEach.getNode(), processor, forEach.getRef(), forEach.getRef());
-                }
+                String outputName = forEach.getId() != null ? forEach.getId() : forEach.getRef();
                 if (outputName != null) {
                     foundOutput = true;
+                    ProcessorOutput forEachOutput = processor.createOutput(outputName);
+                    if (forEach.getId() != null)
+                        block.declareOutput(forEach.getNode(), forEach.getId(), forEachOutput);
+                    if (forEach.getRef() != null)
+                        block.connectProcessorToBottomInput(forEach.getNode(), forEach.getId(), forEach.getRef(), forEachOutput);
                     setDebugAndSchema(processor.getOutputByName(outputName), forEachLocationData,
                             forEach.getOutputSchemaUri(), forEach.getOutputSchemaHref(), forEach.getOutputDebug());
                 }

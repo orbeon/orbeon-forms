@@ -208,7 +208,7 @@ public class PipelineBlock {
         return bottomInput.getOutput() != null;
     }
 
-    public ProcessorOutput connectProcessorToBottomInput(Node node, Processor processor, String outputName, String referencedId) {
+    public ProcessorOutput connectProcessorToBottomInput(Node node, String outputName, String referencedId, ProcessorOutput processorOutput) {
         if (!idToInputMap.containsKey(referencedId)) {
             LocationData locationData = node == null ? null : (LocationData) ((Element) node).getData();
             throw new ValidationException("Reference to undeclared output parameter id \"" + referencedId + "\"", locationData);
@@ -217,7 +217,6 @@ public class PipelineBlock {
             LocationData locationData = node == null ? null : (LocationData) ((Element) node).getData();
             throw new ValidationException("Other processor output is already connected to output parameter id \"" + referencedId + "\"", locationData);
         }
-        ProcessorOutput processorOutput = processor.createOutput(outputName);
         ProcessorInput bottomInput = (ProcessorInput) idToInputMap.get(referencedId);
         bottomInput.setOutput(processorOutput);
         processorOutput.setInput(bottomInput);

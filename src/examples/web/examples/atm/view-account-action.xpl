@@ -12,7 +12,8 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:oxf="http://www.orbeon.com/oxf/processors">
+          xmlns:oxf="http://www.orbeon.com/oxf/processors"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
@@ -22,8 +23,8 @@
         <p:output name="data" id="balance"/>
     </p:processor>
 
-    <p:choose href="aggregate('root', #instance, #balance)">
-        <p:when test="if(/root/balance castable as xs:int and /root/ammount castable as xs:int) then
+    <p:choose href="aggregate('root', #instance, #balance)" debug="choose in">
+        <p:when test="if(/root/balance castable as xs:int and /root/amount castable as xs:int) then
               (xs:int(/root/balance) >= xs:int(/root/amount)) else false()">
             <!-- Use the Scope serializer to store the "balance" document into the session -->
             <p:processor name="oxf:scope-serializer">

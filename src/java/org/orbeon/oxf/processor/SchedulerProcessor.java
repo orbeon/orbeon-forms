@@ -22,7 +22,7 @@ import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
-import org.orbeon.oxf.servlet.ServletContextExternalContext;
+import org.orbeon.oxf.webapp.ServletContextExternalContext;
 import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.task.Task;

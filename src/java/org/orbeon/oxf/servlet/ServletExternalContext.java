@@ -28,6 +28,7 @@ import org.orbeon.oxf.util.HttpServletRequestStub;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SystemUtils;
+import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -43,9 +44,12 @@ import java.util.*;
 /*
  * Servlet-specific implementation of ExternalContext.
  */
-public class ServletExternalContext implements ExternalContext {
+public class ServletExternalContext extends ServletWebAppExternalContext implements ExternalContext  {
 
     static Logger logger = LoggerFactory.createLogger(ServletExternalContext.class);
+
+    public static final String DEFAULT_FORM_CHARSET = "utf-8";
+    public static final String DEFAULT_FORM_CHARSET_PROPERTY = "oxf.servlet.default-form-charset";
 
     private class Request implements ExternalContext.Request {
 
@@ -134,18 +138,16 @@ public class ServletExternalContext implements ExternalContext {
                     getParameterMapMultipartFormDataCalled = true;
                 } else {
                     // Try to set an appropriate encoding for forms and parameters
-                    if (OXFServlet.supportsServlet23) {
-                        try {
-    //                        String acceptCharset = nativeRequest.getHeader("accept-charset");
-    //                        if (acceptCharset != null && acceptCharset.toLowerCase().indexOf("utf-8") != -1)
-    //                            nativeRequest.setCharacterEncoding("utf-8");
-                            String formCharset = OXFProperties.instance().getPropertySet().getString(OXFServlet.DEFAULT_FORM_CHARSET_PROPERTY);
-                            if (formCharset == null)
-                                formCharset = OXFServlet.DEFAULT_FORM_CHARSET;
-                            nativeRequest.setCharacterEncoding(formCharset);
-                        } catch (UnsupportedEncodingException e) {
-                            throw new OXFException(e);
-                        }
+                    try {
+//                        String acceptCharset = nativeRequest.getHeader("accept-charset");
+//                        if (acceptCharset != null && acceptCharset.toLowerCase().indexOf("utf-8") != -1)
+//                            nativeRequest.setCharacterEncoding("utf-8");
+                        String formCharset = OXFProperties.instance().getPropertySet().getString(DEFAULT_FORM_CHARSET_PROPERTY);
+                        if (formCharset == null)
+                            formCharset = DEFAULT_FORM_CHARSET;
+                        nativeRequest.setCharacterEncoding(formCharset);
+                    } catch (UnsupportedEncodingException e) {
+                        throw new OXFException(e);
                     }
                     // Just use native request parameters
                     parameterMap = new HashMap();
@@ -673,28 +675,20 @@ public class ServletExternalContext implements ExternalContext {
         }
     }
 
-    private HttpServletRequest nativeRequest;
-    private HttpServletResponse nativeResponse;
-
     private Request request;
     private Response response;
     private Session session;
 
-    private ServletContext servletContext;
     private PipelineContext pipelineContext;
-    private Map attributesMap;
-    private Map initAttributesMap;
+    private HttpServletRequest nativeRequest;
+    private HttpServletResponse nativeResponse;
 
     public ServletExternalContext(ServletContext servletContext, PipelineContext pipelineContext, Map initAttributesMap, HttpServletRequest request, HttpServletResponse response) {
-        this.servletContext = servletContext;
+        super(servletContext, initAttributesMap);
+
         this.pipelineContext = pipelineContext;
-        this.initAttributesMap = initAttributesMap;
         this.nativeRequest = request;
         this.nativeResponse = response;
-    }
-
-    public Object getNativeContext() {
-        return servletContext;
     }
 
     public Object getNativeRequest() {
@@ -730,35 +724,12 @@ public class ServletExternalContext implements ExternalContext {
         return session;
     }
 
-    public Map getAttributesMap() {
-        if (attributesMap == null) {
-            attributesMap = new InitUtils.ServletContextMap(servletContext);
-        }
-        return attributesMap;
-    }
-
-    public synchronized Map getInitAttributesMap() {
-        return initAttributesMap;
-    }
-
-    public String getRealPath(String path) {
-        return servletContext.getRealPath(path);
-    }
-
     public String getStartLoggerString() {
         return getRequest().getPathInfo() + " - Received request";
     }
 
     public String getEndLoggerString() {
         return getRequest().getPathInfo();
-    }
-
-    public void log(String message, Throwable throwable) {
-        servletContext.log(message, throwable);
-    }
-
-    public void log(String msg) {
-        servletContext.log(msg);
     }
 
     public RequestDispatcher getNamedDispatcher(String name) {

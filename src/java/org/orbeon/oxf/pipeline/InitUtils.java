@@ -28,11 +28,11 @@ import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.XMLProcessorRegistry;
 import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.servlet.ServletContextExternalContext;
-import org.orbeon.oxf.servlet.WebAppContext;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.webapp.ServletContextExternalContext;
+import org.orbeon.oxf.webapp.WebAppContext;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -326,31 +326,6 @@ public class InitUtils {
 
                 public void setAttribute(String s, Object o) {
                     throw new UnsupportedOperationException();
-                }
-            });
-        }
-    }
-
-    /**
-     * Present a view of the ServletContext properties as a Map.
-     */
-    public static class ServletContextMap extends AttributesToMap {
-        public ServletContextMap(final ServletContext servletContext) {
-            super(new Attributeable() {
-                public Object getAttribute(String s) {
-                    return servletContext.getAttribute(s);
-                }
-
-                public Enumeration getAttributeNames() {
-                    return servletContext.getAttributeNames();
-                }
-
-                public void removeAttribute(String s) {
-                    servletContext.removeAttribute(s);
-                }
-
-                public void setAttribute(String s, Object o) {
-                    servletContext.setAttribute(s, o);
                 }
             });
         }

@@ -56,6 +56,16 @@
                <param-value>org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory</param-value>
             </context-param>
 
+            <context-param>
+                <param-name>oxf.classloader.enable</param-name>
+                <param-value>false</param-value>
+            </context-param>
+
+            <context-param>
+                <param-name>oxf.classloader.ignore-packages</param-name>
+                <param-value>java. javax. org.apache.log4j. org.xml. org.w3c.</param-value>
+            </context-param>
+
             <xsl:comment> Set location of properties.xml (read by resource manager) </xsl:comment>
             <context-param>
                 <param-name>oxf.properties</param-name>
@@ -164,10 +174,10 @@
                 <xsl:with-param name="commented" select="$target = 'war'"/>
                 <xsl:with-param name="content">
                     <listener>
-                        <listener-class>org.orbeon.oxf.servlet.OXFServletContextListener</listener-class>
+                        <listener-class>org.orbeon.oxf.webapp.OXFServletContextListener</listener-class>
                     </listener>
                     <listener>
-                        <listener-class>org.orbeon.oxf.servlet.OXFSessionListener</listener-class>
+                        <listener-class>org.orbeon.oxf.webapp.OXFSessionListener</listener-class>
                     </listener>
                 </xsl:with-param>
             </xsl:call-template>
@@ -205,7 +215,7 @@
                     <param-name>config/examples/struts/module</param-name>
                     <param-value>/WEB-INF/struts-module.xml</param-value>
                 </init-param>
-                <load-on-startup>1</load-on-startup>
+                <load-on-startup>3</load-on-startup>
             </servlet>
 
             <xsl:call-template name="comment">
@@ -219,7 +229,7 @@
                             <param-name>hsqldb.server.database</param-name>
                             <param-value>oxf</param-value>
                         </init-param>
-                        <load-on-startup>1</load-on-startup>
+                        <load-on-startup>4</load-on-startup>
                     </servlet>
                 </xsl:with-param>
             </xsl:call-template>
@@ -233,7 +243,7 @@
                     <servlet>
                         <servlet-name>jsf</servlet-name>
                         <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
-                        <load-on-startup>1</load-on-startup>
+                        <load-on-startup>5</load-on-startup>
                     </servlet>
                 </xsl:with-param>
             </xsl:call-template>

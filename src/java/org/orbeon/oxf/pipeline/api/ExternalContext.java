@@ -26,7 +26,7 @@ import java.util.Map;
  * It is also possible to use ExternalContext to embed Presentation Server and to provide a
  * web-like request/response interface.
  */
-public interface ExternalContext {
+public interface ExternalContext extends WebAppExternalContext {
 
     public static final int SC_OK = 200;
     public static final int SC_NOT_FOUND = 404;
@@ -123,7 +123,6 @@ public interface ExternalContext {
         public void include(Request request, Response response) throws IOException;
     }
 
-    public Object getNativeContext();
     public Object getNativeRequest();
     public Object getNativeResponse();
     public Object getNativeSession(boolean flag);
@@ -135,13 +134,6 @@ public interface ExternalContext {
     public Response getResponse();
     public Session getSession(boolean create);
 
-    public Map getAttributesMap();
-    public Map getInitAttributesMap();
-    public String getRealPath(String path);
-
     public String getStartLoggerString();
     public String getEndLoggerString();
-
-    public void log(String message, Throwable throwable);
-    public void log(String msg);
 }

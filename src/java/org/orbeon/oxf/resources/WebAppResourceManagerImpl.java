@@ -22,7 +22,6 @@ import java.io.*;
 import java.net.URL;
 import java.util.Map;
 
-
 /**
  * The webapp resource manager is able to load resources from a WAR file. This
  * is very useful when distributing packaged applications.

@@ -23,7 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
 import org.orbeon.oxf.pipeline.InitUtils;
-import org.orbeon.oxf.servlet.ProcessorService;
+import org.orbeon.oxf.webapp.ProcessorService;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;

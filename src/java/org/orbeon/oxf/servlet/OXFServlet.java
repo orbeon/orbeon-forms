@@ -13,156 +13,79 @@
  */
 package org.orbeon.oxf.servlet;
 
-import org.apache.log4j.Logger;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.InitUtils;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
-import org.orbeon.oxf.util.AttributesToMap;
-import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
+import org.orbeon.oxf.webapp.OXFClassLoader;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.Enumeration;
 
+/**
+ * OXFServlet is the Servlet entry point of OXF.
+ *
+ * Several OXFServlet and OXFPortlet instances can be used in the same Web or Portlet application.
+ * They all share the same Servlet context initialization parameters, but each Servlet can be
+ * configured with its own main processor and inputs.
+ *
+ * All OXFServlet and OXFPortlet instances in a given Web application share the same resource
+ * manager.
+ *
+ * WARNING: This class must only depend on the Servlet API and the OXF Class Loader.
+ */
 public class OXFServlet extends HttpServlet {
 
-    private static Logger logger = LoggerFactory.createLogger(OXFServlet.class);
+    // Servlet delegate
+    private HttpServlet delegateServlet;
 
-    public static final String DEFAULT_FORM_CHARSET = "utf-8";
-    public static final String DEFAULT_FORM_CHARSET_PROPERTY = "oxf.servlet.default-form-charset";
-
-    private ProcessorService processorService;
-
-    // Web application context instance
-    private WebAppContext webAppContext;
-
-    public static boolean supportsServlet23;
-
-    // We need to know if Servlet 2.3 API is present
-    static {
-        try {
-            Method method = HttpServletRequest.class.getMethod("setCharacterEncoding", new Class[]{String.class});
-            supportsServlet23  = method != null;
-        } catch (NoSuchMethodException e) {
-            supportsServlet23 = false;
-        }
-        if (!supportsServlet23)
-            logger.warn("Servlet 2.3 API is not dectected. Some feature won't be available.");
-    }
+    // WebAppExternalContext
+    private WebAppExternalContext webAppExternalContext;
 
     public void init() throws ServletException {
         try {
-            // Make sure the Web app context is initialized
-            ServletContext servletContext = getServletContext();
-            webAppContext = WebAppContext.instance(servletContext);
+            // Instanciate WebAppExternalContext
+            webAppExternalContext = new ServletWebAppExternalContext(getServletContext());
 
-            // Try to obtain a local processor definition
-            ProcessorDefinition mainProcessorDefinition
-                = InitUtils.getDefinitionFromMap(new ServletInitMap( this ), ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
-                        ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
-            // Try to obtain a processor definition from the properties
-            if (mainProcessorDefinition == null)
-                mainProcessorDefinition = InitUtils.getDefinitionFromProperties(ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
-                    ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
-            // Try to obtain a processor definition from the context
-            if (mainProcessorDefinition == null)
-                mainProcessorDefinition = InitUtils.getDefinitionFromServletContext(servletContext, ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
-                    ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
+            // Instanciate Servlet delegate
+            Class delegateServletClass = OXFClassLoader.getClassLoader(webAppExternalContext).loadClass(OXFServlet.class.getName() + OXFClassLoader.DELEGATE_CLASS_SUFFIX);
+            delegateServlet = (HttpServlet) delegateServletClass.newInstance();
 
-            // Create and initialize service
-            processorService = new ProcessorService();
-            processorService.init(mainProcessorDefinition);
+            // Initialize Servlet delegate
+            Thread currentThread = Thread.currentThread();
+            ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
+            try {
+                currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+                delegateServlet.init(getServletConfig());
+            } finally {
+                currentThread.setContextClassLoader(oldThreadContextClassLoader);
+            }
         } catch (Exception e) {
-            throw new ServletException(OXFException.getRootThrowable(e));
+            throw new ServletException(e);
         }
     }
 
     public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Delegate to Servlet delegate
+        Thread currentThread = Thread.currentThread();
+        ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
         try {
-            // Filter on supported methods
-            String httpMethod = request.getMethod();
-            if (!("post".equalsIgnoreCase(httpMethod) || "get".equalsIgnoreCase(httpMethod)))
-                throw new OXFException("Unsupported HTTP method: " + httpMethod);
-
-            // Run service
-            PipelineContext pipelineContext = new PipelineContext();
-            ExternalContext externalContext = new ServletExternalContext(getServletContext(), pipelineContext, webAppContext.getServletInitParametersMap(), request, response);
-            processorService.service(true, externalContext, pipelineContext);
-        } catch (Exception e) {
-            throw new ServletException(OXFException.getRootThrowable(e));
+            currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            delegateServlet.service(request, response);
+        } finally {
+            currentThread.setContextClassLoader(oldThreadContextClassLoader);
         }
     }
 
     public void destroy() {
-        processorService.destroy();
-        processorService = null;
-        webAppContext = null;
-    }
-
-    /**
-     * Present a read-only view of the Servlet initialization parameters as a Map.
-     */
-    public class ServletInitMap extends AttributesToMap {
-        public ServletInitMap( final OXFServlet srvlt ) {
-            super(new AttributesToMap.Attributeable() {
-                public Object getAttribute(String s) {
-                    return srvlt.getInitParameter(s);
-                }
-
-                public Enumeration getAttributeNames() {
-                    return srvlt.getInitParameterNames();
-                }
-
-                public void removeAttribute(String s) {
-                    throw new UnsupportedOperationException();
-                }
-
-                public void setAttribute(String s, Object o) {
-                    throw new UnsupportedOperationException();
-                }
-            });
+        // Delegate to Servlet delegate
+        Thread currentThread = Thread.currentThread();
+        ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
+        try {
+            currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            delegateServlet.destroy();
+        } finally {
+            currentThread.setContextClassLoader(oldThreadContextClassLoader);
         }
     }
-
-/*
-    {
-        if (config.waitPageProcessorDefinition != null) {
-                // Create and schedule the task
-                Task task = new Task() {
-                    public String getStatus() {
-                        return null;
-                    }
-
-                    public void run() {
-                        // Scenarios:
-                        // 1. GET -> redirect
-                        // 2. GET -> content (*)
-                        // 3. POST -> redirect (*)
-                        // 4. POST -> content
-
-                        // Check (synchronized on output) whether the response was committed
-
-                        // If it was, return immediately, there is nothing we can do
-
-                        // If it was not, bufferize regular output and run pipeline
-
-                        // When processing instruction is found,
-                    }
-                };
-                task.setSchedule(System.currentTimeMillis() + config.waitPageDelay, 0);
-            }
-    }
-
-    {
-        InitUtils.ProcessorDefinition waitPageProcessorDefinition;
-        long waitPageDelay;
-    }
-*/
 }

@@ -13,37 +13,11 @@
  */
 package org.orbeon.oxf.servlet;
 
-import org.apache.log4j.Logger;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.InitUtils;
-import org.orbeon.oxf.util.LoggerFactory;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-public class OXFServletContextListener implements ServletContextListener {
-    private static Logger logger = LoggerFactory.createLogger(OXFServletContextListener.class);
-
-    public static final String INIT_PROCESSOR_PROPERTY_PREFIX = "oxf.context-initialized-processor.";
-    public static final String INIT_PROCESSOR_INPUT_PROPERTY = "oxf.context-initialized-processor.input.";
-    public static final String DESTROY_PROCESSOR_PROPERTY_PREFIX = "oxf.context-destroyed-processor.";
-    public static final String DESTROY_PROCESSOR_INPUT_PROPERTY = "oxf.context-destroyed-processor.input.";
-
-    public void contextDestroyed(ServletContextEvent event) {
-        try {
-            InitUtils.run(event.getServletContext(), null, DESTROY_PROCESSOR_PROPERTY_PREFIX, DESTROY_PROCESSOR_INPUT_PROPERTY);
-        } catch (Exception e) {
-            logger.error("Exception when running Servlet context destruction processor", OXFException.getRootThrowable(e));
-            throw new OXFException(e);
-        }
-    }
-
-    public void contextInitialized(ServletContextEvent event) {
-        try {
-            InitUtils.run(event.getServletContext(), null, INIT_PROCESSOR_PROPERTY_PREFIX, INIT_PROCESSOR_INPUT_PROPERTY);
-        } catch (Exception e) {
-            logger.error("Exception when running Servlet context initialization processor", OXFException.getRootThrowable(e));
-            throw new OXFException(e);
-        }
-    }
+/**
+ * This listener listens for HTTP context lifecycle changes.
+ *
+ * NOTE: This class is here for backward compatibility only. Use
+ * org.orbeon.oxf.webapp.OXFServletContextListener instead.
+ */
+public class OXFServletContextListener extends org.orbeon.oxf.webapp.OXFServletContextListener {
 }

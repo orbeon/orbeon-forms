@@ -25,7 +25,7 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.PipelineReader;
-import org.orbeon.oxf.servlet.ServletContextExternalContext;
+import org.orbeon.oxf.webapp.ServletContextExternalContext;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.xml.sax.ContentHandler;
 import ymsg.network.AccountLockedException;

@@ -31,7 +31,7 @@ import java.util.*;
 /*
  * Portlet-specific implementation of ExternalContext.
  */
-public class PortletExternalContext implements ExternalContext {
+public class PortletExternalContext extends PortletWebAppExternalContext implements ExternalContext {
 
     public static final String PATH_PARAMETER_NAME = "oxf.path";
 
@@ -58,13 +58,6 @@ public class PortletExternalContext implements ExternalContext {
         public String getRemoteAddr() {
             // NOTE: The portlet API does not provide for this value.
             return null;
-        }
-
-        public synchronized Map getAttributesMap() {
-            if (attributesMap == null) {
-                attributesMap = new RequestMap(portletRequest);
-            }
-            return attributesMap;
         }
 
         public synchronized Map getHeaderMap() {
@@ -147,6 +140,13 @@ public class PortletExternalContext implements ExternalContext {
                 }
             }
             return parameterMap;
+        }
+
+        public synchronized Map getAttributesMap() {
+            if (attributesMap == null) {
+                attributesMap = new PortletExternalContext.RequestMap(portletRequest);
+            }
+            return attributesMap;
         }
 
         public String getPathTranslated() {
@@ -584,46 +584,30 @@ public class PortletExternalContext implements ExternalContext {
         }
     }
 
-    private PortletRequest portletRequest;
-    private ActionRequest actionRequest;
-    private RenderResponse renderResponse;
-
     private Request request;
     private Response response;
     private Session session;
 
     private PipelineContext pipelineContext;
-    private PortletContext portletContext;
-    private Map attributesMap;
-    private Map initAttributesMap;
+    private PortletRequest portletRequest;
+    private ActionRequest actionRequest;
+    private RenderResponse renderResponse;
 
-    PortletExternalContext(PipelineContext pipelineContext, PortletContext context, Map initAttributesMap, PortletRequest request) {
-        this(pipelineContext, context, initAttributesMap, request, null);
+    PortletExternalContext(PortletContext portletContext, Map initAttributesMap) {
+        super(portletContext, initAttributesMap);
     }
 
-    PortletExternalContext(PipelineContext pipelineContext, PortletContext portletContext, Map initAttributesMap, PortletRequest portletRequest, RenderResponse renderResponse) {
+    PortletExternalContext(PipelineContext pipelineContext, PortletContext portletContext, Map initAttributesMap, PortletRequest portletRequest) {
+        this(portletContext, initAttributesMap);
         this.pipelineContext = pipelineContext;
-        this.portletContext = portletContext;
-        this.initAttributesMap = initAttributesMap;
         this.portletRequest = portletRequest;
         if (portletRequest instanceof ActionRequest)
             this.actionRequest = (ActionRequest) portletRequest;
+    }
+
+    PortletExternalContext(PipelineContext pipelineContext, PortletContext portletContext, Map initAttributesMap, PortletRequest portletRequest, RenderResponse renderResponse) {
+        this(pipelineContext, portletContext, initAttributesMap, portletRequest);
         this.renderResponse = renderResponse;
-    }
-
-    public Map getAttributesMap() {
-        if (attributesMap == null) {
-            attributesMap = new PortletContextMap(portletContext);
-        }
-        return attributesMap;
-    }
-
-    public synchronized Map getInitAttributesMap() {
-        return initAttributesMap;
-    }
-
-    public Object getNativeContext() {
-        return portletContext;
     }
 
     public Object getNativeRequest() {
@@ -663,24 +647,12 @@ public class PortletExternalContext implements ExternalContext {
         return session;
     }
 
-    public String getRealPath(String path) {
-        return portletContext.getRealPath(path);
-    }
-
     public String getStartLoggerString() {
         return getRequest().getPathInfo() + " - Received request";
     }
 
     public String getEndLoggerString() {
         return getRequest().getPathInfo();
-    }
-
-    public void log(String message, Throwable throwable) {
-        portletContext.log(message, throwable);
-    }
-
-    public void log(String msg) {
-        portletContext.log(msg);
     }
 
     public RequestDispatcher getNamedDispatcher(String name) {
@@ -713,31 +685,6 @@ public class PortletExternalContext implements ExternalContext {
             } catch (PortletException e) {
                 throw new OXFException(e);
             }
-        }
-    }
-
-    /**
-     * Present a view of the ServletContext properties as a Map.
-     */
-    public static class PortletContextMap extends AttributesToMap {
-        public PortletContextMap(final PortletContext portletContext) {
-            super(new Attributeable() {
-                public Object getAttribute(String s) {
-                    return portletContext.getAttribute(s);
-                }
-
-                public Enumeration getAttributeNames() {
-                    return portletContext.getAttributeNames();
-                }
-
-                public void removeAttribute(String s) {
-                    portletContext.removeAttribute(s);
-                }
-
-                public void setAttribute(String s, Object o) {
-                    portletContext.setAttribute(s, o);
-                }
-            });
         }
     }
 

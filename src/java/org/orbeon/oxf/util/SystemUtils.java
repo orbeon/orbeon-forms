@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.util;
 
-
 import java.io.File;
 
 public class SystemUtils {
@@ -86,7 +85,7 @@ public class SystemUtils {
      * decoded form exists that that is used.  If neither exists then the
      * undecoded for is used. 
      * @param clazz	Class to try and build a classpath from.
-     * @param character encoding to use
+     * @param enc character encoding to use
      * @return	java.io.File.pathSeparator delimited path.
      */
     public static String pathFromLoaders( final Class clazz, final String enc ) 

@@ -13,98 +13,69 @@
  */
 package org.orbeon.oxf.servlet;
 
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.pipeline.InitUtils;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
-import org.orbeon.oxf.util.AttributesToMap;
+import org.orbeon.oxf.webapp.OXFClassLoader;
+import org.orbeon.oxf.pipeline.api.WebAppExternalContext;
 
 import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Enumeration;
 
+/**
+ * OXFServletFilter is the Servlet Filter entry point of OXF.
+ *
+ * WARNING: This class must only depend on the Servlet API and the OXF Class Loader.
+ */
 public class OXFServletFilter implements Filter {
 
-    private ServletContext servletContext;
-    private ProcessorService processorService;
+    // Servlet Filter delegate
+    private Filter servletFilterDelegate;
 
-    // Web application context instance
-    private WebAppContext webAppContext;
+    // WebAppExternalContext
+    private WebAppExternalContext webAppExternalContext;
 
     public void init(FilterConfig config) throws ServletException {
-
         try {
-            // Make sure the Web app context is initialized
-            servletContext = config.getServletContext();
-            webAppContext = WebAppContext.instance(servletContext);
+            // Instanciate WebAppExternalContext
+            webAppExternalContext = new ServletWebAppExternalContext(config.getServletContext());
 
-            // Try to obtain a local processor definition
-            ProcessorDefinition mainProcessorDefinition
-                = InitUtils.getDefinitionFromMap(new ServletFilterInitMap(config), ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
-                        ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
-            // Try to obtain a processor definition from the properties
-            if (mainProcessorDefinition == null)
-                mainProcessorDefinition = InitUtils.getDefinitionFromProperties(ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
-                    ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
-            // Try to obtain a processor definition from the context
-            if (mainProcessorDefinition == null)
-                mainProcessorDefinition = InitUtils.getDefinitionFromServletContext(servletContext, ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
-                    ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
+            // Instanciate Servlet Filter delegate
+            Class delegateServletClass = OXFClassLoader.getClassLoader(webAppExternalContext).loadClass(OXFServletFilter.class.getName() + OXFClassLoader.DELEGATE_CLASS_SUFFIX);
+            servletFilterDelegate = (Filter) delegateServletClass.newInstance();
 
-            // Create and initialize service
-            processorService = new ProcessorService();
-            processorService.init(mainProcessorDefinition);
+            // Initialize Servlet Filter delegate
+            Thread currentThread = Thread.currentThread();
+            ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
+            try {
+                currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+                servletFilterDelegate.init(config);
+            } finally {
+                currentThread.setContextClassLoader(oldThreadContextClassLoader);
+            }
         } catch (Exception e) {
-            throw new ServletException(OXFException.getRootThrowable(e));
+            throw new ServletException(e);
         }
     }
 
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-
-        // Add filter chain to the pipeline context for use by the ServletFilterGenerator
-        PipelineContext pipelineContext = new PipelineContext();
-        pipelineContext.setAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.FILTER_CHAIN, chain);
-
-        // Process the regular pipeline
+        // Delegate to Servlet Filter delegate
+        Thread currentThread = Thread.currentThread();
+        ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
         try {
-            ExternalContext externalContext = new ServletExternalContext(servletContext, pipelineContext, webAppContext.getServletInitParametersMap(), (HttpServletRequest) request, (HttpServletResponse) response);
-            processorService.service(true, externalContext, pipelineContext);
-        } catch (Exception e) {
-            throw new ServletException(OXFException.getRootThrowable(e));
+            currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            servletFilterDelegate.doFilter(request, response, chain);
+        } finally {
+            currentThread.setContextClassLoader(oldThreadContextClassLoader);
         }
     }
 
     public void destroy() {
-        processorService.destroy();
-        processorService = null;
-        webAppContext = null;
-    }
-
-    /**
-     * Present a read-only view of the Servlet initialization parameters as a Map.
-     */
-    public static class ServletFilterInitMap extends AttributesToMap {
-        public ServletFilterInitMap(final FilterConfig config) {
-            super(new AttributesToMap.Attributeable() {
-                public Object getAttribute(String s) {
-                    return config.getInitParameter(s);
-                }
-
-                public Enumeration getAttributeNames() {
-                    return config.getInitParameterNames();
-                }
-
-                public void removeAttribute(String s) {
-                    throw new UnsupportedOperationException();
-                }
-
-                public void setAttribute(String s, Object o) {
-                    throw new UnsupportedOperationException();
-                }
-            });
+        // Delegate to Servlet Filter delegate
+        Thread currentThread = Thread.currentThread();
+        ClassLoader oldThreadContextClassLoader = currentThread.getContextClassLoader();
+        try {
+            currentThread.setContextClassLoader(OXFClassLoader.getClassLoader(webAppExternalContext));
+            servletFilterDelegate.destroy();
+        } finally {
+            currentThread.setContextClassLoader(oldThreadContextClassLoader);
         }
     }
 }

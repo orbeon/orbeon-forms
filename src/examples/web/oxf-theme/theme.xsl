@@ -154,7 +154,9 @@
     </xsl:template>
 
     <!-- Just copy other "xhtml" elements removing the namespace -->
-    <xsl:template match="xhtml:*">
+    <!-- WAS: <xsl:template match="xhtml:*"> -->
+    <!-- See: http://sourceforge.net/mailarchive/message.php?msg_id=10095388 -->
+    <xsl:template match="*[namespace-uri() = 'http://www.w3.org/1999/xhtml']">
         <xsl:element name="{local-name()}">
             <xsl:apply-templates select="@*|node()"/>
         </xsl:element>

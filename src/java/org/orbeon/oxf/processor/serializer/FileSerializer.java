@@ -214,7 +214,7 @@ public class FileSerializer extends CachedSerializer {
                 // Base directory specified
                 File baseDirectory = directoryProperty != null ? new File(directoryProperty) : new File(config.getDirectory());
                 if (!baseDirectory.isDirectory() || !baseDirectory.canWrite())
-                    throw new OXFException(baseDirectory + "is not a directory or is not writeable");
+                    throw new OXFException("Directory '" + baseDirectory + "' is not a directory or is not writeable.");
 
                 file = new File(baseDirectory, config.getFile());
             }

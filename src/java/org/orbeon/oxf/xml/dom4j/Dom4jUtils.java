@@ -13,15 +13,10 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.Attribute;
 import org.dom4j.io.SAXReader;
 import org.dom4j.util.UserDataElement;
 import org.dom4j.util.UserDataAttribute;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.transformer.xupdate.statement.Text;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
@@ -36,11 +31,11 @@ public class Dom4jUtils {
      * Clone a node, making sure that we copy all the declared namespace of
      * the source.
      */
-    public static Node cloneNode(Node node) {
-        if (node instanceof Element) {
-            Element originalElement = (Element) node;
+    public static org.dom4j.Node cloneNode(org.dom4j.Node node) {
+        if (node instanceof org.dom4j.Element) {
+            org.dom4j.Element originalElement = (org.dom4j.Element) node;
             Map namespaceContext = XMLUtils.getNamespaceContext(originalElement);
-            Element resultElement = (Element) cloneNodeWorker(originalElement);
+            org.dom4j.Element resultElement = (org.dom4j.Element) cloneNodeWorker(originalElement);
             for (Iterator i = namespaceContext.keySet().iterator(); i.hasNext();) {
                 String prefix = (String) i.next();
                 if (resultElement.getNamespaceForPrefix(prefix) == null)
@@ -56,7 +51,7 @@ public class Dom4jUtils {
      * because it relies on JAXP. 
      */
     public static org.dom4j.Document parseText( final String s ) 
-    throws SAXException, DocumentException {
+    throws SAXException, org.dom4j.DocumentException {
         final SAXParser sxPrs = XMLUtils.newSAXParser();
         final XMLReader xr = sxPrs.getXMLReader();
         final SAXReader sxRdr = new SAXReader( xr );
@@ -65,7 +60,7 @@ public class Dom4jUtils {
         return ret;
     }
 
-    private static Node cloneNodeWorker(Node node) {
+    private static org.dom4j.Node cloneNodeWorker(org.dom4j.Node node) {
         if (node instanceof UserDataElement) {
             UserDataElement current = (UserDataElement) node;
             UserDataElement clone = new UserDataElement(current.getQName());
@@ -73,13 +68,13 @@ public class Dom4jUtils {
 
             // Copy attributes
             for (Iterator i = current.attributes().iterator(); i.hasNext();) {
-                Attribute attribute = (Attribute) i.next();
+                org.dom4j.Attribute attribute = (org.dom4j.Attribute) i.next();
                 clone.add(cloneNodeWorker(attribute));
             }
 
             // Copy content
             for (Iterator i = current.content().iterator(); i.hasNext();) {
-                Node child = (Node) i.next();
+                org.dom4j.Node child = (org.dom4j.Node) i.next();
                 clone.add(cloneNodeWorker(child));
             }
             return clone;
@@ -89,7 +84,7 @@ public class Dom4jUtils {
             clone.setData(current.getData());
             return clone;
         } else {
-            return (Node) node.clone();
+            return (org.dom4j.Node) node.clone();
         }
     }
 
@@ -97,11 +92,11 @@ public class Dom4jUtils {
      * Removes the elements and text inside the given element, but not the attributes or
      * namespace declarations on the element.
      */
-    public static void clearElementContent(Element element) {
-        for (Iterator j = element.content().iterator(); j.hasNext();) {
-            Node child = (Node) j.next();
-            if (child instanceof Text || child instanceof Element)
-                element.remove(child);
+    public static void clearElementContent(org.dom4j.Element element) {
+        for (final java.util.ListIterator j = element.content().listIterator(); j.hasNext();) {
+            org.dom4j.Node child = (org.dom4j.Node) j.next();
+            if (child instanceof org.dom4j.Text || child instanceof org.dom4j.Element)
+                j.remove();
         }
     }
 }

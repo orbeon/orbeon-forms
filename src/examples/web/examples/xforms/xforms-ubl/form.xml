@@ -23,11 +23,6 @@
             <view>form</view>
             <errors/>
             <xi:include href="ubl_samp.xml"/>
-            <order>
-                <item>
-                    <id/>
-                </item>
-            </order>
         </form>
     </xforms:instance>
     <xforms:submission method="post"/>

@@ -174,15 +174,6 @@
                                                 <xforms:label/>
                                                 <xforms:delete nodeset="/form/order:Order/cat:OrderLine" at="index('lineSet')"/>
                                             </xforms:submit>
-                                            <xforms:submit>
-                                                <xforms:label>Add To Order</xforms:label>
-                                                <xforms:insert
-                                                    nodeset="/form/order/item"
-                                                    at="last()" position="after"/>
-                                                <xforms:setvalue
-                                                    ref="/form/order/item[last()]/id"
-                                                    value="/form/order:Order/cat:OrderLine[index('lineSet')]/cat:Item/cat:SellersItemIdentification/cat:ID"/>
-                                            </xforms:submit>
                                         </xhtml:td>
                                     </xhtml:tr>
                                 </xforms:repeat>

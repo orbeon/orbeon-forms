@@ -363,7 +363,7 @@ public class ServletExternalContext implements ExternalContext {
                     FileItem fileItem = (FileItem) i.next();
                     if (fileItem.isFormField()) {
                         // Simple form filled: add value to existing values, if any
-                        NetUtils.addValueToStringArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString());// FIXME: getString() should use an encoding
+                        NetUtils.addValueToStringArrayMap(uploadParameterMap, fileItem.getFieldName(), fileItem.getString());// FIXME: FORM_ENCODING getString() should use an encoding
                     } else {
                         // It is a file, store the FileItem object
                         uploadParameterMap.put(fileItem.getFieldName(), fileItem);

@@ -103,7 +103,7 @@ public class MultipartFormDataBuilder {
                         size += contentDispositionFormString1.length() + contentDispositionFormString2.length() + 2; // Content-Disposition + CRLF
                         size += newKey.length(); // parameter name
                         size += 2; // blank line
-                        size += s[j].length(); // value
+                        size += s[j].length(); // value FIXME: FORM_ENCODING
                         size += 2; // blank line
                     }
                 }
@@ -176,7 +176,7 @@ public class MultipartFormDataBuilder {
                             writer.write(contentDispositionFormString2);
                             writer.write("\r\n");
                             writer.write("\r\n");
-                            writer.write(s[j]); // we probably need to set an encoding here, otherwise parameter values in utf-8, for example, won't work
+                            writer.write(s[j]); // FIXME: FORM_ENCODING we probably need to set an encoding here, otherwise parameter values in utf-8, for example, won't work
                             writer.write("\r\n");
                         }
                     }

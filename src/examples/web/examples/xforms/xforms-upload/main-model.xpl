@@ -31,7 +31,7 @@
             </p:processor>
 
             <!-- Send the data to the browser -->
-            <p:processor name="oxf:binary-serializer">
+            <p:processor name="oxf:binary-http-serializer">
                 <p:input name="data" href="#file"/>
                 <p:input name="config">
                     <config>

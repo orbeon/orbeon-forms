@@ -44,7 +44,7 @@
         <p:output name="output" id="file"/>
     </p:processor>
 
-    <p:processor name="oxf:binary-serializer">
+    <p:processor name="oxf:binary-http-serializer">
         <p:input name="data" href="#file"/>
         <p:input name="config">
             <config>

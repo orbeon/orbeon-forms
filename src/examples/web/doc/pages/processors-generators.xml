@@ -270,9 +270,8 @@
             </xml-source>
             <p>
                 A typical error pipeline should include an Exception generator followed by one or
-                more transformation(s), and an HTMLSerializer.</p>
-
-
+                more transformation(s), and an HTML serializer.
+            </p>
             <xml-source>
                 <p:processor name="oxf:exception">
                     <p:output name="data" id="exception"/>

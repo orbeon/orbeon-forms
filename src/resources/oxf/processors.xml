@@ -164,7 +164,7 @@
         <class name="org.orbeon.oxf.processor.serializer.XMLSerializer"/>
     </processor>
 
-    <processor name="oxf:binary-serializer" uri="oxf/processor/binary-serializer">
+    <processor name="oxf:binary-http-serializer" uri="oxf/processor/binary-serializer">
         <class name="org.orbeon.oxf.processor.serializer.BinarySerializer"/>
     </processor>
 

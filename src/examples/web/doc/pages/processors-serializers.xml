@@ -21,21 +21,29 @@
     <body>
         <section>
             <title>Introduction</title>
-            <p>Serializers are processors with no XML output. A serializer, just
-                like any processor, can access files, connect to databases, and take
-                an action depending on its inputs.</p>
+            <p>
+                Serializers are processors with no XML output. A serializer, just like any
+                processor, can access files, connect to databases, and take an action depending on
+                its inputs.
+            </p>
         </section>
 
         <anchor id="http-serializers"/>
         <section>
             <title>HTTP Serializers</title>
             <p>
-                These serializers have a common goal: writing their
-                input data to the HTTPResponse or the standard output. They share
-                the same configuration, but differ in their output. The following
-                describes the common configuration, then the specifics for
-                each serializer.
+                These serializers share a common functionality: writing their data input to an HTTP
+                response. Typically, this means sending data back to a client web browser. This can
+                be done in a Servlet environment or a Portlet environment. All share the same
+                configuration, but differ in how they convert their input data. The following
+                describes the common configuration, then the specifics for each serializer.
             </p>
+            <note>
+                When using the command-line mode, instead of sending the output through HTTP, the
+                HTTP serializers send their output to the standard output. In such a case, the
+                parameters that do not affect the content of the data, such as content-type,
+                status-code, etc. are ignored.
+            </note>
             <p>
                 All serializers send the cache control HTTP headers,
                 including
@@ -267,6 +275,49 @@
                         <p:input name="data" href="#xslfo"/>
                     </p:processor>
                 </xml-source>
+            </section>
+            <section>
+                <title>Binary Serializer</title>
+                <p>
+                    The Binary serializer reads characters of its input document as Base64-encoded
+                    binary and sends the data converted into a binary stream, without further
+                    transformation. All the character content of the input is considered as Base64.
+                    Elements, namespace declarations, attributes, processing instructions,
+                    comments, are ignored. The minimal requirement for the input document is to have
+                    a root element (necessary in every well-formed XML document) containing some
+                    Base64-encoded character data.
+                </p>
+                <p>
+                    The input of the serializer can look as follows:
+                </p>
+                <xml-source>
+<binary>
+/9j/4AAQSkZJRgABAQEBygHKAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4R
+...
+KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
+</binary>
+                </xml-source>
+                <p>
+                    The default content-type is <code>application/octet-stream</code>. It can be
+                    overridden using the <code>content-type</code> configuration element. Here is an
+                    example of configuration:
+                </p>
+                <xml-source>
+                    <p:processor name="oxf:binary-http-serializer">
+                        <p:input name="config">
+                            <config>
+                                <content-type>image/jpeg</content-type>
+                            </config>
+                        </p:input>
+                        <p:input name="data" href="oxf:/my-image.jpg"/>
+                    </p:processor>
+                </xml-source>
+                <note>
+                    The Binary serializer performs streaming. If its input data consists of a stream
+                    of short character SAX events, such as those produced by the Request generator
+                    the URL generator, or the SQL processor, it is possible to serialize an
+                    "infinitely" long document.
+                </note>
             </section>
         </section>
 

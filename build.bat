@@ -33,6 +33,6 @@ for %%I in (.) do set BUILD_ROOT=%%~fI
 set CLASSPATH=.\lib\junit.jar
 set PATH=%JAVA_HOME%\bin;%PATH%
 set ANT_HOME=tools\ant
-"%ANT_HOME%\bin\ant.bat" "-Djava.home=%JAVA_HOME%" "-Dant.home=%ANT_HOME%" "-Dbuild.root=%BUILD_ROOT%" "-Ddebug.enabled=%DEBUG_ENABLED%" "-Dweblogic.home=%WEBLOGIC_HOME%" %target% %2 %3 %4 %5 %6 %7 %8 %9
+"%ANT_HOME%\bin\ant.bat" "-Djava.home=%JAVA_HOME%" "-Dant.home=%ANT_HOME%" "-Ddebug.enabled=%DEBUG_ENABLED%" "-Dweblogic.home=%WEBLOGIC_HOME%" %target% %2 %3 %4 %5 %6 %7 %8 %9
 
 :end

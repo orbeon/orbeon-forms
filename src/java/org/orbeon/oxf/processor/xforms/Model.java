@@ -149,87 +149,9 @@ public class Model {
     }
 
     /**
-     * The XForms model must be sent to the returned content handler.
-     */
-    public ContentHandler getContentHandlerForModel() {
-
-        return new ForwardingContentHandler() {
-            private int level = 0;
-            private NamespaceSupport namespaceSupport = new NamespaceSupport();
-            Locator locator;
-            Stack bindStack = new Stack();
-
-            public void startElement(String uri, String localname, String qName, Attributes attributes) {
-                try {
-                    level++;
-                    if (level == 1) {
-                        if (!Constants.XFORMS_NAMESPACE_URI.equals(uri))
-                            throw new ValidationException("Root element of XForms model must be in namespace '"
-                                    + Constants.XFORMS_NAMESPACE_URI + "'. Found instead: '" + uri + "'", new LocationData(locator));
-                        id = attributes.getValue("id");
-                        schema = attributes.getValue("schema");
-                        if (schema != null)
-                            schema = URLFactory.createURL(locator.getSystemId(), schema).toString();
-                    } else if (level >= 2 && Constants.XFORMS_NAMESPACE_URI.equals(uri)) {
-                        if ("bind".equals(localname)) {
-                            Map namespaces = new HashMap();
-                            for (Enumeration i = namespaceSupport.getPrefixes(); i.hasMoreElements();) {
-                                String prefix = (String) i.nextElement();
-                                namespaces.put(prefix, namespaceSupport.getURI(prefix));
-                            }
-                            ModelBind bind = new ModelBind(attributes.getValue("id"), attributes.getValue("nodeset"),
-                                    attributes.getValue("relevant"),
-                                    attributes.getValue("calculate"), attributes.getValue("type"),
-                                    attributes.getValue("constraint"), attributes.getValue("required"),
-                                    attributes.getValue("readonly"),
-                                    namespaces, new LocationData(locator));
-                            if(!bindStack.empty()) {
-                                ModelBind parent = (ModelBind)bindStack.peek();
-                                parent.addChild(bind);
-                                bind.setParent(parent);
-                            } else
-                                binds.add(bind);
-
-                            bindStack.push(bind);
-                        } else if ("submission".equals(localname)) {
-                            method = attributes.getValue("method");
-                            action = attributes.getValue("action");
-                            encoding = attributes.getValue("encoding");
-                        }
-                    }
-                } catch (MalformedURLException e) {
-                    throw new ValidationException(e, new LocationData(locator));
-                }
-            }
-
-            public void endElement(String uri, String localname, String qName) {
-                level--;
-                if("bind".equals(localname))
-                    bindStack.pop();
-            }
-
-            public void startPrefixMapping(String prefix, String uri) {
-                namespaceSupport.pushContext();
-                // HACK: why do we get a empty string URI?
-                if (!"".equals(uri))
-                    namespaceSupport.declarePrefix(prefix, uri);
-            }
-
-            public void endPrefixMapping(String prefix) {
-                namespaceSupport.popContext();
-            }
-
-            public void setDocumentLocator(Locator locator) {
-                this.locator = locator;
-            }
-        };
-    }
-
-    /**
      * Updates the instance according to information in the &lt;bind&gt;
      * elements.
      */
-
     public void applyInputOutputBinds(Document instance) {
         for (Iterator i = binds.iterator(); i.hasNext();) {
             ModelBind modelBind = (ModelBind) i.next();

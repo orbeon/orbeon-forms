@@ -143,7 +143,7 @@
             not normative, but is there to acknowledge that those specifications were taken into
             account and to highlight similarities and differences.
         </p>
-        <div2>
+        <div2 id="note-2002">
             <head>February 2002 XML Pipeline Definition Language W3C Note</head>
             <p>
                 Work on XPL started in 2002 independently from <bibref
@@ -216,8 +216,9 @@
                     </p>
                 </item>
             </ulist>
+            <!-- TODO: Add further differences w/XPL, as in email sent on 4/3/05 to ops-users -->
         </div2>
-        <div2>
+        <div2 id="note-2004">
             <head>April 2004 XML Processing Model W3C Note</head>
             <p>
                 <bibref ref="xml-processing"/>, a W3C Note published in April 2004, sets forth

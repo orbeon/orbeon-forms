@@ -34,7 +34,7 @@
                 </p>
                 <p>
                     The "logout" button below will log you out and bring you back to the
-                    Presentation Server examples home page. If from there you come back to this
+                    PresentationServer examples home page. If from there you come back to this
                     authentication example, you will have to login again.
                 </p>
                 <p>

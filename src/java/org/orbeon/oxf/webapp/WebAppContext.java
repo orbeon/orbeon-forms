@@ -33,7 +33,7 @@ import java.util.*;
  * When the instance is created:
  *
  * 1. Initialize a resource manager
- * 2. Initialize Presentation Server Properties
+ * 2. Initialize PresentationServer Properties
  * 3. Initialize logger based on properties
  * 4. Initialize the processor registry
  */
@@ -53,7 +53,7 @@ public class WebAppContext {
 
     public static WebAppContext instance() {
         if (instance == null)
-            throw new OXFException("Presentation Server WebAppContext not initialized. Make sure at least one servlet or context listener is initialized first.");
+            throw new OXFException("PresentationServer WebAppContext not initialized. Make sure at least one servlet or context listener is initialized first.");
         return instance;
     }
 
@@ -70,7 +70,7 @@ public class WebAppContext {
     private WebAppContext(ServletContext servletContext) {
         try {
             LoggerFactory.initBasicLogger();
-            logger.info("Starting Presentation Server Release " + Version.getVersion());
+            logger.info("Starting PresentationServer Release " + Version.getVersion());
 
             // Remember Servlet context
             this.servletContext = servletContext;

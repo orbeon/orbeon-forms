@@ -22,7 +22,7 @@ import java.util.Enumeration;
 
 public class PortalContextImpl implements PortalContext {
 
-    public static final String PORTAL_INFO = "Presentation Server Portal Server 0.1 alpha";
+    public static final String PORTAL_INFO = "PresentationServer Portal Server 0.1 alpha";
 
     private static final PortletMode[] portletModes = { PortletMode.VIEW, PortletMode.EDIT, PortletMode.HELP };
     private static final WindowState[] windowStates = { WindowState.NORMAL, WindowState.MINIMIZED, WindowState.MAXIMIZED };

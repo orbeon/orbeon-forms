@@ -18,7 +18,7 @@
     <source>view.xsl</source>
     <description>
         <p>
-            This example illustrates how to create repeating structures in Presentation Server with
+            This example illustrates how to create repeating structures in PresentationServer with
             the XForms repeat module.
         </p>
     </description>

@@ -33,7 +33,7 @@
                 <xsl:template match="/">
                     <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
                         <xhtml:head>
-                            <xhtml:title>Presentation Server - Struts Portlet Example</xhtml:title>
+                            <xhtml:title>PresentationServer - Struts Portlet Example</xhtml:title>
                         </xhtml:head>
                         <xhtml:body>
                             <xhtml:h1>Portlet Example</xhtml:h1>

@@ -14,7 +14,7 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<book software="OXF" title="Presentation Server User's Manual" copyright="Orbeon, Inc">
+<book software="OXF" title="PresentationServer User's Manual" copyright="Orbeon, Inc">
     <menu label="Getting Started">
         <menu-item label="Welcome" href="index"/>
         <menu label="Changes">
@@ -90,7 +90,7 @@
         <menu-item label="EJB Support" href="integration-ejb"/>
         <menu-item label="XUpdate JAXP Support" href="integration-xupdate"/>
         <menu-item label="Struts Support" href="model2x-struts"/>
-<!--        <menu-item label="Presentation Server with JSF" href="model2x-jsf"/>-->
+<!--        <menu-item label="PresentationServer with JSF" href="model2x-jsf"/>-->
     </menu>
     <menu label="Internals">
         <menu-item label="XForms" href="internals-xforms"/> 

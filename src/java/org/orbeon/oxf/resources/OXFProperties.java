@@ -75,7 +75,7 @@ public class OXFProperties {
                 propsSerializer.start(context);
                 this.propertyStore = propsSerializer.getPropertyStore(context);
             } catch (Exception e) {
-                throw new OXFException("Failure to initialize Presentation Server properties", e);
+                throw new OXFException("Failure to initialize PresentationServer properties", e);
             } finally {
                 initializing = false;
             }

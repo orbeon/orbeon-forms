@@ -42,9 +42,9 @@
                                 </head>
                                 <body>
                                     <p>
-                                        This is text entered in Presentation Server's Email example form:
+                                        This is text entered in PresentationServer's Email example form:
                                     </p>
-                                    <p style="border: dotted 1px gray; padding: 5px">Orbeon Presentation Server is a J2EE-based MVC framework for building Web applications that present and capture XML using XForms, XSLT, and Web Services. Presentation Server benefits from standardized forms processing using XForms, rich controller semantics, and full-featured XML pipelines. Presentation Server is in fact built around Orbeon's optimized XML pipeline engine, a mature, high-performance engine for pipeline processing of XML. Presentation Server is ideal for building Composite Applications in a Service Oriented Architecture (SOA), an can be used on its own, or within the OIS suite.</p>
+                                    <p style="border: dotted 1px gray; padding: 5px">Orbeon PresentationServer is a J2EE-based MVC framework for building Web applications that present and capture XML using XForms, XSLT, and Web Services. PresentationServer benefits from standardized forms processing using XForms, rich controller semantics, and full-featured XML pipelines. PresentationServer is in fact built around Orbeon's optimized XML pipeline engine, a mature, high-performance engine for pipeline processing of XML. PresentationServer is ideal for building Composite Applications in a Service Oriented Architecture (SOA), an can be used on its own, or within the OIS suite.</p>
                                     <p>
                                         This is a static image attached to the email and referred to by the HTML version:
                                     </p>

@@ -145,7 +145,7 @@ public class SchemaRepository {
     }
 
     /**
-     * Get a systemId by looking in the properties, then in the builtin Presentation Server
+     * Get a systemId by looking in the properties, then in the builtin PresentationServer
      * schemas. This is used only for user-defined validation.
      */
     public String getSchema(String publicId) {
@@ -160,7 +160,7 @@ public class SchemaRepository {
             }
         }
 
-        // Not defined in properties: try predefined Presentation Server schemas
+        // Not defined in properties: try predefined PresentationServer schemas
         String schemaFile = (String) schemas.get(publicId);
         if (schemaFile != null) {
             if (schemaFile.startsWith("/"))

@@ -55,7 +55,7 @@ public class SendMail {
             message.setContent(multi);
 
             Address[] from = new Address[1];
-            from[0] = new InternetAddress("oxf-info@orbeon.com", "Presentation Server Team");
+            from[0] = new InternetAddress("oxf-info@orbeon.com", "PresentationServer Team");
             message.addFrom(from);
 
 
@@ -63,7 +63,7 @@ public class SendMail {
 //            Address to = new InternetAddress("oxf-announce@orbeon.com");
             message.addRecipient(Message.RecipientType.TO, to);
 
-            message.setSubject("PLEASE REVIEW : Orbeon Announces Presentation Server Server 2.7 and Presentation Server Studio 1.2");
+            message.setSubject("PLEASE REVIEW : Orbeon Announces PresentationServer Server 2.7 and PresentationServer Studio 1.2");
             message.setSentDate(new Date());
 
             Transport transport = session.getTransport("smtp");

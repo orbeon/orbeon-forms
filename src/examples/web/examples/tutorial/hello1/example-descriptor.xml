@@ -18,7 +18,7 @@
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <p>
             Please refer to the <a href="/doc/pages/Tutorial.pdf" f:url-type="resource">Orbeon
-            Presentation Server Tutorial</a> for the complete documentation of this example.
+            PresentationServer Tutorial</a> for the complete documentation of this example.
 		</p>
     </description>
 </example-descriptor>

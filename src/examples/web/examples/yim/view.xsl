@@ -5,7 +5,7 @@
             xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
             <xhtml:head>
-                <xhtml:title>Presentation Server Example - Instant Message</xhtml:title>
+                <xhtml:title>PresentationServer Example - Instant Message</xhtml:title>
             </xhtml:head>
             <xhtml:body>
                 <xforms:group ref="form">

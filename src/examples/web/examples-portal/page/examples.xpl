@@ -48,7 +48,7 @@
                 <xsl:template match="/">
                     <xhtml:html>
                         <xhtml:head>
-                            <xhtml:title>Presentation Server Examples</xhtml:title>
+                            <xhtml:title>PresentationServer Examples</xhtml:title>
                         </xhtml:head>
                         <xhtml:body>
                             <!-- Banner (with search) -->
@@ -96,7 +96,7 @@
                                 <div id="main1">
                                     <!-- List of examples -->
                                     <div id="leftcontent">
-                                        <h1>Presentation Server Examples</h1>
+                                        <h1>PresentationServer Examples</h1>
                                         <xf:group ref="/form">
                                             <ul class="tree-sections">
                                                 <xsl:for-each select="$examples-list/*/section">

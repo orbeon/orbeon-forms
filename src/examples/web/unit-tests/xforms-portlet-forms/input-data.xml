@@ -16,7 +16,7 @@
 
     <xhtml:head>
 
-        <xhtml:title>Presentation Server Examples</xhtml:title>
+        <xhtml:title>PresentationServer Examples</xhtml:title>
 
     </xhtml:head>
 
@@ -88,7 +88,7 @@
 
                 <div id="leftcontent">
 
-                    <h1>Presentation Server Examples</h1>
+                    <h1>PresentationServer Examples</h1>
 
                     <xhtml:form xmlns:xforms="http://www.w3.org/2002/xforms" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:saxon="http://saxon.sf.net/" xmlns:xforms-utils="java:org.orbeon.oxf.processor.xforms.XFormsUtils" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext" id="wsrp_rewrite_form_2" method="post">
 

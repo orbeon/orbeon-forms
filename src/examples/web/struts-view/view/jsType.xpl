@@ -27,7 +27,7 @@
                 <xsl:template match="/">
                     <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
                         <xhtml:head>
-                            <xhtml:title>Presentation Server - Struts Javascript Validator Example</xhtml:title>
+                            <xhtml:title>PresentationServer - Struts Javascript Validator Example</xhtml:title>
                             <xhtml:script type="text/javascript">
                                 <xsl:value-of select="struts:javascript('jsTypeForm', 'true', 'true')"/>
                             </xhtml:script>

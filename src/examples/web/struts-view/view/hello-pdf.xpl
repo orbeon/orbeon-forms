@@ -26,7 +26,7 @@
                 <xsl:template match="/beans/hello">
                     <document>
                         <header>
-                            <title>Presentation Server - Struts PDF Example</title>
+                            <title>PresentationServer - Struts PDF Example</title>
                         </header>
                         <body>
                             <section>

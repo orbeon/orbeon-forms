@@ -228,7 +228,7 @@ public class StrutsUtils {
 
         ExternalContext external = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         if (!(external instanceof ServletExternalContext))
-            throw new OXFException("Presentation Server is not running as a servlet. This is not supported.");
+            throw new OXFException("PresentationServer is not running as a servlet. This is not supported.");
 
         ServletContext servletContext = (ServletContext) external.getNativeContext();
         if (servletContext == null)

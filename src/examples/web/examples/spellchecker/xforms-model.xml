@@ -15,9 +15,9 @@
     <xforms:instance>
         <form>
             <action/>
-            <text>Orbeon Presentation Server is a J2EE-based MVC framewok
+            <text>Orbeon PresentationServer is a J2EE-based MVC framewok
 for building Web aplications that present and capture XML
-using XForms, XSLT, and Web Services. Presentation Server
+using XForms, XSLT, and Web Services. PresentationServer
 benefits from sandardized forms processing using XForms,
 rich controller semantics, and full-featured XML pirelines.</text>
         </form>

@@ -19,7 +19,7 @@
     <source>input.xml</source>
     <description>
         <p>
-            This examples illustrates the use of XPL, the Presentation Server XML Pipeline
+            This examples illustrates the use of XPL, the PresentationServer XML Pipeline
             Definition Language, to transform XML documents.
         </p>
     </description>

@@ -52,12 +52,12 @@
                 </p>
             </section>
             <section>
-                <title>XForms Improvements</title>
+                <title>XForms</title>
                 <section>
-                    <title>xxforms:hidden</title>
+                    <title>xxforms:hidden Extension Control</title>
                     <p>
-                        The XForms extension <code>xxforms:hidden</code> is supported again and
-                        documented.
+                        The XForms extension control <code>xxforms:hidden</code> is supported again
+                        and documented.
                     </p>
                 </section>
                 <section>

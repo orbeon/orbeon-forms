@@ -430,7 +430,7 @@
         </zip>
     </target>
 
-    <target name="orbeon-dist" depends="orbeon-dist-war, orbeon-bizdoc-war, orbeon-doc, orbeon-javadoc">
+    <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-bizdoc-war, orbeon-doc, orbeon-javadoc">
         <property name="prefix" value="orbeon-${version.number}"/>
         <!-- Create temporary zip file -->
         <property name="tmp-zip" value="${build.distrib.dir}/orbeon-${version.number}-tmp.zip"/>
@@ -530,7 +530,7 @@
         </exec>
     </target>
 
-    <target name="orbeon-dist" depends="orbeon-dist, orbeon-dist-install"/>
+    <target name="orbeon-dist" depends="orbeon-dist-packages, orbeon-dist-install"/>
 
     <target name="copy-distrib" depends="orbeon-dist">
         <copy todir="/home/httpd/html/public/oxf/secret">

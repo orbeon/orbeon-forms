@@ -457,8 +457,7 @@
         <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${deployDir}/${release.number}/build.log'/>
     	
         <!-- Post the unstable build -->
-        <exec executable='time' failonerror='true' dir='${deployDir}/${release.number}' >
-          <arg value='rsync' />
+        <exec executable='rsync' failonerror='true' dir='${deployDir}/${release.number}' >
           <arg value='--stats' />
           <arg value='-z' />
           <arg value='-c' />

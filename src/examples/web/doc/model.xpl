@@ -121,6 +121,11 @@
                     <config>
                         <version>4.01</version>
                         <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
+                        <encoding>utf-8</encoding>
+                        <header>
+                            <name>Cache-Control</name>
+                            <value>post-check=0, pre-check=0</value>
+                        </header>
                     </config>
                 </p:input>
                 <p:input name="data" href="#fixed-html"/>

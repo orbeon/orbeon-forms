@@ -96,7 +96,7 @@
                             </body>
                         </html>
                     </p:input>
-                    <p:output name="data" id="annotated-data"/>
+                    <p:output name="data" id="annotated-data" debug="aa"/>
                 </p:processor>
                 <!-- Transform annotated XForms to XHTML -->
                 <p:processor name="oxf:xslt"><!-- saxon1 -->
@@ -360,7 +360,7 @@
                                 <selected-sub-task/>
                                 <sub-tasks>
                                     <xsl:call-template name="task">
-                                        <xsl:with-param name="times" select="3"/>
+                                        <xsl:with-param name="times" select="300"/>
                                     </xsl:call-template>
                                 </sub-tasks>
                             </form>
@@ -428,7 +428,8 @@
                         <xforms:group ref="date">
                             <xforms:input ref="year"/>
                         </xforms:group>
-                        <xforms:repeat nodeset="sub-tasks/task[task-id != '' and task-status-code = 'A']" id="subtask-set">
+                        <xforms:repeat nodeset="sub-tasks/task" id="subtask-set">
+<!--                        <xforms:repeat nodeset="sub-tasks/task[task-id != '' and task-status-code = 'A']" id="subtask-set">-->
                             <xforms:input ref="task-id"/>
                             <xforms:input ref="task-name"/>
                             <xforms:select1 ref="task-type-code" appearance="minimal">
@@ -588,7 +589,10 @@
                         </xsl:template>
 
                         <xsl:template match="/">
-                            <xsl:apply-templates select="/form/sub-tasks/task[1]"/>
+                            <form>
+                                <count><xsl:value-of select="count(/form/sub-tasks/task)"/></count>
+                                <xsl:apply-templates select="/form/sub-tasks/task[1]"/>
+                            </form>
                         </xsl:template>
 
                         <xsl:template match="task">
@@ -607,53 +611,56 @@
         </p:config>
     </input>
         <output name="result">
-            <task>
-                <name>Repeat Test</name>
-                <date>
-                    <month>11</month>
-                    <day>11</day>
-                    <year>2004</year>
-                </date>
-                <task-id>1</task-id>
-                <parent-task-id>826</parent-task-id>
-                <task-type-code>FS</task-type-code>
-                <task-status-code>A</task-status-code>
-                <task-status-date>
-                    <month>11</month>
-                    <day>05</day>
-                    <year>2004</year>
-                </task-status-date>
-                <role-id>9</role-id>
-                <assigned-to/>
-                <person-id/>
-                <rec-num/>
-                <lodge-id>1</lodge-id>
-                <district-id/>
-                <task-name>Form a 2004 (1)</task-name>
-                <description>Form a 2004</description>
-                <seqn>0</seqn>
-                <start-date>
-                    <month>11</month>
-                    <day>05</day>
-                    <year>2004</year>
-                </start-date>
-                <end-date>
-                    <month/>
-                    <day/>
-                    <year/>
-                </end-date>
-                <days-to-complete/>
-                <projected-end-date>
-                    <month>11</month>
-                    <day>12</day>
-                    <year>2004</year>
-                </projected-end-date>
-                <grace-period>7</grace-period>
-                <cmc-ref/>
-                <reminder-interval/>
-                <reminder-text/>
-                <received/>
-            </task>
+            <form>
+                <count>300</count>
+                <task>
+                    <name>Repeat Test</name>
+                    <date>
+                        <month>11</month>
+                        <day>11</day>
+                        <year>2004</year>
+                    </date>
+                    <task-id>1</task-id>
+                    <parent-task-id>826</parent-task-id>
+                    <task-type-code>FS</task-type-code>
+                    <task-status-code>A</task-status-code>
+                    <task-status-date>
+                        <month>11</month>
+                        <day>05</day>
+                        <year>2004</year>
+                    </task-status-date>
+                    <role-id>9</role-id>
+                    <assigned-to/>
+                    <person-id/>
+                    <rec-num/>
+                    <lodge-id>1</lodge-id>
+                    <district-id/>
+                    <task-name>Form a 2004 (1)</task-name>
+                    <description>Form a 2004</description>
+                    <seqn>0</seqn>
+                    <start-date>
+                        <month>11</month>
+                        <day>05</day>
+                        <year>2004</year>
+                    </start-date>
+                    <end-date>
+                        <month/>
+                        <day/>
+                        <year/>
+                    </end-date>
+                    <days-to-complete/>
+                    <projected-end-date>
+                        <month>11</month>
+                        <day>12</day>
+                        <year>2004</year>
+                    </projected-end-date>
+                    <grace-period>7</grace-period>
+                    <cmc-ref/>
+                    <reminder-interval/>
+                    <reminder-text/>
+                    <received/>
+                </task>
+            </form>
         </output>
 
     </test>

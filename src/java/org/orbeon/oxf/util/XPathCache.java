@@ -15,11 +15,13 @@ package org.orbeon.oxf.util;
 
 import org.dom4j.DocumentHelper;
 import org.dom4j.XPath;
+import org.dom4j.Node;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.xpath.XPathExpression;
 import org.orbeon.saxon.xpath.XPathEvaluator;
 import org.orbeon.saxon.xpath.StandaloneContext;
@@ -78,11 +80,16 @@ public class XPathCache {
                 }
             }
 
-            // Context node
-            if (nodeInfo != null)
-                xpathEvaluator.setContextNode(nodeInfo);
 
-            return xpathEvaluator.createExpression(xpathExpression);
+            XPathExpression exp = xpathEvaluator.createExpression(xpathExpression);
+            // Context node
+            if (nodeInfo != null) {
+                //somehow we need to set it both to the evaluator and the expression
+                xpathEvaluator.setContextNode(nodeInfo);
+                exp.setContextNode(nodeInfo);
+            }
+
+            return exp;
         } catch (XPathException e) {
             throw new OXFException(e);
         }

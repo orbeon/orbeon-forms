@@ -40,10 +40,11 @@
         <p:input name="request" href="#request"/>
         <p:input name="config">
             <urls xsl:version="2.0">
-                <xsl:variable name="xml-array" select="string:get-bytes(saxon:serialize(/*, ''))"/>
+                <xsl:variable name="xml-string" select="saxon:serialize(/*, '')"/>
+                <xsl:variable name="xml-array" select="string:get-bytes($xml-string)"/>
                 <xsl:variable name="output-stream" select="byte-array-output-stream:new()"/>
                 <xsl:variable name="gzip" select="gzip-output-stream:new($output-stream)"/>
-                <xsl:value-of select="gzip-output-stream:write($gzip, $xml-array, 0, array:get-length($xml-array))"/>
+                <xsl:value-of select="gzip-output-stream:write($gzip, $xml-array, 0, string:length($xml-string))"/>
                 <xsl:value-of select="gzip-output-stream:finish($gzip)"/>
                 <xsl:variable name="base64-string-multi-line" select="base64:encode(byte-array-output-stream:to-byte-array($output-stream))"/>
                 <xsl:variable name="base64-string" select="replace(replace($base64-string-multi-line, '&#xa;', ''), '&#xd;', '')"/>

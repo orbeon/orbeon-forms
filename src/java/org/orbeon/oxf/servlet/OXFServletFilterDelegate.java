@@ -43,22 +43,42 @@ public class OXFServletFilterDelegate implements Filter {
             servletContext = config.getServletContext();
             webAppContext = WebAppContext.instance(servletContext);
 
-            // Try to obtain a local processor definition
-            ProcessorDefinition mainProcessorDefinition
-                = InitUtils.getDefinitionFromMap(new ServletFilterInitMap(config), ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
+            // Get main processor definition
+            ProcessorDefinition mainProcessorDefinition;
+            {
+                // Try to obtain a local processor definition
+                mainProcessorDefinition
+                    = InitUtils.getDefinitionFromMap(new ServletFilterInitMap(config), ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
+                            ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
+                // Try to obtain a processor definition from the properties
+                if (mainProcessorDefinition == null)
+                    mainProcessorDefinition = InitUtils.getDefinitionFromProperties(ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
                         ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
-            // Try to obtain a processor definition from the properties
-            if (mainProcessorDefinition == null)
-                mainProcessorDefinition = InitUtils.getDefinitionFromProperties(ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
-                    ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
-            // Try to obtain a processor definition from the context
-            if (mainProcessorDefinition == null)
-                mainProcessorDefinition = InitUtils.getDefinitionFromServletContext(servletContext, ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
-                    ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
+                // Try to obtain a processor definition from the context
+                if (mainProcessorDefinition == null)
+                    mainProcessorDefinition = InitUtils.getDefinitionFromServletContext(servletContext, ProcessorService.MAIN_PROCESSOR_PROPERTY_PREFIX,
+                        ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
+            }
+            // Get error processor definition
+            ProcessorDefinition errorProcessorDefinition;
+            {
+                // Try to obtain a local processor definition
+                errorProcessorDefinition
+                        = InitUtils.getDefinitionFromMap(new ServletFilterInitMap(config), ProcessorService.ERROR_PROCESSOR_PROPERTY_PREFIX,
+                                ProcessorService.ERROR_PROCESSOR_INPUT_PROPERTY_PREFIX);
+                // Try to obtain a processor definition from the properties
+                if (errorProcessorDefinition == null)
+                    errorProcessorDefinition = InitUtils.getDefinitionFromProperties(ProcessorService.ERROR_PROCESSOR_PROPERTY_PREFIX,
+                            ProcessorService.ERROR_PROCESSOR_INPUT_PROPERTY_PREFIX);
+                // Try to obtain a processor definition from the context
+                if (errorProcessorDefinition == null)
+                    errorProcessorDefinition = InitUtils.getDefinitionFromServletContext(servletContext, ProcessorService.ERROR_PROCESSOR_PROPERTY_PREFIX,
+                        ProcessorService.ERROR_PROCESSOR_INPUT_PROPERTY_PREFIX);
+            }
 
             // Create and initialize service
             processorService = new ProcessorService();
-            processorService.init(mainProcessorDefinition);
+            processorService.init(mainProcessorDefinition, errorProcessorDefinition);
         } catch (Exception e) {
             throw new ServletException(OXFException.getRootThrowable(e));
         }

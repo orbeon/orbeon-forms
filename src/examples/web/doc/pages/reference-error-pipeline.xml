@@ -30,54 +30,45 @@
             <p>
                 When an exception is thrown, Presentation Server displays a default error page
                 containing the root cause and location information if available. However, the
-                application developer can display a different page by specifying a pipeline to be
-                executed upon error. This pipeline could, for example, log the error and display a
-                nice error page to the user. </p>
+                application developer can display a different page by specifying a processor to be
+                executed upon error. This processor could be, for example, a pipeline logging the
+                error and displaying a nice error page to the user.
+            </p>
         </section>
         <section>
-            <title>Usage</title>
-            <p> The error pipeline is set in
-                <link
-                    href="reference-properties#error-pipeline">OXFProperties</link>,
-                using similar methods as the main pipeline. The following properties
-                are used for this purpose:
-            </p>
+            <title>Configuration</title>
             <p>
-                <table ca="|l|p{0.5\textwidth}|">
-                    <tr>
-                        <th>
-                            <code>oxf.servlet.error.processor</code>
-                        </th>
-                        <td>URI of the main processor used for the error
-                            pipeline. It is usually the pipeline processor,
-                            <code>oxf/processor/pipeline</code>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>
-                            <code>oxf.servlet.error.input.&lt;name&gt;</code>
-                        </th>
-                        <td>Binds the inputs of the error processor. If using
-                            the pipeline processor, <code>&lt;name&gt;</code> should be
-                            <code>config</code> and the property must be a URL
-                            pointing to an XPL file
-                        </td>
-                    </tr>
-                </table>
+                The error pipeline can be configured in <code>web.xml</code> or
+                <code>properties.xml</code>. For more information, please refer to the <a
+                href="integration-packaging#error-configuration">Packaging and Deployment</a>
+                documentation.
             </p>
         </section>
         <section>
             <title>Example</title>
-            <p> In most cases, the custom error pipeline logs or displays the
-                exception that occurred. A simple error pipeline is shown below, using the
-                <code>ExceptionGenerator</code> to display the root cause message, but not the
-                exception stack trace.
+            <p>
+                In most cases, the custom error pipeline logs or displays the exception that
+                occurred. A simple error pipeline is shown below, using the <a
+                href="processors-generators#exception-generator">Exception processor</a> to
+                display the root cause message, but not the exception stack trace.
             </p>
             <section>
-                <title>Properties</title>
+                <title>Setup</title>
                 <xml-source>
-<property type="xs:string" name="oxf.servlet.error.processor" value="oxf/processor/pipeline"/>
-<property type="xs:string" name="oxf.servlet.error.input.config" value="oxf:/config/error.xpl"/>
+                    <servlet>
+                        <servlet-name>oxf</servlet-name>
+                        <servlet-class>org.orbeon.oxf.servlet.OXFServlet</servlet-class>
+                        <comment>The error processor that OXFServlet must execute</comment>
+                        <init-param>
+                            <param-name>oxf.error-processor.name</param-name>
+                            <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                        </init-param>
+                        <comment>The pipeline to execute</comment>
+                        <init-param>
+                            <param-name>oxf.error-processor.input.config</param-name>
+                            <param-value>oxf:/config/error.xpl</param-value>
+                        </init-param>
+                    </servlet>
                 </xml-source>
             </section>
             <section>
@@ -93,36 +84,44 @@
         <p:input name="config">
             <xsl:stylesheet version="1.0">
                 <xsl:template match="/">
-                    <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-                        <xhtml:head>
-                            <xhtml:title>Presentation Server - Custom Error Page</xhtml:title>
-                        </xhtml:head>
-                        <xhtml:body>
-                            <xhtml:h1>An error occured:</xhtml:h1>
-                            <xhtml:p>
-The screen demonstrates a
-custom error pipeline. For this
-example, only the first exception is shown.
-                            </xhtml:p>
-                            <xhtml:p>
+                    <html xmlns="http://www.w3.org/1999/xhtml">
+                        <head>
+                            <title>Presentation Server - Custom Error Page</title>
+                        </head>
+                        <body>
+                            <h1>An error occured:</h1>
+                            <p>
+                                The screen demonstrates a custom error pipeline. For this example,
+                                only the message of the first exception is displayed.
+                            </p>
+                            <p>
                                 <code>
                                     <xsl:value-of select="/exceptions/exception/message"/>
                                 </code>
-                            </xhtml:p>
-                        </xhtml:body>
-                    </xhtml:html>
+                            </p>
+                        </body>
+                    </html>
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
         <p:output name="data" id="document"/>
     </p:processor>
-    <!-- Apply stylesheet -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#document"/>
-        <p:input name="config" href="oxf:/themes/theme1.xsl"/>
+        <p:input name="config" href="oxf:/oxf-theme/theme.xsl"/>
+        <p:output name="data" id="themed"/>
+    </p:processor>
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#themed"/>
+        <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>
         <p:output name="data" id="html"/>
     </p:processor>
     <p:processor name="oxf:html-serializer">
+        <p:input name="config">
+            <config>
+                <status-code>500</status-code>
+            </config>
+        </p:input>
         <p:input name="data" href="#html"/>
     </p:processor>
 </p:config>

@@ -793,12 +793,6 @@
                     <li>To refer to a processor output named <code>my-output</code>, use the URI: <code>output:my-output</code></li>
                 </ul>
                 <p>
-                    For concrete examples, please refer to the <a
-                    href="processors-xslt#user-defined">XSLT processor</a> or the <a
-                    href="processors-messaging#out-of-line-parts">Email processor</a>
-                    documentation.
-                </p>
-                <p>
                     While there is no requirement for processor configurations to follow this URI
                     convention, it is highly recommended to do so whenever possible to ensure
                     consistency. In Presentation Server, several processors make use of it,
@@ -810,8 +804,15 @@
                     <li>The Email processor</li>
                 </ul>
                 <p>
+                    For concrete examples, please refer to the <a
+                    href="processors-xslt#user-defined">XSLT processor</a> or the <a
+                    href="processors-messaging#out-of-line-parts">Email processor</a>
+                    documentation.
+                </p>
+                <p>
                     Currently, no standard processor within Presentation Server makes uses of the
-                    <code>output:</code> scheme.
+                    <code>output:</code> scheme. The XSLT processor would be a good candidate for
+                    this feature, with XSLT 2.0's support for multiple output documents.
                 </p>
             </section>
         </section>

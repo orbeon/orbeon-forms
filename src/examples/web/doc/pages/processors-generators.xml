@@ -888,13 +888,13 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </xml-source>
             </section>
         </section>
-        <anchor id="ExceptionGenerator"/>
+        <anchor id="exception-generator"/>
         <section>
             <title>Exception Generator</title>
             <p>
                 The Exception generator is usually used in an <link
-                href="reference-error-pipeline">error pipeline</link>. It serializes an exception
-                into XML. The following shows an XML stream resulting from an exception.
+               href="reference-error-pipeline">error pipeline</link>. It serializes an exception
+               into XML. The following shows an XML stream resulting from an exception.
             </p>
             <xml-source>
                 <exceptions>

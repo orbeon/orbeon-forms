@@ -82,6 +82,16 @@
                 <param-value>oxf:/page-flow.xml</param-value>
             </context-param>
 
+            <xsl:comment> Set error processor </xsl:comment>
+            <context-param>
+                <param-name>oxf.error-processor.name</param-name>
+                <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+            </context-param>
+            <context-param>
+                <param-name>oxf.error-processor.input.config</param-name>
+                <param-value>oxf:/config/error.xpl</param-value>
+            </context-param>
+
             <xsl:comment> Set XML Server configuration file </xsl:comment>
             <context-param>
                 <param-name>oxf.xml-server.config</param-name>

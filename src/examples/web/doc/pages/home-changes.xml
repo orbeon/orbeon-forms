@@ -140,6 +140,30 @@
                     for the Presentation Server resource manager sandbox.
                 </p>
             </section>
+            <section>
+                <title>Error Processor</title>
+                <p>
+                    The error processor now follows the same configuration mechanism as the main
+                    processor. The following property names have been deprecated:
+                </p>
+                <ul>
+                    <li><code>oxf.servlet.error.processor.uri</code></li>
+                    <li><code>oxf.servlet.error.input.*</code></li>
+                </ul>
+                <p>
+                    The new names are as follows:
+                </p>
+                <ul>
+                    <li><code>oxf.error-processor.name</code></li>
+                    <li><code>oxf.error-processor.input.*</code></li>
+                </ul>
+                <p>
+                    Visit <a href="integration-packaging#error-processor">Packaging and
+                    Deployment</a> for more information on configuring the error processor, as well
+                    as <a href="reference-error-pipeline">Error Pipeline</a> for information about
+                    creating an error pipeline.
+                </p>
+            </section>
         </section>
         <section>
             <title>New in Version 2.6</title>

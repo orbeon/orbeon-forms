@@ -15,6 +15,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
+    <!-- Generate exception document -->
     <p:processor name="oxf:exception">
         <p:output name="data" id="exception"/>
     </p:processor>

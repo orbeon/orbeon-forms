@@ -21,22 +21,16 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
 import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
-import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.resources.ClassLoaderResourceManagerImpl;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.task.TaskScheduler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.dom4j.QName;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import java.io.*;
-import java.util.Iterator;
 
 public class ProcessorService {
 
@@ -44,13 +38,9 @@ public class ProcessorService {
     public static final String MAIN_PROCESSOR_PROPERTY_PREFIX = "oxf.main-processor.";
     public static final String MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX = "oxf.main-processor.input.";
 
-    public static final String DEFAULT_PROCESSOR_URI = "oxf/processor/page-flow";
-    public static final String DEFAULT_PROCESSOR_INPUT_NAME = "controller";
-    public static final String DEFAULT_PROCESSOR_INPUT_URL = "oxf:/page-flow.xml";
-
     // Error processor
-    public static final String ERROR_PROCESSOR_URI_PROPERTY = "oxf.servlet.error.processor";// Suggested new name: oxf.error-processor.uri
-    public static final String ERROR_PROCESSOR_INPUT_PROPERTY_PREFIX = "oxf.servlet.error.input.";// Suggested new name: oxf.error-processor.input.
+    public static final String ERROR_PROCESSOR_PROPERTY_PREFIX = "oxf.error-processor.";
+    public static final String ERROR_PROCESSOR_INPUT_PROPERTY_PREFIX = "oxf.error-processor.input.";
 
     // Other properties
     public static final String HTTP_FORCE_LAST_MODIFIED_PROPERTY = "oxf.http.force-last-modified";
@@ -70,12 +60,7 @@ public class ProcessorService {
     public ProcessorService() {
     }
 
-    public synchronized void init(Processor mainProcessor) {
-        this.init((ProcessorDefinition)null);
-        this.mainProcessor = mainProcessor;
-    }
-
-    public synchronized void init(ProcessorDefinition mainProcessorDefinition) {
+    public synchronized void init(ProcessorDefinition mainProcessorDefinition, ProcessorDefinition errorProcessorDefinition) {
         if (initialized) {
             logger.debug("ProcessorService is already initialized. Skipping new initialization.");
             return;
@@ -85,40 +70,12 @@ public class ProcessorService {
             // Create initial context
             jndiContext = new InitialContext();
 
-            // Create default definition if needed
-            if (mainProcessorDefinition == null) {
-                mainProcessorDefinition = new ProcessorDefinition();
-                mainProcessorDefinition.setUri(DEFAULT_PROCESSOR_URI);
-                mainProcessorDefinition.addInput(DEFAULT_PROCESSOR_INPUT_NAME, DEFAULT_PROCESSOR_INPUT_URL);
-            }
-
             // Create and connect main processor
             mainProcessor = InitUtils.createProcessor(mainProcessorDefinition);
 
-            // Create and connect error processor
-            // TODO: make this configurable like the main processor
-            try {
-                QName processorQName = OXFProperties.instance().getPropertySet().getQName(ERROR_PROCESSOR_URI_PROPERTY);
-                if (processorQName != null) {
-                    errorProcessor = ProcessorFactoryRegistry.lookup(processorQName).createInstance(new PipelineContext());
-
-                    // Add inputs
-                    for (Iterator i = OXFProperties.instance().keySet().iterator(); i.hasNext();) {
-                        String key = (String) i.next();
-                        if (key.startsWith(ERROR_PROCESSOR_INPUT_PROPERTY_PREFIX)) {
-                            // It's an input
-
-                            String inputName = key.substring(ERROR_PROCESSOR_INPUT_PROPERTY_PREFIX.length());
-                            String inputSrc = OXFProperties.instance().getPropertySet().getStringOrURIAsString(key);
-
-                            Processor urlGenerator = PipelineUtils.createURLGenerator(inputSrc);
-                            PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, errorProcessor, inputName);
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                logger.warn("Can't instanciate the error pipeline", e);
-            }
+            // Create and connect error processor if specified
+            if (errorProcessorDefinition != null)
+                errorProcessor = InitUtils.createProcessor(errorProcessorDefinition);
 
             initialized = true;
         } catch (Exception e) {
@@ -127,11 +84,6 @@ public class ProcessorService {
     }
 
     public void service(boolean addClient, ExternalContext externalContext, PipelineContext pipelineContext) {
-
-        // Handle license checking
-        ExternalContext.Request request = externalContext.getRequest();
-//        if (addClient && request != null)
-//            LicenseCheck.instance().addClient(request.getRemoteAddr());
 
         // NOTE: Should this just be available from the ExternalContext?
         pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
@@ -144,6 +96,7 @@ public class ProcessorService {
             LocationData locationData = ValidationException.getRootLocationData(e);
             Throwable throwable = OXFException.getRootThrowable(e);
             // Store the exception; needed if we are in a portlet
+            ExternalContext.Request request = externalContext.getRequest();
             request.getAttributesMap().put(OXF_EXCEPTION, e);
             // Try to start the error pipeline if the response has not been committed yet
             try {

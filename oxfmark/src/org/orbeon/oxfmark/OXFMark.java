@@ -403,16 +403,12 @@ public class OXFMark {
             registry.reset(pipelineContext);
             registry.start(pipelineContext);
 
-            // Check license
-            //LicenseCheck.instance().start(pipelineContext);
-            //LicenseCheck.instance().checkLicense();
-
             // Create processor service
             processorService = new ProcessorService();
             ProcessorDefinition processorDefinition = new ProcessorDefinition();
             processorDefinition.setUri("oxf/processor/page-flow");
             processorDefinition.addInput("controller", "oxf:/config/page-flow.xml");
-            processorService.init(processorDefinition);
+            processorService.init(processorDefinition, null);
         } catch (NamingException e) {
             throw new OXFException(e);
         }

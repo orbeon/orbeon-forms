@@ -101,7 +101,7 @@
 					<td>
                         Contains the resources for the Presentation Server example application.
                         Most of the files in this directory will be replaced when you build your own
-                        Presentation Server Web applications. In particular, this directory
+                        Presentation Server web applications. In particular, this directory
                         contains <code>properties.xml</code>, the main Presentation Server
                         configuration file.
                     </td>
@@ -180,8 +180,8 @@
                         <code>OXFServlet</code>, as well as optional inputs of this processor.
                         Alternatively, the main processor can be declared directly within
                         <code>web.xml</code>, which is the recommended approach. By default, the
-                        Page Flow Controller is used as the main processor. If the configuration
-                        is done in <code>web.xml</code>:
+                        Page Flow Controller is used as the main processor. If the configuration is
+                        done in <code>web.xml</code>:
                     </p>
 					<xml-source>
 <comment>The main processor that OXFServlet must execute</comment>
@@ -192,7 +192,7 @@
 <comment>The Page Flow Controller configuration file</comment>
 <context-param>
     <param-name>oxf.main-processor.input.controller</param-name>
-    <param-value>oxf:/config/page-flow.xml</param-value>
+    <param-value>oxf:/page-flow.xml</param-value>
 </context-param>
 					</xml-source>
                     <p>
@@ -203,7 +203,7 @@
     <comment>The main processor that OXFServlet must execute</comment>
     <property as="xs:QName" name="oxf.main-processor.main" value="oxf:page-flow"/>
     <comment>The Page Flow Controller configuration file</comment>
-    <property as="xs:anyURI" name="oxf.main-processor.input.controller" value="oxf:/config/page-flow.xml"/>
+    <property as="xs:anyURI" name="oxf.main-processor.input.controller" value="oxf:/page-flow.xml"/>
 </properties>
 					</xml-source>
                     <p>
@@ -215,7 +215,7 @@
 				<li>
                     The <code>oxf.main-processor.input.controller</code> property connects the
                     <code>controller</code> input of the Page Flow Controller to the configuration
-                    file <code>oxf:/config/page-flow.xml</code>. The Page Flow Controller reads
+                    file <code>oxf:/page-flow.xml</code>. The Page Flow Controller reads
                     this input before it starts to operate.
                 </li>
                 <p>
@@ -234,23 +234,23 @@
                 <title>Definition</title>
                 <p>
                     In the same way that an old-fashioned program has a main function, Presentation
-                    Server has the concept of main processor. Within a Web application, the main
+                    Server has the concept of main processor. Within a web application, the main
                     processor is the processor that is run each time a Servlet, Servlet filter or
                     Portlet receives a client request. Within a command-line application, the main
                     processor is simply the processor that runs when the application is run.
                 </p>
                 <p>
-                    In the simplest Web application deployment scenario, as shown in the example
+                    In the simplest web application deployment scenario, as shown in the example
                     above, only one Presentation Server Servlet needs to be configured. In more
                     complex scenarios, it is possible to deploy multiple Presentation Server
                     Servlets, Servlet filters, and Portlets, as well as one Presentation Server
-                    Servlet context listener, within the same Web or Portlet application. The
+                    Servlet context listener, within the same Web or Portlet Application. The
                     following figure illustrates this:
                 </p>
                 <img print-format="pdf" src="pages/integration-portlets-deployment.png" width="522" height="234"/>
                 <p>
-                    Additional non-Presentation Server components can obviously be deployed within the same Web or
-                    Portlet application.
+                    Additional non-Presentation Server components can obviously be deployed within
+                    the same Web or Portlet Application.
                 </p>
             </section>
             <section>
@@ -261,56 +261,50 @@
                 </p>
                 <ol>
                     <li>
-                        The component's initialization parameters in
-                        <code>web.xml</code>. For example, in the case of a
-                        Servlet:
+                        The component's initialization parameters in <code>web.xml</code>. For
+                        example, in the case of a Servlet:
                         <xml-source>
-<servlet>
-    <servlet-name>oxf</servlet-name>
-    <servlet-class>org.orbeon.oxf.servlet.OXFServlet</servlet-class>
-    <comment>The main processor that OXFServlet must execute</comment>
-    <init-param>
-        <param-name>oxf.main-processor.name</param-name>
-        <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
-    </init-param>
-    <comment>The Page Flow Controller configuration file</comment>
-    <init-param>
-        <param-name>oxf.main-processor.input.controller</param-name>
-        <param-value>oxf:/config/page-flow.xml</param-value>
-    </init-param>
-</servlet>
+                            <servlet>
+                                <servlet-name>oxf</servlet-name>
+                                <servlet-class>org.orbeon.oxf.servlet.OXFServlet</servlet-class>
+                                <comment>The main processor that OXFServlet must execute</comment>
+                                <init-param>
+                                    <param-name>oxf.main-processor.name</param-name>
+                                    <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
+                                </init-param>
+                                <comment>The Page Flow Controller configuration file</comment>
+                                <init-param>
+                                    <param-name>oxf.main-processor.input.controller</param-name>
+                                    <param-value>oxf:/page-flow.xml</param-value>
+                                </init-param>
+                            </servlet>
 					    </xml-source>
                     </li>
                     <li>
                         <code>properties.xml</code>, for example:
 					    <xml-source>
-<properties>
-    <comment>The main processor that OXFServlet must execute</comment>
-    <property as="xs:QName" name="oxf.main-processor.name" value="oxf:page-flow"/>
-    <comment>The Page Flow Controller configuration file</comment>
-    <property as="xs:anyURI" name="oxf.main-processor.input.controller" value="oxf:/config/page-flow.xml"/>
-</properties>
+                            <properties>
+                                <comment>The main processor that OXFServlet must execute</comment>
+                                <property as="xs:QName" name="oxf.main-processor.name" value="oxf:page-flow"/>
+                                <comment>The Page Flow Controller configuration file</comment>
+                                <property as="xs:anyURI" name="oxf.main-processor.input.controller" value="oxf:/page-flow.xml"/>
+                            </properties>
 					    </xml-source>
                     </li>
                     <li>
                         The context parameters in <code>web.xml</code>
 					    <xml-source>
-<comment>The main processor that OXFServlet must execute</comment>
-<context-param>
-    <param-name>oxf.main-processor.name</param-name>
-    <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
-</context-param>
-<comment>The Page Flow Controller configuration file</comment>
-<context-param>
-    <param-name>oxf.main-processor.input.controller</param-name>
-    <param-value>oxf:/config/page-flow.xml</param-value>
-</context-param>
+                            <comment>The main processor that OXFServlet must execute</comment>
+                            <context-param>
+                                <param-name>oxf.main-processor.name</param-name>
+                                <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
+                            </context-param>
+                            <comment>The Page Flow Controller configuration file</comment>
+                            <context-param>
+                                <param-name>oxf.main-processor.input.controller</param-name>
+                                <param-value>oxf:/page-flow.xml</param-value>
+                            </context-param>
 					    </xml-source>
-                    </li>
-                    <li>
-                        Finally, a default is used: the processor used is
-                        <code>oxf:page-flow</code>, and its <code>controller</code> input is set to
-                        <code>oxf:/config/page-flow.xml</code>.
                     </li>
                 </ol>
                 <p>
@@ -319,6 +313,84 @@
                     components with different configurations is facilitated. There are situations
                     where several components need to share a configuration, but it is expected that
                     such situations will be rare.
+                </p>
+            </section>
+        </section>
+        <anchor id="error-processor"/>
+        <section>
+			<title>Error Processor</title>
+            <section>
+                <title>Definition</title>
+                <p>
+                    In case an error is encoutered during the execution or the main processor,
+                    Presentation Server tries to execute an error processor. The error processor is
+                    typically a pipeline that produces a page showing the exception that was
+                    encountered. For more information, please refer to the <a
+                    href="reference-error-pipeline">Error Pipeline</a> documentation.
+                </p>
+            </section>
+            <anchor id="error-configuration"/>
+            <section>
+                <title>Configuring the Error Processor</title>
+                <p>
+                    You can configure an error processor in the same way the main processor is
+                    configured. The error processor is looked up in the following locations, in
+                    this order:
+                </p>
+                <ol>
+                    <li>
+                        The component's initialization parameters in <code>web.xml</code>. For
+                        example, in the case of a Servlet:
+                        <xml-source>
+                            <servlet>
+                                <servlet-name>oxf</servlet-name>
+                                <servlet-class>org.orbeon.oxf.servlet.OXFServlet</servlet-class>
+                                <comment>The error processor that OXFServlet must execute</comment>
+                                <init-param>
+                                    <param-name>oxf.error-processor.name</param-name>
+                                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                                </init-param>
+                                <comment>The pipeline to execute</comment>
+                                <init-param>
+                                    <param-name>oxf.error-processor.input.config</param-name>
+                                    <param-value>oxf:/config/error.xpl</param-value>
+                                </init-param>
+                            </servlet>
+                        </xml-source>
+                    </li>
+                    <li>
+                        <code>properties.xml</code>, for example:
+                        <xml-source>
+                            <properties>
+                                <comment>The error processor that OXFServlet must execute</comment>
+                                <property as="xs:QName" name="oxf.error-processor.name" value="oxf:pipeline"/>
+                                <comment>The Page Flow Controller configuration file</comment>
+                                <property as="xs:anyURI" name="oxf.error-processor.input.config" value="oxf:/config/error.xpl"/>
+                            </properties>
+                        </xml-source>
+                    </li>
+                    <li>
+                        The context parameters in <code>web.xml</code>
+                        <xml-source>
+                            <comment>The error processor that OXFServlet must execute</comment>
+                            <context-param>
+                                <param-name>oxf.error-processor.name</param-name>
+                                <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                            </context-param>
+                            <comment>The pipeline to execute</comment>
+                            <context-param>
+                                <param-name>oxf.error-processor.input.config</param-name>
+                                <param-value>oxf:/config/error.xpl</param-value>
+                            </context-param>
+                        </xml-source>
+                    </li>
+                </ol>
+                <p>
+                    It is recommended to configure each Web or Portlet Application component
+                    individually in the component's initialization properties in <code>web.xml</code>,
+                    so that adding components with different configurations is facilitated. There are
+                    situations where several components need to share a configuration, but it is
+                    expected that such situations will be rare.
                 </p>
             </section>
         </section>

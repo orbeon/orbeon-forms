@@ -526,7 +526,7 @@
                                     case, for example:
 
                                     <xml-source>
-                                        <page id="not-found" path-info="/not-found" view="/config/notfound.xml"/>
+                                        <page id="not-found" path-info="/not-found" view="/config/not-found.xml"/>
                                         <not-found-handler page="not-found"/>
                                     </xml-source>
                                 </li>

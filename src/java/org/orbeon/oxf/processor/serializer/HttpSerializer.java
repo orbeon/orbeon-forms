@@ -27,10 +27,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,6 +53,7 @@ public class HttpSerializer extends HttpSerializerBase {
         try {
             final Config config = (Config) _config;
             readInputAsSAX(context, input, new ContentHandlerAdapter() {
+                private Writer writer;
                 private ContentHandler outputContentHandler;
                 private int elementLevel = 0;
                 private Map prefixMappings;
@@ -116,7 +114,6 @@ public class HttpSerializer extends HttpSerializerBase {
                             // Always set the content type with a charset attribute
                             response.setContentType(contentType + "; charset=" + encoding);
 
-                            Writer writer = null;
                             try {
                                 writer = new OutputStreamWriter(outputStream, encoding);
                             } catch (UnsupportedEncodingException e) {
@@ -133,6 +130,16 @@ public class HttpSerializer extends HttpSerializerBase {
 
                 public void characters(char ch[], int start, int length) throws SAXException {
                     outputContentHandler.characters(ch, start, length);
+                }
+
+                public void endDocument() {
+                    try {
+                        if (writer != null)
+                            writer.flush();
+                        outputStream.flush();
+                    } catch (IOException e) {
+                        throw new OXFException(e);
+                    }
                 }
             });
 

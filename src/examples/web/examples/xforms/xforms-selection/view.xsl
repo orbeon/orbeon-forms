@@ -83,6 +83,17 @@
                     </td>
                 </tr>
                 <tr>
+                    <td align="right">Marital status:</td>
+                    <td>
+                        <xforms:select1 ref="marital-status" appearance="full">
+                            <xforms:itemset nodeset="/form/marital-status-choices/marital-status">
+                            	<xforms:label ref="@label"/>
+                            	<xforms:copy ref="@value"/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                    </td>
+                </tr>
+                <tr>
                     <td/>
                     <td>
                         <xforms:submit>

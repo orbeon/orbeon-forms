@@ -18,6 +18,13 @@
             <payment/>
             <wrapping/>
             <taste/>
+			<marital-status>widow</marital-status>
+			<marital-status-choices>
+				<marital-status value="single" label="Single"/>
+				<marital-status value="married" label="Married"/>
+				<marital-status value="widow" label="Widow"/>
+				<marital-status value="divorced" label="Divorced"/>
+			</marital-status-choices>
         </form>
     </xforms:instance>
 </xforms:model>

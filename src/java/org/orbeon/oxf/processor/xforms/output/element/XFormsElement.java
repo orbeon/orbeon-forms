@@ -14,6 +14,8 @@
 package org.orbeon.oxf.processor.xforms.output.element;
 
 import org.jaxen.JaxenException;
+import org.jaxen.SimpleNamespaceContext;
+import org.jaxen.NamespaceContext;
 import org.jaxen.expr.DefaultXPathFactory;
 import org.jaxen.expr.FunctionCallExpr;
 import org.jaxen.expr.LiteralExpr;
@@ -32,6 +34,7 @@ import org.dom4j.Node;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Enumeration;
 
 /**
  * MISSING:
@@ -46,7 +49,7 @@ public class XFormsElement {
     static final Map DATA_CONTROLS = new HashMap();
     static {
         String[] controlNames = {"input", "secret", "textarea", "upload", "filename", "mediatype", "size",
-                                 "range", "select", "select1", "output"};
+                                 "range", "select", "select1", "output", "alert", "help", "hint"};
         for (int i = 0; i < controlNames.length; i++)
             DATA_CONTROLS.put(controlNames[i], null);
     }
@@ -64,6 +67,21 @@ public class XFormsElement {
                 test = context.getRefXPath() + "/" + test;
             String value = XPathUtils.selectBooleanValue(context.getInstance(), test).toString();
             addExtensionAttribute(newAttributes, "value", value);
+        } else if (context.getParentElement(0) instanceof Itemset
+                && ("copy".equals(localname) || "label".equals(localname))) {
+            // Pass information about the "ref" on the element to the parent "itemset"
+            Itemset itemset = (Itemset) context.getParentElement(0);
+            Map namespacesMap = new HashMap();
+            for (Enumeration e = context.getNamespaceSupport().getDeclaredPrefixes(); e.hasMoreElements();) {
+                String prefix = (String) e.nextElement();
+                namespacesMap.put(prefix, context.getNamespaceSupport().getURI(prefix));
+            }
+            NamespaceContext namespaceContext = new SimpleNamespaceContext(namespacesMap);
+            if ("copy".equals(localname)) {
+                itemset.setCopyRef(attributes.getValue("ref"), namespaceContext);
+            } else {
+                itemset.setLabelRef(attributes.getValue("ref"), namespaceContext);
+            }
         } else {
             // Add annotations about referenced element
             if (attributes.getIndex("", "ref") != -1

@@ -20,10 +20,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.Model;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
-import org.orbeon.oxf.processor.xforms.output.element.Group;
-import org.orbeon.oxf.processor.xforms.output.element.Repeat;
-import org.orbeon.oxf.processor.xforms.output.element.XFormsElement;
-import org.orbeon.oxf.processor.xforms.output.element.XFormsElementContext;
+import org.orbeon.oxf.processor.xforms.output.element.*;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XPathUtils;
@@ -130,6 +127,7 @@ public class XFormsOutput extends ProcessorImpl {
                             // Invoke element
                             XFormsElement element = "group".equals(localname) ? new Group()
                                     : "repeat".equals(localname) ? new Repeat()
+                                    : "itemset".equals(localname) ? new Itemset()
                                     : new XFormsElement();
                             elementContext.pushElement(element);
                             element.start(elementContext, uri, localname, qname, attributes);

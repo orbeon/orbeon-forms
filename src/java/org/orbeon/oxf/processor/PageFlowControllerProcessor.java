@@ -448,7 +448,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         // XForms Input
         final ASTOutput isRedirect = new ASTOutput(null, "is-redirect");
         final ASTOutput xformsModel = new ASTOutput("data", "xforms-model");
-        xformsModel.setSchemaUri(org.orbeon.oxf.processor.xforms.Constants.XFORMS_NAMESPACE_URI + "/model");
+        // FIXME: do not validate with XForms model to avoid connection to W3C Web site
+        //xformsModel.setSchemaUri(org.orbeon.oxf.processor.xforms.Constants.XFORMS_NAMESPACE_URI + "/model");
         final ASTOutput[] xformedInstance = new ASTOutput[1];
 
         if (xformsAttribute != null) {

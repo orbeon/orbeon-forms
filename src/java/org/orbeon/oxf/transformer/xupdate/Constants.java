@@ -14,5 +14,6 @@
 package org.orbeon.oxf.transformer.xupdate;
 
 public class Constants {
+    public static final String XUPDATE_PREFIX = "xu";
     public static final String XUPDATE_NAMESPACE_URI = "http://www.xmldb.org/xupdate";
 }

@@ -787,12 +787,20 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         if (resultElement != null && !resultElement.elements().isEmpty()) {
 
             // Create XUpdate config
-            final Document xupdateConfig = DocumentHelper.createDocument(DocumentHelper.createElement
-                    (new QName("xupdate", new Namespace
-                            ("xupdate", Constants.XUPDATE_NAMESPACE_URI))));
+
+            final Element modificationsElement = DocumentHelper.createElement
+                    (new QName("modifications", new Namespace
+                            (Constants.XUPDATE_PREFIX, Constants.XUPDATE_NAMESPACE_URI)));
+            final Map namespacesOnResult = XMLUtils.getNamespaceContext(resultElement);
+            for (Iterator i = namespacesOnResult.keySet().iterator(); i.hasNext();) {
+                String prefix = (String) i.next();
+                modificationsElement.add(new Namespace(prefix, (String) namespacesOnResult.get(prefix)));
+            }
+            final Document xupdateConfig = DocumentHelper.createDocument(modificationsElement);
+
             for (Iterator l = resultElement.elements().iterator(); l.hasNext();) {
                 Element xupdateElement = (Element) l.next();
-                xupdateConfig.getRootElement().add(xupdateElement.createCopy());
+                modificationsElement.add(xupdateElement.createCopy());
             }
 
             // Run XUpdate

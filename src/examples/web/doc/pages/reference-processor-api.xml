@@ -229,9 +229,8 @@ saxWriter.write(doc);
                 </ul>
 
                     <source><![CDATA[Document doc = ...;
-Document doc = ...;
-TransformerUtils.getXMLIdentityTransformer().transform
-(new DOMSource(doc), new SAXResult(contentHandler));
+Transformer identity = TransformerUtils.getIdentityTransformer();
+transformer.transform(new DOMSource(doc), new SAXResult(contentHandler));
 ]]></source>
                     <note>
                         <code>TransformerUtils</code> is a Presentation Server class (in package

@@ -17,12 +17,9 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
-import org.orbeon.oxf.processor.XMLConstants;
-import org.orbeon.oxf.processor.generator.RequestGenerator;
+import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.servlet.ServletExternalContext;
 
 import javax.portlet.*;
 import java.io.*;

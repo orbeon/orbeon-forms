@@ -17,7 +17,6 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.StreamInterceptor;
-import org.orbeon.oxf.processor.generator.RequestGenerator;
 
 import javax.portlet.*;
 import java.io.Serializable;

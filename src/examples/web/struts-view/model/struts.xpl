@@ -71,7 +71,7 @@
 
                 <p:processor name="oxf:url-generator">
                     <p:input name="config">
-                        <xsl:copy-of select="doc('oxf:url')"/>
+                        <xsl:copy-of select="doc('input:url')"/>
                     </p:input>
                     <p:output name="data" id="user-pipeline"/>
                 </p:processor>

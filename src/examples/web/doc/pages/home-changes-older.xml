@@ -139,7 +139,7 @@
                         Checker</link> spell-checks a paragraph of text entered
                         in a form by searching it on Google. The queries are
                         sent to Google with the <link
-                        href="processors-generators#url-generator">URL
+                        href="processors-generators-url">URL
                         generator</link>.
                     </li>
                     <li>
@@ -197,9 +197,9 @@
             <section>
                 <title>URL Generator</title>
                 <p>
-                    You can now <link href="processors-generators#http-headers">specify
-                    the HTTP headers</link> sent to the server when
-                    retrieving a document with the URL Generator.
+                    You can now <link href="processors-generators-url#http-headers">specify the
+                    HTTP headers</link> sent to the server when retrieving a document with the URL
+                    Generator.
                 </p>
             </section>
         </section>
@@ -1473,7 +1473,7 @@ select * from ps_book
                 <p>The Request Generator is now fully configurable. You can
                     define the the
                     <link
-                        href="processors-generators#request-generator">subset of the
+                        href="processors-generators-request">subset of the
                         request</link> you are interested in.
                 </p>
             </section>

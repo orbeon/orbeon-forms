@@ -73,7 +73,7 @@
             <p:input name="instance" href="#instance"/>
             <p:input name="config">
                 <config xsl:version="2.0">
-                    <xsl:variable name="instance" select="doc('oxf:instance')/*" as="element()"/>
+                    <xsl:variable name="instance" select="doc('input:instance')/*" as="element()"/>
                     <xsl:variable name="portlet-instance" select="/*" as="element()"/>
 
                     <!-- Portal id -->

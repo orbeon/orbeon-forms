@@ -56,7 +56,7 @@
         <action when="/form/action = 'test' or /form/action = 'rss'">
             <result page="rss" instance-passing="redirect-exit-portal">
                 <xu:update select="/">
-                    <xu:copy-of select="doc('oxf:instance')/*"/>
+                    <xu:copy-of select="doc('input:instance')/*"/>
                 </xu:update>
             </result>
         </action>

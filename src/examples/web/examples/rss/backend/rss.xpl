@@ -31,7 +31,7 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/evaluate.xsl"/>
-                <xsl:variable name="descriptor" as="element()" select="doc('oxf:rss-feed-descriptor')/rss-feed-descriptor"/>
+                <xsl:variable name="descriptor" as="element()" select="doc('input:rss-feed-descriptor')/rss-feed-descriptor"/>
                 <xsl:template match="/">
                     <rss version="2.0" xsl:version="2.0">
                         <!-- Channel description -->

@@ -125,7 +125,7 @@
                 <section>
                     <title>Relative URLs</title>
                     <p>
-                        The <a href="processors-generators#url-generator">URL generator</a> now supports
+                        The <a href="processors-generators-url">URL generator</a> now supports
                         URLs relative to the location where the generator is used, instead of just
                         absolute URLs.
                     </p>
@@ -133,7 +133,7 @@
                 <section>
                     <title>XInclude Dependencies</title>
                     <p>
-                        The <a href="processors-generators#url-generator">URL generator</a> also deals
+                        The <a href="processors-generators-url">URL generator</a> also deals
                         correctly with XInclude dependencies. For example, if a file called
                         <code>file1.xml</code> includes a file called <code>file2.xml</code>, which in
                         turn includes a file called <code>file3.xml</code>, and you modify
@@ -251,7 +251,7 @@
                 </p>
                 <p>
                     These document formats are widely used by processors such as the <a
-                    href="processors-generators#url-generator">URL generator</a>, the <a
+                    href="processors-generators-url">URL generator</a>, the <a
                     href="processors-serializers#http-serializer">HTTP serializer</a>, the <a
                     href="processors-messaging#email-processor">Email processor</a>, and <a
                     href="processors-converters">converters</a>.
@@ -262,20 +262,20 @@
                 <title>Improved Request Body and Uploaded Files Support</title>
                 <p>
                     It was possible in the past with the <a
-                    href="processors-generators#request-generator">Request generator</a> to obtain
+                    href="processors-generators-request">Request generator</a> to obtain
                     the request body, which was automatically parsed as XML. This behavior has now
                     been changed. It is instead possible to obtain the request body as
                     <code>xs:anyURI</code> or <code>xs:base64Binary</code> (<a
                     href="reference-formats#binary-documents">standard binary document format</a>).
                     Parsing may then be done using the <a
-                    href="processors-generators#url-generator">URL generator</a>. In addition, the
+                    href="processors-generators-url">URL generator</a>. In addition, the
                     body can now be read several times. This change brings consistency with the
                     handling of uploaded files, and the support for binary files thoughout
                     Presentation Server.
                 </p>
                 <p>
                     In a related change, the <a
-                    href="processors-generators#request-generator">Request generator</a> now
+                    href="processors-generators-request">Request generator</a> now
                     supports specifying whether uploaded files or the request body must be generated
                     as <code>xs:anyURI</code> or <code>xs:base64Binary</code>.
                 </p>
@@ -286,7 +286,7 @@
                 <section>
                     <title>Binary Mode</title>
                     <p>
-                        The <a href="processors-generators#url-generator">URL generator</a> now
+                        The <a href="processors-generators-url">URL generator</a> now
                         supports streaming binary files encoded with Base64. The <a
                         href="/goto-example/xforms-upload">XForms Upload example</a>, among others,
                         illustrates this capability.
@@ -295,7 +295,7 @@
                 <section>
                     <title>Text Mode</title>
                     <p>
-                        The <a href="processors-generators#url-generator">URL generator</a> now
+                        The <a href="processors-generators-url">URL generator</a> now
                         supports reading text files. The <a
                         href="/goto-example/employees">Employees example</a> illustrates this
                         capability.
@@ -304,7 +304,7 @@
                 <section>
                     <title>XML Content Type</title>
                     <p>
-                        The <a href="processors-generators#url-generator">URL generator</a> now
+                        The <a href="processors-generators-url">URL generator</a> now
                         correctly detects as XML the following content types:
                     </p>
                     <ul>
@@ -420,7 +420,7 @@
                 <p>
                     XSLT views in <a href="reference-controller">Page Flow</a> can now access the
                     XForms instance using <code>document('input:instance')</code> or
-                    <code>doc('oxf:instance')</code>. In the past, it was often necessary for the
+                    <code>doc('input:instance')</code>. In the past, it was often necessary for the
                     model to aggregate its output with the XForms instance to make both documents
                     accessible from the view.
                 </p>

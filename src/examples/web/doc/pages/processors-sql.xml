@@ -835,7 +835,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     <ul>
                         <li>
                             <p>
-                                <a href="processors-generators#request-generator">Request
+                                <a href="processors-generators-request">Request
                                 generator</a>: as the result of certain types of HTML form
                                 submissions (typically file uploads) or request body submission,
                                 Base64-encoded representation of the uploaded files may be stored
@@ -851,7 +851,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                         </li>
                         <li>
                             <p>
-                                <a href="processors-generators#url-generator">URL generator</a>:
+                                <a href="processors-generators-url">URL generator</a>:
                                 can read binary documents and produce Base64-encoded output
                                 according to the standard <a
                                 href="reference-formats#binary-documents">binary document

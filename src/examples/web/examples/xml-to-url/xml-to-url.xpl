@@ -60,7 +60,7 @@
                     <xsl:otherwise>
                         <!-- Generate URL -->
                         <original>
-                            <xsl:variable name="request" as="element()" select="doc('oxf:request')/request"/>
+                            <xsl:variable name="request" as="element()" select="doc('input:request')/request"/>
                             <xsl:value-of select="concat(
                                 'http://',
                                 $request/server-name,
@@ -104,7 +104,7 @@
                 <p:input name="config">
                     <urls xsl:version="2.0">
                         <xsl:copy-of select="/urls/original"/>
-                        <tinyurl><xsl:value-of select="doc('oxf:html')//blockquote/b[starts-with(., 'http://tinyurl.com/')]"/></tinyurl>
+                        <tinyurl><xsl:value-of select="doc('input:html')//blockquote/b[starts-with(., 'http://tinyurl.com/')]"/></tinyurl>
                     </urls>
                 </p:input>
                 <p:output name="data" ref="urls"/>

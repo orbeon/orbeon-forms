@@ -223,7 +223,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     <title>Example</title>
                     <p>
                         Here is an example connecting the <a
-                        href="processors-generators#url-generator">URL generator</a> to the
+                        href="processors-generators-url">URL generator</a> to the
                         serializer, and the appropriate configurations:
                     </p>
                     <xml-source>
@@ -380,7 +380,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     <title>Example</title>
                     <p>
                         Here is an example connecting the <a
-                        href="processors-generators#url-generator">URL generator</a> to the
+                        href="processors-generators-url">URL generator</a> to the
                         serializer, and the appropriate configurations:
                     </p>
                     <xml-source>
@@ -416,8 +416,8 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             <note>
                 The HTTP serializer performs streaming. If its input data consists of a stream of
                 short character SAX events, such as those produced by the <a
-                href="processors-generators#request-generator">Request generator</a> the <a
-                href="processors-generators#url-generator">URL generator</a>, the <a
+                href="processors-generators-request">Request generator</a> the <a
+                href="processors-generators-url">URL generator</a>, the <a
                 href="processors-sql#binary-data">SQL processor</a>, or converter processors, it is
                 possible to serialize an "infinitely" long document.
             </note>
@@ -440,7 +440,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             <title>URL Serializer</title>
             <p>
                 The URL Serializer mirrors the functionality of the <link
-                href="processors-generators#url-generator">URL Generator</link>. Instead of reading
+                href="processors-generators-url">URL Generator</link>. Instead of reading
                 from of URL, it writes its <code>data</code> input as XML in a URL. Note that only
                 the <code>oxf:</code> and <code>http:</code> protocols allows writing at this time.
 

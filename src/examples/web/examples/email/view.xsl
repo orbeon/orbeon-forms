@@ -22,7 +22,7 @@
         <title>Sending Email</title>
     </head>
     <body>
-        <xforms:group ref="/form" xxforms:show-errors="{if (doc('oxf:instance')/form/action = 'send') then 'true' else 'false'}">
+        <xforms:group ref="/form" xxforms:show-errors="{if (doc('input:instance')/form/action = 'send') then 'true' else 'false'}">
             <p>
                 <xsl:choose>
                     <xsl:when test="status = 'success'">

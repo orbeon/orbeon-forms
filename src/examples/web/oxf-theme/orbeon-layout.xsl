@@ -347,6 +347,13 @@ a:hover {
     color: #333333;
 }
 
+.tree-section .tree-section {
+    padding-top: 1em;
+    font-weight: bold;
+    font-style: italic;
+    color: #555555;
+}
+
 .tree-section:first-child {
     padding-top: 0em;
 }
@@ -357,6 +364,7 @@ a:hover {
     list-style-type: none;
     color: black;
     font-weight: normal;
+    font-style: normal;
 }
 
 .tree-items a {

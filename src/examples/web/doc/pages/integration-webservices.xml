@@ -89,7 +89,7 @@
                 </li>
                 <li>
                     <p>To get the SOAP envelope sent to the Web service, use the <link
-                    href="processors-generators#request-generator">Request generator</link> and
+                    href="processors-generators-request">Request generator</link> and
                     include the path <code>/request/body</code>, specifying the
                     <code>xs:anyURI</code> type for the result. The resuting URI can then be parsed
                     with the URL generator:</p>

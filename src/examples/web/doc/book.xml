@@ -24,7 +24,10 @@
         <menu-item label="Tutorial" href="/doc/pages/Tutorial.pdf"/>
     </menu>
     <menu label="Reference">
-        <menu-item label="XForms" href="reference-xforms"/>
+        <menu label="XForms">
+            <menu-item label="XForms Reference" href="reference-xforms"/>
+            <menu-item label="XForms Compliance" href="reference-xforms-compliance"/>
+        </menu>
         <menu-item label="Page Flow" href="reference-controller"/>
         <menu-item label="XPL and Pipelines" href="reference-xpl-pipelines"/>
         <menu-item label="Non-XML Documents" href="reference-formats"/>
@@ -37,7 +40,11 @@
         <menu-item label="Processor API" href="reference-processor-api"/>
     </menu>
     <menu label="Processor Reference">
-        <menu-item label="Generators" href="processors-generators"/>
+        <menu label="Generating XML">
+            <menu-item label="URL Generator" href="processors-generators-url"/>
+            <menu-item label="Request Generator" href="processors-generators-request"/>
+            <menu-item label="Other Generators" href="processors-generators"/>
+        </menu>
         <menu-item label="Serializers" href="processors-serializers"/>
         <menu-item label="Converters" href="processors-converters"/>
         <menu-item label="XSLT and TrAX" href="processors-xslt"/>

@@ -34,7 +34,7 @@
                 <xsl:import href="oxf:/oxf/xslt/utils/evaluate.xsl"/>
                 <xsl:template match="/">
                     <items xsl:version="2.0">
-                        <xsl:copy-of select="function:evaluate(/*, doc('oxf:rss-feed-descriptor')/rss-feed-descriptor/items-xpath, ())"/>
+                        <xsl:copy-of select="function:evaluate(/*, doc('input:rss-feed-descriptor')/rss-feed-descriptor/items-xpath, ())"/>
                     </items>
                 </xsl:template>
             </xsl:stylesheet>

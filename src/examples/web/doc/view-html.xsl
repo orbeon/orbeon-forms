@@ -17,7 +17,7 @@
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
     <xsl:include href = "/inspector/xml-formatting.xsl"/>
-    <xsl:variable name="instance" as="element()" select="doc('oxf:instance')/form"/>
+    <xsl:variable name="instance" as="element()" select="doc('input:instance')/form"/>
 
     <xsl:template match="/">
         <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting">
@@ -56,26 +56,7 @@
                     <div id="leftcontent">
                         <h1>Presentation Server Documentation</h1>
                         <ul class="tree-sections">
-                            <xsl:for-each select="doc('book.xml')/book/menu">
-                                <li class="tree-section">
-                                    <xsl:value-of select="@label"/>
-                                </li>
-                                <ul class="tree-items">
-                                    <xsl:for-each select="menu-item">
-                                        <xsl:variable name="selected" as="xs:boolean" select="$instance/page = @href"/>
-                                        <li class="{if ($selected) then 'tree-items-selected' else 'tree-items'}">
-                                            <xsl:choose>
-                                                <xsl:when test="$selected">
-                                                    <xsl:value-of select="@label"/>
-                                                </xsl:when>
-                                                <xsl:otherwise>
-                                                    <a href="{@href}"><xsl:value-of select="@label"/></a>
-                                                </xsl:otherwise>
-                                            </xsl:choose>
-                                        </li>
-                                    </xsl:for-each>
-                                </ul>
-                            </xsl:for-each>
+                            <xsl:apply-templates select="doc('book.xml')/book/menu"/>
                         </ul>
                     </div>
                     <div id="maincontent">
@@ -133,6 +114,29 @@
                 </div>
             </xhtml:body>
         </xhtml:html>
+    </xsl:template>
+    
+    <xsl:template match="menu">
+        <li class="tree-section">
+            <xsl:value-of select="@label"/>
+            <ul class="tree-items">
+                <xsl:apply-templates select="menu-item|menu"/>
+            </ul>
+        </li>
+    </xsl:template>
+
+    <xsl:template match="menu-item">
+        <xsl:variable name="selected" as="xs:boolean" select="$instance/page = @href"/>
+        <li class="{if ($selected) then 'tree-items-selected' else 'tree-items'}">
+            <xsl:choose>
+                <xsl:when test="$selected">
+                    <xsl:value-of select="@label"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <a href="{@href}"><xsl:value-of select="@label"/></a>
+                </xsl:otherwise>
+            </xsl:choose>
+        </li>
     </xsl:template>
 
     <xsl:template match="section[count(ancestor::section) = 0]">

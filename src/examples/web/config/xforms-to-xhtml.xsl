@@ -23,7 +23,7 @@
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
 
-    <xsl:variable name="model" select="doc('oxf:model')/xforms:model" as="element()"/>
+    <xsl:variable name="model" select="doc('input:model')/xforms:model" as="element()"/>
 
     <!-- Form Controls -->
 

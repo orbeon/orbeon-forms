@@ -326,11 +326,10 @@ public class XFormsElementContext {
         nodesetStack.push(((List) nodesetStack.peek()).get(index - 1));
 
         Integer indexObj = new Integer(index);
-        // Store index for current repeat id, if one is specified
         if (repeatId != null)
             repeatIdToIndex.put(repeatId, indexObj);
-
-        variablesValue.put(variableName, indexObj);
+        if (variableName != null)
+            variablesValue.put(variableName, indexObj);
     }
 
     public void removeRepeatId(String repeatId) {

@@ -71,17 +71,17 @@ public class MSVValidationProcessor extends ProcessorImpl {
                 setText("true");
             }});
         }}));
-        // 02/06/2004 d : Make sure to print stack trace here because
+        // 02/06/2004 d : If we don't do anything VM would just convert unchecked exceptions thrown
+        //                from here into ExceptionInIntializerError, without setting the cause.
+        //                This of course makes diagnosing reports from the field a major pain.
         //                otherwise info will just show up as an 
         //                ExceptionInInitializerError.
         try {
             factory = XMLUtils.createSAXParserFactory( false );
         } catch ( final Error e ) {
-            e.printStackTrace();
-            throw e;
+            throw new ExceptionInInitializerError( e );
         } catch ( final RuntimeException e ) {
-            e.printStackTrace();
-            throw e;
+            throw new ExceptionInInitializerError( e );
         }
     }
 

@@ -105,9 +105,7 @@ public class TomcatClasspathFix {
                 }          
             }
         } catch ( final Throwable t ) {
-            // We cannot cound on any logging support at this stage of execution
-            //  so just resort to dumping this to std error.
-            t.printStackTrace();
+            throw new ExceptionInInitializerError( t ); 
         }
     }
     public static void applyIfNeedBe() {

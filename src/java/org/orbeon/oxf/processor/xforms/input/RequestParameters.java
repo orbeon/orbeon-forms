@@ -13,29 +13,37 @@
  */
 package org.orbeon.oxf.processor.xforms.input;
 
+import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.xforms.Constants;
-import org.orbeon.oxf.processor.xforms.input.action.*;
+import org.orbeon.oxf.processor.xforms.input.action.Action;
+import org.orbeon.oxf.processor.xforms.input.action.Delete;
+import org.orbeon.oxf.processor.xforms.input.action.Insert;
+import org.orbeon.oxf.processor.xforms.input.action.SetIndex;
+import org.orbeon.oxf.processor.xforms.input.action.SetValue;
 import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.AttributesImpl;
-import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
-import org.dom4j.DocumentException;
 
 import javax.crypto.Cipher;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.io.ByteArrayInputStream;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.StringTokenizer;
 import java.util.zip.GZIPInputStream;
 
 public class RequestParameters {
@@ -63,46 +71,14 @@ public class RequestParameters {
     private final Cipher cipher = encryptNames || encryptHiddenValues ? SecureUtils.getDecryptingCipher
             (OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD)) : null;
 
-    private static class FileInfo {
-        public FileInfo (int fileRef) {
-            this.fileId = fileRef;
-        }
-        public String value;
-        public String type;
-        public int fileId;
-        public Integer filenameId;
-        public Integer mediatypeId;
-        public Integer contentLengthId;
-        public String filename;
-        public String mediatype;
-        public String contentLength;
-        public String originalValue;
-
-        public boolean hasValue() {
-            return value != null && !value.trim().equals("");
-        }
-    }
-
-    private FileInfo getFileInfo(int fileId) {
-        if (fileInfos == null)
-            fileInfos = new HashMap();
-        Integer fileIdObject = new Integer(fileId);
-        FileInfo fileInfo = (FileInfo) fileInfos.get(fileIdObject);
-        if (fileInfo == null) {
-            fileInfo = new FileInfo(fileId);
-            fileInfos.put(fileIdObject, fileInfo);
-        }
-        return fileInfo;
-    }
-
     /**
      * Adds (id -> value) in idToValue. If there is already a value for this id,
      * concatenates the two values by adding a space.
      *
      * Also store the value type in idToType if present.
      */
-    private void addValue(int id, String value, String type) {
-        Integer idObject = new Integer(id);
+    private void addValue(String name, String value, String type) {
+        Integer idObject = new Integer(name.substring("$node^".length()));
         String currentValue = (String) idToValue.get(idObject);
         idToValue.put(idObject,
                 currentValue == null || "".equals(currentValue) ? value :
@@ -163,11 +139,29 @@ public class RequestParameters {
             }
 
             private String name;
+            private String fileName;
+            private String filenameName;
+            private String mediatypeName;
+            private String sizeName;
 
             private void name(String name) {
                 // We know that name always come before all the other elements within a parameter,
                 // including the value element
                 this.name = name;
+
+                if (name.startsWith("$upload^")) {
+                    // Handle the case of the upload element
+
+                    // Split encoded name
+                    String s = name.substring("$upload^".length());
+                    fileName = s.substring(0, s.indexOf('-'));
+                    s = s.substring(s.indexOf('-') + 1);
+                    filenameName = s.substring(0, s.indexOf('-'));
+                    s = s.substring(s.indexOf('-') + 1);
+                    mediatypeName = s.substring(0, s.indexOf('-'));
+                    s = s.substring(s.indexOf('-') + 1);
+                    sizeName = s;
+                }
             }
 
             /**
@@ -196,34 +190,8 @@ public class RequestParameters {
                         instance = saxContentHandler.getDocument();
 
                     } else if (name.startsWith("$upload^")) {
-                        // Handle the case of the upload element
-
-                        // Split encoded name
-                        String s = name.substring("$upload^".length());
-                        String[] fileInfoNames = new String[10];
-                        int startIndex = 0;
-                        int endIndex = -1;
-                        int count = 0;
-                        while ((endIndex = s.indexOf('^', startIndex)) != -1) {
-                            fileInfoNames[count++] = s.substring(startIndex, endIndex);
-                            startIndex = endIndex + 1;
-                        }
-                        fileInfoNames[count++] = s.substring(startIndex);
-
-                        // Set values on FileInfo element
-                        FileInfo fileInfo = getFileInfo(Integer.parseInt(fileInfoNames[0]));
-                        fileInfo.value = value;
-                        fileInfo.type = type;
-
-                        if (fileInfoNames[2].length() > 0)
-                            fileInfo.filenameId = fileInfoNames[2].length() > 0 ? new Integer(fileInfoNames[2]) : null;
-                        if (fileInfoNames[4].length() > 0)
-                            fileInfo.mediatypeId = fileInfoNames[4].length() > 0 ? new Integer(fileInfoNames[4]) : null;
-                        if (fileInfoNames[6].length() > 0)
-                            fileInfo.contentLengthId = fileInfoNames[6].length() > 0 ? new Integer(fileInfoNames[6]) : null;
-                        if (fileInfoNames[1].length() > 0)
-                            fileInfo.originalValue = fileInfoNames[1];
-
+                        // Store file in instance
+                        addValue(fileName, value, type);
                     } else if (name.startsWith("$action^") || name.startsWith("$actionImg^")) {
 
                         // Image submit. If .y: ignore. If .x: remove .x at the end of name.
@@ -267,7 +235,7 @@ public class RequestParameters {
                             actions.add(action);
                         }
                     } else if (name.startsWith("$node^")) {
-                        addValue(Integer.parseInt(name.substring("$node^".length())), value, type);
+                        addValue(name, value, type);
                     }
                 } catch (InstantiationException e) {
                     throw new OXFException(e);
@@ -281,46 +249,20 @@ public class RequestParameters {
             }
 
             private void filename(String filename) {
-                if (name.startsWith("$upload^"))
-                    getFileInfo(Integer.parseInt(name.substring("$upload^".length(), name.indexOf("^", "$upload^".length())))).filename = filename;
+                if (name.startsWith("$upload^") && filenameName.length() > 0) {
+                    addValue(filenameName, filename, null);
+                }
             }
 
             private void contentType(String contentType) {
-                if (name.startsWith("$upload^"))
-                    getFileInfo(Integer.parseInt(name.substring("$upload^".length(), name.indexOf("^", "$upload^".length())))).mediatype = contentType;
+                if (name.startsWith("$upload^") && mediatypeName.length() > 0) {
+                    addValue(mediatypeName, contentType, null);
+                }
             }
 
             private void contentLength(String contentLength) {
-                if (name.startsWith("$upload^"))
-                    getFileInfo(Integer.parseInt(name.substring("$upload^".length(), name.indexOf("^", "$upload^".length())))).contentLength = contentLength;
-            }
-
-            public void endDocument() {
-                // Complete handling of file uploads
-                if (fileInfos != null) {
-                    for (Iterator i = fileInfos.keySet().iterator(); i.hasNext();) {
-                        String key = (String) i.next();
-                        FileInfo fileInfo = (FileInfo) fileInfos.get(key);
-                        if (fileInfo.hasValue()) {
-                            // If a file was in fact uploaded, set all the file attributes
-                            addValue(fileInfo.fileId, fileInfo.value, fileInfo.type);
-                            if (fileInfo.filenameId != null)
-                                addValue(fileInfo.filenameId.intValue(), fileInfo.filename, null);
-                            if (fileInfo.mediatypeId != null)
-                                addValue(fileInfo.mediatypeId.intValue(), fileInfo.mediatype, null);
-                            if (fileInfo.contentLengthId != null)
-                                addValue(fileInfo.contentLengthId.intValue(), fileInfo.contentLength, null);
-                        } else {
-                            // Set original value and empty attributes
-                            addValue(fileInfo.fileId, fileInfo.originalValue, null);
-                            if (fileInfo.filenameId != null)
-                                addValue(fileInfo.filenameId.intValue(), "", null);
-                            if (fileInfo.mediatypeId != null)
-                                addValue(fileInfo.mediatypeId.intValue(), "", null);
-                            if (fileInfo.contentLengthId != null)
-                                addValue(fileInfo.contentLengthId.intValue(), "", null);
-                        }
-                    }
+                if (name.startsWith("$upload^") && sizeName.length() > 0) {
+                    addValue(sizeName, contentLength, null);
                 }
             }
         };

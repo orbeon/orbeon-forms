@@ -170,4 +170,11 @@
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
     </xsl:template>
+    
+    <xsl:template match='xhtml:td[ @xxforms:error-cell="true" ]' >
+        <td>
+          <img src="/images/error.gif" style="margin: 5px"/>
+        </td>
+    </xsl:template>
+    
 </xsl:stylesheet>

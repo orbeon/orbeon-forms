@@ -51,7 +51,7 @@ public class XFormsElement {
     static {
         String[] controlNames =
                 {"input", "secret", "textarea", "upload", "filename", "mediatype", "size",
-                 "range", "select", "select1", "output"};
+                 "range", "select", "select1", "output", "hidden"};
         for (int i = 0; i < controlNames.length; i++)
             DATA_CONTROLS.put(controlNames[i], null);
     }

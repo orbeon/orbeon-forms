@@ -18,7 +18,7 @@
 &lt;!-- Return year(s) with max sale --&gt;
 &lt;xsl:transform xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" version="2.0">
 	&lt;xsl:template match="/">
-	    &lt;xsl:variable name="max" as="xs:integer" select="max(for $y in /company/year return sum($y/quarter/@sales))"/>
+	    &lt;xsl:variable name="max" as="xs:double" select="max(for $y in /company/year return sum($y/quarter/@sales))"/>
 	    &lt;xsl:copy-of select="/company/year[sum(quarter/@sales) = $max]"/>
     &lt;/xsl:template>
 &lt;/xsl:transform></xslt>

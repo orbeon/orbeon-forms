@@ -17,27 +17,28 @@
 
     <p:param name="instance" type="input"/>
 
-    <p:processor name="oxf:sql-output">
+    <p:processor name="oxf:sql">
+        <p:input name="datasource" href="../../datasource-sql.xml"/>
+        <p:input name="data" href="#instance"/>
         <p:input name="config">
             <sql:config>
                 <sql:connection>
-                    <sql:datasource>db</sql:datasource>
-                    <root>
+                    <!-- Generate document in standard format -->
+                    <document xsi:type="xs:base64Binary" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                         <sql:execute>
                             <sql:query>
-                                select blob_column from test_blob where rownum = 1
+                                select blob_column from oxf_blob_table
+                                 where id = <sql:param type="xs:int" select="string(/)"/><!-- /form/image-id -->
                             </sql:query>
                             <sql:results>
                                 <result>
                                     <sql:row-results>
-                                        <row>
-                                            <sql:get-column type="xs:base64Binary" column="blob_column"/>
-                                        </row>
+                                        <sql:get-column type="xs:base64Binary" column="blob_column"/>
                                     </sql:row-results>
                                 </result>
                             </sql:results>
                         </sql:execute>
-                    </root>
+                    </document>
                 </sql:connection>
             </sql:config>
         </p:input>

@@ -133,8 +133,18 @@ class SQLProcessorInterpreterContext extends DatabaseContext {
                             SQLProcessor.logger.info("Could not load Oracle database delegate. Using generic delegate.");
                         }
                     }
-                } else
+                } else if ("HSQL Database Engine".equalsIgnoreCase(productName)) {
+                    // HSQLDB
+                    try {
+                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.SQLProcessorHSQLDBDelegate");
+                        SQLProcessor.logger.info("Using HSQLDB delegate.");
+                    } catch (Throwable t) {
+                        clazz = SQLProcessorGenericDelegate.class;
+                        SQLProcessor.logger.info("Could not load HSQLDB database delegate. Using generic delegate.");
+                    }
+                } else {
                     clazz = SQLProcessorGenericDelegate.class;
+                }
                 databaseDelegate = (DatabaseDelegate) clazz.newInstance();
                 getContext(pipelineContext).delegates.put(delegateKey, databaseDelegate);
             } catch (Exception e) {

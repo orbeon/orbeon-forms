@@ -12,6 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xu="http://www.xmldb.org/xupdate">
 
     <page id="main"
@@ -24,9 +25,11 @@
         <action when="/form/action = 'goto-simple-upload'"><result page="main" instance-passing="redirect-exit-portal"/></action>
     </page>
 
-    <page path-info="/xforms-uploaded-image"
+    <page path-info="/example-resources/xforms-upload/db-image/(.*)"
+          matcher="oxf:perl5-matcher"
           xforms="database-upload-xforms-model.xml"
           model="database-upload-model.xpl">
+        <param ref="/form/image-id"/>
     </page>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>

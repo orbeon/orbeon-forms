@@ -381,7 +381,7 @@
 
 
                 <xml-source>
-                    <files path-info="/doc/[^.]*\.html" matcher="oxf/processor/perl5-matcher"/>
+                    <files path-info="/doc/[^.]*\.html" matcher="oxf:perl5-matcher"/>
                 </xml-source>
 
                 <p>
@@ -395,7 +395,7 @@
 
                 <xml-source>
                     <page path-info="/([^/]*)/(.*)"
-                        matcher="oxf/processor/perl5-matcher"
+                        matcher="oxf:perl5-matcher"
                         xforms="xforms.xml"
                         view="view.xsl">
                         <param ref="/form/directory"/>

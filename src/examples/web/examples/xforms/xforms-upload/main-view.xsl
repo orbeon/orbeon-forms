@@ -95,20 +95,6 @@
                 </tr>
                 <tr>
                     <th>
-                        Web Service file upload
-                    </th>
-                    <td>
-                        <xf:submit>
-                            <xf:label>Upload</xf:label>
-                            <xf:setvalue ref="action">ws-upload</xf:setvalue>
-                        </xf:submit>
-                    </td>
-                    <td>
-                        The uploaded image must be smaller than 150K.
-                    </td>
-                </tr>
-                <tr>
-                    <th>
                         Database file upload
                     </th>
                     <td>
@@ -118,7 +104,22 @@
                         </xf:submit>
                     </td>
                     <td>
-                        This requires database setup.
+                        This uses the internal SQL database. The uploaded images must be smaller
+                        than 150K.
+                    </td>
+                </tr>
+                <tr>
+                    <th>
+                        Web Service file upload
+                    </th>
+                    <td>
+                        <xf:submit>
+                            <xf:label>Upload</xf:label>
+                            <xf:setvalue ref="action">ws-upload</xf:setvalue>
+                        </xf:submit>
+                    </td>
+                    <td>
+                        The uploaded images must be smaller than 150K.
                     </td>
                 </tr>
             </table>

@@ -46,7 +46,6 @@ import java.sql.*;
 import java.sql.Date;
 import java.util.*;
 
-
 /**
  * This is the SQL processor implementation.
  * <p/>
@@ -375,8 +374,15 @@ public class SQLProcessor extends ProcessorImpl {
                     } else {
                         throw new ValidationException("Illegal getter type for BLOB: " + getterName, new LocationData(locator));
                     }
+                } else if (columnType == Types.BINARY || columnType == Types.VARBINARY || columnType == Types.LONGVARBINARY) {
+                    // The actual column is binary
+                    if ("get-base64binary".equals(getterName)) {
+                        return resultSet.getBinaryStream(columnName);
+                    } else {
+                        throw new ValidationException("Illegal getter type for BINARY, VARBINARY or LONGVARBINARY column: " + getterName, new LocationData(locator));
+                    }
                 } else {
-                    // The actual column is not a CLOB, in which case we use regular ResultSet getters
+                    // The actual column is not a CLOB or BLOB, in which case we use regular ResultSet getters
                     if ("get-string".equals(getterName)) {
                         return resultSet.getString(columnName);
                     } else if ("get-int".equals(getterName)) {
@@ -530,6 +536,13 @@ public class SQLProcessor extends ProcessorImpl {
                                 } finally {
                                     is.close();
                                 }
+                            } else if (o instanceof InputStream) {
+                                InputStream is = (InputStream) o;
+                                try {
+                                    XMLUtils.inputStreamToBase64Characters(is, interpreterContext.getOutput());
+                                } finally {
+                                    is.close();
+                                }
                             } else {
                                 XMLUtils.objectToCharacters(o, interpreterContext.getOutput());
                             }
@@ -548,6 +561,13 @@ public class SQLProcessor extends ProcessorImpl {
                             }
                         } else if (o instanceof Blob) {
                             InputStream is = ((Blob) o).getBinaryStream();
+                            try {
+                                XMLUtils.inputStreamToBase64Characters(is, interpreterContext.getOutput());
+                            } finally {
+                                is.close();
+                            }
+                        } else if (o instanceof InputStream) {
+                            InputStream is = (InputStream) o;
                             try {
                                 XMLUtils.inputStreamToBase64Characters(is, interpreterContext.getOutput());
                             } finally {

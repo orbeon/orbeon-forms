@@ -19,29 +19,47 @@
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
 
+    <!-- Make sure database is initialized with the tables and data we are using -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="initialization/init-database.xpl"/>
+    </p:processor>
+
     <!-- Insert the data into the database -->
     <!-- We do not need to dereference the URI, as the SQL processor understands xs:anyURI -->
     <p:processor name="oxf:sql">
         <p:input name="data" href="#instance"/>
+        <p:input name="datasource" href="../../datasource-sql.xml"/>
         <p:input name="config">
             <sql:config>
                 <sql:connection>
-                    <sql:datasource>db</sql:datasource>
                     <urls>
-                        <url>
-                            <sql:execute>
-                                <sql:update>
-                                    delete from test_blob
-                                </sql:update>
-                            </sql:execute>
-                            <sql:execute>
-                                <sql:update select="/*/files/file[. != '']">
-                                    insert into test_blob (blob_column)
-                                    values (<sql:param select="." type="xs:anyURI"/>)
-                                </sql:update>
-                            </sql:execute>
-                            <sql:text>xforms-uploaded-image</sql:text>
-                        </url>
+                        <!-- Empty table -->
+                        <sql:execute>
+                            <sql:update>
+                                delete from oxf_blob_table
+                            </sql:update>
+                        </sql:execute>
+                        <!-- Insert all files -->
+                        <sql:execute>
+                            <sql:update select="/*/files/file[. != '' and @size &lt;= 160000]">
+                                insert into oxf_blob_table (blob_column)
+                                values (<sql:param select="." type="xs:anyURI"/>)
+                            </sql:update>
+                        </sql:execute>
+                        <!-- Return one URL for each id in the table -->
+                        <sql:execute>
+                            <sql:query>
+                                select id from oxf_blob_table order by id
+                            </sql:query>
+                            <sql:results>
+                                <sql:row-results>
+                                    <url>
+                                        <sql:text>/example-resources/xforms-upload/db-image/</sql:text>
+                                        <sql:get-column column="id" type="xs:int"/>
+                                    </url>
+                                </sql:row-results>
+                            </sql:results>
+                        </sql:execute>
                     </urls>
                 </sql:connection>
             </sql:config>

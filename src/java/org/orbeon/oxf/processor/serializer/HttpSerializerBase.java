@@ -147,8 +147,13 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                 if (!read[0]) {
                     if (logger.isDebugEnabled())
                         logger.debug("Serializer output cached");
-                    if (externalContext != null)
+                    if (externalContext != null)  {
+                        String encoding = getEncoding(config, null, DEFAULT_ENCODING);
+                        String contentType = getContentType(config, null, getDefaultContentType());
+                        if (contentType != null)
+                            response.setContentType(contentType + "; charset=" + encoding);
                         response.setContentLength(resultStore.length(pipelineContext));
+                    }
                     resultStore.replay(pipelineContext);
                 }
             } else {

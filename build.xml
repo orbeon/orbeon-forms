@@ -186,7 +186,6 @@
                 <include name="commons-cli-1_0.jar"/>
                 <include name="commons-fileupload-1.0.jar"/>
                 <include name="commons-beanutils-1_5.jar"/>
-                <include name="commons-logging-1_0_4.jar"/>
                 <include name="commons-pool-1.1.jar"/>
                 <include name="commons-discovery-0_2.jar"/>
                 <include name="axis-1_1-axis.jar"/>
@@ -239,6 +238,7 @@
                 <exclude name="jsf-*.jar"/>
             </fileset>
         </copy>
+        <copy file='${lib.dir}/commons-logging-1_0_4.jar' todir="${war.dir}/WEB-INF/lib/private" />
         <mkdir dir="${war.dir}/WEB-INF/lib/cli"/>
         <copy todir="${war.dir}/WEB-INF/lib/cli">
             <fileset dir="${lib.dir}">

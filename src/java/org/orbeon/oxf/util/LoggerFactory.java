@@ -25,6 +25,16 @@ public class LoggerFactory {
 
     public static final String LOG4J_DOM_CONFIG_PROPERTY = "oxf.log4j-config";
     public static final String LOG4J_DOM_CONFIG_PROPERTY_OLD = "oxf.servlet.log4j";
+    
+    static 
+	{
+    	// 11-22-2004 d : Current log4j tries to load a default config. This is
+    	//                why we are seeing a message about a log4j.properties being
+    	//                loaded from the Axis jar.  
+    	//                Since this is't a behaviour we want we hack around it by
+    	//                specifying a file that doesn't exist.
+    	System.setProperty( "log4j.configuration", "-there-aint-no-such-file-" );
+	}
 
     private static final Logger logger = LoggerFactory.createLogger(LoggerFactory.class);
 
@@ -59,7 +69,8 @@ public class LoggerFactory {
                 PipelineContext ctx = new PipelineContext();
                 dom.reset(ctx);
                 dom.start(ctx);
-                DOMConfigurator.configure(dom.getW3CDocument(ctx).getDocumentElement());
+                Object o = dom.getW3CDocument(ctx).getDocumentElement();
+                DOMConfigurator.configure( ( org.w3c.dom.Element )o );
             } else {
                 logger.info("Property " + LOG4J_DOM_CONFIG_PROPERTY + " not set. Skipping logging initialization.");
             }

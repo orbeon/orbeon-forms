@@ -12,7 +12,6 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/batik-all-1_5.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/castor-0_9_4_3-xml.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-beanutils-1_5.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/commons-cli-1.0.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-collections-2_0.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-digester-1_5.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/commons-discovery-0_2.jar"/>
@@ -47,7 +46,6 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/relaxngDatatype-20031020.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/resolver-xerces_2_6_2_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/saxon-6_5_2.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/saxon-7_9_1_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/saxpath-dev_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/struts-1_1.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/xalan-2_5_1_orbeon.jar"/>
@@ -68,13 +66,14 @@
 	<classpathentry kind="lib" path="lib/commons-dbcp-1.1.jar"/>
 	<classpathentry kind="lib" path="lib/jing-2003_01_31.jar"/>
 	<classpathentry kind="lib" path="lib/ejb-2_0.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/mailapi-1_3_2.jar"/>
 	<classpathentry kind="lib" path="lib/TaminoAPI4J.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/log4j-1.3alpha0.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/itext-1_02b.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/itext-xml-1_02.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/commons-logging-1_0_4.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/activation-1_0_2.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/mail-1_3_2.jar"/>
+	<classpathentry kind="lib" path="lib/saxon-8_1_1_orbeon.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/private/commons-logging-1_0_4.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/cli/commons-cli-1_0.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>

@@ -1,0 +1,22 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+ 
+<!DOCTYPE jboss-web
+    PUBLIC "-//JBoss//DTD Web Application 2.3V2//EN"
+    "http://www.jboss.org/j2ee/dtd/jboss-web_3_2.dtd">
+
+<jboss-web>
+   <!-- 11/22/2004 d : Heavy handed workaround for fact that
+                       jboss by default forces us to use 
+                       their version of dom4j and jaxen.
+    -->
+
+  <class-loading java2ClassLoadingCompliance='false'>
+  <loader-repository >
+     orbeon.war:loader=orbeon.war
+     <loader-repository-config >
+        java2ParentDelegaton=false
+     </loader-repository-config>
+  </loader-repository>
+  </class-loading>
+</jboss-web>
+

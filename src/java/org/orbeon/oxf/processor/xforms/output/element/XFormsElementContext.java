@@ -229,10 +229,10 @@ public class XFormsElementContext {
 
     public Node getRefNode() {
         List refNodeList = getRefNodeList();
-        Node node = refNodeList.size() != 1 ? null :
+        Node node = refNodeList.size() == 0 ? null :
                 refNodeList.get(0) instanceof Node ? (Node) refNodeList.get(0) : null;
         if (node == null)
-            throw new OXFException("Expression '" + getRefXPath() + "' must return an element or an attribute");
+            throw new OXFException("Expression '" + getRefXPath() + "' must return a non-empty nodeset");
         return node;
     }
 

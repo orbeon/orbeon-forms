@@ -23,7 +23,7 @@
     xmlns:xu="http://www.xmldb.org/xupdate"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xi="http://www.w3.org/2003/XInclude"
-    >
+    xmlns:xforms="http://www.w3.org/2002/xforms">
 
     <test description="Annotate" name="oxf:xforms-annotate">
             <input name="instance">
@@ -43,6 +43,7 @@
                 </xforms:model>
             </input>
             <output name="instance">
+                
                 <d:form xmlns:d="http://orbeon.org/oxf/xml/document" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                     <d:id xxforms:valid="true">42</d:id>
                     <d:id xxforms:valid="false">4x</d:id>
@@ -331,285 +332,285 @@
     </test>
 
     <test description="xforms-repeat-speed-test" name="oxf:pipeline">
-    <input name="config">
-        <p:config>
-            <p:param name="result" type="output"/>
-
-            <p:processor uri="oxf/processor/xslt-2.0">
-                <p:input name="data">
-                    <dummy/>
-                </p:input>
-                <p:input name="config">
-                    <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-
-                        <xsl:template match="@*|node()" priority="-2">
-                            <xsl:copy>
-                                <xsl:apply-templates select="@*|node()"/>
-                            </xsl:copy>
-                        </xsl:template>
-
-                        <xsl:template match="/">
-                            <form>
-                                <action/>
-                                <name>Repeat Test</name>
-                                 <date>
-                                    <month>11</month>
-                                    <day>11</day>
-                                    <year>2004</year>
-                                </date>
-                                <selected-sub-task/>
-                                <sub-tasks>
+        <input name="config">
+            <p:config>
+                <p:param name="result" type="output"/>
+    
+                <p:processor uri="oxf/processor/xslt-2.0">
+                    <p:input name="data">
+                        <dummy/>
+                    </p:input>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    
+                            <xsl:template match="@*|node()" priority="-2">
+                                <xsl:copy>
+                                    <xsl:apply-templates select="@*|node()"/>
+                                </xsl:copy>
+                            </xsl:template>
+    
+                            <xsl:template match="/">
+                                <form>
+                                    <action/>
+                                    <name>Repeat Test</name>
+                                     <date>
+                                        <month>11</month>
+                                        <day>11</day>
+                                        <year>2004</year>
+                                    </date>
+                                    <selected-sub-task/>
+                                    <sub-tasks>
+                                        <xsl:call-template name="task">
+                                            <xsl:with-param name="times" select="300"/>
+                                        </xsl:call-template>
+                                    </sub-tasks>
+                                </form>
+                            </xsl:template>
+    
+                            <xsl:template name="task">
+                                <xsl:param name="times" as="xs:integer"/>
+                                <xsl:if test="$times > 0">
                                     <xsl:call-template name="task">
-                                        <xsl:with-param name="times" select="300"/>
+                                        <xsl:with-param name="times" select="$times - 1"/>
                                     </xsl:call-template>
-                                </sub-tasks>
-                            </form>
-                        </xsl:template>
-
-                        <xsl:template name="task">
-                            <xsl:param name="times" as="xs:integer"/>
-                            <xsl:if test="$times > 0">
-                                <xsl:call-template name="task">
-                                    <xsl:with-param name="times" select="$times - 1"/>
-                                </xsl:call-template>
-                                    <task>
-                                        <task-id><xsl:value-of select="$times"/></task-id>
-                                        <parent-task-id>826</parent-task-id>
-                                        <task-type-code>FS</task-type-code>
-                                        <task-status-code>A</task-status-code>
-                                        <task-status-date>
-                                            <month>11</month>
-                                            <day>05</day>
-                                            <year>2004</year>
-                                        </task-status-date>
-                                        <role-id>9</role-id>
-                                        <assigned-to/>
-                                        <person-id/>
-                                        <rec-num/>
-                                        <lodge-id>1</lodge-id>
-                                        <district-id/>
-                                        <task-name>Form a 2004 (<xsl:value-of select="$times"/>)</task-name>
-                                        <description>Form a 2004</description>
-                                        <seqn>0</seqn>
-                                        <start-date>
-                                            <month>11</month>
-                                            <day>05</day>
-                                            <year>2004</year>
-                                        </start-date>
-                                        <end-date>
-                                            <month/>
-                                            <day/>
-                                            <year/>
-                                        </end-date>
-                                        <days-to-complete/>
-                                        <projected-end-date>
-                                            <month>11</month>
-                                            <day>12</day>
-                                            <year>2004</year>
-                                        </projected-end-date>
-                                        <grace-period>7</grace-period>
-                                        <cmc-ref/>
-                                        <reminder-interval/>
-                                        <reminder-text/>
-                                        <received></received>
-                                    </task>
-                            </xsl:if>
-                        </xsl:template>
-
-                    </xsl:stylesheet>
-                </p:input>
-                <p:output name="data" id="instance"/>
-            </p:processor>
-
-            <p:processor uri="oxf/processor/identity">
-                <p:input name="data">
-                    <xforms:group ref="/form">
-                        <xforms:input ref="name"/>
-                        <xforms:group ref="date">
-                            <xforms:input ref="year"/>
+                                        <task>
+                                            <task-id><xsl:value-of select="$times"/></task-id>
+                                            <parent-task-id>826</parent-task-id>
+                                            <task-type-code>FS</task-type-code>
+                                            <task-status-code>A</task-status-code>
+                                            <task-status-date>
+                                                <month>11</month>
+                                                <day>05</day>
+                                                <year>2004</year>
+                                            </task-status-date>
+                                            <role-id>9</role-id>
+                                            <assigned-to/>
+                                            <person-id/>
+                                            <rec-num/>
+                                            <lodge-id>1</lodge-id>
+                                            <district-id/>
+                                            <task-name>Form a 2004 (<xsl:value-of select="$times"/>)</task-name>
+                                            <description>Form a 2004</description>
+                                            <seqn>0</seqn>
+                                            <start-date>
+                                                <month>11</month>
+                                                <day>05</day>
+                                                <year>2004</year>
+                                            </start-date>
+                                            <end-date>
+                                                <month/>
+                                                <day/>
+                                                <year/>
+                                            </end-date>
+                                            <days-to-complete/>
+                                            <projected-end-date>
+                                                <month>11</month>
+                                                <day>12</day>
+                                                <year>2004</year>
+                                            </projected-end-date>
+                                            <grace-period>7</grace-period>
+                                            <cmc-ref/>
+                                            <reminder-interval/>
+                                            <reminder-text/>
+                                            <received></received>
+                                        </task>
+                                </xsl:if>
+                            </xsl:template>
+    
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="instance"/>
+                </p:processor>
+    
+                <p:processor uri="oxf/processor/identity">
+                    <p:input name="data">
+                        <xforms:group ref="/form">
+                            <xforms:input ref="name"/>
+                            <xforms:group ref="date">
+                                <xforms:input ref="year"/>
+                            </xforms:group>
+                            <xforms:repeat nodeset="sub-tasks/task" id="subtask-set">
+    <!--                        <xforms:repeat nodeset="sub-tasks/task[task-id != '' and task-status-code = 'A']" id="subtask-set">-->
+                                <xforms:input ref="task-id"/>
+                                <xforms:input ref="task-name"/>
+                                <xforms:select1 ref="task-type-code" appearance="minimal">
+                                    <xforms:choices>
+                                        <xforms:item>
+                                            <xforms:label>-</xforms:label>
+                                            <xforms:value></xforms:value>
+                                        </xforms:item>
+                                    </xforms:choices>
+                                </xforms:select1>
+                                <xforms:select1 ref="task-status-code" appearance="minimal">
+                                    <xforms:choices>
+                                        <xforms:item>
+                                            <xforms:label>-</xforms:label>
+                                            <xforms:value></xforms:value>
+                                        </xforms:item>
+                                    </xforms:choices>
+                                </xforms:select1>
+                                <xforms:input ref="lodge-id"/>
+                                <xxforms:if test="task-status-code != 'C'">
+                                    <xforms:select ref="received" appearance="minimal">
+                                        <xforms:item>
+                                            <xforms:value>true</xforms:value>
+                                            <xforms:label/>
+                                        </xforms:item>
+                                    </xforms:select>
+                                </xxforms:if>
+                                <xxforms:if test="task-status-code = 'C'">
+                                  Yes
+                                </xxforms:if>
+                                <xforms:submit>
+                                    <xforms:label>Edit</xforms:label>
+                                    <xforms:setvalue ref="/form/action">edit-task</xforms:setvalue>
+                                    <xforms:setvalue ref="/form/selected-sub-task" value="/form/tasks/task[index('subtask-set')]/task-id"/>
+                                </xforms:submit>
+                            </xforms:repeat>
                         </xforms:group>
-                        <xforms:repeat nodeset="sub-tasks/task" id="subtask-set">
-<!--                        <xforms:repeat nodeset="sub-tasks/task[task-id != '' and task-status-code = 'A']" id="subtask-set">-->
-                            <xforms:input ref="task-id"/>
-                            <xforms:input ref="task-name"/>
-                            <xforms:select1 ref="task-type-code" appearance="minimal">
-                                <xforms:choices>
-                                    <xforms:item>
-                                        <xforms:label>-</xforms:label>
-                                        <xforms:value></xforms:value>
-                                    </xforms:item>
-                                </xforms:choices>
-                            </xforms:select1>
-                            <xforms:select1 ref="task-status-code" appearance="minimal">
-                                <xforms:choices>
-                                    <xforms:item>
-                                        <xforms:label>-</xforms:label>
-                                        <xforms:value></xforms:value>
-                                    </xforms:item>
-                                </xforms:choices>
-                            </xforms:select1>
-                            <xforms:input ref="lodge-id"/>
-                            <xxforms:if test="task-status-code != 'C'">
-                                <xforms:select ref="received" appearance="minimal">
-                                    <xforms:item>
-                                        <xforms:value>true</xforms:value>
-                                        <xforms:label/>
-                                    </xforms:item>
-                                </xforms:select>
-                            </xxforms:if>
-                            <xxforms:if test="task-status-code = 'C'">
-                              Yes
-                            </xxforms:if>
-                            <xforms:submit>
-                                <xforms:label>Edit</xforms:label>
-                                <xforms:setvalue ref="/form/action">edit-task</xforms:setvalue>
-                                <xforms:setvalue ref="/form/selected-sub-task" value="/form/tasks/task[index('subtask-set')]/task-id"/>
-                            </xforms:submit>
-                        </xforms:repeat>
-                    </xforms:group>
-                </p:input>
-                <p:output name="data" id="data"/>
-            </p:processor>
-
-            <p:processor uri="oxf/processor/identity">
-                <p:input name="data">
-                    <xforms:model id="form">
-                        <xforms:submission method="post"/>
-                        <xforms:instance>
-                            <form>
-                                <action/>
-                                <name/>
-                                <date>
-                                    <month/>
-                                    <day/>
-                                    <year/>
-                                </date>
-                                <selected-sub-task/>
-                                <sub-tasks>
-                                    <task>
-                                        <task-id/>
-                                        <parent-task-id/>
-                                        <task-type-code/>
-                                        <task-status-code/>
-                                        <task-status-date>
-                                            <month/>
-                                            <day/>
-                                            <year/>
-                                        </task-status-date>
-                                        <role-id/>
-                                        <member-id/>
-                                        <lodge-id/>
-                                        <district-id/>
-                                        <task-name/>
-                                        <description/>
-                                        <seqn/>
-                                        <start-date>
-                                            <month/>
-                                            <day/>
-                                            <year/>
-                                        </start-date>
-                                        <end-date>
-                                            <month/>
-                                            <day/>
-                                            <year/>
-                                        </end-date>
-                                        <days-to-complete/>
-                                        <projected-end-date>
-                                            <month/>
-                                            <day/>
-                                            <year/>
-                                        </projected-end-date>
-                                        <grace-period/>
-                                        <cmc-ref/>
-                                        <reminder-interval/>
-                                        <reminder-text/>
-                                    </task>
-                                </sub-tasks>
-                            </form>
-                        </xforms:instance>
-                    </xforms:model>
-                </p:input>
-                <p:output name="data" id="model"/>
-            </p:processor>
-
-            <p:processor name="oxf:xforms-output">
-                <p:input name="model" href="#model"/>
-                <p:input name="instance" href="#instance"/>
-                <p:input name="data" href="#data"/>
-                <p:output name="data" id="xf-out"/>
-            </p:processor>
-
-            <p:processor uri="oxf/processor/xslt-2.0">
-                <p:input name="data" href="#xf-out"/>
-                <p:input name="config">
-                    <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-                        <xsl:template match="/">
-                            <request>
-                                <parameters>
-                                    <parameter>
-                                        <name>$submitted</name>
-                                        <value>true</value>
-                                    </parameter>
-                                    <xsl:for-each select="//*[@xxforms:name and @xxforms:value]">
+                    </p:input>
+                    <p:output name="data" id="data"/>
+                </p:processor>
+    
+                <p:processor uri="oxf/processor/identity">
+                    <p:input name="data">
+                        <xforms:model id="form">
+                            <xforms:submission method="post"/>
+                            <xforms:instance>
+                                <form>
+                                    <action/>
+                                    <name/>
+                                    <date>
+                                        <month/>
+                                        <day/>
+                                        <year/>
+                                    </date>
+                                    <selected-sub-task/>
+                                    <sub-tasks>
+                                        <task>
+                                            <task-id/>
+                                            <parent-task-id/>
+                                            <task-type-code/>
+                                            <task-status-code/>
+                                            <task-status-date>
+                                                <month/>
+                                                <day/>
+                                                <year/>
+                                            </task-status-date>
+                                            <role-id/>
+                                            <member-id/>
+                                            <lodge-id/>
+                                            <district-id/>
+                                            <task-name/>
+                                            <description/>
+                                            <seqn/>
+                                            <start-date>
+                                                <month/>
+                                                <day/>
+                                                <year/>
+                                            </start-date>
+                                            <end-date>
+                                                <month/>
+                                                <day/>
+                                                <year/>
+                                            </end-date>
+                                            <days-to-complete/>
+                                            <projected-end-date>
+                                                <month/>
+                                                <day/>
+                                                <year/>
+                                            </projected-end-date>
+                                            <grace-period/>
+                                            <cmc-ref/>
+                                            <reminder-interval/>
+                                            <reminder-text/>
+                                        </task>
+                                    </sub-tasks>
+                                </form>
+                            </xforms:instance>
+                        </xforms:model>
+                    </p:input>
+                    <p:output name="data" id="model"/>
+                </p:processor>
+    
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model" href="#model"/>
+                    <p:input name="instance" href="#instance"/>
+                    <p:input name="data" href="#data"/>
+                    <p:output name="data" id="xf-out"/>
+                </p:processor>
+    
+                <p:processor uri="oxf/processor/xslt-2.0">
+                    <p:input name="data" href="#xf-out"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                            <xsl:template match="/">
+                                <request>
+                                    <parameters>
                                         <parameter>
-                                            <name>
-                                                <xsl:value-of select="@xxforms:name"/>
-                                            </name>
-                                            <value>
-                                                <xsl:value-of select="@xxforms:value"/>
-                                            </value>
+                                            <name>$submitted</name>
+                                            <value>true</value>
                                         </parameter>
-                                    </xsl:for-each>
-                                </parameters>
-                            </request>
-                        </xsl:template>
-                    </xsl:stylesheet>
-                </p:input>
-                <p:output name="data" id="request"/>
-            </p:processor>
-
-            <p:processor name="oxf:xforms-input">
-                <p:input name="model" href="#model"/>
-                <p:input name="request" href="#request"/>
-                <p:input name="filter">
-                    <null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-                </p:input>
-                <p:input name="instance" href="#model#xpointer(xforms:model/xforms:instance/form)"/>
-                <p:output name="data" id="xf-input"/>
-            </p:processor>
-
-            <p:processor uri="oxf/processor/xslt-2.0">
-                <p:input name="data" href="#xf-input"/>
-                <p:input name="config">
-                    <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-                         <xsl:template match="@*|node()" priority="-2">
-                            <xsl:copy>
-                                <xsl:apply-templates select="@*|node()"/>
-                            </xsl:copy>
-                        </xsl:template>
-
-                        <xsl:template match="/">
-                            <form>
-                                <count><xsl:value-of select="count(/form/sub-tasks/task)"/></count>
-                                <xsl:apply-templates select="/form/sub-tasks/task[1]"/>
-                            </form>
-                        </xsl:template>
-
-                        <xsl:template match="task">
-                            <xsl:copy>
-                                <xsl:apply-templates select="/form/name"/>
-                                <xsl:apply-templates select="/form/date"/>
-                                <xsl:apply-templates/>
-                            </xsl:copy>
-                        </xsl:template>
-
-                    </xsl:stylesheet>
-                </p:input>
-                <p:output name="data" ref="result"/>
-            </p:processor>
-
-        </p:config>
-    </input>
+                                        <xsl:for-each select="//*[@xxforms:name and @xxforms:value]">
+                                            <parameter>
+                                                <name>
+                                                    <xsl:value-of select="@xxforms:name"/>
+                                                </name>
+                                                <value>
+                                                    <xsl:value-of select="@xxforms:value"/>
+                                                </value>
+                                            </parameter>
+                                        </xsl:for-each>
+                                    </parameters>
+                                </request>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="request"/>
+                </p:processor>
+    
+                <p:processor name="oxf:xforms-input">
+                    <p:input name="model" href="#model"/>
+                    <p:input name="request" href="#request"/>
+                    <p:input name="filter">
+                        <null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
+                    </p:input>
+                    <p:input name="instance" href="#model#xpointer(xforms:model/xforms:instance/form)"/>
+                    <p:output name="data" id="xf-input"/>
+                </p:processor>
+    
+                <p:processor uri="oxf/processor/xslt-2.0">
+                    <p:input name="data" href="#xf-input"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                             <xsl:template match="@*|node()" priority="-2">
+                                <xsl:copy>
+                                    <xsl:apply-templates select="@*|node()"/>
+                                </xsl:copy>
+                            </xsl:template>
+    
+                            <xsl:template match="/">
+                                <form>
+                                    <count><xsl:value-of select="count(/form/sub-tasks/task)"/></count>
+                                    <xsl:apply-templates select="/form/sub-tasks/task[1]"/>
+                                </form>
+                            </xsl:template>
+    
+                            <xsl:template match="task">
+                                <xsl:copy>
+                                    <xsl:apply-templates select="/form/name"/>
+                                    <xsl:apply-templates select="/form/date"/>
+                                    <xsl:apply-templates/>
+                                </xsl:copy>
+                            </xsl:template>
+    
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+    
+            </p:config>
+        </input>
         <output name="result">
             <form>
                 <count>300</count>
@@ -662,6 +663,38 @@
                 </task>
             </form>
         </output>
-
+    </test>
+    
+    <test description="Ref attribute pointing to mulitple nodes" name="oxf:pipeline">
+        <input name="config">
+            <p:config>
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:xforms-output">
+                    <p:input name="model">
+                        <xforms:model/>
+                    </p:input>
+                    <p:input name="instance">
+                        <instance>
+                            <data>1</data>
+                            <data>2</data>
+                            <data>3</data>
+                        </instance>
+                    </p:input>
+                    <p:input name="data">
+                        <xforms:group ref="instance">
+                            <xforms:input ref="data"/>
+                        </xforms:group>
+                    </p:input>
+                    <p:output name="data" id="annotated-data"/>
+                </p:processor>
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href="aggregate('value', #annotated-data#xpointer(string(//xforms:input/@xxforms:value)))"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <value>1</value>
+        </output>
     </test>
 </group>

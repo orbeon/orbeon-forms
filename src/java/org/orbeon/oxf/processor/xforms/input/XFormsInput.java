@@ -101,6 +101,13 @@ public class XFormsInput extends ProcessorImpl {
                     instance = new Instance(pipelineContext, instanceDom4j);
                     final Element instanceElement = instance.getDocument().getRootElement();
 
+                    // Only recreate instance if data was submitted
+                    if (requestParameters.isSubmitted()) {
+
+                        // Discard text in instance
+                        instance.empty();
+                    }
+
                     // Extract filtered parameters from instance if any
                     Element filterElement = readCacheInputAsDOM4J(pipelineContext, INPUT_FILTER).getRootElement();
                     Map filteredParams = null;
@@ -121,9 +128,6 @@ public class XFormsInput extends ProcessorImpl {
                         }
                     }
 
-                    // Discard instance if the form was submitted
-                    if (requestParameters.isSubmitted())
-                        instance.empty();
                     // Fill-out instance
                     for (int i = 0; i < requestParameters.getPaths().length; i++) {
                         String path = requestParameters.getPaths()[i];
@@ -154,7 +158,7 @@ public class XFormsInput extends ProcessorImpl {
                     // Run model item properties
                     model.applyInputOutputBinds(instance.getDocument());
                     if (logger.isDebugEnabled())
-                        logger.debug("3) Instance with model item properties applied:\n" 
+                        logger.debug("3) Instance with model item properties applied:\n"
                                 + XMLUtils.domToString(instance.getDocument()));
                 }
 

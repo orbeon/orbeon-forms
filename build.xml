@@ -399,45 +399,43 @@
         </zip>
     </target>
 
-    <target name="orbeon-bizdoc-war" depends="prepare, orbeon-dist-war">
-        <delete dir="${build.temp.dir}/distrib-bizdoc"/>
-        <delete file="${build.distrib.dir}/orbeon-bizdoc.war"/>
-        <!-- Work from the distrib WAR -->
-        <unzip src="${build.distrib.dir}/orbeon.war" dest="${build.temp.dir}/distrib-bizdoc"/>
-        <!-- Create new custom WAR -->
-        <zip zipfile="${build.distrib.dir}/orbeon-bizdoc.war">
-            <fileset dir="${build.temp.dir}/distrib-bizdoc">
-                <include name="WEB-INF/exist-data/**/*"/>
-                <include name="WEB-INF/lib/**/*"/>
-                <include name="WEB-INF/weblogic.xml"/>
-                <include name="WEB-INF/exist-conf.xml"/>
-                <include name="WEB-INF/exist-data/*.*"/>
-                <include name="WEB-INF/resources/config/**/*"/>
-                <include name="WEB-INF/resources/images/**/*"/>
-                <include name="WEB-INF/resources/oxf-theme/**/*"/>
-            </fileset>
-            <zipfileset dir="${build.temp.dir}/distrib-bizdoc/WEB-INF/resources/examples/bizdoc" prefix="WEB-INF/resources/bizdoc">
+    <target name="bizdoc-example" depends="prepare">
+        <mkdir dir="${build.distrib.dir}"/>
+        <zip zipfile="${build.distrib.dir}/bizdoc-example-1.0.zip">
+            <zipfileset dir="doc/example-applications"/>
+            <zipfileset dir="descriptors/examples/web/bizdoc" prefix="WEB-INF"/>
+            <zipfileset dir="${web-examples-src.dir}" prefix="WEB-INF/resources">
+                <include name="config/**/*"/>
+                <include name="images/**/*"/>
+                <include name="oxf-theme/**/*"/>
+                <include name="bizdoc/**/*"/>
+            </zipfileset>
+            <zipfileset dir="${web-examples-src.dir}/examples/bizdoc" prefix="WEB-INF/resources/bizdoc">
                 <include name="**/*"/>
                 <exclude name="example-descriptor.xml"/>
                 <exclude name="page-flow.xpl"/>
             </zipfileset>
-            <zipfileset dir="${build.temp.dir}/distrib-bizdoc/WEB-INF/resources/bizdoc/schema" prefix="WEB-INF/resources/bizdoc/schema">
-                <include name="*.xml"/>
-            </zipfileset>
-            <zipfileset dir="descriptors/examples/web/bizdoc" prefix="WEB-INF">
-                <include name="*.xml"/>
-            </zipfileset>
         </zip>
     </target>
 
-    <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-bizdoc-war, orbeon-doc, orbeon-javadoc">
+    <target name="orbeon-com-example" depends="prepare">
+        <mkdir dir="${build.distrib.dir}"/>
+        <zip zipfile="${build.distrib.dir}/orbeon-com-example-1.0.zip">
+            <zipfileset dir="doc/example-applications"/>
+            <zipfileset dir="descriptors/examples/web/orbeon-com" prefix="WEB-INF"/>
+            <zipfileset dir="C:/Documents and Settings/Alessandro Vernet/My Documents/orbeon/cvs-public/oss-site/resources" prefix="WEB-INF/resources"/>
+        </zip>
+    </target>
+
+    <target name="example-applications" depends="bizdoc-example, orbeon-com-example"/>
+
+    <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-doc, orbeon-javadoc">
         <property name="prefix" value="orbeon-${version.number}"/>
         <!-- Create temporary zip file -->
         <property name="tmp-zip" value="${build.distrib.dir}/orbeon-${version.number}-tmp.zip"/>
         <zip zipfile="${tmp-zip}">
             <zipfileset dir="${build.distrib.dir}" prefix="${prefix}">
                 <include name="orbeon.war"/>
-                <include name="orbeon-bizdoc.war"/>
             </zipfileset>
             <zipfileset dir="${build.doc.dir}" prefix="${prefix}/doc"/>
             <zipfileset dir="doc/dist" prefix="${prefix}"/>

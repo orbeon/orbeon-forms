@@ -447,7 +447,8 @@ public class StrutsUtils {
         }
 
         public void println(char[] chars) throws IOException {
-            writer.write(chars + NEWLINE);
+            final String s = new String( chars );
+            writer.write( s + NEWLINE);
         }
 
         public void println(double v) throws IOException {

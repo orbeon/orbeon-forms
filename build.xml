@@ -230,6 +230,8 @@
         <include name="xmlrpc-1_2_eXist_20041005_patched.jar"/>
         <include name="jms-api-1_1.jar"/>
         <include name="mailapi-1_3_2.jar"/>
+        <include name="itext-1_02b.jar"/>
+        <include name="itext-xml-1_02.jar"/>
       </fileset>
       <fileset dir="${build.lib.dir}">
         <exclude name="jsf-*.jar"/>

@@ -35,7 +35,7 @@ public class BinarySerializer extends HttpBinarySerializer {
 
     protected void readInput(PipelineContext context, ProcessorInput input, Config config, OutputStream outputStream) {
         try {
-            readInputAsSAX(context, input, new Base64ContentHandler(outputStream));
+            readInputAsSAX(context, (input != null) ? input : getInputByName(INPUT_DATA), new Base64ContentHandler(outputStream));
         } catch (Exception e) {
             throw new OXFException(e);
         }

@@ -66,7 +66,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
                             return createChartConfig(context, input);
                         }
                     });
-            Document data = readInputAsDOM4J(pipelineContext, input);
+            Document data = readInputAsDOM4J(pipelineContext, (input != null) ? input : getInputByName(INPUT_DATA));
 
             Dataset ds;
             if (chartConfig.getType() == ChartConfig.PIE_TYPE ||

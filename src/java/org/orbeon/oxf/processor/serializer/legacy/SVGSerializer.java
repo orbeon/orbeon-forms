@@ -75,7 +75,7 @@ public class SVGSerializer extends HttpBinarySerializer {
                 }
 
                 private void parse() {
-                    readInputAsSAX(context, input, contentHandler);
+                    readInputAsSAX(context, (input != null) ? input : getInputByName(INPUT_DATA), contentHandler);
                 }
 
                 public void parse(InputSource input) {

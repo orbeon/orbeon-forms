@@ -477,6 +477,11 @@
         <class name="org.orbeon.oxf.processor.serializer.legacy.XSLFOSerializer"/>
     </processor>
 
+    <!-- Scratchpad -->
+    <processor name="oxf:pdf-template" uri="oxf/processor/pdf-template">
+        <class name="org.orbeon.oxf.processor.scratchpad.PDFTemplateProcessor"/>
+    </processor>
+
     <!-- Saxon profiling (test only) -->
     <processor name="oxf:saxon1">
         <instantiation name="oxf:generic-xslt-2.0">

@@ -48,7 +48,7 @@ public class XSLFOSerializer extends HttpBinarySerializer {
             // First read input, as we don't want to get the output stream
             // before we are sure we can read the input without error
             final SAXStore inputSAXStore = new SAXStore();
-            readInputAsSAX(context, INPUT_DATA, inputSAXStore);
+            readInputAsSAX(context, (input != null) ? input : getInputByName(INPUT_DATA), inputSAXStore);
 
             Driver fop = new Driver();
             fop.setLogger(fopLogger);

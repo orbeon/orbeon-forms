@@ -325,10 +325,11 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </xml-source>
                 <note>
                     The Binary serializer performs streaming. If its input data consists of a stream
-                    of short character SAX events, such as those produced by the Request generator
-                    the <a href="processors-generators#url-generator">URL generator</a>, or the <a
-                    href="processors-sql#binary-data">SQL processor</a>, it is possible to
-                    serialize an "infinitely" long document.
+                    of short character SAX events, such as those produced by the <a
+                    href="processors-generators#request-generator">Request generator</a> the <a
+                    href="processors-generators#url-generator">URL generator</a>, or the <a
+                    href="processors-sql#binary-data">SQL processor</a>, it is possible to serialize
+                    an "infinitely" long document.
                 </note>
             </section>
         </section>

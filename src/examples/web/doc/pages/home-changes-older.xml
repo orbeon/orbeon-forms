@@ -1466,7 +1466,7 @@ select * from ps_book
                 <p>The Request Generator is now fully configurable. You can
                     define the the
                     <link
-                        href="processors-generators#RequestGenerator">subset of the
+                        href="processors-generators#request-generator">subset of the
                         request</link> you are interested in.
                 </p>
             </section>

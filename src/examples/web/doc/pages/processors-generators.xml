@@ -28,7 +28,7 @@
                 several generators as described below.
             </p>
         </section>
-        <anchor id="RequestGenerator"/>
+        <anchor id="request-generator"/>
         <section>
             <title>Request Generator</title>
             <p>
@@ -214,9 +214,14 @@
                 <p>
                     Uploaded files are stored into <code>parameter</code> elements, like any other
                     form parameter. The rules for the data type used are the same as for the request
-                    body (see above): the data type depends on the <code>stream-type</code>
-                    attribute and the size of the uploaded files.
+                    body (see above), the data type depending on the <code>stream-type</code>
+                    attribute and the size of the uploaded files:
                 </p>
+                <xml-source>
+                    <config stream-type="xs:anyURI">
+                        <include>/request/parameters</include>
+                    </config>
+                </xml-source>
                 <p>
                     The <code>parameter</code> element for an uploaded file contains the following
                     elements in addition to the <code>name</code> and <code>value</code> elements
@@ -231,22 +236,25 @@
                     A resulting uploaded file may look as follows:
                 </p>
                 <xml-source>
-                    <parameters>
-                        <name>upload-form-element-name</name>
-                        <filename>photo.jpg</filename>
-                        <content-type>image/jpeg</content-type>
-                        <content-length>2345</content-length>
-                        <value xsi:type="xs:anyURI">file:/C:/Tomcat/temp/upload_00000005.tmp</value>
-                    </parameters>
+                    <request>
+                        <parameters>
+                            <parameter>
+                                <name>upload-form-element-name</name>
+                                <filename>photo.jpg</filename>
+                                <content-type>image/jpeg</content-type>
+                                <content-length>2345</content-length>
+                                <value xsi:type="xs:anyURI">file:/C:/Tomcat/temp/upload_00000005.tmp</value>
+                            </parameter>
+                        </parameters>
+                    </request>
                 </xml-source>
             </section>
-
             <warning>
                 The URL stored as the value of the upload or request body is temporary and only
                 valid for the duration of the current request. It is only accessible from the server
                 side, and will not be accessible from a client such as a web browser. It is not
                 guaranteed to be a <code>file:</code> URL, only that it can be read with
-                Presentation Server's URL generator.
+                Presentation Server's <a href="#url-generator">URL generator</a>.
             </warning>
         </section>
 

@@ -39,26 +39,42 @@
                 </p>
             </section>
             <section>
-                <title>Improved Request Body Support</title>
+                <title>Improved Request Body and Uploaded Files Support</title>
                 <p>
-                    It was possible in the past with the Request generator to obtain the request
-                    body, which was automatically parsed as XML. It is now possible to read the body
-                    several times, and to obtain it as <code>xs:anyURI</code> or
-                    <code>xs:base64Binary</code>. Parsing may then be done using the URL generator.
+                    It was possible in the past with the <a
+                    href="processors-generators#request-generator">Request generator</a> to obtain
+                    the request body, which was automatically parsed as XML. This behavior has now
+                    been changed. It is instead possible to obtain the request body as
+                    <code>xs:anyURI</code> or <code>xs:base64Binary</code>. Parsing may then be done
+                    using the <a href="processors-generators#url-generator">URL generator</a>. In
+                    addition, the body can now be read several times. This change brings
+                    consistency with the handling of uploaded files, and the support for binary
+                    files thoughout Presentation Server.
                 </p>
                 <p>
-                    In a related change, the Request generator now supports specifying whether
-                    uploaded files or the request body must be generated as <code>xs:anyURI</code>
-                    or <code>xs:base64Binary</code>.
+                    In a related change, the <a
+                    href="processors-generators#request-generator">Request generator</a> now
+                    supports specifying whether uploaded files or the request body must be generated
+                    as <code>xs:anyURI</code> or <code>xs:base64Binary</code>.
                 </p>
             </section>
+            <section>
+				<title>URL Generator Binary Mode</title>
+				<p>
+                    The <a href="processors-generators#url-generator">URL generator</a>'s support of
+                    streaming binary files encoded with Base64 is now documented. The <a
+                    href="/goto-example/xforms-upload">XForms Upload example</a> illustrates this
+                    capability.
+                </p>
+			</section>
             <section>
 				<title>Binary HTTP Serializer</title>
 				<p>
                     A new serializer, the <a
-                    href="processors-serializers#binary-http-serializer">Binary HTTP
-                    serializer</a>, supports decoding of Base64-encoded data and sending the
-                    resulting binary stream.
+                    href="processors-serializers#binary-http-serializer">Binary HTTP serializer</a>,
+                    supports decoding of Base64-encoded data and sending the resulting binary
+                    stream. The <a href="/goto-example/xforms-upload">XForms Upload example</a>
+                    illustrates this capability.
                 </p>
 			</section>
 <!--            <section>-->

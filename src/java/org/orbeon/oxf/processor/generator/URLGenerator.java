@@ -411,6 +411,7 @@ public class URLGenerator extends ProcessorImpl {
                     // Handle config if read as input
                     if (localConfigURIReferences == null) {
                         KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
+                        if ( configKeyValidity == null ) return null;
                         keys.add(configKeyValidity.key);
                     }
                     // Handle main document and config

@@ -17,14 +17,13 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.dom4j.*;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
@@ -34,8 +33,6 @@ import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -231,7 +228,7 @@ public class ProcessorTest extends TestCase {
             if (threads[i].getException() != null) {
                 System.err.println(description);
                 Throwable throwable = OXFException.getRootThrowable(threads[i].getException());
-                throw throwable instanceof Exception? (Exception) throwable : threads[i].getException();
+                throw throwable instanceof Exception ? (Exception) throwable : threads[i].getException();
             }
 
             // Check if got expected result

@@ -327,7 +327,7 @@
             </p>
 
             <section>
-                <title>Configuration Input</title>
+                <title>Configuration</title>
 
                 <p>
                     The configuration input describes which bean to serialize, and two optional
@@ -951,7 +951,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 This generator works only in a servlet environment. It is not supported in portlets.
             </note>
             <section>
-                <title>Config Input</title>
+                <title>Configuration</title>
                 <p>
                     The <code>config</code> input describes the servlet to call, and optionally
                     configures the HTMLTidy process. You can specify the servlet either by name or

@@ -74,12 +74,12 @@
     <!-- Set classpath to compile and run the application -->
     <target name="classpath" depends="prepare">
         <path id="class.path">
+            <pathelement location="${jar.file}"/>
             <fileset dir="${lib.dir}">
                 <include name="**/*.jar"/>
                 <exclude name="**/*jsf_1_1*.jar"/>
             </fileset>
             <!--            <pathelement location="${build.classes.dir}"/>-->
-            <pathelement location="${jar.file}"/>
             <pathelement location="${java.home}/../lib/tools.jar"/>
             <pathelement location="C:\bea81sp2\weblogic81\server\lib\weblogic.jar"/>
         </path>
@@ -176,8 +176,6 @@
                 <include name="log4j-1.3alpha0.jar"/>
                 <include name="jaxen-1_1-beta-1-dev.jar"/>
                 <include name="saxpath-dev_orbeon.jar"/>
-                <include name="xercesImpl_2_6_2_orbeon.jar"/>
-                <include name="xml-apis-xerces_2_6_2_orbeon.jar"/>
                 <include name="resolver-xerces_2_6_2_orbeon.jar"/>
                 <include name="xalan-2_5_1_orbeon.jar"/>
                 <include name="xsltc-2_5_1_orbeon.jar"/>
@@ -233,6 +231,8 @@
                 <include name="mail-1_3_2.jar"/>
                 <include name="itext-1_02b.jar"/>
                 <include name="itext-xml-1_02.jar"/>
+                <include name="xml-apis-xerces_2_6_2_orbeon.jar"/>
+                <include name="xercesImpl_2_6_2_orbeon.jar"/>
             </fileset>
             <fileset dir="${build.lib.dir}">
                 <exclude name="jsf-*.jar"/>
@@ -684,8 +684,8 @@
         <unzip src="lib/log4j-1.3alpha0.jar" dest="build/oxfmark/lib"/>
         <unzip src="lib/jaxen-1_1-beta-1-dev.jar" dest="build/oxfmark/lib"/>
         <unzip src="lib/saxpath-dev_orbeon.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/xercesImpl-2_2_1_orbeon.jar" dest="build/oxfmark/lib"/>
-        <unzip src="lib/xml-apis-2_5_1.jar" dest="build/oxfmark/lib"/>
+        <unzip src="lib/xercesImpl_2_6_2_orbeon.jar" dest="build/oxfmark/lib"/>
+        <unzip src="lib/xml-apis-xerces_2_6_2_orbeon.jar" dest="build/oxfmark/lib"/>
         <unzip src="lib/xalan-2_5_1_orbeon.jar" dest="build/oxfmark/lib"/>
         <unzip src="lib/commons-collections-2_0.jar" dest="build/oxfmark/lib"/>
         <unzip src="lib/commons-lang-1_0-b1.jar" dest="build/oxfmark/lib"/>

@@ -24,6 +24,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.DOMSerializer;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.validation.XFormsValidationProcessor;
 import org.orbeon.oxf.processor.xforms.Model;
@@ -99,6 +100,25 @@ public class XFormsInput extends ProcessorImpl {
                     instance = new Instance(pipelineContext, requestParameters.getInstance() != null
                             ? requestParameters.getInstance() : model.getInitialInstance());
 
+                    // Schema-validate if necessary
+                    Boolean enabled = getPropertySet().getBoolean(XFORMS_VALIDATION_FLAG, true);
+                    if (enabled != null && enabled.booleanValue() && model.getSchema() != null) {
+
+                        Processor validator = new XFormsValidationProcessor(model.getSchema());
+                        Processor resourceGenerator = PipelineUtils.createURLGenerator(model.getSchema());
+                        PipelineUtils.connect(resourceGenerator, ProcessorImpl.OUTPUT_DATA, validator, XFormsValidationProcessor.INPUT_SCHEMA);
+                        PipelineUtils.connect(XFormsValidationProcessor.DECORATION_CONFIG, ProcessorImpl.OUTPUT_DATA,
+                                validator, ProcessorImpl.INPUT_CONFIG);
+                        DOMGenerator domGenerator = new DOMGenerator(instance.getDocument());
+                        PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, validator, ProcessorImpl.INPUT_DATA);
+                        DOMSerializer serializer = new DOMSerializer();
+                        PipelineUtils.connect(validator, ProcessorImpl.OUTPUT_DATA, serializer, ProcessorImpl.INPUT_DATA);
+
+                        serializer.reset(pipelineContext);
+                        serializer.start(pipelineContext);
+                        instance.setDocument(serializer.getDocument(pipelineContext));
+                    }
+
                     // Fill-out instance from request
                     XFormsUtils.setInitialDecoration(instance.getDocument());
                     int[] ids = requestParameters.getIds();
@@ -148,23 +168,8 @@ public class XFormsInput extends ProcessorImpl {
                                 + XMLUtils.domToString(instance.getDocument()));
                 }
 
-                // Schema-validate if necessary
-                Boolean enabled = getPropertySet().getBoolean(XFORMS_VALIDATION_FLAG, true);
-                if (enabled != null && enabled.booleanValue() && model.getSchema() != null) {
+                instance.read(contentHandler);
 
-                    Processor validator = new XFormsValidationProcessor(model.getSchema());
-                    Processor resourceGenerator = PipelineUtils.createURLGenerator(model.getSchema());
-                    PipelineUtils.connect(resourceGenerator, ProcessorImpl.OUTPUT_DATA, validator, XFormsValidationProcessor.INPUT_SCHEMA);
-                    PipelineUtils.connect(XFormsValidationProcessor.DECORATION_CONFIG, ProcessorImpl.OUTPUT_DATA,
-                            validator, ProcessorImpl.INPUT_CONFIG);
-                    DOMGenerator domGenerator = new DOMGenerator(instance.getDocument());
-                    PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, validator, ProcessorImpl.INPUT_DATA);
-                    ProcessorOutput validationOutput = validator.createOutput(ProcessorImpl.OUTPUT_DATA);
-                    validationOutput.read(pipelineContext, contentHandler);
-                } else {
-                    // Just output instance
-                    instance.read(contentHandler);
-                }
             }
         };
         addOutput(name, output);

@@ -26,6 +26,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
@@ -204,7 +205,7 @@ public class XFormsValidationProcessor extends ProcessorImpl {
                             // Find xxforms:relevant attribute if any
                             {
                                 // Store a null iif non-relevant
-                                int index = attributes.getIndex("http://orbeon.org/oxf/xml/xforms", "relevant");
+                                int index = attributes.getIndex(Constants.XXFORMS_NAMESPACE_URI, "relevant");
                                 relevantState.push((index != -1 && "false".equals(attributes.getValue(index))) ? null : this);
 
 //                                if (index > -1) {

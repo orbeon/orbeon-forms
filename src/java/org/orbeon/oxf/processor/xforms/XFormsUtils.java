@@ -13,27 +13,33 @@
  */
 package org.orbeon.oxf.processor.xforms;
 
-import org.dom4j.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentFactory;
+import org.dom4j.Element;
+import org.dom4j.Node;
+import org.dom4j.Visitor;
+import org.dom4j.VisitorSupport;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import java.util.*;
-import java.util.zip.GZIPOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.zip.GZIPOutputStream;
 
 public class XFormsUtils {
 
@@ -86,7 +92,14 @@ public class XFormsUtils {
     private static void setInitialDecorationWorker(Element element, int[] currentId, Map idToNodeMap) {
         int elementId = ++currentId[0];
         idToNodeMap.put(new Integer(elementId), element);
-        element.setData(new InstanceData((LocationData) element.getData(), elementId));
+        Object o = element.getData();
+        if(o instanceof LocationData)
+            element.setData(new InstanceData((LocationData) o, elementId));
+        else if(o instanceof InstanceData)
+            element.setData(new InstanceData( ((InstanceData)o).getLocationData(), elementId));
+        else
+            throw new OXFException("No Location data found in instance");
+
         for (Iterator i = element.attributes().iterator(); i.hasNext();) {
             Attribute attribute = (Attribute) i.next();
             if (!Constants.XXFORMS_NAMESPACE_URI.equals(attribute.getNamespaceURI())) {
@@ -112,6 +125,7 @@ public class XFormsUtils {
     }
 
     public static String instanceToString(PipelineContext pipelineContext, String password, Document instance) {
+        removeXXFormsAttributes(instance);
         try {
             ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
             GZIPOutputStream gzipOutputStream = null;
@@ -125,5 +139,21 @@ public class XFormsUtils {
         } catch (IOException e) {
             throw new OXFException(e);
         }
+    }
+
+    public static void removeXXFormsAttributes(Document doc) {
+        Visitor visitor = new VisitorSupport() {
+            public void visit(Element node) {
+                List newAttributes = new ArrayList();
+                for(Iterator i = node.attributeIterator(); i.hasNext();) {
+                    Attribute attr = (Attribute)i.next();
+                    if(!Constants.XXFORMS_NAMESPACE_URI.equals(attr.getNamespaceURI()))
+                        newAttributes.add(attr);
+
+                }
+                node.setAttributes(newAttributes);
+            }
+        };
+        doc.accept(visitor);
     }
 }

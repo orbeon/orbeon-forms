@@ -11,14 +11,17 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:dyn="http://exslt.org/dynamic"
     xmlns:str="http://exslt.org/strings"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-    <xsl:variable name="display-column" select="str:tokenize(document('oxf:instance')/form/display-column)"/>
+    <xsl:variable name="instance" as="element()" select="document('oxf:instance')/form"/>
+    <xsl:variable name="display-column" as="xs:string*" select="tokenize(document('oxf:instance')/form/display-column, ' ')"/>
 
     <xsl:template match="/">
         <xhtml:html>
@@ -133,12 +136,12 @@
                 <xsl:text>&#160;</xsl:text>
                 <xforms:submit xxforms:appearance="image">
                     <xsl:choose>
-                        <xsl:when test="/root/form/sort-column = $column and /root/form/sort-order = 'ascending'">
+                        <xsl:when test="$instance/sort-column = $column and $instance/sort-order = 'ascending'">
                             <xxforms:img src="/images/sort-up.gif"/>
                             <xforms:setvalue ref="sort-column"><xsl:value-of select="$column"/></xforms:setvalue>
                             <xforms:setvalue ref="sort-order">descending</xforms:setvalue>
                         </xsl:when>
-                        <xsl:when test="/root/form/sort-column = $column and /root/form/sort-order = 'descending'">
+                        <xsl:when test="$instance/sort-column = $column and $instance/sort-order = 'descending'">
                             <xxforms:img src="/images/sort-down.gif"/>
                             <xforms:setvalue ref="sort-column"/>
                             <xforms:setvalue ref="sort-order"/>

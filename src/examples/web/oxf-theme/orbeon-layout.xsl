@@ -349,6 +349,7 @@ a:hover {
 
 .tree-section .tree-section {
     padding-top: 0em;
+    padding-left: 1em;
     font-weight: bold;
     font-style: italic;
     color: #555555;
@@ -360,7 +361,7 @@ a:hover {
 
 .tree-items, .tree-items-selected {
     margin-left: 0em;
-    padding-left: .5em;
+    padding-left: 1em;
     list-style-type: none;
     color: black;
     font-weight: normal;

@@ -16,7 +16,6 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 

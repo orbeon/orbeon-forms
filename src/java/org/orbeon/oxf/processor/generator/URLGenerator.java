@@ -413,7 +413,7 @@ public class URLGenerator extends ProcessorImpl {
                         KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
                         keys.add(configKeyValidity.key);
                     }
-                    // Handle main document
+                    // Handle main document and config
                     keys.add(new OutputCacheKey(this, configURIReferences.config.toString()));
                     // Handle dependencies if any
                     if (configURIReferences.uriReferences != null) {
@@ -442,7 +442,7 @@ public class URLGenerator extends ProcessorImpl {
                         KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
                         validities.add(configKeyValidity.validity);
                     }
-                    // Handle main document
+                    // Handle main document and config
                     validities.add(getHandlerValidity(configURIReferences.config.getURL()));
                     // Handle dependencies if any
                     if (configURIReferences.uriReferences != null) {

@@ -39,10 +39,63 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
 
+
 public class InitUtils {
+    
+    /*
+     * Work around broken Tomcat loader if need be
+     * According to servlet spec and j2ee spec the container should honor 
+     * Class-Path entry in our jar's manifest.mf.   However Tomcat doesn't do 
+     * follow the spec and so we have to work around it.  ( A note on versions:
+     * version 2.3, which Tomcat 4 supports, has stipulation so this pbm has
+     * been around for some time now. )
+     * 
+     * FWIW, we need this to work because we want META-INF/services in 
+     * orbeon.jar to be found before META-INF/services in xerces.*Impl.*.jar.
+     * 
+     * And we want that to happen because we want to specify our own parser
+     * config.  ( As opposed to the re-rooted one ).  The diff being that 
+     * the pres serv config sets an xincludehandler that lets us provide 
+     * caching support for xincluded files.
+     */
+    static {
+        try {
+            final ClassLoader ldr = InitUtils.class.getClassLoader();
+            final Class ldrCls = ldr.getClass(); 
+            if ( "org.apache.catalina.loader.WebappClassLoader".equals( ldrCls.getName() ) ) {
+                final Method mthd = ldrCls.getMethod( "addRepository", new Class[] { String.class } );
+                final java.net.URL url = InitUtils.class.getResource
+                        ( "/org/orbeon/oxf/pipeline/InitUtils.class" );
+                final java.net.URLConnection uc = url.openConnection();
+                if ( uc instanceof java.net.JarURLConnection ) {
+                    final java.net.JarURLConnection juc = ( java.net.JarURLConnection )uc;
+                    final java.util.jar.Manifest mf = juc.getManifest();
+                    final java.util.jar.Attributes attrs = mf.getMainAttributes();
+                    final String cp = attrs.getValue( "Class-Path" );
+                    final String surl = url.toString();
+                    int idxSep = surl.lastIndexOf( "!/" );
+                    final int idxEnd = surl.lastIndexOf( '/', idxSep );
+                    final String base = surl.substring( 0, idxEnd + 1 );
+                    for ( java.util.StringTokenizer st = new java.util.StringTokenizer( cp ); 
+                          st.hasMoreTokens(); ) {
+                        final String tkn = st.nextToken() + "!/";
+                        if ( tkn.indexOf( '/' ) == -1 ) continue;
+                        final String cpEnt = base + tkn;
+                        mthd.invoke( ldr, new Object[] { cpEnt } );
+                    }
+                }
+            }
+        }
+        catch ( final Throwable t ) {
+            // We cannot cound on any logging support at this stage of execution
+            //  so just resort to dumping this to std error.
+            t.printStackTrace();
+        }
+    }
 
     private static final String CACHE_SIZE_PROPERTY = "oxf.cache.size";
     public static final String PROLOGUE_PROPERTY = "oxf.prologue";

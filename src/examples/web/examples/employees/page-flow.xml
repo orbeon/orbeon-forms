@@ -71,7 +71,8 @@
     <page id="edit-employee" path-info="/employees/edit-employee"
         xforms="edit-employee/edit-employee-xforms-model.xml"
         view="edit-employee/edit-employee-view.xsl">
-        <action when="/*/action = 'save' and not(/*/document//@*[local-name() = 'error'])" action="edit-employee/save-employee.xpl">
+        <action when="/*/action = 'save' and not( /*/document//@*[ namespace-uri() = 'http://orbeon.org/oxf/xml/xforms' and local-name() = 'valid' ])" 
+                action="edit-employee/save-employee.xpl">
             <result page="edit-employee">
                 <xu:remove select="/*"/>
                 <xu:update select="/">
@@ -81,7 +82,7 @@
                 <xu:update select="/form/message">save-success</xu:update>
             </result>
         </action>
-        <action when="/*/action = 'save' and /*/document//@*[local-name() = 'error']">
+        <action when="/*/action = 'save' and /*/document//@*[ namespace-uri() = 'http://orbeon.org/oxf/xml/xforms' and local-name() = 'valid' ]">
             <result>
                 <xu:update select="/form/message">save-failure</xu:update>
                 <xu:update select="/form/show-errors">true</xu:update>

@@ -58,6 +58,7 @@
                             <xforms:input ref="/*/document/employee:employee/employee:lastname">
                                 <xforms:hint>Last Name</xforms:hint>
                                 <xforms:help>Please enter a mandatory employee last name</xforms:help>
+                                <xforms:alert src="orbeon:xforms:schema:errors" />
                             </xforms:input>
                         </td>
                     </tr>
@@ -67,6 +68,7 @@
                             <xforms:input ref="/*/document/employee:employee/employee:firstname">
                                 <xforms:hint>First Name</xforms:hint>
                                 <xforms:help>Please enter a mandatory employee first name</xforms:help>
+                                <xforms:alert src="orbeon:xforms:schema:errors" />
                             </xforms:input>
                         </td>
                     </tr>

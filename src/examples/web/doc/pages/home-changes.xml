@@ -65,6 +65,11 @@
                     The SQL processor now supports reading <code>BINARY</code>, <code>VARBINARY
                     </code>and <code>LONGVARBINARY</code> columns in addition to <code>BLOB</code>.
                 </p>
+                <p>
+                    The SQL processor's <code>data</code> input and output are now optional. This
+                    removes the need for "dummy" input content or Null serializers with the SQL
+                    processor.
+                </p>
             </section>
             <section>
                 <title>Examples</title>

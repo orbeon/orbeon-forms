@@ -26,12 +26,17 @@ import org.orbeon.oxf.processor.XMLConstants;
 import org.orbeon.oxf.processor.scope.ScopeStore;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
+import org.orbeon.oxf.util.PooledXPathExpression;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.util.Iterator;
+import java.util.Map;
 
 public class Instance {
 
@@ -40,11 +45,14 @@ public class Instance {
 
     private PipelineContext pipelineContext;
     private Document instance;
+    private NodeInfo instanceNodeInfo;
 
     public Instance(PipelineContext pipelineContext, Document template) {
         this.pipelineContext = pipelineContext;
         instance = XMLUtils.createDOM4JDocument();
         instance.add(template.getRootElement().createCopy());
+        instanceNodeInfo = new DocumentWrapper(instance, null).wrap(instance);
+
     }
 
     public Document getDocument() {
@@ -54,22 +62,6 @@ public class Instance {
     public void setDocument(Document instance) {
         this.instance = instance;
     }
-    /**
-     * Remove all the attribute and child nodes in the instance.
-     */
-    public void empty() {
-        // TODO: instead of this, we should probably rather just create an empty document. The code
-        // that updates the instance will have to be modified.
-        Element root = instance.getRootElement();
-        // Remove attributes
-        while (root.attributeCount() > 0)
-            root.attribute(0).detach();
-        // Remove elements and text nodes
-        for (Iterator i = root.elements().iterator(); i.hasNext();) {
-            i.next();
-            i.remove();
-        }
-    }
 
     /**
      * Set a value on the instance.
@@ -77,13 +69,32 @@ public class Instance {
      * If a type is specified, it means that the Request generator set it, which, for now, means
      * that it was a file upload.
      */
-    public void setValue(int id, String value, String type, boolean dontSetIfExisting) {
+    public void setValueForId(int id, String value, String type) {
         InstanceData rootInstanceData = XFormsUtils.getInstanceData(instance.getRootElement());
         Node node = (Node) rootInstanceData.getIdToNodeMap().get(new Integer(id));
         if (node instanceof Element) {
-            setElementValue((Element) node, value, type, dontSetIfExisting);
+            setElementValue((Element) node, value, type);
         } else {
             setAttributeValue((Attribute) node, value);
+        }
+    }
+
+    public void setValueForParam(PipelineContext pipelineContext, String xpath, Map prefixToURIMap, String value) {
+        PooledXPathExpression xpathExpression =
+                XPathCache.getXPathExpression(pipelineContext, instanceNodeInfo, xpath, prefixToURIMap);
+        try {
+            Node node = (Node) xpathExpression.evaluateSingle();
+            if (node == null)
+                throw new OXFException("Cannot find node instance for param '" + xpath + "'");
+            if (node instanceof Element) {
+                setElementValue((Element) node, value, null);
+            } else {
+                setAttributeValue((Attribute) node, value);
+            }
+        } catch (XPathException e) {
+            throw new OXFException(e);
+        } finally {
+            if (xpathExpression != null) xpathExpression.returnToPool();
         }
     }
 
@@ -103,10 +114,8 @@ public class Instance {
         attribute.setValue(value);
     }
 
-    private void setElementValue(Element element, String value, String type, boolean dontSetIfExisting) {
+    private void setElementValue(Element element, String value, String type) {
         // Don't do anything if value exists and dontSetIfexisting is true
-        if (dontSetIfExisting && !"".equals(element.getText()))
-            return;
         if (type != null) {
             // Handle value type
             String currentType = element.attributeValue(XMLConstants.XSI_TYPE_QNAME);

@@ -50,8 +50,7 @@ public class XFormsOutput extends ProcessorImpl {
                 final Model model = (Model) readCacheInputAsObject(context,
                         getInputByName(INPUT_MODEL), new CacheableInputReader(){
                     public Object read(PipelineContext context, ProcessorInput input) {
-                        Model model = new Model(context);
-                        readInputAsSAX(context, input, model.getContentHandlerForModel());
+                        Model model = new Model(context, readInputAsDOM4J(context, input));
                         return model;
                     }
                 });

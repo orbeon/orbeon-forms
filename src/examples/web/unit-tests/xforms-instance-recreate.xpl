@@ -57,10 +57,8 @@
     <p:processor name="oxf:xforms-input">
         <p:input name="model" href="#model"/>
         <p:input name="request" href="#request"/>
-        <p:input name="filter">
-            <null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-        </p:input>
-        <p:input name="instance" href="#model#xpointer(xforms:model/xforms:instance/*)"/>
+        <p:input name="filter"><params/></p:input>
+        <p:input name="matcher-result"><result/></p:input>
         <p:output name="data" ref="instance"/>
     </p:processor>
 

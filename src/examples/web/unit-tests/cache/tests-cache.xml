@@ -12,12 +12,13 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<group description="Cache" xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+<group description="Cache" xmlns:p="http://www.orbeon.com/oxf/pipeline" 
+    xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <test description="Simple URL Generator" name="oxf:test">
         <input name="config">
             <script>
-                <processor name="oxf:url-generator">
+                <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="config">
                         <config>
                             <url>cache/document1.xml</url>
@@ -42,7 +43,7 @@
     <test description="URL Generator With XInclude" name="oxf:test">
         <input name="config">
             <script>
-                <processor name="oxf:url-generator">
+                <processor name="oxf:url-generator" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="config">
                         <config>
                             <url>cache/document3.xml</url>
@@ -75,7 +76,7 @@
     <test description="Simple XSLT" name="oxf:test">
         <input name="config">
             <script>
-                <processor name="oxf:xslt">
+                <processor name="oxf:xslt" xmlns:oxf="http://www.orbeon.com/oxf/processors">
                     <input name="config" href="cache/stylesheet1.xsl"/>
                     <input name="data" href="cache/document1.xml"/>
                 </processor>

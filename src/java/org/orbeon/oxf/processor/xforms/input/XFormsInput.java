@@ -14,12 +14,14 @@
 package org.orbeon.oxf.processor.xforms.input;
 
 import org.apache.log4j.Logger;
-import org.dom4j.Attribute;
 import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.Document;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.CacheableInputReader;
+import org.orbeon.oxf.processor.Processor;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.validation.XFormsValidationProcessor;
 import org.orbeon.oxf.processor.xforms.Model;
@@ -29,13 +31,10 @@ import org.orbeon.oxf.processor.xforms.input.action.ActionFunctionContext;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.common.OXFException;
 import org.xml.sax.ContentHandler;
 
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
+import java.util.List;
 
 /**
  * Handle XForms decoding.
@@ -44,10 +43,10 @@ import java.util.Map;
  * WAC based on URL filtering. The format of the filter comes directly from the native document
  * created in the WAC, for example:
  *
- * <params>
- *    <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/x"/>
- *    <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/y"/>
- *    <param xmlns="http://www.orbeon.com/oxf/controller" ref="/form/z"/>
+ * <params xmlns="http://www.orbeon.com/oxf/controller">
+ *    <param ref="/form/x"/>
+ *    <param ref="/form/y"/>
+ *    <param ref="/form/z"/>
  * </params>
  */
 public class XFormsInput extends ProcessorImpl {
@@ -56,16 +55,16 @@ public class XFormsInput extends ProcessorImpl {
 
     final static private String XFORMS_VALIDATION_FLAG = "validate";
     final static private String INPUT_MODEL = "model";
-    final static private String INPUT_INSTANCE = "instance";
+    final static private String INPUT_MATCHER_RESULT = "matcher-result";
     final static private String INPUT_REQUEST = "request";
     final static private String INPUT_FILTER = "filter";
     final static private String OUTPUT_INSTANCE = "instance";
 
     public XFormsInput() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_MODEL));
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_INSTANCE));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_REQUEST));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_FILTER));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_MATCHER_RESULT));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_INSTANCE));
     }
 
@@ -76,7 +75,7 @@ public class XFormsInput extends ProcessorImpl {
                 // Extract information from XForms model
                 Model model = (Model) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
                     public Object read(PipelineContext context, ProcessorInput input) {
-                        Model model = new Model(pipelineContext);
+                        Model model = new Model(pipelineContext, readInputAsDOM4J(context, input));
                         readInputAsSAX(context, input, model.getContentHandlerForModel());
                         return model;
                     }
@@ -95,57 +94,33 @@ public class XFormsInput extends ProcessorImpl {
                 Instance instance = Instance.createInstanceFromContext(pipelineContext);
 
                 if (instance == null) {
-                    // Get instance from input or from request
-                    if (requestParameters.getInstance() != null) {
-                        instance = new Instance(pipelineContext, requestParameters.getInstance());
-                    } else {
-                        // Get instance from input and create copy as we don't want the copy from the cache
-                        Document templateInstanceFromCache = readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE);
-                        if (templateInstanceFromCache.getRootElement() == null)
-                            throw new OXFException("No instance found in XForms model");
-                        Document templateInstance = XMLUtils.createDOM4JDocument();
-                        templateInstance.add(templateInstanceFromCache.getRootElement().createCopy());
-                        instance = new Instance(pipelineContext, templateInstance);
-                    }
+                    // Get instance from XForms model or from request
+                    instance = new Instance(pipelineContext, requestParameters.getInstance() != null
+                            ? requestParameters.getInstance() : model.getInitialInstance());
 
-                    // Extract filtered parameters from instance if any
-                    Element filterElement = readCacheInputAsDOM4J(pipelineContext, INPUT_FILTER).getRootElement();
-                    Map filteredParams = null;
-                    for (Iterator i = XPathUtils.selectIterator(filterElement, "/*/*/@ref"); i.hasNext();) {
-                        Attribute attribute = (Attribute) i.next();
-                        String paramRef = attribute.getValue();
-                        // FIXME: Argh, we don't handle namespaces correctly here!
-                        // If the param element in the WAC contains namespaces, this won't work!
-                        Node paramNode = XPathUtils.selectSingleNode(instance.getDocument().getRootElement(), paramRef);
-                        if (paramNode != null) {
-                            if (filteredParams == null)
-                                filteredParams = new HashMap();
-
-                            String nodeName = XFormsUtils.getNameForNode(paramNode, false);
-                            String nodeValue = paramNode instanceof Element ? ((Element) paramNode).getStringValue() : ((Attribute) paramNode).getValue();
-
-                            filteredParams.put(nodeName, nodeValue);
-                        }
-                    }
-
-                    // Fill-out instance
+                    // Fill-out instance from request
                     XFormsUtils.setInitialDecoration(instance.getDocument());
                     int[] ids = requestParameters.getIds();
                     for (int i = 0; i < ids.length; i++) {
                         int id = ids[i];
-                        instance.setValue(id, requestParameters.getValue(id), requestParameters.getType(id), false);
+                        instance.setValueForId(id, requestParameters.getValue(id), requestParameters.getType(id));
                     }
 
-                    // FIXME: will need to modify this as we now use node id instead of node path
-                    /*
-                    if (requestParameters.isSubmitted() && filteredParams != null) {
-                        for (Iterator i = filteredParams.keySet().iterator(); i.hasNext();) {
-                            String nodeName = (String) i.next();
-                            String nodeValue = (String) filteredParams.get(nodeName);
-                            instance.setValue(nodeName, nodeValue, null, true);
+                    // Fill-out instance from path info
+                    {
+                        final List groupElements = readCacheInputAsDOM4J
+                                (pipelineContext, INPUT_MATCHER_RESULT).getRootElement().elements("group");
+                        final List paramElements = readCacheInputAsDOM4J
+                                (pipelineContext, INPUT_FILTER).getRootElement().elements("param");
+                        for (Iterator paramIterator = paramElements.iterator(),
+                                groupIterator = groupElements.iterator(); paramIterator.hasNext();) {
+                            Element paramElement = (Element) paramIterator.next();
+                            Element groupElement = (Element) groupIterator.next();
+                            instance.setValueForParam(pipelineContext, paramElement.attributeValue("ref"),
+                                    XMLUtils.getNamespaceContext(paramElement), groupElement.getStringValue());
                         }
                     }
-                    */
+
                     if (logger.isDebugEnabled())
                         logger.debug("1) Instance recontructed from request:\n"
                                 + XMLUtils.domToString(instance.getDocument()));

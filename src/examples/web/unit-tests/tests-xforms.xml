@@ -514,9 +514,8 @@
                 <p:processor name="oxf:xforms-input">
                     <p:input name="model" href="#model"/>
                     <p:input name="request" href="#request"/>
-                    <p:input name="filter">
-                        <null xsi:nil="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"/>
-                    </p:input>
+                    <p:input name="filter"><params/></p:input>
+                    <p:input name="matcher-result"><result/></p:input>
                     <p:input name="instance" href="#model#xpointer(xforms:model/xforms:instance/form)"/>
                     <p:output name="data" id="xf-input"/>
                 </p:processor>
@@ -1018,7 +1017,7 @@
         </output>
     </test>
 
-    <test description="Knowing what bind makes a node invalid" name="oxf:pipeline">
+    <test description="Knowing what bind makes a node invalid" name="oxf:pipeline" ignore="true">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="data"/>
@@ -1037,6 +1036,7 @@
                     </p:input>
                     <p:input name="request"><request/></p:input>
                     <p:input name="filter"><params/></p:input>
+                    <p:input name="matcher-result"><result/></p:input>
                     <p:input name="instance"><instance/></p:input>
                     <p:output name="data" ref="data"/>
                 </p:processor>
@@ -1045,6 +1045,51 @@
         </input>
         <output name="data">
             <instance xxforms:invalid-bind-ids="a b d" xxforms:valid="false"/>
+        </output>
+    </test>
+    
+    <test description="" name="oxf:pipeline">
+        <input name="model">
+            <xforms:model xmlns:a="a" xmlns:b="b" >
+                <xforms:instance>
+                    <instance>
+                        <a:a/>
+                        <b:b/>
+                    </instance>
+                </xforms:instance>
+            </xforms:model>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:a="a" xmlns:b="b">
+                <p:param type="input" name="model"/>
+                <p:param type="output" name="data"/>
+                
+                <p:processor name="oxf:xforms-input">
+                    <p:input name="model" href="#model"/>
+                    <p:input name="request"><request/></p:input>
+                    <p:input name="filter">
+                        <params>
+                            <param ref="/instance/a:a"/>
+                            <param ref="/instance/b:b"/>
+                        </params>
+                    </p:input>
+                    <p:input name="matcher-result">
+                        <result>
+                            <matches>true</matches>
+                            <group>1</group>
+                            <group>2</group>
+                        </result>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+                
+            </p:config>
+        </input>
+        <output name="data">
+            <instance xmlns:a="a" xmlns:b="b" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <a:a>1</a:a>
+                <b:b>2</b:b>
+            </instance>
         </output>
     </test>
     

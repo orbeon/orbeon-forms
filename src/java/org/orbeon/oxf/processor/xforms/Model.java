@@ -13,10 +13,17 @@
  */
 package org.orbeon.oxf.processor.xforms;
 
-import org.dom4j.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentFactory;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.Namespace;
+import org.dom4j.Node;
+import org.dom4j.QName;
 import org.dom4j.util.UserDataDocumentFactory;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.output.BooleanModelItemProperty;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
@@ -25,25 +32,34 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
+import org.orbeon.saxon.functions.FunctionLibrary;
+import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.type.ItemType;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.StringValue;
 import org.orbeon.saxon.xpath.StandaloneContext;
 import org.orbeon.saxon.xpath.XPathEvaluator;
 import org.orbeon.saxon.xpath.XPathException;
-import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.om.Item;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.helpers.NamespaceSupport;
 
 import java.net.MalformedURLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * Represents information from the XForms model.
@@ -59,11 +75,77 @@ public class Model {
     private String action;
     private String encoding;
     private List binds = new ArrayList();
+    private Document initialInstance;
 
     private FunctionLibrary xformsFunctionLibrary = new XFormsFunctionLibrary();
 
-    public Model(PipelineContext pipelineContext) {
-        this.pipelineContext = pipelineContext;
+    public Model(PipelineContext pipelineContext, Document modelDocument) {
+        try {
+            this.pipelineContext = pipelineContext;
+            Element modelElement = modelDocument.getRootElement();
+
+            // Basic check trying to make sure this is an XForms model
+            {
+                String rootNamespaceURI = modelElement.getNamespaceURI();
+                if (!rootNamespaceURI.equals(Constants.XFORMS_NAMESPACE_URI))
+                    throw new ValidationException("Root element of XForms model must be in namespace '"
+                            + Constants.XFORMS_NAMESPACE_URI + "'. Found instead: '" + rootNamespaceURI + "'",
+                            (LocationData) modelElement.getData());
+            }
+
+            // Get values from attributes on root element
+            {
+                id = modelElement.attributeValue("id");
+                schema = modelElement.attributeValue("schema");
+                if (schema != null) {
+                    String systemID = ((LocationData) modelElement.getData()).getSystemID();
+                    schema = URLFactory.createURL(systemID, schema).toString();
+                }
+            }
+
+            // Get info from <xforms:submission> element
+            {
+                Element submissionElement = modelElement.element(new QName("submission", Constants.XFORMS_NAMESPACE));
+                if (submissionElement != null) {
+                    method = submissionElement.attributeValue("method");
+                    action = submissionElement.attributeValue("action");
+                    encoding = submissionElement.attributeValue("encoding");
+                }
+            }
+
+            // Get info from <xforms:bind> elements
+            handleBindContainer(modelElement, null);
+
+            // Get initial instance
+            {
+                Element instanceContainer = modelElement.element(new QName("instance", Constants.XFORMS_NAMESPACE));
+                if (instanceContainer != null) {
+                    Element initialInstanceRoot = (Element)
+                            Dom4jUtils.cloneNode((Element) instanceContainer.elements().get(0));
+                    initialInstance = DocumentHelper.createDocument();
+                    initialInstance.setRootElement(initialInstanceRoot);
+                }
+            }
+
+        } catch (MalformedURLException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    private void handleBindContainer(Element container, ModelBind parent) {
+        for (Iterator i = container.elements(new QName("bind", Constants.XFORMS_NAMESPACE)).iterator(); i.hasNext();) {
+            Element bind = (Element) i.next();
+            ModelBind modelBind = new ModelBind(bind.attributeValue("id"), bind.attributeValue("nodeset"),
+                    bind.attributeValue("relevant"), bind.attributeValue("calculate"), bind.attributeValue("type"),
+                    bind.attributeValue("constraint"), bind.attributeValue("required"), bind.attributeValue("readonly"),
+                    XMLUtils.getNamespaceContext(bind), (LocationData) bind.getData());
+            if (parent != null) {
+                parent.addChild(modelBind);
+                modelBind.setParent(parent);
+            }
+            binds.add(modelBind);
+            handleBindContainer(bind, modelBind);
+        }
     }
 
     /**
@@ -546,6 +628,10 @@ public class Model {
 
     public String getEncoding() {
         return encoding;
+    }
+
+    public Document getInitialInstance() {
+        return initialInstance;
     }
 
     public List getBindNodeset(PipelineContext context, ModelBind bind, DocumentWrapper wrapper, Document instance) {

@@ -16,6 +16,8 @@ package org.orbeon.oxf.processor;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.QName;
+import org.dom4j.Namespace;
+import org.dom4j.Attribute;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
@@ -29,6 +31,8 @@ import org.orbeon.oxf.resources.URLFactory;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 import java.net.URL;
 import java.net.MalformedURLException;
 
@@ -77,6 +81,7 @@ public class ProcessorUtils {
         if (processorFactory == null)
             throw new OXFException("Cannot find processor factory with name '"
                     + processorName.getNamespacePrefix() + ":" + processorName.getName() + "'");
+
         Processor processor = processorFactory.createInstance(pipelineContext);
 
         // Connect inputs
@@ -85,8 +90,12 @@ public class ProcessorUtils {
             String name = XPathUtils.selectStringValue(inputElement, "@name");
             if (XPathUtils.selectStringValue(inputElement, "@href") == null) {
                 // Case of embedded XML
-                Node data = (Node) ((Element) inputElement).elementIterator().next();
-                DOMGenerator domGenerator = new DOMGenerator(Dom4jUtils.cloneNode(data));
+                Element originalElement = (Element) ((Element) inputElement).elementIterator().next();
+                if (originalElement == null)
+                    throw new OXFException("Input content is mandatory");
+                Element copiedElement = originalElement.createCopy();
+                addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
+                DOMGenerator domGenerator = new DOMGenerator(copiedElement);
                 PipelineUtils.connect(domGenerator, "data", processor, name);
             } else {
                 // Href
@@ -107,5 +116,38 @@ public class ProcessorUtils {
             }
         }
         return processor;
+    }
+
+    public static void addNeededNamespaceDeclarations(Element originalElement, Element copyElement, Set alreadyDeclaredPrefixes) {
+        Set newAlreadyDeclaredPrefixes = new HashSet(alreadyDeclaredPrefixes);
+
+        // Add namespaces declared on this element
+        for (Iterator i = copyElement.declaredNamespaces().iterator(); i.hasNext();) {
+            Namespace namespace = (Namespace) i.next();
+            newAlreadyDeclaredPrefixes.add(namespace.getPrefix());
+        }
+
+        // Add element prefix if needed
+        String elementPrefix = copyElement.getNamespace().getPrefix();
+        if (elementPrefix != null && !newAlreadyDeclaredPrefixes.contains(elementPrefix)) {
+            copyElement.addNamespace(elementPrefix, originalElement.getNamespaceForPrefix(elementPrefix).getURI());;
+            newAlreadyDeclaredPrefixes.add(elementPrefix);
+        }
+
+        // Add attribute prefixes if needed
+        for (Iterator i = copyElement.attributes().iterator(); i.hasNext();) {
+            Attribute attribute = (Attribute) i.next();
+            String attributePrefix = attribute.getNamespace().getPrefix();
+            if (attributePrefix != null && !newAlreadyDeclaredPrefixes.contains(attribute.getNamespace().getPrefix())) {
+                copyElement.addNamespace(attributePrefix, originalElement.getNamespaceForPrefix(attributePrefix).getURI());
+                newAlreadyDeclaredPrefixes.add(attributePrefix);
+            }
+        }
+
+        // Get needed namespace declarations for children
+        for (Iterator i = copyElement.elements().iterator(); i.hasNext();) {
+            Element child = (Element) i.next();
+            addNeededNamespaceDeclarations(originalElement, child, newAlreadyDeclaredPrefixes);
+        }
     }
 }

@@ -30,6 +30,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.DocumentDelegate;
 import org.orbeon.oxf.xml.dom4j.ElementDelegate;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.net.MalformedURLException;
 import java.util.HashMap;
@@ -464,39 +465,23 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 addOutput(xformsModel);
             }});
 
-            // Modify instance using params
-            final ASTOutput[] paramedInstance = new ASTOutput[1];
-            final Document[] paramsDocument = new Document[1];
-            final List params = pageElement.elements("param");
-            if (!params.isEmpty()) {
-                paramsDocument[0] = DocumentHelper.createDocument(DocumentHelper.createElement("params"));
-                final Document _paramsDocument = paramsDocument[0];
-                for (Iterator j = params.iterator(); j.hasNext();) {
-                    Node node = (Node) j.next();
-                    _paramsDocument.getRootElement().add((Node) node.clone());
-                }
-                paramedInstance[0] = new ASTOutput("data", "paramed-instance");
-                statementsList.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("instance", new ASTHrefId(xformsModel)));
-                    addInput(new ASTInput("config", new ASTHrefURL("oxf:/oxf/private/page-flow/params.xpl")));
-                    addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));
-                    addInput(new ASTInput("params", _paramsDocument));
-                    addOutput(new ASTOutput("instance", paramedInstance[0]));
-                }});
-            } else {
-                paramedInstance[0] = xformsModel;
-            }
-
             // Execute XForms Input
             xformedInstance[0] = new ASTOutput("instance", "xformed-instance");
+            final List params = pageElement.elements("param");
             statementsList.add(new ASTProcessorCall(XMLConstants.XFORMS_INPUT_PROCESSOR_QNAME) {{
                 addInput(new ASTInput("model", new ASTHrefId(xformsModel)));
                 if(!params.isEmpty()) {
-                    addInput(new ASTInput("instance", new ASTHrefId(paramedInstance[0])));
-                    addInput(new ASTInput("filter", paramsDocument[0]));
+                    // Create document with params
+                    Document paramsDocument = DocumentHelper.createDocument(DocumentHelper.createElement("params"));
+                    for (Iterator j = params.iterator(); j.hasNext();) {
+                        Element paramElement = (Element) j.next();
+                        paramsDocument.getRootElement().add(Dom4jUtils.cloneNode(paramElement));
+                    }
+                    addInput(new ASTInput("filter", paramsDocument));
+                    addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));
                 } else {
-                    addInput(new ASTInput("instance", new ASTHrefXPointer(new ASTHrefId(xformsModel), EXTRACT_INSTANCE_XPATH)));
                     addInput(new ASTInput("filter", XMLUtils.NULL_DOCUMENT));
+                    addInput(new ASTInput("matcher-result", XMLUtils.NULL_DOCUMENT));
                 }
                 addInput(new ASTInput("request", new ASTHrefId(requestWithParameters)));
                 addOutput(xformedInstance[0]);

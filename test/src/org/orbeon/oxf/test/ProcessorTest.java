@@ -16,7 +16,11 @@ package org.orbeon.oxf.test;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import org.dom4j.*;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Namespace;
+import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -37,16 +41,34 @@ import org.orbeon.oxf.xml.XPathUtils;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.servlet.*;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.Servlet;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Principal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 public class ProcessorTest extends TestCase {
 
@@ -147,7 +169,7 @@ public class ProcessorTest extends TestCase {
                         if (originalElement == null)
                             throw new OXFException("Output content is mandatory");
                         Element copiedElement = originalElement.createCopy();
-                        addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
+                        ProcessorUtils.addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
                         doc = XMLUtils.createDOM4JDocument();
                         doc.add(copiedElement);
                     } else {
@@ -320,6 +342,7 @@ public class ProcessorTest extends TestCase {
                                 // Get expected
                                 DOMSerializer domSerializer = (DOMSerializer) domSerializersIterator.next();
                                 Document expectedData = (Document) expectedNodesIterator.next();
+                                // TODO: we want to remove that (avernet 2004-12-14)
                                 removeUnusedNamespaceDeclarations(expectedData.getRootElement());
 
                                 // Run serializer
@@ -327,13 +350,12 @@ public class ProcessorTest extends TestCase {
 
                                 // Get actual data
                                 Document actualData = domSerializer.getNode(pipelineContext);
+                                // TODO: we want to remove that (avernet 2004-12-14)
                                 removeUnusedNamespaceDeclarations(actualData.getRootElement());
 
                                 // Compare converting to strings
                                 expectedDataString = XMLUtils.domToString(expectedData);
                                 actualDataString = XMLUtils.domToString(actualData);
-//                                expectedDataString = domToString(expectedData);
-//                                actualDataString = domToString(actualData);
                                 boolean outputPassed = expectedDataString.equals(actualDataString);
 
                                 // Display if test not passed
@@ -369,39 +391,6 @@ public class ProcessorTest extends TestCase {
 
         public String getActualDataString() {
             return actualDataString;
-        }
-    }
-
-    private static void addNeededNamespaceDeclarations(Element originalElement, Element copyElement, Set alreadyDeclaredPrefixes) {
-        Set newAlreadyDeclaredPrefixes = new HashSet(alreadyDeclaredPrefixes);
-
-        // Add namespaces declared on this element
-        for (Iterator i = copyElement.declaredNamespaces().iterator(); i.hasNext();) {
-            Namespace namespace = (Namespace) i.next();
-            newAlreadyDeclaredPrefixes.add(namespace.getPrefix());
-        }
-
-        // Add element prefix if needed
-        String elementPrefix = copyElement.getNamespace().getPrefix();
-        if (elementPrefix != null && !newAlreadyDeclaredPrefixes.contains(elementPrefix)) {
-            copyElement.addNamespace(elementPrefix, originalElement.getNamespaceForPrefix(elementPrefix).getURI());;
-            newAlreadyDeclaredPrefixes.add(elementPrefix);
-        }
-
-        // Add attribute prefixes if needed
-        for (Iterator i = copyElement.attributes().iterator(); i.hasNext();) {
-            Attribute attribute = (Attribute) i.next();
-            String attributePrefix = attribute.getNamespace().getPrefix();
-            if (attributePrefix != null && !newAlreadyDeclaredPrefixes.contains(attribute.getNamespace().getPrefix())) {
-                copyElement.addNamespace(attributePrefix, originalElement.getNamespaceForPrefix(attributePrefix).getURI());
-                newAlreadyDeclaredPrefixes.add(attributePrefix);
-            }
-        }
-
-        // Get needed namespace declarations for children
-        for (Iterator i = copyElement.elements().iterator(); i.hasNext();) {
-            Element child = (Element) i.next();
-            addNeededNamespaceDeclarations(originalElement, child, newAlreadyDeclaredPrefixes);
         }
     }
 

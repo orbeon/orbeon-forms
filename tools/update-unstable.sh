@@ -14,4 +14,4 @@ then
   rm $BOGUSCERT
 fi  
 
-echo  y | sitecopy -u studio-unstable
+echo  y | sitecopy -u $SITE

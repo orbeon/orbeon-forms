@@ -24,11 +24,11 @@
     <div2 id="output-invariance">
         <head>Output Invariance</head>
         <p>
-            Multiple statements may consume XML Infoset in a pipeline by referencing the
-            same XML Infoset identifier. These consumers may request the XML Infoset at
-            different times during pipeline execution. The XPL implementation must make sure
-            that the XML Infoset read by those different processors is the same for a given
-            execution of a sequence of statements.
+            Multiple statements may consume XML Infoset in an XPL program by referencing the same
+            XML Infoset identifier. These consumers may request the XML Infoset at different times
+            during program execution. The XPL implementation must make sure that the XML Infoset
+            read by those different processors is the same for a given execution of a sequence of
+            statements.
         </p>
     </div2>
     <div2 id="connections">
@@ -112,8 +112,8 @@
             </item>
         </ulist>
         <p>
-            If a processor does not have any connected output, the execution of the
-            processor terminates with the end of the initialization phase.
+            If a processor does not have any declared output, the execution of the processor
+            terminates with the end of the initialization phase.
         </p>
         <p>
             When a processor has at least one output, execution of the processor may resume
@@ -159,10 +159,10 @@
             This is entirely left to the implementor of the XML processor.
         </p>
         <p>
-            There is no guarantee that a processor in a pipeline will be initialized, or
-            will have any read phase after an initialization phase. The only guarantee of
-            execution is that if an XML processor does not have any outputs and is declared
-            in a sequence of statements which is executed, then it will be initialized.
+            There is no guarantee that a processor in an XPL program will be initialized, or will
+            have any read phase after an initialization phase. The only guarantee of execution is
+            that if an XML processor does not have any outputs and is declared in a sequence of
+            statements which is executed, then it will be initialized.
         </p>
     </div2>
     <div2>
@@ -185,7 +185,7 @@
             </item>
             <item>
                 <p>
-                    A list of statements in the sequence that do not have any connected output is
+                    A list of statements in the sequence that do not have any declared output is
                     established in document order (in the order they appear in the XPL program).
                     Each statement in the list is then <emph>initialized</emph> in that order.
                 </p>
@@ -244,15 +244,15 @@
     <div2>
         <head>XPL Program Execution</head>
         <p>
-            The execution of an XPL pipeline consists in executing the sequence of statements
+            The execution of an XPL program consists in executing the sequence of statements
             contained under the <el>p:pipeline</el> element.
         </p>
         <p>
             After the initialization phase, the XPL implementation may request XML Infosets
-            associated with pipeline outputs. To achieve this, <el>href</el> attribute
-            associated with the pipeline output to read is evaluated. This may cause
-            requesting one or more XML Infosets exposed by the sequence of statements,
-            therefore executing one or more read phases on the sequence of statements.
+            associated with XPL program outputs. To achieve this, <el>href</el> attribute associated
+            with the XPL program output to read is evaluated. This may cause requesting one or more
+            XML Infosets exposed by the sequence of statements, therefore executing one or more read
+            phases on the sequence of statements.
         </p>
     </div2>
     <div2>

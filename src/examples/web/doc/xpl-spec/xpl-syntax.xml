@@ -24,8 +24,8 @@
             <head>The <el>p:pipeline</el> Element</head>
             <pre>
 &lt;p:pipeline
-version = "1.0" &gt;
-&lt;!-- Content: (p:input*, p:output*, (p:processor | p:choose | p:for-each)*) --&gt;
+    version = "1.0" &gt;
+    &lt;!-- Content: (p:input*, p:output*, (p:processor | p:choose | p:for-each)*) --&gt;
 &lt;/p:pipeline&gt;
             </pre>
             <p>
@@ -47,10 +47,10 @@ version = "1.0" &gt;
             <head>The <el>p:input</el> Element</head>
             <pre>
 &lt;p:input
-name = <emph>ncname</emph>
-id? = <emph>ncname</emph>
-schema-uri? = <emph>uri-reference</emph>
-schema-href? = <emph>uri-reference</emph> /&gt;
+    name = <emph>ncname</emph>
+    id? = <emph>ncname</emph>
+    schema-uri? = <emph>uri-reference</emph>
+    schema-href? = <emph>uri-reference</emph> /&gt;
             </pre>
             <p>
                 The <el>p:input</el> element defines exactly one XPL program input. Zero,
@@ -87,10 +87,10 @@ schema-href? = <emph>uri-reference</emph> /&gt;
             <head>The <el>p:output</el> Element</head>
             <pre>
 &lt;p:output
-name = <emph>ncname</emph>
-href = <emph>infoset-reference</emph>
-schema-uri? = <emph>uri-reference</emph>
-schema-href? = <emph>uri-reference</emph> /&gt;
+    name = <emph>ncname</emph>
+    href = <emph>infoset-reference</emph>
+    schema-uri? = <emph>uri-reference</emph>
+    schema-href? = <emph>uri-reference</emph> /&gt;
             </pre>
             <p>
                 The <el>p:output</el> element within a <el>p:pipeline</el> element defines
@@ -132,8 +132,8 @@ schema-href? = <emph>uri-reference</emph> /&gt;
             <head>The <el>p:processor</el> Element</head>
             <pre>
 &lt;p:processor
-name = <emph>qname</emph> &gt;
-&lt;!-- Content: (p:input* | p:output*) --&gt;
+    name = <emph>qname</emph> &gt;
+    &lt;!-- Content: (p:input* | p:output*) --&gt;
 &lt;/p:processor&gt;
             </pre>
             <p>
@@ -167,11 +167,11 @@ name = <emph>qname</emph> &gt;
             <head>The <el>p:input</el> Element</head>
             <pre>
 &lt;p:input
-name = <emph>ncname</emph>
-href? = <emph>infoset-reference</emph>
-schema-uri? = <emph>uri-reference</emph>
-schema-href? = <emph>uri-reference</emph> &gt;
-&lt;!-- Content: (embedded-infoset)? --&gt;
+    name = <emph>ncname</emph>
+    href? = <emph>infoset-reference</emph>
+    schema-uri? = <emph>uri-reference</emph>
+    schema-href? = <emph>uri-reference</emph> &gt;
+    &lt;!-- Content: (embedded-infoset)? --&gt;
 &lt;/p:input&gt;
             </pre>
             <p>
@@ -206,10 +206,10 @@ schema-href? = <emph>uri-reference</emph> &gt;
             <head>The <el>p:output</el> Element</head>
             <pre>
 &lt;p:output
-name = <emph>ncname</emph>
-id = <emph>ncname</emph>
-schema-uri? = <emph>uri-reference</emph>
-schema-href? = <emph>uri-reference</emph> &gt;
+    name = <emph>ncname</emph>
+    id = <emph>ncname</emph>
+    schema-uri? = <emph>uri-reference</emph>
+    schema-href? = <emph>uri-reference</emph> &gt;
 &lt;/p:output&gt;
             </pre>
             <p>
@@ -245,8 +245,8 @@ schema-href? = <emph>uri-reference</emph> &gt;
             <head>The <el>p:choose</el> Element</head>
             <pre>
 &lt;p:choose
-href = <emph>infoset-reference</emph> &gt;
-&lt;!-- Content: (p:output*, p:when+, p:otherwise?) --&gt;
+    href = <emph>infoset-reference</emph> &gt;
+    &lt;!-- Content: (p:output*, p:when+, p:otherwise?) --&gt;
 &lt;/p:choose&gt;
             </pre>
             <p>
@@ -275,10 +275,11 @@ href = <emph>infoset-reference</emph> &gt;
         <div3>
             <head>The <el>p:output</el> Element</head>
             <pre>
-&lt;p:output id = <emph>ncname</emph>
-          href = <emph>infoset-reference</emph>
-          schema-uri? = <emph>uri-reference</emph>
-          schema-href? = <emph>uri-reference</emph> /&gt;
+&lt;p:output
+    id = <emph>ncname</emph>
+    href = <emph>infoset-reference</emph>
+    schema-uri? = <emph>uri-reference</emph>
+    schema-href? = <emph>uri-reference</emph> /&gt;
             </pre>
             <p>
                 The <el>p:output</el> element defines what XML Infoset identifers are exposed by the
@@ -301,8 +302,8 @@ href = <emph>infoset-reference</emph> &gt;
             <head>The <el>p:when</el> Element</head>
             <pre>
 &lt;p:when
-test = <emph>expression</emph> &gt;
-&lt;!-- Content: (p:processor | p:choose | p:for-each)* --&gt;
+    test = <emph>expression</emph> &gt;
+    &lt;!-- Content: (p:processor | p:choose | p:for-each)* --&gt;
 &lt;/p:when&gt;
             </pre>
             <p>
@@ -325,7 +326,7 @@ test = <emph>expression</emph> &gt;
             <head>The <el>p:otherwise</el> Element</head>
             <pre>
 &lt;p:otherwise&gt;
-&lt;!-- Content: (p:processor | p:choose | p:for-each)* --&gt;
+    &lt;!-- Content: (p:processor | p:choose | p:for-each)* --&gt;
 &lt;/p:otherwise&gt;
             </pre>
             <p>
@@ -367,11 +368,11 @@ test = <emph>expression</emph> &gt;
             <head>The <el>p:for-each</el> Element</head>
             <pre>
 &lt;p:for-each
-href = <emph>infoset-reference</emph>
-select = <emph>expression</emph>
-schema-href? <emph>uri-reference</emph>
-schema-uri? <emph>uri-reference</emph> &gt;
-&lt;!-- Content: (p:output?, (p:processor | p:choose | p:for-each)*) --&gt;
+    href = <emph>infoset-reference</emph>
+    select = <emph>expression</emph>
+    schema-href? <emph>uri-reference</emph>
+    schema-uri? <emph>uri-reference</emph> &gt;
+    &lt;!-- Content: (p:output?, (p:processor | p:choose | p:for-each)*) --&gt;
 &lt;/p:for-each&gt;
             </pre>
             <p>
@@ -412,10 +413,10 @@ schema-uri? <emph>uri-reference</emph> &gt;
             <head>The <el>p:output</el> Element</head>
             <pre>
 &lt;p:output
-href = <emph>infoset-reference</emph>
-id = <emph>ncname</emph>
-schema-uri? = <emph>uri-reference</emph>
-schema-href? = <emph>uri-reference</emph> &gt;
+    href = <emph>infoset-reference</emph>
+    id = <emph>ncname</emph>
+    schema-uri? = <emph>uri-reference</emph>
+    schema-href? = <emph>uri-reference</emph> &gt;
 &lt;/p:output&gt;
             </pre>
             <p>

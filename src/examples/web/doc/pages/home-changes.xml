@@ -292,8 +292,9 @@
                 <title>Custom Processors</title>
                 <p>
                     There is a new facility to declare custom processors that does not involve
-                    modifying the original <code>processors.xml</code> file.
-                    <!-- TODO -->
+                    modifying the original <code>processors.xml</code> file. To do this, create a
+                    file called <code>oxf:/config/custom-processors.xml</code>. Its format is the
+                    same as the original <code>processors.xml</code>.
                 </p>
                 <p>
                     The <code>Processor</code> API has been enhanced to provide access to the inputs
@@ -313,13 +314,7 @@
             <section>
                 <title>J2SE 5.0 Support</title>
                 <p>
-                    TODO
-                </p>
-            </section>
-            <section>
-                <title>Tomcat 5.0 Support</title>
-                <p>
-                    TODO
+                    The source code of Presentation Server now compiles with Java 5.
                 </p>
             </section>
         </section>

@@ -13,224 +13,131 @@
  */
 package org.orbeon.oxf.processor.serializer;
 
-import org.apache.log4j.Logger;
-import org.dom4j.Element;
+import org.dom4j.Namespace;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.processor.serializer.store.ResultStore;
-import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
-import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.processor.XMLConstants;
+import org.orbeon.oxf.util.Base64ContentHandler;
+import org.orbeon.oxf.util.TextContentHandler;
+import org.orbeon.oxf.xml.ContentHandlerAdapter;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
-public abstract class HttpSerializer extends CachedSerializer {
+/**
+ * This serializer is a generic HTTP serializer able to serialize text as well as binary.
+ */
+public class HttpSerializer extends HttpSerializerBase {
 
-    static private Logger logger = LoggerFactory.createLogger(HttpSerializer.class);
+    public static final String HTTP_SERIALIZER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/http-serializer";
 
-    protected abstract String getDefaultContentType();
+    public static final String DEFAULT_BINARY_CONTENT_TYPE = "application/octet-stream";
+    public static final String DEFAULT_TEXT_CONTENT_TYPE = "text/plain";
 
-    protected HttpSerializer() {
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SERIALIZER_CONFIG_NAMESPACE_URI));
+    protected String getDefaultContentType() {
+        return DEFAULT_BINARY_CONTENT_TYPE;
     }
 
-    public void start(PipelineContext context) {
+    protected String getConfigSchemaNamespaceURI() {
+        return HTTP_SERIALIZER_CONFIG_NAMESPACE_URI;
+    }
+
+    protected void readInput(PipelineContext context, final ExternalContext.Response response, ProcessorInput input, Object _config, final OutputStream outputStream) {
         try {
+            final Config config = (Config) _config;
+            readInputAsSAX(context, input, new ContentHandlerAdapter() {
+                private ContentHandler outputContentHandler;
+                private int elementLevel = 0;
+                private Map prefixMappings;
 
-            final Config config = readConfig(context);
-
-            ProcessorInput dataInput = getInputByName(INPUT_DATA);
-
-            ExternalContext externalContext = (ExternalContext) context.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-            ExternalContext.Response response = externalContext.getResponse();
-
-            // Compute headers
-            if (externalContext != null) {
-
-                // Send an error if needed and return immediately
-                int errorCode = config.errorCode;
-                if (errorCode != DEFAULT_ERROR_CODE) {
-                    response.sendError(errorCode);
-                    return;
+                public void startPrefixMapping(String prefix, String uri) {
+                    if (elementLevel == 0) {
+                        // Record definitions only before root element arrives
+                        if (prefixMappings == null)
+                            prefixMappings = new HashMap();
+                        prefixMappings.put(prefix, uri);
+                    }
                 }
 
-                // Content type / encoding and status
-                // charset info is not set if we are a BinarySerializer (PDF, Image, etc..)
-                String contentTypeHeader = config.contentType;
-                if(!(this instanceof HttpBinarySerializer))
-                    contentTypeHeader = contentTypeHeader + "; charset=" + config.encoding;
-                int statusCode = config.statusCode;
+                public void startElement(String namespaceURI, String localName, String qName, Attributes atts) {
+                    if (elementLevel++ == 0) {
+                        // This is the root element
 
-                // Get last modification date and compute last modified if possible
-                Object validity = getInputValidity(context, dataInput);
-                long lastModified = (validity != null) ? findLastModified(validity) : 0;
+                        // Get xsi:type attribute and determine whether the input is binary or text
+                        String xsiType = atts.getValue(XMLConstants.XSI_TYPE_QNAME.getNamespaceURI(), XMLConstants.XSI_TYPE_QNAME.getName());
 
-                if (logger.isDebugEnabled())
-                    logger.debug("Last modified: " + lastModified);
+                        if (xsiType == null)
+                            throw new OXFException("Root element must contain an xsi:type attribute");
 
-                // Set headers
-                response.setContentType(contentTypeHeader);
-                response.setStatus(statusCode);
-                // Set caching headers and force revalidation
-                response.setCaching(lastModified, true, true);
+                        int colonIndex = xsiType.indexOf(':');
+                        if (colonIndex == -1)
+                            throw new OXFException("Type xs:string or xs:base64Binary must be specified");
 
-                // Check If-Modified-Since (conditional GET) and don't return content if condition is met
-                if (!response.checkIfModifiedSince(lastModified, true)) {
-                    response.setStatus(ExternalContext.SC_NOT_MODIFIED);
-                    if (logger.isDebugEnabled())
-                        logger.debug("Sending SC_NOT_MODIFIED");
-                    return;
-                }
+                        String typePrefix = xsiType.substring(0, colonIndex);
+                        String typeLocalName = xsiType.substring(colonIndex + 1);
+                        String typeNamespaceURI = (String) prefixMappings.get(typePrefix);
 
-                // Set custom headers
-                for(Iterator i = config.headers.iterator(); i.hasNext();){
-                    String name = (String) i.next();
-                    String value = (String) i.next();
-                    response.setHeader(name, value);
-                }
-            }
+                        if (typeNamespaceURI == null)
+                            throw new OXFException("Undeclared prefix in xsi:type: " + typePrefix);
 
-            // If we have an empty body, return w/o reading the data input
-            if (config.empty)
-                return;
+                        QName typeQName = new QName(typeLocalName, new Namespace(typePrefix, typeNamespaceURI));
+                        boolean isBinaryInput;
+                        if (typeQName.equals(XMLConstants.XS_BASE64BINARY_QNAME)) {
+                            isBinaryInput = true;
+                        } else if (typeQName.equals(XMLConstants.XS_STRING_QNAME)) {
+                            isBinaryInput = false;
+                        } else
+                            throw new OXFException("Type xs:string or xs:base64Binary must be specified");
 
-            final OutputStream httpOutputStream = response.getOutputStream();
+                        // Set ContentHandler and headers depending on input type
+                        String contentTypeAttribute = atts.getValue("content-type");
+                        if (isBinaryInput) {
+                            // Get content-type
+                            String contentType = getContentType(config, contentTypeAttribute, DEFAULT_BINARY_CONTENT_TYPE);
 
-            if (config.cacheUseLocalCache) {
-                // If local caching of the data is enabled, use the caching API
-                // We return a ResultStore
-                final boolean[] read = new boolean[1];
-                ResultStore resultStore = (ResultStore) readCacheInputAsObject(context, dataInput, new CacheableInputReader() {
-                    public Object read(PipelineContext context, ProcessorInput input) {
-                        read[0] = true;
-                        if (logger.isDebugEnabled())
-                            logger.debug("Output not cached");
-                        try {
-                            ResultStoreOutputStream resultStoreOutputStream = new ResultStoreOutputStream(httpOutputStream);
-                            readInput(context, input, config, resultStoreOutputStream);
-                            resultStoreOutputStream.close();
-                            return resultStoreOutputStream;
-                        } catch (IOException e) {
-                            throw new OXFException(e);
+                            response.setContentType(contentType);
+
+                            outputContentHandler = new Base64ContentHandler(outputStream);
+                        } else {
+                            // Get content-type and encoding
+                            String contentType = getContentType(config, contentTypeAttribute, DEFAULT_TEXT_CONTENT_TYPE);
+                            String encoding = getEncoding(config, contentTypeAttribute, DEFAULT_ENCODING);
+
+                            // Always set the content type with a charset attribute
+                            response.setContentType(contentType + "; charset=" + encoding);
+
+                            Writer writer = null;
+                            try {
+                                writer = new OutputStreamWriter(outputStream, encoding);
+                            } catch (UnsupportedEncodingException e) {
+                                throw new OXFException(e);
+                            }
+                            outputContentHandler = new TextContentHandler(writer);
                         }
                     }
-                });
-
-                // If the output was obtained from the cache, just write it
-                if (!read[0]) {
-                    if (logger.isDebugEnabled())
-                        logger.debug("Serializer output cached");
-                    if (externalContext != null)
-                        response.setContentLength(resultStore.length(context));
-                    resultStore.replay(context);
                 }
-            } else {
-                // Local caching is not enabled
-                readInput(context, dataInput, config, httpOutputStream);
-                httpOutputStream.close();
-            }
+
+                public void endElement(String namespaceURI, String localName, String qName) {
+                    --elementLevel;
+                }
+
+                public void characters(char ch[], int start, int length) throws SAXException {
+                    outputContentHandler.characters(ch, start, length);
+                }
+            });
+
         } catch (Exception e) {
             throw new OXFException(e);
-        }
-    }
-
-    private Config readConfig(PipelineContext context) {
-        final Config config = (Config) readCacheInputAsObject(context, getInputByName(INPUT_CONFIG),
-                new CacheableInputReader() {
-                    public Object read(PipelineContext context, ProcessorInput input) {
-                        Element configElement = readInputAsDOM4J(context, input).getRootElement();
-                        try {
-                            String contentType = XPathUtils.selectStringValueNormalize(configElement, "/config/content-type");
-                            Integer statusCode = XPathUtils.selectIntegerValue(configElement, "/config/status-code");
-                            Boolean empty = XPathUtils.selectBooleanValue(configElement, "/config/empty-content");
-                            Integer errorCode = XPathUtils.selectIntegerValue(configElement, "/config/error-code");
-                            String method = XPathUtils.selectStringValueNormalize(configElement, "/config/method");
-                            String version = XPathUtils.selectStringValueNormalize(configElement, "/config/version");
-                            String publicDoctype = XPathUtils.selectStringValueNormalize(configElement, "/config/public-doctype");
-                            String systemDoctype = XPathUtils.selectStringValueNormalize(configElement, "/config/system-doctype");
-                            String encoding = XPathUtils.selectStringValueNormalize(configElement, "/config/encoding");
-                            String indent = XPathUtils.selectStringValueNormalize(configElement, "/config/indent");
-                            Integer indentAmount = XPathUtils.selectIntegerValue(configElement, "/config/indent-amount");
-                            String omitXMLDeclaration = XPathUtils.selectStringValueNormalize(configElement, "/config/omit-xml-declaration");
-                            String standalone = XPathUtils.selectStringValueNormalize(configElement, "/config/standalone");
-
-                            Config config = new Config();
-                            config.contentType = contentType == null ? getDefaultContentType() : contentType;
-                            config.statusCode = statusCode == null ? DEFAULT_STATUS_CODE : statusCode.intValue();
-                            config.empty = empty == null ? DEFAULT_EMPTY : empty.booleanValue();
-                            config.errorCode = errorCode == null ? DEFAULT_ERROR_CODE : errorCode.intValue();
-                            config.method = method;
-                            config.version = version;
-                            config.publicDoctype = publicDoctype;
-                            config.systemDoctype = systemDoctype;
-                            if (encoding != null)
-                                config.encoding = encoding;
-                            if (indent != null)
-                                config.indent = new Boolean(indent).booleanValue();
-                            if (indentAmount != null)
-                                config.indentAmount = indentAmount.intValue();
-                            if (omitXMLDeclaration != null)
-                                config.omitXMLDeclaration = new Boolean(omitXMLDeclaration).booleanValue();
-                            if (standalone != null)
-                                config.standalone = new Boolean(standalone).booleanValue();
-
-                            // Cache control
-                            config.cacheUseLocalCache = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/use-local-cache", DEFAULT_CACHE_USE_LOCAL_CACHE);
-
-                            // Headers
-                            for(Iterator i = XPathUtils.selectIterator(configElement, "/config/header"); i.hasNext();) {
-                                Element header = (Element)i.next();
-                                String name = header.element("name").getTextTrim();
-                                String value = header.element("value").getTextTrim();
-                                config.addHeader(name, value);
-                            }
-
-                            return config;
-                        } catch (Exception e) {
-                            throw new OXFException(e);
-                        }
-                    }
-                });
-        return config;
-    }
-
-
-    protected Writer getWriter(OutputStream outputStream, Config config) {
-        try {
-            return new OutputStreamWriter(outputStream, config.encoding);
-        } catch (UnsupportedEncodingException e) {
-            throw new OXFException(e);
-        }
-    }
-
-    protected static class Config {
-        String contentType;
-        int statusCode;
-        boolean empty;
-        int errorCode;
-        boolean indent = DEFAULT_INDENT;
-        int indentAmount = DEFAULT_INDENT_AMOUNT;
-        String method;
-        String version;
-        String publicDoctype;
-        String systemDoctype;
-        String encoding = DEFAULT_ENCODING;
-        boolean omitXMLDeclaration;
-        boolean standalone;
-        boolean cacheUseLocalCache;
-        List headers = new ArrayList();
-
-        public void addHeader(String name, String value){
-            headers.add(name);
-            headers.add(value);
         }
     }
 }

@@ -78,13 +78,13 @@
                 </section>
 			</section>
             <section>
-				<title>Binary HTTP Serializer</title>
+				<title>HTTP Serializer</title>
 				<p>
-                    A new serializer, the <a
-                    href="processors-serializers#binary-http-serializer">Binary HTTP serializer</a>,
-                    supports decoding of Base64-encoded data and sending the resulting binary
-                    stream. The <a href="/goto-example/xforms-upload">XForms Upload example</a>
-                    illustrates this capability.
+                    A new serializer, the <a href="processors-serializers#http-serializer">HTTP
+                    serializer</a>, supports decoding of binary or text data, and sending the
+                    resulting stream to an HTTP client. The <a
+                    href="/goto-example/xforms-upload">XForms Upload example</a> illustrates this
+                    capability.
                 </p>
 			</section>
             <section>

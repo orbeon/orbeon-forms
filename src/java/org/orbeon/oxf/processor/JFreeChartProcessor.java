@@ -238,5 +238,4 @@ public class JFreeChartProcessor extends JFreeChartSerializer {
             this.file = file;
         }
     }
-
 }

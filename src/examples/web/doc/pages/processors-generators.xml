@@ -473,8 +473,8 @@
                         configuration of the HTTP server.
                     </li>
                     <li>
-                        Use the content type in the <code>content-type</code> element, if
-                        specified.
+                        Use the content type in the <code>content-type</code> element of the
+                        configuration, if specified.
                     </li>
                     <li>
                         Use <code>application/xml</code>.
@@ -628,7 +628,7 @@
                     processors that do not require storing the entire stream of data in memory, for
                     example the <a href="processors-sql#binary-data">SQL processor</a> (with an
                     appropriate configuration to stream BLOBs), or the <a
-                    href="processors-serializers#binary-http-serializer">Binary HTTP serializer</a>.
+                    href="processors-serializers#http-serializer">HTTP serializer</a>.
                 </note>
             </section>
             <section>
@@ -671,7 +671,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                     processors that do not require storing the entire stream of data in memory, for
                     example the <a href="processors-sql#binary-data">SQL processor</a> (with an
                     appropriate configuration to stream BLOBs), or the <a
-                    href="processors-serializers#binary-http-serializer">Binary HTTP serializer</a>.
+                    href="processors-serializers#http-serializer">HTTP serializer</a>.
                 </note>
             </section>
             <section>

@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
@@ -267,7 +268,7 @@ public class FileSerializer extends CachedSerializer {
                             logger.debug("Output not cached");
                         try {
                             ResultStoreOutputStream resultStoreOutputStream = new ResultStoreOutputStream(fileOutputStream);
-                            readInput(context, input, config, resultStoreOutputStream);
+                            readInput(context, null, input, config, resultStoreOutputStream);
                             resultStoreOutputStream.close();
                             return resultStoreOutputStream;
                         } catch (IOException e) {
@@ -284,7 +285,7 @@ public class FileSerializer extends CachedSerializer {
                 }
             } else {
                 // Caching is not enabled
-                readInput(context, dataInput, config, fileOutputStream);
+                readInput(context, null, dataInput, config, fileOutputStream);
                 fileOutputStream.close();
             }
 
@@ -294,7 +295,7 @@ public class FileSerializer extends CachedSerializer {
     }
 
 
-    protected void readInput(PipelineContext context, ProcessorInput input, Object _config, OutputStream outputStream) {
+    protected void readInput(PipelineContext context, ExternalContext.Response response, ProcessorInput input, Object _config, OutputStream outputStream) {
         FileSerializer.Config config = (FileSerializer.Config) _config;
         Writer writer = getWriter(outputStream, config);
 

@@ -14,12 +14,26 @@
 package org.orbeon.oxf.processor.serializer;
 
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.ProcessorInput;
 
 import java.io.OutputStream;
 
-public abstract class HttpBinarySerializer extends HttpSerializer {
-    protected final void readInput(PipelineContext context, ProcessorInput input, Object config, OutputStream outputStream) {
+/**
+ * Legacy HTTP binary serializer. This is deprecated by HttpSerializer.
+ */
+public abstract class HttpBinarySerializer extends HttpSerializerBase {
+    protected final void readInput(PipelineContext context, ExternalContext.Response response, ProcessorInput input, Object _config, OutputStream outputStream) {
+
+        Config config = (Config) _config;
+
+        // Set content type
+        if (response != null) {
+            String contentType = getContentType(config, null, getDefaultContentType());
+            response.setContentType(contentType);
+        }
+
+        // Read input into an OutputStream
         readInput(context, input, (Config) config, outputStream);
     }
 

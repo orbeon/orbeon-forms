@@ -24,6 +24,8 @@ import org.orbeon.oxf.processor.pipeline.AggregatorProcessor;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.processor.serializer.FileSerializer;
+import org.orbeon.oxf.processor.serializer.JFreeChartSerializer;
+import org.orbeon.oxf.processor.serializer.HttpSerializer;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.transformer.TraxTransformer;
 import org.orbeon.oxf.processor.transformer.xslt.XSLT1Transformer;
@@ -62,9 +64,13 @@ public class SchemaRepository {
         schemas.put(RequestSecurityGenerator.REQUEST_SECURITY_NAMESPACE_URI, "schemas/request-security.rng");
         schemas.put(SignatureVerifierProcessor.SIGNATURE_DATA_URI, "schemas/signature.rng");
         schemas.put(SignatureVerifierProcessor.SIGNATURE_PUBLIC_KEY_URI, "schemas/public-key.rng");
-//        schemas.put(LicenseCheck.LICENSE_URI, "schemas/license.rng");
+
+        // Serializers schemas
         schemas.put(CachedSerializer.SERIALIZER_CONFIG_NAMESPACE_URI, "schemas/serializer-config.rng");
-        schemas.put(CachedSerializer.JFCHART_SERIALIZER_CONFIG_NAMESPACE_URI, "schemas/chart-config.rng");
+        schemas.put(HttpSerializer.HTTP_SERIALIZER_CONFIG_NAMESPACE_URI, "schemas/http-serializer-config.rng");
+        schemas.put(JFreeChartSerializer.JFCHART_SERIALIZER_CONFIG_NAMESPACE_URI, "schemas/chart-config.rng");
+        schemas.put(FileSerializer.FILE_SERIALIZER_CONFIG_NAMESPACE_URI, "schemas/file-serializer-config.rng");
+
         schemas.put(EmailProcessor.EMAIL_CONFIG_NAMESPACE_URI, "schemas/email.rng");
         schemas.put(BeanGenerator.BEAN_CONFIG_NAMESPACE_URI, "schemas/bean-generator-config.rng");
         schemas.put(ResourceServer.RESOURCE_SERVER_NAMESPACE_URI, "schemas/resource-server.rng");
@@ -79,7 +85,6 @@ public class SchemaRepository {
 
         schemas.put(XSLTTransformer.XSLT_TRANSFORMER_CONFIG_NAMESPACE_URI, "schemas/xslt-transformer-config.rng");
         schemas.put(TraxTransformer.TRAX_TRANSFORMER_CONFIG_NAMESPACE_URI, "schemas/trax-transformer-config.rng");
-        schemas.put(FileSerializer.FILE_SERIALIZER_CONFIG_NAMESPACE_URI, "schemas/file-serializer-config.rng");
         schemas.put(PageFlowControllerProcessor.CONTROLLER_NAMESPACE_URI, "schemas/page-flow-controller-runtime.xsd");
         schemas.put(MSVValidationProcessor.ORBEON_ERROR_NS, "schemas/validation-config.rng");
         schemas.put(DirectoryGenerator.DIRECTORY_GENERATOR_NAMESPACE_URI, "schemas/directory-generator-config.rng");

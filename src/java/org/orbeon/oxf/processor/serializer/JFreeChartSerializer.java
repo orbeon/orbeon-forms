@@ -44,6 +44,8 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
     private static Logger logger = LoggerFactory.createLogger(JFreeChartSerializer.class);
 
+    public static final String JFCHART_SERIALIZER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/serializer/jfchart";
+
     public static String DEFAULT_CONTENT_TYPE = "image/png";
     public static final String INPUT_CHART = "chart";
 
@@ -52,7 +54,7 @@ public class JFreeChartSerializer extends HttpBinarySerializer {
 
     public JFreeChartSerializer() {
         super();
-        addInputInfo(new org.orbeon.oxf.processor.ProcessorInputOutputInfo(INPUT_CHART, CachedSerializer.JFCHART_SERIALIZER_CONFIG_NAMESPACE_URI));
+        addInputInfo(new org.orbeon.oxf.processor.ProcessorInputOutputInfo(INPUT_CHART, JFCHART_SERIALIZER_CONFIG_NAMESPACE_URI));
     }
 
     protected String getDefaultContentType() {

@@ -22,7 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * Implement a streamed Base64 decoder.
+ * Implement a streamed Base64 decoder acting as a ContentHandler.
  *
  * The Base64 decoder handles data by chunks of 4 characters. With SAX, character events may be
  * broken up at any point. We have to put data back together so we can correctly feed the Base64

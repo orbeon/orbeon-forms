@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.serializer;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -25,8 +26,10 @@ import java.io.Writer;
 /**
  * A forwarding content handler that flushed the output when receiving a
  * given processing instruction.
+ *
+ * Also clean invalid XML 1.0 namespace declarations.
  */
-public class SerializerContentHandler extends ForwardingContentHandler {
+public class SerializerContentHandler extends NamespaceCleanupContentHandler {
     private Writer writer;
     private OutputStream os;
 

@@ -1446,7 +1446,7 @@ public class SQLProcessor extends ProcessorImpl {
                                                 } else if (value instanceof String || value instanceof Element) {
                                                     // Make sure we create a Document from the Element if we have one
                                                     Document xmlFragmentDocument = (value instanceof Element) ? DocumentHelper.createDocument(((Element) value).createCopy()) : null;
-                                                    // Convert document into a compact XML String if necessary
+                                                    // Convert document into an XML String if necessary
                                                     if (value instanceof Element && !SQL_TYPE_XMLTYPE.equals(sqlType)) {
                                                         // Convert Document into a String
                                                         value = XMLUtils.domToString(xmlFragmentDocument, false, false);

@@ -17,6 +17,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.xml.TransformerUtils;
 
 import java.io.OutputStream;
@@ -26,21 +27,30 @@ import java.util.List;
 public abstract class CachedSerializer extends ProcessorImpl {
 
     public static final String SERIALIZER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/serializer";
-    public static final String JFCHART_SERIALIZER_CONFIG_NAMESPACE_URI = "http://www.orbeon.com/oxf/serializer/jfchart";
     public static final String DEFAULT_ENCODING = TransformerUtils.DEFAULT_OUTPUT_ENCODING;
     public static final boolean DEFAULT_INDENT = true;
     public static final int DEFAULT_INDENT_AMOUNT = 0;
     public static final int DEFAULT_ERROR_CODE = 0;
-    public static final int DEFAULT_STATUS_CODE = ExternalContext.SC_OK;
     public static final boolean DEFAULT_EMPTY = false;
     public static final boolean DEFAULT_CACHE_USE_LOCAL_CACHE = true;
+    public static final boolean DEFAULT_OMIT_XML_DECLARATION = false;
+    public static final boolean DEFAULT_STANDALONE = false;
 
 
     protected CachedSerializer() {
-        addInputInfo(new org.orbeon.oxf.processor.ProcessorInputOutputInfo(INPUT_DATA));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
     }
 
-    protected abstract void readInput(PipelineContext context, ProcessorInput input, Object config, OutputStream outputStream);
+    /**
+     * This must be implemented by subclasses.
+     *
+     * @param context       pipeline context
+     * @param response      response to use only to set some headers; should be used carefully
+     * @param input         processor input being read
+     * @param config        current serializer configuration
+     * @param outputStream  OutputStream to write to; do not use the response parameter
+     */
+    protected abstract void readInput(PipelineContext context, ExternalContext.Response response, ProcessorInput input, Object config, OutputStream outputStream);
 
     protected long findLastModified(Object validity) {
         if (validity instanceof Long) {

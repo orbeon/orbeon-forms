@@ -44,11 +44,12 @@
         <p:output name="output" id="file"/>
     </p:processor>
 
-    <p:processor name="oxf:binary-http-serializer">
+    <p:processor name="oxf:http-serializer">
         <p:input name="data" href="#file"/>
         <p:input name="config">
             <config>
                 <content-type>image/jpeg</content-type>
+                <force-content-type>true</force-content-type>
                 <cache-control>
                     <use-local-cache>false</use-local-cache>
                 </cache-control>

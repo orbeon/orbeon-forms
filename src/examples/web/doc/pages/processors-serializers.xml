@@ -14,7 +14,9 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
-<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:xforms="http://www.w3.org/2002/xforms"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <header>
         <title>Serializers</title>
     </header>
@@ -26,6 +28,169 @@
                 processor, can access files, connect to databases, and take an action depending on
                 its inputs.
             </p>
+        </section>
+
+        <anchor id="http-serializer"/>
+        <section>
+            <title>HTTP Serializer</title>
+            <p>
+                The HTTP serializer supports decoding binary or text data encapsulated in XML
+                documents and sending it into a binary HTTP stream.
+             </p>
+            <section>
+                <title>Binary Mode</title>
+                <section>
+                    <title>Input Document Format</title>
+                    <p>
+                        The binary mode is enabled when the root element of the input document
+                        contains an <code>xsi:type</code> attribute containing a reference to the
+                        <code>xs:base64Encoding</code> type.
+                    </p>
+                    <p>
+                        In this mode, all the character content under the root element is considered
+                        as Base64-encoded binary content. Extra elements, namespace declarations,
+                        attributes, processing instructions, comments, are ignored, but they should
+                        not be present: the input document should have a root element (necessary in
+                        every well-formed XML document) containing only Base64-encoded character
+                        data, for example:
+                    </p>
+                    <xml-source>
+<document xsi:type="xs:base64Binary" content-type="image/jpeg">
+/9j/4AAQSkZJRgABAQEBygHKAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4R
+...
+KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
+</document>
+                    </xml-source>
+                </section>
+                <section>
+                    <title>Configuration</title>
+                        <p>
+                            The configuration consists of the following optional elements.
+                        </p>
+                        <table ca="|l|p{0.3\textwidth}|p{0.2\textwidth}|">
+                            <tr>
+                                <th>Element</th>
+                                <th>Purpose</th>
+                                <th>Default</th>
+                            </tr>
+                            <tr>
+                                <td>content-type</td>
+                                <td>MIME type sent to the client</td>
+                                <td>Specific to each serializer</td>
+                            </tr>
+                            <tr>
+                                <td>encoding</td>
+                                <td>The text encoding sent to the client</td>
+                                <td>iso-8859-1</td>
+                            </tr>
+                            <tr>
+                                <td>status-code</td>
+                                <td>HTTP status code sent to the client</td>
+                                <td>SC_OK, or 100</td>
+                            </tr>
+                            <tr>
+                                <td>error-code</td>
+                                <td>HTTP error code sent to the client</td>
+                                <td>none</td>
+                            </tr>
+                            <tr>
+                                <td>header</td>
+                                <td>
+                                    Adds a custom HTTP header to the response. The nested elements
+                                    <code>name</code> and <code>value</code> contain the name and
+                                    value of the header, respectively. You can add multiple headers.
+                                </td>
+                                <td>none</td>
+                            </tr>
+                            <tr>
+                                <td>cache-control/use-local-cache</td>
+                                <td>
+                                    Whether the resulting stream must be locally cached. For
+                                    documents or binaries that are large or known to change at every
+                                    request, it is recommended to set this to false.
+                                </td>
+                                <td>true</td>
+                            </tr>
+                            <tr>
+                                <td>empty-content</td>
+                                <td>
+                                    Forces the serializer to return an empty content, without
+                                    reading its data input.
+                                </td>
+                                <td>false</td>
+                            </tr>
+                        </table>
+                        <xml-source>
+                            <config>
+                                <content-type>image/jpeg</content-type>
+                                <header>
+                                    <name>Content-Disposition</name>
+                                    <value>attachment; filename=image.jpg;</value>
+                                </header>
+                            </config>
+                        </xml-source>
+                </section>
+                <section>
+                    <title>Content Type</title>
+                    <p>
+                        The content type sent to the HTTP output is determined according to the
+                        following priorities:
+                    </p>
+                    <ol>
+                        <li>
+                            Use the content type in the <code>content-type</code> element of the
+                            configuration if <code>force-content-type</code> is set to
+                            <code>true</code>.
+                        </li>
+                        <li>
+                            Use the content type set in the input document with the
+                            <code>content-type</code> attribute, if any, unless the
+                            <code>ignore-document-content-type</code> element of the configuration
+                            is set to <code>true</code>.
+                        </li>
+                        <li>
+                            Use the content type in the <code>content-type</code> element of the
+                            configuration, if specified.
+                        </li>
+                        <li>
+                            Use <code>application/octet-stream</code>.
+                        </li>
+                    </ol>
+                    <p>
+                        Here is an example connecting the <a
+                        href="processors-generators#url-generator">URL generator</a> to the
+                        serializer, and the appropriate configurations:
+                    </p>
+                    <xml-source>
+                        <p:processor name="oxf:url-generator">
+                            <p:input name="config">
+                                <config>
+                                    <url>oxf:/my-image.jpg</url>
+                                    <content-type>image/jpeg</content-type>
+                                </config>
+                            </p:input>
+                            <p:output name="data" id="image-data"/>
+                        </p:processor>
+                        <p:processor name="oxf:http-serializer">
+                            <p:input name="config">
+                                <config>
+                                    <content-type>image/jpeg</content-type>
+                                    <force-content-type>true</force-content-type>
+                                </config>
+                            </p:input>
+                            <p:input name="data" href="#image-data"/>
+                        </p:processor>
+                    </xml-source>
+                </section>
+                <note>
+                    The HTTP serializer performs streaming. If its input data consists of a stream
+                    of short character SAX events, such as those produced by the <a
+                    href="processors-generators#request-generator">Request generator</a> the <a
+                    href="processors-generators#url-generator">URL generator</a>, or the <a
+                    href="processors-sql#binary-data">SQL processor</a>, it is possible to serialize
+                    an "infinitely" long document.
+                </note>
+            </section>
         </section>
 
         <anchor id="http-serializers"/>
@@ -290,62 +455,6 @@
                         <p:input name="data" href="#xslfo"/>
                     </p:processor>
                 </xml-source>
-            </section>
-            <anchor id="binary-http-serializer"/>
-            <section>
-                <title>Binary HTTP Serializer</title>
-                <p>
-                    The Binary HTTP serializer reads characters of its input document as
-                    Base64-encoded binary and sends the data converted into a binary stream, without
-                    further transformation. All the character content of the input is considered as
-                    Base64. Elements, namespace declarations, attributes, processing instructions,
-                    comments, are ignored. The minimal requirement for the input document is to have
-                    a root element (necessary in every well-formed XML document) containing some
-                    Base64-encoded character data.
-                </p>
-                <p>
-                    The input of the serializer can look as follows:
-                </p>
-                <xml-source>
-<document>
-/9j/4AAQSkZJRgABAQEBygHKAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4R
-...
-KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
-</document>
-                </xml-source>
-                <p>
-                    The default content-type is <code>application/octet-stream</code>. It can be
-                    overridden using the <code>content-type</code> configuration element. Here is an
-                    example connecting the <a href="processors-generators#url-generator">URL
-                    generator</a> to the serializer, and the appropriate configurations:
-                </p>
-                <xml-source>
-                    <p:processor name="oxf:url-generator">
-                        <p:input name="config">
-                            <config>
-                                <url>oxf:/my-image.jpg</url>
-                                <content-type>application/octet-stream</content-type>
-                            </config>
-                        </p:input>
-                        <p:output name="data" id="image-data"/>
-                    </p:processor>
-                    <p:processor name="oxf:binary-http-serializer">
-                        <p:input name="config">
-                            <config>
-                                <content-type>image/jpeg</content-type>
-                            </config>
-                        </p:input>
-                        <p:input name="data" href="#image-data"/>
-                    </p:processor>
-                </xml-source>
-                <note>
-                    The Binary serializer performs streaming. If its input data consists of a
-                    stream of short character SAX events, such as those produced by the <a
-                    href="processors-generators#request-generator">Request generator</a> the <a
-                    href="processors-generators#url-generator">URL generator</a>, or the <a
-                    href="processors-sql#binary-data">SQL processor</a>, it is possible to serialize
-                    an "infinitely" long document.
-                </note>
             </section>
         </section>
 

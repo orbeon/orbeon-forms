@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.processor.transformer;
 
+import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Namespace;
@@ -23,6 +24,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.transformer.xslt.StringErrorListener;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.query.DynamicQueryContext;
@@ -48,6 +50,8 @@ import java.util.Properties;
  */
 public class SaxonXQueryProcessor extends ProcessorImpl {
 
+    private static Logger logger = Logger.getLogger(SaxonXQueryProcessor.class);
+
     public SaxonXQueryProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
@@ -68,18 +72,22 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
                 try {
-                    Document xqueryDocument = readCacheInputAsDOM4J(context, INPUT_CONFIG);
-                    Document dataDocument = readInputAsDOM4J(context, INPUT_DATA);
+                    Document xqueryDocument = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
+                    Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
 
                     // Read XQuery into String
-                    String xqueryBody = XMLUtils.domToString(xqueryDocument);
+                    String xqueryBody = Dom4jUtils.domToString(xqueryDocument);
                     xqueryBody = xqueryBody.substring(xqueryBody.indexOf(">") + 1);
                     xqueryBody = xqueryBody.substring(0, xqueryBody.lastIndexOf("<"));
 
-                    // Create XQuery expression and run it
+                    // Create XQuery configuration
                     Configuration config = new Configuration();
+                    config.setErrorListener(new StringErrorListener(logger));
+                    config.setURIResolver(new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext));
+
+                    // Create static context
                     LocalStaticQueryContext staticContext = new LocalStaticQueryContext(config);
 
                     // Add namespaces declarations

@@ -478,11 +478,9 @@
             <section>
                 <title>Preparing the Spreadsheet</title>
                 <p>
-                    First, create an Excel spreadsheet with the
-                    formatting of your choosing. Values are taken from the
-                    <code>data</code> input document with an XPath expression.
-                    Apply a special markup to the cell you need to export values
-                    to:
+                    First, create an Excel spreadsheet with the formatting of your choosing.
+                    Values are taken from the <code>data</code> input document with an XPath
+                    expression. Apply a special markup to the cell you need to export values to:
                     <ol>
                         <li>Select the cell</li>
                         <li>Go to the menu
@@ -514,14 +512,11 @@
             <section>
                 <title>Export</title>
                 <p>
-                    The XLS Serializer processor takes a
-                    <code>config</code>
-                    input describing the XLS template file, and a
-                    <code>data</code> input containing the values to be
-                    inserted in the template. The processor scans the template,
-                    and applies XPath expressions to fill in the template. The
-                    <code>config</code> input takes a single element with two
-                    attributes:
+                    The XLS Serializer processor takes a <code>config</code> input describing the
+                    XLS template file, and a <code>data</code> input containing the values to be
+                    inserted in the template. The processor scans the template, and applies XPath
+                    expressions to fill in the template. The <code>config</code> input takes a
+                    single element with two attributes:
                 </p>
 
                 <p>

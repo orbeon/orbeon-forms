@@ -55,16 +55,16 @@
                     <code>xs:string</code>, <code>xs:date</code>, <code>xs:dateTime</code>.
                 </p></li>
                 <li><p>
-                    <b>System and Processor Properties</b> – There are two types of properties:
-                    system properties that apply to the system as a whole, and processor-specific
+                    <b>Global and Processor Properties</b> – There are two types of properties:
+                    global properties that apply to the system as a whole, and processor-specific
                     properties. For instance, you set the cache size with a global property:
 
                     <xml-source>
                         <property as="xs:integer" name="oxf.cache.size" value="200"/>
                     </xml-source>
 
-                    While setting the maximum amount of byte that can be uploaded to the server is
-                    set with a processor sepecific property. Note the addiitional
+                    On the other hand setting the maximum amount of bytes that can be uploaded to
+                    the server is set with a processor specific property. Note the additional
                     <code>processor-name</code> attribute:
 
                     <xml-source>
@@ -74,7 +74,7 @@
             </ul>
         </section>
         <section>
-            <title>System Properties</title>
+            <title>Global Properties</title>
             <anchor id="log4j"/>
             <section>
                 <title>oxf.log4j-config</title>
@@ -201,9 +201,10 @@
                 </p>
                 <p>
                     Many processors validate their configuration input with a schema. This
-                    validation is automatic and allows meaningful error reporting. To further
+                    validation is automatic and allows meaningful error reporting. To potentially
                     improve the performance of the application, validation can be disabled in
-                    production environments.
+                    production environments. It is however strongly discouraged to do so, as
+                    validation can highly contribute to the robustness of the application.
                 </p>
             </section>
             <section>
@@ -229,9 +230,10 @@
                 <p>
                     User-defined validation is activated in the <link
                     href="reference-xpl-pipelines">XML Pipeline Definition Language</link> with the
-                    attributes <code>schema-href</code> and <code>schema-uri</code>. To further
+                    attributes <code>schema-href</code> and <code>schema-uri</code>. To potentially
                     improve the performance of the application, validation can be disabled in
-                    production environments.
+                    production environments. It is however strongly discouraged to do so, as
+                    validation can highly contribute to the robustness of the application.
                 </p>
             </section>
             <section>
@@ -253,7 +255,7 @@
                     </table>
                 </p>
                 <p>
-                    Loads an Presentation Server prologue file, where processors are declared.
+                    Loads a Presentation Server prologue file, where processors are declared.
                     Presentation Server is bundled with a default prologue file containing all
                     processors. You can create processors (see the <link
                     href="reference-processor-api">processor API</link>) and declare them in a
@@ -290,15 +292,15 @@
                     </table>
                 </p>
                 <p>
-                    SAX is the underlying mechanism in OIS by which processors receive and generate
-                    XML data. Given only the constraints of the SAX API, it is possible for a
-                    processor to generate an invalid sequence of SAX events. Another processor that
-                    receives that invalid sequence of events may or may not be able to deal with it
-                    without throwing an exception. Some processors try to process invalid SAX
-                    events, while others throw exceptions. This means that when a processor
-                    generating an invalid sequence of SAX events is used in a pipeline, the problem
-                    might go unnoticed, or it might cause some other processor downstream to throw
-                    an exception.
+                    SAX is the underlying mechanism in Presentation Server by which processors
+                    receive and generate XML data. Given only the constraints of the SAX API, it is
+                    possible for a processor to generate an invalid sequence of SAX events. Another
+                    processor that receives that invalid sequence of events may or may not be able
+                    to deal with it without throwing an exception. Some processors try to process
+                    invalid SAX events, while others throw exceptions. This means that when a
+                    processor generating an invalid sequence of SAX events is used in a pipeline,
+                    the problem might go unnoticed, or it might cause some other processor
+                    downstream to throw an exception.
                 </p>
                 <p>
                     To deal more efficiently with those cases, the <code>sax.inspection</code>
@@ -314,201 +316,198 @@
                 </p>
             </section>
         </section>
+        <anchor id="java-processor"/>
         <section>
-            <title>Processor Properties</title>
-            <anchor id="java-processor"/>
+            <title>Java Processor Properties</title>
+            <anchor id="classpath"/>
             <section>
-                <title>Java Processor</title>
-                <anchor id="classpath"/>
-                <section>
-                    <title>Class Path</title>
-                    <p>
-                        <table ca="|l|p{0.5\textwidth}|">
-                            <tr>
-                                <th>Name</th>
-                                <td><code>classpath</code></td>
-                            </tr>
-                            <tr>
-                                <th>Purpose</th>
-                                <td>
-                                    Defines a directory where Java class files are located. The
-                                    <link href="processors-java">Java processor</link> dynamically
-                                    compiles Java code, and may need some libraries. This property
-                                    defines the classpath used by the compiler.
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Processor name</th>
-                                <td><code><a href="processors-java">oxf:java</a></code></td>
-                            </tr>
-                            <tr>
-                                <th>Type</th>
-                                <td><code>xs:string</code></td>
-                            </tr>
-                            <tr>
-                                <th>Default Value</th>
-                                <td>None</td>
-                            </tr>
-                        </table>
-                    </p>
-                </section>
-                <anchor id="jarpath"/>
-                <section>
-                    <title>JAR Path</title>
-                    <p>
-                        <table ca="|l|p{0.5\textwidth}|">
-                            <tr>
-                                <th>Name</th>
-                                <td><code>jarpath</code></td>
-                            </tr>
-                            <tr>
-                                <th>Purpose</th>
-                                <td>
-                                    Defines a list of directories where JAR files are located. The
-                                    <link href="processors-java">Java processor</link> dynamically
-                                    compiles Java code, and may need some libraries. This property
-                                    defines a "JAR path", a list of directories containing JAR files
-                                    that will be added to the classpath when compiling and running
-                                    the processor executed by the Java processor.
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Processor name</th>
-                                <td><code><a href="processors-java">oxf:java</a></code></td>
-                            </tr>
-                            <tr>
-                                <th>Type</th>
-                                <td><code>xs:string</code></td>
-                            </tr>
-                            <tr>
-                                <th>Default Value</th>
-                                <td>None</td>
-                            </tr>
-                        </table>
-                    </p>
-                </section>
-            </section>
-            <anchor id="email-processor"/>
-            <section>
-                <title>Email Processor</title>
-                <section>
-                    <title>Global SMTP Host</title>
-                    <p>
-                        The following property can be specified globally as a property instead of
-                        being part of the processor configuration:
-                    </p>
-                    <p>
-                        <table ca="|l|p{0.5\textwidth}|">
-                            <tr>
-                                <th>Name</th>
-                                <td><code>smtp-host</code></td>
-                            </tr>
-                            <tr>
-                                <th>Purpose</th>
-                                <td>
-                                    Configure the SMTP host for all email processors. This global
-                                    property can be overridden by local processor configurations.
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Processor name</th>
-                                <td><code><a href="processors-messaging">oxf:email</a></code></td>
-                            </tr>
-                            <tr>
-                                <th>Type</th>
-                                <td><code>xs:string</code></td>
-                            </tr>
-                            <tr>
-                                <th>Default Value</th>
-                                <td>None</td>
-                            </tr>
-                        </table>
-                    </p>
-                </section>
+                <title>Class Path</title>
                 <p>
-                    The following properties can be used for testing purposes:
-                </p>
-                <section>
-                    <title>Test SMTP host</title>
-                    <p>
-                        <table ca="|l|p{0.5\textwidth}|">
-                            <tr>
-                                <th>Name</th>
-                                <td><code>test-smtp-host</code></td>
-                            </tr>
-                            <tr>
-                                <th>Purpose</th>
-                                <td>
-                                    Configure a test SMTP host for all email processors. This global
-                                    property when specified overrides all the other SMTP host
-                                    configurations for all Email processors, whether in the processor
-                                    configuration or using the <code>smtp-host</code> property.
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Processor name</th>
-                                <td><code><a href="processors-messaging">oxf:email</a></code></td>
-                            </tr>
-                            <tr>
-                                <th>Type</th>
-                                <td><code>xs:string</code></td>
-                            </tr>
-                            <tr>
-                                <th>Default Value</th>
-                                <td>None</td>
-                            </tr>
-                        </table>
-                    </p>
-                    <note>
-                        This property replaces the deprecated <code>smtp</code> property.
-                    </note>
-                </section>
-                <section>
-                    <title>Test Recipient</title>
-                    <p>
-                        <table ca="|l|p{0.5\textwidth}|">
-                            <tr>
-                                <th>Name</th>
-                                <td><code>test-to</code></td>
-                            </tr>
-                            <tr>
-                                <th>Purpose</th>
-                                <td>
-                                    Configure a test recipient email address for all email processors.
-                                    This global property when specified overrides all the other SMTP
-                                    recipient configurations for all Email processors.
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Processor name</th>
-                                <td><code><a href="processors-messaging">oxf:email</a></code></td>
-                            </tr>
-                            <tr>
-                                <th>Type</th>
-                                <td><code>xs:string</code></td>
-                            </tr>
-                            <tr>
-                                <th>Default Value</th>
-                                <td>None</td>
-                            </tr>
-                        </table>
-                    </p>
-                    <note>
-                        This property replaces the deprecated <code>forceto</code> property.
-                    </note>
-                </section>
-                <p>
-                    For example, those properties can be used as follows:
-                </p>
-                <xml-source>
-                    <property as="xs:string" processor-name="oxf:email" name="smtp-host" value="mail.example.org"/>
-                    <property as="xs:string" processor-name="oxf:email" name="test-smtp-host" value="test.example.org"/>
-                    <property as="xs:string" processor-name="oxf:email" name="test-to" value="joe@example.org"/>
-                </xml-source>
-                <p>
-                    The test properties can easily be commented out for deployment.
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Name</th>
+                            <td><code>classpath</code></td>
+                        </tr>
+                        <tr>
+                            <th>Purpose</th>
+                            <td>
+                                Defines a directory where Java class files are located. The
+                                <link href="processors-java">Java processor</link> dynamically
+                                compiles Java code, and may need some libraries. This property
+                                defines the classpath used by the compiler.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Processor name</th>
+                            <td><code><a href="processors-java">oxf:java</a></code></td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td><code>xs:string</code></td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>None</td>
+                        </tr>
+                    </table>
                 </p>
             </section>
+            <anchor id="jarpath"/>
+            <section>
+                <title>JAR Path</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Name</th>
+                            <td><code>jarpath</code></td>
+                        </tr>
+                        <tr>
+                            <th>Purpose</th>
+                            <td>
+                                Defines a list of directories where JAR files are located. The
+                                <link href="processors-java">Java processor</link> dynamically
+                                compiles Java code, and may need some libraries. This property
+                                defines a "JAR path", a list of directories containing JAR files
+                                that will be added to the classpath when compiling and running
+                                the processor executed by the Java processor.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Processor name</th>
+                            <td><code><a href="processors-java">oxf:java</a></code></td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td><code>xs:string</code></td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                </p>
+            </section>
+        </section>
+        <anchor id="email-processor"/>
+        <section>
+            <title>Email Processor Properties</title>
+            <section>
+                <title>Global SMTP Host</title>
+                <p>
+                    The following property can be specified globally as a property instead of
+                    being part of the processor configuration:
+                </p>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Name</th>
+                            <td><code>smtp-host</code></td>
+                        </tr>
+                        <tr>
+                            <th>Purpose</th>
+                            <td>
+                                Configure the SMTP host for all email processors. This global
+                                property can be overridden by local processor configurations.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Processor name</th>
+                            <td><code><a href="processors-messaging">oxf:email</a></code></td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td><code>xs:string</code></td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                </p>
+            </section>
+            <p>
+                The following properties can be used for testing purposes:
+            </p>
+            <section>
+                <title>Test SMTP host</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Name</th>
+                            <td><code>test-smtp-host</code></td>
+                        </tr>
+                        <tr>
+                            <th>Purpose</th>
+                            <td>
+                                Configure a test SMTP host for all email processors. This global
+                                property when specified overrides all the other SMTP host
+                                configurations for all Email processors, whether in the processor
+                                configuration or using the <code>smtp-host</code> property.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Processor name</th>
+                            <td><code><a href="processors-messaging">oxf:email</a></code></td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td><code>xs:string</code></td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                </p>
+                <note>
+                    This property replaces the deprecated <code>smtp</code> property.
+                </note>
+            </section>
+            <section>
+                <title>Test Recipient</title>
+                <p>
+                    <table ca="|l|p{0.5\textwidth}|">
+                        <tr>
+                            <th>Name</th>
+                            <td><code>test-to</code></td>
+                        </tr>
+                        <tr>
+                            <th>Purpose</th>
+                            <td>
+                                Configure a test recipient email address for all email processors.
+                                This global property when specified overrides all the other SMTP
+                                recipient configurations for all Email processors.
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Processor name</th>
+                            <td><code><a href="processors-messaging">oxf:email</a></code></td>
+                        </tr>
+                        <tr>
+                            <th>Type</th>
+                            <td><code>xs:string</code></td>
+                        </tr>
+                        <tr>
+                            <th>Default Value</th>
+                            <td>None</td>
+                        </tr>
+                    </table>
+                </p>
+                <note>
+                    This property replaces the deprecated <code>forceto</code> property.
+                </note>
+            </section>
+            <p>
+                For example, those properties can be used as follows:
+            </p>
+            <xml-source>
+                <property as="xs:string" processor-name="oxf:email" name="smtp-host" value="mail.example.org"/>
+                <property as="xs:string" processor-name="oxf:email" name="test-smtp-host" value="test.example.org"/>
+                <property as="xs:string" processor-name="oxf:email" name="test-to" value="joe@example.org"/>
+            </xml-source>
+            <p>
+                The test properties can easily be commented out for deployment.
+            </p>
         </section>
     </body>
 </document>

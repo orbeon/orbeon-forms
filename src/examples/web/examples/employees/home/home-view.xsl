@@ -40,14 +40,14 @@
             </p>
             <ul>
                 <li>CRUD operations, paging and sorting with a SQL backend</li>
-                <li>Authentication (login / logout) and roles</li>
-                <li>Simple XForms with validation</li>
-                <li>XForms upload</li>
+                <li>XForms controls and validation with XML Schema</li>
+                <li>XForms upload control</li>
                 <li>Reading plain text files</li>
                 <li>Using the Java processor</li>
-                <li>Comma-Separated Values (CSV) export</li>
-                <li>Excel import / export</li>
-                <li>Web Service call and implementation</li>
+                <li>Exporting Comma-Separated Values (CSV) files</li>
+                <li>Exporting and importing Excel files</li>
+                <li>Calling and implementing Web Service</li>
+                <li>Authentication (login / logout) and roles</li>
                 <li>LDAP access</li>
             </ul>
             <h2>Installation and Configuration</h2>

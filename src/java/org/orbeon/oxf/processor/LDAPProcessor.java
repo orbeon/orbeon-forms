@@ -380,6 +380,10 @@ public class LDAPProcessor extends ProcessorImpl {
         public void addAttribute(String attr) {
             this.attributes.add(attr);
         }
+
+        public String toString() {
+            return "Host: "+host + " Port: " + port + " Bind DN: "+bindDN + " password: "+password+" root: "+rootDN;
+        }
     }
 
 

@@ -104,7 +104,8 @@
                         serializer</a>, supports decoding of binary or text data, and sending the
                         resulting stream to an HTTP client. The <a
                         href="/goto-example/xforms-upload">XForms Upload example</a> illustrates
-                        this capability.
+                        this capability. The HTTP serializer can be used for example in conjunction
+                        with <a href="processors-converters">converters</a> and the URL generator.
                     </p>
                 </section>
                 <section>
@@ -158,19 +159,19 @@
                 </p>
                 <ul>
                     <li>
-                        <b>Binary attachments:</b> binary files such as images and PDF files can be
-                        attached to an email.
+                        <b>Multipart hierarchy:</b> it is possible to have multiple levels of
+                        multipart messages.
                     </li>
                     <li>
-                        <b>Character encoding:</b> character encoding can be specified for text content.
+                        <b>Binary attachments:</b> binary files such as images and PDF files can be
+                        attached to an email.
                     </li>
                     <li>
                         <b>Dynamic attachments:</b> attachments can be generated dynamically. It is
                         for example possible to attach a dynamically generated chart or PDF file.
                     </li>
                     <li>
-                        <b>Multipart hierarchy:</b> it is possible to have multiple levels of
-                        multipart messages.
+                        <b>Character encoding:</b> character encoding can be specified for text content.
                     </li>
                 </ul>
                 <p>

@@ -31,6 +31,10 @@
                 href="processors-serializers#http-serializer">HTTP serializer</a>, or attached to an
                 email with the <a href="processors-messaging#email-processor">Email processor</a>.
             </p>
+            <p>
+                Converters typically have a <code>data</code> output containing the converted
+                document.
+            </p>
         </section>
         <section>
             <title>Standard Converters</title>
@@ -45,9 +49,9 @@
                 <li><b>Text:</b> any text document</li>
             </ul>
             <p>
-                The resulting text is embedded in an XML document as specified by the <a
-                href="processors-serializers#text-mode">text mode</a> in the serializers
-                documentation.
+                The resulting text is sent to the <code>data</code> output. It is embedded in an
+                XML document as specified by the <a href="processors-serializers#text-mode">text
+                mode</a> in the serializers documentation.
             </p>
             <section>
                 <title>Configuration</title>
@@ -264,6 +268,12 @@
                 Recommendation</fork>. Note that only subset of the recommendation implemented by <a
                 href="http://xml.apache.org/fop/">FOP 0.20.5</a> is supported.
             </note>
+            <p>
+                The resulting binary stream is sent to the <code>data</code> output. It is embedded
+                in an XML document as specified by the <a
+                href="processors-serializers#binary-mode">binary mode</a> in the serializers
+                documentation.
+            </p>
         </section>
         <section>
             <title>Chart Converter</title>

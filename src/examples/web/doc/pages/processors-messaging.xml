@@ -27,8 +27,25 @@
                 sending emails). Its input contains the basic configuration (SMTP host, subject,
                 etc.) as well as inline message body content. Alternatively, the message content can
                 refer to external resources, such as resources on disk or dynamically generated
-                content.
+                content. It features the following high-level functionality:
             </p>
+            <ul>
+                <li>
+                    <b>Multiple recipients:</b> send the same email to multiple recipients.
+                </li>
+                <li>
+                    <b>Multipart hierarchy:</b> it is possible to have multiple levels of multipart
+                    messages.
+                </li>
+                <li>
+                    <b>Binary attachments:</b> binary files such as images and PDF files can be
+                    attached to an email.
+                </li>
+                <li>
+                    <b>Dynamic attachments:</b> attachments can be generated dynamically. It is for
+                    example possible to attach a dynamically generated chart or PDF file.
+                </li>
+            </ul>
             <section>
                 <title>Data Input</title>
                 <p>

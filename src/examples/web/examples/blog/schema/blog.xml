@@ -1,0 +1,11 @@
+<blog>
+    <blog-id>blog123</blog-id>
+    <username>ebruchez</username>
+    <name>My Cool Blog</name>
+    <categories>
+        <category>
+            <name>General Stuff</name>
+            <name>Cool Stuff</name>
+        </category>
+    </categories>
+</blog>

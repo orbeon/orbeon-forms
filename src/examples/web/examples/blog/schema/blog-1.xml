@@ -1,0 +1,13 @@
+<blog>
+    <username>ebruchez</username>
+    <id>500001</id>
+    <name>Erik Bruchez's OPS Blog</name>
+    <categories>
+        <category>
+            <name>General</name>
+        </category>
+        <category>
+            <name>Music</name>
+        </category>
+    </categories>
+</blog>

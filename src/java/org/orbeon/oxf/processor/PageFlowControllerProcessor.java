@@ -69,7 +69,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         falseConfigElement.setText("false");
         FALSE_DOCUMENT.setRootElement(falseConfigElement);
 
-        NAMESPACES_WITH_XSI_AND_XSLT.put(XMLUtils.XSI_PREFIX, XMLUtils.XSI_NAMESPACE);
+        NAMESPACES_WITH_XSI_AND_XSLT.put(XMLUtils.XSI_PREFIX, XMLUtils.XSI_NAMESPACE_URI);
         NAMESPACES_WITH_XSI_AND_XSLT.put(XMLUtils.XSLT_PREFIX, XMLUtils.XSLT_NAMESPACE);
     }
 

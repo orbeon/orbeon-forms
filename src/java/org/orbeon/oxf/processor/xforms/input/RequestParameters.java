@@ -14,6 +14,8 @@
 package org.orbeon.oxf.processor.xforms.input;
 
 import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.Constants;
@@ -28,23 +30,17 @@ import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
-import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
-import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.StringTokenizer;
 import java.util.zip.GZIPInputStream;
 
@@ -52,10 +48,6 @@ public class RequestParameters {
 
     private static final Map actionClasses = new HashMap();
     private PipelineContext pipelineContext;
-
-    public RequestParameters(PipelineContext pipelineContext) {
-        this.pipelineContext = pipelineContext;
-    }
 
     static {
         actionClasses.put("insert", Insert.class);
@@ -71,210 +63,154 @@ public class RequestParameters {
     private Document instance;
     private String encryptionPassword;
 
-    public ContentHandler getContentHandlerForRequest() {
-        // NOTE: We do this "by hand" as the apache digester has problems including namespace
-        // handling and value whitespace trimming.
+    public RequestParameters(PipelineContext pipelineContext, Document requestDocument) {
+        try {
+            this.pipelineContext = pipelineContext;
+            List parameters = requestDocument.getRootElement().element("parameters").elements("parameter");
 
-        return new ContentHandlerAdapter() {
-            private Stack elementNameStack = new Stack();
-            private boolean recording = false;
-            private String recordingName;
-            private StringBuffer recordingValue;
-            private Attributes recordingAttributes;
-
-
-            public void characters(char ch[], int start, int length) {
-                if (recording)
-                    recordingValue.append(ch, start, length);
-            }
-
-            public void startElement(String namespaceURI, String localName, String qName, Attributes atts) {
-                if (isChildOfParameter()) {
-                    recording = true;
-                    recordingName = localName;
-                    recordingValue = new StringBuffer();
-                    recordingAttributes = new AttributesImpl(atts);
-                }
-                elementNameStack.add(localName);
-            }
-
-            public void endElement(String namespaceURI, String localName, String qName) {
-                elementNameStack.pop();
-                if (isChildOfParameter()) {
-                    String value = recordingValue.toString();
-                    if (recordingName.equals("name"))
-                        name(value);
-                    else if (recordingName.equals("value"))
-                        value(value, recordingAttributes.getValue(XMLUtils.XSI_NAMESPACE, "type"));
-                    else if (recordingName.equals("filename"))
-                        filename(value);
-                    else if (recordingName.equals("content-type"))
-                        contentType(value);
-                    else if (recordingName.equals("content-length"))
-                        contentLength(value);
+            // Get encryption key
+            if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
+                for (Iterator i = parameters.iterator(); i.hasNext();) {
+                    Element parameterElement = (Element) i.next();
+                    if ("$key".equals(parameterElement.element("name").getStringValue())) {
+                        String value = parameterElement.element("value").getStringValue();
+                        String serverPassword = OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD);
+                        encryptionPassword = SecureUtils.decrypt(pipelineContext, serverPassword, value);
+                    }
                 }
             }
 
-            private boolean isChildOfParameter() {
-                int size = elementNameStack.size();
-                return size == 3 && elementNameStack.elementAt(size - 1).equals("parameter")
-                    && elementNameStack.elementAt(size - 2).equals("parameters")
-                    && elementNameStack.elementAt(size - 3).equals("request");
-            }
+            // Go through parameters
+            for (Iterator i = parameters.iterator(); i.hasNext();) {
+                Element parameterElement = (Element) i.next();
+                String name = parameterElement.element("name").getStringValue();
+                String value = parameterElement.element("value").getStringValue();
+                String type = parameterElement.element("value").attributeValue
+                        (new QName("type", XMLUtils.XSI_NAMESPACE));
 
-            private String name;
-            private String fileName;
-            private String filenameName;
-            private String mediatypeName;
-            private String sizeName;
+                if ("$instance".equals(name)) {
+                    // Un-base64, uncompress to get XML as text
+                    String xmlText;
+                    {
+                        String compressed = value;
+                        if (XFormsUtils.isHiddenEncryptionEnabled())
+                            compressed = SecureUtils.decrypt(pipelineContext, encryptionPassword, compressed);
+                        ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(compressed));
+                        StringBuffer xml = new StringBuffer();
+                        byte[] buffer = new byte[1024];
+                        GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
+                        int size;
+                        while ((size = gzipInputStream.read(buffer)) != -1)
+                            xml.append(new String(buffer, 0, size));
+                        xmlText = xml.toString();
+                    }
 
-            private void name(String name) {
-                // We know that name always come before all the other elements within a parameter,
-                // including the value element
-                this.name = name;
+                    // Parse XML and store as instance
+                    LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
+                    XMLUtils.stringToSAX(xmlText, null, saxContentHandler, false);
+                    instance = saxContentHandler.getDocument();
 
-                if (name.startsWith("$upload^")) {
-                    // Handle the case of the upload element
+                } else if (name.startsWith("$upload^")) {
 
                     // Split encoded name
                     String s = name.substring("$upload^".length());
-                    fileName = s.substring(0, s.indexOf('-'));
+                    String fileName = s.substring(0, s.indexOf('-'));
                     s = s.substring(s.indexOf('-') + 1);
-                    filenameName = s.substring(0, s.indexOf('-'));
+                    String filenameName = s.substring(0, s.indexOf('-'));
                     s = s.substring(s.indexOf('-') + 1);
-                    mediatypeName = s.substring(0, s.indexOf('-'));
+                    String mediatypeName = s.substring(0, s.indexOf('-'));
                     s = s.substring(s.indexOf('-') + 1);
-                    sizeName = s;
-                }
-            }
+                    String sizeName = s;
 
-            /**
-             * Handle request parameter
-             */
-            private void value(String value, String type) {
-                try {
-                    if ("$key".equals(name)) {
-                        String serverPassword = OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD);
-                        encryptionPassword = SecureUtils.decrypt(pipelineContext, serverPassword, value);
-                    } else if ("$instance".equals(name)) {
+                    // Store file in instance
+                    addValue(fileName, value, type);
 
-                        // Un-base64, uncompress to get XML as text
-                        String xmlText;
-                        {
-                            String compressed = value;
-                            if (XFormsUtils.isHiddenEncryptionEnabled())
-                                compressed = SecureUtils.decrypt(pipelineContext, encryptionPassword, compressed);
-                            ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(compressed));
-                            StringBuffer xml = new StringBuffer();
-                            byte[] buffer = new byte[1024];
-                            GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
-                            int size;
-                            while ((size = gzipInputStream.read(buffer)) != -1)
-                                xml.append(new String(buffer, 0, size));
-                            xmlText = xml.toString();
-                        }
-
-                        // Parse XML and store as instance
-                        LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
-                        XMLUtils.stringToSAX(xmlText, null, saxContentHandler, false);
-                        instance = saxContentHandler.getDocument();
-
-                    } else if (name.startsWith("$upload^")) {
-                        // Store file in instance
-                        addValue(fileName, value, type);
-                    } else if (name.startsWith("$action^") || name.startsWith("$actionImg^")) {
-
-                        // Image submit. If .y: ignore. If .x: remove .x at the end of name.
-                        if (name.startsWith("$actionImg^")) {
-                            if (name.endsWith(".y")) return;
-                            name = name.substring(0, name.length() - 2);
-                        }
-
-                        // Separate different action, e.g.: $action^action1&action_2
-                        StringTokenizer actionsTokenizer = new StringTokenizer(name.substring(name.indexOf('^') + 1), "&");
-                        while (actionsTokenizer.hasMoreTokens()) {
-
-                            // Parse an action string, e.g.: name&param1Name&param1Value&param2Name&param2Value
-                            String actionString = URLDecoder.decode(actionsTokenizer.nextToken(), NetUtils.DEFAULT_URL_ENCODING);
-                            String[] keyValue = new String[2];
-                            String actionName = null;
-                            Map actionParameters = new HashMap();
-                            while (actionString.length() > 0) {
-                                for (int i = 0; i < 2; i++) {
-                                    int firstDelimiter = actionString.indexOf('&');
-                                    keyValue[i] = firstDelimiter == -1 ? actionString
-                                            : actionString.substring(0, firstDelimiter);
-                                    actionString = firstDelimiter == -1 ? ""
-                                            : actionString.substring(firstDelimiter + 1);
-                                    if (actionName == null) break;
-                                }
-                                if (actionName == null) {
-                                    actionName = keyValue[0];
-                                } else {
-                                    // We used to do URLDecoder.decode(keyValue[1], NetUtils.DEFAULT_URL_ENCODING) but this was once too many times
-                                    actionParameters.put(keyValue[0], keyValue[1]);
-                                }
-                            }
-
-                            // Create action object
-                            Class actionClass = (Class) actionClasses.get(actionName);
-                            if  (actionClass == null)
-                                throw new OXFException("Cannot find implementation for action '" + actionName + "'");
-                            Action action = (Action) actionClass.newInstance();
-                            action.setParameters(actionParameters);
-                            actions.add(action);
-                        }
-                    } else if (name.startsWith("$node^")) {
-                        addValue(name, value, type);
+                    // Store other information about file
+                    if (filenameName.length() > 0) {
+                        String filenameFromRequest = parameterElement.element("filename").getStringValue();
+                        addValue(filenameName, filenameFromRequest, null);
                     }
-                } catch (InstantiationException e) {
-                    throw new OXFException(e);
-                } catch (IllegalAccessException e) {
-                    throw new OXFException(e);
-                } catch (UnsupportedEncodingException e) {
-                    throw new OXFException(e);
-                } catch (IOException e) {
-                    throw new OXFException(e);
+                    if (name.startsWith("$upload^") && mediatypeName.length() > 0) {
+                        String contentTypeFromRequest = parameterElement.element("content-type").getStringValue();
+                        addValue(mediatypeName, contentTypeFromRequest, null);
+                    }
+                    if (name.startsWith("$upload^") && sizeName.length() > 0) {
+                        String contentLengthFromRequest = parameterElement.element("content-length").getStringValue();
+                        addValue(sizeName, contentLengthFromRequest, null);
+                    }
+
+                } else if (name.startsWith("$action^") || name.startsWith("$actionImg^")) {
+
+                    // Image submit. If .y: ignore. If .x: remove .x at the end of name.
+                    if (name.startsWith("$actionImg^")) {
+                        if (name.endsWith(".y")) return;
+                        name = name.substring(0, name.length() - 2);
+                    }
+
+                    // Separate different action, e.g.: $action^action1&action_2
+                    StringTokenizer actionsTokenizer = new StringTokenizer(name.substring(name.indexOf('^') + 1), "&");
+                    while (actionsTokenizer.hasMoreTokens()) {
+
+                        // Parse an action string, e.g.: name&param1Name&param1Value&param2Name&param2Value
+                        String actionString = URLDecoder.decode(actionsTokenizer.nextToken(), NetUtils.DEFAULT_URL_ENCODING);
+                        String[] keyValue = new String[2];
+                        String actionName = null;
+                        Map actionParameters = new HashMap();
+                        while (actionString.length() > 0) {
+                            for (int j = 0; j < 2; j++) {
+                                int firstDelimiter = actionString.indexOf('&');
+                                keyValue[j] = firstDelimiter == -1 ? actionString
+                                        : actionString.substring(0, firstDelimiter);
+                                actionString = firstDelimiter == -1 ? ""
+                                        : actionString.substring(firstDelimiter + 1);
+                                if (actionName == null) break;
+                            }
+                            if (actionName == null) {
+                                actionName = keyValue[0];
+                            } else {
+                                // We used to do URLDecoder.decode(keyValue[1], NetUtils.DEFAULT_URL_ENCODING) but this was once too many times
+                                actionParameters.put(keyValue[0], keyValue[1]);
+                            }
+                        }
+
+                        // Create action object
+                        Class actionClass = (Class) actionClasses.get(actionName);
+                        if  (actionClass == null)
+                            throw new OXFException("Cannot find implementation for action '" + actionName + "'");
+                        Action action = (Action) actionClass.newInstance();
+                        action.setParameters(actionParameters);
+                        actions.add(action);
+                    }
+                } else if (name.startsWith("$node^")) {
+                    addValue(name, value, type);
                 }
             }
+        } catch (IOException e) {
+            throw new OXFException(e);
+        } catch (InstantiationException e) {
+            throw new OXFException(e);
+        } catch (IllegalAccessException e) {
+            throw new OXFException(e);
+        }
+    }
 
-            private void filename(String filename) {
-                if (name.startsWith("$upload^") && filenameName.length() > 0) {
-                    addValue(filenameName, filename, null);
-                }
-            }
-
-            private void contentType(String contentType) {
-                if (name.startsWith("$upload^") && mediatypeName.length() > 0) {
-                    addValue(mediatypeName, contentType, null);
-                }
-            }
-
-            private void contentLength(String contentLength) {
-                if (name.startsWith("$upload^") && sizeName.length() > 0) {
-                    addValue(sizeName, contentLength, null);
-                }
-            }
-
-            /**
-             * Adds (id -> value) in idToValue. If there is already a value for this id,
-             * concatenates the two values by adding a space.
-             *
-             * Also store the value type in idToType if present.
-             */
-            private void addValue(String name, String value, String type) {
-                String idString = name.substring("$node^".length());
-                if (XFormsUtils.isNameEncryptionEnabled())
-                    idString = SecureUtils.decrypt(pipelineContext, encryptionPassword, idString);
-                Integer idObject = new Integer(idString);
-                String currentValue = (String) idToValue.get(idObject);
-                idToValue.put(idObject,
-                        currentValue == null || "".equals(currentValue) ? value :
-                        "".equals(value) ? currentValue : currentValue + ' ' + value);
-                if (type != null)
-                    idToType.put(idObject, type);
-            }
-        };
+    /**
+     * Adds (id -> value) in idToValue. If there is already a value for this id,
+     * concatenates the two values by adding a space.
+     *
+     * Also store the value type in idToType if present.
+     */
+    private void addValue(String name, String value, String type) {
+        String idString = name.substring("$node^".length());
+        if (XFormsUtils.isNameEncryptionEnabled())
+            idString = SecureUtils.decrypt(pipelineContext, encryptionPassword, idString);
+        Integer idObject = new Integer(idString);
+        String currentValue = (String) idToValue.get(idObject);
+        idToValue.put(idObject,
+                currentValue == null || "".equals(currentValue) ? value :
+                "".equals(value) ? currentValue : currentValue + ' ' + value);
+        if (type != null)
+            idToType.put(idObject, type);
     }
 
     public int[] getIds() {

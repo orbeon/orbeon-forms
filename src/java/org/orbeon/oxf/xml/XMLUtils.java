@@ -53,7 +53,9 @@ import java.util.*;
 
 public class XMLUtils {
 
-    public static final String XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
+    public static final String XSI_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema-instance";
+    public static final String XSI_NAMESPACE_PREFIX = "xsi";
+    public static final Namespace XSI_NAMESPACE = new Namespace(XSI_NAMESPACE_PREFIX, XSI_NAMESPACE_URI);
     public static final String XSI_PREFIX = "xsi";
     public static final String XSI_NIL_ATTRIBUTE = "nil";
 
@@ -69,7 +71,7 @@ public class XMLUtils {
         NULL_DOCUMENT = DocumentHelper.createDocument();
         Element nullElement = DocumentHelper.createElement("null");
         nullElement.addAttribute(new QName(XMLUtils.XSI_NIL_ATTRIBUTE,
-                new Namespace(XMLUtils.XSI_PREFIX, XMLUtils.XSI_NAMESPACE)), "true");
+                new Namespace(XMLUtils.XSI_PREFIX, XMLUtils.XSI_NAMESPACE_URI)), "true");
         NULL_DOCUMENT.setRootElement(nullElement);
     }
 
@@ -957,7 +959,7 @@ public class XMLUtils {
         org.dom4j.Document result = DocumentHelper.createDocument();
         Element nullElement = DocumentHelper.createElement("null");
         nullElement.addAttribute(new QName(XMLUtils.XSI_NIL_ATTRIBUTE,
-                new Namespace(XMLUtils.XSI_PREFIX, XMLUtils.XSI_NAMESPACE)), "true");
+                new Namespace(XMLUtils.XSI_PREFIX, XMLUtils.XSI_NAMESPACE_URI)), "true");
         result.setRootElement(nullElement);
         return result;
     }

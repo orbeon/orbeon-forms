@@ -85,9 +85,8 @@ public class XFormsInput extends ProcessorImpl {
                 // Extract parameters from request
                 RequestParameters requestParameters = (RequestParameters) readCacheInputAsObject(pipelineContext,  getInputByName(INPUT_REQUEST), new CacheableInputReader(){
                     public Object read(PipelineContext context, ProcessorInput input) {
-                        Document request = readInputAsDOM4J(context, input);
-                        RequestParameters requestParameters = new RequestParameters(pipelineContext);
-                        readInputAsSAX(context, input, requestParameters.getContentHandlerForRequest());
+                        Document requestDocument = readInputAsDOM4J(context, input);
+                        RequestParameters requestParameters = new RequestParameters(pipelineContext, requestDocument);
                         return requestParameters;
                     }
                 });

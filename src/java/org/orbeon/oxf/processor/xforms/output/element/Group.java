@@ -35,12 +35,19 @@ public class Group extends XFormsElement {
         isFirstGroup = context.getParentElement(0) == null;
         super.start(context, uri, localname, qname, attributes);
 
-        if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
-            // Generate hidden field with random key encrypted with server key
-            String serverPassword = OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD);
-            String encryptedRandomKey = SecureUtils.encrypt(context.getPipelineContext(),
-                    serverPassword, context.getEncryptionPassword());
-            sendHiddenElement(context, "$key", encryptedRandomKey);
+        if (isFirstGroup) {
+            if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
+                // Generate hidden field with random key encrypted with server key
+                String serverPassword = OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD);
+                String encryptedRandomKey = SecureUtils.encrypt(context.getPipelineContext(),
+                        serverPassword, context.getEncryptionPassword());
+                sendHiddenElement(context, "$key", encryptedRandomKey);
+
+//                 Encode instance in a string and put in hidden field
+//                String instanceString = XFormsUtils.instanceToString(context.getPipelineContext(),
+//                        context.getEncryptionPassword(), context.getInstance());
+//                sendHiddenElement(context, "$instance", instanceString);
+            }
         }
     }
 

@@ -27,21 +27,24 @@ For more information, visit:
 1. About Orbeon Presentation Server
 ************************************
 
-Orbeon Presentation Server is an MVC Framework for building
-Composite Web applications from XML sources using XForms. While
-similar to Apache Cocoon, Orbeon Presentation Server benefits from
-richer controller semantics, standardized forms processing using W3C
-XForms, and tight integration with XPL, a full-featured pipeline
-processing language for XML.
+Orbeon Presentation Server is a J2EE-based MVC framework for building
+Web applications that present and capture XML using XForms, XSLT, and
+Web Services. Presentation Server benefits from standardized forms
+processing using XForms, rich controller semantics, and full-featured
+XML pipelines. Presentation Server is in fact built around Orbeon's
+optimized XML pipeline engine, a mature, high-performance engine for
+pipeline processing of XML. Presentation Server is ideal for building
+Composite Applications in a Service Oriented Architecture (SOA), an can
+be used on its own, or within the OIS suite.
 
 
 ************************************
 2. Licenses
 ************************************
 
-The source code is distributed under the terms of the GNU Lesser
-General Public License (LGPL). The full text of the license is
-available at http://www.gnu.org/copyleft/lesser.html.
+The source code is distributed under the terms of the GNU Lesser General
+Public License (LGPL). The full text of the license is available at
+http://www.gnu.org/copyleft/lesser.html.
 
 Some examples are distributed under the terms of the Apache License,
 Version 2.0. The full text of the license is available at:
@@ -216,8 +219,8 @@ Software License. The schema is available at the following location:
 
     jar:orbeon.jar!/org/orbeon/oxf/xml/schemas/xslt-2_0.xsd
 
-Please consult the third-party-licenses directory for more
-information about individual licenses.
+Please consult the third-party-licenses directory for more information
+about individual licenses.
 
 Last updated: November 2004
 

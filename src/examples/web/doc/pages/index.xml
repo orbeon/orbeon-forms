@@ -25,13 +25,14 @@
             <p>Welcome to the Orbeon Presentation Server User Guide!</p>
 
             <p>
-                Presentation Server is a native XML Web application platform that is purpose-built
-                to automate document-centric business processes with web applications built directly
-                from XML business documents. Although Presentation Server was designed primarily to
-                develop Web applications, it can be used to build all sorts of XML applications,
-                including Enterprise Application Integration (EAI), Content Management Systems
-                (CMS), and more. Presentation Server is part of the <a
-                href="http://www.orbeon.com/software/">Open Integration Suite</a>.
+                Orbeon Presentation Server is a J2EE-based MVC framework for building Web
+                applications that present and capture XML using XForms, XSLT, and Web Services.
+                Presentation Server benefits from standardized forms processing using XForms, rich
+                controller semantics, and full-featured XML pipelines. Presentation Server is in
+                fact built around Orbeon's optimized XML pipeline engine, a mature, high-performance
+                engine for pipeline processing of XML. Presentation Server is ideal for building
+                Composite Applications in a Service Oriented Architecture (SOA), an can be used on
+                its own, or within the <a href="http://www.orbeon.com/software/">OIS suite</a>.
             </p>
         </section>
 

@@ -73,7 +73,7 @@
 
     <page id="detail-1" path-info="/bizdoc/detail-1" xforms="detail/detail-xforms-model.xml" view="detail/detail-view-1.xsl">
         <!-- Save the current document and documemnt is valid -->
-        <action when="/form/action = 'save' and not(/form/document//@*[local-name() = 'error'])" action="detail/save-document-action.xpl">
+        <action when="/form/action = 'save' and not(/form/document//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="detail/save-document-action.xpl">
             <result page="detail-1">
                 <xu:remove select="/*"/>
                 <xu:update select="/">
@@ -84,7 +84,7 @@
             </result>
         </action>
         <!-- Save the current document and documemnt is invalid -->
-        <action when="/form/action = 'save' and /form/document//@*[local-name() = 'error']">
+        <action when="/form/action = 'save' and /form/document//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])]">
             <result>
                 <xu:update select="/form/message">save-failure</xu:update>
                 <xu:update select="/form/show-errors">true</xu:update>
@@ -110,7 +110,7 @@
 
     <page id="detail-2" path-info="/bizdoc/detail-2" xforms="detail/detail-xforms-model.xml" view="detail/detail-view-2.xsl">
         <!-- Save the current document and documemnt is valid -->
-        <action when="/form/action = 'save' and not(/form/document//@*[local-name() = 'error'])" action="detail/save-document-action.xpl">
+        <action when="/form/action = 'save' and not(/form/document//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="detail/save-document-action.xpl">
             <result page="detail-2">
                 <xu:remove select="/*"/>
                 <xu:update select="/">
@@ -121,7 +121,7 @@
             </result>
         </action>
         <!-- Save the current document and documemnt is invalid -->
-        <action when="/form/action = 'save' and /form/document//@*[local-name() = 'error']">
+        <action when="/form/action = 'save' and /form/document//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])]">
             <result>
                 <xu:update select="/form/message">save-failure</xu:update>
                 <xu:update select="/form/show-errors">true</xu:update>

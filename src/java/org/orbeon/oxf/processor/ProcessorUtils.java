@@ -13,28 +13,21 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.QName;
-import org.dom4j.Namespace;
-import org.dom4j.Attribute;
+import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.generator.URLGenerator;
-import org.orbeon.oxf.util.PipelineUtils;
-import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.HashSet;
-import java.util.Set;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 
 public class ProcessorUtils {
     public static final String XML_CONTENT_TYPE1 = "text/xml";
@@ -47,6 +40,7 @@ public class ProcessorUtils {
     public static final String DEFAULT_BINARY_CONTENT_TYPE = "application/octet-stream";
 
     public static final Map supportedBinaryTypes = new HashMap();
+
     static {
         supportedBinaryTypes.put(XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(), XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
         supportedBinaryTypes.put(XMLConstants.XS_ANYURI_QNAME.getQualifiedName(), XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
@@ -100,15 +94,7 @@ public class ProcessorUtils {
             } else {
                 // Href
                 LocationData locationData = (LocationData) inputElement.getData();
-                String url = XPathUtils.selectStringValue(inputElement, "@href");
-                URL fullURL;
-                try {
-                    fullURL = (locationData != null && locationData.getSystemID() != null)
-                                                ? URLFactory.createURL(locationData.getSystemID(), url)
-                                                : URLFactory.createURL(url);
-                } catch (MalformedURLException e) {
-                    throw new OXFException(e);
-                }
+                URL fullURL = createRelativeURL(locationData, XPathUtils.selectStringValue(inputElement, "@href"));
 
                 URLGenerator urlGenerator = new URLGenerator(fullURL);
                 urlGenerator.setLocationData(locationData);
@@ -118,7 +104,45 @@ public class ProcessorUtils {
         return processor;
     }
 
-    public static void addNeededNamespaceDeclarations(Element originalElement, Element copyElement, Set alreadyDeclaredPrefixes) {
+    public static URL createRelativeURL(LocationData locationData, String urlString) {
+        try {
+            return (locationData != null && locationData.getSystemID() != null)
+                    ? URLFactory.createURL(locationData.getSystemID(), urlString)
+                    : URLFactory.createURL(urlString);
+        } catch (MalformedURLException e) {
+            throw new ValidationException(e, locationData);
+        }
+    }
+
+    public static Document createDocumentFromEmbeddedOrHref(Element element, String urlString) {
+        Document result;
+        if (urlString == null) {
+            // Case of embedded XML
+            Element originalElement = (Element) ((Element) element).elementIterator().next();
+            if (originalElement == null)
+                throw new OXFException("Content for element '" + element.getName() + "' is mandatory");
+            Element copiedElement = originalElement.createCopy();
+            addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
+            result = XMLUtils.createDOM4JDocument();
+            result.add(copiedElement);
+        } else {
+            // Href
+            LocationData locationData = (LocationData) element.getData();
+            URL url = createRelativeURL(locationData, urlString);
+
+            URLGenerator urlGenerator = new URLGenerator(url);
+            urlGenerator.setLocationData(locationData);
+            DOMSerializer domSerializer = new DOMSerializer();
+            PipelineUtils.connect(urlGenerator, "data", domSerializer, "data");
+
+            PipelineContext domSerializerPipelineContext = new PipelineContext();
+            domSerializer.start(domSerializerPipelineContext);
+            result = domSerializer.getNode(domSerializerPipelineContext);
+        }
+        return result;
+    }
+
+    private static void addNeededNamespaceDeclarations(Element originalElement, Element copyElement, Set alreadyDeclaredPrefixes) {
         Set newAlreadyDeclaredPrefixes = new HashSet(alreadyDeclaredPrefixes);
 
         // Add namespaces declared on this element

@@ -20,7 +20,6 @@ import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Namespace;
-import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
@@ -29,7 +28,6 @@ import org.orbeon.oxf.processor.DOMSerializer;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.XMLProcessorRegistry;
-import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.ResourceManager;
 import org.orbeon.oxf.resources.ResourceManagerWrapper;
@@ -41,34 +39,16 @@ import org.orbeon.oxf.xml.XPathUtils;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.Servlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
-import javax.servlet.ServletOutputStream;
+import javax.servlet.*;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 public class ProcessorTest extends TestCase {
 
@@ -157,31 +137,12 @@ public class ProcessorTest extends TestCase {
                 List domSerializers = new ArrayList();
                 List expectedDocuments = new ArrayList();
                 for (Iterator j = XPathUtils.selectIterator(testNode, "output"); j.hasNext();) {
-                    Node outputNode = (Node) j.next();
-                    String name = XPathUtils.selectStringValue(outputNode, "@name");
+                    Element outputElement = (Element) j.next();
+                    String name = XPathUtils.selectStringValue(outputElement, "@name");
                     if (name == null || name.equals(""))
                         throw new OXFException("Output name is mandatory");
 
-                    Document doc;
-                    if (XPathUtils.selectStringValue(outputNode, "@href") == null) {
-                        // Case of embedded XML
-                        Element originalElement = (Element) ((Element) outputNode).elementIterator().next();
-                        if (originalElement == null)
-                            throw new OXFException("Output content is mandatory");
-                        Element copiedElement = originalElement.createCopy();
-                        ProcessorUtils.addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
-                        doc = XMLUtils.createDOM4JDocument();
-                        doc.add(copiedElement);
-                    } else {
-                        // Href
-                        URLGenerator urlGenerator = new URLGenerator(XPathUtils.selectStringValue(outputNode, "@href"));
-                        DOMSerializer domSerializer = new DOMSerializer();
-                        PipelineUtils.connect(urlGenerator, "data", domSerializer, "data");
-
-                        PipelineContext domSerializerPipelineContext = new PipelineContext();
-                        domSerializer.start(domSerializerPipelineContext);
-                        doc = domSerializer.getNode(domSerializerPipelineContext);
-                    }
+                    Document doc = ProcessorUtils.createDocumentFromEmbeddedOrHref(outputElement, XPathUtils.selectStringValue(outputElement, "@href"));
 
                     expectedDocuments.add(doc);
                     DOMSerializer domSerializer = new DOMSerializer();

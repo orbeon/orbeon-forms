@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.test;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.orbeon.oxf.cache.Cacheable;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
@@ -22,15 +23,21 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.*;
+import org.orbeon.oxf.processor.generator.DOMGenerator;
+import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.resources.URLFactory;
 
 import java.io.File;
 import java.util.Iterator;
 import java.util.Map;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 /**
  *
@@ -179,17 +186,9 @@ public class TestProcessor extends ProcessorImpl {
     }
 
     private void handleSetRequestCommand(ExecutionContext executionContext, Element commandElement) {
-        String href = commandElement.attributeValue("href");
 
         // Build request document
-        Document requestDocument;
-        if (href == null) {
-            requestDocument = XMLUtils.createDOM4JDocument();
-            requestDocument.setRootElement(((Element) commandElement.elements().get(0)).createCopy());
-        } else {
-            // TODO
-            throw new IllegalArgumentException("Not implemented yet.");
-        }
+        Document requestDocument = ProcessorUtils.createDocumentFromEmbeddedOrHref(commandElement, XPathUtils.selectStringValue(commandElement, "@href"));
 
         // Create external context
         executionContext.externalContext = new TestExternalContext(requestDocument);

@@ -48,6 +48,7 @@
     <define name="processors">
         <element name="processors">
             <optional>
+                <!-- Because of XInclude -->
                 <attribute name="xml:base">
                     <data type="anyURI"/>
                 </attribute>

@@ -915,6 +915,25 @@
         </output>
     </test>
 
+    <test description="Constraint with Korean character" name="oxf:xforms-annotate">
+        <input name="instance">
+            <instance>
+                <a>&#x1105;</a>
+                <b>&#x1200;</b>
+            </instance>
+        </input>
+        <input name="model">
+            <xforms:model>
+                <xforms:bind nodeset="/instance/*" constraint="matches(.,'[&#x1100;-&#x11FF;]+')"/>
+            </xforms:model>
+        </input>
+        <output name="instance">
+            <instance>
+                <a xxforms:valid="true">&#x1105;</a>
+                <b xxforms:valid="false">&#x1200;</b>
+            </instance>
+        </output>
+    </test>
 
 
     <test description="Bind And Ref on Controls" name="oxf:pipeline">

@@ -988,6 +988,10 @@ public abstract class ProcessorImpl implements Processor {
                             ( debugConfigDocument, "debug filter"
                               , DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext );
                         PipelineUtils.connect( dg, "data", debugProcessor, "config");
+                        final ProcessorOutput dbgOut 
+                            = debugProcessor.getOutputByName( OUTPUT_DATA );
+                        final ProcessorInput dbgIn = debugProcessor.getInputByName( INPUT_DATA );
+                        filter = new ConcreteProcessorFilter( dbgIn, dbgOut, filter );
                     }
                 }
             }

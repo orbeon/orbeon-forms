@@ -16,14 +16,14 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>Installing Orbeon PresentationServer</title>
+        <title>Installing Orbeon Presentation Server</title>
     </header>
     <body>
         <section>
             <title>Downloading</title>
 
             <p>
-            	PresentationServer can be downloaded from
+            	Presentation Server can be downloaded from
                 <link href="http://www.orbeon.com/community/downloads">http://www.orbeon.com/community/downloads</link>.
             </p>
         </section>
@@ -31,7 +31,7 @@
             <title>System Requirements</title>
 
             <p>
-                To install PresentationServer you need an application server that runs on Java
+                To install Presentation Server you need an application server that runs on Java
                 version 1.4.1 (or later) and implements the Servlet API 2.3 (or later). Presentation
                 Server is supported on the following application servers:
             </p>
@@ -49,7 +49,7 @@
             or versions.</p>
         </section>
         <section>
-            <title>Installing PresentationServer on Apache Tomcat</title>
+            <title>Installing Presentation Server on Apache Tomcat</title>
 
             <ol>
                 <li><p>Assuming that <code>TOMCAT_HOME</code> represents the location of your
@@ -236,7 +236,7 @@
             </ol>
         </section>
         <section>
-            <title>Installing PresentationServer on BEA WebLogic 7 and 8.1</title>
+            <title>Installing Presentation Server on BEA WebLogic 7 and 8.1</title>
 
             <ol>
                 <p><li>Assume that <code>DOMAIN</code> represents your WebLogic domain directory
@@ -261,7 +261,7 @@
                         <li>Start WebLogic (e.g. with
                         <code>startWebLogic.cmd</code>)</li>
 
-                        <li>Make sure you can access the PresentationServer examples with your
+                        <li>Make sure you can access the Presentation Server examples with your
                         browser (by going to
                         <code>http://localhost:7001/orbeon/</code>)</li>
 
@@ -272,7 +272,7 @@
                         Name="orbeon"&gt;</code> element and add the attribute:
                         <code>ServletReloadCheckSecs="-1"</code>. This will
                         prevent WebLogic from checking if a servlet has changed
-                        in the application and will make PresentationServer <i>much</i>
+                        in the application and will make Presentation Server <i>much</i>
                         faster.</li>
                     </ol></p>
                 </li></p>
@@ -403,13 +403,13 @@
                     </ol></p>
                 </li></p>
                 -->
-                <p><li>Once PresentationServer is properly installed, you can start WebLogic as
+                <p><li>Once Presentation Server is properly installed, you can start WebLogic as
                 usual with the <code>startWeblogic.cmd</code> script (in
                 <code>DOMAIN</code>).</li></p>
             </ol>
         </section>
         <section>
-            <title>Installing PresentationServer on IBM WebSphere 6</title>
+            <title>Installing Presentation Server on IBM WebSphere 6</title>
             <ol>
                <p> <li>
                     Launch WebSphere server and log in to the administrative
@@ -421,7 +421,7 @@
                      <ul>
                          <p><li>
                              Extract the
-                             <code>hsqldb-1_7_2_4_orbeon.jar</code> file from PresentationServer
+                             <code>hsqldb-1_7_2_4_orbeon.jar</code> file from Presentation Server
                              WAR file, and save it on WebSphere's directory.
                          </li></p>
 
@@ -465,7 +465,7 @@
 -->
                 <p>
                     <li>
-                        Install and deploy PresentationServer (<code>orbeon.war</code>). Using the
+                        Install and deploy Presentation Server (<code>orbeon.war</code>). Using the
                         administrative console (Install New Application) and uploading the war file.
                         Set the application name to <code>orbeon</code>. <!-- Don't forget to map
                         the JDBC resource if you created the DataSource above. --> Finally, save
@@ -611,7 +611,7 @@
 <!--        </section>-->
         <anchor id="jboss"/>
         <section>
-            <title>Installing PresentationServer on JBoss 3.2.6 and 4.0.0</title>
+            <title>Installing Presentation Server on JBoss 3.2.6 and 4.0.0</title>
             <ol>
                 <li>Assuming that <code>JBOSS_HOME</code> represents the location of your JBoss
                 installation: create a new <code>JBOSS_HOME/server/default/deploy/orbeon.war</code>
@@ -649,7 +649,7 @@
                         </li>
                         <li>
                             Open <code>JBOSS_HOME/server/default/conf/login-config.xml</code> and
-                            and the following aplication policy to the list of policies :
+                            add the following aplication policy to the list of policies :
                             <xml-source>
                                 <application-policy name = "orbeon-demo">
                                    <authentication>
@@ -740,7 +740,7 @@
         <section>
             <title>Running the BizDoc Tutorial Application</title>
             <p>
-                To install the standalone BizDoc application described in the PresentationServer
+                To install the standalone BizDoc application described in the Presentation Server
                 Tutorial, simply deploy the <code>orbeon-bizdoc.war</code> file in your application
                 server. To do so, follow the installation instructions above depending on your
                 application server, but deploy <code>orbeon-bizdoc.war</code> instead of
@@ -757,7 +757,7 @@
         <section>
             <title>Security</title>
             <p>
-                For security reasons, you might want to run PresentationServer under a Security Manager. Java's
+                For security reasons, you might want to run Presentation Server under a Security Manager. Java's
                 Security Manager allows you to control the Java sandbox and which resources the
                 application can access. When installed correctly, the Security Manager can prevent
                 unauthorized code to execute malicious actions, such as deleting files on the server
@@ -802,8 +802,8 @@
                     <li>
                         Add the following system properties to the server startup script.
                         <ul>
-                            <li><i>oxf.home</i>: Location of the PresentationServer exploded WAR file</li>
-                            <li><i>oxf.resources</i>: Location of PresentationServer resources directory</li>
+                            <li><i>oxf.home</i>: Location of the Presentation Server exploded WAR file</li>
+                            <li><i>oxf.resources</i>: Location of Presentation Server resources directory</li>
                         </ul>
                     </li>
                     <li>

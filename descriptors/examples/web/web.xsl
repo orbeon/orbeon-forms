@@ -72,6 +72,12 @@
                 <param-value>oxf:/page-flow.xml</param-value>
             </context-param>
 
+            <xsl:comment> Set XML Server configuration file </xsl:comment>
+            <context-param>
+                <param-name>oxf.xml-server.config</param-name>
+                <param-value>oxf:/config/xml-server.xml</param-value>
+            </context-param>
+
             <xsl:comment> Set context listener processors </xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'context listener processors'"/>
@@ -152,7 +158,7 @@
             </xsl:call-template>
             -->
 
-            <xsl:comment> Set listeners </xsl:comment>
+            <xsl:comment> Set Presentation Server listeners </xsl:comment>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'listeners'"/>
                 <xsl:with-param name="commented" select="$target = 'war'"/>
@@ -162,6 +168,16 @@
                     </listener>
                     <listener>
                         <listener-class>org.orbeon.oxf.servlet.OXFSessionListener</listener-class>
+                    </listener>
+                </xsl:with-param>
+            </xsl:call-template>
+
+            <xsl:call-template name="comment">
+                <xsl:with-param name="caption" select="'XML Server'"/>
+                <xsl:with-param name="commented" select="true()"/>
+                <xsl:with-param name="content">
+                    <listener>
+                        <listener-class>org.orbeon.oxf.xmlserver.ContextListener</listener-class>
                     </listener>
                 </xsl:with-param>
             </xsl:call-template>

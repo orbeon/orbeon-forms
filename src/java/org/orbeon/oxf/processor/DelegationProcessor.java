@@ -15,32 +15,40 @@ package org.orbeon.oxf.processor;
 
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
+import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.PrefixedQName;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
-import org.apache.axis.message.MessageElement;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Text;
 import org.dom4j.XPath;
+import org.dom4j.io.DOMReader;
+import org.dom4j.io.DOMWriter;
+import org.dom4j.io.SAXContentHandler;
 import org.jaxen.SimpleNamespaceContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.generator.SAXStoreGenerator;
+import org.orbeon.oxf.servicedirectory.ServiceDirectory;
+import org.orbeon.oxf.util.JMSUtils;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.w3c.dom.Node;
-import org.xml.sax.*;
-import org.xml.sax.helpers.XMLFilterImpl;
+import org.xml.sax.Attributes;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
 
+import javax.jms.*;
 import javax.naming.Context;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.dom.DOMResult;
-import javax.xml.transform.sax.SAXSource;
+import javax.naming.InitialContext;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -52,12 +60,12 @@ public class DelegationProcessor extends ProcessorImpl {
 
     private static final org.dom4j.QName xsiType = new org.dom4j.QName
             ("type", new org.dom4j.Namespace("xsi", "http://www.w3.org/1999/XMLSchema-instance"));
-    private static final String DEFAULT_SELECT = "/SOAP-ENV:Envelope/SOAP-ENV:Body/*[1]/node()";
+    private static final String DEFAULT_SELECT_WEB_SERVICE = "/SOAP-ENV:Envelope/SOAP-ENV:Body/*[1]/node()";
+    private static final String DEFAULT_SELECT_BUS = "/SOAP-ENV:Envelope/SOAP-ENV:Body/*";
     private static final Map DEFAULT_SELECT_NAMESPACE_CONTEXT = new HashMap();
     static {
         DEFAULT_SELECT_NAMESPACE_CONTEXT.put("SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/");
     }
-
 
     public final String INPUT_INTERFACE = "interface";
     public final String INPUT_CALL = "call";
@@ -132,50 +140,32 @@ public class DelegationProcessor extends ProcessorImpl {
                             if (uri.equals(DELEGATION_NAMESPACE_URI)) {
                                 if (localname.equals("execute")) {
 
-                                    if (service.type == ServiceDefinition.WEB_SERVICE_TYPE) {
+                                    if (service.type == ServiceDefinition.WEB_SERVICE_TYPE
+                                            || service.type == ServiceDefinition.BUS_SERVICE_TYPE) {
 
                                         // Call Web service
                                         Service axisService = new Service();
                                         Call call = (Call) axisService.createCall();
-                                        SOAPEnvelope requestEnvelope = new SOAPEnvelope();
 
                                         // Read all parameters in root node
                                         final Node rootNode;
                                         {
-                                            SAXSource saxSource = new SAXSource(new XMLFilterImpl() {
-                                                ContentHandler contentHandler;
-                                                public void setContentHandler(ContentHandler handler) {
-                                                    super.setContentHandler(handler);
-                                                    contentHandler = handler;
-                                                }
+                                            // Read in DOM4j content handler
+                                            SAXContentHandler dom4jContentHandler = new SAXContentHandler();
+                                            dom4jContentHandler.startDocument();
+                                            dom4jContentHandler.startElement("", "dummy", "dummy", XMLUtils.EMPTY_ATTRIBUTES);
+                                            parameters.replay(dom4jContentHandler);
+                                            dom4jContentHandler.endElement("", "dummy", "dummy");
+                                            dom4jContentHandler.endDocument();
 
-                                                public void parse(InputSource input) throws SAXException {
-                                                    contentHandler.startDocument();
-                                                    contentHandler.startElement("", "dummy", "dummy", XMLUtils.EMPTY_ATTRIBUTES);
-                                                    parameters.replay(contentHandler);
-                                                    contentHandler.endElement("", "dummy", "dummy");
-                                                    contentHandler.endDocument();
-                                                }
-
-                                                public void setFeature(String name, boolean state) throws SAXNotRecognizedException, SAXNotSupportedException {
-                                                    // We allow these two features
-                                                    if (name.equals("http://xml.org/sax/features/namespaces") && state)
-                                                        return;
-                                                    if (name.equals("http://xml.org/sax/features/namespace-prefixes") && !state)
-                                                        return;
-
-                                                    // Otherwise we throw
-                                                    throw new SAXNotRecognizedException("Feature: " + name);
-                                                }
-                                            }, null);
-                                            DOMResult domResult = new DOMResult();
-                                            Transformer identityTransformer = TransformerUtils.getIdentityTransformer();
-                                            identityTransformer.transform(saxSource, domResult);
-                                            rootNode = domResult.getNode().getFirstChild();
+                                            // Convert to DOM
+                                            rootNode = new DOMWriter().write
+                                                    (dom4jContentHandler.getDocument()).getDocumentElement();
                                         }
 
                                         // Populate envelope
-                                        if ("document".equals(service.style)) {
+                                        SOAPEnvelope requestEnvelope = new SOAPEnvelope();
+                                        if (service.type == ServiceDefinition.BUS_SERVICE_TYPE || "document".equals(service.style)) {
                                             // Add elements to directly to body
                                             for (int i = 0; i < rootNode.getChildNodes().getLength(); i++) {
                                                 Node child = rootNode.getChildNodes().item(i);
@@ -198,47 +188,103 @@ public class DelegationProcessor extends ProcessorImpl {
                                             }
                                             requestEnvelope.addBodyElement(requestBody);
                                         }
-                                        
-                                        parameters = null;
-                                        call.setTargetEndpointAddress(new URL(service.endpoint));
-                                        if (operation != null && operation.soapAction != null) {
-                                            call.setUseSOAPAction(true);
-                                            call.setSOAPActionURI(operation.soapAction);
+
+                                        // Call service
+                                        SOAPEnvelope resultEnvelope = null;
+                                        if (service.type == ServiceDefinition.WEB_SERVICE_TYPE) {
+                                            // Call Web service
+                                            parameters = null;
+                                            call.setTargetEndpointAddress(new URL(service.endpoint));
+                                            if (operation != null && operation.soapAction != null) {
+                                                call.setUseSOAPAction(true);
+                                                call.setSOAPActionURI(operation.soapAction);
+                                            }
+                                            call.setReturnClass(javax.xml.soap.SOAPMessage.class);
+                                            resultEnvelope = call.invoke(requestEnvelope);
+                                        } else {
+                                            // Call bus service
+                                            QueueConnection requestQueueConnection = null;
+                                            QueueSession requestQueueSession = null;
+                                            QueueSender queueSender = null;
+                                            try {
+                                                requestQueueConnection = JMSUtils.getQueueConnection();
+                                                requestQueueSession = requestQueueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+                                                queueSender = requestQueueSession.createSender
+                                                        ((Queue) new InitialContext().lookup(JMSUtils.JNDI_SERVICE_PREFIX + service.name));
+                                                ObjectMessage responseMessage = requestQueueSession.createObjectMessage();
+                                                responseMessage.setObject(requestEnvelope);
+
+                                                // Send message
+                                                if (ServiceDirectory.instance().getServiceByName(service.name).hasOutputs()) {
+                                                    // Response expected
+                                                    QueueConnection responseQueueConnection = null;
+                                                    QueueSession responseQueueSession = null;
+                                                    QueueReceiver queueReceiver = null;
+                                                    try {
+                                                        responseQueueConnection = JMSUtils.getQueueConnection();
+                                                        responseQueueSession = responseQueueConnection.createQueueSession(false, Session.AUTO_ACKNOWLEDGE);
+                                                        Queue temporaryQueue = responseQueueSession.createTemporaryQueue();
+                                                        queueReceiver = responseQueueSession.createReceiver(temporaryQueue);
+                                                        responseMessage.setJMSReplyTo(temporaryQueue);
+                                                        responseQueueConnection.start();
+                                                        queueSender.send(responseMessage);
+                                                        Message message = queueReceiver.receive();
+                                                        resultEnvelope = (SOAPEnvelope) ((ObjectMessage) message).getObject();
+                                                    } finally{
+                                                        if (queueReceiver != null) queueReceiver.close();
+                                                        if (responseQueueSession != null) responseQueueSession.close();
+                                                        if (responseQueueConnection != null) responseQueueConnection.close();
+                                                    }
+
+                                                } else {
+                                                    // No response expected
+                                                    queueSender.send(responseMessage);
+                                                }
+                                            } finally {
+                                                if (queueSender != null) queueSender.close();
+                                                if (requestQueueSession != null) requestQueueSession.close();
+                                                if (requestQueueConnection != null) requestQueueConnection.close();
+                                            }
+
                                         }
-                                        call.setReturnClass(javax.xml.soap.SOAPMessage.class);
-                                        SOAPEnvelope resultEnvelope = call.invoke(requestEnvelope);
 
-                                        // Throw exception if a fault is returned
-                                        if (resultEnvelope.getBody().getFault() != null) {
-                                            throw new OXFException("SOAP Fault. Request:\n"
-                                                    + XMLUtils.domToString(requestEnvelope.getAsDocument())
-                                                    + "\n\nResponse:\n"
-                                                    + XMLUtils.domToString(resultEnvelope.getAsDocument()));
-                                        }
+                                        // Handle result
+                                        if (resultEnvelope != null) {
 
-                                        // Get body from result envelope
-                                        LocationSAXContentHandler domContentHandler = new LocationSAXContentHandler();
-                                        resultEnvelope.publishToHandler(domContentHandler);
-                                        XPath xpath = XPathCache.createCacheXPath(context,
-                                                operation != null && operation.select != null
-                                                ? operation.select : DEFAULT_SELECT);
-                                        xpath.setNamespaceContext(new SimpleNamespaceContext(
-                                                operation != null && operation.select != null
-                                                ? operation.selectNamespaceContext : DEFAULT_SELECT_NAMESPACE_CONTEXT));
-                                        LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
-                                        locationSAXWriter.setContentHandler(contentHandler);
-                                        for (Iterator i = xpath.selectNodes(domContentHandler.getDocument()).iterator(); i.hasNext();) {
+                                            // Throw exception if a fault is returned
+                                            if (resultEnvelope.getBody().getFault() != null) {
+                                                throw new OXFException("SOAP Fault. Request:\n"
+                                                        + XMLUtils.domToString(requestEnvelope.getAsDocument())
+                                                        + "\n\nResponse:\n"
+                                                        + XMLUtils.domToString(resultEnvelope.getAsDocument()));
+                                            }
 
-                                            // Create document with node from SOAP envelope
-                                            Object result = i.next();
-                                            if (result instanceof Element) {
-                                                locationSAXWriter.write((Element) result);
-                                            } else if (result instanceof Document) {
-                                                locationSAXWriter.write(((Document) result).getRootElement());
-                                            } else if (result instanceof Text) {
-                                                locationSAXWriter.write((Text) result);
-                                            } else {
-                                                throw new OXFException("Unsupported result from select expression: '" + result.getClass() + "'");
+                                            // Send body from result envelope
+                                            XPath xpath = XPathCache.createCacheXPath(context,
+                                                    operation != null && operation.select != null
+                                                    ? operation.select
+                                                    : service.type == ServiceDefinition.WEB_SERVICE_TYPE
+                                                    ? DEFAULT_SELECT_WEB_SERVICE
+                                                    : DEFAULT_SELECT_BUS);
+                                            xpath.setNamespaceContext(new SimpleNamespaceContext(
+                                                    operation != null && operation.select != null
+                                                    ? operation.selectNamespaceContext : DEFAULT_SELECT_NAMESPACE_CONTEXT));
+                                            LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
+                                            locationSAXWriter.setContentHandler(contentHandler);
+                                            Document resultEnvelopeDOM4j = new DOMReader().read(resultEnvelope.getAsDocument());
+                                            for (Iterator i = xpath.selectNodes(resultEnvelopeDOM4j).iterator(); i.hasNext();) {
+
+                                                // Create document with node from SOAP envelope
+                                                Object result = i.next();
+                                                if (result instanceof Element) {
+                                                    locationSAXWriter.write((Element) result);
+                                                } else if (result instanceof Document) {
+                                                    locationSAXWriter.write(((Document) result).getRootElement());
+                                                } else if (result instanceof Text) {
+                                                    locationSAXWriter.write((Text) result);
+                                                } else {
+                                                    throw new OXFException("Unsupported result from select expression: '" + result.getClass() + "'");
+                                                }
                                             }
                                         }
 
@@ -360,10 +406,12 @@ public class DelegationProcessor extends ProcessorImpl {
                     "webservice".equals(serviceType) ? ServiceDefinition.WEB_SERVICE_TYPE :
                     "stateless-ejb".equals(serviceType) ? ServiceDefinition.STATELESS_EJB_TYPE :
                     "javabean".equals(serviceType) ? ServiceDefinition.JAVABEAN_TYPE :
+                    "bus".equals(serviceType) ? ServiceDefinition.BUS_SERVICE_TYPE:
                     -1;
             service.id = serviceElement.attributeValue("id");
             service.endpoint = serviceElement.attributeValue("endpoint");
             service.jndiName = serviceElement.attributeValue("uri");
+            service.name = serviceElement.attributeValue("name");
             service.clazz = serviceElement.attributeValue("class");
             service.style = serviceElement.attributeValue("style");
 
@@ -392,11 +440,13 @@ public class DelegationProcessor extends ProcessorImpl {
         public final static int WEB_SERVICE_TYPE = 1;
         public final static int STATELESS_EJB_TYPE = 2;
         public final static int JAVABEAN_TYPE = 3;
+        public final static int BUS_SERVICE_TYPE = 4;
 
         public int type;
         public String id;
         public String endpoint;
         public String jndiName;
+        public String name;
         public String clazz;
         public String style;
         public List operations = new ArrayList();

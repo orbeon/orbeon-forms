@@ -5,7 +5,7 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <p:param name="instance" type="input"/>
+    <p:param name="instance" type="input" debug="instance"/>
     <p:param name="instance" type="output"/>
 
     <!-- Perform custom validation, and generate global errors -->

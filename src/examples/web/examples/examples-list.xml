@@ -84,6 +84,9 @@
         <example id="knight" label="Computations using XSLT"/>
         <example id="stx" label="Streaming Transformations"/>
     </section>
+    <section label="Enterprise Service Bus">
+        <example id="xmlserver" label="Simple Bus Service"/>
+    </section>
     <section label="Calling a Web Service">
         <example id="quotes" label="Famous Quotes"/>
         <example id="ca-traffic" label="California Traffic"/>

@@ -29,6 +29,7 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.common.OXFException;
 import org.xml.sax.ContentHandler;
 
 import java.util.HashMap;
@@ -94,7 +95,10 @@ public class XFormsInput extends ProcessorImpl {
 
                 if (instance == null) {
                     // Read instance input
-                    instance = new Instance(pipelineContext, readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE));
+                    org.dom4j.Document instanceDom4j = readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE);
+                    if (instanceDom4j.getRootElement() == null)
+                        throw new OXFException("No instance found in XForms model");
+                    instance = new Instance(pipelineContext, instanceDom4j);
                     final Element instanceElement = instance.getDocument().getRootElement();
 
                     // Extract filtered parameters from instance if any

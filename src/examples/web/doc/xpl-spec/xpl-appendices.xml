@@ -127,15 +127,15 @@
             </blist>
         </div2>
     </div1>
-    <div1 id="examples">
-        <head>Examples and Use Cases (Non-Normative)</head>
-        <div2>
-            <head></head>
-            <p>
-                [TODO]
-            </p>
-        </div2>
-    </div1>
+<!--    <div1 id="examples">-->
+<!--        <head>Examples and Use Cases (Non-Normative)</head>-->
+<!--        <div2>-->
+<!--            <head></head>-->
+<!--            <p>-->
+<!--                [TODO]-->
+<!--            </p>-->
+<!--        </div2>-->
+<!--    </div1>-->
     <div1 id="relationship">
         <head> Relationship with Other Specifications (Non-Normative)</head>
         <p>
@@ -359,12 +359,12 @@
                 that in addition, the use cases of the Note can all be satisfied by XPL.
             </p>
         </div2>
-        <div2>
-            <head>WS-BPEL 2.0</head>
-            <p>
-                [TODO]
-            </p>
-        </div2>
+<!--        <div2>-->
+<!--            <head>WS-BPEL 2.0</head>-->
+<!--            <p>-->
+<!--                [TODO]-->
+<!--            </p>-->
+<!--        </div2>-->
 <!--        <div2>-->
 <!--            <head>SXPipe</head>-->
 <!--            <p>-->
@@ -372,15 +372,15 @@
 <!--            </p>-->
 <!--        </div2>-->
     </div1>
-    <div1>
-        <head>Schema for XPL</head>
-        <p>
-            This appendix provides a W3C XML Schema for XPL.
-        </p>
-        <p>
-            [TODO]
-        </p>
-    </div1>
+<!--    <div1>-->
+<!--        <head>Schema for XPL</head>-->
+<!--        <p>-->
+<!--            This appendix provides a W3C XML Schema for XPL.-->
+<!--        </p>-->
+<!--        <p>-->
+<!--            [TODO]-->
+<!--        </p>-->
+<!--    </div1>-->
     <div1>
         <head>Summary of Issues (Non-Normative)</head>
         <div2>
@@ -437,7 +437,7 @@
                 </item>
                 <item>
                     <p>
-                        XPL must have a company-agnostic namsepace used for the elements of its
+                        XPL must have a company-agnostic namespace used for the elements of its
                         syntax and for the Standard XML Processor Library. This can be done once the
                         specification has found a host organization.
                     </p>
@@ -476,6 +476,23 @@
                     <p>
                        The <termref def="xpl-program">XPL program</termref> definition mentions
                        versions 1.0 of XML and namespaces. Should versions 1.1 be allowed?
+                    </p>
+                </item>
+                <item>
+                    <p>
+                       The specification should provide a W3C XML Schema or a Relax NG schema for
+                       XPL.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                       The specification should provide non-normative examples and use cases.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                       The specification should provide a non-normative comparison with WS-BPEL
+                       2.0.
                     </p>
                 </item>
             </olist>

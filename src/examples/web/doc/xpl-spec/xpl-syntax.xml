@@ -6,7 +6,7 @@
         <p>
             The XPL syntax is organized into modules. The Pipeline module and the Processor
             module constitute the basic framework of XPL. Other modules build on top that
-            framework to provide enhanced functionality. Modules are then grouped into
+            framework to provide enhanced functionality. Modules are grouped into
             profiles, see <specref ref="conformance"/>.
         </p>
     </div2>

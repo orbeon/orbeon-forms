@@ -462,11 +462,8 @@
           <arg value='-z' />
           <arg value='-c' />
           <arg value='--rsh=/usr/bin/ssh' />
-          <arg value='--exclude' />
-          <arg value='*.tar.gz' />
-          <arg value='--exclude' />
-          <arg value='*.zip' />
-          <arg value='*' />
+          <arg value='build.log' />
+          <arg value='orbeon.war' />
           <arg value='orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops' />
         </exec>
 

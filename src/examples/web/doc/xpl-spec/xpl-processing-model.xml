@@ -352,16 +352,16 @@
                     refer to XML Infoset identifiers of two types:
                 </p>
                 <ulist>
-                    <p>
+                    <item>
                         XML Infoset identifiers in scope for the <el>p:for-each</el>
                         statement. Those are called <emph>external XML Infoset
                         identifiers</emph>.
-                    </p>
-                    <p>
+                    </item>
+                    <item>
                         XML Infoset identifiers exposed by the sequence of statements
                         contained within the <el>p:for-each</el> statement. Those are called
                         <emph>local XML Infoset identifiers</emph>.
-                    </p>
+                    </item>
                 </ulist>
                 <p>
                     A local XML Infoset identifier must be interpreted as sequences of XML

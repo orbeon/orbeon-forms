@@ -88,13 +88,15 @@
             <head>Introduction</head>
             <div2 id="what-is-xpl">
                 <head>What is XPL?</head>
-                <termdef id="xpl-program" term="XPL program">
-                    An <term>XPL program</term> or <term>program in the XPL language</term> is a
-                    well-formed XML document whose syntax is well-formed XML <bibref ref="xml-10"/>
-                    conforming to the Namespaces in XML Recommendation <bibref
-                    ref="xml-namespaces-10"/>. Furthermore, the XML document must conform to the
-                    syntax of the XPL language described in this specification.
-                </termdef>
+                <p>
+                    <termdef id="xpl-program" term="XPL program">
+                        An <term>XPL program</term> or <term>program in the XPL language</term> is a
+                        well-formed XML document whose syntax is well-formed XML <bibref ref="xml-10"/>
+                        conforming to the Namespaces in XML Recommendation <bibref
+                        ref="xml-namespaces-10"/>. Furthermore, the XML document must conform to the
+                        syntax of the XPL language described in this specification.
+                    </termdef>
+                </p>
                 <p>
                     An XPL program defines orchestrated sequences of operations on XML Information
                     Sets (Infosets). Individual operations are encapsulated within components called
@@ -449,45 +451,43 @@
                     In the following table "N/A" is used to designate combinations that do not exist
                     according to the above definitions.
                 </p>
-                <p>
-                    <table border="1" align="center">
-                        <tr>
-                            <td rowspan="2" colspan="2"/>
-                            <th colspan="2">Static</th>
-                            <th rowspan="2">Dynamic</th>
-                        </tr>
-                        <tr>
-                            <th>Mandatory</th>
-                            <th>Optional</th>
-                        </tr>
-                        <tr>
-                            <th rowspan="2">Declared</th>
-                            <th>Connected</th>
-                            <td>OK</td>
-                            <td>OK</td>
-                            <td>OK</td>
-                        </tr>
-                        <tr>
-                            <th>Not Connected</th>
-                            <td>OK</td>
-                            <td>OK</td>
-                            <td>OK</td>
-                        </tr>
-                        <tr>
-                            <th rowspan="2">Not Declared</th>
-                            <th>Connected</th>
-                            <td>N/A</td>
-                            <td>N/A</td>
-                            <td>N/A</td>
-                        </tr>
-                        <tr>
-                            <th>Not Connected</th>
-                            <td>Invalid</td>
-                            <td>OK</td>
-                            <td>N/A</td>
-                        </tr>
-                    </table>
-                </p>
+                <table border="1" align="center">
+                    <tr>
+                        <td rowspan="2" colspan="2"/>
+                        <th colspan="2">Static</th>
+                        <th rowspan="2">Dynamic</th>
+                    </tr>
+                    <tr>
+                        <th>Mandatory</th>
+                        <th>Optional</th>
+                    </tr>
+                    <tr>
+                        <th rowspan="2">Declared</th>
+                        <th>Connected</th>
+                        <td>OK</td>
+                        <td>OK</td>
+                        <td>OK</td>
+                    </tr>
+                    <tr>
+                        <th>Not Connected</th>
+                        <td>OK</td>
+                        <td>OK</td>
+                        <td>OK</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="2">Not Declared</th>
+                        <th>Connected</th>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                        <td>N/A</td>
+                    </tr>
+                    <tr>
+                        <th>Not Connected</th>
+                        <td>Invalid</td>
+                        <td>OK</td>
+                        <td>N/A</td>
+                    </tr>
+                </table>
                 <note>
                     The mechanism by which an XML processor exposes inputs and outputs, and whether
                     they are mandatory or optional to the XPL implementation is outside the scope of

@@ -70,7 +70,7 @@
                     <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">
                     XML Path Language (XPath) 2.0 Working Draft</titleref>. World Wide Web Consortium, 2004.
                 </bibl>
-                <bibl id="relax-ng" href="http://www.oasis- open.org/committees/relax- ng/" key="RELAX NG" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
+                <bibl id="relax-ng" href="http://www.oasis-open.org/committees/relax-ng/" key="RELAX NG" xlink:type="simple" xlink:show="replace" xlink:actuate="onRequest">
                     James Clark, editor.
                     <titleref xlink:type="simple" xlink:show="new" xlink:actuate="onRequest">OASIS RELAX NG Technical Committee</titleref>.
                     OASIS. 2001.

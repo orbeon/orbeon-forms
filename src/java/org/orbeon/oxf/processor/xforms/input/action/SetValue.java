@@ -17,6 +17,7 @@ import org.dom4j.*;
 import org.jaxen.FunctionContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
+import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 
@@ -38,37 +39,11 @@ public class SetValue implements Action {
 
     public void run(PipelineContext context, FunctionContext functionContext, Document instance) {
 
-        // Compute value
-        String newValue;
-        if (value == null) {
-            newValue = content == null ? "" : content;
-        } else {
-            XPath valueXPath = XPathUtils.xpathWithFullURI(context, "string(" + value + ")");
-            valueXPath.setFunctionContext(functionContext);
-            newValue = (String) valueXPath.evaluate(instance);
-        }
-
-        // Get referenced part of the instance
-        XPath refXPath = XPathUtils.xpathWithFullURI(context, ref);
-        refXPath.setFunctionContext(functionContext);
-        Object refObject = refXPath.evaluate(instance);
-
         // Fill the instance
-        fill(refObject, newValue);
-    }
-
-    private void fill(Object refObject, String newValue) {
-
-        if (refObject instanceof Element || refObject instanceof Attribute) {
-            XFormsUtils.fillNode((Node) refObject, newValue);
-        } else  if (refObject instanceof List) {
-            for (Iterator i = ((List) refObject).iterator(); i.hasNext();) {
-                Object child = i.next();
-                fill(child, newValue);
-            }
-        } else {
-            throw new OXFException("XPath expression '" + ref
-                    + "' must reference an element or an attribute in the instance");
-        }
+        Integer id = new Integer(ref);
+        Node node = (Node) ((InstanceData) instance.getRootElement().getData()).getIdToNodeMap().get(id);
+        String newValue = value != null ? value
+                : content == null ? "" : content;
+        XFormsUtils.fillNode(node, newValue);
     }
 }

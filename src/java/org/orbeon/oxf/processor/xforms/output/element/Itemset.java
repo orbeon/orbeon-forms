@@ -35,9 +35,12 @@ public class Itemset extends XFormsElement {
                       String qname, Attributes attributes) throws SAXException {
         context.getContentHandler().startElement(uri, localname, qname, attributes);
         nodelist = context.getRefNodeList();
+        context.addRepeatId(null);
+        context.setRepeatIdIndex(null, null, 1);
     }
 
     public void end(XFormsElementContext context, String uri, String localname, String qname) throws SAXException {
+        context.removeRepeatId(null);
         for (Iterator i = nodelist.iterator(); i.hasNext();) {
             Node node = (Node) i.next();
             context.getContentHandler().startElement(Constants.XFORMS_NAMESPACE_URI, "item",

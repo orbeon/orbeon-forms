@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.Model;
+import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -52,6 +53,7 @@ public class XFormsAnnotate extends ProcessorImpl {
                     // Read instance data and annotate
                     final Document instance = DocumentHelper.createDocument
                             (readCacheInputAsDOM4J(context, INPUT_INSTANCE).getRootElement().createCopy());
+                    XFormsUtils.setInitialDecoration(instance.getDocument());
                     model.applyInputOutputBinds(instance);
 
                     // Output the instance to the specified content handler

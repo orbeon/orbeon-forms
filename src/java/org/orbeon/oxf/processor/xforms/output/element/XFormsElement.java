@@ -13,31 +13,33 @@
  */
 package org.orbeon.oxf.processor.xforms.output.element;
 
+import org.dom4j.Node;
 import org.jaxen.JaxenException;
-import org.jaxen.SimpleNamespaceContext;
 import org.jaxen.NamespaceContext;
+import org.jaxen.SimpleNamespaceContext;
 import org.jaxen.expr.DefaultXPathFactory;
 import org.jaxen.expr.FunctionCallExpr;
 import org.jaxen.expr.LiteralExpr;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.JaxenXPathRewrite;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.saxon.xpath.XPathExpression;
 import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.xpath.XPathExpression;
+import org.orbeon.saxon.om.NodeInfo;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import org.dom4j.Node;
 
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Enumeration;
+import java.util.Iterator;
 
 /**
  * MISSING:
@@ -78,7 +80,7 @@ public class XFormsElement {
                 String test = attributes.getValue("test");
                 XPathExpression xpathExpression = XPathCache.createCacheXPath20(context.getPipelineContext(),
                         context.getDocumentWrapper(), context.getDocumentWrapper().wrap(context.getRefNode()),
-                        "boolean(" + test + ")", prefixToURI, context.getRepeatIdToIndex());
+                        "boolean(" + test + ")", prefixToURI, context.getRepeatIdToIndex(), null);
                 Boolean value = (Boolean) xpathExpression.evaluateSingle();
                 addExtensionAttribute(newAttributes, "value", Boolean.toString(value.booleanValue()));
             } else if (context.getParentElement(0) instanceof Itemset
@@ -110,15 +112,43 @@ public class XFormsElement {
                     }
                 }
 
-                // Rewrite XPath attributes into full XPath expressions
-                if (attributes.getIndex("", "ref") != -1)
-                    addExtensionAttribute(newAttributes, "ref-xpath", rewriteXPath(context, attributes.getValue("ref")));
-                if (attributes.getIndex("", "nodeset") != -1)
-                    addExtensionAttribute(newAttributes, "nodeset-xpath", rewriteXPath(context, attributes.getValue("nodeset")));
-                if (attributes.getIndex("", "at") != -1)
-                    addExtensionAttribute(newAttributes, "at-xpath", rewriteXPath(context, attributes.getValue("at")));
-                if (attributes.getIndex("", "value") != -1)
-                    addExtensionAttribute(newAttributes, "value-xpath", rewriteXPath(context, attributes.getValue("value")));
+                // Handle attributes used by XForms actions
+                if (attributes.getIndex("", "ref") != -1) {
+                    // Get id of referenced node
+                    addExtensionAttribute(newAttributes, "ref-id",
+                            Integer.toString(XFormsUtils.getInstanceData(context.getCurrentNode()).getId()));
+                }
+                if (attributes.getIndex("", "nodeset") != -1) {
+                    // Get ids of node in "nodeset"
+                    StringBuffer ids = new StringBuffer();
+                    boolean first = true;
+                    for (Iterator i = context.getCurrentNodeset().iterator(); i.hasNext();) {
+                        Node node = (Node) i.next();
+                        if (!first) ids.append(' '); else first = false;
+                        ids.append(XFormsUtils.getInstanceData(node).getId());
+                    }
+                    addExtensionAttribute(newAttributes, "nodeset-ids", ids.toString());
+                }
+                if (attributes.getIndex("", "at") != -1) {
+                    // Evaluate "at" as a number
+                    NodeInfo contextNode = context.getDocumentWrapper().wrap((Node) context.getRefNodeList().get(0));
+                    Object at = XPathCache.createCacheXPath20(context.getPipelineContext(),
+                            context.getDocumentWrapper(), contextNode,
+                            "round(" + attributes.getValue("at") + ")", context.getCurrentPrefixToURIMap(),
+                            null, context.getFunctionLibrary()).evaluateSingle();
+                    if (!(at instanceof Number))
+                        throw new ValidationException("'at' expression must return a number",
+                                new LocationData(context.getLocator()));
+                    addExtensionAttribute(newAttributes, "at-value", at.toString());
+                }
+                if (attributes.getIndex("", "value") != -1) {
+                    // Evaluate "value" as a string
+                    String value = (String) XPathCache.createCacheXPath20(context.getPipelineContext(),
+                            context.getDocumentWrapper(), context.getDocumentWrapper().wrap(context.getCurrentNode()),
+                            "string(" + attributes.getValue("value") + ")",
+                            context.getCurrentPrefixToURIMap(), null, null).evaluateSingle();
+                    addExtensionAttribute(newAttributes, "value-value", value);
+                }
             }
             context.getContentHandler().startElement(uri, localname, qname, newAttributes);
         } catch (XPathException e) {
@@ -133,28 +163,5 @@ public class XFormsElement {
     private void addExtensionAttribute(AttributesImpl newAttributes, String name, String value) {
         newAttributes.addAttribute(Constants.XXFORMS_NAMESPACE_URI, name,
                 Constants.XXFORMS_PREFIX + ":" + name, "CDATA", value);
-    }
-
-    /**
-     * Rewrites the XPath expression, replacing index('set') by the current
-     * index in the given set.
-     */
-    private String rewriteXPath(final XFormsElementContext context, final String xpath) {
-        final LocationData locationData = new LocationData(context.getLocator());
-        String result = JaxenXPathRewrite.rewrite(xpath, null, null, "index", 1, locationData, new JaxenXPathRewrite.Rewriter() {
-            public void rewrite(FunctionCallExpr expr) {
-                try {
-                    if (! (expr.getParameters().get(0) instanceof LiteralExpr))
-                        throw new ValidationException("Literal expression expected as argument to index function", locationData);
-                    String repeatId = ((LiteralExpr) expr.getParameters().get(0)).getLiteral();
-                    int index = context.getRepeatIdIndex(repeatId, locationData);
-                    expr.setFunctionName("identity");
-                    expr.getParameters().set(0, new DefaultXPathFactory().createNumberExpr(index));
-                } catch (JaxenException e) {
-                    throw new OXFException(e.getMessage() + " while parsing XPath expression '" + xpath + "'");
-                }
-            }
-        });
-        return XPathUtils.putNamespacesInPath(context.getNamespaceSupport(), result);
     }
 }

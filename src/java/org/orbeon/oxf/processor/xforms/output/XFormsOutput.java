@@ -61,6 +61,7 @@ public class XFormsOutput extends ProcessorImpl {
                 // Read instance data and annotate
                 final Document instance = DocumentHelper.createDocument
                         (readCacheInputAsDOM4J(context, INPUT_INSTANCE).getRootElement().createCopy());
+                XFormsUtils.setInitialDecoration(instance.getDocument());
                 model.applyInputOutputBinds(instance);
 
                 // Create evaluation context
@@ -109,7 +110,11 @@ public class XFormsOutput extends ProcessorImpl {
                             // Get ref
                             String ref = attributes.getValue("ref");
                             if (ref == null) ref = attributes.getValue("nodeset");
-                            if (ref == null) ref = attributes.getValue("value");
+
+                            // New method where relative XPath is pushed
+                            elementContext.pushRelativeXPath(ref, attributes.getValue("ref") != null);
+
+                            // Old method where expanded XPath is pushed
                             if (ref != null) {
                                 // Concatenate with existing ref
                                 ref = XPathUtils.putNamespacesInPath(elementContext.getNamespaceSupport(), ref);
@@ -169,6 +174,7 @@ public class XFormsOutput extends ProcessorImpl {
                                 element.end(elementContext, uri, localname, qname);
                                 elementContext.popElement();
                                 elementContext.popGroupRef();
+                                elementContext.popRelativeXPath();
                             } else {
                                 super.endElement(uri, localname, qname);
                             }

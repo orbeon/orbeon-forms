@@ -37,6 +37,7 @@ public class Repeat extends XFormsElement {
         String variableName = "v" + context.getElementDepth();
 
         if (firstChild) {
+            context.addRepeatId(repeatId);
             context.pushGroupRef(context.getRefXPath() + "[$" + variableName + "]");
         } else {
             // End group

@@ -147,6 +147,7 @@ public class XFormsInput extends ProcessorImpl {
                                 + XMLUtils.domToString(instance.getDocument()));
 
                     // Run actions
+                    XFormsUtils.setInitialDecoration(instance.getDocument());
                     Action[] actions = requestParameters.getActions();
                     for (int i = 0; i < actions.length; i++) {
                         Action action = actions[i];

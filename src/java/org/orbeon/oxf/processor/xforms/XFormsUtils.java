@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.processor.xforms;
 
-import org.dom4j.Attribute;
-import org.dom4j.DocumentFactory;
-import org.dom4j.Element;
-import org.dom4j.Node;
+import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.resources.OXFProperties;
@@ -32,9 +29,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 
 public class XFormsUtils {
 
@@ -122,7 +117,8 @@ public class XFormsUtils {
         ((InstanceData) element.getData()).setGenerated(false);
         for (Iterator i = element.attributes().iterator(); i.hasNext();) {
             Attribute attribute = (Attribute) i.next();
-            ((InstanceData) attribute.getData()).setGenerated(false);
+            if (!attribute.getNamespaceURI().equals(Constants.XXFORMS_NAMESPACE_URI))
+                ((InstanceData) attribute.getData()).setGenerated(false);
         }
         for (Iterator i = element.elements().iterator(); i.hasNext();) {
             Element child = (Element) i.next();
@@ -134,15 +130,28 @@ public class XFormsUtils {
      * Recursively decorate the element and its attribute with empty instances
      * of <code>InstanceData</code>.
      */
-    public static void setInitialDecoration(Element element) {
-        element.setData(new InstanceData((LocationData) element.getData()));
+    public static void setInitialDecoration(Document document) {
+        Element rootElement = document.getRootElement();
+        Map idToNodeMap = new HashMap();
+        setInitialDecorationWorker(rootElement, new int[] {-1}, idToNodeMap);
+        ((InstanceData) rootElement.getData()).setIdToNodeMap(idToNodeMap);
+    }
+
+    private static void setInitialDecorationWorker(Element element, int[] currentId, Map idToNodeMap) {
+        int elementId = ++currentId[0];
+        idToNodeMap.put(new Integer(elementId), element);
+        element.setData(new InstanceData((LocationData) element.getData(), elementId));
         for (Iterator i = element.attributes().iterator(); i.hasNext();) {
             Attribute attribute = (Attribute) i.next();
-            attribute.setData(new InstanceData((LocationData) attribute.getData()));
+            if (!Constants.XXFORMS_NAMESPACE_URI.equals(attribute.getNamespaceURI())) {
+                int attributeId = ++currentId[0];
+                idToNodeMap.put(new Integer(attributeId), attribute);
+                attribute.setData(new InstanceData((LocationData) attribute.getData(), attributeId));
+            }
         }
         for (Iterator i = element.elements().iterator(); i.hasNext();) {
             Element child = (Element) i.next();
-            setInitialDecoration(child);
+            setInitialDecorationWorker(child, currentId, idToNodeMap);
         }
     }
 

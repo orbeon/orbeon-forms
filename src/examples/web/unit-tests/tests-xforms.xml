@@ -202,7 +202,7 @@
         </output>
     </test>
 
-    <test description="Keep namespace prefixes" name="oxf:pipeline" only="true">
+    <test description="Keep namespace prefixes" name="oxf:pipeline">
         <input name="config">
             <p:config>
                 <p:param type="output" name="out"/>
@@ -616,14 +616,6 @@
         </input>
         <output name="data">
             <value>1</value>
-        </output>
-    </test>
-    
-    <test description="Keep namespace declarations" name="oxf:pipeline">
-        <input name="config">
-        
-        </input>
-        <output name="data">
         </output>
     </test>
 </group>

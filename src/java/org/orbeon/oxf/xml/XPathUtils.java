@@ -331,7 +331,7 @@ public class XPathUtils {
         Map prefixToURIMap = new HashMap();
         String xpathExpression = xpathWithFullURIString(xpath, prefixToURIMap);
         return XPathCache.createCacheXPath20(null, documentWrapper, null, xpathExpression, 
-                prefixToURIMap, repeatIdToIndex);
+                prefixToURIMap, repeatIdToIndex, null);
     }
 
     /**

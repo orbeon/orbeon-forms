@@ -29,6 +29,8 @@ import org.orbeon.saxon.xpath.XPathException;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.om.NodeInfo;
+import org.orbeon.saxon.functions.FunctionLibrary;
+import org.orbeon.saxon.functions.FunctionLibraryList;
 
 import java.util.Map;
 import java.util.Iterator;
@@ -57,7 +59,7 @@ public class XPathCache {
 
     public static XPathExpression createCacheXPath20
             (PipelineContext context, DocumentWrapper documentWrapper, NodeInfo nodeInfo,
-             String xpathExpression, Map prefixToURIMap, Map variableToValueMap) {
+             String xpathExpression, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary) {
         try {
             // Create Saxon XPath Evaluator
             final XPathEvaluator xpathEvaluator = new XPathEvaluator(documentWrapper);
@@ -80,6 +82,10 @@ public class XPathCache {
                 }
             }
 
+            // Add function library
+            if (functionLibrary != null) {
+                ((FunctionLibraryList) standaloneContext.getFunctionLibrary()).libraryList.add(0, functionLibrary);
+            }
 
             XPathExpression exp = xpathEvaluator.createExpression(xpathExpression);
             // Context node

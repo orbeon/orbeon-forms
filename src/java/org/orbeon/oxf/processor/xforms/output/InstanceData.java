@@ -14,6 +14,9 @@
 package org.orbeon.oxf.processor.xforms.output;
 
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.common.OXFException;
+
+import java.util.Map;
 
 /**
  * Instance of this class are used to decorate the XForms instance.
@@ -26,10 +29,17 @@ public class InstanceData {
     private BooleanModelItemProperty required = new BooleanModelItemProperty(false);
     private BooleanModelItemProperty readonly = new BooleanModelItemProperty(false);
     private BooleanModelItemProperty valid = new BooleanModelItemProperty(true);
+    private int id = -1;
     private String invalidBindIds = null;
+    private Map idToNodeMap;
 
     public InstanceData(LocationData locationData) {
         this.locationData = locationData;
+    }
+
+    public InstanceData(LocationData locationData, int id) {
+        this(locationData);
+        this.id = id;
     }
 
     public boolean isGenerated() {
@@ -63,5 +73,19 @@ public class InstanceData {
 
     public void setInvalidBindIds(String invalidBindIds) {
         this.invalidBindIds = invalidBindIds;
+    }
+
+    public int getId() {
+        if (id == -1)
+            throw new OXFException("InstanceData id is in invalid state");
+        return id;
+    }
+
+    public Map getIdToNodeMap() {
+        return idToNodeMap;
+    }
+
+    public void setIdToNodeMap(Map idToNodeMap) {
+        this.idToNodeMap = idToNodeMap;
     }
 }

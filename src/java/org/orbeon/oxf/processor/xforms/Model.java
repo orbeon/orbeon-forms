@@ -125,7 +125,6 @@ public class Model {
      */
 
     public void applyInputOutputBinds(Document instance) {
-        XFormsUtils.setInitialDecoration(instance.getDocument().getRootElement());
         for (Iterator i = binds.iterator(); i.hasNext();) {
             final ModelBind modelBind = (ModelBind) i.next();
 

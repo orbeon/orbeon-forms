@@ -26,11 +26,15 @@ import org.orbeon.oxf.processor.xforms.Model;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.processor.xforms.output.XFormsOutputConfig;
+import org.orbeon.oxf.processor.xforms.output.XFormsFunctionLibrary;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.xpath.*;
+import org.orbeon.saxon.functions.FunctionLibrary;
+import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 
@@ -49,6 +53,7 @@ public class XFormsElementContext {
     private Locator locator;
     private Stack refStack = new Stack();
     private Stack elements = new Stack();
+    private Stack nodesetStack = new Stack();
     private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
     private Map repeatIdToIndex = new HashMap();
     private PipelineContext pipelineContext;
@@ -57,6 +62,7 @@ public class XFormsElementContext {
     private StandaloneContext standaloneContext;
     private Map variables = new HashMap();
     private Map xpathExpressionCache = new HashMap();
+    private FunctionLibrary functionLibrary = new XFormsFunctionLibrary(this);
 
     public XFormsElementContext(PipelineContext pipelineContext, Model model, Document instance,
                                 XFormsOutputConfig config, ContentHandler contentHandler) {
@@ -73,6 +79,68 @@ public class XFormsElementContext {
         } catch (XPathException e) {
             throw new OXFException(e);
         }
+    }
+
+    public void pushRelativeXPath(String xpath, boolean single) {
+        try {
+            if (xpath == null) {
+                // No change to current node
+                nodesetStack.push(getCurrentNode());
+            } else {
+                // Evaluate new xpath in context of current node
+                XPathExpression xpathExpression = XPathCache.createCacheXPath20(pipelineContext, documentWrapper,
+                        documentWrapper.wrap(getCurrentNode()), xpath,
+                        getCurrentPrefixToURIMap(), null, functionLibrary);
+                if (single) {
+                    Node node = (Node) xpathExpression.evaluateSingle();
+                    if (node == null)
+                        throw new ValidationException("Single binding expression '" + xpath
+                                + "' must return at least one node", new LocationData(locator));
+                    nodesetStack.push(node);
+                } else {
+                    nodesetStack.push(xpathExpression.evaluate());
+                }
+            }
+        } catch (XPathException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public Node getCurrentNode() {
+        if (nodesetStack.isEmpty()) {
+            return instance;
+        } else {
+            Object current = nodesetStack.peek();
+            if (!(current instanceof Node))
+                throw new ValidationException("Current context is a nodelist, a node is expected",
+                        new LocationData(locator));
+            return (Node) nodesetStack.peek();
+        }
+    }
+
+    public List getCurrentNodeset() {
+        Object current = nodesetStack.peek();
+        if (!(current instanceof List))
+            throw new ValidationException("Current context is a node, a nodelist is expected",
+                    new LocationData(locator));
+        return (List) nodesetStack.peek();
+    }
+
+    public Map getCurrentPrefixToURIMap() {
+        Map prefixToURI = new HashMap();
+        for (Enumeration e = namespaceSupport.getDeclaredPrefixes(); e.hasMoreElements();) {
+            String prefix = (String) e.nextElement();
+            prefixToURI.put(prefix, namespaceSupport.getURI(prefix));
+        }
+        return prefixToURI;
+    }
+
+    public void popRelativeXPath() {
+        nodesetStack.pop();
+    }
+
+    public FunctionLibrary getFunctionLibrary() {
+        return functionLibrary;
     }
 
     public void pushGroupRef(String ref) {
@@ -122,8 +190,8 @@ public class XFormsElementContext {
         // Add attribute values
         for (Iterator i = element.attributes().iterator(); i.hasNext();) {
             Attribute attribute = (Attribute) i.next();
-            if (!((InstanceData) attribute.getData()).isGenerated()
-                    && !attribute.getNamespaceURI().equals(Constants.XXFORMS_NAMESPACE_URI))
+            if (!attribute.getNamespaceURI().equals(Constants.XXFORMS_NAMESPACE_URI)
+                    && !((InstanceData) attribute.getData()).isGenerated())
                 map.put(XFormsUtils.getNameForNode(attribute, true), attribute.getValue());
         }
 
@@ -209,13 +277,15 @@ public class XFormsElementContext {
                 Map prefixToURIMap = new HashMap();
                 String xpath = XPathUtils.xpathWithFullURIString(refXPath, prefixToURIMap);
 
-                // Redeclare namespaces
+                // Declare namespaces
                 standaloneContext.clearNamespaces();
                 for (Iterator i = prefixToURIMap.keySet().iterator(); i.hasNext();) {
                     String prefix = (String) i.next();
                     standaloneContext.declareNamespace(prefix, (String) prefixToURIMap.get(prefix));
-
                 }
+
+                // Declare function context
+                ((FunctionLibraryList) standaloneContext.getFunctionLibrary()).libraryList.add(0, functionLibrary);
 
                 // Cache XPathExpression
                 xpathExpression = xpathEvaluator.createExpression(xpath);
@@ -236,19 +306,29 @@ public class XFormsElementContext {
         return node;
     }
 
+    public void addRepeatId(String repeatId) {
+        nodesetStack.push(null);
+    }
+
     public void setRepeatIdIndex(String repeatId, String variableName, int index) {
         try {
+            // Update current element of nodeset in stack
+            nodesetStack.pop();
+            nodesetStack.push(((List) nodesetStack.peek()).get(index - 1));
+
             // Store index for current repeat id, if one is specified
             if (repeatId != null)
                 repeatIdToIndex.put(repeatId, new Integer(index));
 
             // Set value of index for variable
-            Variable variable = (Variable) variables.get(variableName);
-            if (variable == null) {
-                variable = standaloneContext.declareVariable(variableName, new Integer(index));
-                variables.put(variableName, variable);
-            } else {
-                variable.setValue(new Integer(index));
+            if (variableName != null) {
+                Variable variable = (Variable) variables.get(variableName);
+                if (variable == null) {
+                    variable = standaloneContext.declareVariable(variableName, new Integer(index));
+                    variables.put(variableName, variable);
+                } else {
+                    variable.setValue(new Integer(index));
+                }
             }
         } catch (XPathException e) {
             throw new OXFException(e);
@@ -256,7 +336,9 @@ public class XFormsElementContext {
     }
 
     public void removeRepeatId(String repeatId) {
-        repeatIdToIndex.remove(repeatId);
+        if (repeatId != null)
+            repeatIdToIndex.remove(repeatId);
+        nodesetStack.pop();
     }
 
     public int getRepeatIdIndex(String repeatId, LocationData locationData) {

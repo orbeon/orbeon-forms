@@ -15,9 +15,11 @@ package org.orbeon.oxf.processor.xforms.input.action;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.jaxen.FunctionContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.xforms.output.InstanceData;
 
 import java.util.Iterator;
 import java.util.List;
@@ -40,27 +42,43 @@ public class Insert implements Action {
 
     public void run(PipelineContext context, FunctionContext functionContext, Document instance) {
 
-        // Get nodeset and element to duplicate
-        List nodesetList = ActionUtils.getNodeset(context, functionContext, instance, nodeset);
-        if (nodesetList.size() == 0)
-            throw new OXFException("nodeset attribute '" + nodeset + "' in insert action must return a non-empty nodeset");
-        Object lastNode = nodesetList.get(nodesetList.size() - 1);
-        if (!(lastNode instanceof Element))
-            throw new OXFException("last node in nodeset attribute from insert action must must be an element");
-        Element elementToDuplicate = (Element) lastNode;
+        String[] ids = nodeset.split(" ");
+        Map idToNodeMap = ((InstanceData) instance.getRootElement().getData()).getIdToNodeMap();
+
+        // Get element to duplicate (last one in the nodeset)
+        final Element elementToDuplicate;
+        {
+            if (ids.length == 0)
+                throw new OXFException("nodeset attribute in insert action must return a non-empty nodeset");
+            Object lastNode = idToNodeMap.get(new Integer(ids[ids.length - 1]));
+            if (!(lastNode instanceof Element))
+                throw new OXFException("last node in nodeset attribute from insert action must must be an element");
+            elementToDuplicate = (Element) lastNode;
+        }
 
         // Determine where to insert the duplicated element
-        int atValue = ActionUtils.getAtValue(functionContext, nodesetList, at);
-        if (atValue == Integer.MAX_VALUE) {
-            atValue = nodesetList.size() - 1;
-            position = POSITION_AFTER;
+        int atValue;
+        {
+            atValue = Integer.parseInt(at) - 1;
+            if (atValue < 0) atValue = 0;
+            if (atValue >= ids.length) atValue = ids.length - 1;
         }
+
+        // Get element at "at" position
+        final Element atElement;
+        {
+            Object atNode = idToNodeMap.get(new Integer(ids[atValue]));
+            if (!(atNode instanceof Element))
+                throw new OXFException("node pointed by 'at' position in nodeset attribute from"
+                        + " insert action must must be an element");
+            atElement = (Element) atNode;
+        }
+
 
         // Locate position of atElement (element pointed by "at") among his siblings
         int atElementIndex = 0;
-        List atElementSiblings = elementToDuplicate.getParent().elements();
+        List atElementSiblings = atElement.getParent().elements();
         {
-            Element atElement = (Element) nodesetList.get(atValue);
             boolean found = false;
             for (Iterator i = atElementSiblings.iterator(); i.hasNext();) {
                 if (i.next() == atElement) {

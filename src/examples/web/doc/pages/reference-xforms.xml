@@ -1109,6 +1109,7 @@
                     </xforms:repeat>
                 </xml-source>
             </section>
+            <a name="message-action"/>
             <section>
                 <title>Message Action</title>
                 <p>

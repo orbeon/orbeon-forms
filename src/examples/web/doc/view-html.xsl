@@ -67,9 +67,12 @@
                             <div class="minitoc">
                                 <ul>
                                     <xsl:for-each select="/document/body/section">
+                                        <xsl:variable name="anchor" 
+                                            select="if (preceding-sibling::a) 
+                                            then preceding-sibling::a/@name else generate-id()"/>
                                         <li>
                                             <xsl:number level="single" count="section" format="1. "/>
-                                            <a href="#{generate-id()}">
+                                            <a href="#{$anchor}">
                                                 <xsl:value-of select="title"/>
                                             </a>
                                             <!-- Second level -->
@@ -77,9 +80,12 @@
                                                 <ul>
                                                     <xsl:variable name="subsection-count" select="count(section)"/>
                                                     <xsl:for-each select="section">
+                                                        <xsl:variable name="anchor" 
+                                                            select="if (preceding-sibling::a) 
+                                                            then preceding-sibling::a/@name else generate-id()"/>
                                                         <li>
                                                             <xsl:number level="multiple" count="section" format="1.1. "/>
-                                                            <a href="#{generate-id()}">
+                                                            <a href="#{$anchor}">
                                                                 <xsl:value-of select="title"/>
                                                             </a>
                                                             <!-- Third -->
@@ -87,9 +93,12 @@
                                                                 <ul>
                                                                     <xsl:variable name="subsubsection-count" select="count(section)"/>
                                                                     <xsl:for-each select="section">
+                                                                        <xsl:variable name="anchor" 
+                                                                            select="if (preceding-sibling::a) 
+                                                                            then preceding-sibling::a/@name else generate-id()"/>
                                                                         <li>
                                                                             <xsl:number level="multiple" count="section" format="1.1.1. "/>
-                                                                            <a href="#{generate-id()}">
+                                                                            <a href="#{$anchor}">
                                                                                 <xsl:value-of select="title"/>
                                                                             </a>
                                                                         </li>

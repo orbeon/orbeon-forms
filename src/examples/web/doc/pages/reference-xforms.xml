@@ -1261,16 +1261,16 @@
                 <section>
                     <title>Pattern description</title>
                     <p>
-                        Validation of an instance can be done with XForms built-in mechanisms,
-                        specifically using model items properties or a W3C schema. In some case, it
-                        is desiderable to perform some other type of validation. For instance, one
-                        might want to delegate validation to a web service. In this case the
-                        application has to "tell" the XForms engine which nodes in the instance are
-                        invalid, so the XForms engine can display the appropriate alerts if XForms
-                        controls are bound to those nodes. Note that we are talking about validation
-                        here as this is the most frequent scenario, but this pattern applies as well
-                        to the all the other model item properties evaluated with an XPath
-                        expression: <code>relevant</code>, <code>required</code>, and
+                        Validation of an XForms instance can be done with XForms built-in
+                        mechanisms, specifically using model items properties or a W3C XML Schema.
+                        In some cases, it is desirable to perform other types of validation. For
+                        instance, one might want to delegate validation to a web service. In this
+                        case the application has to "tell" the XForms engine which nodes in the
+                        instance are invalid, so the XForms engine can display the appropriate
+                        alerts if XForms controls are bound to those nodes. Note that we are talking
+                        about validation here as this is the most frequent scenario, but this
+                        pattern applies as well to the all the other model item properties evaluated
+                        with an XPath expression: <code>relevant</code>, <code>required</code>, and
                         <code>readonly</code>.
                     </p>
                 </section>

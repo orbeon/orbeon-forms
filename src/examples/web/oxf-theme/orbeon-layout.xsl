@@ -22,7 +22,6 @@
     xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
 
 body {
-    color: red;
     margin: .71em .71em .71em .71em;
     padding: 0em;
     min-width: 800px;

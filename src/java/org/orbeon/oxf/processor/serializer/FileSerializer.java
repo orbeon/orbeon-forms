@@ -219,25 +219,28 @@ public class FileSerializer extends CachedSerializer {
                 file = new File(baseDirectory, config.getFile());
             }
 
-            // Get last modification date if possible
-            Object validity = getInputValidity(context, dataInput);
+            // NOTE: Caching here is broken. This is what we need to do:
+            // o for a given file, store a hash of the content stored (or the input key?)
+            // o then when we check whether we need to modify the file, check against the key
+            //   AND the validity
 
             // Compute last modified
-            long now = System.currentTimeMillis();
-            long lastModified = (validity != null) ? findLastModified(validity) : now;
-            boolean cacheable = validity != null && lastModified != 0;
-            if (lastModified == 0)
-                lastModified = now;
-
-            if (logger.isDebugEnabled())
-                logger.debug("Last modified: " + lastModified);
-
-            // Check lastModified and don't return content if condition is met
-            if (cacheable && (lastModified <= (file.lastModified() + 1000))) {
-                if (logger.isDebugEnabled())
-                    logger.debug("File doesn't need rewrite");
-                return;
-            }
+//            Object validity = getInputValidity(context, dataInput);
+//            long now = System.currentTimeMillis();
+//            long lastModified = (validity != null) ? findLastModified(validity) : now;
+//            boolean cacheable = validity != null && lastModified != 0;
+//            if (lastModified == 0)
+//                lastModified = now;
+//
+//            if (logger.isDebugEnabled())
+//                logger.debug("Last modified: " + lastModified);
+//
+//            // Check lastModified and don't return content if condition is met
+//            if (cacheable && (lastModified <= (file.lastModified() + 1000))) {
+//                if (logger.isDebugEnabled())
+//                    logger.debug("File doesn't need rewrite");
+//                return;
+//            }
 
             // Delete file if it exists
             if (file.exists() && file.canWrite())

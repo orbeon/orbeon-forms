@@ -281,5 +281,199 @@
 
             </p>
         </section>
+        <section>
+            <title>XLS Converters</title>
+            <p>
+                Presentation Server ships with the <link
+                href="http://jakarta.apache.org/poi/">POI</link> library which allows import and
+                export of Microsoft Excel documents. Presentation Server uses an Excel file
+                template to define the layout of the spreadsheet. You define cells that will contain
+                the values with a special markup.
+            </p>
+            <section>
+                <title>Preparing the Spreadsheet</title>
+                <p>
+                    First, create an Excel spreadsheet with the formatting of your choosing. Apply
+                    a special markup to the cell you need to export values to:
+                </p>
+                <ol>
+                    <li>Select the cell</li>
+                    <li>Go to the menu
+                        <code>Format->Cell</code>
+                    </li>
+                    <li>
+                        In the <code>Number</code> tab, choose the <code>Custom</code> format and
+                        enter a format that looks like: <code>#,##0;"/a/b|/c/d"</code>. In this
+                        example we have 2 XPath expressions separated by a pipe character
+                        (<code>|</code>): <code>/a/b</code> and <code>/c/d</code>. The first XPath
+                        expression is used when creating the Excel file (exporting) and is run
+                        against the <code>data</code> input document of the To XLS converter. The
+                        second expression is optional and is used when recreating an XML document
+                        from the Excel file (importing with the From XLS converter).
+                    </li>
+                </ol>
+            </section>
+            <section>
+                <title>To XLS Converter</title>
+                <p>
+                    The To XLS converter takes a <code>config</code> input describing the XLS
+                    template file, and a <code>data</code> input containing the values to be
+                    inserted in the template. The processor scans the template, and applies XPath
+                    expressions to fill in the template. The <code>config</code> input takes a
+                    single <code>config</code> element with one attribute:
+                </p>
+                <table>
+                    <tr>
+                        <th>
+                            <code>template</code>
+                        </th>
+                        <td>A URL pointing to an XLS template file</td>
+                    </tr>
+                </table>
+                <xml-source>
+                    <p:processor name="oxf:xls-serializer">
+                        <p:input name="config">
+                            <config template="oxf:/excel/template.xls"/>
+                        </p:input>
+                        <p:input name="data">
+                            <currency>
+                                <value1>10</value1>
+                                <value2>20</value2>
+                                <value3>30</value3>
+                            </currency>
+                        </p:input>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    The <code>config</code> element can also contain zero or more
+                    <code>repeat-row</code> elements with two attributes, <code>row-num</code> and
+                    <code>for-each</code>.
+                </p>
+<!--                <table>-->
+<!--                    <tr>-->
+<!--                        <th>-->
+<!--                            <code>row-num</code>-->
+<!--                        </th>-->
+<!--                        <td></td>-->
+<!--                    </tr>-->
+<!--                    <tr>-->
+<!--                        <th>-->
+<!--                            <code>for-each</code>-->
+<!--                        </th>-->
+<!--                        <td></td>-->
+<!--                    </tr>-->
+<!--                </table>-->
+                <p>
+                    The To XLS converter is typically connected to the HTTP serializer. This allows
+                    specifying headers such as <code>Content-Disposition</code>:
+                </p>
+                <xml-source>
+                    <comment> Convert to XLS </comment>
+                    <p:processor name="oxf:to-xls-converter">
+                        <p:input name="config">
+                            <config template="oxf:/examples/employees/export-excel/employees.xls">
+                                <repeat-row row-num="3" for-each="employees/employee"/>
+                            </config>
+                        </p:input>
+                        <p:input name="data" href="#workbook"/>
+                        <p:output name="data" id="xls-binary"/>
+                    </p:processor>
+
+                    <comment> Serialize </comment>
+                    <p:processor name="oxf:http-serializer">
+                        <p:input name="data" href="#xls-binary"/>
+                        <p:input name="config">
+                            <config>
+                                <header>
+                                    <name>Content-Disposition</name>
+                                    <value>attachment; filename=employees.xls</value>
+                                </header>
+                            </config>
+                        </p:input>
+                    </p:processor>
+                </xml-source>
+            </section>
+            <section>
+                <title>From XLS Converter</title>
+                <p>
+                    The From XLS converter takes an Excel file (for example uploaded with an XForms
+                    upload control), finds special markup cells and reconstructs an XML document from
+                    this markup. The converter has one <code>data</code> input which must receive a
+                    binary document, and a <code>data</code> output containing the generated XML
+                    document. Assume the following XForms model:
+                </p>
+                <xml-source>
+                    <xf:model xmlns:xf="http://www.w3.org/2002/xforms"
+                              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                              xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                        <xf:instance>
+                            <form>
+                                <action/>
+                                <files>
+                                    <file filename="" mediatype="" size="" xsi:type="xs:anyURI"/>
+                                </files>
+                            </form>
+                        </xf:instance>
+                        <xf:submission method="post" encoding="multipart/form-data"/>
+                    </xf:model>
+                </xml-source>
+                <p>
+                    The model can be filled with the following XForms controls:
+                </p>
+                <xml-source>
+                    <xforms:group ref="/form">
+                        <p>
+                            <xforms:upload ref="files/file[1]"/>
+                            <xforms:submit>
+                                <xforms:label>Submit</xforms:label>
+                                <xforms:setvalue ref="action">import</xforms:setvalue>
+                            </xforms:submit>
+                        </p>
+                    </xforms:group>
+                </xml-source>
+                <p>
+                    Then the following pipeline can extract the data from the uploaded file:
+                </p>
+                <xml-source>
+                    <comment> Dereference URI stored in instance and return a binary </comment>
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config" href="aggregate('config', aggregate('url', #instance#xpointer(string(/form/files/file[1]))), aggregate('content-type', #instance#xpointer('application/octet-stream')))"/>
+                        <p:output name="data" id="xls-binary"/>
+                    </p:processor>
+
+                    <comment> Convert file to XML </comment>
+                    <p:processor name="oxf:from-xls-converter">
+                        <p:input name="data" href="#xls-binary"/>
+                        <p:output name="data" id="xls"/>
+                    </p:processor>
+                </xml-source>
+                <p>
+                    This is an example of returned document, given an appropriate configuration of the
+                    Excel template:
+                </p>
+                <xml-source>
+                    <workbook>
+                        <sheet>
+                            <employees>
+                                <employee-id>5398</employee-id>
+                                <firstname>Nils</firstname>
+                                <lastname>Aas</lastname>
+                                <phone>(555) 123 0434</phone>
+                                <title>Norwegian sculptor and illustrator</title>
+                                <age>70</age>
+                                <manager-id/>
+                                <employee-id>5028</employee-id>
+                                <firstname>Ali</firstname>
+                                <lastname>Abbasi</lastname>
+                                <phone>(555) 123 0060</phone>
+                                <title>BBC Scotland travel presenter</title>
+                                <age>42</age>
+                                <manager-id/>
+                            </employees>
+                        </sheet>
+                    </workbook>
+                </xml-source>
+            </section>
+        </section>
     </body>
 </document>

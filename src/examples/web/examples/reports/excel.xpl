@@ -60,7 +60,7 @@
         <p:input name="config">
             <config>
                 <header>
-                   <name>Content-Disposition</name>
+                    <name>Content-Disposition</name>
                     <value>attachment; filename=report.xls</value>
                 </header>
             </config>

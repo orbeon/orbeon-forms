@@ -60,7 +60,17 @@
                 <script type="text/javascript" src="/oxf-theme/style/theme.js"/>
             </head>
             <!-- This gives a little nudge to IE, so IE displays all the borders -->
-            <body onload="document.body.innerHTML += ''; ">
+            <body>
+                <!-- Handle onload handler -->
+                <xsl:variable name="standard-onload" select="'document.body.innerHTML += ''''; '" as="xs:string"/>
+                <xsl:choose>
+                    <xsl:when test="/xhtml:html/xhtml:body/@onload">
+                        <xsl:attribute name="onload" select="concat($standard-onload, /xhtml:html/xhtml:body/@onload)"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:attribute name="onload" select="$standard-onload"/>
+                    </xsl:otherwise>
+                </xsl:choose>
                 <!-- Handle optional tabs -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:head/f:tabs"/>
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>

@@ -17,9 +17,7 @@ import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.common.OXFException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -29,9 +27,6 @@ import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.Node;
 
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.BadPaddingException;
 
 public class Group extends XFormsElement {
 

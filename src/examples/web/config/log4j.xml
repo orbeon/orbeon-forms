@@ -26,7 +26,7 @@
 
     <!-- Hub appender for studio to connect to. -->
     <appender name="StudioAppender" class="org.apache.log4j.net.SocketHubAppender">
-        <param name="Port" value="4445"/>
+        <param name="Port" value="4447"/>
         <param name="LocationInfo" value="true"/> 
     </appender>
 

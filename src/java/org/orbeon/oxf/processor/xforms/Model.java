@@ -432,14 +432,7 @@ public class Model {
 
                 // Put in DOM and attribute
                 instanceData.setInvalidBindIds(invalidBinds);
-                if (attribute == null) {
-                    attribute = UserDataDocumentFactory.getInstance().createAttribute
-                            (element, Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME, invalidBinds);
-                    attribute.setData(new InstanceData((LocationData) attribute.getData()));
-                    element.add(attribute);
-                } else {
-                    attribute.setValue(invalidBinds);
-                }
+                updateAttribute(element, attribute, Constants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME, invalidBinds);
             }
         }
 
@@ -465,14 +458,28 @@ public class Model {
 
             // Set on DOM and attribute
             property.set(outcome);
-            if (attribute == null) {
-                attribute = UserDataDocumentFactory.getInstance().createAttribute
-                        (element, qname, Boolean.toString(outcome));
-                attribute.setData(new InstanceData((LocationData) attribute.getData()));
-                element.add(attribute);
-            } else {
-                attribute.setValue(Boolean.toString(outcome));
+            updateAttribute(element, attribute, qname, Boolean.toString(outcome));
+        }
+    }
+
+    private void updateAttribute(Element element, Attribute attribute, QName qname, String value) {
+        if (attribute == null) {
+            // Add a namespace declaration if necessary
+            Namespace namespace = element.getNamespaceForPrefix(qname.getNamespacePrefix());
+            if (namespace == null) {
+                element.addNamespace(qname.getNamespacePrefix(), qname.getNamespaceURI());
+            } else if (!namespace.getURI().equals(qname.getNamespaceURI())) {
+                throw new ValidationException("Cannot add attribute to node with 'xxforms' prefix"
+                        + " as the prefix is already mapped to another URI",
+                        XFormsUtils.getInstanceData(element).getLocationData());
             }
+
+            // Add attribute
+            attribute = UserDataDocumentFactory.getInstance().createAttribute(element, qname, value);
+            attribute.setData(new InstanceData((LocationData) attribute.getData()));
+            element.add(attribute);
+        } else {
+            attribute.setValue(value);
         }
     }
 
@@ -579,10 +586,6 @@ public class Model {
 
         }
         return nodeset;
-    }
-
-    private void getBindNodesetWorker(PipelineContext context, List nodeset, DocumentWrapper wrapper, Node currentNode) {
-
     }
 
     public ModelBind getModelBindById(String id) {

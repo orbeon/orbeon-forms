@@ -34,18 +34,19 @@ public class Repeat extends XFormsElement {
 
     public boolean nextChildren(XFormsElementContext context) throws SAXException {
 
-        // Remove ref that that we added earlier
-        if (!firstChild) {
-            context.popGroupRef();
+        String variableName = "v" + context.getElementDepth();
+
+        if (firstChild) {
+            context.pushGroupRef(context.getRefXPath() + "[$" + variableName + "]");
+        } else {
             // End group
             super.end(context, Constants.XFORMS_NAMESPACE_URI, "group",
                     Constants.XFORMS_PREFIX + ":group");
         }
 
-        while (currentIndex <= lastIndex) {
+        if (currentIndex <= lastIndex) {
             // Update context
-            context.pushGroupRef(context.getRefXPath() + "[" + currentIndex + "]");
-            context.setRepeatIdIndex(repeatId, currentIndex);
+            context.setRepeatIdIndex(repeatId, variableName, currentIndex);
 
             // Start group
             AttributesImpl attributes = new AttributesImpl();
@@ -58,9 +59,11 @@ public class Repeat extends XFormsElement {
             currentIndex++;
             firstChild = false;
             return true;
+        } else {
+            context.removeRepeatId(repeatId);
+            context.popGroupRef();
+            return false;
         }
-        context.removeRepeatId(repeatId);
-        return false;
     }
 
     public void start(XFormsElementContext context, String uri, String localname, String qname, Attributes attributes) throws SAXException {

@@ -31,7 +31,7 @@ public class ActionUtils {
      * Gets a nodeset from the instance. Nodeset is a list of elements.
      */
     public static List getNodeset(PipelineContext context, FunctionContext functionContext, Document instance, String nodeset) {
-        XPath nodesetXPath = XPathUtils.xpathWithFullURI(context, instance, nodeset);
+        XPath nodesetXPath = XPathUtils.xpathWithFullURI(context, nodeset);
         nodesetXPath.setFunctionContext(functionContext);
         Object nodesetObject = nodesetXPath.evaluate(instance);
         if (nodesetObject instanceof List) {

@@ -43,13 +43,13 @@ public class SetValue implements Action {
         if (value == null) {
             newValue = content == null ? "" : content;
         } else {
-            XPath valueXPath = XPathUtils.xpathWithFullURI(context, instance, "string(" + value + ")");
+            XPath valueXPath = XPathUtils.xpathWithFullURI(context, "string(" + value + ")");
             valueXPath.setFunctionContext(functionContext);
             newValue = (String) valueXPath.evaluate(instance);
         }
 
         // Get referenced part of the instance
-        XPath refXPath = XPathUtils.xpathWithFullURI(context, instance, ref);
+        XPath refXPath = XPathUtils.xpathWithFullURI(context, ref);
         refXPath.setFunctionContext(functionContext);
         Object refObject = refXPath.evaluate(instance);
 

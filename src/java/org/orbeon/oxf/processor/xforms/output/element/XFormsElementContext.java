@@ -30,8 +30,7 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.xpath.XPathEvaluator;
-import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.saxon.xpath.*;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 
@@ -54,16 +53,26 @@ public class XFormsElementContext {
     private Map repeatIdToIndex = new HashMap();
     private PipelineContext pipelineContext;
     private DocumentWrapper documentWrapper;
+    private XPathEvaluator xpathEvaluator;
+    private StandaloneContext standaloneContext;
+    private Map variables = new HashMap();
+    private Map xpathExpressionCache = new HashMap();
 
     public XFormsElementContext(PipelineContext pipelineContext, Model model, Document instance,
                                 XFormsOutputConfig config, ContentHandler contentHandler) {
-        this.pipelineContext = pipelineContext;
-        this.model = model;
-        this.instance = instance;
-        this.config = config;
-        this.contentHandler = contentHandler;
-        this.contentHandlerHelper = new ContentHandlerHelper(contentHandler);
-        this.documentWrapper = new DocumentWrapper(instance, null);
+        try {
+            this.pipelineContext = pipelineContext;
+            this.model = model;
+            this.instance = instance;
+            this.config = config;
+            this.contentHandler = contentHandler;
+            this.contentHandlerHelper = new ContentHandlerHelper(contentHandler);
+            this.documentWrapper = new DocumentWrapper(instance, null);
+            this.xpathEvaluator = new XPathEvaluator(documentWrapper);
+            this.standaloneContext = (StandaloneContext) xpathEvaluator.getStaticContext();
+        } catch (XPathException e) {
+            throw new OXFException(e);
+        }
     }
 
     public void pushGroupRef(String ref) {
@@ -80,11 +89,14 @@ public class XFormsElementContext {
      * @param annotateElement
      */
     public String getRefName(boolean annotateElement) {
-        Object value = null;
-        value = XPathUtils.xpath2WithFullURI(documentWrapper, getRefXPath());
-        if (!(value instanceof Element) && !(value instanceof Attribute))
-            throw new OXFException("Expression '" + getRefXPath() + "' must reference an element or an attribute");
-        return XFormsUtils.getNameForNode((Node) value, annotateElement);
+        try {
+            Object value = getXPathExpression(getRefXPath()).evaluateSingle();
+            if (!(value instanceof Element) && !(value instanceof Attribute))
+                throw new OXFException("Expression '" + getRefXPath() + "' must reference an element or an attribute");
+            return XFormsUtils.getNameForNode((Node) value, annotateElement);
+        } catch (XPathException e) {
+            throw new OXFException(e);
+        }
     }
 
     /**
@@ -165,11 +177,42 @@ public class XFormsElementContext {
     }
 
     private List getRefNodeList(String refXPath) {
-        List result = XPathUtils.xpath2WithFullURIMultiple(documentWrapper, refXPath);
-        if (result == null)
-            throw new OXFException("Expression '" + refXPath
-                    + "' must return an element, an attribute or a nodeset");
-        return result;
+        try {
+            List result = getXPathExpression(refXPath).evaluate();
+            if (result == null)
+                throw new OXFException("Expression '" + refXPath
+                        + "' must return an element, an attribute or a nodeset");
+            return result;
+        } catch (XPathException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    private XPathExpression getXPathExpression(String refXPath) {
+        try {
+            XPathExpression xpathExpression = (XPathExpression) xpathExpressionCache.get(refXPath);
+            if (xpathExpression == null) {
+
+                // Create string version of XPath expression
+                Map prefixToURIMap = new HashMap();
+                String xpath = XPathUtils.xpathWithFullURIString(refXPath, prefixToURIMap);
+
+                // Redeclare namespaces
+                standaloneContext.clearNamespaces();
+                for (Iterator i = prefixToURIMap.keySet().iterator(); i.hasNext();) {
+                    String prefix = (String) i.next();
+                    standaloneContext.declareNamespace(prefix, (String) prefixToURIMap.get(prefix));
+
+                }
+
+                // Cache XPathExpression
+                xpathExpression = xpathEvaluator.createExpression(xpath);
+                xpathExpressionCache.put(refXPath, xpathExpression);
+            }
+            return xpathExpression;
+        } catch (XPathException e) {
+            throw new OXFException(e);
+        }
     }
 
     public Node getRefNode() {
@@ -177,13 +220,27 @@ public class XFormsElementContext {
         Node node = refNodeList.size() != 1 ? null :
                 refNodeList.get(0) instanceof Node ? (Node) refNodeList.get(0) : null;
         if (node == null)
-            throw new OXFException("Expression '" + getRefXPath()
-                    + "' must return an element or an attribute");
+            throw new OXFException("Expression '" + getRefXPath() + "' must return an element or an attribute");
         return node;
     }
 
-    public void setRepeatIdIndex(String repeatId, int index) {
-        repeatIdToIndex.put(repeatId, new Integer(index));
+    public void setRepeatIdIndex(String repeatId, String variableName, int index) {
+        try {
+            // Store index for current repeat id, if one is specified
+            if (repeatId != null)
+                repeatIdToIndex.put(repeatId, new Integer(index));
+
+            // Set value of index for variable
+            Variable variable = (Variable) variables.get(variableName);
+            if (variable == null) {
+                variable = standaloneContext.declareVariable(variableName, new Integer(index));
+                variables.put(variableName, variable);
+            } else {
+                variable.setValue(new Integer(index));
+            }
+        } catch (XPathException e) {
+            throw new OXFException(e);
+        }
     }
 
     public void removeRepeatId(String repeatId) {
@@ -200,6 +257,14 @@ public class XFormsElementContext {
 
     public Document getInstance() {
         return instance;
+    }
+
+    public DocumentWrapper getDocumentWrapper() {
+        return documentWrapper;
+    }
+
+    public Map getRepeatIdToIndex() {
+        return repeatIdToIndex;
     }
 
     public Model getModel() {
@@ -240,6 +305,10 @@ public class XFormsElementContext {
 
     public XFormsElement peekElement() {
         return (XFormsElement) elements.peek();
+    }
+
+    public int getElementDepth() {
+        return elements.size();
     }
 
     public XFormsElement getParentElement(int level) {

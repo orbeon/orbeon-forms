@@ -241,7 +241,7 @@ public class XPathUtils {
         }
     }
 
-    private static String xpathWithFullURIString(String xpath, Map prefixToURIMap) {
+    public static String xpathWithFullURIString(String xpath, Map prefixToURIMap) {
         // Replace URI by prefix in XPath expression
         Map uriToPrefixMap = new HashMap();
         int namespaceIndex = 0;
@@ -320,55 +320,19 @@ public class XPathUtils {
      *
      *     /{http://www.example.com/x}x:a/{http://www.example.com/y}y:b
      */
-    public static org.dom4j.XPath xpathWithFullURI(PipelineContext context, org.dom4j.Node node, String xpath) {
+    public static org.dom4j.XPath xpathWithFullURI(PipelineContext context, String xpath) {
         Map prefixToURIMap = new HashMap();
         org.dom4j.XPath path = XPathCache.createCacheXPath(context, xpathWithFullURIString(xpath, prefixToURIMap));
         path.setNamespaceContext(new SimpleNamespaceContext(prefixToURIMap));
         return path;
     }
 
-    public static Object xpath2WithFullURI(DocumentWrapper documentWrapper, String xpath) {
-        try {
-            // Create String XPath expression
-            Map prefixToURIMap = new HashMap();
-            String xpathExpression = xpathWithFullURIString(xpath, prefixToURIMap);
-
-            // Create Saxon XPath expression
-            final XPathEvaluator xpathEvaluator;
-            xpathEvaluator = new XPathEvaluator(documentWrapper);
-            StandaloneContext standaloneContext = (StandaloneContext) xpathEvaluator.getStaticContext();
-            for (Iterator j = prefixToURIMap.keySet().iterator(); j.hasNext();) {
-                String prefix = (String) j.next();
-                standaloneContext.declareNamespace(prefix, (String) prefixToURIMap.get(prefix));
-            }
-
-            return xpathEvaluator.evaluateSingle(xpathExpression);
-        } catch (XPathException e) {
-            throw new OXFException(e);
-        }
+    public static XPathExpression xpath2WithFullURI(DocumentWrapper documentWrapper, Map repeatIdToIndex, String xpath) {
+        Map prefixToURIMap = new HashMap();
+        String xpathExpression = xpathWithFullURIString(xpath, prefixToURIMap);
+        return XPathCache.createCacheXPath20(null, documentWrapper, null, xpathExpression, 
+                prefixToURIMap, repeatIdToIndex);
     }
-
-    public static List xpath2WithFullURIMultiple(DocumentWrapper documentWrapper, String xpath) {
-        try {
-            // Create String XPath expression
-            Map prefixToURIMap = new HashMap();
-            String xpathExpression = xpathWithFullURIString(xpath, prefixToURIMap);
-
-            // Create Saxon XPath expression
-            final XPathEvaluator xpathEvaluator;
-            xpathEvaluator = new XPathEvaluator(documentWrapper);
-            StandaloneContext standaloneContext = (StandaloneContext) xpathEvaluator.getStaticContext();
-            for (Iterator j = prefixToURIMap.keySet().iterator(); j.hasNext();) {
-                String prefix = (String) j.next();
-                standaloneContext.declareNamespace(prefix, (String) prefixToURIMap.get(prefix));
-            }
-
-            return xpathEvaluator.evaluate(xpathExpression);
-        } catch (XPathException e) {
-            throw new OXFException(e);
-        }
-    }
-
 
     /**
      * Example:

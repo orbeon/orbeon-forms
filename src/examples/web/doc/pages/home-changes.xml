@@ -122,11 +122,25 @@
             </section>
             <section>
                 <title>URL generator</title>
-                <p>
-                    The <a href="processors-generators#url-generator">URL generator</a> now supports
-                    URLs relative to the location where the generator is used, instead of just
-                    absolute URLs.
-                </p>
+                <section>
+                    <title>Relative URLs</title>
+                    <p>
+                        The <a href="processors-generators#url-generator">URL generator</a> now supports
+                        URLs relative to the location where the generator is used, instead of just
+                        absolute URLs.
+                    </p>
+                </section>
+                <section>
+                    <title>XInclude Dependencies</title>
+                    <p>
+                        The <a href="processors-generators#url-generator">URL generator</a> also deals
+                        correctly with XInclude dependencies. For example, if a file called
+                        <code>file1.xml</code> includes a file called <code>file2.xml</code>, which in
+                        turn includes a file called <code>file3.xml</code>, and you modify
+                        <code>file3.xml</code>, then <code>file1.xml</code> is re-read automatically.
+                        Of course, this works with other dependency scenarios as well!
+                    </p>
+                </section>
             </section>
             <section>
                 <title>User-Defined Processor Inputs</title>

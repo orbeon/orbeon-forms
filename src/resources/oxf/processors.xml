@@ -224,31 +224,35 @@
     </processor>
 
     <!-- Converters -->
-    <processor name="oxf:xml-converter" uri="oxf/processor/xml-converter">
+    <processor name="oxf:xml-converter">
         <class name="org.orbeon.oxf.processor.converter.XMLConverter"/>
     </processor>
 
-    <processor name="oxf:html-converter" uri="oxf/processor/html-converter">
+    <processor name="oxf:html-converter">
         <class name="org.orbeon.oxf.processor.converter.HTMLConverter"/>
     </processor>
 
-    <processor name="oxf:text-converter" uri="oxf/processor/text-converter">
+    <processor name="oxf:text-converter">
         <class name="org.orbeon.oxf.processor.converter.TextConverter"/>
     </processor>
 
-    <processor name="oxf:xslfo-converter" uri="oxf/processor/xslfo-converter">
+    <processor name="oxf:xslfo-converter">
         <class name="org.orbeon.oxf.processor.converter.XSLFOConverter"/>
     </processor>
 
-    <processor name="oxf:chart-converter" uri="oxf/processor/chart-converter">
+    <processor name="oxf:chart-converter">
         <class name="org.orbeon.oxf.processor.converter.JFreeChartConverter"/>
     </processor>
 
-    <processor name="oxf:svg-converter" uri="oxf/processor/svg-converter">
+    <processor name="oxf:svg-converter">
         <class name="org.orbeon.oxf.processor.converter.SVGConverter"/>
     </processor>
 
-    <processor name="oxf:xls-converter" uri="oxf/processor/xls-converter">
+    <processor name="oxf:from-xls-converter">
+        <class name="org.orbeon.oxf.processor.converter.FromXLSConverter"/>
+    </processor>
+
+    <processor name="oxf:xls-converter">
         <class name="org.orbeon.oxf.processor.converter.XLSConverter"/>
     </processor>
 

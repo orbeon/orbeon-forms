@@ -13,7 +13,7 @@
 
     <!-- Dereference URI -->
     <p:processor name="oxf:url-generator">
-        <p:input name="config" href="aggregate('config', aggregate('url', #request#xpointer(string(/reqest/body)))"/>
+        <p:input name="config" href="aggregate('config', aggregate('url', #request#xpointer(string(/request/body))))"/>
         <p:output name="data" id="file"/>
     </p:processor>
 

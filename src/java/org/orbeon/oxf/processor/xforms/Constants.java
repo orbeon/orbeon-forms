@@ -44,6 +44,6 @@ public class Constants {
     public static final String XFORMS_ENCRYPT_HIDDEN = "oxf.xforms.encrypt-hidden";
     
     private Constants() {
-        // dissallow contruction
+        // dissallow contruction 
     }
 }

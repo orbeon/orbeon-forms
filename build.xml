@@ -370,7 +370,7 @@
     <echo message='ops-version: ${ops-version}' />
 
 
-    <cvs command='rtag TAG_OPS_${ops-version} orbeon'
+    <cvs command='tag TAG_OPS_${ops-version}'
          cvsRoot=':ext:orbeonbld@cvs.sourceforge.net:/cvsroot/orbeon' failonerror='true' />
     
     <echo message="Deploying to ${deployDir}/${release.number}"/>

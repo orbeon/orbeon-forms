@@ -20,29 +20,26 @@
                 <data type="string"/>
             </element>
             <element name="xquery">
-                <ref name="anyElement"/>
+                <ref name="textOrElement"/>
             </element>
         </choice>
     </start>
 
-    <define name="anyElement">
-        <interleave>
-            <text/>
-            <optional>
+    <define name="textOrElement">
+        <zeroOrMore>
+            <choice>
+                <text/>
                 <element>
                     <anyName/>
                     <zeroOrMore>
-                        <choice>
-                            <attribute>
-                                <anyName/>
-                            </attribute>
-                            <text/>
-                            <ref name="anyElement"/>
-                        </choice>
+                        <attribute>
+                            <anyName/>
+                        </attribute>
                     </zeroOrMore>
+                    <ref name="textOrElement"/>
                 </element>
-            </optional>
-        </interleave>
+            </choice>
+        </zeroOrMore>
     </define>
 
 </grammar>

@@ -27,7 +27,8 @@
                 <table class="gridtable">
                     <tr>
                         <th>Document Identifier</th>
-                        <th>View</th>
+                        <th>Edit</th>
+                        <th>XML</th>
                         <th>Delete</th>
                     </tr>
                     <xsl:choose>
@@ -39,8 +40,15 @@
                                     </td>
                                     <td>
                                         <xforms:submit>
-                                            <xforms:label>View</xforms:label>
+                                            <xforms:label>Edit</xforms:label>
                                             <xforms:setvalue ref="action">show-detail</xforms:setvalue>
+                                            <xforms:setvalue ref="document-id"><xsl:value-of select="."/></xforms:setvalue>
+                                        </xforms:submit>
+                                    </td>
+                                    <td>
+                                        <xforms:submit>
+                                            <xforms:label>XML</xforms:label>
+                                            <xforms:setvalue ref="action">show-xml</xforms:setvalue>
                                             <xforms:setvalue ref="document-id"><xsl:value-of select="."/></xforms:setvalue>
                                         </xforms:submit>
                                     </td>
@@ -57,7 +65,7 @@
                         </xsl:when>
                         <xsl:otherwise>
                             <tr>
-                                <td colspan="3"><i>No document found.<br/>Please press the "Import
+                                <td colspan="4"><i>No document found.<br/>Please press the "Import
                                 Documents" button to get started.</i></td>
                             </tr>
                         </xsl:otherwise>

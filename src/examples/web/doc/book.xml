@@ -18,10 +18,10 @@
     <menu label="Getting Started">
         <menu-item label="Welcome" href="index"/>
         <menu-item label="Changes" href="home-changes"/>
-        <menu-item label="Installing OXF" href="intro-install"/>
+        <menu-item label="Installing" href="intro-install"/>
     </menu>
     <menu label="Tutorial">
-        <menu-item label="Tutorial" href="/doc/pages/OXFTutorial.pdf"/>
+        <menu-item label="Tutorial" href="/doc/pages/Tutorial.pdf"/>
     </menu>
     <menu label="Reference">
         <menu-item label="XForms" href="reference-xforms"/>

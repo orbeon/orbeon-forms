@@ -16,25 +16,23 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>Installing OXF</title>
+        <title>Installing Orbeon Presentation Server</title>
     </header>
     <body>
         <section>
-            <title>Downloading OXF</title>
+            <title>Downloading</title>
 
-            <p>OXF can be downloaded from
-                <link href="http://www.orbeon.com/my/">http://www.orbeon.com/my/</link>.
+            <p>
+            	Presentation Server can be downloaded from
+                <link href="http://www.orbeon.com/community/downloads">http://www.orbeon.com/community/downloads</link>.
             </p>
-
-            <note>For a complete list of third-party software used by OXF,
-            please refer to the README.txt file.</note>
         </section>
         <section>
             <title>System Requirements</title>
 
             <p>
-                To install OXF you need an application server that runs on Java version 1.4.1 (or
-                later) and implements the Servlet API 2.3 (or later). OXF is supported on the
+                To install Presentation Server you need an application server that runs on Java version 1.4.1 (or
+                later) and implements the Servlet API 2.3 (or later). Presentation Server is supported on the
                 following application servers:
             </p>
 
@@ -49,23 +47,23 @@
             or versions.</p>
         </section>
         <section>
-            <title>Installing OXF on Apache Tomcat</title>
+            <title>Installing Presentation Server on Apache Tomcat</title>
 
             <ol>
                 <li><p>Assuming that <code>TOMCAT_HOME</code> represents the
                 location of your Tomcat installation: create a new
-                <code>TOMCAT_HOME/webapps/oxf</code> directory.</p></li>
+                <code>TOMCAT_HOME/webapps/orbeon</code> directory.</p></li>
 
-                <li><p>Unzip <code>oxf.war</code> in the <code>oxf</code>
+                <li><p>Unzip <code>orbeon.war</code> in the <code>orbeon</code>
                 directory you just created.</p></li>
 
                 <li><p>With Tomcat 5, move <code>xercesImpl.jar</code> and
                 <code>xmlParserAPIs.jar</code> from <code>common/endoresed</code> to
                 <code>server/lib</code>. This way Xerces will be available to Tomcat, but it won't
-                override the version of Xerces and standard XML APIs that comes with OXF.</p></li>
+                override the version of Xerces and standard XML APIs that comes with Presentation Server.</p></li>
 
                 <li><p>You can now start Tomcat, and acess
-                <code>http://localhost:8080/oxf/</code> to test your
+                <code>http://localhost:8080/orbeon/</code> to test your
                 installation (replacing <code>localhost</code> and <code>8080</code>
                 with the host name and port number of your Tomcat installation),
                 or perform one of the optional installation steps
@@ -76,12 +74,12 @@
 
                    <ol>
                         <li>Open
-                        <code>TOMCAT_HOME/webapps/oxf/WEB-INF/web.xml</code>
+                        <code>TOMCAT_HOME/webapps/orbeon/WEB-INF/web.xml</code>
                         and uncomment the three sections delimited with "Uncomment
                         this for the SQL example".</li>
 
                         <li>Copy <code>hsqldb-1_7_1.jar</code> from
-                        <code>TOMCAT_HOME/webapps/oxf/WEB-INF/lib</code>
+                        <code>TOMCAT_HOME/webapps/orbeon/WEB-INF/lib</code>
                         to <code>TOMCAT_HOME/common/lib</code>.</li>
 
                         <li>If you are using Tomcat 4.1 LE, download <link
@@ -95,7 +93,7 @@
                         with the following properties:
 
                             <xml-source>
-                                <Context path="/oxf" docBase="oxf" reloadable="true" override="true">
+                                <Context path="/orbeon" docBase="orbeon" reloadable="true" override="true">
                                     <Resource name="jdbc/db" auth="Container"
                                         type="javax.sql.DataSource"/>
 
@@ -110,7 +108,7 @@
                                         </parameter>
                                         <parameter>
                                             <name>url</name>
-                                            <value>jdbc:hsqldb:http://localhost:8080/oxf/db</value>
+                                            <value>jdbc:hsqldb:http://localhost:8080/orbeon/db</value>
                                         </parameter>
                                         <parameter>
                                             <name>username</name>
@@ -130,7 +128,7 @@
 
                     <ol>
                         <li>Open
-                        <code>TOMCAT_HOME/webapps/oxf/WEB-INF/web.xml</code>
+                        <code>TOMCAT_HOME/webapps/orbeon/WEB-INF/web.xml</code>
                         and uncomment the <code>security-constraint</code>,
                         <code>login-config</code> and <code>security-role</code>
                         declarations at the end of the file.</li>
@@ -221,14 +219,14 @@
             </ol>
         </section>
         <section>
-            <title>Installing OXF on BEA WebLogic 7 and 8.1</title>
+            <title>Installing Presentation Server on BEA WebLogic 7 and 8.1</title>
 
             <ol>
                 <p><li>Assume that <code>DOMAIN</code> represents your WebLogic domain directory
                 (typically <code>c:\bea\user_projects</code>). Create a new directory:
-                <code>DOMAIN\applications\oxf</code>.</li></p>
+                <code>DOMAIN\applications\orbeon</code>.</li></p>
 
-                <p><li>Unzip <code>oxf.war</code> in the <code>oxf</code>
+                <p><li>Unzip <code>orbeon.war</code> in the <code>orbeon</code>
                 directory you just created.</li></p>
 
                 <p><li>Edit the <code>startWeblogic.cmd</code> (in
@@ -246,18 +244,18 @@
                         <li>Start WebLogic (e.g. with
                         <code>startWebLogic.cmd</code>)</li>
 
-                        <li>Make sure you can access the OXF examples with your
+                        <li>Make sure you can access the Presentation Server examples with your
                         browser (by going to
-                        <code>http://localhost:7001/oxf/</code>)</li>
+                        <code>http://localhost:7001/orbeon/</code>)</li>
 
                         <li>Stop WebLogic</li>
 
                         <li>Open the <code>config.xml</code> file in an editor.
                         Look for the <code>&lt;WebAppComponent
-                        Name="oxf"&gt;</code> element and add the attribute:
+                        Name="orbeon"&gt;</code> element and add the attribute:
                         <code>ServletReloadCheckSecs="-1"</code>. This will
                         prevent WebLogic from checking if a servlet has changed
-                        in the application and will make OXF <i>much</i>
+                        in the application and will make Presentation Server <i>much</i>
                         faster.</li>
                     </ol></p>
                 </li></p>
@@ -267,7 +265,7 @@
 
                     <p><ol>
                         <li>Open
-                        <code>DOMAIN/applications/oxf/WEB-INF/web.xml</code>
+                        <code>DOMAIN/applications/orbeon/WEB-INF/web.xml</code>
                         and uncomment the <code>jdbc/db</code> data source
                         declaration.</li>
 
@@ -276,20 +274,20 @@
                             <p><ul>
                                 <li>On WebLogic 7: before the call to
                                 <code>startWLS.cmd</code> add a line: <code>set
-                                PRE_CLASSPATH=applications\oxf\WEB-INF\lib\hsqldb-1_7_1.jar</code>.</li>
+                                PRE_CLASSPATH=applications\orbeon\WEB-INF\lib\hsqldb-1_7_1.jar</code>.</li>
 
                                 <li>On WebLogic 8: at the end of the line
                                 <code>set CLASSPATH=...</code>, add:
-                                <code>;applications\oxf\WEB-INF\lib\hsqldb-1_7_1.jar</code></li>
+                                <code>;applications\orbeon\WEB-INF\lib\hsqldb-1_7_1.jar</code></li>
                             </ul></p>
                         </li>
 
                         <li>Go to the WebLogic Console with a browser.</li>
 
                         <li>Create a new connection pool (in Services / JDBC /
-                        Connection Pools). Name it <code>oxf</code>, set the
+                        Connection Pools). Name it <code>orbeon</code>, set the
                         URL to
-                        <code>jdbc:hsqldb:http://localhost:7001/oxf/db</code>,
+                        <code>jdbc:hsqldb:http://localhost:7001/orbeon/db</code>,
                         the driver classname to
                         <code>org.hsqldb.jdbcDriver</code> and the properties
                         to <code>user=sa</code>.</li>
@@ -301,9 +299,9 @@
                         <li>Go to the Targets tab and deploy the pool.</li>
 
                         <li>Create a Data Source for this connection pool.
-                        Name it <code>oxf</code>, set the JNDI name to
-                        <code>weblogic.jdbc.jts.oxf</code> and the pool
-                        name to <code>oxf</code>.</li>
+                        Name it <code>orbeon</code>, set the JNDI name to
+                        <code>weblogic.jdbc.jts.orbeon</code> and the pool
+                        name to <code>orbeon</code>.</li>
 
                         <li>Go to the <code>Targets</code> tab and deploy the
                         data source.</li>
@@ -314,7 +312,7 @@
 
                     <p><ol>
                         <li>Open
-                        <code>DOMAIN/applications/oxf/WEB-INF/web.xml</code>
+                        <code>DOMAIN/applications/orbeon/WEB-INF/web.xml</code>
                         and uncomment the <code>security-constraint</code>,
                         <code>login-config</code> and <code>security-role</code>
                         declarations at the end of the file.</li>
@@ -386,13 +384,13 @@
                     </ol></p>
                 </li></p>
                 -->
-                <p><li>Once OXF is properly installed, you can start WebLogic as
+                <p><li>Once Presentation Server is properly installed, you can start WebLogic as
                 usual with the <code>startWeblogic.cmd</code> script (in
                 <code>DOMAIN</code>).</li></p>
             </ol>
         </section>
         <section>
-            <title>Installing OXF on IBM WebSphere 5.1</title>
+            <title>Installing Presentation Server on IBM WebSphere 5.1</title>
             <ol>
                <p> <li>
                     Launch WebSphere server and log in to the administrative
@@ -403,7 +401,7 @@
                      <ul>
                          <p><li>
                              Extract the
-                             <code>hsqldb-1.7.1.jar</code> file from OXF
+                             <code>hsqldb-1.7.1.jar</code> file from Presentation Server
                              WAR file, and save it on WebSphere's directory.
                          </li></p>
 
@@ -429,7 +427,7 @@
 
                                  <tr>
                                      <th>Database Name</th>
-                                     <td><code>http://localhost:9080/oxf/db</code></td>
+                                     <td><code>http://localhost:9080/orbeon/db</code></td>
                                  </tr>
                                  <tr>
                                      <th>username</th>
@@ -446,10 +444,10 @@
                  </li>
 
                 <p><li>
-                    Install and deploy OXF (<code>oxf.war</code>). Using the
+                    Install and deploy Presentation Server (<code>orbeon.war</code>). Using the
                     administrative console (Install New Application) and
                     uploading the war file. Set the application name to
-                    <code>oxf</code>. Don't forget to map the JDBC resource if
+                    <code>orbeon</code>. Don't forget to map the JDBC resource if
                     you created the DataSource above. Finally, save the
                     configuration and start to the application.
                 </li></p>
@@ -680,16 +678,16 @@
         <section>
             <title>Running the BizDoc Tutorial Application</title>
             <p>
-                To install the standalone BizDoc application described in the OXF Tutorial, simply
-                deploy the <code>oxf-bizdoc.war</code> file in your application server. To do so,
+                To install the standalone BizDoc application described in the Presentation Server Tutorial, simply
+                deploy the <code>orbeon-bizdoc.war</code> file in your application server. To do so,
                 follow the installation instructions above depending on your application server, but
-                deploy <code>oxf-bizdoc.war</code> instead of <code>oxf.war</code>. You do not have
+                deploy <code>orbeon-bizdoc.war</code> instead of <code>orbeon.war</code>. You do not have
                 to include the optional steps.
             </p>
             <p>
-                Access the application using the <code>/oxf-bizdoc/</code> path from web browser.
+                Access the application using the <code>/orbeon-bizdoc/</code> path from web browser.
                 For example, if you application server is running on your local host on port 8080,
-                enter <code>http://localhost:8080/oxf-bizdoc/</code> in the URL bar of your web
+                enter <code>http://localhost:8080/orbeon-bizdoc/</code> in the URL bar of your web
                 browser.
             </p>
         </section>
@@ -697,7 +695,7 @@
         <section>
             <title>Security</title>
             <p>
-                For security reasons, you might want to run OXF under a Security Manager. Java's
+                For security reasons, you might want to run Presentation Server under a Security Manager. Java's
                 Security Manager allows you to control the Java sandbox and which resources the
                 application can access. When installed correctly, the Security Manager can prevent
                 unauthorized code to execute malicious actions, such as deleting files on the server
@@ -742,8 +740,8 @@
                     <li>
                         Add the following system properties to the server startup script.
                         <ul>
-                            <li><i>oxf.home</i>: Location of the OXF exploded WAR file</li>
-                            <li><i>oxf.resources</i>: Location of OXF resources directory</li>
+                            <li><i>oxf.home</i>: Location of the Presentation Server exploded WAR file</li>
+                            <li><i>oxf.resources</i>: Location of Presentation Server resources directory</li>
                         </ul>
                     </li>
                     <li>

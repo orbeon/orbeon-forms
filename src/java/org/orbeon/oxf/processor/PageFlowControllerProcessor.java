@@ -533,6 +533,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         if (foundActionWithoutWhen[0])
                             throw new ValidationException("Unreachable <action>", (LocationData) actionElement.getData());
                         setTest(whenAttribute);
+                        setNamespaces(XMLUtils.getNamespaceContext(actionElement));
+                        setLocationData((LocationData) actionElement.getData());
                     } else {
                         foundActionWithoutWhen[0] = true;
                     }
@@ -587,8 +589,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                                 // Execute result
                                 addWhen(new ASTWhen() {{
-                                    if (resultWhenAttribute != null)
+                                    if (resultWhenAttribute != null) {
                                         setTest(resultWhenAttribute);
+                                        setNamespaces(XMLUtils.getNamespaceContext(resultElement));
+                                        setLocationData((LocationData) resultElement.getData());
+                                    }
                                     executeResult(stepProcessorContext, controllerContext, this, pageIdToXFormsModel,
                                             pageIdToPathInfo, pageIdToParamsDocument,
                                             xformedInstance, resultElement, internalActionData,

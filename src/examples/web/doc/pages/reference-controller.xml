@@ -385,7 +385,7 @@
                 </xml-source>
 
                 <p>
-                    Like for the <code>files</code> element, a matcher can also be specified. When
+                    As with the <code>files</code> element, a matcher can also be specified. When
                     using a matcher where groups can be created, the part of the URI matched by
                     those groups can be passed to the model and the view through the XForms
                     instance. Note that the only matcher bundled with Presentation Server that

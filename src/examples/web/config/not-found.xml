@@ -13,74 +13,12 @@
 -->
 <html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>Page Not Found</title>
-        <style>
-
-            body {
-            background-color: #E5E5E5;
-            }
-
-            .blue { color: #666699; font-weight: bold;}
-            .orange { color: #FF9900; font-weight: bold; font-size: larger}
-
-            font, th, td, p { font-family: Verdana, Arial, Helvetica, sans-serif }
-            a:link,a:active,a:visited { color : #006699; }
-            a:hover { text-decoration: underline; color : #DD6900; }
-
-            hr { height: 0px; border: solid #D1D7DC 0px; border-top-width: 1px;}
-
-            .gen               { font-size : 13px; }
-            .bodytd            { background-color: #FFFFFF; border: 1px #98AAB1 solid; }
-            .table	           { background-color: #FFFFFF; border: 2px #006699 solid; }
-            .copyright         { font-size: 11px; font-family: Verdana, Arial, Helvetica, sans-serif; color: #444444; letter-spacing: -1px;}
-            .maintitle, h1, h2 {
-            font-weight: bold; font-size: 22px; font-family: "Trebuchet MS",Verdana, Arial, Helvetica, sans-serif;
-            text-decoration: none; line-height : 120%; color : #000000;
-            }
-
-            td.td	{ background-color: #EFEFEF; }
-
-            th	{
-            color: #FFA34F; font-size: 12px; font-weight : bold;
-            background-color: #006699; height: 25px;
-            }
-
-            th.th { border-width: 1px 0px 0px 1px; }
-
-            a.gen { color: #006699; text-decoration: none; }
-            a.gen:hover{ color: #DD6900; text-decoration: underline; }
-
-            input, textarea, select {
-            color : #000000;
-            font: normal 11px Verdana, Arial, Helvetica, sans-serif;
-            border-color : #000000;
-            }
-
-            input.post, textarea.post, select {
-            background-color : #FFFFFF;
-            }
-
-            input { text-indent : 2px; }
-
-            input.button {
-            background-color : #EFEFEF;
-            color : #000000;
-            font-size: 12px; font-family: Verdana, Arial, Helvetica, sans-serif;
-            }
-
-            input.mainoption {
-            background-color : #FAFAFA;
-            font-weight : bold;
-            }
-
-            input.liteoption {
-            background-color : #FAFAFA;
-            font-weight : normal;
-            }
-        </style>
+        <title>Orbeon Presentation Server - Page Not Found</title>
     </head>
     <body>
-        <h1>Page Not Found</h1>
-        <p>Sorry, but the resource you have requested is not available on this server.</p>
+        <h1>Orbeon Presentation Server - Page Not Found</h1>
+        <p>
+            We are sorry, but the resource you have requested is not available on this server.
+        </p>
     </body>
 </html>

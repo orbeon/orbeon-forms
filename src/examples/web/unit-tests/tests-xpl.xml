@@ -975,7 +975,7 @@
         </output>
     </test>
 
-<!--    <test description="Checking that each processor is only executed once" name="oxf:pipeline">-->
+<!--    <test description="Checking that each processor is only executed once" name="oxf:pipeline" only="true">-->
 <!--        <input name="config">-->
 <!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">-->
 <!--                <p:param name="result" type="output"/>-->
@@ -992,28 +992,56 @@
 <!--            <y/>-->
 <!--        </output>-->
 <!--    </test>-->
-<!---->
-<!--    <test description="Checking that each processor is only executed once" name="oxf:pipeline" only="true">-->
-<!--        <input name="config">-->
-<!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">-->
-<!--                <p:param name="result" type="output"/>-->
-<!--                <p:processor name="oxf:scope-generator">-->
-<!--                    <p:input name="config">-->
-<!--                        <config>-->
-<!--                            <key>xpl-unique</key>-->
-<!--                            <scope>application</scope>-->
-<!--                        </config>-->
-<!--                    </p:input>-->
-<!--                    <p:output name="data" id="tmp" ref="result" debug="TRACE"/>-->
-<!--                </p:processor>-->
-<!--                <p:processor name="oxf:null-serializer">-->
-<!--                    <p:input name="data" href="#tmp"/>-->
-<!--                </p:processor>-->
-<!--            </p:config>-->
-<!--        </input>-->
-<!--        <output name="result">-->
-<!--            <y/>-->
-<!--        </output>-->
-<!--    </test>-->
+
+    <test description="Checking that each processor is only executed once" name="oxf:pipeline">
+        <input name="scope-config">
+            <config>
+                <key>xpl-unique</key>
+                <scope>application</scope>
+            </config>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="scope-config" type="input"/>
+                <p:param name="result" type="output"/>
+                <!-- Initialize scope -->
+                <p:processor name="oxf:scope-serializer">
+                    <p:input name="config" href="#scope-config"/>
+                    <p:input name="data" href="aggregate('root')"/>
+                </p:processor>
+                <!-- Add container to document on application scope -->
+                <p:processor name="oxf:pipeline">
+                    <p:input name="scope-config" href="#scope-config"/>
+                    <p:input name="config">
+                        <p:config>
+                            <p:param name="scope-config" type="input"/>
+                            <p:param name="scope" type="output"/>
+                            <p:processor name="oxf:scope-generator">
+                                <p:input name="config" href="#scope-config"/>
+                                <p:output name="data" id="xpl-unique"/>
+                            </p:processor>
+                            <p:processor name="oxf:scope-serializer">
+                                <p:input name="config" href="#scope-config"/>
+                                <p:input name="data" href="aggregate('root', #xpl-unique)"/>
+                            </p:processor>
+                            <p:processor name="oxf:scope-generator">
+                                <p:input name="config" href="#scope-config"/>
+                                <p:output name="data" ref="scope"/>
+                            </p:processor>
+                        </p:config>
+                    </p:input>
+                    <p:output name="scope" id="scope" ref="result"/>
+                </p:processor>
+                <p:processor name="oxf:null-serializer">
+                    <p:input name="data" href="#scope"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <root>
+                <root/>
+            </root>
+        </output>
+    </test>
 
 </group>

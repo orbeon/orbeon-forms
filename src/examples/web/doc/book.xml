@@ -21,7 +21,7 @@
         <menu-item label="Installing OXF" href="intro-install"/>
     </menu>
     <menu label="Tutorial">
-        <menu-item label="Tutorial" href="/doc/pages/Tutorial.pdf"/>
+        <menu-item label="Tutorial" href="/doc/pages/OXFTutorial.pdf"/>
     </menu>
     <menu label="Reference">
         <menu-item label="XForms" href="reference-xforms"/>

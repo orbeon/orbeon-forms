@@ -81,6 +81,16 @@
                     <td>Recipient(s) of the message. Contains an <code>email</code> element and an optional <code>name</code> element.</td>
                 </tr>
                 <tr>
+                    <td>message/cc</td>
+                    <td>0..n</td>
+                    <td>Carbon copy recipient(s) of the message. Contains an <code>email</code> element and an optional <code>name</code> element.</td>
+                </tr>
+                <tr>
+                    <td>message/bcc</td>
+                    <td>0..n</td>
+                    <td>Blind carbon copy recipient(s) of the message. Contains an <code>email</code> element and an optional <code>name</code> element.</td>
+                </tr>
+                <tr>
                     <td>message/subject</td>
                     <td>1</td>
                     <td>Subject of the message</td>

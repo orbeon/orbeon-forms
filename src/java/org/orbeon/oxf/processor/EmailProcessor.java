@@ -145,6 +145,20 @@ public class EmailProcessor extends ProcessorImpl {
                 }
             }
 
+            // Set Cc
+            for (Iterator i = messageElement.elements("cc").iterator(); i.hasNext();) {
+                Element toElement = (Element) i.next();
+                InternetAddress address = createAddress(toElement);
+                message.addRecipient(Message.RecipientType.CC, address);
+            }
+
+            // Set Bcc
+            for (Iterator i = messageElement.elements("bcc").iterator(); i.hasNext();) {
+                Element toElement = (Element) i.next();
+                InternetAddress address = createAddress(toElement);
+                message.addRecipient(Message.RecipientType.BCC, address);
+            }
+
             // Set subject
             message.setSubject(messageElement.element("subject").getStringValue());
 

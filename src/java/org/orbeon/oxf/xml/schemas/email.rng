@@ -28,6 +28,16 @@
                     <ref name="address"/>
                 </element>
             </oneOrMore>
+            <zeroOrMore>
+                <element name="cc">
+                    <ref name="address"/>
+                </element>
+            </zeroOrMore>
+            <zeroOrMore>
+                <element name="bcc">
+                    <ref name="address"/>
+                </element>
+            </zeroOrMore>
             <element name="subject">
                 <data type="string"/>
             </element>

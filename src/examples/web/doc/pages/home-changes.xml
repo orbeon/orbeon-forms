@@ -21,7 +21,7 @@
     </header>
     <body>
         <section>
-            <title>New in Version 2.6.x</title>
+            <title>New in Version 2.7</title>
             <section>
                 <title>eXist Native XML Database</title>
                 <p>
@@ -167,6 +167,13 @@
                     The <a href="processors-java">Java processor</a> now works correctly in command
                     line mode. It also supports relative source paths and supports specifying
                     alternate compilers.
+                </p>
+            </section>
+            <section>
+                <title>Email Processor</title>
+                <p>
+                    The <a href="processors-messaging-email">Email processor</a> now supports
+                    <code>Cc</code> and <code>Bcc</code> recipients.
                 </p>
             </section>
             <section>

@@ -395,43 +395,63 @@
 
                 <item>
                     <p>
-                        Determine company-agnostic namespace for XPL.
+                        While the execution model for processors with outputs has been well
+                        received, this document proposes an execution model for processors without
+                        outputs that is the subject of debate, because:
                     </p>
-                </item>
-
-                <item>
+                    <ulist>
+                        <item>
+                            <p>It does not appear completely in line with the lazy evaluation model.</p>
+                        </item>
+                        <item>
+                            <p>It can appear confusing to users, especially beginners.</p>
+                        </item>
+                        <item>
+                            <p>Some use cases imvolving such processors are difficult to implement.</p>
+                        </item>
+                        <item>
+                            <p>Some use cases involving the controled order of execution of such
+                            processors are difficult to implement.</p>
+                        </item>
+                    </ulist>
                     <p>
-                        Determine wither p:pipeline/p:output should support embedded XML Infoset
-                        like p:input. [I DON'T SEE THE POINT, SO WOULD SAY NO]
+                        A satisfactory solution needs to be found, whether the current execution
+                        model is deemed good enough, or whether a new solution is proposed.
                     </p>
-                </item>
-                <item>
                     <p>
-                        Determine whether p:while must be defined in XPL 1.0. [FOR 1.0 MAYBE,
-                        BUT FOR A FIRST SUBMISSION NO]
-                    </p>
-                </item>
-                <item>
-                    <p>
-                        Determine whether exception handling must be defined in XPL 1.0.[FOR 1.0 MAYBE,
-                        BUT FOR A FIRST SUBMISSION NO]
-                    </p>
-                </item>
-                <item>
-                    <p>
-                        Determine whether unconnected outputs are allowed.
-                    </p>
-                </item>
-                <item>
-                    <p>
-                        Determine how to solve issue of exporting ids from p:choose branches.
-                        Should we use an attribute, or simply the p:output syntax?
+                        Current directions of thinking suggest for example mandating that all
+                        processors have at least one output, or implementing a separate syntax to
+                        express certain execution dependencies.
                     </p>
                 </item>
                 <item>
                     <p>
-                        Debug attributes are currently not specified. Are we happy with this
-                        solution?
+                        It is thought that exception handling is a very important optional language
+                        construct to define as soon as possible. A proposal needs to be made,
+                        experimented with, and then needs to make it into a stable version of XPL.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        It is thought that a "while" statement is an important optional language
+                        construct to define. A proposal needs to be made, experimented with, and
+                        then needs to make it into a stable version of XPL.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        XPL must have a company-agnostic namsepace used for the elements of its
+                        syntax and for the Standard XML Processor Library. This can be done once the
+                        specification has a definite host.
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        XPL needs a tracing facility. Current implementations allow for a
+                        <el>debug</el> attribute on inputs and outputs that has the semantic of
+                        logging the XML Infoset going through the associated input or output. It is
+                        found that the term "debug" is not appropriate, and that there may be a
+                        better way to construct the tracing facility.
                     </p>
                 </item>
             </olist>
@@ -512,6 +532,25 @@
                         feature? It would definitely make things easier if we did not have to
                         support this. [NO, WE DON'T SUPPORT MULTIPLE INPUTS AND OUTPUTS WITH
                         THE SAME NAME]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        Determine how to solve issue of exporting ids from p:choose branches. Should
+                        we use an attribute, or simply the p:output syntax? [CURRENT CHOICE IS
+                        USING p:output]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        Determine whether unconnected outputs are allowed. [CURRENT CHOICE IS
+                        THAT YES, THEY ARE]
+                    </p>
+                </item>
+                <item>
+                    <p>
+                        Determine wither p:pipeline/p:output should support embedded XML Infoset
+                        like p:input. [I DON'T SEE THE POINT, SO WOULD SAY NO]
                     </p>
                 </item>
             </olist>

@@ -151,11 +151,11 @@ public abstract class XMLDBProcessor extends ProcessorImpl {
      * Examples of datasourceURI / collection / XML:DB collection name combinations:
      *
      * 1. xmldb:exist:///
-     *    /db/oxf/adaptive-example
-     *    xmldb:exist:///db/oxf/adaptive-example
-     * 2. xmldb:exist://localhost:8888/oxf/exist-xmlrpc
-     *    /db/oxf/adaptive-example
-     *    xmldb:exist://localhost:8888/oxf/exist-xmlrpc/db/oxf/adaptive-example
+     *    /db/orbeon/bizdoc-example
+     *    xmldb:exist:///db/orbeon/bizdoc-example
+     * 2. xmldb:exist://localhost:9999/exist/xmlrpc
+     *    /db/orbeon/bizdoc-example
+     *    xmldb:exist://localhost:9999/exist/xmlrpc/db/orbeon/bizdoc-example
      */
     private Collection getCollection(PipelineContext pipelineContext, Datasource datasource, String collection) {
         ensureDriverRegistered(pipelineContext, datasource);

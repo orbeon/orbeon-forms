@@ -88,18 +88,18 @@
             </xsl:when>
             <xsl:when test="@xxforms:appearance = 'image'">
                 <xhtml:input type="image" name="{$name}" src="{xxforms:img/@src}" alt="{xforms:label}">
-                    <xsl:call-template name="copy-other-attributes"/>
+                    <xsl:copy-of select="@* except (@xhtml:onclick | @xxforms:* | @*[namespace-uri() = ''])"/>
                     <xsl:copy-of select="xxforms:img/@* except xxforms:img/@src"/>
-                    <xsl:if test="$message != ''">
-                        <xsl:attribute name="onclick" select="$message"/>
+                    <xsl:if test="@xhtml:onclick or $message != ''">
+                        <xsl:attribute name="onclick" select="concat(@xhtml:onclick, '; ', $message)"/>
                     </xsl:if>
                 </xhtml:input>
             </xsl:when>
             <xsl:otherwise>
                 <xhtml:input type="submit" name="{$name}" value="{xforms:label}">
-                    <xsl:call-template name="copy-other-attributes"/>
+                    <xsl:copy-of select="@* except (@xhtml:onclick | @xxforms:* | @*[namespace-uri() = ''])"/>
                     <xsl:if test="$message != ''">
-                        <xsl:attribute name="onclick" select="$message"/>
+                        <xsl:attribute name="onclick" select="concat(@xhtml:onclick, '; ', $message)"/>
                     </xsl:if>
                 </xhtml:input>
             </xsl:otherwise>

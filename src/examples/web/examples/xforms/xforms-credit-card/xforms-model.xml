@@ -15,7 +15,7 @@
 
     <xforms:instance>
         <credit-card>
-            <type/>
+            <type>visa</type>
             <number/>
             <expiration-month/>
             <expiration-year/>

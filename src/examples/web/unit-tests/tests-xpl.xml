@@ -863,48 +863,116 @@
         </output>
     </test>
 
-<!--    <test description="Subpipeline with non-called output and serializer" name="oxf:pipeline">-->
-<!--        <input name="config">-->
-<!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">-->
-<!--                <p:param name="result" type="output"/>-->
-<!--                <p:processor name="oxf:pipeline">-->
-<!--                    <p:input name="config">-->
-<!--                        <p:config>-->
-<!--                            <p:param name="not-read" type="output"/>-->
-<!--                            <p:processor name="oxf:scope-serializer">-->
-<!--                                <p:input name="data"><x/></p:input>-->
-<!--                                <p:input name="config">-->
-<!--                                    <config>-->
-<!--                                        <key>key</key>-->
-<!--                                        <scope>application</scope>-->
-<!--                                    </config>-->
-<!--                                </p:input>-->
-<!--                            </p:processor>-->
-<!--                            <p:processor name="oxf:identity">-->
-<!--                                <p:input name="data"><dummy/></p:input>-->
-<!--                                <p:output name="data" ref="not-read"/>-->
-<!--                            </p:processor>-->
-<!--                        </p:config>-->
-<!--                    </p:input>-->
-<!--                    <p:output name="not-read" id="not-read"/>-->
-<!--                </p:processor>-->
-<!--                <p:processor name="oxf:scope-generator">-->
-<!--                    <p:input name="config">-->
-<!--                        <config>-->
-<!--                            <key>key</key>-->
-<!--                            <scope>application</scope>-->
-<!--                        </config>-->
-<!--                    </p:input>-->
-<!--                    <p:output name="data" ref="result"/>-->
-<!--                </p:processor>-->
-<!--                <p:processor name="oxf:null-serializer">-->
-<!--                    <p:input name="data" href="#not-read"/>-->
-<!--                </p:processor>-->
-<!--            </p:config>-->
-<!--        </input>-->
-<!--        <output name="result">-->
-<!--            <b><c/></b>-->
-<!--        </output>-->
-<!--    </test>-->
-
+    <test description="Output and serializer: pipeline, no read" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="reset-scope.xpl"/>
+                </p:processor>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="serialize-and-return-pipeline.xpl"/>
+                </p:processor>
+                <p:processor name="oxf:scope-generator">
+                    <p:input name="config">
+                        <config>
+                            <key>key</key>
+                            <scope>application</scope>
+                        </config>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <x/>
+        </output>
+    </test>
+    
+    <test description="Output and serializer: pipeline, do read" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="reset-scope.xpl"/>
+                </p:processor>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="serialize-and-return-pipeline.xpl"/>
+                    <p:output name="sub-output" id="sub-output"/>
+                </p:processor>
+                <p:processor name="oxf:null-serializer">
+                    <p:input name="data" href="#sub-output"/>
+                </p:processor>
+                <p:processor name="oxf:scope-generator">
+                    <p:input name="config">
+                        <config>
+                            <key>key</key>
+                            <scope>application</scope>
+                        </config>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <x/>
+        </output>
+    </test>
+    
+    <test description="Output and serializer: choose, no read" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="reset-scope.xpl"/>
+                </p:processor>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="serialize-and-return-choose.xpl"/>
+                </p:processor>
+                <p:processor name="oxf:scope-generator">
+                    <p:input name="config">
+                        <config>
+                            <key>key</key>
+                            <scope>application</scope>
+                        </config>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <empty/>
+        </output>
+    </test>
+    
+    <test description="Output and serializer: choose, do read" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="reset-scope.xpl"/>
+                </p:processor>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="serialize-and-return-choose.xpl"/>
+                    <p:output name="sub-output" id="sub-output"/>
+                </p:processor>
+                <p:processor name="oxf:null-serializer">
+                    <p:input name="data" href="#sub-output"/>
+                </p:processor>
+                <p:processor name="oxf:scope-generator">
+                    <p:input name="config">
+                        <config>
+                            <key>key</key>
+                            <scope>application</scope>
+                        </config>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <x/>
+        </output>
+    </test>
+    
 </group>

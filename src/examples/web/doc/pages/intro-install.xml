@@ -411,10 +411,65 @@
         <section>
             <title>Installing Presentation Server on IBM WebSphere 6</title>
             <ol>
-               <p> <li>
-                    Launch WebSphere server and log in to the administrative
-                    console at <code>http://localhost:9060/ibm/console/</code>.
-                </li></p>
+                <li>
+                    <p>
+                        Launch WebSphere server.
+                        <ul>
+                            <li>On Windows go to Control Panel, Administrative Tools, Services.</li>
+                            <li>
+                                On Linux/UNIX, assuming that <code>WSAS_HOME</code> represents the
+                                location of your WebSphere installation, run
+                                <code>WSAS_HOME/profiles/default/bin/startServer.sh server1</code>.
+                            </li>
+                        </ul>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Log in to the administrative console.
+                        <ul>
+                            <li>Got to <code>http://localhost:9060/ibm/console/</code>.</li>
+                            <li>The default administrator login is <code>admin</code>.</li>
+                        </ul>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Install and deploy Presentation Server (<code>orbeon.war</code>).
+                        <ul>
+                            <li>Click on Applications / Install New Application.</li>
+                            <li>
+                                Upload <code>orbeon.war</code> and follow the wizard. We will
+                                assume that you chose <code>/ops</code> as context root.
+                            </li>
+                            <li>Save the configuration.</li>
+                            <li>Click on Applications / Enterprise Applications.</li>
+                            <li>Select <code>orbeon_war</code> and click on the "start" button.</li>
+                        </ul>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Run and modify the examples.
+                        <ul>
+                            <li>Go to <code>http://localhost:9080/ops/</code>.</li>
+                            <li>
+                                You can view the log from PresentationServer in
+                                <code>WSAS_HOME/profiles/default/logs/server1/SystemOut.log</code>.
+                            </li>
+                            <li>
+                                You can modify the examples resources as the application sever is
+                                running and see the results of your modifications on the fly. The
+                                resources are stored under
+                                <code>WSAS_HOME/profiles/default/installedApps/yourmachineNode01Cell/
+                                orbeon_war.ear/orbeon.war/WEB-INF/resources</code>. For instance,
+                                try to modify <code>examples/tutorial/hello1/view.xhtml</code>:
+                                replace "Hello World!" by your own message, and reload the page in
+                                the browser to see the result.
+                            </li>
+                        </ul>
+                    </p>
+                </li>
 <!--
                 <li>
                      Optionally, configure a datasource to use the SQL examples using the bundled HSQLDB database:
@@ -463,15 +518,6 @@
                      </ul>
                  </li>
 -->
-                <p>
-                    <li>
-                        Install and deploy Presentation Server (<code>orbeon.war</code>). Using the
-                        administrative console (Install New Application) and uploading the war file.
-                        Set the application name to <code>orbeon</code>. <!-- Don't forget to map
-                        the JDBC resource if you created the DataSource above. --> Finally, save
-                        the configuration and start to the application.
-                    </li>
-                </p>
             </ol>
         </section>
 <!--        <section>-->

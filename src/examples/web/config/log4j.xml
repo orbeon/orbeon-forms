@@ -37,6 +37,10 @@
             <param name="ConversionPattern" value="%t %-5p %c{2} - %m%n"/>
         </layout>
     </appender>
+    
+<!--    <logger name='org.orbeon.oxf.processor.JavaProcessor' >-->
+<!--        <level value='DEBUG' />-->
+<!--    </logger>-->
 
     <!-- This is the root logger -->
     <root>

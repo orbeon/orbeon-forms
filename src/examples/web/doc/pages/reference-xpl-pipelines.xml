@@ -80,6 +80,9 @@
                         <zeroOrMore>
                             <ref name="choose"/>
                         </zeroOrMore>
+                        <zeroOrMore>
+                            <ref name="for-each"/>
+                        </zeroOrMore>
                     </interleave>
                 </define>
             </xml-source>

@@ -351,7 +351,23 @@
       </classpath>
     </junit>
 
-    <cvs command='rtag TAG_OPS_${release.number} orbeon'
+    <!-- dump version string with dots in into a file, then read that file convert -->
+    <!-- the dots to underscores while reeading.   i.e. convert 2.5.4.3234 to      -->
+    <!-- 2_5_4_3234                                                                -->
+    <tempfile property='ops-temp-version-file' />
+    <echo message='ops-version=${release.number}' file='${ops-temp-version-file}' />
+
+    <loadproperties srcFile='${ops-temp-version-file}' >
+      <filterchain>
+        <tokenfilter>
+          <replaceregex pattern='\.' replace='_' flags='g' />
+        </tokenfilter>
+      </filterchain>
+    </loadproperties>
+    <echo message='ops-version: ${ops-version}' />
+
+
+    <cvs command='rtag TAG_OPS_${ops-version} orbeon'
          cvsRoot=':ext:orbeonbld@cvs.sourceforge.net:/cvsroot/orbeon' failonerror='true' />
     
     <echo message="Deploying to ${deployDir}/${release.number}"/>

@@ -40,6 +40,10 @@ import javax.xml.transform.stream.StreamResult;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+import java.nio.charset.CoderResult;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -362,6 +366,22 @@ public class XMLUtils {
         private static final int TEXT_CODE = Node.TEXT_NODE;
         private static final int PROCESSING_INSTRUCTION_CODE = Node.PROCESSING_INSTRUCTION_NODE;
         private static final int NAMESPACE_CODE = 0XAA01; // some code that is none of the above
+        /**
+         * 4/6/2005 d : Previously we were using String.getBytes( "UnicodeBigUnmarked" ).  ( Believe
+         * the code was copied from RFC 2803 ). This first tries to get a java.nio.Charset with
+         * the name if this fails it uses a sun.io.CharToByteConverter.  
+         * Now in the case of "UnicodeBigUnmarked" there is no such Charset so a 
+         * CharToByteConverter, utf-16be, is used.  Unfortunately this negative lookup is expensive.
+         * ( Costing us a full second in the 50thread/512MB test. )  
+         * The solution, of course, is just to use get the appropriate Charset and hold on to it. 
+         */
+        private static final Charset utf16BECharset = Charset.forName( "UTF-16BE" );
+        /**
+         * Encoder has state and therefore cannot be shared across threads.
+         */
+        private final CharsetEncoder charEncoder;
+        private java.nio.CharBuffer charBuff;
+        private java.nio.ByteBuffer byteBuff;
 
         private MessageDigest digest;
 
@@ -371,8 +391,73 @@ public class XMLUtils {
             } catch (NoSuchAlgorithmException e) {
                 throw new OXFException(e);
             }
+            charEncoder = utf16BECharset.newEncoder();
+            charBuff = java.nio.CharBuffer.allocate( 64 );
+            byteBuff = java.nio.ByteBuffer.allocate( 128 );
         }
 
+        private void ensureCharBuffRemaining( final int size ) {
+            if ( charBuff.remaining() < size ) {
+                final int cpcty = ( charBuff.capacity() + size ) * 2;
+                final java.nio.CharBuffer newChBuf = java.nio.CharBuffer.allocate( cpcty );
+                newChBuf.put( charBuff );
+                charBuff = newChBuf;
+            }
+        }
+        
+        private void updateWithCharBuf() {
+            final int reqSize = ( int )charEncoder.maxBytesPerChar() * charBuff.position();
+            if ( byteBuff.capacity() < reqSize ) java.nio.ByteBuffer.allocate( 2 * reqSize );
+            
+            // Make ready for read
+            charBuff.flip();
+
+            final CoderResult cr = charEncoder.encode( charBuff, byteBuff, true );
+            try {
+
+                if ( cr.isError() ) cr.throwException();
+
+                // Make ready for read
+                byteBuff.flip();
+
+                final byte[] byts = byteBuff.array();
+                final int len = byteBuff.remaining();
+                final int strt = byteBuff.arrayOffset();
+                digest.update( byts, strt, len );
+
+            } catch ( final CharacterCodingException e ) {
+                throw new OXFException( e );
+            } catch ( java.nio.BufferOverflowException e ) {
+                throw new OXFException( e );
+            } catch ( java.nio.BufferUnderflowException e ) {
+                throw new OXFException( e );
+            } finally {
+                // Make ready for write
+                charBuff.clear();
+                byteBuff.clear();
+            }
+        }
+
+        private void updateWith( final String s ) {
+            addToCharBuff( s );
+            updateWithCharBuf();
+        }
+        private void updateWith( final char[] chArr, final int ofst, final int len ) {
+            ensureCharBuffRemaining( len );
+            charBuff.put( chArr, ofst, len );
+            updateWithCharBuf();
+        }
+        
+        private void addToCharBuff( final char c ) {
+            ensureCharBuffRemaining( 1 );
+            charBuff.put( c );
+        }
+        private void addToCharBuff( final String s ) {
+            final int size = s.length();
+            ensureCharBuffRemaining( size );
+            charBuff.put( s );
+        }
+        
         public byte[] getResult() {
             return digest.digest();
         }
@@ -390,54 +475,64 @@ public class XMLUtils {
 
         public void startPrefixMapping(String prefix, String uri)
                 throws SAXException {
-            try {
-                digest.update((byte) ((NAMESPACE_CODE >> 24) & 0xff));
-                digest.update((byte) ((NAMESPACE_CODE >> 16) & 0xff));
-                digest.update((byte) ((NAMESPACE_CODE >> 8) & 0xff));
-                digest.update((byte) (NAMESPACE_CODE & 0xff));
-                digest.update(prefix.getBytes("UnicodeBigUnmarked"));
-                digest.update((byte) 0);
-                digest.update((byte) 0);
-                digest.update(uri.getBytes("UnicodeBigUnmarked"));
-                digest.update((byte) 0);
-                digest.update((byte) 0);
-            } catch (UnsupportedEncodingException e) {
-                throw new OXFException(e);
-            }
+            
+            digest.update((byte) ((NAMESPACE_CODE >> 24) & 0xff));
+            digest.update((byte) ((NAMESPACE_CODE >> 16) & 0xff));
+            digest.update((byte) ((NAMESPACE_CODE >> 8) & 0xff));
+            digest.update((byte) (NAMESPACE_CODE & 0xff));
+            updateWith( prefix );
+            digest.update((byte) 0);
+            digest.update((byte) 0);
+            updateWith( uri );
+            digest.update((byte) 0);
+            digest.update((byte) 0);
         }
 
         public void endPrefixMapping(String prefix)
                 throws SAXException {
         }
-
+        
         public void startElement(String namespaceURI, String localName,
                                  String qName, Attributes atts)
                 throws SAXException {
-            try {
-                digest.update((byte) ((ELEMENT_CODE >> 24) & 0xff));
-                digest.update((byte) ((ELEMENT_CODE >> 16) & 0xff));
-                digest.update((byte) ((ELEMENT_CODE >> 8) & 0xff));
-                digest.update((byte) (ELEMENT_CODE & 0xff));
-                digest.update(new String("{" + namespaceURI + "}" + localName).getBytes("UnicodeBigUnmarked"));
+            digest.update((byte) ((ELEMENT_CODE >> 24) & 0xff));
+            digest.update((byte) ((ELEMENT_CODE >> 16) & 0xff));
+            digest.update((byte) ((ELEMENT_CODE >> 8) & 0xff));
+            digest.update((byte) (ELEMENT_CODE & 0xff));
+            
+            addToCharBuff( '{' );
+            addToCharBuff( namespaceURI );
+            addToCharBuff( '}' );
+            addToCharBuff( localName );
+            updateWithCharBuf();
+            
+            digest.update((byte) 0);
+            digest.update((byte) 0);
+            int attCount = atts.getLength();
+            digest.update((byte) ((attCount >> 24) & 0xff));
+            digest.update((byte) ((attCount >> 16) & 0xff));
+            digest.update((byte) ((attCount >> 8) & 0xff));
+            digest.update((byte) (attCount & 0xff));
+            for (int i = 0; i < attCount; i++) {
+                digest.update((byte) ((ATTRIBUTE_CODE >> 24) & 0xff));
+                digest.update((byte) ((ATTRIBUTE_CODE >> 16) & 0xff));
+                digest.update((byte) ((ATTRIBUTE_CODE >> 8) & 0xff));
+                digest.update((byte) (ATTRIBUTE_CODE & 0xff));
+                
+                final String attURI = atts.getURI( i );
+                final String attNam = atts.getLocalName( i );
+
+                addToCharBuff( '{' );
+                addToCharBuff( attURI );
+                addToCharBuff( '}' );
+                addToCharBuff( attNam );
+                updateWithCharBuf();
+                
                 digest.update((byte) 0);
                 digest.update((byte) 0);
-                int attCount = atts.getLength();
-                digest.update((byte) ((attCount >> 24) & 0xff));
-                digest.update((byte) ((attCount >> 16) & 0xff));
-                digest.update((byte) ((attCount >> 8) & 0xff));
-                digest.update((byte) (attCount & 0xff));
-                for (int i = 0; i < attCount; i++) {
-                    digest.update((byte) ((ATTRIBUTE_CODE >> 24) & 0xff));
-                    digest.update((byte) ((ATTRIBUTE_CODE >> 16) & 0xff));
-                    digest.update((byte) ((ATTRIBUTE_CODE >> 8) & 0xff));
-                    digest.update((byte) (ATTRIBUTE_CODE & 0xff));
-                    digest.update(new String("{" + atts.getURI(i) + "}" + atts.getLocalName(i)).getBytes("UnicodeBigUnmarked"));
-                    digest.update((byte) 0);
-                    digest.update((byte) 0);
-                    digest.update(atts.getValue(i).getBytes("UnicodeBigUnmarked"));
-                }
-            } catch (UnsupportedEncodingException e) {
-                throw new OXFException(e);
+                
+                final String val = atts.getValue( i );
+                updateWith( val );
             }
         }
 
@@ -446,20 +541,16 @@ public class XMLUtils {
                 throws SAXException {
         }
 
-        public void characters(char ch[], int start, int length)
-                throws SAXException {
-            try {
-                digest.update((byte) ((TEXT_CODE >> 24) & 0xff));
-                digest.update((byte) ((TEXT_CODE >> 16) & 0xff));
-                digest.update((byte) ((TEXT_CODE >> 8) & 0xff));
-                digest.update((byte) (TEXT_CODE & 0xff));
-                String s = new String(ch, start, length);
-                digest.update(s.getBytes("UnicodeBigUnmarked"));
-                digest.update((byte) 0);
-                digest.update((byte) 0);
-            } catch (UnsupportedEncodingException e) {
-                throw new OXFException(e);
-            }
+        public void characters(char ch[], int start, int length) throws SAXException {
+            digest.update((byte) ((TEXT_CODE >> 24) & 0xff));
+            digest.update((byte) ((TEXT_CODE >> 16) & 0xff));
+            digest.update((byte) ((TEXT_CODE >> 8) & 0xff));
+            digest.update((byte) (TEXT_CODE & 0xff));
+            
+            updateWith( ch, start, length );
+            
+            digest.update((byte) 0);
+            digest.update((byte) 0);
         }
 
         public void ignorableWhitespace(char ch[], int start, int length)
@@ -468,20 +559,20 @@ public class XMLUtils {
 
         public void processingInstruction(String target, String data)
                 throws SAXException {
-            try {
-                digest.update((byte) ((PROCESSING_INSTRUCTION_CODE >> 24) & 0xff));
-                digest.update((byte) ((PROCESSING_INSTRUCTION_CODE >> 16) & 0xff));
-                digest.update((byte) ((PROCESSING_INSTRUCTION_CODE >> 8) & 0xff));
-                digest.update((byte) (PROCESSING_INSTRUCTION_CODE & 0xff));
-                digest.update(target.getBytes("UnicodeBigUnmarked"));
-                digest.update((byte) 0);
-                digest.update((byte) 0);
-                digest.update(data.getBytes("UnicodeBigUnmarked"));
-                digest.update((byte) 0);
-                digest.update((byte) 0);
-            } catch (UnsupportedEncodingException e) {
-                throw new OXFException(e);
-            }
+            digest.update((byte) ((PROCESSING_INSTRUCTION_CODE >> 24) & 0xff));
+            digest.update((byte) ((PROCESSING_INSTRUCTION_CODE >> 16) & 0xff));
+            digest.update((byte) ((PROCESSING_INSTRUCTION_CODE >> 8) & 0xff));
+            digest.update((byte) (PROCESSING_INSTRUCTION_CODE & 0xff));
+            
+            updateWith( target );
+            
+            digest.update((byte) 0);
+            digest.update((byte) 0);
+            
+            updateWith( data );
+            
+            digest.update((byte) 0);
+            digest.update((byte) 0);
         }
 
         public void skippedEntity(String name)

@@ -404,7 +404,7 @@
     </xsl:template>
 
     <!-- Generate hidden form element for disabled controls -->
-    <xsl:template match="xforms:*[@xhtml:disabled = 'true' and not(@xxforms:relevant = 'false')]" priority="8">
+    <xsl:template match="xforms:*[@xhtml:disabled = 'true' and not(@xxforms:relevant = 'false') and not(@xxforms:readonly = 'true')]" priority="8">
         <xhtml:input type="hidden" name="{@xxforms:name}" value="{@xxforms:value}"/>
         <xsl:next-match/>
     </xsl:template>

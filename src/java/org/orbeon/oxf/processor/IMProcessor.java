@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor;
 
 import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
@@ -26,6 +25,8 @@ import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.PipelineReader;
 import org.orbeon.oxf.webapp.ServletContextExternalContext;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.xml.sax.ContentHandler;
 import ymsg.network.AccountLockedException;
@@ -166,10 +167,10 @@ public class IMProcessor extends ProcessorImpl {
         public void messageReceived(SessionEvent ev) {
             synchronized (onMessageReceived) {
                 // Create message
-                Element messageElement = DocumentHelper.createElement("message");
-                Document messageDocument = DocumentHelper.createDocument(messageElement);
-                messageElement.addElement("from").addText(ev.getFrom());
-                messageElement.addElement("body").addText(ev.getMessage());
+                final NonLazyUserDataElement msgElt = new NonLazyUserDataElement( "message" );
+                Document messageDocument = new NonLazyUserDataDocument( msgElt );
+                msgElt.addElement("from").addText(ev.getFrom());
+                msgElt.addElement("body").addText(ev.getMessage());
 
                 // Connect to processor
                 final DOMGenerator domGenerator = new DOMGenerator

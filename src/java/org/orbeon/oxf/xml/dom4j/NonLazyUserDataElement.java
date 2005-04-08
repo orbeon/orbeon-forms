@@ -34,6 +34,11 @@ import org.dom4j.util.NonLazyElement;
  * functionality is unmatched by NonLazyElement.  Hence this class, a subclass of NonLazyElement  
  * with the safe functionality as UserDataElement.
  * 
+ * Btw NonLazyUserDataElement also tries to be smart wrt to cloning and parent specifying.  That
+ * is, if you clone the clone will have parent == null but will have all of the requisite 
+ * namespace declarations and if you setParent( notNull ) then any redundant namespace declarations
+ * are removed.
+ * 
  */
 public class NonLazyUserDataElement extends NonLazyElement {
 
@@ -51,6 +56,11 @@ public class NonLazyUserDataElement extends NonLazyElement {
         super( nm, ns );
     }
         
+    /**
+     * Doesn't try to grab name space decls from ancestors.
+     * @return a clone.  May be missing some necessary namespace decls.
+     * @see #clone
+     */
     private NonLazyUserDataElement cloneInternal() {
         final NonLazyUserDataElement ret = ( NonLazyUserDataElement )super.clone();
 
@@ -126,6 +136,10 @@ public class NonLazyUserDataElement extends NonLazyElement {
         }
     }
 
+    /**
+     * @return A clone.  The clone will have parent == null but will have any necessary namespace
+     *         declarations this element's ancestors.
+     */
     public Object clone() {
         final NonLazyUserDataElement ret = cloneInternal();
         org.dom4j.Element anstr = getParent();
@@ -153,7 +167,9 @@ public class NonLazyUserDataElement extends NonLazyElement {
         }
         return ret;
     }
-    
+    /**
+     * If parent != null checks with ancestors and removes any redundant namespace declarations.
+     */
     public void setParent( final org.dom4j.Element prnt ) {
         super.setParent( prnt );
         done : if ( prnt != null ) {

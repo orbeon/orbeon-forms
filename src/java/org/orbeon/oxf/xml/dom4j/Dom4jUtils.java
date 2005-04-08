@@ -13,15 +13,22 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import javax.xml.parsers.SAXParser;
 import org.dom4j.Element;
 import org.dom4j.InvalidXPathException;
-import org.dom4j.Namespace;
-import org.dom4j.QName;
-import org.dom4j.XPath;
 import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.dom4j.Namespace;
+import org.dom4j.QName;
+import org.dom4j.XPath;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
@@ -30,15 +37,12 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import javax.xml.parsers.SAXParser;
-
+/**
+ * Collection of util routines for working with DOM4J.  In particular offers many methods found
+ * in DocumentHelper.  The difference between these 'copied' methods and the orginals is that
+ * our copies use our NonLazyUserData* classes. ( As opposed to DOM4J's defaults or whatever
+ * happens to be specied in DOM4J's system property. )
+ */
 public class Dom4jUtils {
     
     public static final Namespace XSI_NAMESPACE = new Namespace

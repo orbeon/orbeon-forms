@@ -46,6 +46,10 @@ public class NonLazyUserDataElement extends NonLazyElement {
     public NonLazyUserDataElement( final org.dom4j.QName qname ) { 
         super( qname );
     }
+    
+    public NonLazyUserDataElement( final String nm, final org.dom4j.Namespace ns ) {
+        super( nm, ns );
+    }
         
     private NonLazyUserDataElement cloneInternal() {
         final NonLazyUserDataElement ret = ( NonLazyUserDataElement )super.clone();

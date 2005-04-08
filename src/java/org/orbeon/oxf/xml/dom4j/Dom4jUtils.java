@@ -13,18 +13,15 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
-import org.dom4j.DocumentFactory;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
+import org.dom4j.InvalidXPathException;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
+import org.dom4j.XPath;
 import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-import org.dom4j.util.UserDataDocumentFactory;
-import org.dom4j.util.UserDataElement;
-import org.dom4j.util.UserDataAttribute;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
@@ -55,14 +52,26 @@ public class Dom4jUtils {
     public static final org.dom4j.Document NULL_DOCUMENT;
 
     static {
-        NULL_DOCUMENT = DocumentHelper.createDocument();
-        Element nullElement = DocumentHelper.createElement("null");
+        NULL_DOCUMENT = new NonLazyUserDataDocument();
+        final NonLazyUserDataDocumentFactory fctry 
+            = NonLazyUserDataDocumentFactory.getInstance( null );
+        Element nullElement = fctry.createElement("null");
         final org.dom4j.QName attNm = new QName
             ( XMLConstants.XSI_NIL_ATTRIBUTE, XSI_NAMESPACE ); 
         nullElement.addAttribute( attNm, "true" );
         NULL_DOCUMENT.setRootElement( nullElement );
     }
     
+    private static SAXReader createSAXReader() throws SAXException {
+        final SAXParser sxPrs = XMLUtils.newSAXParser();
+        final XMLReader xr = sxPrs.getXMLReader();
+        final SAXReader sxRdr = new SAXReader( xr );
+        final NonLazyUserDataDocumentFactory fctry 
+            = NonLazyUserDataDocumentFactory.getInstance( null );
+        sxRdr.setDocumentFactory( fctry );
+        return sxRdr;
+    }
+
     private static String domToString
     ( final org.dom4j.Node n, final OutputFormat frmt ) {
         try {
@@ -96,78 +105,39 @@ public class Dom4jUtils {
         return ret;
     }
     
-    private static org.dom4j.Node cloneNodeWorker(org.dom4j.Node node) {
-        if (node instanceof UserDataElement) {
-            UserDataElement current = (UserDataElement) node;
-            UserDataElement clone = new UserDataElement(current.getQName());
-            clone.setData(current.getData());
-
-            // Copy attributes
-            for (Iterator i = current.attributes().iterator(); i.hasNext();) {
-                org.dom4j.Attribute attribute = (org.dom4j.Attribute) i.next();
-                clone.add(cloneNodeWorker(attribute));
-            }
-
-            // Copy content
-            for (Iterator i = current.content().iterator(); i.hasNext();) {
-                org.dom4j.Node child = (org.dom4j.Node) i.next();
-                clone.add(cloneNodeWorker(child));
-            }
-            return clone;
-        } else if (node instanceof UserDataAttribute) {
-            UserDataAttribute current = (UserDataAttribute) node;
-            UserDataAttribute clone = new UserDataAttribute
-                (current.getQName(), current.getText());
-            clone.setData(current.getData());
-            return clone;
-        } else {
-            return (org.dom4j.Node) node.clone();
-        }
-    }
-
-    /**
-     * Clone a node, making sure that we copy all the declared namespace of
-     * the source.
-     */
-    public static org.dom4j.Node cloneNode( final org.dom4j.Node n ) {
-        final org.dom4j.Node ret;
-        if ( n.getNodeType() == org.dom4j.Node.ELEMENT_NODE ) {
-            ret = cloneElement( ( org.dom4j.Element )n );
-        } else {
-            ret = cloneNodeWorker( n );
-        }
-        return ret;
-    }
-    /**
-     * Clone a node making sure that we copy all the declared namespace of the source and any user
-     * data.  Note that the copying of UserData is to work around pbm in DOM4J.  The pbm is that
-     * while UserDataAttribute.clone works as expected UserDataElement.clone doesn't use it and
-     * consequently user data on attributes is lost when one calls UserDataElement.clone. ( or
-     * createCopy for that matter )
-     */
-    public static org.dom4j.Element cloneElement( final org.dom4j.Element e ) {
-        final Map namespaceContext = Dom4jUtils.getNamespaceContext( e );
-        final org.dom4j.Element ret = (org.dom4j.Element) cloneNodeWorker( e );
-        for ( final Iterator i = namespaceContext.keySet().iterator(); 
-              i.hasNext(); ) {
-            final String pfx = ( String )i.next();
-            if ( ret.getNamespaceForPrefix( pfx ) == null ) {
-                ret.addNamespace(pfx, ( String )namespaceContext.get( pfx ) );
-            }
-        }
-        return ret;
-    }
+    
     /**
      * Replacment for DocumentHelper.parseText.  DocumentHelper.parseText is not
      * used since it creates work for GC ( because it relies on JAXP ). 
      */
     public static org.dom4j.Document parseText( final String s ) 
     throws SAXException, org.dom4j.DocumentException {
-        final SAXParser sxPrs = XMLUtils.newSAXParser();
-        final XMLReader xr = sxPrs.getXMLReader();
-        final SAXReader sxRdr = new SAXReader( xr );
         final java.io.StringReader strRdr = new java.io.StringReader( s );
-        final org.dom4j.Document ret = sxRdr.read( strRdr );
+        final org.dom4j.Document ret = read( strRdr );
+        return ret;
+    }
+    public static org.dom4j.Document read( final java.io.Reader rdr ) 
+    throws SAXException, org.dom4j.DocumentException {
+        final SAXReader sxRdr = createSAXReader();
+        final org.dom4j.Document ret = sxRdr.read( rdr );
+        return ret;
+    }
+    public static org.dom4j.Document read( final java.io.Reader rdr, final String uri ) 
+    throws SAXException, org.dom4j.DocumentException {
+        final SAXReader sxRdr = createSAXReader();
+        final org.dom4j.Document ret = sxRdr.read( rdr, uri );
+        return ret;
+    }
+    public static org.dom4j.Document read( final java.io.InputStream rdr ) 
+    throws SAXException, org.dom4j.DocumentException {
+        final SAXReader sxRdr = createSAXReader();
+        final org.dom4j.Document ret = sxRdr.read( rdr );
+        return ret;
+    }
+    public static org.dom4j.Document read( final java.io.InputStream rdr, final String uri ) 
+    throws SAXException, org.dom4j.DocumentException {
+        final SAXReader sxRdr = createSAXReader();
+        final org.dom4j.Document ret = sxRdr.read( rdr, uri );
         return ret;
     }
 
@@ -196,11 +166,6 @@ public class Dom4jUtils {
         final String ldSid = ld == null ? null : ld.getSystemID();
         final String ret = ldSid == null ? DOMGenerator.DefaultContext : ldSid;
         return ret;
-    }
-
-    public static org.dom4j.Document createDOM4JDocument() {
-        final DocumentFactory fctry = UserDataDocumentFactory.getInstance();        
-        return fctry.createDocument();
     }
 
     /*
@@ -432,5 +397,41 @@ public class Dom4jUtils {
             return qName.getName();
         else
             return "{" + qName.getNamespaceURI() + "}" + qName.getName();
+    }
+    
+    public static XPath createXPath( final String exprsn ) throws InvalidXPathException {
+        final NonLazyUserDataDocumentFactory fctry 
+            = NonLazyUserDataDocumentFactory.getInstance( null );
+        final XPath ret = fctry.createXPath( exprsn );
+        return ret;
+    }
+    public static org.dom4j.Text createText( final String txt ) {
+        final NonLazyUserDataDocumentFactory fctry 
+            = NonLazyUserDataDocumentFactory.getInstance( null );
+        final org.dom4j.Text ret = fctry.createText( txt );
+        return ret;
+    }
+    public static org.dom4j.Attribute createAttribute
+    ( final org.dom4j.Element elt, final org.dom4j.QName nm, final String val ) {
+        final NonLazyUserDataDocumentFactory fctry 
+            = NonLazyUserDataDocumentFactory.getInstance( null );
+        final org.dom4j.Attribute ret = fctry.createAttribute( elt, nm, val );
+        return ret;
+    }
+    public static org.dom4j.Namespace createNamespace( final String pfx, final String uri ) {
+        final NonLazyUserDataDocumentFactory fctry 
+            = NonLazyUserDataDocumentFactory.getInstance( null );
+        final org.dom4j.Namespace ret = fctry.createNamespace( pfx, uri );
+        return ret;
+    }
+    /**
+     * @return A document from with a _copy_ of root as its root.
+     */
+    public static org.dom4j.Document createDocument( final org.dom4j.Element root ) {
+        final org.dom4j.Element cpy = root.createCopy();
+        final NonLazyUserDataDocumentFactory fctry 
+            = NonLazyUserDataDocumentFactory.getInstance( null );
+        final org.dom4j.Document ret = fctry.createDocument( cpy );
+        return ret;
     }
 }

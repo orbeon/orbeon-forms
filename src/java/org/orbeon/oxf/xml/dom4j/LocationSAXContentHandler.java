@@ -14,19 +14,13 @@
 package org.orbeon.oxf.xml.dom4j;
 
 import org.dom4j.ElementPath;
-import org.dom4j.io.SAXContentHandler;
-import org.dom4j.util.UserDataDocumentFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-public class LocationSAXContentHandler extends SAXContentHandler {
+public class LocationSAXContentHandler extends NonLazySAXContentHandler {
 
     private Locator locator;
-
-    public LocationSAXContentHandler() {
-        super(UserDataDocumentFactory.getInstance());
-    }
 
     public void setDocumentLocator(Locator locator) {
         this.locator = locator;

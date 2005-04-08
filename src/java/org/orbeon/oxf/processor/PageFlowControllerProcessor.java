@@ -27,10 +27,10 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.transformer.xupdate.Constants;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.dom4j.DocumentDelegate;
-import org.orbeon.oxf.xml.dom4j.ElementDelegate;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 import org.xml.sax.SAXException;
 
 import java.net.MalformedURLException;
@@ -44,8 +44,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     static private Logger logger = LoggerFactory.createLogger(PageFlowControllerProcessor.class);
     public final static String INPUT_CONTROLER = "controller";
     public final static String CONTROLLER_NAMESPACE_URI = "http://www.orbeon.com/oxf/controller";
-    private final static Document TRUE_DOCUMENT = DocumentHelper.createDocument();
-    private final static Document FALSE_DOCUMENT = DocumentHelper.createDocument();
+    private final static Document TRUE_DOCUMENT = new NonLazyUserDataDocument();
+    private final static Document FALSE_DOCUMENT = new NonLazyUserDataDocument();
     private final static Map NAMESPACES_WITH_XSI_AND_XSLT = new HashMap();
     public final static String EXTRACT_INSTANCE_XPATH
             = "/*/*[local-name() = 'instance' and namespace-uri() = '" + org.orbeon.oxf.processor.xforms.Constants.XFORMS_NAMESPACE_URI + "']/*[1]";
@@ -62,11 +62,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     private static final String NOT_FOUND_PROPERTY_NAME = "not-found";
 
     static {
-        Element trueConfigElement = DocumentHelper.createElement("config");
+        Element trueConfigElement = new NonLazyUserDataElement( "config");
         trueConfigElement.setText("true");
         TRUE_DOCUMENT.setRootElement(trueConfigElement);
 
-        Element falseConfigElement = DocumentHelper.createElement("config");
+        Element falseConfigElement = new NonLazyUserDataElement("config");
         falseConfigElement.setText("false");
         FALSE_DOCUMENT.setRootElement(falseConfigElement);
 
@@ -130,7 +130,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     }
                     List params = pageElement.elements("param");
                     if (!params.isEmpty()) {
-                        Document paramsDocument = DocumentHelper.createDocument(DocumentHelper.createElement("params"));
+                        Document paramsDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("params"));
                         for (Iterator j = params.iterator(); j.hasNext();) {
                             Node node = (Node) j.next();
                             paramsDocument.getRootElement().add((Node) node.clone());
@@ -272,7 +272,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 final ASTOutput realMatcherOutput = new ASTOutput("data", "matcher-" + (++matcherCount));
                                 _matcherOutput = realMatcherOutput;
                                 statements.add(new ASTProcessorCall(matcherQName, matcherURI) {{
-                                    Document config = DocumentHelper.createDocument(DocumentHelper.createElement("regexp"));
+                                    Document config = new NonLazyUserDataDocument(new NonLazyUserDataElement("regexp"));
                                     config.getRootElement().addText(pathInfo);
                                     addInput(new ASTInput("config", config));
                                     addInput(new ASTInput("data", new ASTHrefXPointer(new ASTHrefId(request), "/request/request-path")));
@@ -413,7 +413,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
                 // The epilogue did not do the serialization
                 addStatement(new ASTProcessorCall(XMLConstants.HTML_SERIALIZER_PROCESSOR_QNAME) {{
-                    Document config = DocumentHelper.createDocument(DocumentHelper.createElement("config"));
+                    Document config = new NonLazyUserDataDocument(new NonLazyUserDataElement("config"));
                     Element rootElement = config.getRootElement();
                     rootElement.addElement("status-code").addText(Integer.toString(defaultStatusCode));
                     if (HTMLSerializer.DEFAULT_PUBLIC_DOCTYPE != null)
@@ -477,7 +477,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 addInput(new ASTInput("model", new ASTHrefId(xformsModel)));
                 if(!params.isEmpty()) {
                     // Create document with params
-                    Document paramsDocument = DocumentHelper.createDocument(DocumentHelper.createElement("params"));
+                    Document paramsDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("params"));
                     for (Iterator j = params.iterator(); j.hasNext();) {
                         Element paramElement = (Element) j.next();
                         paramsDocument.getRootElement().add(Dom4jUtils.cloneElement(paramElement));
@@ -594,7 +594,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             // Continue when all results fail
                             addWhen(new ASTWhen() {{
                                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                                    addInput(new ASTInput("data", new DocumentDelegate(new ElementDelegate
+                                    addInput(new ASTInput("data", new NonLazyUserDataDocument(new NonLazyUserDataElement
                                             ("is-redirect") {{ setText("false"); }})));
                                     addOutput(new ASTOutput("data", isRedirect));
                                 }});
@@ -624,7 +624,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         addOutput(new ASTOutput("data", xupdatedInstance));
                     }});
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                        Document config = DocumentHelper.createDocument(DocumentHelper.createElement("is-redirect"));
+                        Document config = new NonLazyUserDataDocument(new NonLazyUserDataElement("is-redirect"));
                         config.getRootElement().addText("false");
                         addInput(new ASTInput("data", config));
                         addOutput(new ASTOutput("data", isRedirect));
@@ -778,16 +778,15 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
             // Create XUpdate config
 
-            final Element modificationsElement = DocumentHelper.createElement
-                    (new QName("modifications", new Namespace
-                            (Constants.XUPDATE_PREFIX, Constants.XUPDATE_NAMESPACE_URI)));
+            final NonLazyUserDataElement modificationsElement 
+                = new NonLazyUserDataElement( "modifications", Constants.XUPDATE_NAMESPACE );
             final Map namespacesOnResult = Dom4jUtils.getNamespaceContext(resultElement);
             for (Iterator i = namespacesOnResult.keySet().iterator(); i.hasNext();) {
                 String prefix = (String) i.next();
                 if (prefix.length() > 0)
                     modificationsElement.add(new Namespace(prefix, (String) namespacesOnResult.get(prefix)));
             }
-            final Document xupdateConfig = DocumentHelper.createDocument(modificationsElement);
+            final Document xuCfg = new NonLazyUserDataDocument( modificationsElement );
 
             for (Iterator l = resultElement.elements().iterator(); l.hasNext();) {
                 Element xupdateElement = (Element) l.next();
@@ -796,7 +795,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
             // Run XUpdate
             when.addStatement(new ASTProcessorCall(XMLConstants.XUPDATE_PROCESSOR_QNAME) {{
-                addInput(new ASTInput("config", xupdateConfig));
+                addInput(new ASTInput("config", xuCfg));
                 addInput(new ASTInput("data", new ASTHrefId(instanceToUpdate)));
                 addInput(new ASTInput("instance", new ASTHrefId(paramedInstance[0])));
                 if (actionData != null)
@@ -829,21 +828,21 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 // Handle path info
                 final ASTOutput forwardPathInfoOutput = new ASTOutput(null, "forward-path-info");
                 when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", new DocumentDelegate
-                            (new ElementDelegate("path-info") {{ setText(forwardPathInfo); }} )));
+                    addInput(new ASTInput("data", new NonLazyUserDataDocument
+                            (new NonLazyUserDataElement("path-info") {{ setText(forwardPathInfo); }} )));
                     addOutput(new ASTOutput("data", forwardPathInfoOutput));
                 }});
                 // Handle server-side redirect and exit portal redirect
                 final ASTOutput isServerSideRedirectOutput = new ASTOutput(null, "is-server-side-redirect");
                 when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", new DocumentDelegate
-                            (new ElementDelegate("server-side") {{ setText(Boolean.toString(doServerSideRedirect)); }} )));
+                    addInput(new ASTInput("data", new NonLazyUserDataDocument
+                            (new NonLazyUserDataElement("server-side") {{ setText(Boolean.toString(doServerSideRedirect)); }} )));
                     addOutput(new ASTOutput("data", isServerSideRedirectOutput));
                 }});
                 final ASTOutput isRedirectExitPortal = new ASTOutput(null, "is-redirect-exit-portal");
                 when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", new DocumentDelegate
-                            (new ElementDelegate("exit-portal") {{ setText(Boolean.toString(doRedirectExitPortal)); }} )));
+                    addInput(new ASTInput("data", new NonLazyUserDataDocument
+                            (new NonLazyUserDataElement("exit-portal") {{ setText(Boolean.toString(doRedirectExitPortal)); }} )));
                     addOutput(new ASTOutput("data", isRedirectExitPortal));
                 }});
                 // Serialize the instance into the request if we are doing a server-side redirect
@@ -897,7 +896,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
         // Signal if we did a redirect
         when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-            addInput(new ASTInput("data", new DocumentDelegate(new ElementDelegate
+            addInput(new ASTInput("data", new NonLazyUserDataDocument(new NonLazyUserDataElement
                     ("is-redirect") {{ setText(Boolean.toString(resultPageId != null)); }})));
             addOutput(new ASTOutput("data", redirect));
         }});
@@ -920,12 +919,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             if (mimeType == null) {
                 addInput(new ASTInput(ResourceServer.MIMETYPE_INPUT, new ASTHrefURL("oxf:/oxf/mime-types.xml")));
             } else {
-                Document mimeTypeConfig = new DocumentDelegate(new ElementDelegate("mime-types") {{
-                    add(new ElementDelegate("mime-type") {{
-                        add(new ElementDelegate("name") {{
+                Document mimeTypeConfig = new NonLazyUserDataDocument(new NonLazyUserDataElement("mime-types") {{
+                    add(new NonLazyUserDataElement("mime-type") {{
+                        add(new NonLazyUserDataElement("name") {{
                             addText(mimeType);
                         }});
-                        add(new ElementDelegate("pattern") {{
+                        add(new NonLazyUserDataElement("pattern") {{
                             addText("*");
                         }});
                     }});
@@ -1161,7 +1160,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             super(new PipelineProcessor(stepProcessorContext.getPipelineConfig()));
             try {
                 final String url = URLFactory.createURL(controllerContext, uri).toExternalForm();
-                final Document configDocument = DocumentHelper.createDocument(DocumentHelper.createElement("config"));
+                final Document configDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("config"));
                 configDocument.getRootElement().addText(url);
                 addInput(new ASTInput("step-url", configDocument));
             } catch (MalformedURLException e) {

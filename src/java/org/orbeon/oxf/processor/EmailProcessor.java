@@ -16,7 +16,6 @@ package org.orbeon.oxf.processor;
 import org.apache.commons.fileupload.DefaultFileItemFactory;
 import org.apache.commons.fileupload.FileItem;
 import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -34,6 +33,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -256,7 +256,7 @@ public class EmailProcessor extends ProcessorImpl {
 
             // Create Document and convert it into a String
             Element rootElement = (Element)(needsRootElement ? partOrBodyElement.elements().get(0) : partOrBodyElement);
-            Document partDocument = DocumentHelper.createDocument();
+            Document partDocument = new NonLazyUserDataDocument();
             partDocument.setRootElement((Element) Dom4jUtils.cloneElement(rootElement));
             content = handleInlinePartContent(partDocument, contentType);
         }

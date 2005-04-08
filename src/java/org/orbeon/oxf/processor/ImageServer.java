@@ -31,6 +31,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -266,7 +267,7 @@ public class ImageServer extends ProcessorImpl {
 
     private String computeCacheFileName(String type, String path, List nodes) {
         // Create digest document and digest
-        Document document = Dom4jUtils.createDOM4JDocument();
+        Document document = new NonLazyUserDataDocument();
         Element rootElement = document.addElement("image");
         for (Iterator i = nodes.iterator(); i.hasNext();) {
             Element element = (Element) i.next();

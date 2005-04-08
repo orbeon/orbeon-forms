@@ -24,7 +24,6 @@ import org.dom4j.Element;
 import org.dom4j.Text;
 import org.dom4j.io.DOMReader;
 import org.dom4j.io.DOMWriter;
-import org.dom4j.io.SAXContentHandler;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.generator.SAXStoreGenerator;
@@ -40,6 +39,8 @@ import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom4j.NonLazySAXContentHandler;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocumentFactory;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
@@ -150,7 +151,8 @@ public class DelegationProcessor extends ProcessorImpl {
                                         final Node rootNode;
                                         {
                                             // Read in DOM4j content handler
-                                            SAXContentHandler dom4jContentHandler = new SAXContentHandler();
+                                            final NonLazySAXContentHandler dom4jContentHandler 
+                                                = new NonLazySAXContentHandler();
                                             dom4jContentHandler.startDocument();
                                             dom4jContentHandler.startElement("", "dummy", "dummy", XMLUtils.EMPTY_ATTRIBUTES);
                                             parameters.replay(dom4jContentHandler);
@@ -261,7 +263,10 @@ public class DelegationProcessor extends ProcessorImpl {
                                             // Send body from result envelope
                                             LocationSAXWriter locationSAXWriter = new LocationSAXWriter();
                                             locationSAXWriter.setContentHandler(contentHandler);
-                                            Document resultEnvelopeDOM4j = new DOMReader().read(resultEnvelope.getAsDocument());
+                                            final NonLazyUserDataDocumentFactory fctry 
+                                                = NonLazyUserDataDocumentFactory
+                                                      .getInstance( null );
+                                            Document resultEnvelopeDOM4j = new DOMReader( fctry ).read(resultEnvelope.getAsDocument());
 
                                             String xpath =
                                                     operation != null && operation.select != null

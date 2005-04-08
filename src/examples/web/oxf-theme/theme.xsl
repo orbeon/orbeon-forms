@@ -63,16 +63,8 @@
             </head>
             <!-- This gives a little nudge to IE, so IE displays all the borders -->
             <body>
-                <!-- Handle onload handler -->
-                <xsl:variable name="standard-onload" select="'document.body.innerHTML += ''''; '" as="xs:string"/>
-                <xsl:choose>
-                    <xsl:when test="/xhtml:html/xhtml:body/@onload">
-                        <xsl:attribute name="onload" select="concat($standard-onload, /xhtml:html/xhtml:body/@onload)"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:attribute name="onload" select="$standard-onload"/>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <!-- Copy attributes -->
+                <xsl:apply-templates select="/xhtml:html/xhtml:body/@*"/>
                 <!-- Handle optional tabs -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:head/f:tabs"/>
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
@@ -100,7 +92,7 @@
     </xsl:template>
 
     <xsl:template match="xhtml:textarea">
-        <textarea cols="20" wrap="soft">
+        <textarea wrap="soft">
             <xsl:apply-templates select="@*|node()"/>
         </textarea>
     </xsl:template>

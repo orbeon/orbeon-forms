@@ -23,7 +23,6 @@ body {
     margin: .71em .71em .71em .71em;
     padding: 0em;
     min-width: 800px;
-    width: expression(document.body.clientWidth &lt; 800 ? '800px' : '1200px' );
 }
 
 body, input, table {

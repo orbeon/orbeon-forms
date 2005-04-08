@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.transformer.xupdate.statement;
 
-import org.dom4j.DocumentHelper;
 import org.dom4j.QName;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.URIResolver;
@@ -33,7 +33,7 @@ public class Attribute extends Statement {
     }
 
     public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
-        org.dom4j.Attribute attribute = DocumentHelper.createAttribute(null, qname, "");
+        org.dom4j.Attribute attribute = Dom4jUtils.createAttribute(null, qname, "");
         Utils.insert(getLocationData(), attribute, 0,
                 Utils.execute(uriResolver, context, variableContext, statements));
         return Arrays.asList(new Object[] {attribute});

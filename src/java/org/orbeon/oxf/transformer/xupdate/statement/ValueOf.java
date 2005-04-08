@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.transformer.xupdate.statement;
 
-import org.dom4j.DocumentHelper;
 import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.URIResolver;
@@ -33,6 +33,6 @@ public class ValueOf extends Statement {
 
     public Object execute(final URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
         Object selectedObject = Utils.evaluate(uriResolver, context, variableContext, getLocationData(), select, namespaceContext);
-        return DocumentHelper.createXPath("string()").evaluate(selectedObject);
+        return Dom4jUtils.createXPath("string()").evaluate(selectedObject);
     }
 }

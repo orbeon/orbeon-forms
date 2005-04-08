@@ -13,10 +13,10 @@
  */
 package org.orbeon.oxf.transformer.xupdate.statement;
 
-import org.dom4j.DocumentHelper;
 import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.URIResolver;
@@ -45,8 +45,8 @@ public class Namespace extends Statement {
         String uri = select != null
                 ? (String) Utils.evaluate(uriResolver, context, variableContext,
                     getLocationData(), "string(" + select + ")", namespaceContext)
-                : (String) DocumentHelper.createXPath("string()").evaluate
+                : (String) Dom4jUtils.createXPath("string()").evaluate
                     (Utils.execute(uriResolver, context, variableContext, statements));
-        return Arrays.asList(new Object[] {DocumentHelper.createNamespace(prefix, uri)});
+        return Arrays.asList(new Object[] {Dom4jUtils.createNamespace(prefix, uri)});
     }
 }

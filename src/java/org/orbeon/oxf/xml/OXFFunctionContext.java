@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.xml;
 
-import org.dom4j.DocumentHelper;
 import org.jaxen.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.List;
 
@@ -41,7 +41,7 @@ public class OXFFunctionContext implements FunctionContext {
                 public Object call(Context context, List args) throws FunctionCallException {
                     if (args.size() != 3)
                         throw new OXFException("if function expects 3 arguments");
-                    return (((Boolean) DocumentHelper.createXPath("boolean(.)").evaluate(args.get(0))).booleanValue())
+                    return (((Boolean) Dom4jUtils.createXPath("boolean(.)").evaluate(args.get(0))).booleanValue())
                         ? args.get(1) : args.get(2);
                 }
             };

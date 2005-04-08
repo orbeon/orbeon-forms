@@ -17,7 +17,6 @@ import org.apache.commons.pool.ObjectPool;
 import org.apache.commons.pool.PoolableObjectFactory;
 import org.apache.commons.pool.impl.SoftReferenceObjectPool;
 import org.apache.log4j.Logger;
-import org.dom4j.DocumentHelper;
 import org.dom4j.XPath;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.InternalCacheKey;
@@ -25,6 +24,7 @@ import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XPathCacheStandaloneContext;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.functions.FunctionLibraryList;
 import org.orbeon.saxon.om.NodeInfo;
@@ -51,12 +51,12 @@ public class XPathCache {
             InternalCacheKey cacheKey = new InternalCacheKey("XPath Expression", xpathExpression);
             XPath xpath = (XPath) cache.findValid(context, cacheKey, validity);
             if (xpath == null) {
-                xpath = DocumentHelper.createXPath(xpathExpression);
+                xpath = Dom4jUtils.createXPath(xpathExpression);
                 cache.add(context, cacheKey, validity, xpath);
             }
             return xpath;
         } else {
-            return DocumentHelper.createXPath(xpathExpression);
+            return Dom4jUtils.createXPath(xpathExpression);
         }
     }
 

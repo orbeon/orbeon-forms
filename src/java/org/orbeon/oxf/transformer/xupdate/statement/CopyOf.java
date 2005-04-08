@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.transformer.xupdate.statement;
 
-import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.common.ValidationException;
@@ -41,7 +40,7 @@ public class CopyOf extends Statement {
         if (selected == null) {
             return Collections.EMPTY_LIST;
         } else if (selected instanceof String || selected instanceof Number) {
-            org.dom4j.Text textNode = DocumentHelper.createText(selected.toString());
+            org.dom4j.Text textNode = Dom4jUtils.createText(selected.toString());
             return Arrays.asList(new org.dom4j.Text[] {textNode});
         } else if (selected instanceof Node) {
             return Arrays.asList(new Node[]{Dom4jUtils.cloneNode((Node) selected)});

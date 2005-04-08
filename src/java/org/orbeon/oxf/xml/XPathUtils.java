@@ -19,7 +19,7 @@ import org.jaxen.dom.DOMXPath;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.helpers.NamespaceSupport;
@@ -523,7 +523,7 @@ public class XPathUtils {
         org.dom4j.Node selectedNode = selectSingleNode(node, expr, prefixes);
         if (selectedNode == null)
             return null;
-        org.dom4j.Document resultDocument = Dom4jUtils.createDOM4JDocument();
+        org.dom4j.Document resultDocument = new NonLazyUserDataDocument();
         resultDocument.add(selectedNode);
         return resultDocument;
     }

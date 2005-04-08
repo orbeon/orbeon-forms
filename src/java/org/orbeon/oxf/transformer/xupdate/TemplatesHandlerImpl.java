@@ -26,6 +26,7 @@ import org.orbeon.oxf.transformer.xupdate.statement.Text;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 
 import javax.xml.transform.sax.TemplatesHandler;
 import java.util.ArrayList;
@@ -129,7 +130,7 @@ public class TemplatesHandlerImpl extends LocationSAXContentHandler implements T
                                 + element.getQualifiedName() + "'", (LocationData) element.getData());
                     }
                 } else {
-                    Element staticElement = DocumentHelper.createElement(element.getQName());
+                    Element staticElement = new NonLazyUserDataElement(element.getQName());
                     List childNodes = new ArrayList();
                     for (Iterator j = element.attributes().iterator(); j.hasNext();)
                         staticElement.add((org.dom4j.Attribute) ((org.dom4j.Attribute) j.next()).clone());

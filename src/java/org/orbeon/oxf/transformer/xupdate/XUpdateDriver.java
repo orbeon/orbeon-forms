@@ -28,9 +28,9 @@ import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerException;
 
 import org.dom4j.io.OutputFormat;
-import org.dom4j.io.SAXContentHandler;
 import org.dom4j.io.XMLWriter;
 
+import org.orbeon.oxf.xml.dom4j.NonLazySAXContentHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -52,7 +52,7 @@ public class XUpdateDriver {
 
         // Perform transformation
         Templates templates = createTemplates(new FileReader(args[1]));
-        SAXContentHandler saxContentHandler = new SAXContentHandler();
+        final NonLazySAXContentHandler saxContentHandler = new NonLazySAXContentHandler();
         templates.newTransformer().transform(new SAXSource( newXMLReader(),
                 new InputSource(new FileReader(args[0]))),
                 new SAXResult(saxContentHandler));

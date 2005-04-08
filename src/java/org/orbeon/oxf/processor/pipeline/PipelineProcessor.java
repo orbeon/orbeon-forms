@@ -263,10 +263,8 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                         final org.dom4j.Document doc;
                         final int ndTyp = inlineNode.getNodeType();
                         if ( ndTyp == org.dom4j.Node.ELEMENT_NODE ) {
-                            // Create new Document
                             final org.dom4j.Element elt = ( org.dom4j.Element )inlineNode;
-                            final org.dom4j.Element eltCpy = elt.createCopy();
-                            doc = DocumentHelper.createDocument( eltCpy );
+                            doc = Dom4jUtils.createDocument( elt );
                             // Make sure the parent namespaces are copied over
                             final org.dom4j.Element prntElt = elt.getParent();
                             final java.util.Map parentNamespaceContext 
@@ -288,7 +286,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                         final LocationData ld = astPipeline.getLocationData();
                         String sid = ld == null ? DOMGenerator.DefaultContext : ld.getSystemID();
                         if ( sid == null ) sid = DOMGenerator.DefaultContext;
-                        final Processor docPrcssr 
+                        final DOMGenerator docPrcssr 
                             = PipelineUtils.createDOMGenerator(doc, "inline config", v, sid );
 
                         ProcessorOutput pout = docPrcssr.createOutput(OUTPUT_DATA);
@@ -321,7 +319,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
 
                             // Connect data input (for now, a null document)
                             ProcessorInput dataInput = templateProcessor.createInput(INPUT_DATA);
-                            Processor nullGenerator = PipelineUtils.createDOMGenerator
+                            DOMGenerator nullGenerator = PipelineUtils.createDOMGenerator
                                 ( Dom4jUtils.NULL_DOCUMENT, "null input", DOMGenerator.ZeroValidity
                                   , DOMGenerator.DefaultContext );
                             ProcessorOutput nullGeneratorOutput = nullGenerator.createOutput(OUTPUT_DATA);

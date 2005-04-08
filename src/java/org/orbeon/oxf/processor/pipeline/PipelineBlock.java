@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.pipeline;
 
 import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.ValidationException;
@@ -30,6 +29,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -116,7 +116,7 @@ public class PipelineBlock {
 
             // Connect aggregator to config
             Processor aggregator = new AggregatorProcessor();
-            Document aggregatorConfig = DocumentHelper.createDocument();
+            Document aggregatorConfig = new NonLazyUserDataDocument();
             Element configElement = aggregatorConfig.addElement("config");
             configElement.addElement("root").addText(hrefAggregate.getRoot());
             addNamespaces(configElement, node);
@@ -161,7 +161,7 @@ public class PipelineBlock {
             ASTHrefXPointer hrefXPointer = (ASTHrefXPointer) href;
 
             // Create config for XPath processor
-            final Document xpthCfg = DocumentHelper.createDocument();
+            final Document xpthCfg = new NonLazyUserDataDocument();
             final Element configElement = xpthCfg.addElement("config");
             configElement.addElement("xpath").addText(hrefXPointer.getXpath());
             addNamespaces(configElement, node);

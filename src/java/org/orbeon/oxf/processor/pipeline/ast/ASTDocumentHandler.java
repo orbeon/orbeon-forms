@@ -16,17 +16,19 @@ package org.orbeon.oxf.processor.pipeline.ast;
 import org.dom4j.*;
 import org.orbeon.oxf.processor.pipeline.ForEachProcessor;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 
 import java.util.*;
 
 public class ASTDocumentHandler implements ASTHandler {
 
-    private Document document = DocumentHelper.createDocument();
+    private Document document = new NonLazyUserDataDocument();
     private Element currentElement;
     private Stack href;
 
     public boolean startPipeline(ASTPipeline pipeline) {
-        currentElement = DocumentHelper.createElement(new QName("config", PipelineProcessor.PIPELINE_NAMESPACE));
+        currentElement = new NonLazyUserDataElement(new QName("config", PipelineProcessor.PIPELINE_NAMESPACE));
         document.setRootElement(currentElement);
         return true;
     }

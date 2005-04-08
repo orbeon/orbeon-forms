@@ -18,7 +18,6 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.dom4j.Document;
-import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -31,6 +30,9 @@ import org.orbeon.oxf.util.XLSUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocumentFactory;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
@@ -110,15 +112,14 @@ public class XLSGenerator extends ProcessorImpl {
                 HSSFWorkbook workbook = new HSSFWorkbook(new POIFSFileSystem(inputStream));
 
                 // Create document
-                DocumentFactory factory = DocumentFactory.getInstance();
-                final Document resultDocument = factory.createDocument();
-                resultDocument.setRootElement(factory.createElement("workbook"));
+                final NonLazyUserDataElement root = new NonLazyUserDataElement( "workbook" );
+                final Document resultDocument = new NonLazyUserDataDocument( root );
 
                 // Add elements for each sheet
                 for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
                     HSSFSheet sheet = workbook.getSheetAt(i);
 
-                    final Element element = factory.createElement("sheet");
+                    final Element element = new NonLazyUserDataElement("sheet");
                     resultDocument.getRootElement().add(element);
 
                     // Go though each cell
@@ -156,7 +157,8 @@ public class XLSGenerator extends ProcessorImpl {
             }
 
             private void addToElement(Element element, String xpath, String value) {
-                DocumentFactory factory = DocumentFactory.getInstance();
+                final NonLazyUserDataDocumentFactory fctry 
+                    = NonLazyUserDataDocumentFactory.getInstance( null );
                 StringTokenizer elements = new StringTokenizer(xpath, "/");
 
                 while (elements.hasMoreTokens()) {
@@ -165,14 +167,14 @@ public class XLSGenerator extends ProcessorImpl {
                         // Not the last: try to find sub element, otherwise create
                         Element child = element.element(name);
                         if (child == null) {
-                            child = factory.createElement(name);
+                            child = new NonLazyUserDataElement(name);
                             element.add(child);
                         }
                         element = child;
                     } else {
                         // Last: add element, set content to value
-                        Element child = factory.createElement(name);
-                        child.add(factory.createText(value));
+                        Element child = new NonLazyUserDataElement(name);
+                        child.add(fctry.createText(value));
                         element.add(child);
                     }
                 }

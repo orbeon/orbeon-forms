@@ -37,6 +37,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -312,7 +313,7 @@ public class RequestGenerator extends ProcessorImpl {
     private Document readRequestAsDOM4J(PipelineContext context, Node config, boolean all) {
         ExternalContext.Request request = getRequest(context);
 
-        Document document = Dom4jUtils.createDOM4JDocument();
+        Document document = new NonLazyUserDataDocument();
         Element requestElement = document.addElement("request");
         if (all || XPathUtils.selectSingleNode(config, "/config/container-type") != null)
             addTextElement(requestElement, "container-type", request.getContainerType());

@@ -18,7 +18,6 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import org.dom4j.DocumentHelper;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.cache.SimpleOutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
@@ -28,6 +27,7 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.xml.sax.ContentHandler;
 
 /**
@@ -112,10 +112,10 @@ public final class DOMGenerator extends ProcessorImpl {
 
     private static org.dom4j.Document makeCopyDoc( final org.dom4j.Element e ) {
         final org.dom4j.Element cpy = ( org.dom4j.Element )e.createCopy();
-        final org.dom4j.Document ret = DocumentHelper.createDocument( cpy );
+        final NonLazyUserDataDocument ret = new NonLazyUserDataDocument();
+        ret.setRootElement( cpy );
         return ret;
     }
-    
 
     private final SourceFactory sourceFactory;
     private final DocKey key;

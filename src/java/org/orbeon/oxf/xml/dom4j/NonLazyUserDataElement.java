@@ -76,14 +76,15 @@ public class NonLazyUserDataElement extends NonLazyElement {
     }
     
     protected org.dom4j.Element createElement( final org.dom4j.QName qName ) {
-        final org.dom4j.DocumentFactory fctry = getDocumentFactory();
+        final NonLazyUserDataDocumentFactory fctry 
+            = NonLazyUserDataDocumentFactory.getInstance( null );
         final org.dom4j.Element ret = fctry.createElement( qName );
         final Object dta = getCopyOfUserData();
         ret.setData( dta );
         return ret;
     }
     protected org.dom4j.DocumentFactory getDocumentFactory() {
-        return NonLazyUserDataDocumentFactory.getInstance();
+        return NonLazyUserDataDocumentFactory.getInstance( null );
     }
 
     public Object getData() {

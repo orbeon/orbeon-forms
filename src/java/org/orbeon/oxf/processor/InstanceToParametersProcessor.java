@@ -15,7 +15,6 @@ package org.orbeon.oxf.processor;
 
 import org.dom4j.Attribute;
 import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.VisitorSupport;
 import org.orbeon.oxf.common.OXFException;
@@ -71,8 +70,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
             public void readImpl(PipelineContext pipelineContext, final ContentHandler contentHandler) {
                 try {
                     Element filterElement = readInputAsDOM4J(pipelineContext, INPUT_FILTER).getRootElement();
-                    Document instance = DocumentHelper.createDocument
-                            (readInputAsDOM4J(pipelineContext, INPUT_INSTANCE).getRootElement().createCopy());
+                    Document instance = ( org.dom4j.Document )readInputAsDOM4J( pipelineContext, INPUT_INSTANCE ).clone();
                     DocumentWrapper instanceWrapper = new DocumentWrapper(instance,
                             ((LocationData) instance.getRootElement().getData()).getSystemID());
 

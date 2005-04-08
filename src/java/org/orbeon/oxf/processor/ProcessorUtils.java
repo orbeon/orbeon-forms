@@ -25,6 +25,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -126,7 +127,7 @@ public class ProcessorUtils {
                 throw new OXFException("Content for element '" + element.getName() + "' is mandatory");
             Element copiedElement = originalElement.createCopy();
             addNeededNamespaceDeclarations(originalElement, copiedElement, new HashSet());
-            result = Dom4jUtils.createDOM4JDocument();
+            result = new NonLazyUserDataDocument();
             result.add(copiedElement);
         } else {
             // Href

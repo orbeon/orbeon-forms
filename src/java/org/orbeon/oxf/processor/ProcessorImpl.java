@@ -16,7 +16,6 @@ package org.orbeon.oxf.processor;
 import orbeon.apache.xerces.xni.NamespaceContext;
 import orbeon.apache.xml.utils.DOMBuilder;
 import org.apache.log4j.Logger;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.cache.*;
@@ -35,6 +34,7 @@ import org.orbeon.oxf.xml.SchemaRepository;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -973,7 +973,7 @@ public abstract class ProcessorImpl implements Processor {
                         // Create config document for Debug processor
                         final org.dom4j.Document debugConfigDocument;
                         {
-                            debugConfigDocument = DocumentHelper.createDocument();
+                            debugConfigDocument = new NonLazyUserDataDocument();
                             Element configElement = debugConfigDocument.addElement("config");
                             configElement.addElement("message").addText(debugMessage);
                             if (debugLocationData != null) {

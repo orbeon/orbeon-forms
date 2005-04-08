@@ -20,6 +20,7 @@ import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.xml.sax.ContentHandler;
 
 import java.security.KeyFactory;
@@ -60,7 +61,7 @@ public class SignatureVerifierProcessor extends ProcessorImpl {
                     String sig = XPathUtils.selectStringValueNormalize(data, "/signed-data/signature");
 
                     sigDataNode.detach();
-                    Document sigData = Dom4jUtils.createDOM4JDocument();
+                    Document sigData = new NonLazyUserDataDocument();
                     sigData.add(sigDataNode);
 
                     dsa.update(Dom4jUtils.domToString(sigData).getBytes());

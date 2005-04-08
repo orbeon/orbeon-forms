@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.xforms.output;
 
 import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.Constants;
@@ -53,9 +52,9 @@ public class XFormsOutput extends ProcessorImpl {
                 final XFormsOutputConfig xformsOutputConfig = new XFormsOutputConfig("d", "http://orbeon.org/oxf/xml/document");
 
                 // Read instance data and annotate
-                final Document instance = DocumentHelper.createDocument
-                        (readCacheInputAsDOM4J(context, INPUT_INSTANCE).getRootElement().createCopy());
-                XFormsUtils.setInitialDecoration(instance.getDocument());
+                final Document instance = 
+                    ( org.dom4j.Document )readCacheInputAsDOM4J( context, INPUT_INSTANCE ).clone();
+                XFormsUtils.setInitialDecoration( instance );
                 Boolean enabledObj = getPropertySet().getBoolean( Constants.XFORMS_VALIDATION_FLAG, true);
                 final boolean enabled = enabledObj.booleanValue();
                 model.applyInputOutputBinds( instance, context, enabled ); 

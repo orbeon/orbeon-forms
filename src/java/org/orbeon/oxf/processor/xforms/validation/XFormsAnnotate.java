@@ -14,7 +14,6 @@
 package org.orbeon.oxf.processor.xforms.validation;
 
 import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
@@ -51,8 +50,8 @@ public class XFormsAnnotate extends ProcessorImpl {
                     });
 
                     // Read instance data and annotate
-                    final Document instance = DocumentHelper.createDocument
-                            (readCacheInputAsDOM4J(context, INPUT_INSTANCE).getRootElement().createCopy());
+                    final Document instance = ( org.dom4j.Document )readCacheInputAsDOM4J
+                        ( context, INPUT_INSTANCE ).clone();
                     XFormsUtils.setInitialDecoration(instance.getDocument());
                     Boolean enabledObj = getPropertySet().getBoolean( Constants.XFORMS_VALIDATION_FLAG, true);
                     final boolean enabled = enabledObj.booleanValue();

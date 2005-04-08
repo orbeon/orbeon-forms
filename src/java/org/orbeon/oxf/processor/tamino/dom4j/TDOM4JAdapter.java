@@ -23,9 +23,9 @@ import com.softwareag.tamino.db.api.namespace.TInoNamespace;
 import com.softwareag.tamino.db.api.objectModel.TXMLObject;
 import org.dom4j.*;
 import org.dom4j.io.OutputFormat;
-import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.dom4j.tree.FlyweightAttribute;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.io.*;
 import java.util.Iterator;
@@ -203,10 +203,8 @@ public class TDOM4JAdapter extends TXMLObject implements Serializable {
 	 **/
 	public void readFrom(InputStream inputStream, String baseUri) throws TStreamReadException  {
 		try  {
-			// Instantiate a new SAXReader.
-			SAXReader saxReader = new SAXReader();
 			// Obtain the created DOM4J document.
-			document = TString.isEmpty( baseUri ) ? saxReader.read( inputStream ) : saxReader.read( inputStream, baseUri );
+			document = TString.isEmpty( baseUri ) ? Dom4jUtils.read( inputStream ) : Dom4jUtils.read( inputStream, baseUri );
 			// Reset the temporay id and docname that might be given in base class if element previously has been null.
 			if ( element == null )  {
 				super.setDocname( null );
@@ -233,10 +231,8 @@ public class TDOM4JAdapter extends TXMLObject implements Serializable {
 	 **/
 	public void readFrom(Reader reader, String baseUri) throws TStreamReadException  {
 		try  {
-			// Instantiate a new SAXReader.
-			SAXReader saxReader = new SAXReader();
 			// Obtain the created DOM4J document.
-			document = TString.isEmpty( baseUri ) ? saxReader.read( reader ) : saxReader.read( reader, baseUri );
+			document = TString.isEmpty( baseUri ) ? Dom4jUtils.read( reader ) : Dom4jUtils.read( reader, baseUri );
 			// Reset the temporay id and docname that might be given in base class if element previously has been null.
 			if ( element == null )  {
 				super.setDocname( null );
@@ -263,10 +259,8 @@ public class TDOM4JAdapter extends TXMLObject implements Serializable {
 	 **/
 	public void readFrom(InputStream inputStream) throws TStreamReadException  {
 		try  {
-			// Instantiate a new SAXReader.
-			SAXReader saxReader = new SAXReader();
 			// Obtain the created DOM4J document.
-			document = saxReader.read( inputStream );
+			document = Dom4jUtils.read( inputStream );
 			// Reset the temporay id and docname that might be given in base class if element previously has been null.
 			if ( element == null )  {
 				super.setDocname( null );
@@ -293,10 +287,8 @@ public class TDOM4JAdapter extends TXMLObject implements Serializable {
 	 **/
 	public void readFrom(Reader reader) throws TStreamReadException  {
 		try  {
-			// Instantiate a new SAXReader.
-			SAXReader saxReader = new SAXReader();
 			// Obtain the created DOM4J document.
-			document = saxReader.read( reader );
+			document = Dom4jUtils.read( reader );
 			// Reset the temporay id and docname that might be given in base class if element previously has been null.
 			if ( element == null )  {
 				super.setDocname( null );

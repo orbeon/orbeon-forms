@@ -34,13 +34,10 @@ import javax.xml.parsers.SAXParserFactory;
 import org.apache.log4j.Logger;
 import org.dom4j.Attribute;
 import org.dom4j.Document;
-import org.dom4j.DocumentFactory;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.Node;
 import org.dom4j.QName;
-import org.dom4j.util.UserDataDocumentFactory;
 import org.orbeon.oxf.cache.Cache;
 import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
@@ -57,6 +54,7 @@ import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.XPathContext;
@@ -266,7 +264,7 @@ public class Model {
                 if (instanceContainer != null) {
                     Element initialInstanceRoot = (Element)
                             Dom4jUtils.cloneElement((Element) instanceContainer.elements().get(0));
-                    initialInstance = DocumentHelper.createDocument();
+                    initialInstance = new NonLazyUserDataDocument();
                     initialInstance.setRootElement(initialInstanceRoot);
                 }
             }
@@ -550,9 +548,9 @@ public class Model {
                                         if (resultItem instanceof Node) {
                                             elementNode.add(Dom4jUtils.cloneElement(elementNode));
                                         } else if(resultItem instanceof Item) {
-                                            elementNode.add(DocumentFactory.getInstance().createText(((Item)resultItem).getStringValue()));
+                                            elementNode.add(Dom4jUtils.createText(((Item)resultItem).getStringValue()));
                                         } else {
-                                            elementNode.add(DocumentFactory.getInstance().createText(resultItem.toString()));
+                                            elementNode.add(Dom4jUtils.createText(resultItem.toString()));
                                         }
                                     }
                                 } catch (XPathException e) {
@@ -801,8 +799,7 @@ public class Model {
             }
             // Add attribute
             if ( attr == null ) {
-                final DocumentFactory df = UserDataDocumentFactory.getInstance();
-                attr = df.createAttribute( elt, qnam, val );
+                attr = Dom4jUtils.createAttribute( elt, qnam, val );
                 final LocationData ld = ( LocationData )attr.getData();
                 final InstanceData instDat = new InstanceData( ld );
                 attr.setData( instDat );

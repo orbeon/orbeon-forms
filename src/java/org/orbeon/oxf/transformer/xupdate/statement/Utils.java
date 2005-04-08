@@ -16,7 +16,6 @@ package org.orbeon.oxf.transformer.xupdate.statement;
 import org.dom4j.Attribute;
 import org.dom4j.*;
 import org.dom4j.XPath;
-import org.dom4j.util.UserDataDocumentFactory;
 import org.jaxen.*;
 import org.jaxen.dom4j.DocumentNavigator;
 import org.orbeon.oxf.common.ValidationException;
@@ -47,7 +46,7 @@ public class Utils {
         for (Iterator j = nodesToInsert.iterator(); j.hasNext();) {
             Object object = j.next();
             Node node = object instanceof String || object instanceof Number
-                    ? UserDataDocumentFactory.getInstance().createText(object.toString())
+                    ? Dom4jUtils.createText(object.toString())
                     : (Node) ((Node) object).clone();
             if (parent instanceof Element) {
                 Element element = (Element) parent;
@@ -87,7 +86,7 @@ public class Utils {
                     return new org.jaxen.Function() {
                         public Object call(Context jaxenContext, List args) {
                             try {
-                                String url = (String) DocumentHelper.createXPath("string(.)").evaluate(args.get(0));
+                                String url = (String) Dom4jUtils.createXPath("string(.)").evaluate(args.get(0));
                                 Source source = uriResolver.resolve(url, locationData.getSystemID());
                                 if (! (source instanceof SAXSource))
                                     throw new ValidationException("Unsupported source type", locationData);
@@ -104,7 +103,7 @@ public class Utils {
                 } else if (/*namespaceURI == null &&*/ "get-namespace-uri-for-prefix".equals(localName)) {
                     return new org.jaxen.Function() {
                         public Object call(Context jaxenContext, List args) {
-                            String prefix = (String) DocumentHelper.createXPath("string(.)").evaluate(args.get(0));
+                            String prefix = (String) Dom4jUtils.createXPath("string(.)").evaluate(args.get(0));
                             Element element = null;
                             if (args.get(1) instanceof List) {
                                 List list = (List) args.get(1);
@@ -125,7 +124,7 @@ public class Utils {
                             List originalList = args.get(0) instanceof List ? (List) args.get(0)
                                     : Collections.singletonList(args.get(0));
                             List resultList = new ArrayList();
-                            XPath stringXPath = DocumentHelper.createXPath("string(.)");
+                            XPath stringXPath = Dom4jUtils.createXPath("string(.)");
                             for (Iterator i = originalList.iterator(); i.hasNext();) {
                                 Object item = (Object) i.next();
                                 String itemString = (String) stringXPath.evaluate(item);
@@ -146,8 +145,8 @@ public class Utils {
                                         throw new ValidationException(e, locationData);
                                     }
                                 } else {
-                                    String xpathString = (String) DocumentHelper.createXPath("string(.)").evaluate(args.get(0));
-                                    XPath xpath = DocumentHelper.createXPath(xpathString);
+                                    String xpathString = (String) Dom4jUtils.createXPath("string(.)").evaluate(args.get(0));
+                                    XPath xpath = Dom4jUtils.createXPath(xpathString);
                                     Map namespaceURIs = new HashMap();
                                     List namespaces = (List) args.get(1);
                                     for (Iterator i = namespaces.iterator(); i.hasNext();) {
@@ -166,8 +165,8 @@ public class Utils {
                     return new org.jaxen.Function() {
                         public Object call(Context jaxenContext, List args) {
                             try {
-                                String input = (String) DocumentHelper.createXPath("string(.)").evaluate(args.get(0));
-                                String pattern = (String) DocumentHelper.createXPath("string(.)").evaluate(args.get(1));
+                                String input = (String) Dom4jUtils.createXPath("string(.)").evaluate(args.get(0));
+                                String pattern = (String) Dom4jUtils.createXPath("string(.)").evaluate(args.get(1));
                                 List result = new ArrayList();
                                 while (input.length() != 0) {
                                     int position = input.indexOf(pattern);
@@ -190,12 +189,12 @@ public class Utils {
                         public Object call(Context jaxenContext, List args) {
                             try {
                                 List strings = (List) args.get(0);
-                                String pattern = (String) DocumentHelper.createXPath("string(.)").evaluate(args.get(1));
+                                String pattern = (String) Dom4jUtils.createXPath("string(.)").evaluate(args.get(1));
                                 StringBuffer result = new StringBuffer();
                                 boolean isFirst = true;
                                 for (Iterator i = strings.iterator(); i.hasNext();) {
                                     if (! isFirst) result.append(pattern); else isFirst = false;
-                                    String item = (String) (String) DocumentHelper.createXPath("string(.)").evaluate(i.next());
+                                    String item = (String) (String) Dom4jUtils.createXPath("string(.)").evaluate(i.next());
                                     result.append(item);
                                 }
                                 return result.toString();
@@ -259,7 +258,7 @@ public class Utils {
 
         try {
             // Create XPath
-            XPath xpath = DocumentHelper.createXPath(select);
+            XPath xpath = Dom4jUtils.createXPath(select);
 
             // Set variable, namespace, and function context
             if (context instanceof Context) {
@@ -295,7 +294,7 @@ public class Utils {
         if (selected == null) {
             return Collections.EMPTY_LIST;
         } else if (selected instanceof String || selected instanceof Number) {
-            org.dom4j.Text textNode = DocumentHelper.createText(selected.toString());
+            org.dom4j.Text textNode = Dom4jUtils.createText(selected.toString());
             return Arrays.asList(new org.dom4j.Text[] {textNode});
         } else if (selected instanceof Node) {
             return Arrays.asList(new Node[]{(Node) selected});

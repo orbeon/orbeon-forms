@@ -15,7 +15,6 @@ package org.orbeon.oxf.processor.xforms;
 
 import org.dom4j.Attribute;
 import org.dom4j.Document;
-import org.dom4j.DocumentFactory;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.Visitor;
@@ -65,7 +64,7 @@ public class XFormsUtils {
             // Remove current content
             Dom4jUtils.clearElementContent(elementnode);
             // Put text node with value
-            elementnode.add(DocumentFactory.getInstance().createText(value));
+            elementnode.add(Dom4jUtils.createText(value));
         } else if (node instanceof Attribute) {
             Attribute attributenode = (Attribute) node;
             attributenode.setValue(value);

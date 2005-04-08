@@ -14,12 +14,12 @@
 package org.orbeon.oxf.processor.xforms.input.action;
 
 import org.dom4j.Document;
-import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.XPath;
 import org.jaxen.FunctionContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.util.Collections;
@@ -51,7 +51,7 @@ public class ActionUtils {
         // Evaluate "at" expression
         int atValue;
         {
-            XPath atXPath = DocumentHelper.createXPath("round(" + at + ")");
+            XPath atXPath = Dom4jUtils.createXPath("round(" + at + ")");
             atXPath.setFunctionContext(functionContext);
             Number atObject = (Number) atXPath.evaluate(nodeset);
             if (Double.isNaN(atObject.doubleValue()))

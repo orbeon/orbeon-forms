@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.transformer.xupdate.statement;
 
-import org.dom4j.util.UserDataDocumentFactory;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import javax.xml.transform.URIResolver;
 import java.util.Arrays;
@@ -29,6 +29,6 @@ public class Text extends Statement {
     }
 
     public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
-        return Arrays.asList(new Object[] {UserDataDocumentFactory.getInstance().createText(this.text)});
+        return Arrays.asList(new Object[] {Dom4jUtils.createText(this.text)});
     }
 }

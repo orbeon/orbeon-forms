@@ -17,7 +17,6 @@ import org.dom4j.Attribute;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.dom4j.util.UserDataDocumentFactory;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -31,6 +30,7 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.xpath.XPathException;
@@ -50,7 +50,7 @@ public class Instance {
 
     public Instance(PipelineContext pipelineContext, Document template) {
         this.pipelineContext = pipelineContext;
-        instance = Dom4jUtils.createDOM4JDocument();
+        instance = new NonLazyUserDataDocument();
         instance.add(template.getRootElement().createCopy());
         instanceNodeInfo = new DocumentWrapper(instance, null).wrap(instance);
 
@@ -128,7 +128,7 @@ public class Instance {
                 // There is no type, convert to default type
                 if (!DEFAULT_UPLOAD_TYPE.equals(type)) // FIXME: prefixes of type name could be different!
                     value = convertUploadTypes(value, type, DEFAULT_UPLOAD_TYPE);
-                element.add(UserDataDocumentFactory.getInstance().createAttribute(element, XMLConstants.XSI_TYPE_QNAME, DEFAULT_UPLOAD_TYPE));
+                element.add(Dom4jUtils.createAttribute(element, XMLConstants.XSI_TYPE_QNAME, DEFAULT_UPLOAD_TYPE));
             }
             element.setText(value);
         } else {

@@ -27,10 +27,10 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.TeeContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom4j.DocumentDelegate;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.ElementDelegate;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -62,13 +62,13 @@ public class MSVValidationProcessor extends ProcessorImpl {
     private static final SAXParserFactory factory;
 
     static {
-        NO_DECORATION_CONFIG = new DOMGenerator(new DocumentDelegate(new ElementDelegate("config") {{
-            add(new ElementDelegate("decorate") {{
+        NO_DECORATION_CONFIG = new DOMGenerator(new NonLazyUserDataDocument(new NonLazyUserDataElement("config") {{
+            add(new NonLazyUserDataElement("decorate") {{
                 setText("false");
             }});
         }}), "no decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext );
-        DECORATION_CONFIG = new DOMGenerator(new DocumentDelegate(new ElementDelegate("config") {{
-            add(new ElementDelegate("decorate") {{
+        DECORATION_CONFIG = new DOMGenerator(new NonLazyUserDataDocument(new NonLazyUserDataElement("config") {{
+            add(new NonLazyUserDataElement("decorate") {{
                 setText("true");
             }});
         }}), "decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext );

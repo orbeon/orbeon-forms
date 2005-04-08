@@ -27,6 +27,7 @@ import org.dom4j.Namespace;
 import org.dom4j.QName;
 import org.dom4j.io.SAXReader;
 import org.dom4j.tree.DefaultText;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocumentFactory;
 import org.xml.sax.SAXException;
 
 import java.util.Iterator;
@@ -78,6 +79,13 @@ public class TDOM4JInputStreamInterpreter extends TInputStreamInterpreter {
 		try {
 			// Create the DOM4J SAXReader with the DOM4J specific underlying SAX parser. This is a JAXP parser!
 			SAXReader saxReader = (parserName == null || parserName.equals( "") ) ? new SAXReader() : new SAXReader( parserName );
+            
+			// Make sure the document and its children are thread safe by using our
+                        // document factory.
+			final NonLazyUserDataDocumentFactory fctry 
+                            = NonLazyUserDataDocumentFactory.getInstance( null );
+			saxReader.setDocumentFactory( fctry );
+ 
 			// Invoke the parsing and obtain the Document instance
 			document = saxReader.read( inputStream );
 			TStreamHeader header = inputStream.getHeader();

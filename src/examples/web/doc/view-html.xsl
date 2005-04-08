@@ -25,101 +25,100 @@
                 <xhtml:title>PresentationServer Documentation</xhtml:title>
             </xhtml:head>
             <xhtml:body>
-                <!-- Banner (with search) -->
-                <div id="banner">
-                    <div style="float: left">
-                        <a href="/" f:url-norewrite="true">
-                            <img f:url-norewrite="false" width="199" height="42" style="border: 0 white; margin-left: 1em; margin-top: 0.2em; margin-bottom: 0.4em" src="/oxf-theme/images/orbeon-small-blueorange.gif"/>
-                        </a>
-                    </div>
-                    <span style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
-                        <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0em" action="http://www.google.com/custom">
-                            <a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</a> |
-                            <a href="../" f:url-norewrite="true">Examples</a> | 
-                            <span style="white-space: nowrap">
-                                Search:
-                                <input type="text" name="q" size="10" maxlength="255" value=""/>
-                                <input type="submit" name="sa" VALUE="Go" style="margin-left: 0.2em;"/>
-                            </span>
-                            <input type="hidden" name="cof" VALUE="GIMP:#FF9900;T:black;LW:510;ALC:#FF9900;L:http://www.orbeon.com/pics/orbeon-google.png;GFNT:#666699;LC:#666699;LH:42;BGC:#FFFFFF;AH:center;VLC:#666699;GL:0;S:http://www.orbeon.com;GALT:#FF9900;AWFID:8ac636f034abb7d8;"/>
-                            <input type="hidden" name="sitesearch" value="orbeon.com"/>
-                        </form>
-                    </span>
-                </div>
-
-                <!-- Tabs -->
-                <div class="tabs">&#160;</div> <!-- Need to insert a space here for Safari -->
-                <div id="main">
-                    <div id="main1">
-                    <!-- List of sections -->
-                    <div id="leftcontent">
-                        <h1>PresentationServer Documentation</h1>
-                        <ul class="tree-sections">
-                            <xsl:apply-templates select="doc('book.xml')/book/menu"/>
-                        </ul>
-                    </div>
-                    <div id="maincontent">
-                        <div id="mainbody">
+                <table cellpadding="0" cellspacing="0" border="0" id="main">
+                    <!-- Banner (with search) -->
+                    <tr><td colspan="2" id="banner">
+                        <div style="float: left">
+                            <a href="/" f:url-norewrite="true">
+                                <img f:url-norewrite="false" width="199" height="42" style="border: 0 white; margin-left: 1em; margin-top: 0.2em; margin-bottom: 0.4em" src="/oxf-theme/images/orbeon-small-blueorange.gif"/>
+                            </a>
+                        </div>
+                        <span style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
+                            <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0em" action="http://www.google.com/custom">
+                                <a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</a> |
+                                <a href="../" f:url-norewrite="true">Examples</a> | 
+                                <span style="white-space: nowrap">
+                                    Search:
+                                    <input type="text" name="q" size="10" maxlength="255" value=""/>
+                                    <input type="submit" name="sa" VALUE="Go" style="margin-left: 0.2em;"/>
+                                </span>
+                                <input type="hidden" name="cof" VALUE="GIMP:#FF9900;T:black;LW:510;ALC:#FF9900;L:http://www.orbeon.com/pics/orbeon-google.png;GFNT:#666699;LC:#666699;LH:42;BGC:#FFFFFF;AH:center;VLC:#666699;GL:0;S:http://www.orbeon.com;GALT:#FF9900;AWFID:8ac636f034abb7d8;"/>
+                                <input type="hidden" name="sitesearch" value="orbeon.com"/>
+                            </form>
+                        </span>
+                    </td></tr>
+                    <!-- Tabs -->
+                    <tr><td colspan="2">
+                        <div class="tabs">&#160;</div> <!-- Need to insert a space here for Safari -->
+                    </td></tr>
+                    <tr>
+                        <!-- List of sections -->
+                        <td id="leftcontent" valign="top" width="1%">
+                            <h1>PresentationServer Documentation</h1>
+                            <ul class="tree-sections">
+                                <xsl:apply-templates select="doc('book.xml')/book/menu"/>
+                            </ul>
+                        </td>
+                        <td id="maincontent" valign="top" width="99%">
                             <!-- Title -->
                             <h1><xsl:value-of select="/document/header/title"/></h1>
                             <!-- TOC  -->
-                            <div class="minitoc">
-                                <ul>
-                                    <xsl:for-each select="/document/body/section">
-                                        <xsl:variable name="anchor" 
-                                            select="if (preceding-sibling::a) 
-                                            then preceding-sibling::a/@name else generate-id()"/>
-                                        <li>
-                                            <xsl:number level="single" count="section" format="1. "/>
-                                            <a href="#{$anchor}">
-                                                <xsl:value-of select="title"/>
-                                            </a>
-                                            <!-- Second level -->
-                                            <xsl:if test="section">
-                                                <ul>
-                                                    <xsl:variable name="subsection-count" select="count(section)"/>
-                                                    <xsl:for-each select="section">
-                                                        <xsl:variable name="anchor" 
-                                                            select="if (preceding-sibling::a) 
-                                                            then preceding-sibling::a/@name else generate-id()"/>
-                                                        <li>
-                                                            <xsl:number level="multiple" count="section" format="1.1. "/>
-                                                            <a href="#{$anchor}">
-                                                                <xsl:value-of select="title"/>
-                                                            </a>
-                                                            <!-- Third -->
-                                                            <xsl:if test="section">
-                                                                <ul>
-                                                                    <xsl:variable name="subsubsection-count" select="count(section)"/>
-                                                                    <xsl:for-each select="section">
-                                                                        <xsl:variable name="anchor" 
-                                                                            select="if (preceding-sibling::a) 
-                                                                            then preceding-sibling::a/@name else generate-id()"/>
-                                                                        <li>
-                                                                            <xsl:number level="multiple" count="section" format="1.1.1. "/>
-                                                                            <a href="#{$anchor}">
-                                                                                <xsl:value-of select="title"/>
-                                                                            </a>
-                                                                        </li>
-                                                                    </xsl:for-each>
-                                                                </ul>
-                                                            </xsl:if>
-                                                        </li>
-                                                    </xsl:for-each>
-                                                </ul>
-                                            </xsl:if>
-                                        </li>
-                                    </xsl:for-each>
-                                </ul>
+                            <div id="mainbody">
+                                <div class="minitoc">
+                                    <ul>
+                                        <xsl:for-each select="/document/body/section">
+                                            <xsl:variable name="anchor" 
+                                                select="if (preceding-sibling::a) 
+                                                then preceding-sibling::a/@name else generate-id()"/>
+                                            <li>
+                                                <xsl:number level="single" count="section" format="1. "/>
+                                                <a href="#{$anchor}">
+                                                    <xsl:value-of select="title"/>
+                                                </a>
+                                                <!-- Second level -->
+                                                <xsl:if test="section">
+                                                    <ul>
+                                                        <xsl:variable name="subsection-count" select="count(section)"/>
+                                                        <xsl:for-each select="section">
+                                                            <xsl:variable name="anchor" 
+                                                                select="if (preceding-sibling::a) 
+                                                                then preceding-sibling::a/@name else generate-id()"/>
+                                                            <li>
+                                                                <xsl:number level="multiple" count="section" format="1.1. "/>
+                                                                <a href="#{$anchor}">
+                                                                    <xsl:value-of select="title"/>
+                                                                </a>
+                                                                <!-- Third -->
+                                                                <xsl:if test="section">
+                                                                    <ul>
+                                                                        <xsl:variable name="subsubsection-count" select="count(section)"/>
+                                                                        <xsl:for-each select="section">
+                                                                            <xsl:variable name="anchor" 
+                                                                                select="if (preceding-sibling::a) 
+                                                                                then preceding-sibling::a/@name else generate-id()"/>
+                                                                            <li>
+                                                                                <xsl:number level="multiple" count="section" format="1.1.1. "/>
+                                                                                <a href="#{$anchor}">
+                                                                                    <xsl:value-of select="title"/>
+                                                                                </a>
+                                                                            </li>
+                                                                        </xsl:for-each>
+                                                                    </ul>
+                                                                </xsl:if>
+                                                            </li>
+                                                        </xsl:for-each>
+                                                    </ul>
+                                                </xsl:if>
+                                            </li>
+                                        </xsl:for-each>
+                                    </ul>
+                                </div>
                             </div>
                             <!-- Body -->
-                            <xsl:apply-templates select="/document/body/*" />
-                        </div>
-
-                    </div>
-                         <div class="cleaner">&#160;</div>
-                    </div>
-                </div>
+                            <xsl:apply-templates select="/document/body/*"/>
+                        </td>
+                    </tr>
+                </table>
             </xhtml:body>
         </xhtml:html>
     </xsl:template>
@@ -248,6 +247,12 @@
             <xsl:if test="@bgcolor"><xsl:attribute name="bgcolor"><xsl:value-of select="@bgcolor"/></xsl:attribute></xsl:if>
             <xsl:apply-templates/>
         </table>
+    </xsl:template>
+    
+    <xsl:template match="*[parent::section]">
+        <div id="mainbody">
+            <xsl:next-match/>
+        </div>
     </xsl:template>
 
 </xsl:stylesheet>

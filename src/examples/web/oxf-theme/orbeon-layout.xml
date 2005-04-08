@@ -247,9 +247,10 @@ a:hover {
     background-color: &xlight-color;;
     font-size: 9pt;
     font-weight: bold;
-    padding: .2em .5em .2em .5em;
-    margin-left: -0.6em;
-    margin-right: .5em;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-top: .2em;
+    padding-bottom: .2em;
     margin-top: 2em;
     margin-bottom: 1em;
     border-bottom: solid 1px &dark-color;;

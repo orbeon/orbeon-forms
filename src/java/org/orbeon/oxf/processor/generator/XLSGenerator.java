@@ -30,8 +30,8 @@ import org.orbeon.oxf.util.XLSUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocumentFactory;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.xpath.XPathException;
@@ -157,8 +157,6 @@ public class XLSGenerator extends ProcessorImpl {
             }
 
             private void addToElement(Element element, String xpath, String value) {
-                final NonLazyUserDataDocumentFactory fctry 
-                    = NonLazyUserDataDocumentFactory.getInstance( null );
                 StringTokenizer elements = new StringTokenizer(xpath, "/");
 
                 while (elements.hasMoreTokens()) {
@@ -174,7 +172,7 @@ public class XLSGenerator extends ProcessorImpl {
                     } else {
                         // Last: add element, set content to value
                         Element child = new NonLazyUserDataElement(name);
-                        child.add(fctry.createText(value));
+                        child.add(Dom4jUtils.createText(value));
                         element.add(child);
                     }
                 }

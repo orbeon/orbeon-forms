@@ -28,8 +28,8 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.util.Base64ContentHandler;
 import org.orbeon.oxf.util.XLSUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocumentFactory;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 import org.xml.sax.ContentHandler;
 
@@ -126,9 +126,6 @@ public class FromXLSConverter extends ProcessorImpl {
             private void addToElement(Element element, String xpath, String value) {
                 StringTokenizer elements = new StringTokenizer(xpath, "/");
                 
-                final NonLazyUserDataDocumentFactory fctry 
-                    = NonLazyUserDataDocumentFactory.getInstance( null );
-
                 while (elements.hasMoreTokens()) {
                     String name = elements.nextToken();
                     if (elements.hasMoreTokens()) {
@@ -142,7 +139,7 @@ public class FromXLSConverter extends ProcessorImpl {
                     } else {
                         // Last: add element, set content to value
                         Element child = new NonLazyUserDataElement(name);
-                        child.add(fctry.createText(value));
+                        child.add(Dom4jUtils.createText(value));
                         element.add(child);
                     }
                 }

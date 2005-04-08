@@ -30,7 +30,6 @@ import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.ProcessorOutputXMLReader;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
@@ -257,7 +256,7 @@ public class EmailProcessor extends ProcessorImpl {
             // Create Document and convert it into a String
             Element rootElement = (Element)(needsRootElement ? partOrBodyElement.elements().get(0) : partOrBodyElement);
             Document partDocument = new NonLazyUserDataDocument();
-            partDocument.setRootElement((Element) Dom4jUtils.cloneElement(rootElement));
+            partDocument.setRootElement((Element) rootElement.clone());
             content = handleInlinePartContent(partDocument, contentType);
         }
 

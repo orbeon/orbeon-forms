@@ -43,11 +43,11 @@ public class CopyOf extends Statement {
             org.dom4j.Text textNode = Dom4jUtils.createText(selected.toString());
             return Arrays.asList(new org.dom4j.Text[] {textNode});
         } else if (selected instanceof Node) {
-            return Arrays.asList(new Node[]{Dom4jUtils.cloneNode((Node) selected)});
+            return Arrays.asList(new Node[]{ ( Node )( ( Node )selected ).clone()  });
         } else if (selected instanceof List) {
             List result = new ArrayList();
             for (Iterator i = ((List) selected).iterator(); i.hasNext();)
-                result.add(Dom4jUtils.cloneNode((Node) i.next()));
+                result.add( ( ( Node )i.next() ).clone() );
             return result;
         } else if (selected instanceof Closure) {
             return Arrays.asList(new Closure[] {(Closure) selected});

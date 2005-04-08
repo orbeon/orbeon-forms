@@ -480,7 +480,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     Document paramsDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("params"));
                     for (Iterator j = params.iterator(); j.hasNext();) {
                         Element paramElement = (Element) j.next();
-                        paramsDocument.getRootElement().add(Dom4jUtils.cloneElement(paramElement));
+                        paramsDocument.getRootElement()
+                            .add( ( org.dom4j.Element )paramElement.clone() );
                     }
                     addInput(new ASTInput("filter", paramsDocument));
                     addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));

@@ -80,7 +80,7 @@ public class SchedulerProcessor extends ProcessorImpl {
                                 if ( it.hasNext() ) {
                                     final org.dom4j.Element srcElt = ( org.dom4j.Element )it.next();
                                     final org.dom4j.Element elt 
-                                        = Dom4jUtils.cloneElement( srcElt ); 
+                                        = ( org.dom4j.Element )srcElt.clone(); 
                                     processorDefinition.addInput( name, elt );
                                 }
                                 else

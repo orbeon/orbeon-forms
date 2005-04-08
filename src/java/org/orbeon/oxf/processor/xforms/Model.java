@@ -263,7 +263,7 @@ public class Model {
                 Element instanceContainer = modelElement.element(new QName("instance", Constants.XFORMS_NAMESPACE));
                 if (instanceContainer != null) {
                     Element initialInstanceRoot = (Element)
-                            Dom4jUtils.cloneElement((Element) instanceContainer.elements().get(0));
+                            ((Element) instanceContainer.elements().get(0)).clone();
                     initialInstance = new NonLazyUserDataDocument();
                     initialInstance.setRootElement(initialInstanceRoot);
                 }
@@ -541,16 +541,16 @@ public class Model {
                                 try {
                                     List result = expr.evaluate();
                                     // Place in element
-                                    Element elementNode = (Element) node;
-                                    Dom4jUtils.clearElementContent(elementNode);
+                                    Element elt = (Element) node;
+                                    Dom4jUtils.clearElementContent(elt);
                                     for (Iterator k = result.iterator(); k.hasNext();) {
                                         Object resultItem = k.next();
                                         if (resultItem instanceof Node) {
-                                            elementNode.add(Dom4jUtils.cloneElement(elementNode));
+                                            elt.add( ( org.dom4j.Node )elt.clone() );
                                         } else if(resultItem instanceof Item) {
-                                            elementNode.add(Dom4jUtils.createText(((Item)resultItem).getStringValue()));
+                                            elt.add(Dom4jUtils.createText(((Item)resultItem).getStringValue()));
                                         } else {
-                                            elementNode.add(Dom4jUtils.createText(resultItem.toString()));
+                                            elt.add(Dom4jUtils.createText(resultItem.toString()));
                                         }
                                     }
                                 } catch (XPathException e) {

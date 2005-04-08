@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!--
     Copyright (C) 2004 Orbeon, Inc.
 
@@ -14,6 +15,10 @@
 
     Please contact Orbeon at info@orbeon.com for more information.
 -->
+<!DOCTYPE document [
+    <!ENTITY jboss-vers "JBoss 3.2.7 and 4.0.1sp1">
+    <!ELEMENT document (ANY)>
+]>
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
         <title>Installing Orbeon Presentation Server</title>
@@ -42,7 +47,7 @@
                 <li>Apache Tomcat 5.5.4 with JDK 1.5.0</li>
                 <li>BEA WebLogic Server 7 and 8.1</li>
                 <li>IBM WebSphere 6</li>
-                <li>JBoss 3.2.6 and 4.0.0</li>
+                <li>&jboss-vers;</li>
             </ul>
 
             <p>Please contact us if you have questions about support for other application servers
@@ -657,7 +662,7 @@
 <!--        </section>-->
         <anchor id="jboss"/>
         <section>
-            <title>Installing Presentation Server on JBoss 3.2.6 and 4.0.0</title>
+            <title>Installing Presentation Server on &jboss-vers;</title>
             <ol>
                 <li>Assuming that <code>JBOSS_HOME</code> represents the location of your JBoss
                 installation: create a new <code>JBOSS_HOME/server/default/deploy/orbeon.war</code>
@@ -666,11 +671,6 @@
                 <li>Unzip <code>orbeon.war</code> in the <code>orbeon.war</code> directory you just
                 created.</li>
 
-                <li>Edit <code>JBOSS_HOME/bin/run.bat</code> (or <code>run.sh</code> on UNIX).
-                Look for the line that starts with <code>set JAVA_OPTS</code>. Add at the end of
-                this line the following option:
-                <code>-Dorg.jboss.logging.Log4jService.catchSystemOut=false</code></li>
-                
                 <li>If you are using JBoss 4.0.0, edit
                 <code>JBOSS_HOME/server/default/deploy/jbossweb-tomcat50.sar/META-INF/jboss-service.xml</code>
                 and change the value in <code>&lt;attribute name="UseJBossWebLoader"></code> from

@@ -75,6 +75,7 @@ import orbeon.apache.xerces.parsers.XML11Configuration;
  *
  * @author Peter McCracken, IBM
  * @see orbeon.apache.xerces.xinclude.XIncludeHandler
+ * @see org.orbeon.oxf.xml.XIncludeHandler
  */
 public class XIncludeParserConfiguration extends XML11Configuration {
 
@@ -135,7 +136,7 @@ public class XIncludeParserConfiguration extends XML11Configuration {
         XMLComponentManager parentSettings) {
         super(symbolTable, grammarPool, parentSettings);
 
-        fXIncludeHandler = new XIncludeHandler();
+        fXIncludeHandler = new XIncludeHandler( this );
         addCommonComponent(fXIncludeHandler);
 
         final String[] recognizedFeatures = {
@@ -250,7 +251,7 @@ public class XIncludeParserConfiguration extends XML11Configuration {
         // 2/16/2004 d : Xerces special cases  http://xml.org/sax/features/namespaces and 
         //               http://xml.org/sax/features/namespace-prefixes and consequently they
         //               won't be available unless we add them manually.
-        ret.add( "http://xml.org/sax/features/namespace-prefixes" );
+        ret.add( FEATURE_NS_PREFIXES );
         ret.add( "http://xml.org/sax/features/namespaces" );
     	return ret;
     	
@@ -263,5 +264,23 @@ public class XIncludeParserConfiguration extends XML11Configuration {
     	final java.util.TreeMap ret = new java.util.TreeMap( fFeatures );
     	ret.remove( PARSER_SETTINGS );
     	return ret;
+    }
+    private static final String FEATURE_NS_PREFIXES 
+        = "http://xml.org/sax/features/namespace-prefixes";
+
+    private static final String FEATURE_NS = "http://xml.org/sax/features/namespace-prefixes";
+    
+    /**
+     * 4/9/2005 d : A more efficient way to find out if this cfg recognizes a resource.  ( More
+     * efficient than creating a map anyway. )
+     */
+    public boolean isRecognizedFeature( final String id ) {
+        // Think this order of checks is one of the more optimal ones.  That is we see ids other 
+        // than FEATURE_NS and FEATURE_NS_PREFIXES more often.
+        boolean ret = !PARSER_SETTINGS.equals( id ) && fRecognizedFeatures.contains( id );
+        if ( !ret ) {
+            ret = FEATURE_NS.equals( id ) || FEATURE_NS_PREFIXES.equals( id );
+        }
+        return ret;
     }
 }

@@ -40,12 +40,12 @@
     <page id="post" path-info="/blog/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           xforms="post/post-xforms-model.xml"
           model="post/post-model.xpl"
-          view="post/post-view.xsl">
+          view="post/post-view.xpl">
         <param ref="/form/username"/>
         <param ref="/form/blog-id"/>
         <param ref="/form/post-id"/>
         <action when="/form/action = 'save'  and not(/form//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="post/do-save-comment.xpl">
-            <result page="post">
+            <result page="post" instance-passing="redirect">
                 <xu:update select="/form/username">
                     <xu:value-of select="doc('input:instance')/form/username"/>
                 </xu:update>

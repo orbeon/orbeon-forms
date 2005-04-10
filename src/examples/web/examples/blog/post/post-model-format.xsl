@@ -20,11 +20,13 @@
 
     <xsl:variable name="instance" select="doc('input:instance')/*" as="element()"/>
     <xsl:variable name="blog" select="doc('input:blog')/*" as="element()"/>
-    <xsl:variable name="posts" select="doc('input:posts')/*" as="element()"/>
+    <xsl:variable name="post" select="doc('input:post')/*" as="element()"/>
     <xsl:variable name="categories" select="doc('input:categories')/*" as="element()"/>
 
+    <xsl:copy-of select="$instance"/>
+
     <user>
-        <username><xsl:value-of select="doc('input:instance')/*/username"/></username>
+        <username><xsl:value-of select="$instance/username"/></username>
     </user>
 
     <xsl:copy-of select="$blog"/>
@@ -41,41 +43,35 @@
     <feeds>
         <feed>
             <name>All</name>
-            <link><xsl:value-of select="concat('/', doc('input:instance')/*/username, '/', $blog/blog-id, '?format=rss')"/></link>
+            <link><xsl:value-of select="concat('/', $instance/username, '/', $blog/blog-id, '?format=rss')"/></link>
         </feed>
         <xsl:for-each select="$categories/category">
             <feed>
                 <name><xsl:value-of select="name"/></name>
-                <link><xsl:value-of select="concat('/', doc('input:instance')/*/username, '/', $blog/blog-id, '?format=rss&amp;category=', name)"/></link>
+                <link><xsl:value-of select="concat('/', $instance/username, '/', $blog/blog-id, '?format=rss&amp;category=', name)"/></link>
             </feed>
         </xsl:for-each>
     </feeds>
 
     <posts>
-        <xsl:for-each-group select="$posts/post[published = 'true']" group-by="substring(date-created, 1, 10)">
-            <xsl:sort select="xs:dateTime(date-created)" order="descending"/>
+        <xsl:for-each select="$post">
             <day>
                 <date><xsl:value-of select="date-created"/></date>
                 <formatted-date><xsl:value-of select="format-dateTime(date-created, '[FNn] [MNn] [D], [Y]', 'en', (), ())"/></formatted-date>
 
-                <xsl:for-each select="current-group()">
-                    <xsl:sort select="xs:dateTime(date-created)" order="descending"/>
-
-                    <xsl:copy>
-                        <xsl:copy-of select="*"/>
-                        <links>
-                            <fragment-name><xsl:value-of select="concat('post-', post-id)"/></fragment-name>
-                            <post><xsl:value-of select="concat('/blog/', $instance/username, '/post/', post-id)"/></post>
-                            <comments><xsl:value-of select="concat('/blog/', $instance/username, '/post/', post-id, '#comments')"/></comments>
-                            <category></category>
-                        </links>
-                        <formatted-date-created><xsl:value-of select="format-dateTime(date-created, '[FNn] [MNn] [D], [Y]', 'en', (), ())"/></formatted-date-created>
-                        <formatted-dateTime-created><xsl:value-of select="format-dateTime(date-created, '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ())"/></formatted-dateTime-created>
-                    </xsl:copy>
-
-                </xsl:for-each>
+                <xsl:copy>
+                    <xsl:copy-of select="*"/>
+                    <links>
+                        <fragment-name><xsl:value-of select="concat('post-', post-id)"/></fragment-name>
+                        <post><xsl:value-of select="concat('/blog/', $instance/username, '/post/', post-id)"/></post>
+                        <comments><xsl:value-of select="concat('/blog/', $instance/username, '/post/', post-id, '#comments')"/></comments>
+                        <category></category>
+                    </links>
+                    <formatted-date-created><xsl:value-of select="format-dateTime(date-created, '[FNn] [MNn] [D], [Y]', 'en', (), ())"/></formatted-date-created>
+                    <formatted-dateTime-created><xsl:value-of select="format-dateTime(date-created, '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ())"/></formatted-dateTime-created>
+                </xsl:copy>
             </day>
-        </xsl:for-each-group>
+        </xsl:for-each>
     </posts>
 
 </recent-posts>

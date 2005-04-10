@@ -95,7 +95,112 @@
                                         </a>
                                     </div>
                                 </xsl:for-each>
+
+                                <h2>Comments</h2>
+                                <div id="comments">
+                                    <xsl:for-each select="post">
+                                        <xsl:choose>
+                                            <xsl:when test="count(comments/comment) > 0">
+                                                <xsl:for-each select="comments/comment">
+                                                    <div>
+                                                        <!-- Display comment content -->
+                                                        <div style="margin-left: 2em; border: 1px solid #ccc; padding: 1em; margin-top: 1em; background-color: #f6f6f6">
+                                                            <xsl:value-of select="text"/>
+                                                        </div>
+                                                        <!-- Display comment information and links -->
+                                                        <div style="margin-left: 2em; padding: 1em; padding-top: 0.5em; border-bottom: 1px dotted #ccc">
+                                                            Comment by
+                                                            <a href="mailto:{email}">
+                                                                <xsl:value-of select="name"/>
+                                                            </a>
+                                                            <xsl:text> @ </xsl:text>
+                                                            <xsl:value-of select="format-dateTime(date-created, '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ())"/>
+                                                        </div>
+                                                    </div>
+                                                </xsl:for-each>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                No comments yet.
+                                            </xsl:otherwise>
+                                        </xsl:choose>
+                                    </xsl:for-each>
+                                </div>
+
                             </xsl:for-each>
+                            <xforms:group ref="/form" xxforms:show-errors="{/*/form/action != ''}">
+                                <!-- Display comment for preview if needed -->
+                                <xsl:if test="/*/form/action = 'preview'">
+                                    <!-- Display comment content -->
+                                    <div style="margin-left: 2em; border: 1px solid #ccc; padding: 1em; background-color: #ffff9a">
+                                        <xsl:value-of select="/*/form/comment/text"/>
+                                    </div>
+                                    <!-- Display comment information and links -->
+                                    <div style="margin-left: 2em; padding: 1em">
+                                        Comment by
+                                        <a href="mailto:{/*/form/comment/email}">
+                                            <xsl:value-of select="/*/form/comment/name"/>
+                                        </a>
+                                        <xsl:text> @ </xsl:text>
+                                        <xsl:value-of select="format-dateTime(/*/form/comment/date-created, '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ())"/>
+                                    </div>
+                                </xsl:if>
+                                <h2>Post New Comment</h2>
+                                <table>
+                                    <tr>
+                                        <th style="text-align: right">Name:</th>
+                                        <td style="width: 100%">
+                                            <xforms:input ref="comment/name"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align: right">Email:</th>
+                                        <td>
+                                            <xforms:input ref="comment/email"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th style="text-align: right">URI:</th>
+                                        <td>
+                                            <xforms:input ref="comment/uri"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th colspan="2" style="text-align: left">
+                                            Please enter your comment below:
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <xforms:textarea ref="comment/text" xhtml:rows="10" xhtml:cols="80"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span style="white-space: nowrap">
+                                                <xforms:output ref="check/value1"/>
+                                                <xsl:text> + </xsl:text>
+                                                <xforms:output ref="check/value2"/>
+                                                <xsl:text> = </xsl:text>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <xforms:input ref="check/value3" xhtml:size="3">
+                                                <xforms:alert>Please enter a correct check value!</xforms:alert>
+                                                <xforms:hint>Please enter a check value. This is a measure about comment spam.</xforms:hint>
+                                            </xforms:input>
+                                        </td>
+                                    </tr>
+                                </table>
+                                <xforms:submit>
+                                    <xforms:label>Preview</xforms:label>
+                                    <xforms:setvalue ref="/form/action">preview</xforms:setvalue>
+                                </xforms:submit>
+                                <xforms:submit>
+                                    <xforms:label>Submit</xforms:label>
+                                    <xforms:setvalue ref="/form/action">save</xforms:setvalue>
+                                </xforms:submit>
+                            </xforms:group>
+
                         </xsl:when>
                         <xsl:otherwise>
                             No posts yet.

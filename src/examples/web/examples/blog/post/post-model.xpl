@@ -26,16 +26,29 @@
         <p:output name="post" id="post"/>
     </p:processor>
 
-    <!-- Get categories -->
+    <!-- Call data access to get blog information -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../data-access/get-user-blogs.xpl"/>
+        <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username), #post#xpointer(/*/blog-id))"/>
+        <p:output name="blogs" id="blogs"/>
+    </p:processor>
+
+    <!-- Call data access to get list of categories -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../data-access/get-categories.xpl"/>
-        <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username|/*/blog-id))"/>
+        <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username), #post#xpointer(/*/blog-id))"/>
         <p:output name="categories" id="categories"/>
     </p:processor>
 
-    <p:processor name="oxf:identity">
-        <p:input name="data" href="aggregate('model', #post, #categories)"/>
-        <p:output name="posts" ref="data"/>
+    <!-- Produce model -->
+    <p:processor name="oxf:xslt">
+        <p:input name="config" href="post-model-format.xsl"/>
+        <p:input name="data"><dummy/></p:input>
+        <p:input name="instance" href="#instance"/>
+        <p:input name="blog" href="#blogs#xpointer(/*/blog[1])"/>
+        <p:input name="post" href="#post"/>
+        <p:input name="categories" href="#categories"/>
+        <p:output name="data" ref="data" debug="zzzmodel"/>
     </p:processor>
 
 </p:config>

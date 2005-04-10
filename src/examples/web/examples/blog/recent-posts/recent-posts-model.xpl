@@ -19,32 +19,36 @@
     <p:param type="input" name="instance"/>
     <p:param type="output" name="data"/>
 
-<!--    <p:processor name="oxf:xslt">-->
-<!--        <p:input name="data" href="#params"/>-->
-<!--        <p:input name="config">-->
-<!--            <query xsl:version="2.0">-->
-<!--                <username>ebruchez</username>-->
-<!--                <blog-id>500001</blog-id>-->
-<!--            </query>-->
-<!--        </p:input>-->
-<!--        <p:output name="data" id="query"/>-->
-<!--    </p:processor>-->
+    <!-- Call data access to get blog information -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../data-access/get-user-blogs.xpl"/>
+        <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username|/*/blog-id))"/>
+        <p:output name="blogs" id="blogs"/>
+    </p:processor>
 
+    <!-- Call data access to get list of recent posts -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../data-access/get-recent-posts.xpl"/>
         <p:input name="query" href="aggregate('query', #instance#xpointer(/*/*))"/>
         <p:output name="posts" id="posts"/>
     </p:processor>
 
+    <!-- Call data access to get list of categories -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../data-access/get-categories.xpl"/>
         <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username|/*/blog-id))"/>
         <p:output name="categories" id="categories"/>
     </p:processor>
 
-    <p:processor name="oxf:identity">
-        <p:input name="data" href="aggregate('model', #posts, #categories)"/>
-        <p:output name="posts" ref="data"/>
+    <!-- Produce model -->
+    <p:processor name="oxf:xslt">
+        <p:input name="config" href="recent-posts-model-format.xsl"/>
+        <p:input name="data"><dummy/></p:input>
+        <p:input name="instance" href="#instance"/>
+        <p:input name="blog" href="#blogs#xpointer(/*/blog[1])"/>
+        <p:input name="posts" href="#posts"/>
+        <p:input name="categories" href="#categories"/>
+        <p:output name="data" ref="data" debug="zzzmodel"/>
     </p:processor>
 
 </p:config>

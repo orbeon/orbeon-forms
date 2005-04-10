@@ -28,7 +28,9 @@
                 xquery version "1.0";
                 <blogs>
                     {
-                    for $i in /blog[username = '<xsl:value-of select="/query/username"/>' and blog-id]
+                    for $i in /blog[username = '<xsl:value-of select="/query/username"/>'
+                                    and blog-id
+                                    <xsl:if test="/query/blog-id">= '<xsl:value-of select="/query/blog-id"/>'</xsl:if>]
                         return $i
                     }
                 </blogs>

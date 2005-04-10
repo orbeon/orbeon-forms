@@ -11,13 +11,19 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<element name="query" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" xmlns="http://relaxng.org/ns/structure/1.0">
-    <element name="username">
-        <data type="string"/>
-    </element>
-    <optional>
-        <element name="blog-id">
-            <data type="string"/>
-        </element>
-    </optional>
-</element>
+<p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors"
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <p:param type="input" name="data"/>
+    <p:param type="output" name="data"/>
+
+    <!-- Call theme stylesheet -->
+    <p:processor name="oxf:xslt">
+        <p:input name="config" href="../theme/recent-posts.xsl"/>
+        <p:input name="data" href="#data"/>
+        <p:output name="data" ref="data"/>
+    </p:processor>
+
+</p:config>

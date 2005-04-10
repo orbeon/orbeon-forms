@@ -54,7 +54,7 @@
     </p:processor>
 
     <p:processor name="oxf:null-serializer">
-        <p:input name="data" href="#result" debug="zzz"/>
+        <p:input name="data" href="#result"/>
     </p:processor>
 
 </p:config>

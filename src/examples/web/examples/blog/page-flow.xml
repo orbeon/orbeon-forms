@@ -63,7 +63,7 @@
     <page path-info="/blog/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           xforms="recent-posts/recent-posts-xforms-model.xml"
           model="recent-posts/recent-posts-model.xpl"
-          view="recent-posts/recent-posts-view.xsl">
+          view="recent-posts/recent-posts-view.xpl">
         <param ref="/form/username"/>
         <param ref="/form/blog-id"/>
     </page>

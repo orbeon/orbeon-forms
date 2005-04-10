@@ -127,12 +127,23 @@
                                 </div>
 
                             </xsl:for-each>
+
                             <xforms:group ref="/form" xxforms:show-errors="{/*/form/action != ''}">
                                 <!-- Display comment for preview if needed -->
                                 <xsl:if test="/*/form/action = 'preview'">
+                                    <p>
+                                        This is how your comment will look like:
+                                    </p>
                                     <!-- Display comment content -->
                                     <div style="margin-left: 2em; border: 1px solid #ccc; padding: 1em; background-color: #ffff9a">
-                                        <xsl:value-of select="/*/form/comment/text"/>
+                                        <xsl:choose>
+                                            <xsl:when test="normalize-space(/*/form/comment/text) != ''">
+                                                <xsl:value-of select="/*/form/comment/text"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>
+                                                <i>[Please enter a comment!]</i>
+                                            </xsl:otherwise>
+                                        </xsl:choose>
                                     </div>
                                     <!-- Display comment information and links -->
                                     <div style="margin-left: 2em; padding: 1em">
@@ -171,7 +182,10 @@
                                     </tr>
                                     <tr>
                                         <td colspan="2">
-                                            <xforms:textarea ref="comment/text" xhtml:rows="10" xhtml:cols="80"/>
+                                            <!--  xhtml:style="background: #eee; border: 1px solid #ccc" -->
+                                            <xforms:textarea ref="comment/text" xhtml:rows="10" xhtml:cols="80">
+                                                <xforms:alert>Please enter a valid comment!</xforms:alert>
+                                            </xforms:textarea>
                                         </td>
                                     </tr>
                                     <tr>

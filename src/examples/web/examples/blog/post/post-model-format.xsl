@@ -35,7 +35,7 @@
         <xsl:for-each select="$categories/category">
             <xsl:copy>
                 <xsl:copy-of select="*"/>
-                <link><xsl:value-of select="concat('/xxx/', id)"/></link>
+                <link><xsl:value-of select="concat('/', $instance/username, '/', $blog/blog-id, '/', '?category=', id)"/></link>
             </xsl:copy>
         </xsl:for-each>
     </categories>

@@ -82,7 +82,8 @@
         <include name="mail-1_3_2.jar"/>
         <include name="itext-1_02b.jar"/>
         <include name="itext-xml-1_02.jar"/>
-        <include name="xml-apis-xerces_2_6_2_orbeon.jar"/> 
+        <include name="xml-apis-xerces_2_6_2_orbeon.jar"/>
+        <include name="pdfbox-0_7_1.jar"/>
     </fileset>
     <fileset id='war.libs.private' dir="${lib.dir}">
       <include name='xercesImpl_2_6_2_orbeon.jar' />
@@ -99,7 +100,7 @@
         </tstamp>
         <property name='release.number' value='${version.number}.${time}'/>
 
-        <echo message="Building Orbeon Presentation Server ${release.number}"/>
+        <echo message="Building Orbeon PresentationServer ${release.number}"/>
 
         <property name="src.dir" value="src"/>
         <property name="java-src.dir" value="${src.dir}/java"/>

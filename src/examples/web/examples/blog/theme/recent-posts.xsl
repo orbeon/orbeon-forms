@@ -71,7 +71,7 @@
                                     <a name="{links/fragment-name}"/>
                                     <h3>
                                         <a href="{links/post}">
-                                            <img src="/images/permalink.png" style="border: 0px"/>
+                                            <img src="/images/text.png" style="border: 0px"/>
                                             <xsl:text> </xsl:text>
                                             <xsl:value-of select="title"/>
                                         </a>

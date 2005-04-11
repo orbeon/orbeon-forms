@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>BizDoc</title>
+    <title>Employees</title>
     <source>data-access/initialization/create-database.xpl</source>
     <source>data-access/initialization/init-database.xpl</source>
     <source>data-access/initialization/init-script.xpl</source>
@@ -62,9 +62,9 @@
     <source>page-flow.xpl</source>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <p>
-            This is a sample application for <a
-            href="http://www.orbeon.com/software/presentation-server">Orbeon Presentation
-            Server</a>. For more information, please refer to the home page of the application.
+            This is a sample application for <a href="http://www.orbeon.com/software/">Orbeon
+            PresentationServer</a>. For more information, please refer to the home page of the
+            example application.
         </p>
     </description>
 </example-descriptor>

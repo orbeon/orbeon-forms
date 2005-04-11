@@ -95,8 +95,9 @@ public class ForwardingContentHandler implements ContentHandler {
         return contentHandler;
     }
 
-    public void setContentHandler(ContentHandler contentHandler) {
-        this.contentHandler = contentHandler;
+    public void setContentHandler( final ContentHandler cntntHndlr ) {
+        contentHandler = cntntHndlr;
+        if ( contentHandler == null ) forward = false;
     }
 
     protected boolean getForward() {

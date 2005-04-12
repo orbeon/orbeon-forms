@@ -52,7 +52,8 @@
     </feeds>
 
     <posts>
-        <xsl:for-each-group select="$posts/post[published = 'true']" group-by="substring(date-created, 1, 10)">
+<!--        <xsl:for-each-group select="$posts/post[published = 'true']" group-by="substring(date-created, 1, 10)">-->
+        <xsl:for-each-group select="$posts/post[published = 'true']" group-by="xs:date(xs:dateTime(date-created))">
             <xsl:sort select="xs:dateTime(date-created)" order="descending"/>
             <day>
                 <date><xsl:value-of select="date-created"/></date>

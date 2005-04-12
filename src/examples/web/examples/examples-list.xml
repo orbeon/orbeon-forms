@@ -109,6 +109,7 @@
         <example id="struts-validation" label="Struts Client-Side Validation" href="/struts/jsType"/>
     </section>
     <section label="Cool Stuff">
+        <example id="xquery-the-web" label="XQuery The Web"/>
         <example id="url" label="HTML Screen-Scraping"/>
         <example id="rss" label="Create Your Own RSS Feeds"/>
         <example id="spellchecker" label="Google Spell Checker"/>

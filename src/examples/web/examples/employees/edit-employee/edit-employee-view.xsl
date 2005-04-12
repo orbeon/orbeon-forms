@@ -29,7 +29,7 @@
         </tabs>
     </head>
     <body>
-        <div id="maincontent">
+        <div class="maincontent">
 
             <xsl:if test="/form/message != ''">
                 <table>

@@ -45,7 +45,7 @@
                 </tabs>
             </head>
             <body>
-                <div id="maincontent">
+                <div class="maincontent">
 
                     <p>
                         Results <xsl:value-of select="($current-page-number - 1) * $form-instance/page-size + 1"/>

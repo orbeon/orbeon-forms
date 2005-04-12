@@ -24,7 +24,7 @@
         <title>Detail - Step 1</title>
     </head>
     <body>
-        <div id="maincontent">
+        <div class="maincontent">
             <xforms:group ref="/form" xxforms:show-errors="{doc('input:instance')/form/show-errors = 'true'}">
                 <xi:include href="../summary/view-logo.xml"/>
                 <xi:include href="detail-view-header.xml"/>

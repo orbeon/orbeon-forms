@@ -27,7 +27,7 @@
     <!-- Extract example id (the first part of the path) -->
     <p:processor name="oxf:perl5-matcher">
         <p:input name="data" href="#request-path"/>
-        <p:input name="config"><regexp>/(example-resources/|examples-standalone/)?([^/]*).*</regexp></p:input>
+        <p:input name="config"><regexp>/(example-resources/|examples-standalone/|direct/)?([^/]*).*</regexp></p:input>
         <p:output name="data" id="regexp-result"/>
     </p:processor>
 

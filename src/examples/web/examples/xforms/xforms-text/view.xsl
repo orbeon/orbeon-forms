@@ -59,6 +59,13 @@
                 </tr>
                 
                 <tr>
+                    <td align="right">Date 2:</td>
+                    <td>
+                        <xforms:input ref="date2"/>
+                    </td>
+                </tr>
+                
+                <tr>
                        <td align="right">Time:</td>
                        <td>
                            <xforms:input ref="time"/>

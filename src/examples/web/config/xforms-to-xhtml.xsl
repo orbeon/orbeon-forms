@@ -31,11 +31,13 @@
         
         <xsl:variable name="id" select="translate($input/@xxforms:name, '$^+-*/=', '_______')"/>
         <xhtml:input type="text" id="{$id}" name="{$input/@xxforms:name}" value="{$input/@xxforms:value}">
-                <xsl:copy-of select="$input/@* except ($input/@xxforms:* | $input/@*[namespace-uri() = ''])"/>
+            <xsl:copy-of select="$input/@* except ($input/@xxforms:* | $input/@*[namespace-uri() = ''])"/>
         </xhtml:input> 
-        <input type="image" src="/images/showCalendar.gif" value="Date"
+        <input type="image" class="calendar-button" src="/images/showCalendar.gif" value="Date"
             onclick="showCalendar('', '{$id}'); return false;"/>
-        <div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"/>
+        <xsl:if test="not(preceding::xforms:input[@xxforms:type = 'xs:date'])">
+            <div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"/>
+        </xsl:if>
     </xsl:template>
 
     <xsl:template name="show-time-picker">
@@ -68,7 +70,7 @@
         </xhtml:script>
 
     </xsl:template>
-    
+
     <xsl:template match="xforms:input">
         <xsl:choose>
             <!-- Display a overlib calendar -->

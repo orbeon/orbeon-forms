@@ -62,11 +62,15 @@ textarea {
     background-color: &xlight-color;;
 }
 
-#maincontent {
+.maincontent {
     margin:0px;
     background: white;
     border-left: 1px solid &light-color;;
     border-right: 1px solid &dark-color;;
+}
+
+.maincontent .maincontent {
+    border: none;
 }
 
 .cleaner {
@@ -226,7 +230,7 @@ a:hover {
     margin-bottom: 0em;
 }
 
-#maincontent h1 {
+.maincontent h1 {
     background-color: &xlight-color;;
     font-weight: bold;
     font-size: 14px;
@@ -241,7 +245,7 @@ a:hover {
     line-height: 180%;
 }
 
-#maincontent h2 {
+.maincontent h2 {
     color: &dark-color;;
     background-color: &xlight-color;;
     font-size: 9pt;
@@ -256,43 +260,45 @@ a:hover {
     clear: right;
 }
 
-#maincontent h3 {
+.maincontent h3 {
     color: &dark-color;;
     font-size: 10pt;
     font-weight: bold;
     clear: right;
 }
 
-#maincontent h4 {
+.maincontent h4 {
     color: &dark-color;;
     font-size: 10pt;
     font-weight: bold;
 }
 
-#maincontent h5 {
+.maincontent h5 {
     padding: 0.5em;
 }
 
-#maincontent img {
+.maincontent img {
     display: block;
     position: relative;
     left: 10em
     background-color: white;
 }
 
-#maincontent b {
+.maincontent b {
     color: &dark-color;;
 }
 
-#maincontent hr {
+.maincontent hr {
     height: 0px;
     border-top: solid gray 1px;
     border-bottom: 0px;
 }
 
 #mainbody {
-    margin-left: 1em;
-    margin-right: 1em;
+<!--    margin-left: 1em;-->
+<!--    margin-right: 1em;-->
+    padding-left: 1em;
+    padding-right: 1em;
 }
 
 .box {
@@ -442,6 +448,12 @@ ul {
 
 .tinyinput { width: 5em; }
 .smallinput { width: 8em; }
+    
+.calendar-button {
+    margin: 0 16px 3px 5px; 
+    padding:0; 
+    vertical-align: top;
+}
 
 <!-- Styles used by xforms-to-xhtml.xsl -->
 .xferrtable    { border: 0; margin: 0px; padding: 0px }
@@ -457,7 +469,7 @@ ul {
     #cleaner { display: none }
     #banner { display: none}
     #xmaincontent { position: relative; top: -2cm; left: -3.5cm; width: 15cm;}
-    #main #maincontent { margin: 0; }
+    #main .maincontent { margin: 0; }
 }
 
 </root>

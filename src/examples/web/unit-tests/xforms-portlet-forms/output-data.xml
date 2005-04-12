@@ -215,7 +215,7 @@
                         <input type="hidden" name="$hidden" value="example-id[2]^tutorial-hello3^action[1]^^visible-portlet[3]^OXFExamplesPortlet"/>
                     </xhtml:form>
                 </div>
-                <div id="maincontent">
+                <div class="maincontent">
                     <div id="mainbody">
                         <h1>Hello World XForms</h1>
                         <div f:url-norewrite="true">

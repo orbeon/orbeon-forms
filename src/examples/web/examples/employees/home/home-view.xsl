@@ -29,7 +29,7 @@
         </tabs>
     </head>
     <body>
-        <div id="maincontent">
+        <div class="maincontent">
             <p>
                 Welcome to the Employees example application!
             </p>

@@ -40,7 +40,7 @@
                 </tabs>
             </head>
             <body>
-                <div id="maincontent">
+                <div class="maincontent">
 
                     <xforms:group ref="/form">
 

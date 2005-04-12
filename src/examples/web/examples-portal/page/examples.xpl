@@ -135,7 +135,7 @@
                                             </ul>
                                         </xf:group>
                                     </td>
-                                    <td id="maincontent" valign="top" width="99%">
+                                    <td class="maincontent" valign="top" width="99%">
                                         <!-- Title -->
                                         <h1>
                                             <xsl:choose>
@@ -145,7 +145,7 @@
                                                 <xsl:otherwise>[Untitled]</xsl:otherwise>
                                             </xsl:choose>
                                         </h1>
-                                        <div id="mainbody">
+                                        <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td id="mainbody">
                                             <!-- Body -->
                                             <xsl:if test="not($visible-portlet/@window-state = 'minimized')">
                                                 <!-- Encapsulate everything in a div that makes sure URLs won't be rewritten further -->
@@ -170,7 +170,7 @@
                                                     </xsl:choose>
                                                 </div>
                                             </xsl:if>
-                                        </div>
+                                        </td></tr></table>
                                     </td>
                                 </tr>
                             </table>

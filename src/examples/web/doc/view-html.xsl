@@ -59,7 +59,7 @@
                                 <xsl:apply-templates select="doc('book.xml')/book/menu"/>
                             </ul>
                         </td>
-                        <td id="maincontent" valign="top" width="99%">
+                        <td class="maincontent" valign="top" width="99%">
                             <!-- Title -->
                             <h1><xsl:value-of select="/document/header/title"/></h1>
                             <!-- TOC  -->

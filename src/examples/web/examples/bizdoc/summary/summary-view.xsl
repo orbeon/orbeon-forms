@@ -20,7 +20,7 @@
         <title>Summary</title>
     </head>
     <body>
-        <div id="maincontent">
+        <div class="maincontent">
             <xi:include href="view-logo.xml"/>
             <xforms:group ref="/form">
                 <h2 style="margin-top: 0">Available Documents</h2>

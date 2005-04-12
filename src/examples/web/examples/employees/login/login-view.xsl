@@ -27,7 +27,7 @@
         </tabs>
     </head>
     <body>
-        <div id="maincontent">
+        <div class="maincontent">
             <p>
                 Please enter your login and password:
             </p>

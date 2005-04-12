@@ -32,6 +32,7 @@
     <page path-info="/blog/xmlrpc" model="xml-rpc.xpl"/>
 
     <!-- For tests only -->
+    <page path-info="/blog/test-calculate" xforms="test/xforms-model.xml" view="test/view.xsl"/>
     <page path-info="/blog/test/create-user-blog" model="data-access/test-create-user-blog.xpl"/>
     <page path-info="/blog/test/create-user" model="data-access/test-create-user.xpl"/>
     <page path-info="/blog/test/delete-posts" model="data-access/test-delete-posts.xpl"/>

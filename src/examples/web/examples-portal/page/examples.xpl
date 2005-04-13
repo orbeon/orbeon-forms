@@ -51,37 +51,37 @@
                             <xhtml:title>PresentationServer Examples</xhtml:title>
                         </xhtml:head>
                         <xhtml:body>
-                            <table id="main" width="100%" border="0" cellpadding="0" cellspacing="0">
+                            <xhtml:table id="main" width="100%" border="0" cellpadding="0" cellspacing="0">
                                 <!-- Banner (with search) -->
-                                <tr><td colspan="2" id="banner">
-                                    <div style="float: left">
-                                        <a href="/" f:url-norewrite="true">
-                                            <img f:url-norewrite="false" width="199" height="42" style="border: 0 white; margin-left: 1em; margin-top: 0.2em; margin-bottom: 0.4em" src="/oxf-theme/images/orbeon-small-blueorange.gif"/>
-                                        </a>
-                                    </div>
-                                    <span style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
+                                <xhtml:tr><xhtml:td colspan="2" id="banner">
+                                    <xhtml:div style="float: left">
+                                        <xhtml:a href="/" f:url-norewrite="true">
+                                            <xhtml:img f:url-norewrite="false" width="199" height="42" style="border: 0 white; margin-left: 1em; margin-top: 0.2em; margin-bottom: 0.4em" src="/oxf-theme/images/orbeon-small-blueorange.gif" alt='home' />
+                                        </xhtml:a>
+                                    </xhtml:div>
+                                    <xhtml:span style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
                                         <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0em" action="http://www.google.com/custom">
-                                            <a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</a> |
-                                            <a href="/doc/">Documentation</a> |
-                                            <span style="white-space: nowrap">
+                                            <xhtml:a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</xhtml:a> |
+                                            <xhtml:a href="/doc/">Documentation</xhtml:a> |
+                                            <xhtml:span style="white-space: nowrap">
                                                 Search:
                                                 <input type="text" name="q" size="10" maxlength="255" value=""/>
                                                 <input type="submit" name="sa" VALUE="Go" style="margin-left: 0.2em;"/>
-                                            </span>
+                                            </xhtml:span>
                                             <input type="hidden" name="cof" VALUE="GIMP:#FF9900;T:black;LW:510;ALC:#FF9900;L:http://www.orbeon.com/pics/orbeon-google.png;GFNT:#666699;LC:#666699;LH:42;BGC:#FFFFFF;AH:center;VLC:#666699;GL:0;S:http://www.orbeon.com;GALT:#FF9900;AWFID:8ac636f034abb7d8;"/>
                                             <input type="hidden" name="sitesearch" value="orbeon.com"/>
                                         </form>
-                                    </span>
-                                </td></tr>
+                                    </xhtml:span>
+                                </xhtml:td></xhtml:tr>
                                 <!-- Tabs -->
-                                <tr><td colspan="2">
-                                    <div class="tabs">
+                                <xhtml:tr><xhtml:td colspan="2">
+                                    <xhtml:div class="tabs">
                                         <xf:group ref="/form" xhtml:style="margin-bottom: 0">
                                             <xsl:for-each select="$portlets">
                                                 <xsl:choose>
                                                     <xsl:when test="@name = $visible-portlet-name">
-                                                        <span class="tab-selected-left">&#160;</span>
-                                                        <span class="tab-selected"><xsl:value-of select="@short-title"/></span>
+                                                        <xhtml:span class="tab-selected-left">&#160;</xhtml:span>
+                                                        <xhtml:span class="tab-selected"><xsl:value-of select="@short-title"/></xhtml:span>
                                                     </xsl:when>
                                                     <xsl:otherwise>
                                                         <xf:submit xxf:appearance="link" xhtml:class="tab">
@@ -93,11 +93,11 @@
                                                 </xsl:choose>
                                             </xsl:for-each>
                                         </xf:group>
-                                    </div>
-                                </td></tr>
-                                <tr>
+                                    </xhtml:div>
+                                </xhtml:td></xhtml:tr>
+                                <xhtml:tr>
                                     <!-- List of examples -->
-                                    <td id="leftcontent" valign="top" width="1%">
+                                    <xhtml:td id="leftcontent" valign="top" width="1%">
                                         <h1>PresentationServer Examples</h1>
                                         <xf:group ref="/form">
                                             <ul class="tree-sections">
@@ -112,20 +112,20 @@
                                                             <li class="{if ($selected) then 'tree-items-selected' else 'tree-items'}" style="white-space: nowrap">
                                                                 <xsl:choose>
                                                                     <xsl:when test="@href">
-                                                                        <a href="{@href}" xhtml:target="example"><xsl:value-of select="@label"/></a>
+                                                                        <xhtml:a href="{@href}" xhtml:target="example"><xsl:value-of select="@label"/></xhtml:a>
                                                                         <xsl:text>&#160;</xsl:text>
-                                                                        <img src="/images/new-window.gif" align="middle"/>
+                                                                        <xhtml:img src="/images/new-window.gif" align="middle"/>
                                                                     </xsl:when>
                                                                     <xsl:when test="$selected">
                                                                         <xsl:value-of select="@label"/>
                                                                     </xsl:when>
                                                                     <xsl:when test="@standalone = 'true'">
-                                                                        <a href="/examples-standalone/{@id}" xhtml:target="example"><xsl:value-of select="@label"/></a>
+                                                                        <xhtml:a href="/examples-standalone/{@id}" xhtml:target="example"><xsl:value-of select="@label"/></xhtml:a>
                                                                         <xsl:text>&#160;</xsl:text>
-                                                                        <img src="/images/new-window.gif" align="middle"/>
+                                                                        <xhtml:img src="/images/new-window.gif" align="middle"/>
                                                                     </xsl:when>
                                                                     <xsl:otherwise>
-                                                                        <a href="/goto-example/{@id}"><xsl:value-of select="@label"/></a>
+                                                                        <xhtml:a href="/goto-example/{@id}"><xsl:value-of select="@label"/></xhtml:a>
                                                                     </xsl:otherwise>
                                                                 </xsl:choose>
                                                             </li>
@@ -134,8 +134,8 @@
                                                 </xsl:for-each>
                                             </ul>
                                         </xf:group>
-                                    </td>
-                                    <td class="maincontent" valign="top" width="99%">
+                                    </xhtml:td>
+                                    <xhtml:td class="maincontent" valign="top" width="99%">
                                         <!-- Title -->
                                         <h1>
                                             <xsl:choose>
@@ -145,11 +145,11 @@
                                                 <xsl:otherwise>[Untitled]</xsl:otherwise>
                                             </xsl:choose>
                                         </h1>
-                                        <table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td id="mainbody">
+                                        <xhtml:table width="100%" cellpadding="0" cellspacing="0" border="0"><xhtml:tr><xhtml:td id="mainbody">
                                             <!-- Body -->
                                             <xsl:if test="not($visible-portlet/@window-state = 'minimized')">
                                                 <!-- Encapsulate everything in a div that makes sure URLs won't be rewritten further -->
-                                                <div f:url-norewrite="true" portlet:is-portlet-content="true">
+                                                <xhtml:div f:url-norewrite="true" portlet:is-portlet-content="true">
                                                     <xsl:choose>
                                                         <xsl:when test="$visible-portlet/portlet:body/html">
                                                             <!-- When parsing text/html with Tidy, we will have a root HTML element -->
@@ -168,12 +168,12 @@
                                                             </xsl:apply-templates>
                                                         </xsl:otherwise>
                                                     </xsl:choose>
-                                                </div>
+                                                </xhtml:div>
                                             </xsl:if>
-                                        </td></tr></table>
-                                    </td>
-                                </tr>
-                            </table>
+                                        </xhtml:td></xhtml:tr></xhtml:table>
+                                    </xhtml:td>
+                                </xhtml:tr>
+                            </xhtml:table>
                         </xhtml:body>
                     </xhtml:html>
                 </xsl:template>

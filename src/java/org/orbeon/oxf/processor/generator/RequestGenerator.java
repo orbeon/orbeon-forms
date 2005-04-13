@@ -121,65 +121,67 @@ public class RequestGenerator extends ProcessorImpl {
                     Transformer identity = TransformerUtils.getIdentityTransformer();
                     identity.transform(new DocumentSource(state.requestDocument), new SAXResult(new ForwardingContentHandler(contentHandler) {
                         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-                            if (REQUEST_PRIVATE_NAMESPACE_URI.equals(uri)) {
-                                // Special treatment for this element
-                                if (FILE_ITEM_ELEMENT.equals(qName)) {
-                                    // Marker for file item
+                            try {
+                                if (REQUEST_PRIVATE_NAMESPACE_URI.equals(uri)) {
+                                    // Special treatment for this element
+                                    if (FILE_ITEM_ELEMENT.equals(qName)) {
+                                        // Marker for file item
 
-                                    String parameterName = attributes.getValue(PARAMETER_NAME_ATTRIBUTE);
-                                    FileItem fileItem = (FileItem) getRequest(pipelineContext).getParameterMap().get(parameterName);
+                                        String parameterName = attributes.getValue(PARAMETER_NAME_ATTRIBUTE);
+                                        FileItem fileItem = (FileItem) getRequest(pipelineContext).getParameterMap().get(parameterName);
 
-                                    AttributesImpl newAttributes = new AttributesImpl();
-                                    super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-                                    super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-                                    newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
-                                            useBase64(pipelineContext, fileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(): XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
-                                    super.startElement("", "value", "value", newAttributes);
-                                    writeFileItem(pipelineContext, fileItem, getContentHandler());
-                                    super.endElement("", "value", "value");
-                                    super.endPrefixMapping(XMLConstants.XSD_PREFIX);
-                                    super.endPrefixMapping(XMLConstants.XSI_PREFIX);
-                                }
-                            } else if (localname.equals("body") && uri.equals("")) {
-                                // Marker for request body
-
-                                // Read InputStream into FileItem object, if not already present
-
-                                // We do this so we can read the body multiple times, if needed.
-                                // For large files, there will be a performance hit. If we knew
-                                // we didn't need to read it multiple times, we could avoid
-                                // saving the stream, but practically, it can happen, and it is
-                                // convenient.
-                                Context context = getContext(pipelineContext);
-                                if (context.bodyFileItem == null) {
-                                    final FileItem fileItem = new DefaultFileItemFactory(getMaxMemorySizeProperty(), SystemUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
-                                    pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
-                                        public void contextDestroyed(boolean success) {
-                                            fileItem.delete();
-                                        }
-                                    });
-                                    try {
-                                        OutputStream outputStream = fileItem.getOutputStream();
-                                        NetUtils.copyStream(getRequest(pipelineContext).getInputStream(), outputStream);
-                                        outputStream.close();
-                                    } catch (IOException e) {
-                                        throw new OXFException(e);
+                                        AttributesImpl newAttributes = new AttributesImpl();
+                                        super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+                                        super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+                                        newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
+                                                useBase64(pipelineContext, fileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(): XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
+                                        super.startElement("", "value", "value", newAttributes);
+                                        writeFileItem(pipelineContext, fileItem, getContentHandler());
+                                        super.endElement("", "value", "value");
+                                        super.endPrefixMapping(XMLConstants.XSD_PREFIX);
+                                        super.endPrefixMapping(XMLConstants.XSI_PREFIX);
                                     }
-                                    context.bodyFileItem = fileItem;
+                                } else if (localname.equals("body") && uri.equals("")) {
+                                    // Marker for request body
+
+                                    // Read InputStream into FileItem object, if not already present
+
+                                    // We do this so we can read the body multiple times, if needed.
+                                    // For large files, there will be a performance hit. If we knew
+                                    // we didn't need to read it multiple times, we could avoid
+                                    // saving the stream, but practically, it can happen, and it is
+                                    // convenient.
+                                    Context context = getContext(pipelineContext);
+                                    if (context.bodyFileItem != null || getRequest(pipelineContext).getInputStream() != null) {
+                                        if (context.bodyFileItem == null) {
+                                            final FileItem fileItem = new DefaultFileItemFactory(getMaxMemorySizeProperty(), SystemUtils.getTemporaryDirectory()).createItem("dummy", "dummy", false, null);
+                                            pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
+                                                public void contextDestroyed(boolean success) {
+                                                    fileItem.delete();
+                                                }
+                                            });
+                                            OutputStream outputStream = fileItem.getOutputStream();
+                                            NetUtils.copyStream(getRequest(pipelineContext).getInputStream(), outputStream);
+                                            outputStream.close();
+                                            context.bodyFileItem = fileItem;
+                                        }
+                                        // Serialize the stream into the body element
+                                        AttributesImpl newAttributes = new AttributesImpl();
+                                        super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+                                        super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+                                        newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
+                                                useBase64(pipelineContext, context.bodyFileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(): XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
+                                        super.startElement(uri, localname, qName, newAttributes);
+                                        writeFileItem(pipelineContext, context.bodyFileItem, getContentHandler());
+                                        super.endElement(uri, localname, qName);
+                                        super.endPrefixMapping(XMLConstants.XSD_PREFIX);
+                                        super.endPrefixMapping(XMLConstants.XSI_PREFIX);
+                                    }
+                                } else {
+                                    super.startElement(uri, localname, qName, attributes);
                                 }
-                                // Serialize the stream into the body element
-                                AttributesImpl newAttributes = new AttributesImpl();
-                                super.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-                                super.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-                                newAttributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA",
-                                        useBase64(pipelineContext, context.bodyFileItem) ? XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName(): XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
-                                super.startElement(uri, localname, qName, newAttributes);
-                                writeFileItem(pipelineContext, context.bodyFileItem, getContentHandler());
-                                super.endElement(uri, localname, qName);
-                                super.endPrefixMapping(XMLConstants.XSD_PREFIX);
-                                super.endPrefixMapping(XMLConstants.XSI_PREFIX);
-                            } else {
-                                super.startElement(uri, localname, qName, attributes);
+                            } catch (IOException e) {
+                                throw new OXFException(e);
                             }
                         }
                         public void endElement(String uri, String localname, String qName) throws SAXException {

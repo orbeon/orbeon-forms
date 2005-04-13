@@ -15,17 +15,34 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
     
-    <p:param name="instance" type="input" debug="instance"/>
+    <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
     
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config>
+                <include>/*</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="request"/>
+    </p:processor>
+    
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#instance"/>
+        <p:input name="data" href="aggregate('root', #instance, #request)"/>
         <p:input name="config">
             <javascript xsl:version="2.0">
-                <xsl:text>&lt;script language="javascript" type="text/javascript" src="http://localhost:8888/ops/direct/xquery-the-web?url=</xsl:text>
-                <xsl:value-of select="escape-uri(/instance/url, true())"/>
+                <xsl:variable name="url-start">
+                    <xsl:text>http://</xsl:text>
+                    <xsl:value-of select="/root/request/server-name"/>
+                    <xsl:value-of select="if (/root/request/server-port != '80') then concat(':', /root/request/server-port) else ''"/>
+                    <xsl:value-of select="/root/request/context-path"/>
+                </xsl:variable>
+                <xsl:text>&lt;script language="javascript" type="text/javascript" src="</xsl:text>
+                <xsl:value-of select="$url-start"/>
+                <xsl:text>/direct/xquery-the-web?url=</xsl:text>
+                <xsl:value-of select="escape-uri(/root/instance/url, true())"/>
                 <xsl:text>&amp;xquery=</xsl:text>
-                <xsl:value-of select="escape-uri(/instance/xquery, true())"/>
+                <xsl:value-of select="escape-uri(/root/instance/xquery, true())"/>
                 <xsl:text>&amp;output=javascript"></xsl:text>
             </javascript>
         </p:input>

@@ -12,6 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
@@ -57,9 +58,9 @@
     </p:processor>
 
     <p:processor name="oxf:xquery">
-        <p:input name="config" href="#xquery"/>
+        <p:input name="config" href="#xquery" debug="xquery"/>
         <p:input name="data" href="#page"/>
-        <p:output name="data" id="xquery-output"/>
+        <p:output name="data" id="xquery-output" debug="xquery output"/>
     </p:processor>
     
     <p:choose href="#request">
@@ -76,9 +77,19 @@
                 <p:output name="data" id="html"/>
             </p:processor>
             <p:processor name="oxf:xslt">
-                <p:input name="data" href="#html"/>
+                <p:input name="data" href="#html" debug="html"/>
                 <p:input name="config">
-                    <text xsl:version="2.0">document.write("<xsl:value-of select="replace(/*, '&quot;', '\\&quot;')"/>")</text>
+                    <text xsl:version="2.0">
+                        <xsl:variable name="text" as="xs:string" select="replace(/*, '&quot;', '\\&quot;')"/>
+                        <xsl:text>document.write(</xsl:text>
+                        <xsl:for-each select="tokenize($text, '&#x0a;')">
+                            <xsl:if test="position() > 1"> +&#x0a;</xsl:if>
+                            <xsl:text>"</xsl:text>
+                            <xsl:value-of select="."/>
+                            <xsl:text>"</xsl:text>
+                        </xsl:for-each>
+                        <xsl:text>);</xsl:text>
+                    </text>
                 </p:input>
                 <p:output name="data" id="javascript"/>
             </p:processor>

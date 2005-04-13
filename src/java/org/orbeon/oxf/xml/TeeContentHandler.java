@@ -18,15 +18,18 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
-import java.util.List;
-
 public class TeeContentHandler implements ContentHandler {
 
     // NOTE: Use an array, as List and Iterator are less efficient (profiling)
-    private Object[] contentHandlers;
+    private ContentHandler[] contentHandlers;
 
-    public TeeContentHandler(List contentHandlers) {
-        this.contentHandlers = contentHandlers.toArray();
+    public TeeContentHandler( final java.util.List hndlrs ) {
+        contentHandlers = new ContentHandler[ hndlrs.size() ];
+        hndlrs.toArray( contentHandlers );
+    }
+
+    public TeeContentHandler( final ContentHandler[] hndlrs  ) {
+        contentHandlers = ( ContentHandler[] )hndlrs.clone();
     }
 
     public TeeContentHandler(ContentHandler contentHandler1, ContentHandler contentHandler2) {
@@ -37,35 +40,35 @@ public class TeeContentHandler implements ContentHandler {
 
     public void setDocumentLocator(Locator locator) {
         for (int i = 0; i < contentHandlers.length; i++) {
-            ContentHandler contentHandler = (ContentHandler) contentHandlers[i];
+            ContentHandler contentHandler = contentHandlers[i];
             contentHandler.setDocumentLocator(locator);
         }
     }
 
     public void startDocument() throws SAXException {
         for (int i = 0; i < contentHandlers.length; i++) {
-            ContentHandler contentHandler = (ContentHandler) contentHandlers[i];
+            ContentHandler contentHandler = contentHandlers[i];
             contentHandler.startDocument();
         }
     }
 
     public void endDocument() throws SAXException {
         for (int i = 0; i < contentHandlers.length; i++) {
-            ContentHandler contentHandler = (ContentHandler) contentHandlers[i];
+            ContentHandler contentHandler = contentHandlers[i];
             contentHandler.endDocument();
         }
     }
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
         for (int i = 0; i < contentHandlers.length; i++) {
-            ContentHandler contentHandler = (ContentHandler) contentHandlers[i];
+            ContentHandler contentHandler = contentHandlers[i];
             contentHandler.startPrefixMapping(prefix, uri);
         }
     }
 
     public void endPrefixMapping(String prefix) throws SAXException {
         for (int i = 0; i < contentHandlers.length; i++) {
-            ContentHandler contentHandler = (ContentHandler) contentHandlers[i];
+            ContentHandler contentHandler = contentHandlers[i];
             contentHandler.endPrefixMapping(prefix);
         }
     }
@@ -73,7 +76,7 @@ public class TeeContentHandler implements ContentHandler {
     public void startElement(String namespaceURI, String localName,
                              String qName, Attributes atts) throws SAXException {
         for (int i = 0; i < contentHandlers.length; i++) {
-            ContentHandler contentHandler = (ContentHandler) contentHandlers[i];
+            ContentHandler contentHandler = contentHandlers[i];
             contentHandler.startElement(namespaceURI, localName, qName, atts);
         }
     }
@@ -81,35 +84,35 @@ public class TeeContentHandler implements ContentHandler {
     public void endElement(String namespaceURI, String localName,
                            String qName) throws SAXException {
         for (int i = 0; i < contentHandlers.length; i++) {
-            ContentHandler contentHandler = (ContentHandler) contentHandlers[i];
+            ContentHandler contentHandler = contentHandlers[i];
             contentHandler.endElement(namespaceURI, localName, qName);
         }
     }
 
     public void characters(char ch[], int start, int length) throws SAXException {
         for (int i = 0; i < contentHandlers.length; i++) {
-            ContentHandler contentHandler = (ContentHandler) contentHandlers[i];
+            ContentHandler contentHandler = contentHandlers[i];
             contentHandler.characters(ch, start,  length);
         }
     }
 
     public void ignorableWhitespace(char ch[], int start, int length) throws SAXException {
         for (int i = 0; i < contentHandlers.length; i++) {
-            ContentHandler contentHandler = (ContentHandler) contentHandlers[i];
+            ContentHandler contentHandler = contentHandlers[i];
             contentHandler.ignorableWhitespace(ch, start, length);
         }
     }
 
     public void processingInstruction(String target, String data) throws SAXException {
         for (int i = 0; i < contentHandlers.length; i++) {
-            ContentHandler contentHandler = (ContentHandler) contentHandlers[i];
+            ContentHandler contentHandler = contentHandlers[i];
             contentHandler.processingInstruction(target, data);
         }
     }
 
     public void skippedEntity(String name) throws SAXException {
         for (int i = 0; i < contentHandlers.length; i++) {
-            ContentHandler contentHandler = (ContentHandler) contentHandlers[i];
+            ContentHandler contentHandler = contentHandlers[i];
             contentHandler.skippedEntity(name);
         }
     }

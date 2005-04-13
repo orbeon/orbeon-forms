@@ -121,6 +121,9 @@ public class SchemaRepository {
 
         schemas.put(Constants.XFORMS_NAMESPACE_URI + "/controls", "schemas/xforms-controls.rng");
         schemas.put(Constants.XFORMS_NAMESPACE_URI + "/model", "schemas/xforms-1_0.xsd");
+        
+        schemas.put( Constants.XHTML_NAMESPACE_URI, "schemas/xhtml1-transitional_and_xforms1.xsd");
+        
         schemas.put("http://relaxng.org/ns/structure/1.0", "schemas/relaxng.rng");
         schemas.put("http://www.w3.org/2001/xml-events", "schemas/XML-Events-Schema.xsd");
         schemas.put("http://www.w3.org/2001/XMLSchema", "schemas/XMLSchema.xsd");

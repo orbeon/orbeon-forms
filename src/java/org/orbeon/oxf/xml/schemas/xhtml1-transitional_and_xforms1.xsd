@@ -1,0 +1,54 @@
+<?xml version='1.0' ?>
+<xsd:schema 
+  xmlns:xsd='http://www.w3.org/2001/XMLSchema'
+  xmlns:xhtml='http://www.w3.org/1999/xhtml'
+  targetNamespace='http://www.w3.org/1999/xhtml'
+  
+>
+  <xsd:redefine schemaLocation='xhtml1-transitional.xsd' >
+
+    <xsd:attributeGroup name='coreattrs' >
+      <xsd:annotation>
+        <xsd:documentation>
+          Allow for foreign attribs on most elements ( block and inline ).
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:attributeGroup ref='xhtml:coreattrs' />
+      <xsd:anyAttribute namespace='##other' processContents='lax' />
+    </xsd:attributeGroup>
+      
+    <xsd:attributeGroup name='i18n' >
+      <xsd:annotation>
+        <xsd:documentation>
+          Allow for foreign attribs on doc structure elements. ( e.g. html )
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:attributeGroup ref='xhtml:i18n' />
+      <xsd:anyAttribute namespace='##other' processContents='lax' />
+    </xsd:attributeGroup>
+      
+    <xsd:group name='misc.inline' >
+      <xsd:annotation>
+        <xsd:documentation>
+          Allow for foreign elements.
+        </xsd:documentation>
+      </xsd:annotation>
+      <xsd:choice>
+        <xsd:group ref='xhtml:misc.inline' />
+        <xsd:any 
+          namespace='##other' 
+          processContents='lax' 
+          minOccurs='0' 
+          maxOccurs='unbounded' 
+        />
+      </xsd:choice>
+    </xsd:group>
+    
+  </xsd:redefine>
+
+  <xsd:import 
+    namespace='http://www.w3.org/2002/xforms' 
+    schemaLocation='xforms-1_0.xsd' 
+  />
+
+</xsd:schema>

@@ -38,9 +38,12 @@
         </layout>
     </appender>
     
-<!--    <logger name='org.orbeon.oxf.processor.JavaProcessor' >-->
+<!--    <logger name='org.orbeon.oxf.processor.validation.MSVValidationProcessor' >-->
 <!--        <level value='DEBUG' />-->
 <!--    </logger>-->
+    <!--    <logger name='org.orbeon.oxf.processor.JavaProcessor' >-->
+    <!--        <level value='DEBUG' />-->
+    <!--    </logger>-->
 
     <!-- This is the root logger -->
     <root>

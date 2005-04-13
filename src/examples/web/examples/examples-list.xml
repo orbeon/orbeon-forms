@@ -110,6 +110,7 @@
     </section>
     <section label="Cool Stuff">
         <example id="xquery-the-web" label="XQuery The Web"/>
+        <example id="translate" label="Translate This"/>
         <example id="url" label="HTML Screen-Scraping"/>
         <example id="rss" label="Create Your Own RSS Feeds"/>
         <example id="spellchecker" label="Google Spell Checker"/>

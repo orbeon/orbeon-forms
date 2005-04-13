@@ -1,0 +1,95 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+    <xhtml:head><xhtml:title>XQuery The Web</xhtml:title></xhtml:head>
+    <xhtml:body>
+        <p>
+            <img src="/images/xquery-the-web.gif" style="float: right; margin: 0 0 2em 2em"/>
+
+            <ul style="margin-left: 2em; padding-left: 0">
+                <li>
+                    <span class="question">What is this service?</span> Using XQuery, extract data from web sites,
+                    recombine it, include it in your own pages, create feeds, ...
+                </li>
+                <li>
+                    <span class="question">How do I use it?</span> Enter a URL you want to extract information from,
+                    enter an XQuery, and the format of the output. Use JavaScript if you want to
+                    include the output of the query in your own pages.
+                </li>
+                <li>
+                    <span class="question">What is the format of the generated URL?</span> This is REST service. The
+                    URL format is:
+                    <tt>xquery-the-web?output=xml|html|javascript&amp;url=...&amp;xquery=...</tt>.
+                    The form below just help you generate one of those URLs.
+                </li>
+                <li>
+                    <span class="question">What are the restriction for using this service?</span> Don't make a
+                    commercial use of this service. Be courteous to us and sites you are querying.
+                    Be creative.
+                </li>
+                <li>
+                    <span class="question">How can I submit feedback or ask other questions?</span> Join and post your
+                    feedback/questions on the <a
+                    href="http://www.objectweb.org/wws/info/ops-users">ops-users mailing list</a>.
+                </li>
+            </ul>
+        </p>
+        <xforms:group ref="/instance">
+            <table class="gridtable" width="100%" style="clear: both; margin-top: 2em;">
+                <tr>
+                    <th width="1%">URL:</th>
+                    <td><xforms:input xhtml:class="tt" ref="url" xhtml:style="width: 100%" xhtml:tabindex="1"/></td>
+                </tr>
+                <tr>
+                    <th>XQuery:</th>
+                    <td><xforms:textarea ref="xquery" xhtml:rows="10" xhtml:style="width: 100%" xhtml:tabindex="2"/></td>
+                </tr>
+                <tr>
+                    <th style="white-space: nowrap">Output format:</th>
+                    <td>
+                        <xforms:select1 ref="output" appearance="full">
+                            <xforms:choices>
+                                <xforms:item xhtml:tabindex="3">
+                                    <xforms:label>XML</xforms:label>
+                                    <xforms:value>xml</xforms:value>
+                                </xforms:item>
+                                <xforms:item xhtml:tabindex="4">
+                                    <xforms:label>HTML</xforms:label>
+                                    <xforms:value>html</xforms:value>
+                                </xforms:item>
+                                <xforms:item xhtml:tabindex="5">
+                                    <xforms:label>JavaScript</xforms:label>
+                                    <xforms:value>javascript</xforms:value>
+                                </xforms:item>
+                            </xforms:choices>
+                        </xforms:select1>
+                    </td>
+                </tr>
+                <tr>
+                    <th/>
+                    <td>            
+                        <xforms:submit xhtml:tabindex="6">
+                            <xforms:label>Run XQuery</xforms:label>
+                            <xforms:setvalue ref="action">submit</xforms:setvalue>
+                        </xforms:submit>
+                    </td>
+                </tr>
+            </table>
+        </xforms:group>
+    </xhtml:body>
+</xhtml:html>

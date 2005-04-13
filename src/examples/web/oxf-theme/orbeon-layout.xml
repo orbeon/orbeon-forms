@@ -39,7 +39,7 @@ input[type = "submit"] {
     font-size: 8pt;
 }
 
-textarea {
+.tt, textarea {
     font-family: Lucida Console, Courrier;
     font-size: 12px;
 }
@@ -240,7 +240,7 @@ a:hover {
     padding-top: .2em;
     padding-bottom: .2em;
     margin-top: 0;
-    margin-bottom: 2em;
+    margin-bottom: 0em;
     border-bottom: solid 1px &light-color;;
     line-height: 180%;
 }
@@ -453,6 +453,13 @@ ul {
     margin: 0 16px 3px 5px; 
     padding:0; 
     vertical-align: top;
+}
+    
+.question {
+    font-weight: bold;
+    display: block;
+    padding-top: .2em;
+    color: &dark-color;;
 }
 
 <!-- Styles used by xforms-to-xhtml.xsl -->

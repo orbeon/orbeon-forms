@@ -407,7 +407,9 @@ public class XMLUtils {
         
         private void updateWithCharBuf() {
             final int reqSize = ( int )charEncoder.maxBytesPerChar() * charBuff.position();
-            if ( byteBuff.capacity() < reqSize ) java.nio.ByteBuffer.allocate( 2 * reqSize );
+            if ( byteBuff.capacity() < reqSize ) {
+                byteBuff = java.nio.ByteBuffer.allocate( 2 * reqSize );
+            }
             
             // Make ready for read
             charBuff.flip();
@@ -465,12 +467,13 @@ public class XMLUtils {
         public void setDocumentLocator(Locator locator) {
         }
 
-        public void startDocument()
-                throws SAXException {
+        public void startDocument() throws SAXException {
+            charBuff.clear();
+            byteBuff.clear();
+            charEncoder.reset();
         }
 
-        public void endDocument()
-                throws SAXException {
+        public void endDocument() throws SAXException {
         }
 
         public void startPrefixMapping(String prefix, String uri)

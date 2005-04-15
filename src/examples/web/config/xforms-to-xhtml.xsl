@@ -595,7 +595,7 @@
     </xsl:template>
 
     <!-- Just display value if readonly -->
-    <xsl:template match="xforms:*[@xxforms:readonly = 'true']" priority="2">
+    <xsl:template match="xforms:*[@xxforms:readonly = 'true' and @xxforms:value]" priority="2">
         <xsl:variable name="value" select="@xxforms:value"/>
         <xsl:choose>
             <xsl:when test="local-name() = 'select1'">

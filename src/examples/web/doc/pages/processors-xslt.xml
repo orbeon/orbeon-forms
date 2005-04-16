@@ -44,13 +44,10 @@
         </section>
         <section>
             <title>Usage</title>
-
             <p>
-                Instantiate the XSLT Processor with a
-                <code>p:processor</code> declaration. The following URIs are supported:
+                Instantiate the XSLT Processor with a <code>p:processor</code> declaration. The
+                following URIs are supported:
             </p>
-
-
             <p>
                 <table>
                     <tr>

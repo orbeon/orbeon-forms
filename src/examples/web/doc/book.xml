@@ -44,6 +44,7 @@
         <menu-item label="Listeners" href="reference-listeners"/>
         <menu-item label="URL Rewriting" href="reference-url-rewriting"/>
         <menu-item label="Processor API" href="reference-processor-api"/>
+        <menu-item label="XML Namespaces" href="reference-xml-namespaces"/>
     </menu>
     <menu label="Processor Reference">
         <menu label="Producing XML">

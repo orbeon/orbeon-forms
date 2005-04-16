@@ -27,6 +27,13 @@
     <xsl:template match="/">
         <html>
             <head>
+                <!-- Handle meta elements -->
+                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:meta">
+                    <meta>
+                        <xsl:copy-of select="@*"/>
+                    </meta>
+                </xsl:for-each>
+                <!-- Handle title -->
                 <title>
                     <xsl:choose>
                         <xsl:when test="/xhtml:html/xhtml:head/xhtml:title != ''">
@@ -37,7 +44,7 @@
                             <xsl:value-of select="$title"/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:value-of select="/xhtml:html/xhtml:body/xhtml:h1"/>
+                            <xsl:value-of select="/xhtml:html/xhtml:body/xhtml:h1[1]"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </title>

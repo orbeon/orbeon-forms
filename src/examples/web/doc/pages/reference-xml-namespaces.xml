@@ -207,7 +207,7 @@
                         <td>http://www.w3.org/2001/XMLSchema-datatypes</td>
                         <td/>
                         <td>
-                            XML Schema datatypes
+                            XML Schema datatypes, used by XML Schema and by Relax NG
                         </td>
                         <td/>
                         <td style="white-space: nowrap">

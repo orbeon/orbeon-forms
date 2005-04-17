@@ -44,7 +44,7 @@
                             <xsl:value-of select="$title"/>
                         </xsl:when>
                         <xsl:otherwise>
-                            <xsl:value-of select="/xhtml:html/xhtml:body/xhtml:h1[1]"/>
+                            <xsl:value-of select="(/xhtml:html/xhtml:body/xhtml:h1)[1]"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </title>

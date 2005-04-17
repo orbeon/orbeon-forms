@@ -11,9 +11,15 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
+<!--
+    The epilogue is run after all page views. It is typically used to perform tasks that need to be
+    done for all views, for example running the XForms engine, applying a common theme, serialize
+    the pages to HTML or XML, etc.
+-->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:fo="http://www.w3.org/1999/XSL/Format"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xforms="http://www.w3.org/2002/xforms">
 
@@ -80,7 +86,7 @@
         <p:when test="/request/container-type = 'servlet'">
             <!-- Servlet -->
             <p:choose href="#xformed-data">
-                <!-- Auto-detected XSL-FO. Use the FOP Serializer -->
+                <!-- Auto-detected XSL-FO. Use the XSL-FO Serializer -->
                 <p:when test="/fo:root">
                     <p:processor name="oxf:xslfo-serializer">
                         <p:input name="config">
@@ -95,7 +101,7 @@
                     </p:processor>
                 </p:when>
                 <!-- Regular HTML -->
-                <p:otherwise>
+                <p:when test="/xhtml:html">
                     <!-- Apply theme -->
                     <p:processor name="oxf:xslt"> <!-- saxon4 -->
                         <p:input name="data" href="#xformed-data"/>
@@ -120,6 +126,29 @@
                             </config>
                         </p:input>
                         <p:input name="data" href="#rewritten-data"/>
+                        <p:output name="data" id="converted"/>
+                    </p:processor>
+                    <p:processor name="oxf:http-serializer">
+                        <p:input name="config">
+                            <config>
+                                <header>
+                                    <name>Cache-Control</name>
+                                    <value>post-check=0, pre-check=0</value>
+                                </header>
+                            </config>
+                        </p:input>
+                        <p:input name="data" href="#converted"/>
+                    </p:processor>
+                </p:when>
+                <p:otherwise>
+                    <!-- Output XML -->
+                    <p:processor name="oxf:xml-converter">
+                        <p:input name="config">
+                            <config>
+                                <encoding>utf-8</encoding>
+                            </config>
+                        </p:input>
+                        <p:input name="data" href="#xformed-data"/>
                         <p:output name="data" id="converted"/>
                     </p:processor>
                     <p:processor name="oxf:http-serializer">

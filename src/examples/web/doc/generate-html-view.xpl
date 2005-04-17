@@ -59,25 +59,17 @@
             <p:output name="data" id="page"/>
         </p:processor>
 
-
-        <!-- Skin left navigation bar -->
         <p:processor name="oxf:xslt">
-            <p:input name="data" href="aggregate('navigation', #page, oxf:/doc/book.xml)"/>
-            <p:input name="config" href="oxf:/doc/skin/xslt/html/book2menu-link-html.xsl"/>
-            <p:output name="data" id="menu-skinned"/>
+            <p:input name="config" href="view-html.xsl"/>
+            <p:input name="instance"><form/></p:input>
+            <p:input name="data" href="#page"/>
+            <p:output name="data" id="view"/>
         </p:processor>
 
-        <!-- Skin body (based on page) -->
         <p:processor name="oxf:xslt">
-            <p:input name="data" href="#body"/>
-            <p:input name="config" href="oxf:/doc/skin/xslt/html/document2html-link-html.xsl"/>
-            <p:output name="data" id="body-skinned"/>
-        </p:processor>
-
-        <!-- Put left bar and body together -->
-        <p:processor name="oxf:xslt">
-            <p:input name="data" href="aggregate('site', #menu-skinned, #body-skinned)"/>
-            <p:input name="config" href="oxf:/doc/skin/xslt/html/site2xhtml.xsl"/>
+            <p:input name="data" href="#view"/>
+            <p:input name="request"><request/></p:input>
+            <p:input name="config" href="oxf:/oxf-theme/theme.xsl"/>
             <p:output name="data" id="html"/>
         </p:processor>
 

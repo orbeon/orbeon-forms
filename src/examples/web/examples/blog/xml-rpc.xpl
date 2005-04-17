@@ -19,7 +19,7 @@
     <!-- Extract request body -->
     <p:processor name="oxf:request">
         <p:input name="config">
-            <config  stream-type="xs:anyURI">
+            <config stream-type="xs:anyURI">
                 <include>/request/body</include>
             </config>
         </p:input>

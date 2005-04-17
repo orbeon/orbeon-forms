@@ -44,7 +44,7 @@
                 </result>
             </xdb:query>
         </p:input>
-        <p:output name="data" id="xmldb-query" debug="abc"/>
+        <p:output name="data" id="xmldb-query"/>
     </p:processor>
 
     <p:processor name="oxf:xmldb-query">

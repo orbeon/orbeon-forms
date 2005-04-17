@@ -50,7 +50,7 @@
                 </xsl:if>
             </post>
         </p:input>
-        <p:output name="data" id="post" debug="xxxnewpost"/>
+        <p:output name="data" id="post"/>
     </p:processor>
 
     <!-- Dynamically build query -->

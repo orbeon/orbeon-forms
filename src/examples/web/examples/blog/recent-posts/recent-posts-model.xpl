@@ -29,9 +29,26 @@
     <!-- Call data access to get list of recent posts -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../data-access/get-recent-posts.xpl"/>
-        <p:input name="query" href="aggregate('query', #instance#xpointer(/*/*))"/>
+        <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username|/*/blog-id|/*/count))"/>
         <p:output name="posts" id="posts"/>
     </p:processor>
+
+    <!-- Call data access to get requested post if required -->
+    <p:choose href="#instance">
+        <p:when test="/*/post-id != ''">
+            <p:processor name="oxf:pipeline">
+                <p:input name="config" href="../data-access/get-post.xpl"/>
+                <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username|/*/post-id))"/>
+                <p:output name="post" id="post"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <p:processor name="oxf:identity">
+                <p:input name="data"><dummy/></p:input>
+                <p:output name="data" id="post"/>
+            </p:processor>
+        </p:otherwise>
+    </p:choose>
 
     <!-- Call data access to get list of categories -->
     <p:processor name="oxf:pipeline">
@@ -46,9 +63,10 @@
         <p:input name="data"><dummy/></p:input>
         <p:input name="instance" href="#instance"/>
         <p:input name="blog" href="#blogs#xpointer(/*/blog[1])"/>
+        <p:input name="post" href="#post"/>
         <p:input name="posts" href="#posts"/>
         <p:input name="categories" href="#categories"/>
-        <p:output name="data" ref="data" debug="zzzmodel"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

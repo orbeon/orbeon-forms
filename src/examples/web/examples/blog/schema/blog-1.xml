@@ -5,9 +5,11 @@
     <categories>
         <category>
             <name>General</name>
+            <id>1</id>
         </category>
         <category>
             <name>Music</name>
+            <id>2</id>
         </category>
     </categories>
 </blog>

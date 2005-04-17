@@ -27,8 +27,11 @@
             <optional>
                 <element name="categories">
                     <oneOrMore>
-                        <element name="category-name">
+                        <element name="name">
                             <data type="string"/>
+                        </element>
+                        <element name="id">
+                            <data type="positiveInteger"/>
                         </element>
                     </oneOrMore>
                 </element>

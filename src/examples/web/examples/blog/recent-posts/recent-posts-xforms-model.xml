@@ -41,6 +41,7 @@
 <!--    <xforms:bind nodeset="/form/check/value2" calculate="if (. castable as xs:integer) then . else xs:integer(minutes-from-time(current-time()))"/>-->
     <xforms:bind nodeset="/form/comment/date-created" calculate="xs:string(adjust-dateTime-to-timezone(current-dateTime(), xdt:dayTimeDuration('PT0H')))"/>
 
+    <xforms:bind nodeset="/form/comment/email" constraint="normalize-space(.) = '' or matches(., '[A-Za-z0-9!#-''\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-''\*\+\-/=\?\^_`\{-~]+)*@[A-Za-z0-9!#-''\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-''\*\+\-/=\?\^_`\{-~]+)*')"/>
     <xforms:bind nodeset="/form/comment/text" constraint="normalize-space(.) != ''"/>
 
     <xforms:bind nodeset="/form/check/value3" constraint=". castable as xs:positiveInteger and . = ../value1 + ../value2"/>

@@ -173,7 +173,10 @@
                                         <tr>
                                             <th style="text-align: right">Email:</th>
                                             <td>
-                                                <xforms:input ref="comment/email"/>
+                                                <xforms:input ref="comment/email">
+                                                    <xforms:alert>Please enter a correct email address!</xforms:alert>
+                                                    <xforms:hint>Please enter an optional email address.</xforms:hint>
+                                                </xforms:input>
                                             </td>
                                         </tr>
                                         <tr>
@@ -219,6 +222,10 @@
                                     <xforms:submit>
                                         <xforms:label>Submit</xforms:label>
                                         <xforms:setvalue ref="/form/action">save</xforms:setvalue>
+                                    </xforms:submit>
+                                    <xforms:submit>
+                                        <xforms:label>Cancel</xforms:label>
+                                        <xforms:setvalue ref="/form/action">cancel</xforms:setvalue>
                                     </xforms:submit>
                                 </xforms:group>
                             </xsl:if>

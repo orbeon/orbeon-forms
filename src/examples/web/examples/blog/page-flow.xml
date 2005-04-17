@@ -45,7 +45,20 @@
         <param ref="/form/username"/>
         <param ref="/form/blog-id"/>
         <param ref="/form/post-id"/>
-        <action when="/form/action = 'save'  and not(/form//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="recent-posts/do-save-comment.xpl">
+        <action when="/form/action = 'save' and not(/form//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="recent-posts/do-save-comment.xpl">
+            <result page="post" instance-passing="redirect">
+                <xu:update select="/form/username">
+                    <xu:value-of select="doc('input:instance')/form/username"/>
+                </xu:update>
+                <xu:update select="/form/blog-id">
+                    <xu:value-of select="doc('input:instance')/form/blog-id"/>
+                </xu:update>
+                <xu:update select="/form/post-id">
+                    <xu:value-of select="doc('input:instance')/form/post-id"/>
+                </xu:update>
+            </result>
+        </action>
+        <action when="/form/action = 'cancel'">
             <result page="post" instance-passing="redirect">
                 <xu:update select="/form/username">
                     <xu:value-of select="doc('input:instance')/form/username"/>

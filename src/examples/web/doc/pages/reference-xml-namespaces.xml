@@ -205,7 +205,9 @@
                     </tr>
                     <tr>
                         <td>http://www.w3.org/2001/XMLSchema-datatypes</td>
-                        <td/>
+                        <td>
+                            <i>N/A</i>
+                        </td>
                         <td>
                             XML Schema datatypes, used by XML Schema and by Relax NG
                         </td>

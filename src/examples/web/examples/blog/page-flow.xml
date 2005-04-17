@@ -37,28 +37,7 @@
     <page path-info="/blog/test/create-user" model="data-access/test-create-user.xpl"/>
     <page path-info="/blog/test/delete-posts" model="data-access/test-delete-posts.xpl"/>
 
-    <!-- Post for one user -->
-<!--    <page id="post" path-info="/blog/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"-->
-<!--          xforms="post/post-xforms-model.xml"-->
-<!--          model="post/post-model.xpl"-->
-<!--          view="post/post-view.xpl">-->
-<!--        <param ref="/form/username"/>-->
-<!--        <param ref="/form/blog-id"/>-->
-<!--        <param ref="/form/post-id"/>-->
-<!--        <action when="/form/action = 'save'  and not(/form//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="post/do-save-comment.xpl">-->
-<!--            <result page="post" instance-passing="redirect">-->
-<!--                <xu:update select="/form/username">-->
-<!--                    <xu:value-of select="doc('input:instance')/form/username"/>-->
-<!--                </xu:update>-->
-<!--                <xu:update select="/form/blog-id">-->
-<!--                    <xu:value-of select="doc('input:instance')/form/blog-id"/>-->
-<!--                </xu:update>-->
-<!--                <xu:update select="/form/post-id">-->
-<!--                    <xu:value-of select="doc('input:instance')/form/post-id"/>-->
-<!--                </xu:update>-->
-<!--            </result>-->
-<!--        </action>-->
-<!--    </page>-->
+    <!-- A user's blog post with comments -->
     <page id="post" path-info="/blog/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           xforms="recent-posts/recent-posts-xforms-model.xml"
           model="recent-posts/recent-posts-model.xpl"
@@ -66,7 +45,7 @@
         <param ref="/form/username"/>
         <param ref="/form/blog-id"/>
         <param ref="/form/post-id"/>
-        <action when="/form/action = 'save'  and not(/form//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="post/do-save-comment.xpl">
+        <action when="/form/action = 'save'  and not(/form//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="recent-posts/do-save-comment.xpl">
             <result page="post" instance-passing="redirect">
                 <xu:update select="/form/username">
                     <xu:value-of select="doc('input:instance')/form/username"/>
@@ -81,7 +60,7 @@
         </action>
     </page>
 
-    <!-- Page for a user's blog -->
+    <!-- A user's blog -->
     <page path-info="/blog/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           xforms="recent-posts/recent-posts-xforms-model.xml"
           model="recent-posts/recent-posts-model.xpl"

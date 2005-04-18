@@ -249,7 +249,7 @@
         </table>
     </xsl:template>
     
-    <xsl:template match="*[parent::section]">
+    <xsl:template match="*[parent::section]" priority="2">
         <div id="mainbody">
             <xsl:next-match/>
         </div>

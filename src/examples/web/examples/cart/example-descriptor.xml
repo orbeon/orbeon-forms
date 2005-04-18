@@ -25,7 +25,7 @@
             href="/doc/processors-generators#ContextGenerator" f:url-type="resource">Scope
             generator</a> retrieves an XML Document from a Request, Session or Application context
             and sends it to a pipeline. The <a
-            href="../doc/processors-serializers#ContextSerializer" f:url-type="resource">Scope
+            href="/doc/processors-serializers#ContextSerializer" f:url-type="resource">Scope
             serializer</a> stores an XML document to a Request, Session or Application context.
         </p>
         <p>

@@ -85,7 +85,7 @@
             <xsl:copy-of select="@*"/>
 
             <!-- Override href attribute if necessary -->
-            <xsl:if test="$reference-xform-instance">
+            <xsl:if test="$reference-xform-instance and contains(@href, '$portlet$')"><!-- Don't add instance if we are going out of the portal anyway -->
                 <xsl:variable name="params" select="concat('$instance=', escape-uri(normalize-space($reference-xform-instance/@xxforms:value), true()), 
                     '&amp;', '$key=', escape-uri(normalize-space($reference-xform-key/@xxforms:value), true()))"/>
 

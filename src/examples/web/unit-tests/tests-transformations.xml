@@ -93,7 +93,7 @@
         </output>
     </test>
 
-    <test description="xalan:nodeset() function" name="oxf:xslt-1.0">
+    <test description="xalan:nodeset() function" name="oxf:xalan">
         <input name="data">
             <gaga/>
         </input>

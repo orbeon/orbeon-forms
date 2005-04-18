@@ -91,5 +91,33 @@
                 </tr>
             </table>
         </xforms:group>
+        <b>Examples:</b>
+        <ul>
+            <li>
+                <b><a f:url-type="resource"
+                href="/direct/xquery-the-web?output=html&amp;xquery=%3Cp%3E+%3Cp%3EMost+Popular+%3Ca+href%3D%22http%3A%2F%2Fwww.technorati.com%2Ftag%2F%22%3ETechnorati+Tags%3C%2Fa%3E%3C%2Fp%3E+%3Ctable%3E+%7B+let+%24tags+%3A%3D+for+%24k+in+%2F%2Fa%5Bparent%3A%3Aem+and+escape-uri%28.%2C+true%28%29%29+%3D+.%5D+return+%3Ctag+popularity%3D%22%7Bcount%28%24k%2Fancestor%3A%3Aem%29%7D%22%3E%7Bstring%28%24k%29%7D%3C%2Ftag%3E+let+%24sortedTags+%3A%3D+for+%24t+in+%24tags+order+by+xs%3Adouble%28%24t%2F%40popularity%29+descending+return+%24t+for+%24t+in+%24sortedTags%5Bposition%28%29+le+5%5D+return+%3Ctr%3E+%3Cth%3E%7Bstring%28%24t%29%7D%3C%2Fth%3E+%7B+let+%24url+%3A%3D+%3Curl%3Ehttp%3A%2F%2Flocalhost%3A8888%2Fops%2Fdirect%2Fxquery-the-web%3Foutput%3Dxml%26amp%3Bxquery%3D%253Cimages%253E%2B%257B%2Bfor%2B%2524i%2Bin%2B%252F%252Fimg%255Bstarts-with%2528%2540src%252C%2B%2527%252Fimages%2527%2529%255D%2Breturn%2B%253Cimg%2Bsrc%253D%2522http%253A%252F%252Fimages.google.com%257B%2524i%252F%2540src%257D%2522%252F%253E%2B%257D%2B%253C%252Fimages%253E%26amp%3Burl%3Dhttp%253A%252F%252Fimages.google.com%252Fimages%253Fq%253D%3C%2Furl%3E+let+%24images+%3A%3D+doc%28concat%28string%28%24url%29%2C+string%28%24t%29%29%29+for+%24i+in+%24images%2Fimages%2Fimg%5Bposition%28%29+le+5%5D+return+%3Ctd%3E%7B%24i%7D%3C%2Ftd%3E+%7D+%3C%2Ftr%3E+%7D+%3C%2Ftable%3E+%3C%2Fp%3E&amp;url=http%3A%2F%2Fwww.technorati.com%2Ftag%2F">View
+                It</a></b> - Gets the <a href="http://www.technorati.com/tag/">top 5 tags</a> from
+                Technorati by popularity and for each one gets related images from <a
+                href="http://www.google.com/imghp?hl=en&amp;tab=wi&amp;q=">Google Image Search</a>.
+            </li>
+            <li>
+                <b><a f:url-type="resource"
+                href="/direct/xquery-the-web?output=html&amp;xquery=%3Cp%3E+%3Ca+href%3D%22http%3A%2F%2Fdel.icio.us%2F%22%3Edel.icio.us%3C%2Fa%3E+%7B%27+%27%7D+tags+for+latest+%7B%27+%27%7D+%3Ca+href%3D%22http%3A%2F%2Fweblog.infoworld.com%2Fudell%2F%22%3EJon+Udell+blog%3C%2Fa%3E+%7B%27+%27%7D+entries%3A+%3Cul%3E+%7B+for+%24item+in+%2Frss%2Fchannel%2Fitem+return+let+%24deliciousURL+%3A%3D+concat%28%27http%3A%2F%2Fdel.icio.us%2Furl%2F%3Furl%3D%27%2C+%24item%2Flink%29%2C+%24deliciousInXmlURL+%3A%3D+%3Curl%3Ehttp%3A%2F%2Flocalhost%3A8888%2Fops%2Fdirect%2Fxquery-the-web%3Foutput%3Dxml%26amp%3Burl%3D%7Bescape-uri%28%24deliciousURL%2C+true%28%29%29%7D%26amp%3Bxquery%3D%2F*%3C%2Furl%3E%2C+%24deliciousXML+%3A%3D+doc%28%24deliciousInXmlURL%29%2C+%24allTags+as+xs%3Astring*+%3A%3D+%24deliciousXML%2F%2Fa%5B%40class+%3D+%27delNav%27+and+not%28starts-with%28.%2C+%27200%27%29%29+and+matches%28%40href%2C+%27%2F.*%2F%27%29%5D%2Ftext%28%29%2C+%24unorderedTags+as+element%28%29*+%3A%3D+for+%24tag+in+distinct-values%28%24allTags%29+return+%3Ctag+count%3D%22%7Bcount%28%24allTags%5B.+%3D+%24tag%5D%29%7D%22%3E%7B%24tag%7D%3C%2Ftag%3E%2C+%24orderedTags+as+element%28%29*+%3A%3D+for+%24tag+in+%24unorderedTags+order+by+xs%3Ainteger%28%24tag%2F%40count%29+descending+return+%24tag+return+%3Cli%3E+%3Ca+href%3D%22%7B%24item%2Flink%7D%22%3E%7Bstring%28%24item%2Ftitle%29%7D%3C%2Fa%3E+%7B+if+%28%24orderedTags%29+then+%3Cdiv+style%3D%22margin-left%3A+1em%22%3E+%7B+for+%24tag+in+%24orderedTags+return+let+%24size+%3A%3D+if+%28%24tag%2F%40count+%3D+1%29+then+%2780%25%27+else+%27100%25%27+return+%3Cspan+style%3D%22font-size%3A+%7B%24size%7D%22%3E+%3Ca+href%3D%22http%3A%2F%2Fdel.icio.us%2Ftag%2F%7B%24tag%2Ftext%28%29%7D%22%3E%7B%24tag%2Ftext%28%29%7D%3C%2Fa%3E+%26%23160%3B%28%7Bstring%28%24tag%2F%40count%29%7D%29+%3C%2Fspan%3E+%7D+%3C%2Fdiv%3E+else+%28%29+%7D+%3C%2Fli%3E+%7D+%3C%2Ful%3E+%3C%2Fp%3E&amp;url=http%3A%2F%2Fweblog.infoworld.com%2Fudell%2Frss.xml">View
+                It</a></b> - Gets the latest stories in 
+                <a href="http://weblog.infoworld.com/udell/">Jon Udell weblog</a> and for each 
+                one finds the tags assigned by users to that story on 
+                <a href="http://del.icio.us/">del.icios.us</a>. It then displays those 
+                tags, sorted by frequency and displays the tags that appear only 
+                once with a smaller font.
+            </li>
+            <li>
+                <b><a f:url-type="resource"
+                href="/direct/xquery-the-web?url=http%3A%2F%2Frpc.blogrolling.com%2Frss.php%3Fr%3D1a80e03ec214f1bac7f390fa31d80ba0&amp;xquery=%3Cul%3E%20%7Bfor%20%24i%20in%20%2Frss%2Fchannel%2Fitem%20return%20%3Cli%3E%3Ca%20href%3D%22%7B%24i%2Flink%7D%22%3E%7Bstring(%24i%2Ftitle)%7D%3C%2Fa%3E%3C%2Fli%3E%20%7D%20%3C%2Ful%3E&amp;output=javascript">View
+                It</a></b> - Creates JavaScript that generates an HTML list to be embedded in a
+                Blogger/Blogspot <a href="http://avernet.blogspot.com/">blog</a> based on an <a
+                href="http://rpc.blogrolling.com/rss.php?r=1a80e03ec214f1bac7f390fa31d80ba0">RSS
+                feed</a> generated by <a href="http://www.blogrolling.com/">Blogrolling.com</a>.
+            </li>
+        </ul>
     </xhtml:body>
 </xhtml:html>

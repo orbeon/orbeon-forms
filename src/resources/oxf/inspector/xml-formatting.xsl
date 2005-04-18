@@ -210,7 +210,7 @@
         <xsl:call-template name="format-text"/>
     </xsl:template>
 
-    <xsl:template match="comment" mode="xml-formatting" priority="0.5">
+    <xsl:template match="comment" mode="xml-formatting" priority="2">
         <xsl:param name="show-namespaces" select="true()"/>
         <div class="rd">
             <font color="{$comment-color}">

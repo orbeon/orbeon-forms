@@ -14,7 +14,7 @@
 <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
     <xforms:instance>
         <instance>
-            <url>http://www.objectweb.org/wws/info/ops-users</url>
+            <url>http://www.orbeon.com/community/downloads</url>
 <xquery>let 
     $v := //table[tr[1]/th[1] = 'Version']/tr[2]/td[1] 
 return

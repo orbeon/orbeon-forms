@@ -15,11 +15,15 @@
     <xforms:instance>
         <instance>
             <url>http://www.objectweb.org/wws/info/ops-users</url>
-<xquery>&lt;p>
-    The ops-user mailing list has 
-    {//td[contains(., 'Subscribers:')]/b[1]/text()}
-    subscribers.
-&lt;/p></xquery>
+<xquery>let 
+    $v := //table[tr[1]/th[1] = 'Version']/tr[2]/td[1] 
+return
+    &lt;p>Latest versions of Orbeon products:
+        &lt;ul>
+            &lt;li>PresentationServer: {string($v[1])}&lt;/li>
+            &lt;li>Studio: {string($v[2])}&lt;/li>
+        &lt;/ul>
+    &lt;/p></xquery>
             <output>xml</output>
             <action/>
         </instance>

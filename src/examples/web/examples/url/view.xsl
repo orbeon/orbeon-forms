@@ -39,7 +39,7 @@
         </p>
         <xsl:copy-of select="/*/*[2]//table"/>
         <p>
-            See also the standalone <a href="/weather" f:url-type="resource">Yahoo! Weather example</a>.
+            See also the standalone <a href="/direct/url/weather" f:url-type="resource">Yahoo! Weather example</a>.
         </p>
         <p style="font-style: italic; color: red">
             NOTE: The actual format of the Yahoo! Weather web page is subject to change over time,

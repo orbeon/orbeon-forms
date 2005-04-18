@@ -16,6 +16,9 @@
 
     <page path-info="/url" model="model.xpl" view="view.xsl"/>
 
+    <!-- Standalone Weather page-scraping example -->
+    <page path-info="/direct/url/weather" model="/examples/url/weather/model-standalone.xpl"/>
+
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
 </config>

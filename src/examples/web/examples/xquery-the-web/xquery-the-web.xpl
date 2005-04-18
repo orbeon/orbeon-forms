@@ -58,9 +58,9 @@
     </p:processor>
 
     <p:processor name="oxf:xquery">
-        <p:input name="config" href="#xquery" debug="xquery"/>
+        <p:input name="config" href="#xquery"/>
         <p:input name="data" href="#page"/>
-        <p:output name="data" id="xquery-output" debug="xquery output"/>
+        <p:output name="data" id="xquery-output"/>
     </p:processor>
     
     <p:choose href="#request">
@@ -77,7 +77,7 @@
                 <p:output name="data" id="html"/>
             </p:processor>
             <p:processor name="oxf:xslt">
-                <p:input name="data" href="#html" debug="html"/>
+                <p:input name="data" href="#html"/>
                 <p:input name="config">
                     <text xsl:version="2.0">
                         <xsl:variable name="text" as="xs:string" select="replace(/*, '&quot;', '\\&quot;')"/>
@@ -94,7 +94,11 @@
                 <p:output name="data" id="javascript"/>
             </p:processor>
             <p:processor name="oxf:text-serializer">
-                <p:input name="config"><config/></p:input>
+                <p:input name="config">
+                    <config>
+                        <content-type>text/plain</content-type>
+                    </config>
+                </p:input>
                 <p:input name="data" href="#javascript"/>
             </p:processor>
         </p:when>

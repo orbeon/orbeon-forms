@@ -15,7 +15,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
     
-    <p:param name="instance" type="input" debug="instance"/>
+    <p:param name="instance" type="input"/>
     
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#instance"/>

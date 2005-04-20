@@ -872,7 +872,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             new ASTHrefId(isServerSideRedirectOutput), new ASTHrefId(isRedirectExitPortal));
                     redirectDataAggregate.getHrefs().add(new ASTHrefId(parametersOutput));
 
-                    when.addStatement(new ASTProcessorCall(XMLConstants.XSLT_PROCESSOR_QNAME) {{
+                    when.addStatement(new ASTProcessorCall(XMLConstants.UNSAFE_XSLT_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("config", new ASTHrefURL("oxf:/oxf/private/page-flow/reverse-params.xsl")));
                         addInput(new ASTInput("data", redirectDataAggregate));
                         addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));

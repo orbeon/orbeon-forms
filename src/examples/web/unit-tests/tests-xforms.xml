@@ -105,7 +105,7 @@
                     </p:input>
                     <p:output name="data" id="annotated-data"/>
                 </p:processor>
-                <p:processor name="oxf:xslt">
+                <p:processor name="oxf:unsafe-xslt">
                     <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
                     <p:input name="model" href="#xforms-model"/>
                     <p:input name="data" href="#annotated-data"/>
@@ -196,7 +196,7 @@
                     <p:output name="data" id="annotated-data"/>
                 </p:processor>
                 <!-- Transform annotated XForms to XHTML -->
-                <p:processor name="oxf:xslt"><!-- saxon1 -->
+                <p:processor name="oxf:unsafe-xslt"><!-- saxon1 -->
                     <p:input name="config" href="oxf:/config/xforms-to-xhtml.xsl"/>
                     <p:input name="model" href="#xforms-model"/>
                     <p:input name="data" href="#annotated-data"/>

@@ -122,7 +122,6 @@ public class TransformerUtils {
                             };
                         }
                     };
-                    factory.setAttribute("http://xml.apache.org/xalan/features/incremental", Boolean.FALSE);
                     transformerFactories.put(XALAN_BUILTIN_TRANSFORMER_TYPE, factory);
                 }
                 return (SAXTransformerFactory) transformerFactories.get(XALAN_BUILTIN_TRANSFORMER_TYPE);
@@ -240,11 +239,7 @@ public class TransformerUtils {
     }
 
     public static TransformerHandler getTransformerHandler(Templates templates, String clazz, Map attributes) throws TransformerConfigurationException {
-        return getFactory(clazz, attributes).newTransformerHandler(templates);
-    }
-
-    public static TransformerHandler getTransformerHandler(Templates templates, String clazz) throws TransformerConfigurationException {
-        return getFactory(clazz).newTransformerHandler(templates);
+        return ((attributes != null) ? getFactory(clazz, attributes) : getFactory(clazz)).newTransformerHandler(templates);
     }
 
     public static TemplatesHandler getTemplatesHandler(String clazz) throws TransformerException {
@@ -253,15 +248,7 @@ public class TransformerUtils {
 
     public static Templates getTemplates(Source source, String clazz, Map attributes, ErrorListener errorListener, URIResolver uriResolver)
             throws TransformerConfigurationException {
-        SAXTransformerFactory factory = getFactory(clazz, attributes);
-        factory.setErrorListener(errorListener);
-        factory.setURIResolver(uriResolver);
-        return factory.newTemplates(source);
-    }
-
-    public static Templates getTemplates(Source source, String clazz, ErrorListener errorListener, URIResolver uriResolver)
-            throws TransformerConfigurationException {
-        SAXTransformerFactory factory = getFactory(clazz);
+        SAXTransformerFactory factory = (attributes != null) ? getFactory(clazz, attributes) : getFactory(clazz);
         factory.setErrorListener(errorListener);
         factory.setURIResolver(uriResolver);
         return factory.newTemplates(source);

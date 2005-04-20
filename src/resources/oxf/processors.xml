@@ -169,6 +169,11 @@
                     <class>orbeon.apache.xalan.processor.TransformerFactoryImpl</class>
                 </config>
             </input>
+            <input name="attributes">
+                <attributes xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                    <attribute as="xs:boolean" name="http://xml.apache.org/xalan/features/incremental" value="false"/>
+                </attributes>
+            </input>
         </instantiation>
     </processor>
 
@@ -178,6 +183,11 @@
                 <config>
                     <class>orbeon.apache.xalan.xsltc.trax.TransformerFactoryImpl</class>
                 </config>
+            </input>
+            <input name="attributes">
+                <attributes xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                    <attribute as="xs:boolean" name="http://xml.apache.org/xalan/features/incremental" value="false"/>
+                </attributes>
             </input>
         </instantiation>
     </processor>

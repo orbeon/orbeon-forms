@@ -293,7 +293,7 @@
         </output>
     </test>
 
-    <test description="XSLT 2.0 Evaluate" name="oxf:xslt">
+    <test description="XSLT 2.0 Evaluate" name="oxf:unsafe-xslt">
         <input name="data">
             <root>
                 <a>

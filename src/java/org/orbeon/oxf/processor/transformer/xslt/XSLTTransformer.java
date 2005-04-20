@@ -137,10 +137,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     // Create transformer handler and set output writer for Saxon
                     StringWriter saxonStringWriter = null;
                     StringErrorListener errorListener = new StringErrorListener(logger);
-                    if (attributes == null)
-                        transformerHandler = TransformerUtils.getTransformerHandler(transformer.templates, transformer.transformerType);
-                    else
-                        transformerHandler = TransformerUtils.getTransformerHandler(transformer.templates, transformer.transformerType, attributes);
+                    transformerHandler = TransformerUtils.getTransformerHandler(transformer.templates, transformer.transformerType, attributes);
 
                     transformerHandler.getTransformer().setURIResolver(new TransformerURIResolver(XSLTTransformer.this, pipelineContext));
                     transformerHandler.getTransformer().setErrorListener(errorListener);

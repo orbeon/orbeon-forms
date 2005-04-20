@@ -14,7 +14,7 @@
 -->
 <group description="Page Flow" xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
-    <test description="Reverse Params 1" name="oxf:xslt">
+    <test description="Reverse Params 1" name="oxf:unsafe-xslt">
         <input name="config" href="oxf:/oxf/private/page-flow/reverse-params.xsl"/>
         <input name="data">
             <url-rewrite>
@@ -70,7 +70,7 @@
         </output>
     </test>
 
-    <test description="Reverse Params 2" name="oxf:xslt">
+    <test description="Reverse Params 2" name="oxf:unsafe-xslt">
         <input name="config" href="oxf:/oxf/private/page-flow/reverse-params.xsl"/>
         <input name="data">
             <url-rewrite>

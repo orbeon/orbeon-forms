@@ -155,6 +155,10 @@ public class OXFProperties {
             return properties.keySet();
         }
 
+        public int size() {
+            return properties.size();
+        }
+
         public void setProperty(Element element, String name, QName type, String value) {
             properties.put(name, new TypeValue(type, getObject(element, type.getName(), value)));
         }

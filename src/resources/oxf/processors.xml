@@ -103,14 +103,63 @@
         <class name="org.orbeon.oxf.processor.transformer.xslt.XSLT2Transformer"/>
     </processor>
 
-    <processor name="oxf:xslt" uri="oxf/processor/xslt">
-        <instantiation name="oxf:generic-xslt-2.0">
+    <processor name="oxf:saxon" uri="oxf/processor/saxon">
+        <instantiation name="oxf:generic-xslt-1.0">
             <input name="transformer">
                 <config>
-                    <class>DEFAULT</class>
+                    <class>com.icl.saxon.TransformerFactoryImpl</class>
                 </config>
             </input>
         </instantiation>
+    </processor>
+
+    <processor name="oxf:saxon8">
+        <instantiation name="oxf:generic-xslt-2.0">
+            <input name="transformer">
+                <config>
+                    <class>org.orbeon.saxon.TransformerFactoryImpl</class>
+                </config>
+            </input>
+            <input name="attributes">
+                <attributes xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                    <!-- By default, prevent usage of external functions for security purposes -->
+                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/allow-external-functions" value="false"/>
+                    <!--
+                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/trace-external-functions" value="false"/>
+                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/timing" value="false"/>
+                    <attribute as="xs:integer" name="http://saxon.sf.net/feature/treeModel" value="STANDARD_TREE = 0 / TINY_TREE = 1"/>
+                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/linenumbering" value="false"/>
+                    <attribute as="xs:integer" name="http://saxon.sf.net/feature/recoveryPolicy" value="RECOVER_SILENTLY = 0 / RECOVER_WITH_WARNINGS = 1 / DO_NOT_RECOVER = 2"/>
+                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/validation" value="false"/>
+                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/schema-validation" value="false"/>
+                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/validation-warnings" value="false"/>
+                    -->
+                </attributes>
+            </input>
+        </instantiation>
+    </processor>
+
+    <processor name="oxf:unsafe-saxon8">
+        <instantiation name="oxf:generic-xslt-2.0">
+            <input name="transformer">
+                <config>
+                    <class>org.orbeon.saxon.TransformerFactoryImpl</class>
+                </config>
+            </input>
+            <input name="attributes">
+                <attributes xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/allow-external-functions" value="true"/>
+                </attributes>
+            </input>
+        </instantiation>
+    </processor>
+
+    <processor name="oxf:xslt" uri="oxf/processor/xslt">
+        <instantiation name="oxf:saxon8"/>
+    </processor>
+
+    <processor name="oxf:unsafe-xslt" uri="oxf/processor/xslt">
+        <instantiation name="oxf:unsafe-saxon8"/>
     </processor>
 
     <processor name="oxf:xalan" uri="oxf/processor/xalan">
@@ -128,26 +177,6 @@
             <input name="transformer">
                 <config>
                     <class>orbeon.apache.xalan.xsltc.trax.TransformerFactoryImpl</class>
-                </config>
-            </input>
-        </instantiation>
-    </processor>
-
-    <processor name="oxf:saxon" uri="oxf/processor/saxon">
-        <instantiation name="oxf:generic-xslt-1.0">
-            <input name="transformer">
-                <config>
-                    <class>com.icl.saxon.TransformerFactoryImpl</class>
-                </config>
-            </input>
-        </instantiation>
-    </processor>
-
-    <processor name="oxf:saxon8">
-        <instantiation name="oxf:generic-xslt-2.0">
-            <input name="transformer">
-                <config>
-                    <class>org.orbeon.saxon.TransformerFactoryImpl</class>
                 </config>
             </input>
         </instantiation>
@@ -491,13 +520,7 @@
     </processor>
 
     <processor name="oxf:saxon7" uri="oxf/processor/saxon7">
-        <instantiation name="oxf:generic-xslt-2.0">
-            <input name="transformer">
-                <config>
-                    <class>org.orbeon.saxon.TransformerFactoryImpl</class>
-                </config>
-            </input>
-        </instantiation>
+        <instantiation name="oxf:saxon8"/>
     </processor>
 
     <processor name="oxf:qexo-xquery" uri="oxf/processor/xquery">

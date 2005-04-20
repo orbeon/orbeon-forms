@@ -216,7 +216,7 @@ public class URLGenerator extends ProcessorImpl {
         public URIReferences uriReferences;
     }
 
-    public ProcessorOutput createOutput( final String name) {
+    public ProcessorOutput createOutput(final String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
 
@@ -226,7 +226,7 @@ public class URLGenerator extends ProcessorImpl {
                             public Object read(PipelineContext context, ProcessorInput input) {
                                 Element configElement = readInputAsDOM4J(context, input).getRootElement();
 
-                                // shortcut if the url is direct child of config
+                                // Shortcut if the url is direct child of config
                                 String url = configElement.getTextTrim();
                                 if (url != null && !url.equals("")) {
                                     try {
@@ -328,8 +328,8 @@ public class URLGenerator extends ProcessorImpl {
                                 // We need to read the resource
 
                                 handler = Handler.PROTOCOL.equals(configURIReferences.config.getURL().getProtocol())
-                                    ? (ResourceHandler) new OXFResourceHandler(configURIReferences.config)
-                                    : (ResourceHandler) new URLResourceHandler(configURIReferences.config);
+                                        ? (ResourceHandler) new OXFResourceHandler(configURIReferences.config)
+                                        : (ResourceHandler) new URLResourceHandler(configURIReferences.config);
 
                                 // Find content-type to use. If the config says to force the
                                 // content-type, we use the content-type provided by the user.
@@ -412,11 +412,11 @@ public class URLGenerator extends ProcessorImpl {
                     // Handle config if read as input
                     if (localConfigURIReferences == null) {
                         KeyValidity configKeyValidity = getInputKeyValidity(context, INPUT_CONFIG);
-                        if ( configKeyValidity == null ) return null;
+                        if (configKeyValidity == null) return null;
                         keys.add(configKeyValidity.key);
                     }
                     // Handle main document and config
-                    keys.add(new SimpleOutputCacheKey( URLGenerator.class, name, configURIReferences.config.toString()));
+                    keys.add(new SimpleOutputCacheKey(getProcessorClass(), name, configURIReferences.config.toString()));
                     // Handle dependencies if any
                     if (configURIReferences.uriReferences != null) {
                         for (Iterator i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
@@ -424,9 +424,9 @@ public class URLGenerator extends ProcessorImpl {
                             keys.add(new InternalCacheKey(URLGenerator.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm()));
                         }
                     }
-                    final CacheKey[] outKys = new CacheKey[ keys.size() ];
-                    keys.toArray( outKys );
-                    return new CompoundOutputCacheKey( URLGenerator.class, name, outKys );
+                    final CacheKey[] outKys = new CacheKey[keys.size()];
+                    keys.toArray(outKys);
+                    return new CompoundOutputCacheKey(getProcessorClass(), name, outKys);
                 } catch (MalformedURLException e) {
                     throw new OXFException(e);
                 }

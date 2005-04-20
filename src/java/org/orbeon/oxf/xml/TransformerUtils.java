@@ -23,10 +23,7 @@ import javax.xml.transform.*;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TemplatesHandler;
 import javax.xml.transform.sax.TransformerHandler;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * Utility class for XSLT and identity transformations.
@@ -64,9 +61,35 @@ public class TransformerUtils {
 //        properties.put("org.xml.sax.driver", "orbeon.apache.xerces.parsers.SAXParser");
 //    }
 
-    public static SAXTransformerFactory getFactory(String type) {
+    /*
+     * NOTE: Factories are not thread-safe. So we should not store them into transformerFactories
+     * for now, or we should make sure there is one factory per thread, or that we synchronize.
+     */
+    public static SAXTransformerFactory getFactory(String clazz, Map attributes) {
+
+        //Object key = new Object[] { clazz, attributes };
+
         try {
-            if (XALAN_BUILTIN_TRANSFORMER_TYPE.equals(type)) {
+            SAXTransformerFactory factory = (SAXTransformerFactory) Class.forName(clazz).newInstance();
+
+            for (Iterator i = attributes.keySet().iterator(); i.hasNext();) {
+                String key = (String) i.next();
+                factory.setAttribute(key, attributes.get(key));
+            }
+
+            return factory;
+        } catch (Exception e) {
+            throw new OXFException(e);
+        }
+    }
+
+    /*
+     * NOTE: Factories are not thread-safe. So we should not store them into transformerFactories
+     * for now, or we should make sure there is one factory per thread, or that we synchronize.
+     */
+    public static SAXTransformerFactory getFactory(String clazz) {
+        try {
+            if (XALAN_BUILTIN_TRANSFORMER_TYPE.equals(clazz)) {
                 // Special case for Xalan
                 if (transformerFactories.get(XALAN_BUILTIN_TRANSFORMER_TYPE) == null) {
 
@@ -105,30 +128,12 @@ public class TransformerUtils {
                 return (SAXTransformerFactory) transformerFactories.get(XALAN_BUILTIN_TRANSFORMER_TYPE);
             } else {
                 // Any other factory
-                if (transformerFactories.get(type) == null) {
-                    SAXTransformerFactory factory = (SAXTransformerFactory) Class.forName(type).newInstance();
+//                if (transformerFactories.get(clazz) == null) {
+                    SAXTransformerFactory factory = (SAXTransformerFactory) Class.forName(clazz).newInstance();
                     return factory;
-                }
-                return (SAXTransformerFactory) transformerFactories.get(type);
+//                }
+//                return (SAXTransformerFactory) transformerFactories.get(clazz);
             }
-
-//                    compilerFactory.setErrorListener(new ErrorListener() {
-//                        public void warning(TransformerException exception)
-//                                throws TransformerException {
-//                            logger.warn(exception, exception);
-//                        }
-//
-//                        public void error(TransformerException exception)
-//                                throws TransformerException {
-//                            logger.error(exception, exception);
-//                        }
-//
-//                        public void fatalError(TransformerException exception)
-//                                throws TransformerException {
-//                            logger.error(exception, exception);
-//                        }
-//                    });
-
         } catch (Exception e) {
             throw new OXFException(e);
         }
@@ -234,18 +239,29 @@ public class TransformerUtils {
         }
     }
 
-    public static TransformerHandler getTransformerHandler(Templates templates, String type) throws TransformerConfigurationException {
-        return getFactory(type).newTransformerHandler(templates);
+    public static TransformerHandler getTransformerHandler(Templates templates, String clazz, Map attributes) throws TransformerConfigurationException {
+        return getFactory(clazz, attributes).newTransformerHandler(templates);
     }
 
-    public static TemplatesHandler getTemplatesHandler(String type) throws TransformerException {
-        return getFactory(type).newTemplatesHandler();
+    public static TransformerHandler getTransformerHandler(Templates templates, String clazz) throws TransformerConfigurationException {
+        return getFactory(clazz).newTransformerHandler(templates);
     }
 
-    public static Templates getTemplates(Source source, String type,
-                                         ErrorListener errorListener, URIResolver uriResolver)
+    public static TemplatesHandler getTemplatesHandler(String clazz) throws TransformerException {
+        return getFactory(clazz).newTemplatesHandler();
+    }
+
+    public static Templates getTemplates(Source source, String clazz, Map attributes, ErrorListener errorListener, URIResolver uriResolver)
             throws TransformerConfigurationException {
-        SAXTransformerFactory factory = getFactory(type);
+        SAXTransformerFactory factory = getFactory(clazz, attributes);
+        factory.setErrorListener(errorListener);
+        factory.setURIResolver(uriResolver);
+        return factory.newTemplates(source);
+    }
+
+    public static Templates getTemplates(Source source, String clazz, ErrorListener errorListener, URIResolver uriResolver)
+            throws TransformerConfigurationException {
+        SAXTransformerFactory factory = getFactory(clazz);
         factory.setErrorListener(errorListener);
         factory.setURIResolver(uriResolver);
         return factory.newTemplates(source);

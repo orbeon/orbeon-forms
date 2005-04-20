@@ -65,7 +65,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#workbook"/>
         <p:input name="config">
-            <config xsl:version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+            <config xsl:version="2.0">
                 <service id="import" type="webservice" endpoint="http://{doc('../ws-config.xml')/*/host}:{doc('../ws-config.xml')/*/port}{doc('../ws-config.xml')/*/path}" style="document">
                     <operation nsuri="http://www.openuri.org/" name="import"
                         encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" select="/*"/>

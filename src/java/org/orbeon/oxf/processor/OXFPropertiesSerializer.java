@@ -13,10 +13,7 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.Element;
-import org.dom4j.Namespace;
-import org.dom4j.Node;
-import org.dom4j.QName;
+import org.dom4j.*;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.OXFProperties;
@@ -29,12 +26,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+/**
+ * OXFPropertiesSerializer is a special internal processor that reads a properties file and allows
+ * for retrieveing a resulting PropertyStore class.
+ */
 public class OXFPropertiesSerializer extends ProcessorImpl {
 
     public static final String PROPERTIES_SCHEMA_URI = "http://www.orbeon.com/oxf/properties";
 
     private static final String SUPPORTED_TYPES_URI = XMLConstants.XSD_URI;
     private static final Map supportedTypes = new HashMap();
+
     static {
         supportedTypes.put("string", "");
         supportedTypes.put("integer", "");
@@ -57,47 +59,50 @@ public class OXFPropertiesSerializer extends ProcessorImpl {
         PropertyStore propertyStore = (PropertyStore) readCacheInputAsObject(context, getInputByName(INPUT_DATA),
                 new CacheableInputReader() {
                     public Object read(PipelineContext context, ProcessorInput input) {
-                        PropertyStore propertyStore = new PropertyStore();
-
-                        Node propertiesNode = readInputAsDOM4J(context, input);
-                        for (Iterator i = XPathUtils.selectIterator(propertiesNode, "/properties/property"); i.hasNext();) {
-                            Element propertyElement = (Element) i.next();
-
-                            // Extract attributes
-                            String processorName = propertyElement.attributeValue("processor-name");
-                            String as = propertyElement.attributeValue("as");
-                            String name = propertyElement.attributeValue("name");
-                            String value = propertyElement.attributeValue("value");
-
-                            if (as != null) {
-                                // We only support one namespace for types for now
-                                QName typeQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "as");
-                                if (!typeQName.getNamespaceURI().equals(SUPPORTED_TYPES_URI))
-                                    throw new ValidationException("Invalid as attribute: " + typeQName.getQualifiedName(), (LocationData) propertyElement.getData());
-
-                                if (supportedTypes.get(typeQName.getName()) == null)
-                                    throw new ValidationException("Invalid as attribute: " + typeQName.getQualifiedName(), (LocationData) propertyElement.getData());
-
-                                if (processorName != null) {
-                                    // Processor-specific property
-                                    QName processorQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "processor-name");
-                                    propertyStore.setProperty(propertyElement, processorQName, name, typeQName, value);
-                                } else {
-                                    // Global property
-                                    propertyStore.setProperty(propertyElement, name, typeQName, value);
-                                }
-                            } else {
-                                // [BACKWARD COMPATIBILITY] get type attribute
-                                String type = propertyElement.attributeValue("type");
-                                if (supportedTypes.get(type) == null)
-                                    throw new ValidationException("Invalid type attribute: " + type, (LocationData) propertyElement.getData());
-                                propertyStore.setProperty(propertyElement, name, new QName(type, new Namespace("xs", SUPPORTED_TYPES_URI)), value);
-                            }
-                        }
-                        return propertyStore;
+                        Document propertiesDocument = readInputAsDOM4J(context, input);
+                        return createPropertyStore(propertiesDocument);
                     }
                 });
         context.setAttribute(this, propertyStore);
+    }
+
+    public static PropertyStore createPropertyStore(Document propertiesNode) {
+        PropertyStore propertyStore = new PropertyStore();
+        for (Iterator i = XPathUtils.selectIterator(propertiesNode, "/properties/property | /attributes/attribute"); i.hasNext();) {
+            Element propertyElement = (Element) i.next();
+
+            // Extract attributes
+            String processorName = propertyElement.attributeValue("processor-name");
+            String as = propertyElement.attributeValue("as");
+            String name = propertyElement.attributeValue("name");
+            String value = propertyElement.attributeValue("value");
+
+            if (as != null) {
+                // We only support one namespace for types for now
+                QName typeQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "as");
+                if (!typeQName.getNamespaceURI().equals(SUPPORTED_TYPES_URI))
+                    throw new ValidationException("Invalid as attribute: " + typeQName.getQualifiedName(), (LocationData) propertyElement.getData());
+
+                if (supportedTypes.get(typeQName.getName()) == null)
+                    throw new ValidationException("Invalid as attribute: " + typeQName.getQualifiedName(), (LocationData) propertyElement.getData());
+
+                if (processorName != null) {
+                    // Processor-specific property
+                    QName processorQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "processor-name");
+                    propertyStore.setProperty(propertyElement, processorQName, name, typeQName, value);
+                } else {
+                    // Global property
+                    propertyStore.setProperty(propertyElement, name, typeQName, value);
+                }
+            } else {
+                // [BACKWARD COMPATIBILITY] get type attribute
+                String type = propertyElement.attributeValue("type");
+                if (supportedTypes.get(type) == null)
+                    throw new ValidationException("Invalid type attribute: " + type, (LocationData) propertyElement.getData());
+                propertyStore.setProperty(propertyElement, name, new QName(type, new Namespace("xs", SUPPORTED_TYPES_URI)), value);
+            }
+        }
+        return propertyStore;
     }
 
     public static class PropertyStore {

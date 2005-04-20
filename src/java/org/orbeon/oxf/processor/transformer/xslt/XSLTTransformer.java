@@ -16,20 +16,19 @@ package org.orbeon.oxf.processor.transformer.xslt;
 import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.apache.log4j.Logger;
 import org.dom4j.Node;
+import org.dom4j.Document;
 import org.orbeon.oxf.cache.CacheKey;
 import org.orbeon.oxf.cache.InternalCacheKey;
 import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.processor.transformer.URIResolverListener;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
@@ -54,10 +53,7 @@ import java.io.Writer;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public abstract class XSLTTransformer extends ProcessorImpl {
 
@@ -65,15 +61,21 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
     public static final String XSLT_URI = "http://www.w3.org/1999/XSL/Transform";
     public static final String XSLT_TRANSFORMER_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xslt-transformer-config";
+    public static final String XSLT_PREFERENCES_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xslt-preferences-config";
 
-    private static final String INPUT_TRANSFORMER_CONFIG = "transformer";
+    // This input determines the JAXP transformer factory class to use
+    private static final String INPUT_TRANSFORMER = "transformer";
+    // This input determines attributes to set on the TransformerFactory
+    private static final String INPUT_ATTRIBUTES = "attributes";
+
     private static final String DEFAULT_TRANSFORMER_CLASS_STRING = "DEFAULT";
 
     public static final String TRANSFORMER_PROPERTY = "transformer";
 
     public XSLTTransformer(String schemaURI) {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, schemaURI));
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_TRANSFORMER_CONFIG, XSLT_TRANSFORMER_CONFIG_NAMESPACE_URI));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_TRANSFORMER, XSLT_TRANSFORMER_CONFIG_NAMESPACE_URI));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_ATTRIBUTES, XSLT_PREFERENCES_CONFIG_NAMESPACE_URI));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
@@ -90,25 +92,56 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                     // Get transformer from cache
                     if (uriReferences != null) {
+                        // FIXME: this won't depend on the transformer input.
                         KeyValidity stylesheetKeyValidity = createStyleSheetKeyValidity(pipelineContext, configKeyValidity, uriReferences);
                         if (stylesheetKeyValidity != null)
                             transformer = (Transformer) ObjectCache.instance()
                                     .findValid(pipelineContext, stylesheetKeyValidity.key, stylesheetKeyValidity.validity);
                     }
 
+                    // Get transformer attributes if any
+                    Map attributes = null;
+                    {
+                        // Read preferences input only if connected
+                        if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
+                            // Read input as an attribute Map and cache it
+                            attributes = (Map) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
+                                public Object read(PipelineContext context, ProcessorInput input) {
+                                    Document preferencesDocument = readInputAsDOM4J(context, input);
+                                    OXFPropertiesSerializer.PropertyStore propertyStore = OXFPropertiesSerializer.createPropertyStore(preferencesDocument);
+                                    OXFProperties.PropertySet propertySet = propertyStore.getGlobalPropertySet();
+                                    if (propertySet.size() > 0) {
+                                        Map result = new HashMap();
+                                        for (Iterator i = propertySet.keySet().iterator(); i.hasNext();) {
+                                            String key = (String) i.next();
+                                            result.put(key, propertySet.getObject(key));
+                                        }
+                                        return result;
+                                    } else {
+                                        return null;
+                                    }
+                                }
+                            });
+                        }
+                    }
+
                     // Create transformer if we did not find one in cache
                     if (transformer == null) {
                         // Get transformer configuration
-                        Node config = readCacheInputAsDOM4J(pipelineContext, INPUT_TRANSFORMER_CONFIG);
+                        Node config = readCacheInputAsDOM4J(pipelineContext, INPUT_TRANSFORMER);
                         String transformerClass = XPathUtils.selectStringValueNormalize(config, "/config/class");
                         // Create transformer
-                        transformer = createTransformer(pipelineContext, transformerClass);
+                        transformer = createTransformer(pipelineContext, transformerClass, attributes);
                     }
 
                     // Create transformer handler and set output writer for Saxon
                     StringWriter saxonStringWriter = null;
                     StringErrorListener errorListener = new StringErrorListener(logger);
-                    transformerHandler = TransformerUtils.getTransformerHandler(transformer.templates, transformer.transformerType);
+                    if (attributes == null)
+                        transformerHandler = TransformerUtils.getTransformerHandler(transformer.templates, transformer.transformerType);
+                    else
+                        transformerHandler = TransformerUtils.getTransformerHandler(transformer.templates, transformer.transformerType, attributes);
+
                     transformerHandler.getTransformer().setURIResolver(new TransformerURIResolver(XSLTTransformer.this, pipelineContext));
                     transformerHandler.getTransformer().setErrorListener(errorListener);
                     String transformerClassName = transformerHandler.getTransformer().getClass().getName();
@@ -261,7 +294,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
              * uriReferencesKey -> transformer
              * </pre>
              */
-            private Transformer createTransformer(PipelineContext context, String transformerClass) {
+            private Transformer createTransformer(PipelineContext context, String transformerClass, Map attributes) {
                 StringErrorListener errorListener = new StringErrorListener(logger);
                 final StylesheetForwardingContentHandler topStylesheetContentHandler = new StylesheetForwardingContentHandler();
                 try {
@@ -307,7 +340,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                                 return contentHandler;
                             }
                         });
-                        transformer.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerType, errorListener,
+                        transformer.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerType, attributes, errorListener,
                                 new TransformerURIResolver(XSLTTransformer.this, context));
                         TransformerUtils.removeURIResolverListener();
                         transformer.transformerType = transformerType;

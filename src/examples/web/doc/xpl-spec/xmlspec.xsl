@@ -7,7 +7,7 @@
 <!-- ====================================================================== -->
 <!-- xmlspec.xsl: An HTML XSL[1] Stylesheet for XML Spec V2.1[2] markup
 
-     Version: $Id: xmlspec.xsl,v 1.4 2005/02/28 21:10:21 ebruchez Exp $
+     Version: $Id: xmlspec.xsl,v 1.5 2005/04/20 21:56:41 ebruchez Exp $
 
      URI:     http://dev.w3.org/cvsweb/spec-prod/html/xmlspec.xsl
 
@@ -18,7 +18,7 @@
               Henry S. Thompson (ht@cogsci.ed.ac.uk)
 
      Date:    Created 07 September 1999
-              Last updated $Date: 2005/02/28 21:10:21 $ by $Author: ebruchez $
+              Last updated $Date: 2005/04/20 21:56:41 $ by $Author: ebruchez $
 
      Copyright (C) 2000, 2001, 2002 Sun Microsystems, Inc. All Rights Reserved.
      This document is governed by the W3C Software License[3] as

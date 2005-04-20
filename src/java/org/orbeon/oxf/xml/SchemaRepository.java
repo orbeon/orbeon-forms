@@ -100,6 +100,7 @@ public class SchemaRepository {
         schemas.put(PortletContainerProcessor.PORTLET_CONTAINER_NAMESPACE_URI, "schemas/portlet-container-config.rng");
 
         schemas.put(XSLTTransformer.XSLT_TRANSFORMER_CONFIG_NAMESPACE_URI, "schemas/xslt-transformer-config.rng");
+        schemas.put(XSLTTransformer.XSLT_PREFERENCES_CONFIG_NAMESPACE_URI, "schemas/xslt-preferences-config.rng");
         schemas.put(TraxTransformer.TRAX_TRANSFORMER_CONFIG_NAMESPACE_URI, "schemas/trax-transformer-config.rng");
         schemas.put(PageFlowControllerProcessor.CONTROLLER_NAMESPACE_URI, "schemas/page-flow-controller-runtime.xsd");
         schemas.put(MSVValidationProcessor.ORBEON_ERROR_NS, "schemas/validation-config.rng");

@@ -26,7 +26,7 @@
     <!-- TODO: Separate data access -->
 
     <!-- Create post document -->
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#params"/>
         <p:input name="config">
             <post xsl:version="2.0" xmlns:uuid="java:org.orbeon.oxf.util.UUIDUtils">

@@ -48,7 +48,7 @@
                 <p:output name="data" id="annotated-data"/>
             </p:processor>
             <!-- Transform annotated XForms to XHTML -->
-            <p:processor name="oxf:xslt"><!-- saxon1 -->
+            <p:processor name="oxf:unsafe-xslt"><!-- saxon1 -->
                 <p:input name="config" href="xforms-to-xhtml.xsl"/>
                 <p:input name="model" href="#xforms-model"/>
                 <p:input name="instance" href="#instance"/>
@@ -100,7 +100,7 @@
                         <p:input name="data" href="#xformed-data"/>
                     </p:processor>
                 </p:when>
-                <!-- Regular HTML -->
+                <!-- Regular XHTML -->
                 <p:when test="/xhtml:html">
                     <!-- Apply theme -->
                     <p:processor name="oxf:xslt"> <!-- saxon4 -->
@@ -110,8 +110,41 @@
                         <p:output name="data" id="themed-data"/>
                     </p:processor>
                     <!-- Rewrite all URLs in HTML and XHTML documents -->
-                    <p:processor name="oxf:xslt"><!-- saxon5 -->
+                    <p:processor name="oxf:unsafe-xslt"><!-- saxon5 -->
                         <p:input name="data" href="#themed-data"/>
+                        <p:input name="container-type" href="#request"/>
+                        <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>
+                        <p:output name="data" id="rewritten-data"/>
+                    </p:processor>
+                    <!-- Output regular HTML doctype -->
+                    <p:processor name="oxf:html-converter">
+                        <p:input name="config">
+                            <config>
+                                <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
+                                <version>4.01</version>
+                                <encoding>utf-8</encoding>
+                            </config>
+                        </p:input>
+                        <p:input name="data" href="#rewritten-data"/>
+                        <p:output name="data" id="converted"/>
+                    </p:processor>
+                    <p:processor name="oxf:http-serializer">
+                        <p:input name="config">
+                            <config>
+                                <header>
+                                    <name>Cache-Control</name>
+                                    <value>post-check=0, pre-check=0</value>
+                                </header>
+                            </config>
+                        </p:input>
+                        <p:input name="data" href="#converted"/>
+                    </p:processor>
+                </p:when>
+                <!-- Regular HTML -->
+                <p:when test="/html">
+                    <!-- Rewrite all URLs in HTML and XHTML documents -->
+                    <p:processor name="oxf:unsafe-xslt"><!-- saxon5 -->
+                        <p:input name="data" href="#xformed-data"/>
                         <p:input name="container-type" href="#request"/>
                         <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>
                         <p:output name="data" id="rewritten-data"/>
@@ -168,7 +201,7 @@
         <p:otherwise>
             <!-- Portlet -->
             <!-- Extract a fragment and apply theme -->
-            <p:processor name="oxf:xslt"> <!-- saxon4 -->
+            <p:processor name="oxf:unsafe-xslt"> <!-- saxon4 -->
                 <p:input name="data" href="#xformed-data"/>
                 <p:input name="request" href="#request"/>
                 <p:input name="config">
@@ -191,7 +224,7 @@
                 <p:output name="data" id="themed-data"/>
             </p:processor>
             <!-- Rewrite all URLs in HTML and XHTML documents -->
-            <p:processor name="oxf:xslt"><!-- saxon5 -->
+            <p:processor name="oxf:unsafe-xslt"><!-- saxon5 -->
                 <p:input name="data" href="#themed-data"/>
                 <p:input name="container-type" href="#request"/>
                 <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>

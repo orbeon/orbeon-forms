@@ -68,8 +68,6 @@ public abstract class XSLTTransformer extends ProcessorImpl {
     // This input determines attributes to set on the TransformerFactory
     private static final String INPUT_ATTRIBUTES = "attributes";
 
-    private static final String DEFAULT_TRANSFORMER_CLASS_STRING = "DEFAULT";
-
     public static final String TRANSFORMER_PROPERTY = "transformer";
 
     public XSLTTransformer(String schemaURI) {
@@ -137,7 +135,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     // Create transformer handler and set output writer for Saxon
                     StringWriter saxonStringWriter = null;
                     StringErrorListener errorListener = new StringErrorListener(logger);
-                    transformerHandler = TransformerUtils.getTransformerHandler(transformer.templates, transformer.transformerType, attributes);
+                    transformerHandler = TransformerUtils.getTransformerHandler(transformer.templates, transformer.transformerClass, attributes);
 
                     transformerHandler.getTransformer().setURIResolver(new TransformerURIResolver(XSLTTransformer.this, pipelineContext));
                     transformerHandler.getTransformer().setErrorListener(errorListener);
@@ -299,23 +297,6 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     final Transformer transformer = new Transformer();
                     final List xsltContentHandlers = new ArrayList();
                     {
-                        // Transformer type
-                        final String transformerType;
-                        {
-                            if (DEFAULT_TRANSFORMER_CLASS_STRING.equals(transformerClass)) {
-                                // Default is requested, try property
-                                String defaultTransformerType = getPropertySet().getString(TRANSFORMER_PROPERTY);
-                                // For backward compatibility, we accept the string "interpreter" in addition to class names
-                                if (defaultTransformerType == null || "interpreter".equals(defaultTransformerType))
-                                    transformerType = TransformerUtils.DEFAULT_TYPE;
-                                else
-                                    transformerType = defaultTransformerType;
-                            } else {
-                                // This must be a class name
-                                transformerType = transformerClass;
-                            }
-                        }
-
                         // Create SAXSource adding our forwarding content handler
                         final SAXSource stylesheetSAXSource;
                         {
@@ -337,10 +318,10 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                                 return contentHandler;
                             }
                         });
-                        transformer.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerType, attributes, errorListener,
+                        transformer.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerClass, attributes, errorListener,
                                 new TransformerURIResolver(XSLTTransformer.this, context));
                         TransformerUtils.removeURIResolverListener();
-                        transformer.transformerType = transformerType;
+                        transformer.transformerClass = transformerClass;
                         transformer.systemId = topStylesheetContentHandler.getSystemId();
                     }
 
@@ -620,7 +601,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
     private static class Transformer {
         public Templates templates;
-        public String transformerType;
+        public String transformerClass;
         public String systemId;
     }
 }

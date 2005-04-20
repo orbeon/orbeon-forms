@@ -68,7 +68,6 @@ public class TransformerUtils {
     public static SAXTransformerFactory getFactory(String clazz, Map attributes) {
 
         //Object key = new Object[] { clazz, attributes };
-
         try {
             SAXTransformerFactory factory = (SAXTransformerFactory) Class.forName(clazz).newInstance();
 
@@ -91,26 +90,22 @@ public class TransformerUtils {
         try {
             if (XALAN_BUILTIN_TRANSFORMER_TYPE.equals(clazz)) {
                 // Special case for Xalan
-                if (transformerFactories.get(XALAN_BUILTIN_TRANSFORMER_TYPE) == null) {
+//                if (transformerFactories.get(XALAN_BUILTIN_TRANSFORMER_TYPE) == null) {
 
                     // HACK
                     //
-                    // When we create a Templates (object representing
-                    // the stylesheet) based on an JAXP Source, we call the
-                    // TransformerFactoryImpl.newTemplates(Source source) method
-                    // of Xalan.
+                    // When we create a Templates (object representing the stylesheet) based on an
+                    // JAXP Source, we call the TransformerFactoryImpl.newTemplates(Source source)
+                    // method of Xalan.
                     //
-                    // This method has a "bug": if the sytemId is not set on the
-                    // Source (and it's not in the case of a SAXSource since the
-                    // SAXSource is based on am XMLReader and the XMLReader will
-                    // set the Locator on which is based the systemId when the
-                    // parse() method is called), the
-                    // TransformerFactoryImpl.newTemplates(Source) method will
-                    // set the systemId on the StylesheetHandler to the
-                    // home directory.
+                    // This method has a "bug": if the sytemId is not set on the Source (and it's
+                    // not in the case of a SAXSource since the SAXSource is based on am XMLReader
+                    // and the XMLReader will set the Locator on which is based the systemId when
+                    // the parse() method is called), the
+                    // TransformerFactoryImpl.newTemplates(Source) method will set the systemId on
+                    // the StylesheetHandler to the home directory.
                     //
-                    // We prevent this to overriding the
-                    // StylesheetHandler.setSystemId below.
+                    // We prevent this to overriding the StylesheetHandler.setSystemId below.
 
                     SAXTransformerFactory factory = new orbeon.apache.xalan.processor.TransformerFactoryImpl() {
                         public TemplatesHandler newTemplatesHandler()
@@ -122,9 +117,10 @@ public class TransformerUtils {
                             };
                         }
                     };
-                    transformerFactories.put(XALAN_BUILTIN_TRANSFORMER_TYPE, factory);
-                }
-                return (SAXTransformerFactory) transformerFactories.get(XALAN_BUILTIN_TRANSFORMER_TYPE);
+                    return factory;
+//                    transformerFactories.put(XALAN_BUILTIN_TRANSFORMER_TYPE, factory);
+//                }
+//                return (SAXTransformerFactory) transformerFactories.get(XALAN_BUILTIN_TRANSFORMER_TYPE);
             } else {
                 // Any other factory
 //                if (transformerFactories.get(clazz) == null) {

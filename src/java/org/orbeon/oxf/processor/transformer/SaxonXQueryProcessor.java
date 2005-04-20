@@ -21,12 +21,13 @@ import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.transformer.xslt.StringErrorListener;
+import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.saxon.Configuration;
+import org.orbeon.saxon.FeatureKeys;
 import org.orbeon.saxon.query.DynamicQueryContext;
 import org.orbeon.saxon.query.StaticQueryContext;
 import org.orbeon.saxon.query.XQueryExpression;
@@ -52,8 +53,12 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
 
     private static Logger logger = Logger.getLogger(SaxonXQueryProcessor.class);
 
+    // This input determines attributes to set on the Configuration
+    private static final String INPUT_ATTRIBUTES = "attributes";
+
     public SaxonXQueryProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_ATTRIBUTES, XSLTTransformer.XSLT_PREFERENCES_CONFIG_NAMESPACE_URI));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
@@ -71,7 +76,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
     };
 
     public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
+        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
                 try {
                     Document xqueryDocument = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
@@ -86,6 +91,25 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     Configuration config = new Configuration();
                     config.setErrorListener(new StringErrorListener(logger));
                     config.setURIResolver(new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext));
+
+                    // Read attributes
+                    Map attributes = null;
+                    {
+                        // Read attributes input only if connected
+                        if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
+                            // Read input as an attribute Map and cache it
+                            attributes = (Map) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
+                                public Object read(PipelineContext context, ProcessorInput input) {
+                                    Document preferencesDocument = readInputAsDOM4J(context, input);
+                                    OXFPropertiesSerializer.PropertyStore propertyStore = OXFPropertiesSerializer.createPropertyStore(preferencesDocument);
+                                    OXFProperties.PropertySet propertySet = propertyStore.getGlobalPropertySet();
+                                    return propertySet.getObjectMap();
+                                }
+                            });
+                        }
+                    }
+                    if (attributes != null)
+                        setConfigurationAttributes(config, attributes);
 
                     // Create static context
                     LocalStaticQueryContext staticContext = new LocalStaticQueryContext(config);
@@ -120,6 +144,23 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
+    }
+
+    private void setConfigurationAttributes(Configuration config, Map attributes) {
+        // Question: couldn't we just use the Saxon code that does this dispatch under TransformerFactoryImpl?
+        for (Iterator i = attributes.keySet().iterator(); i.hasNext();) {
+            String key = (String) i.next();
+            Object value = attributes.get(key);
+
+            if (key.equals(FeatureKeys.ALLOW_EXTERNAL_FUNCTIONS)) {
+                if (!(value instanceof Boolean)) {
+                    throw new IllegalArgumentException("allow-external-functions must be a boolean");
+                }
+                config.setAllowExternalFunctions(((Boolean) value).booleanValue());
+            } else {
+                throw new OXFException("Unsupported XQuery configuration attribute: " + key);
+            }
+        }
     }
 
     /**

@@ -29,10 +29,7 @@ import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * This class provides access to global, configurable properties, as well as to processor-specific
@@ -157,6 +154,19 @@ public class OXFProperties {
 
         public int size() {
             return properties.size();
+        }
+
+        public Map getObjectMap() {
+            if (size() > 0) {
+                Map result = new HashMap();
+                for (Iterator i = keySet().iterator(); i.hasNext();) {
+                    String key = (String) i.next();
+                    result.put(key, getObject(key));
+                }
+                return result;
+            } else {
+                return null;
+            }
         }
 
         public void setProperty(Element element, String name, QName type, String value) {

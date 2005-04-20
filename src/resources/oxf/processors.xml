@@ -245,6 +245,32 @@
 <!--        </instantiation>-->
 <!--    </processor>-->
 
+    <!-- XQuery Processors-->
+    <processor name="oxf:generic-saxon-xquery">
+        <class name="org.orbeon.oxf.processor.transformer.SaxonXQueryProcessor"/>
+    </processor>
+
+    <processor name="oxf:xquery">
+        <instantiation name="oxf:generic-saxon-xquery">
+            <input name="attributes">
+                <attributes xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                    <!-- By default, prevent usage of external functions for security purposes -->
+                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/allow-external-functions" value="false"/>
+                </attributes>
+            </input>
+        </instantiation>
+    </processor>
+
+    <processor name="oxf:unsafe-xquery">
+        <instantiation name="oxf:generic-saxon-xquery">
+            <input name="attributes">
+                <attributes xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                    <attribute as="xs:boolean" name="http://saxon.sf.net/feature/allow-external-functions" value="true"/>
+                </attributes>
+            </input>
+        </instantiation>
+    </processor>
+
     <!-- SQL processor -->
     <processor name="oxf:sql" uri="oxf/processor/sql">
         <class name="org.orbeon.oxf.processor.sql.SQLProcessor"/>
@@ -442,10 +468,6 @@
 
     <processor name="oxf:im" uri="oxf/processor/im">
         <class name="org.orbeon.oxf.processor.IMProcessor"/>
-    </processor>
-
-    <processor name="oxf:xquery" uri="oxf/processor/xquery">
-        <class name="org.orbeon.oxf.processor.transformer.SaxonXQueryProcessor"/>
     </processor>
 
     <!-- Portlet processors -->

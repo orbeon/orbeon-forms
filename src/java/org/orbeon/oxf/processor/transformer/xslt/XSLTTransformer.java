@@ -68,8 +68,6 @@ public abstract class XSLTTransformer extends ProcessorImpl {
     // This input determines attributes to set on the TransformerFactory
     private static final String INPUT_ATTRIBUTES = "attributes";
 
-    public static final String TRANSFORMER_PROPERTY = "transformer";
-
     public XSLTTransformer(String schemaURI) {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, schemaURI));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_TRANSFORMER, XSLT_TRANSFORMER_CONFIG_NAMESPACE_URI));
@@ -100,7 +98,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     // Get transformer attributes if any
                     Map attributes = null;
                     {
-                        // Read preferences input only if connected
+                        // Read attributes input only if connected
                         if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
                             // Read input as an attribute Map and cache it
                             attributes = (Map) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
@@ -108,16 +106,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                                     Document preferencesDocument = readInputAsDOM4J(context, input);
                                     OXFPropertiesSerializer.PropertyStore propertyStore = OXFPropertiesSerializer.createPropertyStore(preferencesDocument);
                                     OXFProperties.PropertySet propertySet = propertyStore.getGlobalPropertySet();
-                                    if (propertySet.size() > 0) {
-                                        Map result = new HashMap();
-                                        for (Iterator i = propertySet.keySet().iterator(); i.hasNext();) {
-                                            String key = (String) i.next();
-                                            result.put(key, propertySet.getObject(key));
-                                        }
-                                        return result;
-                                    } else {
-                                        return null;
-                                    }
+                                    return propertySet.getObjectMap();
                                 }
                             });
                         }

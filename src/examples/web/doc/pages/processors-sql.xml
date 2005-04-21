@@ -32,40 +32,38 @@
 
         <section>
             <title>Inputs and Outputs</title>
-            <p>
-                <table>
-                    <tr>
-                        <th>Type</th>
-                        <th>Name</th>
-                        <th>Purpose</th>
-                        <th>Mandatory</th>
-                    </tr>
-                    <tr>
-                        <td align="center">Input</td>
-                        <td><code>config</code></td>
-                        <td>Configuration in XML-SQL</td>
-                        <td align="center">Yes</td>
-                    </tr>
-                    <tr>
-                        <td align="center">Input</td>
-                        <td><code>data</code></td>
-                        <td>Source XML data</td>
-                        <td align="center">No</td>
-                    </tr>
-                    <tr>
-                        <td align="center">Input</td>
-                        <td><code>datasource</code></td>
-                        <td>Datasource configuration</td>
-                        <td align="center">No</td>
-                    </tr>
-                    <tr>
-                        <td align="center">Output</td>
-                        <td><code>data</code></td>
-                        <td>Result XML data</td>
-                        <td align="center">No</td>
-                    </tr>
-                </table>
-            </p>
+            <table>
+                <tr>
+                    <th>Type</th>
+                    <th>Name</th>
+                    <th>Purpose</th>
+                    <th>Mandatory</th>
+                </tr>
+                <tr>
+                    <td align="center">Input</td>
+                    <td><code>config</code></td>
+                    <td>Configuration in XML-SQL</td>
+                    <td align="center">Yes</td>
+                </tr>
+                <tr>
+                    <td align="center">Input</td>
+                    <td><code>data</code></td>
+                    <td>Source XML data</td>
+                    <td align="center">No</td>
+                </tr>
+                <tr>
+                    <td align="center">Input</td>
+                    <td><code>datasource</code></td>
+                    <td>Datasource configuration</td>
+                    <td align="center">No</td>
+                </tr>
+                <tr>
+                    <td align="center">Output</td>
+                    <td><code>data</code></td>
+                    <td>Result XML data</td>
+                    <td align="center">No</td>
+                </tr>
+            </table>
             <p>
                 If the <code>data</code> input is not connected, the SQL processor configuration
                 must not use XPath expressions operating on it. If this condition is not satisfied,

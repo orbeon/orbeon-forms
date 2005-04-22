@@ -125,6 +125,7 @@ public class URLGenerator extends ProcessorImpl {
 
         public Config(URL url) {
             this.url = url;
+            this.tidyConfig = new TidyConfig(null);
         }
 
         public Config(URL url, String contentType, boolean forceContentType) {

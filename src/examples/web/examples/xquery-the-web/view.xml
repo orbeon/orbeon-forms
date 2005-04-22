@@ -57,7 +57,19 @@
                 </tr>
                 <tr>
                     <th>XQuery:</th>
-                    <td><xforms:textarea ref="xquery" xhtml:rows="10" xhtml:style="width: 100%" xhtml:tabindex="2"/></td>
+                    <td>
+                        <xforms:textarea xhtml:id="xqueryTextArea" ref="xquery" xhtml:style="width: 100%" xhtml:tabindex="2"/>
+                        <script>
+                            var textarea = document.getElementById('xqueryTextArea');
+                            function updateRows() {
+                                var rows = textarea.value.split('\n').length;
+                                textarea.rows = Math.max(10, rows + 1);
+                            }
+                            
+                            updateRows();
+                            textarea.onkeyup = updateRows;
+                        </script>
+                    </td>
                 </tr>
                 <tr>
                     <th style="white-space: nowrap">Output format:</th>

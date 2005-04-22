@@ -110,7 +110,7 @@
                 <p:output name="data" id="html"/>
             </p:processor>
 
-            <p:processor name="oxf:xslt">
+            <p:processor name="oxf:unsafe-xslt">
                 <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>
                 <p:input name="data" href="#html"/>
                 <p:input name="container-type" href="#request"/>

@@ -80,7 +80,7 @@
     </p:processor>
 
     <!-- Rewrite all URLs in HTML and XHTML documents -->
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#themed-data"/>
         <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>
         <p:output name="data" ref="data"/>

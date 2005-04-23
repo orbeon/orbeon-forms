@@ -58,12 +58,44 @@
                 <tr>
                     <th>XQuery:</th>
                     <td>
-                        <xforms:textarea xhtml:id="xqueryTextArea" ref="xquery" xhtml:style="width: 100%" xhtml:tabindex="2"/>
+                        <xforms:select1 appearance="full" ref="xquery-type">
+                            <xforms:item xhtml:id="xquerySourceInline">
+                                <xforms:label>Inline</xforms:label>
+                                <xforms:value>inline</xforms:value>
+                            </xforms:item>
+                            <xforms:item xhtml:id="xquerySourceURL">
+                                <xforms:label>URL</xforms:label>
+                                <xforms:value>url</xforms:value>
+                            </xforms:item>
+                        </xforms:select1>
+                                
+                        <xforms:input xhtml:id="xqueryURL" xhtml:class="tt" ref="xquery-url" xhtml:style="width: 100%" xhtml:tabindex="1"/>
+                        <xforms:textarea xhtml:id="xqueryTextArea" ref="xquery" xhtml:style="width: 100%; line-height: 1em" xhtml:tabindex="2"/>
+
                         <script>
+                            var xquerySourceInline = document.getElementById('xquerySourceInline');
+                            var xquerySourceURL = document.getElementById('xquerySourceURL');
+
+                            var xqueryURL = document.getElementById('xqueryURL');
                             var textarea = document.getElementById('xqueryTextArea');
+
+                            function xqueryTypeChange() {
+                                if (xquerySourceInline.checked) {
+                                    xqueryURL.style.display = 'none';
+                                    textarea.style.display = 'block';
+                                } else {
+                                    xqueryURL.style.display = 'block';
+                                    textarea.style.display = 'none';
+                                }
+                            }
+                            
+                            xquerySourceInline.onclick = xqueryTypeChange;
+                            xquerySourceURL.onclick = xqueryTypeChange;
+                            xqueryTypeChange();
+                            
                             function updateRows() {
                                 var rows = textarea.value.split('\n').length;
-                                textarea.rows = Math.max(10, rows + 1);
+                                textarea.rows = Math.max(10, rows + 2);
                             }
                             
                             updateRows();
@@ -123,8 +155,10 @@
                 once with a smaller font.
             </li>
             <li>
-                <b><a f:url-type="resource"
-                href="/direct/xquery-the-web?url=http%3A%2F%2Frpc.blogrolling.com%2Frss.php%3Fr%3D1a80e03ec214f1bac7f390fa31d80ba0&amp;xquery=%3Cul%3E%20%7Bfor%20%24i%20in%20%2Frss%2Fchannel%2Fitem%20return%20%3Cli%3E%3Ca%20href%3D%22%7B%24i%2Flink%7D%22%3E%7Bstring(%24i%2Ftitle)%7D%3C%2Fa%3E%3C%2Fli%3E%20%7D%20%3C%2Ful%3E&amp;output=javascript">View
+                <b>
+                <a f:url-type="resource" href="/examples/xquery-the-web/xquery/blogrolling.txt">View Source</a> - 
+                <a f:url-type="resource"
+                href="/direct/xquery-the-web?url=http://rpc.blogrolling.com/rss.php?r=1a80e03ec214f1bac7f390fa31d80ba0&amp;xquery-url=oxf:/examples/xquery-the-web/xquery/blogrolling.txt&amp;output=javascript">Run
                 It</a></b> - Creates JavaScript that generates an HTML list to be embedded in a
                 Blogger/Blogspot <a href="http://avernet.blogspot.com/">blog</a> based on an <a
                 href="http://rpc.blogrolling.com/rss.php?r=1a80e03ec214f1bac7f390fa31d80ba0">RSS

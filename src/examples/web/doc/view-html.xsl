@@ -69,7 +69,7 @@
                                         <xsl:for-each select="/document/body/section">
                                             <xsl:variable name="anchor" 
                                                 select="if (preceding-sibling::a) 
-                                                then preceding-sibling::a/@name else generate-id()"/>
+                                                then preceding-sibling::a[1]/@name else generate-id()"/>
                                             <li>
                                                 <xsl:number level="single" count="section" format="1. "/>
                                                 <a href="#{$anchor}">
@@ -82,7 +82,7 @@
                                                         <xsl:for-each select="section">
                                                             <xsl:variable name="anchor" 
                                                                 select="if (preceding-sibling::a) 
-                                                                then preceding-sibling::a/@name else generate-id()"/>
+                                                                then preceding-sibling::a[1]/@name else generate-id()"/>
                                                             <li>
                                                                 <xsl:number level="multiple" count="section" format="1.1. "/>
                                                                 <a href="#{$anchor}">
@@ -95,7 +95,7 @@
                                                                         <xsl:for-each select="section">
                                                                             <xsl:variable name="anchor" 
                                                                                 select="if (preceding-sibling::a) 
-                                                                                then preceding-sibling::a/@name else generate-id()"/>
+                                                                                then preceding-sibling::a[1]/@name else generate-id()"/>
                                                                             <li>
                                                                                 <xsl:number level="multiple" count="section" format="1.1.1. "/>
                                                                                 <a href="#{$anchor}">

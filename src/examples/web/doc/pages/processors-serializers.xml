@@ -31,8 +31,6 @@
             </p>
         </section>
 
-        <anchor id="http-serializer"/>
-
         <anchor id="url-serializer"/>
         <section>
             <title>URL Serializer</title>

@@ -93,6 +93,19 @@
                         the XSLT processor.
                     </p>
                 </li>
+                <li>
+                    <p>
+                        In addition to XQuery code embedded into XML, the XQuery processor now
+                        supports on its <code>config</code> input a <a
+                        href="reference-formats#text-documents">text document</a> of the form:
+                    </p>
+                    <xml-source>
+                        <document xsi:type="xs:string" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            xquery version "1.0";
+                            ...
+                        </document>
+                    </xml-source>
+                </li>
             </ul>
         </section>
     </body>

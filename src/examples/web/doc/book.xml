@@ -25,7 +25,7 @@
             <menu-item label="Version 2.2 and Earlier" href="home-changes-older"/>
         </menu>
         <menu-item label="Installing" href="intro-install"/>
-        <menu-item label="OPS FAQ" href="home-faq"/>
+        <menu-item label="Frequently Asked Questions" href="home-faq"/>
     </menu>
     <menu label="Tutorial">
         <menu-item label="Tutorial" href="/doc/pages/Tutorial.pdf"/>

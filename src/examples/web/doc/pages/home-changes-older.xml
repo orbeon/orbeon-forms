@@ -598,11 +598,11 @@
             <section>
                 <title>Issue with XUpdate Processor</title>
                 <p>
-                    <a href="http://www.orbeon.com/oxf/faq#caching">Caching</a> in the XUpdate
-                    processor was too aggressive, causing the debug statement on the
-                    <code>config</code> input, or upstream in the pipeline on processors leading to
-                    this input not to be printed. In some very rare cases, this could have caused an
-                    old version of the XUpdate program to be used. This issue is fixed in OXF 2.0.2.
+                    <a href="home-faq#caching">Caching</a> in the XUpdate processor was too
+                    aggressive, causing the debug statement on the <code>config</code> input, or
+                    upstream in the pipeline on processors leading to this input not to be printed.
+                    In some very rare cases, this could have caused an old version of the XUpdate
+                    program to be used. This issue is fixed in OXF 2.0.2.
                 </p>
             </section>
             <section>

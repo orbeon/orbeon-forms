@@ -86,7 +86,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     // Read XQuery into String
 
                     String xqueryBody;
-                    if (Dom4jUtils.extractAttributeValueQName(xqueryDocument.getRootElement(), XMLConstants.XSI_TYPE_QNAME).equals(XMLConstants.XS_STRING_QNAME) ) {
+                    if (XMLConstants.XS_STRING_QNAME.equals(Dom4jUtils.extractAttributeValueQName(xqueryDocument.getRootElement(), XMLConstants.XSI_TYPE_QNAME))) {
                         // Content is text under an XML root element
                         xqueryBody = xqueryDocument.getRootElement().getStringValue();
                     } else {

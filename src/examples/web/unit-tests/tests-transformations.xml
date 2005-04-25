@@ -270,6 +270,70 @@
         </output>
     </test>
 
+    <test description="XQuery: a little bit of everything (as xs:string)" name="oxf:xquery">
+        <input name="data">
+            <company>
+                <department id="1" name="HR">
+                    <employee firstname="John" lastname="Smith">a</employee>
+                    <employee firstname="Peter" lastname="Strain"/>
+                    <employee firstname="Carl" lastname="Thompson"/>
+                </department>
+                <department id="2" name="Engineering">
+                    <employee firstname="Letticia" lastname="Vallejo"/>
+                    <employee firstname="Bruce" lastname="Wilson">b</employee>
+                    <employee firstname="David" lastname="Williams"/>
+                </department>
+            </company>
+        </input>
+        <input name="config">
+            <document xsi:type="xs:string" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                xquery version "1.0";
+                declare namespace xs = "http://www.w3.org/2001/XMLSchema";
+                declare namespace local = "http://orbeon.org/oxf/xml/local";
+
+                (: Find employees of a certain department :)
+                declare function local:employees($company as element(), $name as xs:string) as element()* {
+                     $company/department[@name = $name]/employee
+                };
+
+                (: Compute longest last name :)
+                declare function local:maxLastnameLength($employees as element()*) as xs:integer {
+                    let $lengths :=
+                        for $e in $employees
+                        return string-length($e/@lastname)
+                    return max($lengths)
+                };
+
+                let $company := doc('input:data')/*
+                let $hrEmployees := local:employees($company, "HR")
+                let $engineeringEmployees := local:employees($company, "Engineering")
+
+                return
+                    &lt;mixed-up-company employee-count="{count($company/department/employee)}"
+                            max-lastname-length="{local:maxLastnameLength($company/department/employee)}">
+                        {
+                            for $first in $hrEmployees
+                            for $second in $engineeringEmployees
+                            return &lt;employee firstname="{$first/@firstname}" lastname="{$second/@lastname}"/>
+                        }
+                    &lt;/mixed-up-company>
+            </document>
+        </input>
+        <output name="data">
+            <mixed-up-company max-lastname-length="8" employee-count="6">
+                <employee lastname="Vallejo" firstname="John"/>
+                <employee lastname="Wilson" firstname="John"/>
+                <employee lastname="Williams" firstname="John"/>
+                <employee lastname="Vallejo" firstname="Peter"/>
+                <employee lastname="Wilson" firstname="Peter"/>
+                <employee lastname="Williams" firstname="Peter"/>
+                <employee lastname="Vallejo" firstname="Carl"/>
+                <employee lastname="Wilson" firstname="Carl"/>
+                <employee lastname="Williams" firstname="Carl"/>
+            </mixed-up-company>
+        </output>
+    </test>
+
     <test description="XSLT 2.0 Simple Type" name="oxf:xslt">
         <input name="data">
             <root>

@@ -1,5 +1,5 @@
 <p>
-    (: Try to run this on: http://weblog.infoworld.com/udell/rss.xml :)
+    {(: Try to run this on: http://weblog.infoworld.com/udell/rss.xml :)()}
     
     <a href="http://del.icio.us/">del.icio.us</a> {' '} tags for latest {' '}
     <a href="http://weblog.infoworld.com/udell/">Jon Udell blog</a> {' '} entries:

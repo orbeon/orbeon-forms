@@ -1,5 +1,5 @@
 <table>
-    (: Try this on: http://www.technorati.com/tag/ :)
+    {(: Try this on: http://www.technorati.com/tag/ :)()}
     
     {
     let $tags := 

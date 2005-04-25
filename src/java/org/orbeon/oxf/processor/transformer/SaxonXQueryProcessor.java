@@ -28,7 +28,7 @@ import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
-import org.orbeon.saxon.FeatureKeys;
+import org.orbeon.saxon.TransformerFactoryImpl;
 import org.orbeon.saxon.query.DynamicQueryContext;
 import org.orbeon.saxon.query.StaticQueryContext;
 import org.orbeon.saxon.query.XQueryExpression;
@@ -50,7 +50,7 @@ import java.util.Properties;
  *   o additional inputs
  *   o etc.
  *
- * To get there, should maybe abstract what's in XSLT processor and derive from it here. 
+ * To get there, should maybe abstract what's in XSLT processor and derive from it here.
  */
 public class SaxonXQueryProcessor extends ProcessorImpl {
 
@@ -158,19 +158,18 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
     }
 
     private void setConfigurationAttributes(Configuration config, Map attributes) {
-        // Question: couldn't we just use the Saxon code that does this dispatch under TransformerFactoryImpl?
+
+        // NOTE: The code below directly uses the Saxon TransformerFactoryImpl, which may change
+        // when we upgrade Saxon, but it's the easiest way to set attributes on a Configuration
+        // object from name / value pairs.
+        TransformerFactoryImpl transformerFactory = new TransformerFactoryImpl();
+        transformerFactory.setConfiguration(config);
+
         for (Iterator i = attributes.keySet().iterator(); i.hasNext();) {
             String key = (String) i.next();
             Object value = attributes.get(key);
 
-            if (key.equals(FeatureKeys.ALLOW_EXTERNAL_FUNCTIONS)) {
-                if (!(value instanceof Boolean)) {
-                    throw new IllegalArgumentException("allow-external-functions must be a boolean");
-                }
-                config.setAllowExternalFunctions(((Boolean) value).booleanValue());
-            } else {
-                throw new OXFException("Unsupported XQuery configuration attribute: " + key);
-            }
+            transformerFactory.setAttribute(key, value);
         }
     }
 

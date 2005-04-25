@@ -49,6 +49,8 @@ import java.util.Properties;
  *   o errors
  *   o additional inputs
  *   o etc.
+ *
+ * To get there, should maybe abstract what's in XSLT processor and derive from it here. 
  */
 public class SaxonXQueryProcessor extends ProcessorImpl {
 

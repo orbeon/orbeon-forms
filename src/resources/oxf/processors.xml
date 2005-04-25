@@ -17,6 +17,9 @@
     <!-- Include user definitions. The file must be present, even if almost empty -->
     <xi:include href="oxf:/config/custom-processors.xml"/>
 
+    <!-- Include third-party definitions. The file must be present, even if almost empty -->
+    <xi:include href="oxf:/config/third-party-processors.xml"/>
+
     <!-- These are the main processor declarations. They are defined globaly for any pipeline
     running in OXF. The uri attributes are present only for backward compatibility and is likely to
     be deprecated. The name attribute should be used for new processor definitions. -->

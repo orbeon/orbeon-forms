@@ -24,8 +24,9 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.transformer.xslt.StringErrorListener;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.FeatureKeys;
 import org.orbeon.saxon.query.DynamicQueryContext;
@@ -83,9 +84,17 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
 
                     // Read XQuery into String
-                    String xqueryBody = Dom4jUtils.domToString(xqueryDocument);
-                    xqueryBody = xqueryBody.substring(xqueryBody.indexOf(">") + 1);
-                    xqueryBody = xqueryBody.substring(0, xqueryBody.lastIndexOf("<"));
+
+                    String xqueryBody;
+                    if (Dom4jUtils.extractAttributeValueQName(xqueryDocument.getRootElement(), XMLConstants.XSI_TYPE_QNAME).equals(XMLConstants.XS_STRING_QNAME) ) {
+                        // Content is text under an XML root element
+                        xqueryBody = xqueryDocument.getRootElement().getStringValue();
+                    } else {
+                        // Content is XQuery embedded into XML
+                        xqueryBody = Dom4jUtils.domToString(xqueryDocument);
+                        xqueryBody = xqueryBody.substring(xqueryBody.indexOf(">") + 1);
+                        xqueryBody = xqueryBody.substring(0, xqueryBody.lastIndexOf("<"));
+                    }
 
                     // Create XQuery configuration
                     Configuration config = new Configuration();

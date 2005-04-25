@@ -355,6 +355,14 @@ public class Dom4jUtils {
     }
 
     /**
+     * Extract a QName from an Element and an attribute QName. The prefix of the QName must be in
+     * scope. Return null if the attribute is not found.
+     */
+    public static QName extractAttributeValueQName(Element element, QName attributeQName) {
+        return extractTextValueQName(element, element.attributeValue(attributeQName));
+    }
+
+    /**
      * Extract a QName from an Element's string value. The prefix of the QName must be in scope.
      * Return null if the text is empty.
      */

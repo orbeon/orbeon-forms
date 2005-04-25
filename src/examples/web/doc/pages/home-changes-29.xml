@@ -71,8 +71,9 @@
                 <code>oxf:unsafe-xslt</code> instead.
             </p>
             <p>
-                If you were using <code>oxf:xslt-1.0</code> and used Xalan-specific features, you
-                have to either convert your stylesheet to use Saxon features instead, or use
+                If you were using <code>oxf:xslt-1.0</code> or were using XSLT 1.0 stylesheets
+                directly referenced from a page flow, and used Xalan-specific features, you have to
+                either convert your stylesheet to use Saxon features instead, or use
                 <code>oxf:xalan</code>.
             </p>
         </section>

@@ -27,7 +27,7 @@
         <p:output name="html" id="html"/>
     </p:processor>
 
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#html"/>
         <p:input name="rss-feed-descriptor" href="#rss-feed-descriptor"/>
         <p:input name="config">

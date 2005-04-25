@@ -26,7 +26,7 @@
     </p:processor>
 
     <!-- Create XSLT to extract items -->
-    <p:processor name="oxf:xslt">
+    <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#html"/>
         <p:input name="rss-feed-descriptor" href="#rss-feed-descriptor"/>
         <p:input name="config">

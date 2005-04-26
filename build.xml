@@ -22,6 +22,7 @@
     <property name="lib.dir" location="lib"/>
 <!--    <property name='unstbl-bld-dst' value='/var/tmp/tomcat/ops-unstable/' /> -->
     <property name='local-repos' value=':local:/home/cvs/objectweb-src' />
+    <property name='application.name' value='orbeon-presentation-server' />
 
     <fileset id='war.libs' dir="${lib.dir}">
         <include name="dom4j-1_4_orbeon.jar"/>
@@ -299,12 +300,10 @@
     <!-- WAR file -->
     <target name="orbeon-war" depends="classes" description="Create uncompressed WAR file">
         <antcall target="war">
-            <param name="application.name" value="orbeon-presentation-server"/>
             <param name="descriptors.dir" value="descriptors/examples/web"/>
         </antcall>
 
         <antcall target="war-copy-descriptors">
-            <param name="application.name" value="orbeon-presentation-server"/>
             <param name="descriptors.dir" value="descriptors/examples/web"/>
             <param name="target" value="devel"/>
             <param name="build.root" value="${build.root}"/>
@@ -505,17 +504,15 @@
         <mkdir dir="${build.distrib.dir}"/>
 
         <antcall target="war">
-            <param name="application.name" value="orbeon-presentation-server"/>
             <param name="descriptors.dir" value="descriptors/examples/web"/>
         </antcall>
         <antcall target="war-copy-descriptors">
-            <param name="application.name" value="orbeon-presentation-server"/>
             <param name="descriptors.dir" value="descriptors/examples/web"/>
             <param name="target" value="war"/>
             <param name="build.root" value="${build.root}"/>
         </antcall>
         <zip zipfile="${build.distrib.dir}/orbeon.war">
-            <fileset dir="${build.dir}/orbeon-presentation-server-war"/>
+            <fileset dir="${build.dir}/${application.name}-war"/>
             <zipfileset dir="${web-examples-src.dir}" prefix="WEB-INF/resources">
                 <exclude name="**/*.eps"/>
                 <exclude name="**/*.pdf"/>

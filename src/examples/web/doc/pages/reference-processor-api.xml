@@ -339,8 +339,11 @@ public class SystemOutProcessor extends SimpleProcessor {
             <p>
                 You choose your own prefix name and namespace URI for that prefix, in this example
                 <code>my</code> and <code>http://my.company.com/ops/processors</code> respectively.
-                <code>my.company.com</code> identifies your company or organization. Do the mapping
-                on the <code>processors</code> element as usual in XML with:
+                There is no strict format for the namespace URI, but it should identify your company
+                or organization, here with <code>my.company.com</code>.
+            </p>
+            <p>
+                Do the mapping on the <code>processors</code> element as usual in XML with:
             </p>
             <xml-source>
                 xmlns:my="http://my.company.com/ops/processors"

@@ -22,7 +22,9 @@
     <property name="lib.dir" location="lib"/>
 <!--    <property name='unstbl-bld-dst' value='/var/tmp/tomcat/ops-unstable/' /> -->
     <property name='local-repos' value=':local:/home/cvs/objectweb-src' />
+    <property name="build.dir" value="build"/>
     <property name='application.name' value='orbeon-presentation-server' />
+    <property name="war.dir" value="${build.dir}/${application.name}-war"/>
 
     <fileset id='war.libs' dir="${lib.dir}">
         <include name="dom4j-1_4_orbeon.jar"/>
@@ -110,7 +112,6 @@
         <property name="resources.dir" value="${src.dir}/resources"/>
         <property name="test-src.dir" value="test/src"/>
 
-        <property name="build.dir" value="build"/>
         <property name="build.classes.dir" value="${build.dir}/classes"/>
         <property name="build.test-classes.dir" value="${build.dir}/test-classes"/>
         <property name="build.lib.dir" value="${build.dir}/lib"/>
@@ -242,7 +243,7 @@
 
     <!-- WAR -->
     <target name="war" depends="jars">
-        <property name="war.dir" value="${build.dir}/${application.name}-war"/>
+        <echo message="war.dir: ${war.dir}"/>
         <mkdir dir="${war.dir}"/>
         <mkdir dir="${war.dir}/WEB-INF"/>
         <mkdir dir="${war.dir}/WEB-INF/classes"/>
@@ -272,7 +273,6 @@
     </target>
 
     <target name="war-copy-descriptors" depends="prepare">
-        <property name="war.dir" value="${build.dir}/${application.name}-war"/>
         <copy todir="${war.dir}/WEB-INF">
             <fileset dir="${descriptors.dir}" includes="*.xml"/>
         </copy>
@@ -512,7 +512,7 @@
             <param name="build.root" value="${build.root}"/>
         </antcall>
         <zip zipfile="${build.distrib.dir}/orbeon.war">
-            <fileset dir="${build.dir}/${application.name}-war"/>
+            <fileset dir="${war.dir}"/>
             <zipfileset dir="${web-examples-src.dir}" prefix="WEB-INF/resources">
                 <exclude name="**/*.eps"/>
                 <exclude name="**/*.pdf"/>

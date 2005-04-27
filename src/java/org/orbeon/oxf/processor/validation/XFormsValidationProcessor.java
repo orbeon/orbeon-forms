@@ -25,7 +25,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
@@ -181,7 +181,7 @@ public class XFormsValidationProcessor extends ProcessorImpl {
                             // Find xxforms:relevant attribute if any
                             {
                                 // Store a null iif non-relevant
-                                int index = attributes.getIndex(Constants.XXFORMS_NAMESPACE_URI, "relevant");
+                                int index = attributes.getIndex(XFormsConstants.XXFORMS_NAMESPACE_URI, "relevant");
                                 relevantState.push((index != -1 && "false".equals(attributes.getValue(index))) ? null : this);
 
 //                                if (index > -1) {
@@ -280,8 +280,8 @@ public class XFormsValidationProcessor extends ProcessorImpl {
                                 // Annotate attributes on enclosing element
                                 // We only annotate if we are in a relevant element
                                 AttributesImpl newAttributes = new AttributesImpl(attributes);
-                                newAttributes.addAttribute(Constants.XXFORMS_NAMESPACE_URI, XXFORMS_ERROR_ATTRIBUTE_NAME, Constants.XXFORMS_PREFIX + ":" + XXFORMS_ERROR_ATTRIBUTE_NAME, "CDATA", exception.getMessage());
-                                newAttributes.addAttribute(Constants.XXFORMS_NAMESPACE_URI, Constants.XXFORMS_VALID_ATTRIBUTE_NAME, Constants.XXFORMS_PREFIX + ":" + Constants.XXFORMS_VALID_ATTRIBUTE_NAME, "CDATA", "false");
+                                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, XXFORMS_ERROR_ATTRIBUTE_NAME, XFormsConstants.XXFORMS_PREFIX + ":" + XXFORMS_ERROR_ATTRIBUTE_NAME, "CDATA", exception.getMessage());
+                                newAttributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME, XFormsConstants.XXFORMS_PREFIX + ":" + XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME, "CDATA", "false");
                                 attributes = newAttributes;
                             }
                         }

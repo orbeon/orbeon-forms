@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.xforms.output.element;
 
-import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -38,8 +38,8 @@ public class Repeat extends XFormsElement {
             context.startRepeatId(repeatId);
         } else {
             // End group
-            super.end(context, Constants.XFORMS_NAMESPACE_URI, "group",
-                    Constants.XFORMS_PREFIX + ":group");
+            super.end(context, XFormsConstants.XFORMS_NAMESPACE_URI, "group",
+                    XFormsConstants.XFORMS_PREFIX + ":group");
         }
 
         if (currentIndex <= lastIndex) {
@@ -48,10 +48,10 @@ public class Repeat extends XFormsElement {
 
             // Start group
             AttributesImpl attributes = new AttributesImpl();
-            attributes.addAttribute(Constants.XXFORMS_NAMESPACE_URI, "position",
-                    Constants.XXFORMS_PREFIX + ":position", "CDATA", Integer.toString(currentIndex));
-            super.start(context, Constants.XFORMS_NAMESPACE_URI, "group",
-                    Constants.XFORMS_PREFIX + ":group", attributes);
+            attributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "position",
+                    XFormsConstants.XXFORMS_PREFIX + ":position", "CDATA", Integer.toString(currentIndex));
+            super.start(context, XFormsConstants.XFORMS_NAMESPACE_URI, "group",
+                    XFormsConstants.XFORMS_PREFIX + ":group", attributes);
 
             // Prepare for next one
             currentIndex++;

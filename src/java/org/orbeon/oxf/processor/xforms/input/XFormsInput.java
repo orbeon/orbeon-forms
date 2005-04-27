@@ -25,7 +25,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.processor.xforms.input.action.Action;
 import org.orbeon.oxf.processor.xforms.input.action.ActionFunctionContext;
 import org.orbeon.oxf.processor.xforms.Model;
@@ -141,7 +141,7 @@ public class XFormsInput extends ProcessorImpl {
 
                     final boolean schmVldat;
                     {
-                        final Boolean schmVldatdObj = getPropertySet().getBoolean( Constants.XFORMS_VALIDATION_FLAG, true);
+                        final Boolean schmVldatdObj = getPropertySet().getBoolean( XFormsConstants.XFORMS_VALIDATION_FLAG, true);
                         schmVldat = schmVldatdObj.booleanValue();
                     }
                     model.applyInputOutputBinds( d, pipelineContext, schmVldat );

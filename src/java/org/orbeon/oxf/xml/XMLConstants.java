@@ -59,5 +59,8 @@ public class XMLConstants {
     public static final String XSI_NIL_ATTRIBUTE = "nil";
     public static final String XSLT_NAMESPACE = "http://www.w3.org/1999/XSL/Transform";
     public static final String XSLT_PREFIX = "xsl";
-    
+
+    private XMLConstants() {
+        // Disallow contruction 
+    }
 }

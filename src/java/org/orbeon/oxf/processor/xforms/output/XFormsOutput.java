@@ -16,7 +16,7 @@ package org.orbeon.oxf.processor.xforms.output;
 import org.dom4j.Document;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.processor.xforms.Model;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.processor.xforms.output.element.ViewContentHandler;
@@ -31,7 +31,7 @@ public class XFormsOutput extends ProcessorImpl {
     public XFormsOutput() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_MODEL));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_INSTANCE));
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA, Constants.XFORMS_NAMESPACE_URI + "/controls"));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA, XFormsConstants.XFORMS_NAMESPACE_URI + "/controls"));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
@@ -52,7 +52,7 @@ public class XFormsOutput extends ProcessorImpl {
                 // Read instance data and annotate
                 final Document instance = (Document) readCacheInputAsDOM4J(context, INPUT_INSTANCE).clone();
                 XFormsUtils.setInitialDecoration(instance);
-                Boolean enabledObj = getPropertySet().getBoolean(Constants.XFORMS_VALIDATION_FLAG, true);
+                Boolean enabledObj = getPropertySet().getBoolean(XFormsConstants.XFORMS_VALIDATION_FLAG, true);
                 final boolean enabled = enabledObj.booleanValue();
                 model.applyInputOutputBinds(instance, context, enabled);
 

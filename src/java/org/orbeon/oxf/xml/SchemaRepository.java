@@ -38,7 +38,7 @@ import org.orbeon.oxf.processor.transformer.TraxTransformer;
 import org.orbeon.oxf.processor.transformer.xslt.XSLT1Transformer;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
-import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.processor.xmldb.XMLDBProcessor;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.PipelineUtils;
@@ -120,10 +120,10 @@ public class SchemaRepository {
 
         schemas.put(PDFTemplateProcessor.PDF_TEMPLATE_MODEL_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "scratchpad/pdf-template-model.rng");
 
-        schemas.put(Constants.XFORMS_NAMESPACE_URI + "/controls", "schemas/xforms-controls.rng");
-        schemas.put(Constants.XFORMS_NAMESPACE_URI + "/model", "schemas/xforms-1_0.xsd");
+        schemas.put(XFormsConstants.XFORMS_NAMESPACE_URI + "/controls", "schemas/xforms-controls.rng");
+        schemas.put(XFormsConstants.XFORMS_NAMESPACE_URI + "/model", "schemas/xforms-1_0.xsd");
         
-        schemas.put( Constants.XHTML_NAMESPACE_URI, "schemas/xhtml1-transitional_and_xforms1.xsd");
+        schemas.put(XFormsConstants.XHTML_NAMESPACE_URI, "schemas/xhtml1-transitional_and_xforms1.xsd");
         
         schemas.put("http://relaxng.org/ns/structure/1.0", "schemas/relaxng.rng");
         schemas.put("http://www.w3.org/2001/xml-events", "schemas/XML-Events-Schema.xsd");

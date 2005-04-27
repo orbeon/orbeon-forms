@@ -18,7 +18,7 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.processor.xforms.input.action.Action;
 import org.orbeon.oxf.processor.xforms.input.action.Delete;
@@ -75,7 +75,7 @@ public class RequestParameters {
                     Element parameterElement = (Element) i.next();
                     if ("$key".equals(parameterElement.element("name").getStringValue())) {
                         String value = parameterElement.element("value").getStringValue();
-                        String serverPassword = OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD);
+                        String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD);
                         encryptionPassword = SecureUtils.decrypt(pipelineContext, serverPassword, value);
                     }
                 }

@@ -20,7 +20,7 @@ import org.dom4j.VisitorSupport;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
-import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.SecureUtils;
@@ -113,7 +113,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                         String key = null;
                         if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
                             key = SecureUtils.generateRandomPassword();
-                            String serverPassword = OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD);
+                            String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD);
                             outputParameter("$key", SecureUtils.encrypt(pipelineContext, serverPassword, key), contentHandler);
                         }
                         outputParameter("$instance", XFormsUtils.instanceToString(pipelineContext, key, instance), contentHandler);

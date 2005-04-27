@@ -8,7 +8,7 @@
  */
 package org.orbeon.oxf.processor.xforms.output.element;
 
-import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.SAXStore;
 import org.xml.sax.Attributes;
@@ -56,7 +56,7 @@ public class ViewContentHandler extends ForwardingContentHandler {
             // Record event
             repeatElementDepth++;
             repeatSAXStore.startElement(uri, localname, qname, attributes);
-        } else if (Constants.XFORMS_NAMESPACE_URI.equals(uri) || Constants.XXFORMS_NAMESPACE_URI.equals(uri)) {
+        } else if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
             // Get ref / bind / nodeset
             elementContext.pushRelativeXPath(attributes.getValue("bind"),
                     attributes.getValue("ref"), attributes.getValue("nodeset"));
@@ -99,7 +99,7 @@ public class ViewContentHandler extends ForwardingContentHandler {
         }
 
         if (!recordMode) {
-            if (Constants.XFORMS_NAMESPACE_URI.equals(uri) || Constants.XXFORMS_NAMESPACE_URI.equals(uri)) {
+            if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
                 XFormsElement element = elementContext.peekElement();
                 element.end(elementContext, uri, localname, qname);
                 elementContext.popElement();

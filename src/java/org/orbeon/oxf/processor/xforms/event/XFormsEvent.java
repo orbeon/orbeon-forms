@@ -16,23 +16,24 @@ package org.orbeon.oxf.processor.xforms.event;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.DocumentHelper;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.processor.xforms.Model;
 import org.orbeon.oxf.processor.xforms.input.Instance;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
+import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 
-import java.util.Map;
 import java.util.Iterator;
+import java.util.Map;
 
 /**
  * Implements XForms event handling.
@@ -88,23 +89,23 @@ public class XFormsEvent extends ProcessorImpl {
                 // Create resulting document
                 ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
                 ch.startDocument();
-                ch.startElement(Constants.XXFORMS_NAMESPACE_URI, "event-response");
+                ch.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
 
                 // Output new controls values
-                ch.startElement(Constants.XXFORMS_NAMESPACE_URI, "control-values");
+                ch.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
                 for (Iterator i = XPathUtils.selectIterator(controlsDocument, "/*/*[@ref]"); i.hasNext();) {//TODO: correctly identify children controls
                     Element controlElement = (Element) i.next();
 
-                    String controlId = controlElement.attributeValue(new QName("id", Constants.XXFORMS_NAMESPACE));
+                    String controlId = controlElement.attributeValue(new QName("id", XFormsConstants.XXFORMS_NAMESPACE));
                     String controlValue = getControlValue(pipelineContext, controlElement, instance);
 
-                    ch.element(Constants.XXFORMS_NAMESPACE_URI, "control", new String[] {"id", controlId, "value", controlValue });
+                    ch.element(XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] {"id", controlId, "value", controlValue });
                 }
                 ch.endElement();
 
                 // Output updated instances
-                ch.startElement(Constants.XXFORMS_NAMESPACE_URI, "instances");
-                ch.startElement(Constants.XXFORMS_NAMESPACE_URI, "instance");
+                ch.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "instances");
+                ch.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "instance");
                 instance.read(new EmbeddedDocumentContentHandler(contentHandler));
                 ch.endElement();
                 ch.endElement();
@@ -120,7 +121,7 @@ public class XFormsEvent extends ProcessorImpl {
     private void interpretAction(final PipelineContext pipelineContext, Element actionElement, Instance instance) {
 
         String actionNamespaceURI = actionElement.getNamespaceURI();
-        if (!Constants.XFORMS_NAMESPACE_URI.equals(actionNamespaceURI)) {
+        if (!XFormsConstants.XFORMS_NAMESPACE_URI.equals(actionNamespaceURI)) {
             throw new OXFException("Invalid action namespace: " + actionNamespaceURI);
         }
 

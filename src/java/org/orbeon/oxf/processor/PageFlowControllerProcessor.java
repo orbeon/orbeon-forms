@@ -48,7 +48,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     private final static Document FALSE_DOCUMENT = new NonLazyUserDataDocument();
     private final static Map NAMESPACES_WITH_XSI_AND_XSLT = new HashMap();
     public final static String EXTRACT_INSTANCE_XPATH
-            = "/*/*[local-name() = 'instance' and namespace-uri() = '" + org.orbeon.oxf.processor.xforms.Constants.XFORMS_NAMESPACE_URI + "']/*[1]";
+            = "/*/*[local-name() = 'instance' and namespace-uri() = '" + org.orbeon.oxf.processor.xforms.XFormsConstants.XFORMS_NAMESPACE_URI + "']/*[1]";
 
     // Instance passing configuration
     private final static String INSTANCE_PASSING_REDIRECT = "redirect";

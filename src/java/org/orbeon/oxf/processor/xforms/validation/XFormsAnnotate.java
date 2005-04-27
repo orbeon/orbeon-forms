@@ -17,7 +17,7 @@ import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.processor.xforms.Model;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
@@ -53,7 +53,7 @@ public class XFormsAnnotate extends ProcessorImpl {
                     final Document instance = ( org.dom4j.Document )readCacheInputAsDOM4J
                         ( context, INPUT_INSTANCE ).clone();
                     XFormsUtils.setInitialDecoration(instance.getDocument());
-                    Boolean enabledObj = getPropertySet().getBoolean( Constants.XFORMS_VALIDATION_FLAG, true);
+                    Boolean enabledObj = getPropertySet().getBoolean( XFormsConstants.XFORMS_VALIDATION_FLAG, true);
                     final boolean enabled = enabledObj.booleanValue();
                     model.applyInputOutputBinds( instance, context, enabled );
 

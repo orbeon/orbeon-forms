@@ -13,7 +13,7 @@
  */
 package org.orbeon.oxf.processor.xforms.output.element;
 
-import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.util.SecureUtils;
@@ -70,7 +70,7 @@ public class Group extends XFormsElement {
 
             // Generate hidden field with random key encrypted with server key
             if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
-                String serverPassword = OXFProperties.instance().getPropertySet().getString(Constants.XFORMS_PASSWORD);
+                String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD);
                 String encryptedRandomKey = SecureUtils.encrypt(context.getPipelineContext(),
                         serverPassword, context.getEncryptionPassword());
                 sendHiddenElement(context, "$key", encryptedRandomKey);
@@ -83,15 +83,15 @@ public class Group extends XFormsElement {
 
     private void sendHiddenElement(XFormsElementContext context, String name, String value) throws SAXException {
         AttributesImpl attributes = new AttributesImpl();
-        attributes.addAttribute(Constants.XXFORMS_NAMESPACE_URI, "name",
-                Constants.XXFORMS_PREFIX + ":name", "CDATA", name);
-        attributes.addAttribute(Constants.XXFORMS_NAMESPACE_URI, "value",
-                Constants.XXFORMS_PREFIX + ":value", "CDATA", value);
+        attributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "name",
+                XFormsConstants.XXFORMS_PREFIX + ":name", "CDATA", name);
+        attributes.addAttribute(XFormsConstants.XXFORMS_NAMESPACE_URI, "value",
+                XFormsConstants.XXFORMS_PREFIX + ":value", "CDATA", value);
         String elementLocalName = "hidden";
-        String elementQName = Constants.XXFORMS_PREFIX + ":" + elementLocalName;
-        context.getContentHandler().startElement(Constants.XXFORMS_NAMESPACE_URI,
+        String elementQName = XFormsConstants.XXFORMS_PREFIX + ":" + elementLocalName;
+        context.getContentHandler().startElement(XFormsConstants.XXFORMS_NAMESPACE_URI,
                 elementLocalName, elementQName, attributes);
-        context.getContentHandler().endElement(Constants.XXFORMS_NAMESPACE_URI,
+        context.getContentHandler().endElement(XFormsConstants.XXFORMS_NAMESPACE_URI,
                 elementLocalName, elementQName);
     }
 }

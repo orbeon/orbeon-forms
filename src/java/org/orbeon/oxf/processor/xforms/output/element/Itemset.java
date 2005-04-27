@@ -10,7 +10,7 @@ package org.orbeon.oxf.processor.xforms.output.element;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.orbeon.oxf.processor.xforms.Constants;
+import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.PooledXPathExpression;
@@ -42,12 +42,12 @@ public class Itemset extends XFormsElement {
         context.endRepeatId(null);
         for (Iterator i = nodelist.iterator(); i.hasNext();) {
             Node node = (Node) i.next();
-            context.getContentHandler().startElement(Constants.XFORMS_NAMESPACE_URI, "item",
-                    Constants.XFORMS_PREFIX + ":item", XMLUtils.EMPTY_ATTRIBUTES);
+            context.getContentHandler().startElement(XFormsConstants.XFORMS_NAMESPACE_URI, "item",
+                    XFormsConstants.XFORMS_PREFIX + ":item", XMLUtils.EMPTY_ATTRIBUTES);
             sendElement(context, node, "label", labelRef, labelPrefixToURI);
             sendElement(context, node, "value", copyRef, copyPrefixToURI);
-            context.getContentHandler().endElement(Constants.XFORMS_NAMESPACE_URI, "item",
-                    Constants.XFORMS_PREFIX + ":item");
+            context.getContentHandler().endElement(XFormsConstants.XFORMS_NAMESPACE_URI, "item",
+                    XFormsConstants.XFORMS_PREFIX + ":item");
         }
         context.getContentHandler().endElement(uri, localname, qname);
     }
@@ -59,11 +59,11 @@ public class Itemset extends XFormsElement {
                 prefixToURI, context.getRepeatIdToIndex());
         try {
             String value = (String) expression.evaluateSingle();
-            context.getContentHandler().startElement(Constants.XFORMS_NAMESPACE_URI, localname,
-                    Constants.XFORMS_PREFIX + ":" + localname, XMLUtils.EMPTY_ATTRIBUTES);
+            context.getContentHandler().startElement(XFormsConstants.XFORMS_NAMESPACE_URI, localname,
+                    XFormsConstants.XFORMS_PREFIX + ":" + localname, XMLUtils.EMPTY_ATTRIBUTES);
             context.getContentHandler().characters(value.toCharArray(), 0, value.length());
-            context.getContentHandler().endElement(Constants.XFORMS_NAMESPACE_URI, localname,
-                    Constants.XFORMS_PREFIX + ":" + localname);
+            context.getContentHandler().endElement(XFormsConstants.XFORMS_NAMESPACE_URI, localname,
+                    XFormsConstants.XFORMS_PREFIX + ":" + localname);
         } catch (XPathException e) {
             throw new OXFException(e);
         } finally {

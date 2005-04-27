@@ -51,7 +51,7 @@ public class XFormsUtils {
         for (Iterator i = new XMLUtils.AttributesIterator(source); i.hasNext();) {
             XMLUtils.Attribute attribute = (XMLUtils.Attribute) i.next();
             if (!"".equals(attribute.getURI()) &&
-                    !Constants.XXFORMS_NAMESPACE_URI.equals(attribute.getURI())) {
+                    !XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attribute.getURI())) {
                 target.addAttribute(attribute.getURI(), attribute.getLocalName(),
                         attribute.getQName(), ContentHandlerHelper.CDATA, attribute.getValue());
             }
@@ -96,7 +96,7 @@ public class XFormsUtils {
 
         for (Iterator i = element.attributes().iterator(); i.hasNext();) {
             Attribute attribute = (Attribute) i.next();
-            if (!Constants.XXFORMS_NAMESPACE_URI.equals(attribute.getNamespaceURI())) {
+            if (!XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attribute.getNamespaceURI())) {
                 int attributeId = ++currentId[0];
                 idToNodeMap.put(new Integer(attributeId), attribute);
                 attribute.setData(new InstanceData((LocationData) attribute.getData(), attributeId));
@@ -110,12 +110,12 @@ public class XFormsUtils {
 
     public static boolean isNameEncryptionEnabled() {
         return OXFProperties.instance().getPropertySet().getBoolean
-            (Constants.XFORMS_ENCRYPT_NAMES, false).booleanValue();
+            (XFormsConstants.XFORMS_ENCRYPT_NAMES, false).booleanValue();
     }
 
     public static boolean isHiddenEncryptionEnabled() {
         return OXFProperties.instance().getPropertySet().getBoolean
-            (Constants.XFORMS_ENCRYPT_HIDDEN, false).booleanValue();
+            (XFormsConstants.XFORMS_ENCRYPT_HIDDEN, false).booleanValue();
     }
 
     public static String instanceToString(PipelineContext pipelineContext, String password, Document instance) {
@@ -141,7 +141,7 @@ public class XFormsUtils {
                 List newAttributes = new ArrayList();
                 for(Iterator i = node.attributeIterator(); i.hasNext();) {
                     Attribute attr = (Attribute)i.next();
-                    if(!Constants.XXFORMS_NAMESPACE_URI.equals(attr.getNamespaceURI()))
+                    if(!XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attr.getNamespaceURI()))
                         newAttributes.add(attr);
 
                 }

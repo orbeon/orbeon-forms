@@ -20,6 +20,8 @@ public class XFormsConstants {
 
     public static final String XFORMS_PREFIX = "xforms";
     public static final String XXFORMS_PREFIX = "xxforms";
+    public static final String XFORMS_SHORT_PREFIX = "xf";
+    public static final String XXFORMS_SHORT_PREFIX = "xxf";
     public static final String XFORMS_NAMESPACE_URI = "http://www.w3.org/2002/xforms";
     public static final String XHTML_NAMESPACE_URI = "http://www.w3.org/1999/xhtml";
     public static final String XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";

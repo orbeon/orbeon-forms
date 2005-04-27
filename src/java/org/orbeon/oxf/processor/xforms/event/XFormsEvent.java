@@ -22,16 +22,20 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.processor.xforms.Model;
+import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.processor.xforms.input.Instance;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.PooledXPathExpression;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
-import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
 
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -48,6 +52,13 @@ public class XFormsEvent extends ProcessorImpl {
     final static private String INPUT_ACTION = "action";
 
     final static private String OUTPUT_RESPONSE = "response";
+
+    private final static Map XFORMS_NAMESPACES = new HashMap();
+
+    static {
+        XFORMS_NAMESPACES.put(XFormsConstants.XFORMS_SHORT_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
+        XFORMS_NAMESPACES.put(XFormsConstants.XXFORMS_SHORT_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);
+    }
 
     public XFormsEvent() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_INSTANCE));
@@ -93,14 +104,25 @@ public class XFormsEvent extends ProcessorImpl {
 
                 // Output new controls values
                 ch.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
-                for (Iterator i = XPathUtils.selectIterator(controlsDocument, "/*/*[@ref]"); i.hasNext();) {//TODO: correctly identify children controls
-                    Element controlElement = (Element) i.next();
 
-                    String controlId = controlElement.attributeValue(new QName("id", XFormsConstants.XXFORMS_NAMESPACE));
-                    String controlValue = getControlValue(pipelineContext, controlElement, instance);
+                PooledXPathExpression xpathExpression =
+                    XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument), "/xxf:controls//(xf:input|xf:secret|xf:textarea|xf:output|xf:upload|xf:range|xf:trigger|xf:submit|xf:select|xf:select1)[@ref]", XFORMS_NAMESPACES);
+                try {
+                    for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
+                        Element controlElement = (Element) i.next();
 
-                    ch.element(XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] {"id", controlId, "value", controlValue });
+                        String controlId = controlElement.attributeValue(new QName("id", XFormsConstants.XXFORMS_NAMESPACE));
+                        String controlValue = getControlValue(pipelineContext, controlElement, instance);
+
+                        ch.element(XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] {"id", controlId, "value", controlValue });
+                    }
+                } catch (XPathException e) {
+                    throw new OXFException(e);
+                } finally {
+                    if (xpathExpression != null)
+                        xpathExpression.returnToPool();
                 }
+
                 ch.endElement();
 
                 // Output updated instances

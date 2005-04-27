@@ -63,11 +63,10 @@ public class PooledXPathExpression {
         return context;
     }
 
-
     public void setVariable(String name, Object value) {
         try {
-            Variable v = (Variable)variables.get(name);
-            if(v != null)
+            Variable v = (Variable) variables.get(name);
+            if (v != null)
                 v.setValue(value);
         } catch (XPathException e) {
             throw new OXFException(e);

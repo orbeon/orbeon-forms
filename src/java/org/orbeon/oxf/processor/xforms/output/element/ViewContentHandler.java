@@ -9,7 +9,6 @@
 package org.orbeon.oxf.processor.xforms.output.element;
 
 import org.orbeon.oxf.processor.xforms.Constants;
-import org.orbeon.oxf.processor.xforms.output.XFormsOutputConfig;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.SAXStore;
 import org.xml.sax.Attributes;
@@ -19,18 +18,14 @@ import org.xml.sax.SAXException;
 
 public class ViewContentHandler extends ForwardingContentHandler {
 
-    private XFormsOutputConfig xformsOutputConfig;
     private XFormsElementContext elementContext;
 
     private SAXStore repeatSAXStore = new SAXStore();
     private int repeatElementDepth = 0;
-    private int elementDepth = 0;
     private boolean recordMode = false;
 
-    public ViewContentHandler(ContentHandler contentHandler, XFormsElementContext elementContext,
-                              XFormsOutputConfig xformsOutputConfig) {
+    public ViewContentHandler(ContentHandler contentHandler, XFormsElementContext elementContext) {
         super(contentHandler);
-        this.xformsOutputConfig = xformsOutputConfig;
         this.elementContext = elementContext;
     }
 
@@ -57,9 +52,6 @@ public class ViewContentHandler extends ForwardingContentHandler {
 
     public void startElement(String uri, String localname, String qname, Attributes attributes) throws SAXException {
         elementContext.getNamespaceSupport().pushContext();
-        if (elementDepth == 0) {
-            super.startPrefixMapping(xformsOutputConfig.getNamespacePrefix(), xformsOutputConfig.getNamespaceURI());
-        }
         if (recordMode) {
             // Record event
             repeatElementDepth++;
@@ -87,12 +79,10 @@ public class ViewContentHandler extends ForwardingContentHandler {
         } else {
             super.startElement(uri, localname, qname, attributes);
         }
-        elementDepth++;
     }
 
     public void endElement(String uri, String localname, String qname) throws SAXException {
         elementContext.getNamespaceSupport().popContext();
-        elementDepth--;
         if (recordMode) {
             if (repeatElementDepth == 0) {
                 // We are back to the element that requested the repeat
@@ -117,9 +107,6 @@ public class ViewContentHandler extends ForwardingContentHandler {
             } else {
                 super.endElement(uri, localname, qname);
             }
-        }
-        if (elementDepth == 0) {
-            super.endPrefixMapping(xformsOutputConfig.getNamespacePrefix());
         }
     }
 

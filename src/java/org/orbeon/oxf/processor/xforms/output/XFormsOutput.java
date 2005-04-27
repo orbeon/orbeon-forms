@@ -19,7 +19,8 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.Constants;
 import org.orbeon.oxf.processor.xforms.Model;
 import org.orbeon.oxf.processor.xforms.XFormsUtils;
-import org.orbeon.oxf.processor.xforms.output.element.*;
+import org.orbeon.oxf.processor.xforms.output.element.ViewContentHandler;
+import org.orbeon.oxf.processor.xforms.output.element.XFormsElementContext;
 import org.xml.sax.ContentHandler;
 
 public class XFormsOutput extends ProcessorImpl {
@@ -38,34 +39,29 @@ public class XFormsOutput extends ProcessorImpl {
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                
+
                 // Extract info from model
                 final Model model = (Model) readCacheInputAsObject(context,
-                        getInputByName(INPUT_MODEL), new CacheableInputReader(){
-                    public Object read(PipelineContext context, ProcessorInput input) {
-                        Model model = new Model(context, readInputAsDOM4J(context, input));
-                        return model;
-                    }
-                });
-
-                // Obsolete: used to come from config will be removed for 2.5
-                final XFormsOutputConfig xformsOutputConfig = new XFormsOutputConfig("d", "http://orbeon.org/oxf/xml/document");
+                        getInputByName(INPUT_MODEL), new CacheableInputReader() {
+                            public Object read(PipelineContext context, ProcessorInput input) {
+                                Model model = new Model(context, readInputAsDOM4J(context, input));
+                                return model;
+                            }
+                        });
 
                 // Read instance data and annotate
-                final Document instance = 
-                    ( org.dom4j.Document )readCacheInputAsDOM4J( context, INPUT_INSTANCE ).clone();
-                XFormsUtils.setInitialDecoration( instance );
-                Boolean enabledObj = getPropertySet().getBoolean( Constants.XFORMS_VALIDATION_FLAG, true);
+                final Document instance = (Document) readCacheInputAsDOM4J(context, INPUT_INSTANCE).clone();
+                XFormsUtils.setInitialDecoration(instance);
+                Boolean enabledObj = getPropertySet().getBoolean(Constants.XFORMS_VALIDATION_FLAG, true);
                 final boolean enabled = enabledObj.booleanValue();
-                model.applyInputOutputBinds( instance, context, enabled ); 
+                model.applyInputOutputBinds(instance, context, enabled);
 
                 // Create evaluation context
                 final XFormsElementContext elementContext =
                         new XFormsElementContext(context, contentHandler, model, instance);
 
                 // Send SAX events of view to ViewContentHandler
-                readInputAsSAX(context, INPUT_DATA, new ViewContentHandler
-                        (contentHandler, elementContext, xformsOutputConfig));
+                readInputAsSAX(context, INPUT_DATA, new ViewContentHandler(contentHandler, elementContext));
             }
         };
         addOutput(name, output);

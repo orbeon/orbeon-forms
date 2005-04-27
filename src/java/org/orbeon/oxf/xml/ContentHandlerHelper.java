@@ -22,8 +22,8 @@ import org.xml.sax.helpers.AttributesImpl;
 import java.util.Stack;
 
 /**
- * Wrapper to a SAX content handler. Provides more high-level methods to send
- * event to the content handler.
+ * Wrapper to a SAX ContentHandler. Provides more high-level methods to send events to a
+ * ContentHandler.
  */
 public class ContentHandlerHelper {
 
@@ -94,6 +94,11 @@ public class ContentHandlerHelper {
         } catch (SAXException e) {
             throw new OXFException(e);
         }
+    }
+
+    public void element(String namespaceURI, String name, String[] attributes) {
+        startElement("", namespaceURI, name, attributes);
+        endElement();
     }
 
     public void element(String name, String text) {

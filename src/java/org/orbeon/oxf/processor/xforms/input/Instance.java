@@ -39,6 +39,9 @@ import org.xml.sax.SAXException;
 
 import java.util.Map;
 
+/**
+ * Represent an XForms instance.
+ */
 public class Instance {
 
     public static final String REQUEST_INSTANCE_DOCUMENT = "org.orbeon.oxf.request.xforms-instance-document";
@@ -65,7 +68,7 @@ public class Instance {
     }
 
     /**
-     * Set a value on the instance.
+     * Set a value on the instance using an element or attribute id.
      *
      * If a type is specified, it means that the Request generator set it, which, for now, means
      * that it was a file upload.
@@ -80,18 +83,41 @@ public class Instance {
         }
     }
 
-    public void setValueForParam(PipelineContext pipelineContext, String xpath, Map prefixToURIMap, String value) {
+    /**
+     * Set a value on the instance using an XPath expression pointing to an element or attribute.
+     *
+     * @param pipelineContext
+     * @param refXPath
+     * @param prefixToURIMap
+     * @param value
+     */
+    public void setValueForParam(PipelineContext pipelineContext, String refXPath, Map prefixToURIMap, String value) {
         PooledXPathExpression xpathExpression =
-                XPathCache.getXPathExpression(pipelineContext, instanceNodeInfo, xpath, prefixToURIMap);
+                XPathCache.getXPathExpression(pipelineContext, instanceNodeInfo, refXPath, prefixToURIMap);
         try {
             Node node = (Node) xpathExpression.evaluateSingle();
             if (node == null)
-                throw new OXFException("Cannot find node instance for param '" + xpath + "'");
+                throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
             if (node instanceof Element) {
                 setElementValue((Element) node, value, null);
             } else {
                 setAttributeValue((Attribute) node, value);
             }
+        } catch (XPathException e) {
+            throw new OXFException(e);
+        } finally {
+            if (xpathExpression != null) xpathExpression.returnToPool();
+        }
+    }
+
+    /**
+     * Evaluate an XPath expression on the instance and return its string value.
+     */
+    public String evaluateXPath(PipelineContext pipelineContext, String xpath, Map prefixToURIMap) {
+        PooledXPathExpression xpathExpression =
+                XPathCache.getXPathExpression(pipelineContext, instanceNodeInfo, "string(" + xpath + ")", prefixToURIMap);
+        try {
+            return (String) xpathExpression.evaluateSingle();
         } catch (XPathException e) {
             throw new OXFException(e);
         } finally {

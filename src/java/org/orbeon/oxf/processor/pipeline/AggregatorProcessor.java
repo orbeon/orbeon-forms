@@ -21,7 +21,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.ContentHandler;
@@ -78,7 +78,7 @@ public class AggregatorProcessor extends ProcessorImpl {
                     // Processor input processors
                     for (Iterator i = getInputsByName(INPUT_DATA).iterator(); i.hasNext();) {
                         ProcessorInput input = (ProcessorInput) i.next();
-                        readInputAsSAX(context, input, new StartEndDocumentEater(contentHandler));
+                        readInputAsSAX(context, input, new EmbeddedDocumentContentHandler(contentHandler));
                     }
 
                     // End document
@@ -92,17 +92,4 @@ public class AggregatorProcessor extends ProcessorImpl {
         addOutput(name, output);
         return output;
     }
-
-    /**
-     * Forwards all the SAX events to a content handler, except for
-     * startDocument and endDocument.
-     */
-    private static class StartEndDocumentEater extends ForwardingContentHandler {
-        public StartEndDocumentEater(ContentHandler contentHandler) {
-            super(contentHandler);
-        }
-
-        public void startDocument() throws SAXException {}
-        public void endDocument() throws SAXException {}
-    };
 }

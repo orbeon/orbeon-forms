@@ -59,6 +59,7 @@
     <p:processor name="oxf:xforms-event">
         <p:input name="instance" href="#xml-request#xpointer(/xxforms:event-fired/xxforms:instance)"/>
         <p:input name="model" href="#xml-request#xpointer(/xxforms:event-fired/xxforms:model)"/>
+        <p:input name="controls" href="#xml-request#xpointer(/xxforms:event-fired/xxforms:controls)"/>
         <p:input name="action" href="#xforms-action"/>
 
         <p:output name="response" id="xml-response"/>

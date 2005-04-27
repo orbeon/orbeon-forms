@@ -38,8 +38,8 @@ import org.xml.sax.ContentHandler;
  * Handle XForms decoding.
  *
  * A filter can be provided. It contains XPath references to nodes that have been filled-out by the
- * WAC based on URL filtering. The format of the filter comes directly from the native document
- * created in the WAC, for example:
+ * PFC based on URL filtering. The format of the filter comes directly from the native document
+ * created in the PFC, for example:
  *
  * <params xmlns="http://www.orbeon.com/oxf/controller">
  *    <param ref="/form/x"/>
@@ -72,8 +72,7 @@ public class XFormsInput extends ProcessorImpl {
                 // Extract information from XForms model
                 Model model = (Model) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
                     public Object read(PipelineContext context, ProcessorInput input) {
-                        Model model = new Model(pipelineContext, readInputAsDOM4J(context, input));
-                        return model;
+                        return new Model(pipelineContext, readInputAsDOM4J(context, input));
                     }
                 });
 
@@ -139,13 +138,13 @@ public class XFormsInput extends ProcessorImpl {
 
                     // Run model item properties
                     final org.dom4j.Document d = instance.getDocument();
-                    
-                    final boolean schmVldat; 
+
+                    final boolean schmVldat;
                     {
                         final Boolean schmVldatdObj = getPropertySet().getBoolean( Constants.XFORMS_VALIDATION_FLAG, true);
                         schmVldat = schmVldatdObj.booleanValue();
                     }
-                    model.applyInputOutputBinds( d, pipelineContext, schmVldat );  
+                    model.applyInputOutputBinds( d, pipelineContext, schmVldat );
                     if (logger.isDebugEnabled())
                         logger.debug("3) Instance with model item properties applied:\n"
                                 + Dom4jUtils.domToString(instance.getDocument()));
@@ -159,4 +158,3 @@ public class XFormsInput extends ProcessorImpl {
         return output;
     }
 }
- 

@@ -397,6 +397,10 @@
         <class name="org.orbeon.oxf.processor.xforms.validation.XFormsAnnotate"/>
     </processor>
 
+    <processor name="oxf:xforms-event">
+        <class name="org.orbeon.oxf.processor.xforms.event.XFormsEvent"/>
+    </processor>
+
     <!-- Other processors -->
     <processor name="oxf:delegation" uri="oxf/processor/delegation">
         <class name="org.orbeon.oxf.processor.DelegationProcessor"/>
@@ -565,53 +569,6 @@
     <!-- Scratchpad -->
     <processor name="oxf:pdf-template" uri="oxf/processor/pdf-template">
         <class name="org.orbeon.oxf.processor.scratchpad.PDFTemplateProcessor"/>
-    </processor>
-
-    <!-- Saxon profiling (test only) -->
-    <processor name="oxf:saxon1">
-        <instantiation name="oxf:generic-xslt-2.0">
-            <input name="transformer">
-                <config>
-                    <class>org.orbeon.saxon1.TransformerFactoryImpl</class>
-                </config>
-            </input>
-        </instantiation>
-    </processor>
-    <processor name="oxf:saxon2">
-        <instantiation name="oxf:generic-xslt-2.0">
-            <input name="transformer">
-                <config>
-                    <class>org.orbeon.saxon2.TransformerFactoryImpl</class>
-                </config>
-            </input>
-        </instantiation>
-    </processor>
-    <processor name="oxf:saxon3">
-        <instantiation name="oxf:generic-xslt-2.0">
-            <input name="transformer">
-                <config>
-                    <class>org.orbeon.saxon3.TransformerFactoryImpl</class>
-                </config>
-            </input>
-        </instantiation>
-    </processor>
-    <processor name="oxf:saxon4">
-        <instantiation name="oxf:generic-xslt-2.0">
-            <input name="transformer">
-                <config>
-                    <class>org.orbeon.saxon4.TransformerFactoryImpl</class>
-                </config>
-            </input>
-        </instantiation>
-    </processor>
-    <processor name="oxf:saxon5">
-        <instantiation name="oxf:generic-xslt-2.0">
-            <input name="transformer">
-                <config>
-                    <class>org.orbeon.saxon5.TransformerFactoryImpl</class>
-                </config>
-            </input>
-        </instantiation>
     </processor>
 
 </processors>

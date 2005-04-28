@@ -423,9 +423,16 @@ public class Dom4jUtils {
         final org.dom4j.Text ret = fctry.createText( txt );
         return ret;
     }
+    public static org.dom4j.Element createElement
+    ( final String qualifiedName, final String namespaceURI) {
+        final NonLazyUserDataDocumentFactory fctry
+            = NonLazyUserDataDocumentFactory.getInstance( null );
+        final org.dom4j.Element ret = fctry.createElement(qualifiedName, namespaceURI);
+        return ret;
+    }
     public static org.dom4j.Attribute createAttribute
     ( final org.dom4j.Element elt, final org.dom4j.QName nm, final String val ) {
-        final NonLazyUserDataDocumentFactory fctry 
+        final NonLazyUserDataDocumentFactory fctry
             = NonLazyUserDataDocumentFactory.getInstance( null );
         final org.dom4j.Attribute ret = fctry.createAttribute( elt, nm, val );
         return ret;
@@ -436,6 +443,7 @@ public class Dom4jUtils {
         final org.dom4j.Namespace ret = fctry.createNamespace( pfx, uri );
         return ret;
     }
+
     /**
      * @return A document from with a _copy_ of root as its root.
      */
@@ -444,6 +452,13 @@ public class Dom4jUtils {
         final NonLazyUserDataDocumentFactory fctry 
             = NonLazyUserDataDocumentFactory.getInstance( null );
         final org.dom4j.Document ret = fctry.createDocument( cpy );
+        return ret;
+    }
+
+    public static org.dom4j.Document createDocument() {
+        final NonLazyUserDataDocumentFactory fctry
+            = NonLazyUserDataDocumentFactory.getInstance( null );
+        final org.dom4j.Document ret = fctry.createDocument();
         return ret;
     }
 }

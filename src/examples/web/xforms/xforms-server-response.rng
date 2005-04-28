@@ -31,6 +31,19 @@
                 </zeroOrMore>
             </element>
             <ref name="xformsInstances"/>
+            <element name="xxforms:divs">
+                <zeroOrMore>
+                    <element name="xxforms:div">
+                        <attribute name="id"/>
+                        <attribute name="visibility">
+                            <choice>
+                                <value>hidden</value>
+                                <value>visible</value>
+                            </choice>
+                        </attribute>
+                    </element>
+                </zeroOrMore>
+            </element>
         </element>
     </start>
 

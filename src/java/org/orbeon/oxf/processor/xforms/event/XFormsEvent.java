@@ -31,6 +31,7 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
@@ -106,8 +107,12 @@ public class XFormsEvent extends ProcessorImpl {
                     }
                 }
 
+                // Create resulting divs document
+                Document divsDocument = Dom4jUtils.createDocument();
+                divsDocument.addElement("xxf:divs", XFormsConstants.XXFORMS_NAMESPACE_URI);
+
                 // Interpret action
-                interpretAction(pipelineContext, actionElement, instance);
+                interpretAction(pipelineContext, actionElement, instance, controlsDocument, divsDocument);
 
                 // Create resulting document
                 try {
@@ -148,8 +153,17 @@ public class XFormsEvent extends ProcessorImpl {
                     ch.endElement();
                     ch.endElement();
 
-                    ch.endElement();
+                    // Output divs if needed
 
+                    try {
+                        LocationSAXWriter saxw = new LocationSAXWriter();
+                        saxw.setContentHandler(new EmbeddedDocumentContentHandler(contentHandler));
+                        saxw.write(divsDocument);
+                    } catch (SAXException e) {
+                        throw new OXFException(e);
+                    }
+
+                    ch.endElement();
                     contentHandler.endPrefixMapping("xxf");
                     ch.endDocument();
                 } catch (SAXException e) {
@@ -161,7 +175,7 @@ public class XFormsEvent extends ProcessorImpl {
         return output;
     }
 
-    private void interpretAction(final PipelineContext pipelineContext, Element actionElement, Instance instance) {
+    private void interpretAction(final PipelineContext pipelineContext, Element actionElement, Instance instance, Document controlsDocument, Document divsDocument) {
 
         String actionNamespaceURI = actionElement.getNamespaceURI();
         if (!XFormsConstants.XFORMS_NAMESPACE_URI.equals(actionNamespaceURI)) {
@@ -188,12 +202,56 @@ public class XFormsEvent extends ProcessorImpl {
             }
 
             instance.setValueForParam(pipelineContext, ref, namespaceContext, valueToSet);
+        } else if ("toggle".equals(actionName)) {
+            // 9.2.3 The toggle Element
+            // xforms:toggle
+
+            // Find case with that id and select it
+            String caseId = actionElement.attributeValue("case");
+            {
+                Element divElement = Dom4jUtils.createElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                divElement.addAttribute("id", caseId);
+                divElement.addAttribute("visibility", "visible");
+                divsDocument.getRootElement().add(divElement);
+            }
+
+            // Deselect other cases in that switch
+            {
+                Map variables = new HashMap();
+                variables.put("case-id", caseId);
+
+                PooledXPathExpression xpathExpression =
+                    XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument),
+                            "/xxf:controls//xf:case[id = $case-id]/ancestor::xf:switch//xf:case[not(id = $case-id)]", XFORMS_NAMESPACES, variables);
+                try {
+
+                    for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
+                        Element caseElement = (Element) i.next();
+
+                        Element divElement = Dom4jUtils.createElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                        divElement.addAttribute("id", caseElement.attributeValue("id"));
+                        divElement.addAttribute("visibility", "hidden");
+                        divsDocument.getRootElement().add(divElement);
+                    }
+                } catch (XPathException e) {
+                    throw new OXFException(e);
+                } finally {
+                    if (xpathExpression != null)
+                        xpathExpression.returnToPool();
+                }
+            }
+
+            // TODO:
+            // 1. Dispatching an xforms-deselect event to the currently selected case.
+            // 2. Dispatching an xform-select event to the case to be selected.
+
+
         } else if ("action".equals(actionName)) {
             // xforms:action
 
             for (Iterator i = actionElement.elementIterator(); i.hasNext();) {
                 Element embeddedActionElement = (Element) i.next();
-                interpretAction(pipelineContext, embeddedActionElement, instance);
+                interpretAction(pipelineContext, embeddedActionElement, instance, controlsDocument, divsDocument);
             }
 
         } else {

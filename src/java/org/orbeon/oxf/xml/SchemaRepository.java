@@ -17,16 +17,15 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.portlet.processor.PortletContainerProcessor;
 import org.orbeon.oxf.portlet.processor.PortletIncludeGenerator;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.scope.ScopeProcessorBase;
-import org.orbeon.oxf.processor.test.TestScriptProcessor;
-import org.orbeon.oxf.processor.scratchpad.PDFTemplateProcessor;
 import org.orbeon.oxf.processor.converter.JFreeChartConverter;
+import org.orbeon.oxf.processor.converter.ToXLSConverter;
 import org.orbeon.oxf.processor.converter.XMLConverter;
 import org.orbeon.oxf.processor.converter.XSLFOConverter;
-import org.orbeon.oxf.processor.converter.ToXLSConverter;
 import org.orbeon.oxf.processor.generator.*;
 import org.orbeon.oxf.processor.pipeline.AggregatorProcessor;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
+import org.orbeon.oxf.processor.scope.ScopeProcessorBase;
+import org.orbeon.oxf.processor.scratchpad.PDFTemplateProcessor;
 import org.orbeon.oxf.processor.serializer.CachedSerializer;
 import org.orbeon.oxf.processor.serializer.FileSerializer;
 import org.orbeon.oxf.processor.serializer.HttpSerializer;
@@ -34,6 +33,7 @@ import org.orbeon.oxf.processor.serializer.legacy.JFreeChartSerializer;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.tamino.TaminoProcessor;
 import org.orbeon.oxf.processor.tamino.TaminoQueryProcessor;
+import org.orbeon.oxf.processor.test.TestScriptProcessor;
 import org.orbeon.oxf.processor.transformer.TraxTransformer;
 import org.orbeon.oxf.processor.transformer.xslt.XSLT1Transformer;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
@@ -123,7 +123,7 @@ public class SchemaRepository {
         schemas.put(XFormsConstants.XFORMS_NAMESPACE_URI + "/controls", "schemas/xforms-controls.rng");
         schemas.put(XFormsConstants.XFORMS_NAMESPACE_URI + "/model", "schemas/xforms-1_0.xsd");
         
-        schemas.put(XFormsConstants.XHTML_NAMESPACE_URI, "schemas/xhtml1-transitional_and_xforms1.xsd");
+        schemas.put(XMLConstants.XHTML_NAMESPACE_URI, "schemas/xhtml1-transitional_and_xforms1.xsd");
         
         schemas.put("http://relaxng.org/ns/structure/1.0", "schemas/relaxng.rng");
         schemas.put("http://www.w3.org/2001/xml-events", "schemas/XML-Events-Schema.xsd");

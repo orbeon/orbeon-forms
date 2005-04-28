@@ -49,7 +49,7 @@ public class XFormsEvent extends ProcessorImpl {
     final static private String INPUT_INSTANCE = "instance";
     final static private String INPUT_MODEL = "model";
     final static private String INPUT_CONTROLS = "controls";
-    final static private String INPUT_ACTION = "action";
+    final static private String INPUT_EVENT = "event";
 
     final static private String OUTPUT_RESPONSE = "response";
 
@@ -57,6 +57,7 @@ public class XFormsEvent extends ProcessorImpl {
 
     static {
         XFORMS_NAMESPACES.put(XFormsConstants.XFORMS_SHORT_PREFIX, XFormsConstants.XFORMS_NAMESPACE_URI);
+        XFORMS_NAMESPACES.put(XFormsConstants.XML_EVENTS_PREFIX, XFormsConstants.XML_EVENTS_NAMESPACE_URI);
         XFORMS_NAMESPACES.put(XFormsConstants.XXFORMS_SHORT_PREFIX, XFormsConstants.XXFORMS_NAMESPACE_URI);
     }
 
@@ -64,7 +65,7 @@ public class XFormsEvent extends ProcessorImpl {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_INSTANCE));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_MODEL));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONTROLS));
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_ACTION));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_EVENT));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_RESPONSE));
     }
 
@@ -72,27 +73,37 @@ public class XFormsEvent extends ProcessorImpl {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
 
-                // Extract information from XForms model
-//                Model model = (Model) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
-//                    public Object read(PipelineContext context, ProcessorInput input) {
-//                        return new Model(pipelineContext, readInputAsDOM4J(context, input));
-//                    }
-//                });
-
-                // Get XForms instance
-//                Instance instance = (Instance) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_INSTANCE), new CacheableInputReader(){
-//                    public Object read(PipelineContext context, ProcessorInput input) {
-//                        return new Instance(pipelineContext, readInputAsDOM4J(context, input));
-//                    }
-//                });
+                // Get XForms model and instance, etc.
 
                 Model model = new Model(pipelineContext, readInputAsDOM4J(pipelineContext, INPUT_MODEL));
                 Instance instance = new Instance(pipelineContext, readInputAsDOM4J(pipelineContext, INPUT_INSTANCE));
                 Document controlsDocument = readInputAsDOM4J(pipelineContext, INPUT_CONTROLS);
+                Document eventDocument = readInputAsDOM4J(pipelineContext, INPUT_EVENT);
 
-                // Get action document
-                Document actionDocument = readInputAsDOM4J(pipelineContext, getInputByName(INPUT_ACTION));
-                Element actionElement = actionDocument.getRootElement();
+                Element actionElement;
+                {
+                    String controlId = eventDocument.getRootElement().attributeValue("source-control-id");
+                    String eventName = eventDocument.getRootElement().attributeValue("name");
+
+                    Map variables = new HashMap();
+                    variables.put("control-id", controlId);
+                    variables.put("control-name", eventName);
+
+                    PooledXPathExpression xpathExpression =
+                        XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument),
+                                "/xxf:controls//*[@xxf:id = $control-id]/xf:*[@ev:event = $control-name]", XFORMS_NAMESPACES, variables);
+                    try {
+                        actionElement = (Element) xpathExpression.evaluateSingle();
+
+                        if (actionElement == null)
+                            throw new OXFException("Cannot find control with id '" + controlId + "' and event '" + eventName + "'.");
+                    } catch (XPathException e) {
+                        throw new OXFException(e);
+                    } finally {
+                        if (xpathExpression != null)
+                            xpathExpression.returnToPool();
+                    }
+                }
 
                 // Interpret actions
                 interpretAction(pipelineContext, actionElement, instance);
@@ -105,22 +116,24 @@ public class XFormsEvent extends ProcessorImpl {
                 // Output new controls values
                 ch.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
-                PooledXPathExpression xpathExpression =
-                    XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument), "/xxf:controls//(xf:input|xf:secret|xf:textarea|xf:output|xf:upload|xf:range|xf:trigger|xf:submit|xf:select|xf:select1)[@ref]", XFORMS_NAMESPACES);
-                try {
-                    for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
-                        Element controlElement = (Element) i.next();
+                {
+                    PooledXPathExpression xpathExpression =
+                        XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument), "/xxf:controls//(xf:input|xf:secret|xf:textarea|xf:output|xf:upload|xf:range|xf:trigger|xf:submit|xf:select|xf:select1)[@ref]", XFORMS_NAMESPACES);
+                    try {
+                        for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
+                            Element controlElement = (Element) i.next();
 
-                        String controlId = controlElement.attributeValue(new QName("id", XFormsConstants.XXFORMS_NAMESPACE));
-                        String controlValue = getControlValue(pipelineContext, controlElement, instance);
+                            String controlId = controlElement.attributeValue(new QName("id", XFormsConstants.XXFORMS_NAMESPACE));
+                            String controlValue = getControlValue(pipelineContext, controlElement, instance);
 
-                        ch.element(XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] {"id", controlId, "value", controlValue });
+                            ch.element(XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] {"id", controlId, "value", controlValue });
+                        }
+                    } catch (XPathException e) {
+                        throw new OXFException(e);
+                    } finally {
+                        if (xpathExpression != null)
+                            xpathExpression.returnToPool();
                     }
-                } catch (XPathException e) {
-                    throw new OXFException(e);
-                } finally {
-                    if (xpathExpression != null)
-                        xpathExpression.returnToPool();
                 }
 
                 ch.endElement();

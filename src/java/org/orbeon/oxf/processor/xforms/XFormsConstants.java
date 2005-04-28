@@ -19,15 +19,18 @@ import org.dom4j.QName;
 public class XFormsConstants {
 
     public static final String XFORMS_PREFIX = "xforms";
-    public static final String XXFORMS_PREFIX = "xxforms";
     public static final String XFORMS_SHORT_PREFIX = "xf";
-    public static final String XXFORMS_SHORT_PREFIX = "xxf";
     public static final String XFORMS_NAMESPACE_URI = "http://www.w3.org/2002/xforms";
-    public static final String XHTML_NAMESPACE_URI = "http://www.w3.org/1999/xhtml";
-    public static final String XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
-    public static final String XS_NAMESPACE_URI = "http://www.w3.org/2001/XMLSchema";
     public static final Namespace XFORMS_NAMESPACE = new Namespace(XFORMS_PREFIX, XFORMS_NAMESPACE_URI);
+
+    public static final String XXFORMS_PREFIX = "xxforms";
+    public static final String XXFORMS_SHORT_PREFIX = "xxf";
+    public static final String XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
     public static final Namespace XXFORMS_NAMESPACE = new Namespace(XXFORMS_PREFIX, XXFORMS_NAMESPACE_URI);
+
+    public static final String XML_EVENTS_PREFIX = "ev";
+    public static final String XML_EVENTS_NAMESPACE_URI = "http://www.w3.org/2001/xml-events";
+
     public static final String XXFORMS_VALID_ATTRIBUTE_NAME = "valid";
     public static final QName XXFORMS_VALID_ATTRIBUTE_QNAME = new QName(XXFORMS_VALID_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
     public static final String XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME = "invalid-bind-ids";

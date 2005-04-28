@@ -57,10 +57,13 @@ public class XMLConstants {
     public final static QName XS_BASE64BINARY_QNAME = new QName("base64Binary", XSD_NAMESPACE);
     
     public static final String XSI_NIL_ATTRIBUTE = "nil";
-    public static final String XSLT_NAMESPACE = "http://www.w3.org/1999/XSL/Transform";
+
     public static final String XSLT_PREFIX = "xsl";
+    public static final String XSLT_NAMESPACE = "http://www.w3.org/1999/XSL/Transform";
+
+    public static final String XHTML_NAMESPACE_URI = "http://www.w3.org/1999/xhtml";
 
     private XMLConstants() {
-        // Disallow contruction 
+        // Disallow contruction
     }
 }

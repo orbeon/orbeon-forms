@@ -74,12 +74,12 @@ public class XFormsEvent extends ProcessorImpl {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
 
                 // Get XForms model and instance, etc.
-
                 Model model = new Model(pipelineContext, readInputAsDOM4J(pipelineContext, INPUT_MODEL));
                 Instance instance = new Instance(pipelineContext, readInputAsDOM4J(pipelineContext, INPUT_INSTANCE));
                 Document controlsDocument = readInputAsDOM4J(pipelineContext, INPUT_CONTROLS);
                 Document eventDocument = readInputAsDOM4J(pipelineContext, INPUT_EVENT);
 
+                // Extract action element
                 Element actionElement;
                 {
                     String controlId = eventDocument.getRootElement().attributeValue("source-control-id");
@@ -105,7 +105,7 @@ public class XFormsEvent extends ProcessorImpl {
                     }
                 }
 
-                // Interpret actions
+                // Interpret action
                 interpretAction(pipelineContext, actionElement, instance);
 
                 // Create resulting document

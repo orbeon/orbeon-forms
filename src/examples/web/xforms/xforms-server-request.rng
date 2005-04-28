@@ -1,0 +1,59 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<grammar datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+         xmlns="http://relaxng.org/ns/structure/1.0"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+
+    <include href="xforms-server-common.rng"/>
+
+    <start>
+        <element name="xxforms:event-fired">
+            <element name="xxforms:event">
+                <attribute name="name">
+                    <ref name="xformsActionName"/>
+                </attribute>
+                <attribute name="source-control-id">
+                    <data type="positiveInteger"/>
+                </attribute>
+            </element>
+            <element name="xxforms:models">
+                <oneOrMore>
+                    <element name="xforms:model">
+                        <optional>
+                            <attribute name="functions"/>
+                        </optional>
+                        <optional>
+                            <attribute name="schema"/>
+                        </optional>
+                        <optional>
+                            <attribute name="id"/>
+                        </optional>
+                        <ref name="anyElement"/>
+                    </element>
+                </oneOrMore>
+            </element>
+            <element name="xxforms:controls">
+                <optional>
+                    <attribute name="xml:base"/>
+                </optional>
+                <zeroOrMore>
+                    <ref name="anyElement"/>
+                </zeroOrMore>
+            </element>
+            <ref name="xformsInstances"/>
+        </element>
+    </start>
+
+</grammar>

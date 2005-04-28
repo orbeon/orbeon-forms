@@ -24,7 +24,9 @@
     xmlns:xu="http://www.xmldb.org/xupdate"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xi="http://www.w3.org/2003/XInclude"
-    xmlns:xforms="http://www.w3.org/2002/xforms">
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xf="http://www.w3.org/2002/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events">
 
     <test description="Annotate" name="oxf:xforms-annotate" >
         <input name="instance">

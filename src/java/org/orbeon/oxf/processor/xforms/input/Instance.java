@@ -56,7 +56,6 @@ public class Instance {
         instance = new NonLazyUserDataDocument();
         instance.add(template.getRootElement().createCopy());
         instanceNodeInfo = new DocumentWrapper(instance, null).wrap(instance);
-
     }
 
     public Document getDocument() {

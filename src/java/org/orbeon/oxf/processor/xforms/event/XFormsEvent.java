@@ -34,6 +34,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -109,44 +110,51 @@ public class XFormsEvent extends ProcessorImpl {
                 interpretAction(pipelineContext, actionElement, instance);
 
                 // Create resulting document
-                ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
-                ch.startDocument();
-                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
+                try {
+                    ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
+                    ch.startDocument();
+                    contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
 
-                // Output new controls values
-                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
+                    // Output new controls values
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
-                {
-                    PooledXPathExpression xpathExpression =
-                        XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument), "/xxf:controls//(xf:input|xf:secret|xf:textarea|xf:output|xf:upload|xf:range|xf:trigger|xf:submit|xf:select|xf:select1)[@ref]", XFORMS_NAMESPACES);
-                    try {
-                        for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
-                            Element controlElement = (Element) i.next();
+                    {
+                        PooledXPathExpression xpathExpression =
+                            XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument), "/xxf:controls//(xf:input|xf:secret|xf:textarea|xf:output|xf:upload|xf:range|xf:trigger|xf:submit|xf:select|xf:select1)[@ref]", XFORMS_NAMESPACES);
+                        try {
+                            for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
+                                Element controlElement = (Element) i.next();
 
-                            String controlId = controlElement.attributeValue(new QName("id", XFormsConstants.XXFORMS_NAMESPACE));
-                            String controlValue = getControlValue(pipelineContext, controlElement, instance);
+                                String controlId = controlElement.attributeValue(new QName("id", XFormsConstants.XXFORMS_NAMESPACE));
+                                String controlValue = getControlValue(pipelineContext, controlElement, instance);
 
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] {"id", controlId, "value", controlValue });
+                                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] {"id", controlId, "value", controlValue });
+                            }
+                        } catch (XPathException e) {
+                            throw new OXFException(e);
+                        } finally {
+                            if (xpathExpression != null)
+                                xpathExpression.returnToPool();
                         }
-                    } catch (XPathException e) {
-                        throw new OXFException(e);
-                    } finally {
-                        if (xpathExpression != null)
-                            xpathExpression.returnToPool();
                     }
+
+                    ch.endElement();
+
+                    // Output updated instances
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "instances");
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "instance");
+                    instance.read(new EmbeddedDocumentContentHandler(contentHandler));
+                    ch.endElement();
+                    ch.endElement();
+
+                    ch.endElement();
+
+                    contentHandler.endPrefixMapping("xxf");
+                    ch.endDocument();
+                } catch (SAXException e) {
+                    throw new OXFException(e);
                 }
-
-                ch.endElement();
-
-                // Output updated instances
-                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "instances");
-                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "instance");
-                instance.read(new EmbeddedDocumentContentHandler(contentHandler));
-                ch.endElement();
-                ch.endElement();
-
-                ch.endElement();
-                ch.endDocument();
             }
         };
         addOutput(name, output);

@@ -111,10 +111,10 @@ public class XFormsEvent extends ProcessorImpl {
                 // Create resulting document
                 ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
                 ch.startDocument();
-                ch.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
+                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
 
                 // Output new controls values
-                ch.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
+                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
                 {
                     PooledXPathExpression xpathExpression =
@@ -126,7 +126,7 @@ public class XFormsEvent extends ProcessorImpl {
                             String controlId = controlElement.attributeValue(new QName("id", XFormsConstants.XXFORMS_NAMESPACE));
                             String controlValue = getControlValue(pipelineContext, controlElement, instance);
 
-                            ch.element(XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] {"id", controlId, "value", controlValue });
+                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] {"id", controlId, "value", controlValue });
                         }
                     } catch (XPathException e) {
                         throw new OXFException(e);
@@ -139,8 +139,8 @@ public class XFormsEvent extends ProcessorImpl {
                 ch.endElement();
 
                 // Output updated instances
-                ch.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "instances");
-                ch.startElement(XFormsConstants.XXFORMS_NAMESPACE_URI, "instance");
+                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "instances");
+                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "instance");
                 instance.read(new EmbeddedDocumentContentHandler(contentHandler));
                 ch.endElement();
                 ch.endElement();

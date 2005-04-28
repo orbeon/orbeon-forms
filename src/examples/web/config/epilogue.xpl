@@ -130,7 +130,7 @@
                     </p:processor>
                     <p:choose href="#request">
                         <!-- Remove the 'false() and ' below to allow browsers supporting XHTML to receive XHTML -->
-                        <p:when test="true() or contains(/request/headers/header[name = 'accept'], 'application/xhtml+xml')">
+                        <p:when test="false() and contains(/request/headers/header[name = 'accept'], 'application/xhtml+xml')">
                             <!-- Browser says it supports XHTML -->
                             <p:processor name="oxf:xml-converter">
                                 <p:input name="config">

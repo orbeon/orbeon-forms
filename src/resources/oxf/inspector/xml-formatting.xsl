@@ -11,8 +11,9 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:string="http://orbeon.com/oxf/xslt/string">
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns="http://www.w3.org/1999/xhtml">
 
     <xsl:variable name="text-color" select="'black'"/>
     <xsl:variable name="element-color" select="'blue'"/>

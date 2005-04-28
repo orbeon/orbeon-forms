@@ -33,10 +33,10 @@
         <xhtml:input type="text" id="{$id}" name="{$input/@xxforms:name}" value="{$input/@xxforms:value}">
             <xsl:copy-of select="$input/@* except ($input/@xxforms:* | $input/@*[namespace-uri() = ''])"/>
         </xhtml:input> 
-        <input type="image" class="calendar-button" src="/images/showCalendar.gif" value="Date"
+        <xhtml:input type="image" class="calendar-button" src="/images/showCalendar.gif" value="Date"
             onclick="showCalendar('', '{$id}'); return false;"/>
         <xsl:if test="not(preceding::xforms:input[@xxforms:type = 'xs:date'])">
-            <div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"/>
+            <xhtml:div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"/>
         </xsl:if>
     </xsl:template>
 

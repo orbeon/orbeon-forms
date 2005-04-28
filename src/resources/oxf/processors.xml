@@ -316,6 +316,10 @@
         <class name="org.orbeon.oxf.processor.converter.ToXLSConverter"/>
     </processor>
 
+    <processor name="oxf:xhtml-to-html">
+        <class name="org.orbeon.oxf.processor.converter.XHTMLToHTMLProcessor"/>
+    </processor>
+
     <!-- True serializers -->
     <processor name="oxf:http-serializer" uri="oxf/processor/http-serializer">
         <class name="org.orbeon.oxf.processor.serializer.HttpSerializer"/>
@@ -405,6 +409,7 @@
     <processor name="oxf:delegation" uri="oxf/processor/delegation">
         <class name="org.orbeon.oxf.processor.DelegationProcessor"/>
     </processor>
+
     <processor name="oxf:java" uri="oxf/processor/java">
         <class name="org.orbeon.oxf.processor.JavaProcessor"/>
     </processor>

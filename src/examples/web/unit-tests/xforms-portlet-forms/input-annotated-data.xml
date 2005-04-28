@@ -722,7 +722,7 @@
 
                                     <input type="hidden" name="$submitted" value="true"/>
 
-                                    <p xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" class="gen">Please enter your first name:
+                                    <p xmlns:xmlutils="java:org.orbeon.oxf.xml.XMLUtils" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">Please enter your first name:
 
                                         <input type="text" name="first-name" value=""/>
 

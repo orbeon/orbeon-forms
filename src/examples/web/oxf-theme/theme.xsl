@@ -1,14 +1,14 @@
 <!--
     Copyright (C) 2004 Orbeon, Inc.
-  
+
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
     2.1 of the License, or (at your option) any later version.
-  
+
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU Lesser General Public License for more details.
-  
+
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xsl:stylesheet version="2.0"
@@ -25,16 +25,14 @@
     <xsl:variable name="request" select="doc('input:request')" as="document-node()"/>
 
     <xsl:template match="/">
-        <html>
-            <head>
+        <xhtml:html>
+            <xhtml:head>
                 <!-- Handle meta elements -->
                 <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:meta">
-                    <meta>
-                        <xsl:copy-of select="@*"/>
-                    </meta>
+                    <xsl:copy-of select="."/>
                 </xsl:for-each>
                 <!-- Handle title -->
-                <title>
+                <xhtml:title>
                     <xsl:choose>
                         <xsl:when test="/xhtml:html/xhtml:head/xhtml:title != ''">
                             <xsl:value-of select="/xhtml:html/xhtml:head/xhtml:title"/>
@@ -47,69 +45,44 @@
                             <xsl:value-of select="(/xhtml:html/xhtml:body/xhtml:h1)[1]"/>
                         </xsl:otherwise>
                     </xsl:choose>
-                </title>
-                <link rel="stylesheet" href="/oxf-theme/orbeon-layout.cssd" type="text/css"/>
+                </xhtml:title>
+                <xhtml:link rel="stylesheet" href="/oxf-theme/orbeon-layout.cssd" type="text/css"/>
                 <!-- Copy user-defined stylesheets -->
                 <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:style">
-                    <style type="text/css">
-                        <xsl:copy-of select="@*"/>
-                        <xsl:value-of select="."/>
-                    </style>
+                    <xsl:copy-of select="."/>
                 </xsl:for-each>
                 <!-- Copy user-defined scripts -->
                 <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
-                    <script>
-                        <xsl:copy-of select="@*"/>
-                        <xsl:value-of select="."/>
-                    </script>
+                    <xsl:copy-of select="."/>
                 </xsl:for-each>
-                <script type="text/javascript" src="/oxf-theme/javascript/calendar.js"/>
-                <script type="text/javascript" src="/oxf-theme/javascript/overlib_mini.js"/>
-                <script type="text/javascript" src="/oxf-theme/javascript/time-utils.js"/>
-                <script type="text/javascript" src="/oxf-theme/javascript/sarissa.js"/>
-                <script type="text/javascript" src="/oxf-theme/javascript/xforms.js"/>
-                <script type="text/javascript" src="/oxf-theme/style/theme.js"/>
-            </head>
+                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/calendar.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/overlib_mini.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/time-utils.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/sarissa.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/xforms.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/style/theme.js"/>
+            </xhtml:head>
             <!-- This gives a little nudge to IE, so IE displays all the borders -->
-            <body>
+            <xhtml:body>
                 <!-- Copy attributes -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/@*"/>
                 <!-- Handle optional tabs -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:head/f:tabs"/>
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
-            </body>
-        </html>
-    </xsl:template>
-
-    <xsl:template match="xhtml:p">
-        <p class="gen">
-            <xsl:copy-of select="@*[name() != 'class']"/>
-            <xsl:apply-templates/>
-        </p>
-    </xsl:template>
-
-    <xsl:template match="xhtml:ul">
-        <ul class="gen">
-            <xsl:apply-templates/>
-        </ul>
-    </xsl:template>
-
-    <xsl:template match="xhtml:ol">
-        <ol class="gen">
-            <xsl:apply-templates/>
-        </ol>
+            </xhtml:body>
+        </xhtml:html>
     </xsl:template>
 
     <xsl:template match="xhtml:textarea">
-        <textarea wrap="soft">
+        <xhtml:textarea wrap="soft">
             <xsl:apply-templates select="@*|node()"/>
-        </textarea>
+        </xhtml:textarea>
     </xsl:template>
 
     <xsl:template match="xhtml:input[@type = 'text']">
-        <input>
+        <xhtml:input>
             <xsl:apply-templates select="@*|node()"/>
-        </input>
+        </xhtml:input>
     </xsl:template>
 
     <xsl:template name="ignore-first-empty-lines">
@@ -168,13 +141,7 @@
         </xsl:if>
     </xsl:template>
 
-    <!-- Just copy other "xhtml" elements removing the namespace -->
-    <xsl:template match="xhtml:*">
-        <xsl:element name="{local-name()}">
-            <xsl:apply-templates select="@*|node()"/>
-        </xsl:element>
-    </xsl:template>
-
+    <!-- Copy attributes in XHTML namespace to no namespace -->
     <xsl:template match="@xhtml:*">
         <xsl:attribute name="{local-name()}">
             <xsl:value-of select="."/>
@@ -186,11 +153,12 @@
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
     </xsl:template>
-    
+
+    <!-- Should this be here? -->
     <xsl:template match='xhtml:td[ @xxforms:error-cell="true" ]' >
-        <td>
-          <img src="/images/error.gif" style="margin: 5px"/>
-        </td>
+        <xhtml:td>
+            <xhtml:img src="/images/error.gif" style="margin: 5px"/>
+        </xhtml:td>
     </xsl:template>
-    
+
 </xsl:stylesheet>

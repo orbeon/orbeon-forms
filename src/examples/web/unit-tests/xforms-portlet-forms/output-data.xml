@@ -227,7 +227,7 @@
                                     <input type="hidden" name="$portlet$p1.oxf.path" value="/tutorial-hello3"/>
                                     <input type="hidden" id="p1_action_1" name="$portlet$p1." value=""/>
                                     <input type="hidden" name="$portlet$p1.$submitted" value="true"/>
-                                    <p class="gen">Please enter your first name:
+                                    <p>Please enter your first name:
                                         <input type="text" name="$portlet$p1.first-name" value=""/>
                                         <input type="submit" name="$portlet$a1.$action^" value="Greet Me!"/>
                                     </p>

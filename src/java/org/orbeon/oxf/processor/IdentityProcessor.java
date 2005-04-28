@@ -17,6 +17,9 @@ import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.xml.sax.ContentHandler;
 
+/**
+ * The Identity processor produces on its data output the document received on the data input.
+ */
 public class IdentityProcessor extends ProcessorImpl {
 
     public IdentityProcessor() {

@@ -64,10 +64,10 @@
                         <xsl:value-of select="saxon:serialize($instances, 'xml')"/>
                     </xhtml:div>
                 </xhtml:div>
-                <div xhtml:title="xforms-loading" style="visibility: hidden">
+                <xhtml:div xhtml:title="xforms-loading" style="visibility: hidden">
                     <img src="/images/loading.gif" style="float: left"/>
                     Loading...
-                </div>
+                </xhtml:div>
                 <xsl:apply-templates/>
             </xhtml:form>
         </xsl:copy>

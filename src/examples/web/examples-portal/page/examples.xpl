@@ -100,16 +100,16 @@
                                     <xhtml:td id="leftcontent" valign="top" width="1%">
                                         <h1>PresentationServer Examples</h1>
                                         <xf:group ref="/form">
-                                            <ul class="tree-sections">
+                                            <xhtml:ul class="tree-sections">
                                                 <xsl:for-each select="$examples-list/*/section">
-                                                    <li class="tree-section">
+                                                    <xhtml:li class="tree-section">
                                                         <xsl:value-of select="@label"/>
-                                                    </li>
-                                                    <ul class="tree-items">
+                                                    </xhtml:li>
+                                                    <xhtml:ul class="tree-items">
                                                         <xsl:for-each select="example">
                                                             <xsl:variable name="selected" as="xs:boolean" select="@id = $example-id"/>
     <!--                                                        <xsl:variable name="selected" as="xs:boolean" select="false()"/>-->
-                                                            <li class="{if ($selected) then 'tree-items-selected' else 'tree-items'}" style="white-space: nowrap">
+                                                            <xhtml:li class="{if ($selected) then 'tree-items-selected' else 'tree-items'}" style="white-space: nowrap">
                                                                 <xsl:choose>
                                                                     <xsl:when test="@href">
                                                                         <xhtml:a href="{@href}" xhtml:target="example"><xsl:value-of select="@label"/></xhtml:a>
@@ -128,11 +128,11 @@
                                                                         <xhtml:a href="/goto-example/{@id}"><xsl:value-of select="@label"/></xhtml:a>
                                                                     </xsl:otherwise>
                                                                 </xsl:choose>
-                                                            </li>
+                                                            </xhtml:li>
                                                         </xsl:for-each>
-                                                    </ul>
+                                                    </xhtml:ul>
                                                 </xsl:for-each>
-                                            </ul>
+                                            </xhtml:ul>
                                         </xf:group>
                                     </xhtml:td>
                                     <xhtml:td class="maincontent" valign="top" width="99%">

@@ -117,6 +117,11 @@
                 <p:output name="data" id="fixed-html"/>
             </p:processor>
 
+            <p:processor name="oxf:xhtml-to-html">
+                <p:input name="data" href="#fixed-html"/>
+                <p:output name="data" id="html-data"/>
+            </p:processor>
+
             <p:processor name="oxf:html-serializer">
                 <p:input name="config">
                     <config>
@@ -129,7 +134,7 @@
                         </header>
                     </config>
                 </p:input>
-                <p:input name="data" href="#fixed-html"/>
+                <p:input name="data" href="#html-data"/>
             </p:processor>
         </p:otherwise>
     </p:choose>

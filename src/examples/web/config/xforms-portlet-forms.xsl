@@ -60,7 +60,7 @@
 
                 <xsl:variable name="params" select="tokenize(substring-after(@action, '?'), '&amp;')" as="xs:string*"/>
                 <xsl:for-each select="$params">
-                    <input type="hidden" name="{substring-before(., '=')}" value="{substring-after(., '=')}"/>
+                    <xhtml:input type="hidden" name="{substring-before(., '=')}" value="{substring-after(., '=')}"/>
                 </xsl:for-each>
             </xsl:if>
 

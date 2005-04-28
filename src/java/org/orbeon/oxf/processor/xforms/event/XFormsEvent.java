@@ -222,14 +222,14 @@ public class XFormsEvent extends ProcessorImpl {
 
                 PooledXPathExpression xpathExpression =
                     XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument),
-                            "/xxf:controls//xf:case[id = $case-id]/ancestor::xf:switch//xf:case[not(id = $case-id)]", XFORMS_NAMESPACES, variables);
+                            "/xxf:controls//xf:case[@id = $case-id]/ancestor::xf:switch[1]//xf:case[not(@id = $case-id)]", XFORMS_NAMESPACES, variables);
                 try {
 
                     for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
                         Element caseElement = (Element) i.next();
 
                         Element divElement = Dom4jUtils.createElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                        divElement.addAttribute("id", caseElement.attributeValue("id"));
+                        divElement.addAttribute("id", caseElement.attributeValue(new QName("id")));
                         divElement.addAttribute("visibility", "hidden");
                         divsDocument.getRootElement().add(divElement);
                     }

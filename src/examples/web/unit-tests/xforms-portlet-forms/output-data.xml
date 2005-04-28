@@ -221,10 +221,10 @@
                         <div f:url-norewrite="true">
                             <div>
                                 <form id="p1_form_1" action="/oxf/" method="post" portlet:is-portlet-form="true" portlet:form-portlet-id="1">
-                                    <input type="hidden" name="$portlet$x1.target" value="a"/>
-                                    <input type="hidden" name="$portlet$x1.mode" value="view"/>
-                                    <input type="hidden" name="$portlet$x1.state" value="normal"/>
-                                    <input type="hidden" name="$portlet$p1.oxf.path" value="/tutorial-hello3"/>
+                                    <xhtml:input type="hidden" name="$portlet$x1.target" value="a"/>
+                                    <xhtml:input type="hidden" name="$portlet$x1.mode" value="view"/>
+                                    <xhtml:input type="hidden" name="$portlet$x1.state" value="normal"/>
+                                    <xhtml:input type="hidden" name="$portlet$p1.oxf.path" value="/tutorial-hello3"/>
                                     <input type="hidden" id="p1_action_1" name="$portlet$p1." value=""/>
                                     <input type="hidden" name="$portlet$p1.$submitted" value="true"/>
                                     <p>Please enter your first name:

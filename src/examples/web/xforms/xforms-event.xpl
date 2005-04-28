@@ -18,8 +18,8 @@
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xforms="http://www.w3.org/2002/xforms">
 
-    <p:param name="request" type="input" debug="xxxrequest" schema-href="xforms-server-request.rng"/>
-    <p:param name="response" type="output" debug="xxxresponse" schema-href="xforms-server-response.rng"/>
+    <p:param name="request" type="input" schema-href="xforms-server-request.rng"/>
+    <p:param name="response" type="output" schema-href="xforms-server-response.rng"/>
 
     <!-- Execute event action -->
     <p:processor name="oxf:xforms-event">

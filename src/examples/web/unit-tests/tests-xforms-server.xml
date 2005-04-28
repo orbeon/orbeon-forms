@@ -12,7 +12,7 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<group description="XForms" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+<group description="XForms Server" xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
@@ -28,7 +28,7 @@
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events">
 
-    <test description="XForms Event Processor" name="oxf:pipeline" only="true">
+    <test description="XForms Event Processor" name="oxf:pipeline">
         <input name="config" href="/xforms/xforms-event.xpl"/>
         <input name="request">
             <event-fired xmlns="http://orbeon.org/oxf/xml/xforms">
@@ -54,14 +54,14 @@
             </event-fired>
         </input>
         <output name="response">
-            <event-response xmlns="http://orbeon.org/oxf/xml/xforms">
-                <control-values>
-                    <control id="1" value="7"/>
-                    <control id="2" value="0"/>
-                </control-values>
-                <instances>
-                    <instance>
-                        <equation xmlns="">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:control-values>
+                    <xxf:control id="1" value="7"/>
+                    <xxf:control id="2" value="0"/>
+                </xxf:control-values>
+                <xxf:instances>
+                    <xxf:instance>
+                        <equation>
                             <screen>7</screen>
                             <screenbuffer>7</screenbuffer>
                             <first>0</first>
@@ -69,9 +69,10 @@
                             <memory>0</memory>
                             <result/>
                         </equation>
-                    </instance>
-                </instances>
-            </event-response>
+                    </xxf:instance>
+                </xxf:instances>
+                <xxf:divs/>
+            </xxf:event-response>
         </output>
     </test>
 

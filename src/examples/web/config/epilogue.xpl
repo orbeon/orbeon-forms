@@ -130,16 +130,19 @@
                     </p:processor>
                     <p:choose href="#request">
                         <!-- Remove the 'false() and ' below to allow browsers supporting XHTML to receive XHTML -->
-                        <p:when test="false() and contains(/request/headers/header[name = 'accept'], 'application/xhtml+xml')">
+                        <p:when test="true() or contains(/request/headers/header[name = 'accept'], 'application/xhtml+xml')">
                             <!-- Browser says it supports XHTML -->
                             <p:processor name="oxf:xml-converter">
                                 <p:input name="config">
                                     <config>
                                         <method>xhtml</method>
                                         <public-doctype>-//W3C//DTD XHTML 1.0 Transitional//EN</public-doctype>
+<!--                                        <public-doctype>-//W3C//DTD xhtml 1.1//EN</public-doctype>-->
                                         <system-doctype>http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</system-doctype>
+<!--                                        <system-doctype>http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd</system-doctype>-->
                                         <encoding>utf-8</encoding>
                                         <content-type>application/xhtml+xml</content-type>
+<!--                                        <content-type>text/html</content-type>-->
                                     </config>
                                 </p:input>
                                 <p:input name="data" href="#rewritten-data"/>

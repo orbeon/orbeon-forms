@@ -75,13 +75,24 @@
             </p:choose>
         </p:when>
         <p:otherwise>
-            <p:processor name="oxf:identity">
-                <p:input name="data" href="#data"/>
-                <p:output name="data" id="xformed-data"/>
-            </p:processor>
+            <p:choose href="#data">
+                <p:when test="//xforms:model">
+                    <p:processor name="oxf:xslt">
+                        <p:input name="config" href="xforms-to-ajax-xhtml.xsl"/>
+                        <p:input name="data" href="#data"/>
+                        <p:output name="data" id="xformed-data" debug="ajax"/>
+                    </p:processor>
+                </p:when>
+                <p:otherwise>
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="#data"/>
+                        <p:output name="data" id="xformed-data"/>
+                    </p:processor>
+                </p:otherwise>
+            </p:choose>
         </p:otherwise>
     </p:choose>
-
+    
     <p:choose  href="#request">
         <p:when test="/request/container-type = 'servlet'">
             <!-- Servlet -->
@@ -200,46 +211,13 @@
         </p:when>
         <p:otherwise>
             <!-- Portlet -->
-            <p:choose href="#xformed-data">
-                <p:when test="/xhtml:html">
-                    <p:processor name="oxf:identity">
-                        <p:input name="data" href="#xformed-data"/>
-                        <p:output name="data" id="portlet-document"/>
-                    </p:processor>
-                </p:when>
-                <p:otherwise>
-                    <!-- Another XML document: transform it into an XHTML document that formats the XML document -->
-                    <p:processor name="oxf:xslt">
-                        <p:input name="data" href="#xformed-data"/>
-                        <p:input name="config">
-                            <xsl:stylesheet version="1.0"
-                                    xmlns:f="http://orbeon.org/oxf/xml/formatting">
-                                <xsl:import href="oxf:/oxf-theme/theme.xsl"/>
-                                <xsl:template match="/">
-                                    <xhtml:html>
-                                        <xhtml:head>
-                                            <xhtml:title>XML Document</xhtml:title>
-                                        </xhtml:head>
-                                        <xhtml:body>
-                                            <f:xml-source>
-                                                <xsl:copy-of select="/*"/>
-                                            </f:xml-source>
-                                        </xhtml:body>
-                                    </xhtml:html>
-                                </xsl:template>
-                            </xsl:stylesheet>
-                        </p:input>
-                        <p:output name="data" id="portlet-document"/>
-                    </p:processor>
-                </p:otherwise>
-            </p:choose>
             <!-- Extract a fragment and apply theme -->
-            <p:processor name="oxf:unsafe-xslt">
-                <p:input name="data" href="#portlet-document"/>
+            <p:processor name="oxf:unsafe-xslt"> <!-- saxon4 -->
+                <p:input name="data" href="#xformed-data"/>
                 <p:input name="request" href="#request"/>
                 <p:input name="config">
                     <xsl:stylesheet version="1.0"
-                            xmlns:f="http://orbeon.org/oxf/xml/formatting"
+                            xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
                             xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
                         <xsl:import href="oxf:/oxf-theme/theme.xsl"/>
                         <xsl:template match="/">
@@ -257,13 +235,13 @@
                 <p:output name="data" id="themed-data"/>
             </p:processor>
             <!-- Rewrite all URLs in HTML and XHTML documents -->
-            <p:processor name="oxf:unsafe-xslt">
+            <p:processor name="oxf:unsafe-xslt"><!-- saxon5 -->
                 <p:input name="data" href="#themed-data"/>
                 <p:input name="container-type" href="#request"/>
                 <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>
                 <p:output name="data" id="rewritten-data"/>
             </p:processor>
-            <!-- Serialize to XML (in fact we have a choice but with the internal examples portal XML is more efficient than HTML) -->
+            <!-- Serialize to XML -->
             <p:processor name="oxf:xml-serializer">
                 <p:input name="config">
                     <config>

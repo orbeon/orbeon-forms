@@ -69,6 +69,7 @@
         <example id="xforms-report" path="xforms/xforms-report" label="Sortable Table"/>
         <example id="xforms-wizard" path="xforms/xforms-wizard" label="Multi-Screen Wizard"/>
         <example id="xforms-ubl" path="xforms/xforms-ubl" label="Complex UBL Order"/>
+        <example id="xforms-calculator" path="xforms/xforms-calculator" label="Calculator"/>
     </section>
     <section label="Presenting Data">
         <example id="reports" label="Data in multiple formats"/>

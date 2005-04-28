@@ -66,6 +66,8 @@
                 <script type="text/javascript" src="/oxf-theme/javascript/calendar.js"/>
                 <script type="text/javascript" src="/oxf-theme/javascript/overlib_mini.js"/>
                 <script type="text/javascript" src="/oxf-theme/javascript/time-utils.js"/>
+                <script type="text/javascript" src="/oxf-theme/javascript/sarissa.js"/>
+                <script type="text/javascript" src="/oxf-theme/javascript/xforms.js"/>
                 <script type="text/javascript" src="/oxf-theme/style/theme.js"/>
             </head>
             <!-- This gives a little nudge to IE, so IE displays all the borders -->

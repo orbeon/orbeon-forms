@@ -1,5 +1,5 @@
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
-var XFORMS_SERVER_URL = "http://localhost:8888/ops/direct/xforms-calculator/server";
+var XFORMS_SERVER_URL = "http://localhost:8888/oxf/xforms-server";
 
 /**
  * Initializes attributes of each form:

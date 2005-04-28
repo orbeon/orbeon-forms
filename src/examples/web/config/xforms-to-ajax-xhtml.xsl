@@ -84,6 +84,16 @@
         </xhtml:button>
     </xsl:template>
     
+    <xsl:template match="xforms:switch">
+        <xsl:for-each select="xforms:case">
+            <xhtml:div id="{@id}">
+                <xsl:attribute name="style" select="concat('display: ', 
+                    if (position() = 1) then 'block' else 'none')"/>
+                <xsl:apply-templates/>
+            </xhtml:div>
+        </xsl:for-each>
+    </xsl:template>
+    
     <xsl:template match="xforms:*"/>
     
     <xsl:template match="xforms:*" mode="keep-xforms-only" priority="2">

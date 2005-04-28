@@ -1,5 +1,5 @@
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
-var XFORMS_SERVER_URL = "http://localhost:8888/oxf/xforms-server";
+var XFORMS_SERVER_URL = "http://localhost:8888/ops/xforms-server";
 
 /**
  * Initializes attributes of each form:
@@ -75,6 +75,8 @@ function xformsGetLocalName(element) {
 
 function xformsHandleResponse() {
     if (document.xformsXMLHttpRequest.readyState == 4) {
+        //alert(document.xformsXMLHttpRequest.responseText);
+        //alert(Sarissa.serialize(document.xformsXMLHttpRequest.responseXML));
         var responseRoot = document.xformsXMLHttpRequest.responseXML.documentElement;
         for (var i = 0; i < responseRoot.childNodes.length; i++) {
         
@@ -99,12 +101,23 @@ function xformsHandleResponse() {
                 document.xformsFormOfCurrentRequest.xformsInstancesDocument = newInstances;
             }
 
-            // TODO: update divs
+            // Display or hide divs
+            if (xformsGetLocalName(responseRoot.childNodes[i]) == "divs") {
+                var divsElement = responseRoot.childNodes[i];
+                for (var j = 0; j < divsElement.childNodes.length; j++) {
+                    if (xformsGetLocalName(divsElement.childNodes[j]) == "div") {
+                        var divElement = divsElement.childNodes[j];
+                        var controlId = divElement.getAttribute("id");
+                        var visibile = divElement.getAttribute("visibility") == "visible";
+                        var documentElement = document.getElementById(controlId);
+                        documentElement.style.display = visibile ? "block" : "none";
+                    }
+                }
+            }
         }
 
         // End this request
         document.xformsRequestInProgress = false;
-        //alert(document.xformsFormOfCurrentRequest.xformsLoading.style);
         document.xformsFormOfCurrentRequest.xformsLoading.style.visibility = "hidden";
         
         // Go ahead with next request, if any
@@ -126,6 +139,7 @@ function xformsExecuteNextRequest() {
                 document.xformsXMLHttpRequest = new XMLHttpRequest();
                 document.xformsXMLHttpRequest.open("POST", XFORMS_SERVER_URL, true);
                 document.xformsXMLHttpRequest.onreadystatechange = xformsHandleResponse;
+                //alert(Sarissa.serialize(request));
                 document.xformsXMLHttpRequest.send(request);
                 foundRequest = true;
                 break;

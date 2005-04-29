@@ -161,15 +161,6 @@ public class QNameConverter extends ProcessorImpl {
                         }
                     }
 
-//                    public Map getCurrentPrefixToURIMap() {
-//                        Map prefixToURI = new HashMap();
-//                        for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
-//                            String prefix = (String) e.nextElement();
-//                            prefixToURI.put(prefix, namespaceSupport.getURI(prefix));
-//                        }
-//                        return prefixToURI;
-//                    }
-
                     private boolean isURIInScopeForPrefix(String prefix, String uri) {
                         String inScopeURIForPrefix = namespaceSupport.getURI(prefix);
                         return (inScopeURIForPrefix != null) && inScopeURIForPrefix.equals(uri);

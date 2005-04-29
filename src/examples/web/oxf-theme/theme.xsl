@@ -11,6 +11,10 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
+<!--
+    This is a very simple theme that shows you how to create a common layout for all your pages. You
+    can modify it at will.
+-->
 <xsl:stylesheet version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
@@ -31,7 +35,28 @@
                 <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:meta">
                     <xsl:copy-of select="."/>
                 </xsl:for-each>
-                <!-- Handle title -->
+                <!-- Copy user-defined links -->
+                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:links">
+                    <xsl:copy-of select="."/>
+                </xsl:for-each>
+                <!-- Standard links -->
+                <xhtml:link rel="stylesheet" href="/oxf-theme/orbeon-layout.cssd" type="text/css"/>
+                <!-- Copy user-defined stylesheets -->
+                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:style">
+                    <xsl:copy-of select="."/>
+                </xsl:for-each>
+                <!-- Copy user-defined scripts -->
+                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
+                    <xsl:copy-of select="."/>
+                </xsl:for-each>
+                <!-- Standard scripts -->
+                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/calendar.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/overlib_mini.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/time-utils.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/sarissa.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/xforms.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/style/theme.js"/>
+                <!-- Title -->
                 <xhtml:title>
                     <xsl:choose>
                         <xsl:when test="/xhtml:html/xhtml:head/xhtml:title != ''">
@@ -46,23 +71,7 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xhtml:title>
-                <xhtml:link rel="stylesheet" href="/oxf-theme/orbeon-layout.cssd" type="text/css"/>
-                <!-- Copy user-defined stylesheets -->
-                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:style">
-                    <xsl:copy-of select="."/>
-                </xsl:for-each>
-                <!-- Copy user-defined scripts -->
-                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
-                    <xsl:copy-of select="."/>
-                </xsl:for-each>
-                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/calendar.js"/>
-                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/overlib_mini.js"/>
-                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/time-utils.js"/>
-                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/sarissa.js"/>
-                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/xforms.js"/>
-                <xhtml:script type="text/javascript" src="/oxf-theme/style/theme.js"/>
             </xhtml:head>
-            <!-- This gives a little nudge to IE, so IE displays all the borders -->
             <xhtml:body>
                 <!-- Copy attributes -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/@*"/>

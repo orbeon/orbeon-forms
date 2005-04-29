@@ -168,17 +168,50 @@
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#themed"/>
         <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>
-        <p:output name="data" id="html"/>
+        <p:output name="data" id="rewritten-data"/>
+    </p:processor>
+
+    <!-- Convert to HTML -->
+    <p:processor name="oxf:qname-converter">
+        <p:input name="config">
+            <config>
+                <match>
+                    <uri>http://www.w3.org/1999/xhtml</uri>
+                </match>
+                <replace>
+                    <uri></uri>
+                    <prefix></prefix>
+                </replace>
+            </config>
+        </p:input>
+        <p:input name="data" href="#rewritten-data"/>
+        <p:output name="data" id="html-data"/>
+    </p:processor>
+
+    <p:processor name="oxf:html-converter">
+        <p:input name="config">
+            <config>
+                <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
+                <version>4.01</version>
+                <encoding>utf-8</encoding>
+            </config>
+        </p:input>
+        <p:input name="data" href="#html-data"/>
+        <p:output name="data" id="converted"/>
     </p:processor>
 
     <!-- Serialize -->
-    <p:processor name="oxf:html-serializer">
+    <p:processor name="oxf:http-serializer">
         <p:input name="config">
             <config>
                 <status-code>500</status-code>
+                <header>
+                    <name>Cache-Control</name>
+                    <value>post-check=0, pre-check=0</value>
+                </header>
             </config>
         </p:input>
-        <p:input name="data" href="#html"/>
+        <p:input name="data" href="#converted"/>
     </p:processor>
 
 </p:config>

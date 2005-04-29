@@ -24,6 +24,11 @@ import org.xml.sax.SAXException;
 
 /**
  * The QName converter converts elements' local names and/or namespace URIs.
+ *
+ * NOTE: This implementation probably needs to do more work to detect and adjust to namespace
+ * declarations conflicts.
+ *
+ * Question: attributes should probably also be updated!
  */
 public class QNameConverter extends ProcessorImpl {
 

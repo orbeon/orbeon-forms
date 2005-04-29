@@ -108,5 +108,25 @@
                 </li>
             </ul>
         </section>
+        <section>
+            <title>XHTML Support</title>
+            <p>
+                XHTML is better supported:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        There is no need to remove the XHTML namespace in XSLT, as was done before
+                        in <code>theme.xsl</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The epilogue illustrates the generation of XHTML and HTML to different
+                        browsers.
+                    </p>
+                </li>
+            </ul>
+        </section>
     </body>
 </document>

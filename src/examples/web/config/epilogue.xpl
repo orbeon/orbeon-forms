@@ -132,6 +132,22 @@
                         <!-- Remove the 'false() and ' below to allow browsers supporting XHTML to receive XHTML -->
                         <p:when test="false() and contains(/request/headers/header[name = 'accept'], 'application/xhtml+xml')">
                             <!-- Browser says it supports XHTML -->
+                            <!-- Make sure XHTML elements are output without prefix to increase compatibility -->
+                            <p:processor name="oxf:qname-converter">
+                                <p:input name="config">
+                                    <config>
+                                        <match>
+                                            <uri>http://www.w3.org/1999/xhtml</uri>
+                                        </match>
+                                        <replace>
+                                            <prefix></prefix>
+                                        </replace>
+                                    </config>
+                                </p:input>
+                                <p:input name="data" href="#rewritten-data"/>
+                                <p:output name="data" id="xhtml-data"/>
+                            </p:processor>
+                            <!--  Serialize to XHTML -->
                             <p:processor name="oxf:xml-converter">
                                 <p:input name="config">
                                     <config>
@@ -145,14 +161,25 @@
 <!--                                        <content-type>text/html</content-type>-->
                                     </config>
                                 </p:input>
-                                <p:input name="data" href="#rewritten-data"/>
+                                <p:input name="data" href="#xhtml-data"/>
                                 <p:output name="data" id="converted"/>
                             </p:processor>
                         </p:when>
                         <p:otherwise>
                             <!-- Just send plain HTML -->
                             <!-- Move from XHTML namespace to no namespace -->
-                            <p:processor name="oxf:xhtml-to-html">
+                            <p:processor name="oxf:qname-converter">
+                                <p:input name="config">
+                                    <config>
+                                        <match>
+                                            <uri>http://www.w3.org/1999/xhtml</uri>
+                                        </match>
+                                        <replace>
+                                            <uri></uri>
+                                            <prefix></prefix>
+                                        </replace>
+                                    </config>
+                                </p:input>
                                 <p:input name="data" href="#rewritten-data"/>
                                 <p:output name="data" id="html-data"/>
                             </p:processor>

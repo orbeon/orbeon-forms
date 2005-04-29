@@ -21,6 +21,7 @@ import org.orbeon.oxf.common.OXFException;
  * TODO
  *   - Check the closing element corresponds to opening element
  *   - Check consistency of uri, localname, and qname in startElement/endElement
+ *   - Namespace consistency
  */
 public class InspectingContentHandler extends ForwardingContentHandler {
 

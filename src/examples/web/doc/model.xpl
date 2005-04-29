@@ -117,7 +117,18 @@
                 <p:output name="data" id="fixed-html"/>
             </p:processor>
 
-            <p:processor name="oxf:xhtml-to-html">
+            <p:processor name="oxf:qname-converter">
+                <p:input name="config">
+                    <config>
+                        <match>
+                            <uri>http://www.w3.org/1999/xhtml</uri>
+                        </match>
+                        <replace>
+                            <uri></uri>
+                            <prefix></prefix>
+                        </replace>
+                    </config>
+                </p:input>
                 <p:input name="data" href="#fixed-html"/>
                 <p:output name="data" id="html-data"/>
             </p:processor>

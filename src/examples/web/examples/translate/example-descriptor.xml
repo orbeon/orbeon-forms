@@ -12,13 +12,11 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>XML to URL</title>
+    <title>Translate This</title>
     <source>page-flow.xml</source>
-    <source>xforms-model.xml</source>
-    <source>model.xpl</source>
-    <source>view.xsl</source>
-    <source>xml-to-url.xpl</source>
-    <source>url-to-xml.xpl</source>
+    <source>translate.xpl</source>
+    <source html="true">translate.js.xhtml</source>
+    <source>view.xml</source>
     <description>
         <p>
             This example illustrates the use of <a href="http://tinyurl.com/">TinyURL.com</a> to

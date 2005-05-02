@@ -47,6 +47,11 @@
                         <attribute name="ref">
                             <data type="string"/>
                         </attribute>
+                        <optional>
+                            <attribute name="page">
+                                <data type="positiveInteger"/>
+                            </attribute>
+                        </optional>
                     </element>
                 </zeroOrMore>
             </interleave>

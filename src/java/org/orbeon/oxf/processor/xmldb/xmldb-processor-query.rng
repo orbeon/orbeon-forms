@@ -19,18 +19,18 @@
         <choice>
             <element name="xdb:query">
                 <ref name="resourceAttributes"/>
-                <ref name="anyElement"/>
+                <ref name="anyTextAndElements"/>
             </element>
             <element name="xdb:insert">
                 <ref name="resourceAttributes"/>
             </element>
             <element name="xdb:delete">
                 <ref name="resourceAttributes"/>
-                <ref name="anyElement"/>
+                <ref name="anyTextAndElements"/>
             </element>
             <element name="xdb:update">
                 <ref name="resourceAttributes"/>
-                <ref name="anyElement"/>
+                <ref name="anyTextAndElements"/>
             </element>
         </choice>
     </start>
@@ -50,24 +50,26 @@
         </optional>
     </define>
 
-    <define name="anyElement">
-        <interleave>
-            <text/>
-            <optional>
-                <element>
-                    <anyName/>
-                    <zeroOrMore>
-                        <choice>
-                            <attribute>
-                                <anyName/>
-                            </attribute>
-                            <text/>
-                            <ref name="anyElement"/>
-                        </choice>
-                    </zeroOrMore>
-                </element>
-            </optional>
-        </interleave>
+    <define name="anyTextAndElements">
+        <oneOrMore>
+            <interleave>
+                <text/>
+                <optional>
+                    <element>
+                        <anyName/>
+                        <zeroOrMore>
+                            <choice>
+                                <attribute>
+                                    <anyName/>
+                                </attribute>
+                                <text/>
+                                <ref name="anyTextAndElements"/>
+                            </choice>
+                        </zeroOrMore>
+                    </element>
+                </optional>
+            </interleave>
+        </oneOrMore>
     </define>
 
 </grammar>

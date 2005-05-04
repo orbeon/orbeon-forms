@@ -20,11 +20,10 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.xforms.XFormsModel;
-import org.orbeon.oxf.processor.xforms.output.XFormsFunctionLibrary;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -48,7 +47,7 @@ public class XFormsElementContext {
     private Map repeatIdToIndex = new HashMap();
     private PipelineContext pipelineContext;
     private DocumentWrapper documentWrapper;
-    private FunctionLibrary functionLibrary = new XFormsFunctionLibrary(this);
+    private FunctionLibrary functionLibrary = new org.orbeon.oxf.xforms.XFormsFunctionLibrary(this);
     private String encryptionPassword;
 
     public XFormsElementContext(PipelineContext pipelineContext, ContentHandler contentHandler, XFormsModel model) {

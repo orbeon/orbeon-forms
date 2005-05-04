@@ -8,19 +8,19 @@
  */
 package org.orbeon.oxf.processor.xforms.output.element;
 
+import org.dom4j.Node;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.util.PooledXPathExpression;
+import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.orbeon.oxf.processor.xforms.XFormsConstants;
-import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.util.PooledXPathExpression;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.saxon.xpath.XPathException;
-import org.dom4j.Node;
 
-import java.util.Map;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class Itemset extends XFormsElement {
 

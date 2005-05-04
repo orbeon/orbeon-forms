@@ -5,7 +5,7 @@ import com.sun.faces.el.VariableResolverImpl;
 import javax.faces.context.FacesContext;
 import javax.faces.el.EvaluationException;
 
-import org.orbeon.oxf.processor.xforms.input.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.xml.XMLUtils;
 

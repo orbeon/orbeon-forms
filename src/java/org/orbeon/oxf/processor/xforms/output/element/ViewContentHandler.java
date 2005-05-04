@@ -8,7 +8,7 @@
  */
 package org.orbeon.oxf.processor.xforms.output.element;
 
-import org.orbeon.oxf.processor.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.SAXStore;
 import org.xml.sax.Attributes;

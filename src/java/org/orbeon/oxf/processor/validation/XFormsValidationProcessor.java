@@ -25,7 +25,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
@@ -33,6 +33,7 @@ import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 

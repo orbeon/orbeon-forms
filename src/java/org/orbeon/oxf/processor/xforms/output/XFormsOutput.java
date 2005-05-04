@@ -17,12 +17,12 @@ import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.xforms.XFormsConstants;
-import org.orbeon.oxf.processor.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.processor.xforms.XFormsEvents;
-import org.orbeon.oxf.processor.xforms.XFormsModel;
 import org.orbeon.oxf.processor.xforms.output.element.ViewContentHandler;
 import org.orbeon.oxf.processor.xforms.output.element.XFormsElementContext;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsEvents;
+import org.orbeon.oxf.xforms.XFormsModel;
 import org.xml.sax.ContentHandler;
 
 public class XFormsOutput extends ProcessorImpl {
@@ -43,14 +43,14 @@ public class XFormsOutput extends ProcessorImpl {
             public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
 
                 // Get XForms model
-                XFormsModel model = (XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader() {
+                XFormsModel model = (org.orbeon.oxf.xforms.XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader() {
                         public Object read(PipelineContext context, ProcessorInput input) {
-                            return new XFormsModel(readInputAsDOM4J(context, input));
+                            return new org.orbeon.oxf.xforms.XFormsModel(readInputAsDOM4J(context, input));
                         }
                     });
                 try {
                     // Clone because we set the instance, and that must not be cached
-                    model = (XFormsModel) model.clone();
+                    model = (org.orbeon.oxf.xforms.XFormsModel) model.clone();
                 } catch (CloneNotSupportedException e) {
                     throw new OXFException(e);
                 }
@@ -60,7 +60,7 @@ public class XFormsOutput extends ProcessorImpl {
                 model.setInstanceDocument(pipelineContext, instanceDocument);
 
                 // Create and initialize XForms Engine
-                XFormsContainingDocument containingDocument = new XFormsContainingDocument(null);
+                XFormsContainingDocument containingDocument = new org.orbeon.oxf.xforms.XFormsContainingDocument(null);
                 containingDocument.addModel(model);
                 containingDocument.initialize(pipelineContext);
                 containingDocument.dispatchEvent(pipelineContext, XFormsEvents.XXFORMS_INITIALIZE);

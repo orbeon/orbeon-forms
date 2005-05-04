@@ -17,9 +17,8 @@ import org.dom4j.Document;
 import org.dom4j.Node;
 import org.jaxen.FunctionContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.xforms.output.InstanceData;
-import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.util.Map;
 
@@ -40,7 +39,7 @@ public class Delete implements Action {
         String id = ids[Integer.parseInt(at) - 1];
         if (XFormsUtils.isNameEncryptionEnabled())
             id = SecureUtils.decrypt(context, encryptionPassword, id);
-        Node nodeToRemove = (Node) ((InstanceData) instance.getRootElement().getData())
+        Node nodeToRemove = (Node) ((org.orbeon.oxf.xforms.InstanceData) instance.getRootElement().getData())
                 .getIdToNodeMap().get(new Integer(id));
         nodeToRemove.getParent().remove(nodeToRemove);
     }

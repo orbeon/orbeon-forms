@@ -1,6 +1,6 @@
 package org.orbeon.saxon.dom4j;
 import org.dom4j.Document;
-import org.orbeon.oxf.processor.xforms.output.InstanceData;
+import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.om.DocumentInfo;

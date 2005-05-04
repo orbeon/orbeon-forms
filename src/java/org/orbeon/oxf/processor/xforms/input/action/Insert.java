@@ -18,9 +18,8 @@ import org.dom4j.Element;
 import org.jaxen.FunctionContext;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.xforms.output.InstanceData;
-import org.orbeon.oxf.processor.xforms.XFormsUtils;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.util.Iterator;
 import java.util.List;
@@ -44,7 +43,7 @@ public class Insert implements Action {
     public void run(PipelineContext context, FunctionContext functionContext, String encryptionPassword, Document instance) {
 
         String[] ids = nodeset.split(" ");
-        Map idToNodeMap = ((InstanceData) instance.getRootElement().getData()).getIdToNodeMap();
+        Map idToNodeMap = ((org.orbeon.oxf.xforms.InstanceData) instance.getRootElement().getData()).getIdToNodeMap();
 
         // Get element to duplicate (last one in the nodeset)
         final Element elementToDuplicate;

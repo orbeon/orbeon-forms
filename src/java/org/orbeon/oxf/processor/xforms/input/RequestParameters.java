@@ -18,18 +18,14 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.xforms.XFormsConstants;
-import org.orbeon.oxf.processor.xforms.XFormsUtils;
-import org.orbeon.oxf.processor.xforms.input.action.Action;
-import org.orbeon.oxf.processor.xforms.input.action.Delete;
-import org.orbeon.oxf.processor.xforms.input.action.Insert;
+import org.orbeon.oxf.processor.xforms.input.action.*;
 import org.orbeon.oxf.processor.xforms.input.action.Set;
-import org.orbeon.oxf.processor.xforms.input.action.SetIndex;
-import org.orbeon.oxf.processor.xforms.input.action.SetValue;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
@@ -37,12 +33,7 @@ import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 public class RequestParameters {
@@ -70,7 +61,7 @@ public class RequestParameters {
             List parameters = requestDocument.getRootElement().element("parameters").elements("parameter");
 
             // Get encryption key
-            if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
+            if (org.orbeon.oxf.xforms.XFormsUtils.isHiddenEncryptionEnabled() || org.orbeon.oxf.xforms.XFormsUtils.isNameEncryptionEnabled()) {
                 for (Iterator i = parameters.iterator(); i.hasNext();) {
                     Element parameterElement = (Element) i.next();
                     if ("$key".equals(parameterElement.element("name").getStringValue())) {
@@ -99,7 +90,7 @@ public class RequestParameters {
                     {
                         // there is only one value for $instnace
                         String compressed = (String)values.get(0);
-                        if (XFormsUtils.isHiddenEncryptionEnabled())
+                        if (org.orbeon.oxf.xforms.XFormsUtils.isHiddenEncryptionEnabled())
                             compressed = SecureUtils.decrypt(pipelineContext, encryptionPassword, compressed);
                         ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(compressed));
                         StringBuffer xml = new StringBuffer();

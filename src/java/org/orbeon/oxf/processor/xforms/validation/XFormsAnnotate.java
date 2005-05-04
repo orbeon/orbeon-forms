@@ -17,9 +17,9 @@ import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.processor.xforms.XFormsEvents;
-import org.orbeon.oxf.processor.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsEvents;
+import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -42,7 +42,7 @@ public class XFormsAnnotate extends ProcessorImpl {
 
                 try {
                     // Get XForms model
-                    XFormsModel model = (XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
+                    XFormsModel model = (org.orbeon.oxf.xforms.XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
                         public Object read(PipelineContext context, ProcessorInput input) {
                             return new XFormsModel(readInputAsDOM4J(context, input));
                         }

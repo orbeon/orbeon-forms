@@ -35,7 +35,7 @@ import org.orbeon.oxf.processor.transformer.TraxTransformer;
 import org.orbeon.oxf.processor.transformer.xslt.XSLT1Transformer;
 import org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
-import org.orbeon.oxf.processor.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.processor.xmldb.XMLDBProcessor;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.PipelineUtils;

@@ -13,19 +13,15 @@
  */
 package org.orbeon.oxf.processor.xforms.output.element;
 
-import org.orbeon.oxf.processor.xforms.XFormsConstants;
-import org.orbeon.oxf.processor.xforms.XFormsUtils;
-import org.orbeon.oxf.processor.xforms.output.InstanceData;
-import org.orbeon.oxf.util.SecureUtils;
+import org.dom4j.*;
 import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.xforms.InstanceData;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import org.dom4j.Document;
-import org.dom4j.VisitorSupport;
-import org.dom4j.Attribute;
-import org.dom4j.Element;
-import org.dom4j.Node;
 
 
 public class Group extends XFormsElement {
@@ -56,7 +52,7 @@ public class Group extends XFormsElement {
                     if(node instanceof Element)
                         data = (InstanceData)((Element)node).getData();
                     else
-                        data = (InstanceData)((Attribute)node).getData();
+                        data = (org.orbeon.oxf.xforms.InstanceData)((Attribute)node).getData();
 
                     if(data != null && data.isGenerated())
                         node.setText("");

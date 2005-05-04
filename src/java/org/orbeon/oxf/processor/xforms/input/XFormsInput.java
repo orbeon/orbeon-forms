@@ -19,12 +19,13 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
-import org.orbeon.oxf.processor.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.processor.xforms.XFormsModel;
-import org.orbeon.oxf.processor.xforms.XFormsEvents;
 import org.orbeon.oxf.processor.xforms.input.action.Action;
 import org.orbeon.oxf.processor.xforms.input.action.ActionFunctionContext;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.xforms.XFormsEvents;
+import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 
@@ -67,7 +68,7 @@ public class XFormsInput extends ProcessorImpl {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
 
                 final XFormsInstance instance;
-                XFormsInstance contextInstance = XFormsInstance.createInstanceFromContext(pipelineContext);
+                org.orbeon.oxf.xforms.XFormsInstance contextInstance = XFormsInstance.createInstanceFromContext(pipelineContext);
                 if (contextInstance != null) {
                     // Got instance from context
                     instance = contextInstance;
@@ -76,7 +77,7 @@ public class XFormsInput extends ProcessorImpl {
                     // Get XForms model
                     XFormsModel model = (XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
                         public Object read(PipelineContext pipelineContext, ProcessorInput input) {
-                            return new XFormsModel(readInputAsDOM4J(pipelineContext, input));
+                            return new org.orbeon.oxf.xforms.XFormsModel(readInputAsDOM4J(pipelineContext, input));
                         }
                     });
                     try {

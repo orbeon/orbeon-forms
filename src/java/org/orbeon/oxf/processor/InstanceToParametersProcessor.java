@@ -19,8 +19,9 @@ import org.dom4j.Element;
 import org.dom4j.VisitorSupport;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.xforms.XFormsUtils;
-import org.orbeon.oxf.processor.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.SecureUtils;
@@ -111,12 +112,12 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     contentHandler.startElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
                     if (!allMarked[0]) {
                         String key = null;
-                        if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
+                        if (org.orbeon.oxf.xforms.XFormsUtils.isHiddenEncryptionEnabled() || org.orbeon.oxf.xforms.XFormsUtils.isNameEncryptionEnabled()) {
                             key = SecureUtils.generateRandomPassword();
                             String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
                             outputParameter("$key", SecureUtils.encrypt(pipelineContext, serverPassword, key), contentHandler);
                         }
-                        outputParameter("$instance", XFormsUtils.instanceToString(pipelineContext, key, instance), contentHandler);
+                        outputParameter("$instance", org.orbeon.oxf.xforms.XFormsUtils.instanceToString(pipelineContext, key, instance), contentHandler);
                     }
                     contentHandler.endElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT);
                     contentHandler.endDocument();

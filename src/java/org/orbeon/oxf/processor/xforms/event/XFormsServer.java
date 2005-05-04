@@ -141,38 +141,44 @@ public class XFormsServer extends ProcessorImpl {
                 if (isInitializeEvent)
                     containingDocument.dispatchEvent(pipelineContext, XFormsEvents.XXFORMS_INITIALIZE);
 
-                // Extract action element
-                Element actionElement;
-                {
-                    String controlId = eventDocument.getRootElement().attributeValue("source-control-id");
-                    String eventName = eventDocument.getRootElement().attributeValue("name");
-
-                    Map variables = new HashMap();
-                    variables.put("control-id", controlId);
-                    variables.put("control-name", eventName);
-
-                    PooledXPathExpression xpathExpression =
-                        XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument),
-                                "/xxf:controls//*[@xxf:id = $control-id]/xf:*[@ev:event = $control-name]", XFORMS_NAMESPACES, variables);
-                    try {
-                        actionElement = (Element) xpathExpression.evaluateSingle();
-
-                        if (actionElement == null)
-                            throw new OXFException("Cannot find control with id '" + controlId + "' and event '" + eventName + "'.");
-                    } catch (XPathException e) {
-                        throw new OXFException(e);
-                    } finally {
-                        if (xpathExpression != null)
-                            xpathExpression.returnToPool();
-                    }
-                }
-
                 // Create resulting divs document
                 Document divsDocument = Dom4jUtils.createDocument();
                 divsDocument.addElement("xxf:divs", XFormsConstants.XXFORMS_NAMESPACE_URI);
 
-                // Interpret action
-                interpretAction(pipelineContext, actionElement, controlsDocument, divsDocument, containingDocument);
+                // Extract action element
+                {
+                    String controlId = eventDocument.getRootElement().attributeValue("source-control-id");
+                    String eventName = eventDocument.getRootElement().attributeValue("name");
+
+                    if (controlId != null && eventName != null) {
+                        // An event is passed
+
+                        Map variables = new HashMap();
+                        variables.put("control-id", controlId);
+                        variables.put("control-name", eventName);
+
+                        PooledXPathExpression xpathExpression =
+                            XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument),
+                                    "/xxf:controls//*[@xxf:id = $control-id]/xf:*[@ev:event = $control-name]", XFORMS_NAMESPACES, variables);
+
+                        Element actionElement;
+                        try {
+                            actionElement = (Element) xpathExpression.evaluateSingle();
+                            if (actionElement == null)
+                                throw new OXFException("Cannot find control with id '" + controlId + "' and event '" + eventName + "'.");
+                        } catch (XPathException e) {
+                            throw new OXFException(e);
+                        } finally {
+                            if (xpathExpression != null)
+                                xpathExpression.returnToPool();
+                        }
+
+                        // Interpret action
+                        interpretAction(pipelineContext, actionElement, controlsDocument, divsDocument, containingDocument);
+                    } else if (!(controlId == null && eventName == null)) {
+                        throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
+                    }
+                }
 
                 // Create resulting document
                 try {

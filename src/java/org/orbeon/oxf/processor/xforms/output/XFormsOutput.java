@@ -14,11 +14,12 @@
 package org.orbeon.oxf.processor.xforms.output;
 
 import org.dom4j.Document;
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.XFormsConstants;
-import org.orbeon.oxf.processor.xforms.Model;
-import org.orbeon.oxf.processor.xforms.XFormsUtils;
+import org.orbeon.oxf.processor.xforms.XFormsContainingDocument;
+import org.orbeon.oxf.processor.xforms.XFormsModel;
 import org.orbeon.oxf.processor.xforms.output.element.ViewContentHandler;
 import org.orbeon.oxf.processor.xforms.output.element.XFormsElementContext;
 import org.xml.sax.ContentHandler;
@@ -38,34 +39,43 @@ public class XFormsOutput extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
 
-                // Extract info from model
-                final Model model = (Model) readCacheInputAsObject(context,
-                        getInputByName(INPUT_MODEL), new CacheableInputReader() {
-                            public Object read(PipelineContext context, ProcessorInput input) {
-                                Model model = new Model(context, readInputAsDOM4J(context, input));
-                                return model;
-                            }
-                        });
+                // Get XForms model
+                XFormsModel model = (XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader() {
+                        public Object read(PipelineContext context, ProcessorInput input) {
+                            return new XFormsModel(readInputAsDOM4J(context, input));
+                        }
+                    });
+                try {
+                    // Clone because we set the instance, and that must not be cached
+                    model = (XFormsModel) model.clone();
+                } catch (CloneNotSupportedException e) {
+                    throw new OXFException(e);
+                }
 
-                // Read instance data and annotate
-                final Document instance = (Document) readCacheInputAsDOM4J(context, INPUT_INSTANCE).clone();
-                XFormsUtils.setInitialDecoration(instance);
-                Boolean enabledObj = getPropertySet().getBoolean(XFormsConstants.XFORMS_VALIDATION_FLAG, true);
-                final boolean enabled = enabledObj.booleanValue();
-                model.applyInputOutputBinds(instance, context, enabled);
+                // Set annotated instance on model
+                Document instance = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
+                model.setInstance(instance);
+
+                // Create and initialize XForms Engine
+                XFormsContainingDocument containingDocument = new XFormsContainingDocument(null);
+                containingDocument.addModel(model);
+                containingDocument.initialize(pipelineContext);
+
+                // Run remaining model item properties
+                // TODO: this has to be done in a different way (events?)
+                model.applyOtherBinds(pipelineContext, instance.getDocument());
 
                 // Create evaluation context
-                final XFormsElementContext elementContext =
-                        new XFormsElementContext(context, contentHandler, model, instance);
+                XFormsElementContext elementContext =
+                        new XFormsElementContext(pipelineContext, contentHandler, model);
 
                 // Send SAX events of view to ViewContentHandler
-                readInputAsSAX(context, INPUT_DATA, new ViewContentHandler(contentHandler, elementContext));
+                readInputAsSAX(pipelineContext, INPUT_DATA, new ViewContentHandler(contentHandler, elementContext));
             }
         };
         addOutput(name, output);
         return output;
     }
 }
- 

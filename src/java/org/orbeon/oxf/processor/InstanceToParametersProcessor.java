@@ -113,7 +113,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                         String key = null;
                         if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
                             key = SecureUtils.generateRandomPassword();
-                            String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD);
+                            String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
                             outputParameter("$key", SecureUtils.encrypt(pipelineContext, serverPassword, key), contentHandler);
                         }
                         outputParameter("$instance", XFormsUtils.instanceToString(pipelineContext, key, instance), contentHandler);

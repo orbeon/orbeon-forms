@@ -92,14 +92,15 @@ public class XFormsUtils {
     private static void setInitialDecorationWorker(Element element, int[] currentId, Map idToNodeMap) {
         int elementId = ++currentId[0];
         idToNodeMap.put(new Integer(elementId), element);
-        element.setData(new InstanceData((LocationData) element.getData(), elementId));
+
+        element.setData(newInstanceData(element.getData(), elementId));
 
         for (Iterator i = element.attributes().iterator(); i.hasNext();) {
             Attribute attribute = (Attribute) i.next();
             if (!XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attribute.getNamespaceURI())) {
                 int attributeId = ++currentId[0];
                 idToNodeMap.put(new Integer(attributeId), attribute);
-                attribute.setData(new InstanceData((LocationData) attribute.getData(), attributeId));
+                attribute.setData(newInstanceData(attribute.getData(), attributeId));
             }
         }
         for (Iterator i = element.elements().iterator(); i.hasNext();) {
@@ -108,14 +109,24 @@ public class XFormsUtils {
         }
     }
 
+    private static InstanceData newInstanceData(Object existingData, int id) {
+        if (existingData instanceof LocationData) {
+            return new InstanceData((LocationData) existingData, id);
+        } else if (existingData instanceof InstanceData) {
+            return new InstanceData(((InstanceData) existingData).getLocationData(), id);
+        } else {
+            return new InstanceData(null, id);
+        }
+    }
+
     public static boolean isNameEncryptionEnabled() {
         return OXFProperties.instance().getPropertySet().getBoolean
-            (XFormsConstants.XFORMS_ENCRYPT_NAMES, false).booleanValue();
+            (XFormsConstants.XFORMS_ENCRYPT_NAMES_PROPERTY, false).booleanValue();
     }
 
     public static boolean isHiddenEncryptionEnabled() {
         return OXFProperties.instance().getPropertySet().getBoolean
-            (XFormsConstants.XFORMS_ENCRYPT_HIDDEN, false).booleanValue();
+            (XFormsConstants.XFORMS_ENCRYPT_HIDDEN_PROPERTY, false).booleanValue();
     }
 
     public static String instanceToString(PipelineContext pipelineContext, String password, Document instance) {
@@ -149,5 +160,31 @@ public class XFormsUtils {
             }
         };
         doc.accept(visitor);
+    }
+
+    /**
+     * Iterate through all data nodes of the instance document and call the walker on each of them.
+     *
+     * @param instanceDocument
+     * @param instanceWalker
+     */
+    public static void updateInstanceData(Document instanceDocument, InstanceWalker instanceWalker) {
+        updateInstanceData(instanceDocument.getRootElement(), instanceWalker);
+    }
+
+    private static void updateInstanceData(Element element, InstanceWalker instanceWalker) {
+        instanceWalker.walk(element, (InstanceData) element.getData());
+        for (Iterator i = element.attributes().iterator(); i.hasNext();) {
+            Attribute attribute = (Attribute) i.next();
+            instanceWalker.walk(attribute,  (InstanceData) element.getData());
+        }
+        for (Iterator i = element.elements().iterator(); i.hasNext();) {
+            Element child = (Element) i.next();
+            updateInstanceData(child, instanceWalker);
+        }
+    }
+
+    public static interface InstanceWalker {
+        public void walk(Node node, InstanceData instanceData);
     }
 }

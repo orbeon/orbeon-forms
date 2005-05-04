@@ -48,13 +48,13 @@
             </xforms:model>
         </input>
         <output name="instance">
-            <d:form xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" >
-                <d:id xxforms:valid="true">42</d:id>
-                <d:id xxforms:valid="false">4x</d:id>
+            <d:form xmlns:d="http://orbeon.org/oxf/xml/document">
+                <d:id>42</d:id>
+                <d:id xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false">4x</d:id>
                 <d:firstname>John</d:firstname>
-                <d:firstname xxforms:valid="false">John</d:firstname>
-                <d:lastname xxforms:valid="true">Smith</d:lastname>
-                <d:zip xxforms:valid="false">4x</d:zip>
+                <d:firstname xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false">John</d:firstname>
+                <d:lastname>Smith</d:lastname>
+                <d:zip xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false">4x</d:zip>
             </d:form>
         </output>
     </test>
@@ -64,7 +64,7 @@
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <p:param type="output" name="data"/>
 
-                <p:processor uri="oxf/processor/identity">
+                <p:processor name="oxf:identity">
                     <p:input name="data">
                         <xforms:model id="form">
                             <xforms:submission method="post"/>
@@ -134,7 +134,7 @@
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <p:param type="output" name="data"/>
 
-                <p:processor uri="oxf/processor/identity">
+                <p:processor name="oxf:identity">
                     <p:input name="data">
                         <xforms:model id="form">
                             <xforms:submission method="post"/>
@@ -224,7 +224,7 @@
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
                 <p:param type="output" name="out"/>
-                <p:processor uri="oxf/processor/pipeline">
+                <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-instance-recreate.xpl"/>
                     <p:input name="model">
                         <xforms:model xsl:version="2.0">
@@ -286,7 +286,7 @@
                     xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <p:param name="result" type="output"/>
     
-                <p:processor uri="oxf/processor/xslt-2.0">
+                <p:processor name="oxf:xslt">
                     <p:input name="data">
                         <dummy/>
                     </p:input>
@@ -372,7 +372,7 @@
                     <p:output name="data" id="instance"/>
                 </p:processor>
     
-                <p:processor uri="oxf/processor/identity">
+                <p:processor name="oxf:identity">
                     <p:input name="data">
                         <xforms:group ref="/form">
                             <xforms:input ref="name"/>
@@ -422,7 +422,7 @@
                     <p:output name="data" id="data"/>
                 </p:processor>
     
-                <p:processor uri="oxf/processor/identity">
+                <p:processor name="oxf:identity">
                     <p:input name="data">
                         <xforms:model id="form">
                             <xforms:submission method="post"/>
@@ -490,7 +490,7 @@
                     <p:output name="data" id="xf-out"/>
                 </p:processor>
     
-                <p:processor uri="oxf/processor/xslt-2.0">
+                <p:processor name="oxf:xslt">
                     <p:input name="data" href="#xf-out"/>
                     <p:input name="config">
                         <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -524,7 +524,7 @@
                     <p:output name="data" id="xf-input"/>
                 </p:processor>
     
-                <p:processor uri="oxf/processor/xslt-2.0">
+                <p:processor name="oxf:xslt">
                     <p:input name="data" href="#xf-input"/>
                     <p:input name="config">
                         <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
@@ -900,9 +900,9 @@
                     </c>
                 </b>
                 <c>
-                    <d xxforms:valid="true">1</d>
-                    <d xxforms:valid="true">2</d>
-                    <d xxforms:valid="true">3</d>
+                    <d>1</d>
+                    <d>2</d>
+                    <d>3</d>
                 </c>
             </instance>
         </output>
@@ -921,9 +921,9 @@
             </xforms:model>
         </input>
         <output name="instance">
-            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"  >
-                <a xxforms:valid="true">&#x1105;</a>
-                <b xxforms:valid="false">&#x1200;</b>
+            <instance>
+                <a>&#x1105;</a>
+                <b xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false">&#x1200;</b>
             </instance>
         </output>
     </test>
@@ -1011,12 +1011,12 @@
             </xforms:group>
         </input>
         <output name="instance">
-            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"  >
+            <instance>
                 <a>Orbeon</a>
-                <b xxforms:valid="true"/>
-                <c xxforms:required="true" xxforms:valid="false"/>
-                <d xxforms:readonly="true"/>
-                <e xxforms:relevant="true"/>
+                <b/>
+                <c xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:required="true" xxforms:valid="false"></c>
+                <d xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true"></d>
+                <e/>
             </instance>
         </output>
     </test>
@@ -1127,9 +1127,9 @@
             </xforms:group>
         </input>
         <output name="instance">
-            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" >
-                <a xxforms:readonly="true">a</a>
-                <b xxforms:relevant="false">b</b>
+            <instance>
+                <a xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">a</a>
+                <b xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:relevant="false">b</b>
             </instance>
         </output>
     </test>
@@ -1181,7 +1181,7 @@
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" >
                 <p:param name="instance" type="output"/>
-                <p:processor name="oxf:xslt-2.0">
+                <p:processor name="oxf:xslt">
                     <p:input name="data"><dummy/></p:input>
                     <p:input name="config">
                         <xforms:model xsl:version="2.0">
@@ -1211,7 +1211,7 @@
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" >
                 <p:param name="instance" type="output"/>
-                <p:processor name="oxf:xslt-2.0">
+                <p:processor name="oxf:xslt">
                     <p:input name="data"><dummy/></p:input>
                     <p:input name="config">
                         <xforms:model xsl:version="2.0">
@@ -1241,9 +1241,9 @@
             </p:config>
         </input>
         <output name="instance">
-            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" >
-                <x a="1" xxforms:valid="true"/>
-                <y a="2" xxforms:valid="false"/>
+            <instance>
+                <x a="1"/>
+                <y xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" a="2" xxforms:valid="false"></y>
             </instance>
         </output>
     </test>
@@ -1272,7 +1272,7 @@
                 </p:processor>
                 <!-- Remove error message added by validator that might 
                      change from one version to the other  -->
-                <p:processor name="oxf:xslt-2.0">
+                <p:processor name="oxf:xslt">
                     <p:input name="data" href="#instance"/>
                     <p:input name="config">
                         <xsl:stylesheet version="2.0">
@@ -1285,11 +1285,11 @@
             </p:config>
         </input>
         <output name="instance">
-            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"  >
+            <instance>
                 <a>35</a>
-                <b xxforms:valid="false">-42</b>
-                <c xxforms:valid="false">x</c>
-                <d xxforms:valid="false" />
+                <b xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false">-42</b>
+                <c xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false">x</c>
+                <d xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false"></d>
             </instance>
         </output>
     </test>
@@ -1325,7 +1325,7 @@
                     </p:input>
                     <p:output name="data" id="html"/>
                 </p:processor>
-                <p:processor name="oxf:xslt-2.0">
+                <p:processor name="oxf:xslt">
                     <p:input name="data" href="#html" debug="html"/>
                     <p:input name="config">
                         <result xsl:version="2.0">
@@ -1354,7 +1354,7 @@
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" >
                 <p:param name="instance" type="output"/>
 
-                <p:processor uri="oxf/processor/pipeline">
+                <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-instance-recreate.xpl"/>
                     <p:input name="model">
                         <xforms:model>

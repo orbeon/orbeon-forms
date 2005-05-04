@@ -70,7 +70,7 @@ public class Group extends XFormsElement {
 
             // Generate hidden field with random key encrypted with server key
             if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
-                String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD);
+                String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
                 String encryptedRandomKey = SecureUtils.encrypt(context.getPipelineContext(),
                         serverPassword, context.getEncryptionPassword());
                 sendHiddenElement(context, "$key", encryptedRandomKey);

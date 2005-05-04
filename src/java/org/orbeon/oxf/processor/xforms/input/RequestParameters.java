@@ -75,7 +75,7 @@ public class RequestParameters {
                     Element parameterElement = (Element) i.next();
                     if ("$key".equals(parameterElement.element("name").getStringValue())) {
                         String value = parameterElement.element("value").getStringValue();
-                        String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD);
+                        String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
                         encryptionPassword = SecureUtils.decrypt(pipelineContext, serverPassword, value);
                     }
                 }

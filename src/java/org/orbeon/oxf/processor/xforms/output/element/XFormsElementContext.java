@@ -20,11 +20,11 @@ import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.xforms.Model;
+import org.orbeon.oxf.processor.xforms.XFormsModel;
 import org.orbeon.oxf.processor.xforms.output.XFormsFunctionLibrary;
 import org.orbeon.oxf.util.PooledXPathExpression;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -40,8 +40,7 @@ import java.util.*;
 public class XFormsElementContext {
 
     private ContentHandler contentHandler;
-    private Document instance;
-    private Model model;
+    private XFormsModel model;
     private Locator locator;
     private Stack elements = new Stack();
     private Stack nodesetStack = new Stack();
@@ -52,13 +51,11 @@ public class XFormsElementContext {
     private FunctionLibrary functionLibrary = new XFormsFunctionLibrary(this);
     private String encryptionPassword;
 
-    public XFormsElementContext(PipelineContext pipelineContext, ContentHandler contentHandler,
-                                Model model, Document instance) {
+    public XFormsElementContext(PipelineContext pipelineContext, ContentHandler contentHandler, XFormsModel model) {
         this.pipelineContext = pipelineContext;
         this.contentHandler = contentHandler;
         this.model = model;
-        this.instance = instance;
-        this.documentWrapper = new DocumentWrapper(instance, null);
+        this.documentWrapper = new DocumentWrapper(model.getInstance(), null);
         this.encryptionPassword = SecureUtils.generateRandomPassword();
     }
 
@@ -67,8 +64,7 @@ public class XFormsElementContext {
         try {
             if (bind != null) {
                 // Resolve the bind id to a node
-                nodesetStack.push(model.getBindNodeset(pipelineContext,
-                        model.getModelBindById(bind), documentWrapper, instance));
+                nodesetStack.push(model.getBindNodeset(pipelineContext, model.getModelBindById(bind), documentWrapper));
             } else if (ref != null || nodeset != null) {
                 // Evaluate new xpath in context of current node
                 expr = XPathCache.getXPathExpression(pipelineContext, documentWrapper.wrap(getCurrentSingleNode()),
@@ -92,7 +88,7 @@ public class XFormsElementContext {
 
     public Node getCurrentSingleNode() {
         if (nodesetStack.isEmpty()) {
-            return instance;
+            return model.getInstance();
         } else {
             List nodeset = getCurrentNodeset();
             if (nodeset.size() == 0)
@@ -104,7 +100,7 @@ public class XFormsElementContext {
     }
 
     public List getCurrentNodeset() {
-        return nodesetStack.isEmpty() ? Arrays.asList(new Object[] {instance})
+        return nodesetStack.isEmpty() ? Arrays.asList(new Object[] { model.getInstance() })
             : (List) nodesetStack.peek();
     }
 
@@ -209,7 +205,7 @@ public class XFormsElementContext {
     }
 
     public Document getInstance() {
-        return instance;
+        return model.getInstance();
     }
 
     public String getEncryptionPassword() {

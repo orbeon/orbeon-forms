@@ -25,6 +25,7 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.processor.xforms.XFormsConstants;
 import org.orbeon.oxf.processor.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.processor.xforms.XFormsModel;
+import org.orbeon.oxf.processor.xforms.XFormsEvents;
 import org.orbeon.oxf.processor.xforms.input.XFormsInstance;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
@@ -48,21 +49,6 @@ import java.util.Map;
 public class XFormsServer extends ProcessorImpl {
 
     static private Logger logger = LoggerFactory.createLogger(XFormsServer.class);
-
-    public static final String XFORMS_SETVALUE_ACTION = "setvalue";
-    public static final String XFORMS_TOGGLE_ACTION = "toggle";
-    public static final String XFORMS_ACTION_ACTION = "action";
-
-    public static final String XFORMS_MODEL_CONSTRUCT = "xforms-model-construct";
-    public static final String XFORMS_MODEL_DONE = "xforms-model-construct-done";
-    public static final String XFORMS_READY = "xforms-ready";
-    public static final String XFORMS_MODEL_DESTRUCT = "xforms-model-destruct";
-
-    public static final String XFORMS_REBUILD = "xforms-rebuild";
-    public static final String XFORMS_RECALCULATE = "xforms-recalculate";
-    public static final String XFORMS_REVALIDATE = "xforms-revalidate";
-    public static final String XFORMS_REFRESH = "xforms-refresh";
-    public static final String XFORMS_RESET = "xforms-reset";
 
     private static final String INPUT_INSTANCES = "instances";
     private static final String INPUT_MODELS = "models";
@@ -138,7 +124,7 @@ public class XFormsServer extends ProcessorImpl {
 
                             instancesCount++;
                         }
-                        if (containingDocument.getModels().size() != instancesCount)
+                        if (instancesCount != 0 && containingDocument.getModels().size() != instancesCount)
                             throw new OXFException("Number of instances (" + instancesCount + ") doesn't match number of models (" + containingDocument.getModels().size()  + ").");
                         // Initialization will take place if no instances are provided
                         isInitializeEvent = instancesCount == 0;
@@ -150,9 +136,10 @@ public class XFormsServer extends ProcessorImpl {
                     }
                 }
 
-                // Initialize XForms Engine if needed
+                // Initialize XForms Engine
+                containingDocument.initialize(pipelineContext);
                 if (isInitializeEvent)
-                    containingDocument.initialize(pipelineContext);
+                    containingDocument.dispatchEvent(pipelineContext, XFormsEvents.XXFORMS_INITIALIZE);
 
                 // Extract action element
                 Element actionElement;
@@ -263,7 +250,7 @@ public class XFormsServer extends ProcessorImpl {
 
         String actionEventName = actionElement.getName();
 
-        if (XFORMS_SETVALUE_ACTION.equals(actionEventName)) {
+        if (XFormsEvents.XFORMS_SETVALUE_ACTION.equals(actionEventName)) {
             // 10.1.9 The setvalue Element
             // xforms:setvalue
 
@@ -285,7 +272,7 @@ public class XFormsServer extends ProcessorImpl {
             }
 
             instance.setValueForParam(pipelineContext, ref, namespaceContext, valueToSet);
-        } else if (XFORMS_TOGGLE_ACTION.equals(actionEventName)) {
+        } else if (XFormsEvents.XFORMS_TOGGLE_ACTION.equals(actionEventName)) {
             // 9.2.3 The toggle Element
             // xforms:toggle
 
@@ -329,7 +316,7 @@ public class XFormsServer extends ProcessorImpl {
             // 2. Dispatching an xform-select event to the case to be selected.
 
 
-        } else if (XFORMS_ACTION_ACTION.equals(actionEventName)) {
+        } else if (XFormsEvents.XFORMS_ACTION_ACTION.equals(actionEventName)) {
             // 10.1.1 The action Element
             // xforms:action
 

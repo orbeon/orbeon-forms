@@ -21,6 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.XFormsContainingDocument;
 import org.orbeon.oxf.processor.xforms.XFormsModel;
+import org.orbeon.oxf.processor.xforms.XFormsEvents;
 import org.orbeon.oxf.processor.xforms.input.action.Action;
 import org.orbeon.oxf.processor.xforms.input.action.ActionFunctionContext;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -150,6 +151,7 @@ public class XFormsInput extends ProcessorImpl {
                     XFormsContainingDocument containingDocument = new XFormsContainingDocument(null);
                     containingDocument.addModel(model);
                     containingDocument.initialize(pipelineContext);
+                    containingDocument.dispatchEvent(pipelineContext, XFormsEvents.XXFORMS_INITIALIZE);
 
                     // Run remaining model item properties
                     // TODO: this has to be done in a different way (events?)

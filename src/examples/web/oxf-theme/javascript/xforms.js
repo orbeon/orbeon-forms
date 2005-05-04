@@ -1,5 +1,9 @@
+/**
+ * Constants
+ */
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
-var XFORMS_SERVER_URL = "http://localhost:8888/oxf/xforms-server";
+var XFORMS_SERVER_URL = null;
+var PATH_TO_JAVASCRIPT = "/oxf-theme/javascript/xforms.js";
 
 /**
  * Initializes attributes of each form:
@@ -18,6 +22,17 @@ var XFORMS_SERVER_URL = "http://localhost:8888/oxf/xforms-server";
  *
  */
 function xformsPageLoaded() {
+
+    // Initialize XForms server URL
+    var scripts = document.getElementsByTagName("script");
+    for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
+        var script = scripts[scriptIndex];
+        var startPathToJavaScript = script.getAttribute("src").indexOf(PATH_TO_JAVASCRIPT);
+        if (startPathToJavaScript != -1) {
+            XFORMS_SERVER_URL = script.getAttribute("src").substr(0, startPathToJavaScript) + "/xforms-server";
+            break;
+        }
+    }
 
     // Initialize attributes of each form
     var forms = document.getElementsByTagName("form");

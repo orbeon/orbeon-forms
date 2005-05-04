@@ -23,6 +23,12 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
     <xsl:output name="xml" method="xml"/>
 
+    <xsl:variable name="controls" as="element()" select="doc('input:controls')/*"/>
+    <xsl:variable name="models" as="element()" 
+        select="doc('input:models')/xxforms:models"/>
+    <xsl:variable name="initialization-response" as="element()" 
+        select="doc('input:initialization-response')/xxforms:event-response"/>
+    
     <xsl:template match="xhtml:body">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
@@ -30,38 +36,13 @@
                 <!-- Store private information used by the client-side JavaScript -->
                 <xhtml:div title="xforms-private" style="display: none">
                     <xhtml:div title="models">
-                        <xsl:variable name="models">
-                            <xxforms:models>
-                                <xsl:copy-of select="//xforms:model"/>
-                            </xxforms:models>
-                        </xsl:variable>
                         <xsl:value-of select="saxon:serialize($models, 'xml')"/>
                     </xhtml:div>
                     <xhtml:div title="controls">
-                        <xsl:variable name="controls">
-                            <xxforms:controls>
-                                <xsl:apply-templates select="//xforms:*[local-name() != 'model' and not(ancestor::xforms:*)]" mode="keep-xforms-only"/>
-                            </xxforms:controls>
-                        </xsl:variable>
                         <xsl:value-of select="saxon:serialize($controls, 'xml')"/>
                     </xhtml:div>
                     <xhtml:div title="instances">
-                        <xsl:variable name="instances">
-                            <xxforms:instances>
-                                <xsl:for-each select="//xforms:model/xforms:instance">
-                                    <xxforms:instance>
-                                        <xsl:if test="../@id">
-                                            <xsl:attribute name="model-id" select="../@id"/>
-                                        </xsl:if>
-                                        <xsl:if test="@id">
-                                            <xsl:attribute name="id" select="@id"/>
-                                        </xsl:if>
-                                        <xsl:copy-of select="*"/>
-                                    </xxforms:instance>
-                                </xsl:for-each>
-                            </xxforms:instances>
-                        </xsl:variable>
-                        <xsl:value-of select="saxon:serialize($instances, 'xml')"/>
+                        <xsl:value-of select="saxon:serialize($initialization-response/xxforms:instances, 'xml')"/>
                     </xhtml:div>
                 </xhtml:div>
                 <xhtml:div xhtml:title="xforms-loading" style="visibility: hidden">
@@ -75,7 +56,12 @@
     
     <xsl:template match="xforms:output">
         <xsl:value-of select="xforms:label"/>
-        <xhtml:span id="{count(preceding::*)}">0</xhtml:span>
+        <xsl:variable name="control-id" as="xs:integer" select="count(preceding::*)"/>
+        <xsl:variable name="value-element" as="element()" 
+            select="$initialization-response/xxforms:control-values/xxforms:control[@id = $control-id]"/>
+        <xhtml:span id="{$control-id}">
+            <xsl:value-of select="$value-element/@value"/>
+        </xhtml:span>
     </xsl:template>
     
     <xsl:template match="xforms:trigger">
@@ -95,25 +81,5 @@
     </xsl:template>
     
     <xsl:template match="xforms:*"/>
-    
-    <xsl:template match="xforms:*" mode="keep-xforms-only" priority="2">
-        <xsl:copy>
-            <xsl:attribute name="xxforms:id">
-                <xsl:value-of select="count(preceding::*)"/>
-            </xsl:attribute>
-            <xsl:copy-of select="@*"/>
-            <xsl:apply-templates mode="keep-xforms-only"/>
-        </xsl:copy>
-    </xsl:template>
-    
-    <xsl:template match="*" mode="keep-xforms-only" priority="1">
-        <xsl:apply-templates select="*" mode="keep-xforms-only"/>
-    </xsl:template>
-
-    <xsl:template match="text()" mode="keep-xforms-only" priority="1">
-        <xsl:if test="parent::xforms:*">
-            <xsl:value-of select="node()"/>
-        </xsl:if>
-    </xsl:template>
     
 </xsl:stylesheet>

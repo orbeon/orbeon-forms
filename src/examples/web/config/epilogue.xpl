@@ -21,7 +21,8 @@
     xmlns:fo="http://www.w3.org/1999/XSL/Format"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
-    xmlns:xforms="http://www.w3.org/2002/xforms">
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
     <p:param type="input" name="data"/>
     <p:param type="input" name="instance"/>
@@ -78,10 +79,35 @@
         <p:otherwise>
             <p:choose href="#data">
                 <p:when test="//xforms:model">
+                    <!-- Extract models -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="aggregate('xxforms:models', #data#xpointer(//xforms:model))"/>
+                        <p:output name="data" id="xforms-models"/>
+                    </p:processor>
+                    <!-- Extract controls -->
+                    <p:processor name="oxf:xslt">
+                        <p:input name="data" href="#data"/>
+                        <p:input name="config" href="xforms-extract-controls.xsl"/>
+                        <p:output name="data" id="xforms-controls"/>
+                    </p:processor>
+                    <!-- Get initial instances -->
+                    <p:processor name="oxf:xforms-server">
+                        <p:input name="instances"><xxforms:instances/></p:input>
+                        <p:input name="models" href="#xforms-models"/>
+                        <p:input name="controls" href="#xforms-controls"/>
+                        <p:input name="event"><xxforms:events/></p:input>
+                        <p:output name="response" id="response"/>
+                    </p:processor>
+                    <p:processor name="oxf:null-serializer">
+                        <p:input name="data" href="#response"/>
+                    </p:processor>
                     <p:processor name="oxf:xslt">
                         <p:input name="config" href="xforms-to-ajax-xhtml.xsl"/>
                         <p:input name="data" href="#data"/>
-                        <p:output name="data" id="xformed-data" debug="ajax"/>
+                        <p:input name="models" href="#xforms-models"/>
+                        <p:input name="controls" href="#xforms-controls"/>
+                        <p:input name="initialization-response" href="#response"/>
+                        <p:output name="data" id="xformed-data"/>
                     </p:processor>
                 </p:when>
                 <p:otherwise>

@@ -12,18 +12,17 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>XML to URL</title>
+    <title>XQuery The Web</title>
     <source>page-flow.xml</source>
+    <source>redirect.xpl</source>
+    <source>show-javascript-model.xpl</source>
+    <source>show-javascript-view.xsl</source>
+    <source>view.xml</source>
     <source>xforms-model.xml</source>
-    <source>model.xpl</source>
-    <source>view.xsl</source>
-    <source>xml-to-url.xpl</source>
-    <source>url-to-xml.xpl</source>
+    <source>xquery-the-web.xpl</source>
     <description>
         <p>
-            This example illustrates the use of <a href="http://tinyurl.com/">TinyURL.com</a> to
-            create short URLs referring to XML documents. It also shows how to call Java libraries
-            from XSLT.
+            
         </p>
     </description>
 </example-descriptor>

@@ -401,8 +401,8 @@
         <class name="org.orbeon.oxf.processor.xforms.validation.XFormsAnnotate"/>
     </processor>
 
-    <processor name="oxf:xforms-event">
-        <class name="org.orbeon.oxf.processor.xforms.event.XFormsEvent"/>
+    <processor name="oxf:xforms-server">
+        <class name="org.orbeon.oxf.processor.xforms.event.XFormsServer"/>
     </processor>
 
     <!-- Other processors -->

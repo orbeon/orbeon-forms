@@ -13,22 +13,11 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import javax.xml.parsers.SAXParser;
-import org.dom4j.Element;
-import org.dom4j.InvalidXPathException;
+import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-import org.dom4j.Namespace;
-import org.dom4j.QName;
-import org.dom4j.XPath;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.xml.NamespaceCleanupContentHandler;
@@ -36,6 +25,14 @@ import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
+
+import javax.xml.parsers.SAXParser;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Collection of util routines for working with DOM4J.  In particular offers many methods found
@@ -53,14 +50,14 @@ public class Dom4jUtils {
      * checks in place.  If/when DOM4J adds real support then NULL_DOCUMENt should be made a 
      * read only document.
      */
-    public static final org.dom4j.Document NULL_DOCUMENT;
+    public static final Document NULL_DOCUMENT;
 
     static {
         NULL_DOCUMENT = new NonLazyUserDataDocument();
         final NonLazyUserDataDocumentFactory fctry 
             = NonLazyUserDataDocumentFactory.getInstance( null );
         Element nullElement = fctry.createElement("null");
-        final org.dom4j.QName attNm = new QName
+        final QName attNm = new QName
             ( XMLConstants.XSI_NIL_ATTRIBUTE, XSI_NAMESPACE ); 
         nullElement.addAttribute( attNm, "true" );
         NULL_DOCUMENT.setRootElement( nullElement );
@@ -77,7 +74,7 @@ public class Dom4jUtils {
     }
 
     private static String domToString
-    ( final org.dom4j.Node n, final OutputFormat frmt ) {
+    ( final Node n, final OutputFormat frmt ) {
         try {
             final StringWriter wrtr = new StringWriter();
             // Ugh, XMLWriter doesn't accept null formatter _and_ default 
@@ -94,7 +91,7 @@ public class Dom4jUtils {
     }
     
     private static String domToString
-    ( final org.dom4j.Branch brnch, final boolean trm, final boolean cmpct  ) {
+    ( final Branch brnch, final boolean trm, final boolean cmpct  ) {
         final OutputFormat frmt = new OutputFormat();
         if ( cmpct ) {
             frmt.setIndent( false );
@@ -114,34 +111,34 @@ public class Dom4jUtils {
      * Replacment for DocumentHelper.parseText.  DocumentHelper.parseText is not
      * used since it creates work for GC ( because it relies on JAXP ). 
      */
-    public static org.dom4j.Document parseText( final String s ) 
-    throws SAXException, org.dom4j.DocumentException {
+    public static Document parseText( final String s )
+    throws SAXException, DocumentException {
         final java.io.StringReader strRdr = new java.io.StringReader( s );
-        final org.dom4j.Document ret = read( strRdr );
+        final Document ret = read( strRdr );
         return ret;
     }
-    public static org.dom4j.Document read( final java.io.Reader rdr ) 
-    throws SAXException, org.dom4j.DocumentException {
+    public static Document read( final java.io.Reader rdr )
+    throws SAXException, DocumentException {
         final SAXReader sxRdr = createSAXReader();
-        final org.dom4j.Document ret = sxRdr.read( rdr );
+        final Document ret = sxRdr.read( rdr );
         return ret;
     }
-    public static org.dom4j.Document read( final java.io.Reader rdr, final String uri ) 
-    throws SAXException, org.dom4j.DocumentException {
+    public static Document read( final java.io.Reader rdr, final String uri )
+    throws SAXException, DocumentException {
         final SAXReader sxRdr = createSAXReader();
-        final org.dom4j.Document ret = sxRdr.read( rdr, uri );
+        final Document ret = sxRdr.read( rdr, uri );
         return ret;
     }
-    public static org.dom4j.Document read( final java.io.InputStream rdr ) 
-    throws SAXException, org.dom4j.DocumentException {
+    public static Document read( final java.io.InputStream rdr )
+    throws SAXException, DocumentException {
         final SAXReader sxRdr = createSAXReader();
-        final org.dom4j.Document ret = sxRdr.read( rdr );
+        final Document ret = sxRdr.read( rdr );
         return ret;
     }
-    public static org.dom4j.Document read( final java.io.InputStream rdr, final String uri ) 
-    throws SAXException, org.dom4j.DocumentException {
+    public static Document read( final java.io.InputStream rdr, final String uri )
+    throws SAXException, DocumentException {
         final SAXReader sxRdr = createSAXReader();
-        final org.dom4j.Document ret = sxRdr.read( rdr, uri );
+        final Document ret = sxRdr.read( rdr, uri );
         return ret;
     }
 
@@ -149,23 +146,23 @@ public class Dom4jUtils {
      * Removes the elements and text inside the given element, but not the 
      * attributes or namespace declarations on the element.
      */
-    public static void clearElementContent( final org.dom4j.Element elt ) {
+    public static void clearElementContent( final Element elt ) {
         final java.util.List cntnt = elt.content();
         for ( final java.util.ListIterator j = cntnt.listIterator(); 
               j.hasNext(); ) {
-            final org.dom4j.Node chld = ( org.dom4j.Node )j.next();
-            if ( chld.getNodeType() == org.dom4j.Node.TEXT_NODE 
-                 || chld.getNodeType() == org.dom4j.Node.ELEMENT_NODE ) {
+            final Node chld = ( Node )j.next();
+            if ( chld.getNodeType() == Node.TEXT_NODE
+                 || chld.getNodeType() == Node.ELEMENT_NODE ) {
                 j.remove();
             }
         }
     }
-    public static String makeSystemId( final org.dom4j.Document d ) {
-        final org.dom4j.Element e = d.getRootElement();
+    public static String makeSystemId( final Document d ) {
+        final Element e = d.getRootElement();
         final String ret = makeSystemId( e );
         return ret;
     }
-    public static String makeSystemId( final org.dom4j.Element e ) {
+    public static String makeSystemId( final Element e ) {
         final LocationData ld = ( LocationData )e.getData();
         final String ldSid = ld == null ? null : ld.getSystemID();
         final String ret = ldSid == null ? DOMGenerator.DefaultContext : ldSid;
@@ -182,10 +179,10 @@ public class Dom4jUtils {
                 // this will be a node
                 buff.append(objectToString(i.next())); 
             }
-        } else if(o instanceof org.dom4j.Element){
-            buff.append(((org.dom4j.Element) o).asXML());
-        } else if(o instanceof org.dom4j.Node){
-            buff.append(((org.dom4j.Node)o).asXML());
+        } else if(o instanceof Element){
+            buff.append(((Element) o).asXML());
+        } else if(o instanceof Node){
+            buff.append(((Node)o).asXML());
         } else if (o instanceof String)
             buff.append((String) o);
         else if (o instanceof Number)
@@ -196,36 +193,36 @@ public class Dom4jUtils {
     }
 
     public static String domToString
-    ( final org.dom4j.Element e, final boolean trm, final boolean cmpct ) {
-        final org.dom4j.Branch cpy = e.createCopy();
+    ( final Element e, final boolean trm, final boolean cmpct ) {
+        final Branch cpy = e.createCopy();
         final String ret = Dom4jUtils.domToString( cpy, trm, cmpct );
         return ret;
     }
 
-    public static String domToString( final org.dom4j.Element e ) {
+    public static String domToString( final Element e ) {
         final String ret = domToString( e, true, false );
         return ret;
     }
 
     public static String domToString
-    ( final org.dom4j.Document d, final boolean trm, final boolean cmpct ) {
-        final org.dom4j.Element relt = d.getRootElement();
+    ( final Document d, final boolean trm, final boolean cmpct ) {
+        final Element relt = d.getRootElement();
         final String ret = domToString( relt, trm, cmpct );
         return ret;
     }
 
-    public static String domToString( final org.dom4j.Document d ) {
+    public static String domToString( final Document d ) {
         final String ret = domToString( d, true, false );
         return ret;
     }
 
     public static String domToString
-    ( final org.dom4j.Text txt, final boolean t, final boolean c ) {
+    ( final Text txt, final boolean t, final boolean c ) {
         final String ret = txt.getText();
         return ret;
     }
 
-    public static String domToString( final org.dom4j.Text t ) {
+    public static String domToString( final Text t ) {
         return domToString( t, true, false );
     }
 
@@ -234,32 +231,32 @@ public class Dom4jUtils {
      * domToString( ( Type )n, t, c ).  Otherwise returns domToString( n, null )
      */
     public static String domToString
-    ( final org.dom4j.Node n, final boolean t, final boolean c ) {
+    ( final Node n, final boolean t, final boolean c ) {
         final String ret;
         switch ( n.getNodeType() ) {
-            case org.dom4j.Node.DOCUMENT_NODE : 
+            case Node.DOCUMENT_NODE :
             {
-                ret = domToString( ( org.dom4j.Document )n, t, c ); break;
+                ret = domToString( ( Document )n, t, c ); break;
             }
-            case org.dom4j.Node.ELEMENT_NODE : 
+            case Node.ELEMENT_NODE :
             {
-                ret = domToString( ( org.dom4j.Element )n, t, c ); break;
+                ret = domToString( ( Element )n, t, c ); break;
             }
-            case org.dom4j.Node.TEXT_NODE : 
+            case Node.TEXT_NODE :
             {
-                ret = domToString( ( org.dom4j.Text )n, t, c ); break;
+                ret = domToString( ( Text )n, t, c ); break;
             }
             default : ret = domToString( n, null ); break; 
         }
         return ret;
     }
 
-    public static String domToString( final org.dom4j.Node nd ) {
+    public static String domToString( final Node nd ) {
         return domToString( nd, true, false );
     }
 
     public static DocumentSource getDocumentSource
-    ( final org.dom4j.Document d ) {
+    ( final Document d ) {
         /*
          * Saxon's error handler is expensive for the service it provides so we just use our 
          * singeton intead. 
@@ -303,7 +300,7 @@ public class Dom4jUtils {
         return lds;
     }
 
-    public static byte[] getDigest(org.dom4j.Document document) {
+    public static byte[] getDigest(Document document) {
         final DocumentSource ds = getDocumentSource( document );
         return XMLUtils.getDigest( ds );
     }
@@ -316,8 +313,8 @@ public class Dom4jUtils {
      * and SAX level, so this should be used only in rare occasions, when
      * serializing certain documents to XML 1.0.
      */
-    public static org.dom4j.Document adjustNamespaces
-    (org.dom4j.Document document, boolean xml11) {
+    public static Document adjustNamespaces
+    (Document document, boolean xml11) {
         if (xml11)
             return document;
         LocationSAXWriter writer = new LocationSAXWriter();
@@ -417,48 +414,48 @@ public class Dom4jUtils {
         final XPath ret = fctry.createXPath( exprsn );
         return ret;
     }
-    public static org.dom4j.Text createText( final String txt ) {
+    public static Text createText( final String txt ) {
         final NonLazyUserDataDocumentFactory fctry 
             = NonLazyUserDataDocumentFactory.getInstance( null );
-        final org.dom4j.Text ret = fctry.createText( txt );
+        final Text ret = fctry.createText( txt );
         return ret;
     }
-    public static org.dom4j.Element createElement
+    public static Element createElement
     ( final String qualifiedName, final String namespaceURI) {
         final NonLazyUserDataDocumentFactory fctry
             = NonLazyUserDataDocumentFactory.getInstance( null );
-        final org.dom4j.Element ret = fctry.createElement(qualifiedName, namespaceURI);
+        final Element ret = fctry.createElement(qualifiedName, namespaceURI);
         return ret;
     }
-    public static org.dom4j.Attribute createAttribute
-    ( final org.dom4j.Element elt, final org.dom4j.QName nm, final String val ) {
+    public static Attribute createAttribute
+    ( final Element elt, final QName nm, final String val ) {
         final NonLazyUserDataDocumentFactory fctry
             = NonLazyUserDataDocumentFactory.getInstance( null );
-        final org.dom4j.Attribute ret = fctry.createAttribute( elt, nm, val );
+        final Attribute ret = fctry.createAttribute( elt, nm, val );
         return ret;
     }
-    public static org.dom4j.Namespace createNamespace( final String pfx, final String uri ) {
+    public static Namespace createNamespace( final String pfx, final String uri ) {
         final NonLazyUserDataDocumentFactory fctry 
             = NonLazyUserDataDocumentFactory.getInstance( null );
-        final org.dom4j.Namespace ret = fctry.createNamespace( pfx, uri );
+        final Namespace ret = fctry.createNamespace( pfx, uri );
         return ret;
     }
 
     /**
      * @return A document from with a _copy_ of root as its root.
      */
-    public static org.dom4j.Document createDocument( final org.dom4j.Element root ) {
-        final org.dom4j.Element cpy = root.createCopy();
+    public static Document createDocument( final Element root ) {
+        final Element cpy = root.createCopy();
         final NonLazyUserDataDocumentFactory fctry 
             = NonLazyUserDataDocumentFactory.getInstance( null );
-        final org.dom4j.Document ret = fctry.createDocument( cpy );
+        final Document ret = fctry.createDocument( cpy );
         return ret;
     }
 
-    public static org.dom4j.Document createDocument() {
+    public static Document createDocument() {
         final NonLazyUserDataDocumentFactory fctry
             = NonLazyUserDataDocumentFactory.getInstance( null );
-        final org.dom4j.Document ret = fctry.createDocument();
+        final Document ret = fctry.createDocument();
         return ret;
     }
 }

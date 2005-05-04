@@ -54,8 +54,8 @@ public class XFormsAnnotate extends ProcessorImpl {
                     }
 
                     // Set annotated instance on model
-                    Document instance = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
-                    model.setInstance(instance);
+                    Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
+                    model.setInstanceDocument(pipelineContext, instanceDocument);
 
                     // Create and initialize XForms Engine
                     XFormsContainingDocument containingDocument = new XFormsContainingDocument(null);
@@ -64,13 +64,12 @@ public class XFormsAnnotate extends ProcessorImpl {
 
                     // Run remaining model item properties
                     // TODO: this has to be done in a different way (events?)
-                    model.applyOtherBinds(pipelineContext, instance.getDocument());
-
+                    model.applyOtherBinds(pipelineContext);
 
                     // Output the instance to the specified content handler
                     LocationSAXWriter saxw = new LocationSAXWriter();
                     saxw.setContentHandler(contentHandler);
-                    saxw.write(instance);
+                    saxw.write(instanceDocument);
                 } catch (SAXException e) {
                     throw new OXFException(e);
                 }

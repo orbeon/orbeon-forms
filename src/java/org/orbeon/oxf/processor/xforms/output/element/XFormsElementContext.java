@@ -55,7 +55,7 @@ public class XFormsElementContext {
         this.pipelineContext = pipelineContext;
         this.contentHandler = contentHandler;
         this.model = model;
-        this.documentWrapper = new DocumentWrapper(model.getInstance(), null);
+        this.documentWrapper = new DocumentWrapper(model.getInstanceDocument(), null);
         this.encryptionPassword = SecureUtils.generateRandomPassword();
     }
 
@@ -88,7 +88,7 @@ public class XFormsElementContext {
 
     public Node getCurrentSingleNode() {
         if (nodesetStack.isEmpty()) {
-            return model.getInstance();
+            return model.getInstanceDocument();
         } else {
             List nodeset = getCurrentNodeset();
             if (nodeset.size() == 0)
@@ -100,7 +100,7 @@ public class XFormsElementContext {
     }
 
     public List getCurrentNodeset() {
-        return nodesetStack.isEmpty() ? Arrays.asList(new Object[] { model.getInstance() })
+        return nodesetStack.isEmpty() ? Arrays.asList(new Object[] { model.getInstanceDocument() })
             : (List) nodesetStack.peek();
     }
 
@@ -205,7 +205,7 @@ public class XFormsElementContext {
     }
 
     public Document getInstance() {
-        return model.getInstance();
+        return model.getInstanceDocument();
     }
 
     public String getEncryptionPassword() {

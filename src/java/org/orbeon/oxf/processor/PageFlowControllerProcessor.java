@@ -22,7 +22,7 @@ import org.orbeon.oxf.processor.pipeline.PipelineConfig;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.serializer.legacy.HTMLSerializer;
-import org.orbeon.oxf.processor.xforms.input.Instance;
+import org.orbeon.oxf.processor.xforms.input.XFormsInstance;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.transformer.xupdate.Constants;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -852,7 +852,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         Document config = null;
                         try {
                             config = Dom4jUtils.parseText
-                                    ("<config><key>" + Instance.REQUEST_INSTANCE_DOCUMENT + "</key><scope>request</scope></config>");
+                                    ("<config><key>" + XFormsInstance.REQUEST_INSTANCE_DOCUMENT + "</key><scope>request</scope></config>");
                         } catch (DocumentException e) {
                             throw new OXFException(e);
                         } catch ( final SAXException e ) {

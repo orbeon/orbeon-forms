@@ -1,7 +1,7 @@
 package org.orbeon.oxf.processor.xforms;
 
 import org.dom4j.Document;
-import org.orbeon.oxf.processor.xforms.event.XFormsEvent;
+import org.orbeon.oxf.processor.xforms.event.XFormsServer;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 import java.util.*;
@@ -30,8 +30,12 @@ public class XFormsContainingDocument {
         modelsMap.put(model.getId(), model);
     }
 
+    /**
+     * Return model with the specified id, null if not found. If the id is the empty string, return
+     * the default model, i.e. the first model.
+     */
     public XFormsModel getModel(String id) {
-        return (XFormsModel) modelsMap.get(id);
+        return (XFormsModel) ("".equals(id) ? models.get(0) : modelsMap.get(id));
     }
 
     public List getModels() {
@@ -48,7 +52,7 @@ public class XFormsContainingDocument {
         // 2. Dispatch xforms-model-construct-done to all models
         // 3. Dispatch xforms-ready to all models
 
-        final String[] eventsToDispatch = { XFormsEvent.XFORMS_MODEL_CONSTRUCT, XFormsEvent.XFORMS_MODEL_DONE, XFormsEvent.XFORMS_READY };
+        final String[] eventsToDispatch = { XFormsServer.XFORMS_MODEL_CONSTRUCT, XFormsServer.XFORMS_MODEL_DONE, XFormsServer.XFORMS_READY };
         for (int i = 0; i < eventsToDispatch.length; i++) {
             for (Iterator j = getModels().iterator(); j.hasNext();) {
                 XFormsModel model = (XFormsModel) j.next();

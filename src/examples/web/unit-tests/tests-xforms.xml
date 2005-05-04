@@ -1099,9 +1099,9 @@
             </p:config>
         </input>
         <output name="data">
-            <instance xmlns:a="a" xmlns:b="b" xmlns:xforms="http://www.w3.org/2002/xforms">
-                <a:a>1</a:a>
-                <b:b>B</b:b>
+            <instance>
+                <a:a xmlns:a="a">1</a:a>
+                <b:b xmlns:b="b">B</b:b>
             </instance>
         </output>
     </test>

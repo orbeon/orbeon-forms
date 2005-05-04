@@ -22,9 +22,9 @@
     <p:param name="response" type="output" schema-href="xforms-server-response.rng"/>
 
     <!-- Execute event action -->
-    <p:processor name="oxf:xforms-event">
-        <p:input name="instance" href="#request#xpointer(/xxforms:event-fired/xxforms:instances/xxforms:instance/*[1])"/>
-        <p:input name="model" href="#request#xpointer(/xxforms:event-fired/xxforms:models/xforms:model[1])"/>
+    <p:processor name="oxf:xforms-server">
+        <p:input name="instances" href="#request#xpointer(/xxforms:event-fired/xxforms:instances)"/>
+        <p:input name="models" href="#request#xpointer(/xxforms:event-fired/xxforms:models)"/>
         <p:input name="controls" href="#request#xpointer(/xxforms:event-fired/xxforms:controls)"/>
         <p:input name="event" href="#request#xpointer(/xxforms:event-fired/xxforms:event)"/>
 

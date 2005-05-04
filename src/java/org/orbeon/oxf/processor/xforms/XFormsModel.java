@@ -32,7 +32,8 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.event.EventTarget;
-import org.orbeon.oxf.processor.xforms.event.XFormsEvent;
+import org.orbeon.oxf.processor.xforms.event.XFormsServer;
+import org.orbeon.oxf.processor.xforms.input.XFormsInstance;
 import org.orbeon.oxf.processor.xforms.output.BooleanModelItemProperty;
 import org.orbeon.oxf.processor.xforms.output.InstanceData;
 import org.orbeon.oxf.processor.xforms.output.XFormsFunctionLibrary;
@@ -45,7 +46,6 @@ import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
@@ -228,7 +228,8 @@ public class XFormsModel implements EventTarget, Cloneable {
     private Grammar schemaGrammar;
 
     // Instance
-    private Document instanceDocument;
+    //private Document instanceDocument;
+    private XFormsInstance instance;
     private InstanceConstructListener instanceConstructListener;
 
     // Submission information
@@ -419,32 +420,36 @@ public class XFormsModel implements EventTarget, Cloneable {
         }
     }
 
-    public Document getInstance() {
-        return instanceDocument;
+    public XFormsInstance getInstance() {
+        return instance;
     }
 
-    public void setInstance(Document instanceDocument) {
+    public Document getInstanceDocument() {
+        return instance.getDocument();
+    }
+
+    public void setInstanceDocument(PipelineContext pipelineContext, Document instanceDocument) {
         XFormsUtils.setInitialDecoration(instanceDocument);
-        this.instanceDocument = instanceDocument;
+        this.instance = new XFormsInstance(pipelineContext, instanceDocument);
     }
 
-    public void applyOtherBinds(final PipelineContext pipelineContext, Document instanceDocument) {
-        applyBinds(instanceDocument, new BindRunner() {
+    public void applyOtherBinds(final PipelineContext pipelineContext) {
+        applyBinds(new BindRunner() {
             public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
                 handleOtherBinds(pipelineContext, modelBind, documentWrapper, this);
             }
         });
-        reconcile(instanceDocument.getRootElement());
+        reconcile(instance.getDocument().getRootElement());
     }
 
     /**
      * Apply schema validation only.
      */
-    private void applySchema(Document instanceDocument) {
+    private void applySchema() {
         if (!isSkipInstanceSchemaValidation() && schemaGrammar != null) {
             final REDocumentDeclaration rdd = new REDocumentDeclaration(schemaGrammar);
             final Acceptor acc = rdd.createAcceptor();
-            final Element relt = instanceDocument.getRootElement();
+            final Element relt = instance.getDocument().getRootElement();
             final IDConstraintChecker icc = new IDConstraintChecker();
 
             validateElement(relt, acc, icc);
@@ -460,12 +465,12 @@ public class XFormsModel implements EventTarget, Cloneable {
     /**
      * Apply binds.
      */
-    private void applyBinds(Document instanceDocument, BindRunner bindRunner) {
+    private void applyBinds(BindRunner bindRunner) {
         for (Iterator i = binds.iterator(); i.hasNext();) {
             final ModelBind modelBind = (ModelBind) i.next();
             try {
                 // Create XPath evaluator for this bind
-                final DocumentWrapper documentWrapper = new DocumentWrapper(instanceDocument, null);
+                final DocumentWrapper documentWrapper = new DocumentWrapper(instance.getDocument(), null);
                 bindRunner.applyBind(modelBind, documentWrapper);
             } catch (final Exception e) {
                 throw new ValidationException(e, modelBind.getLocationData());
@@ -904,7 +909,7 @@ public class XFormsModel implements EventTarget, Cloneable {
 
         // find the final node
         List nodeset = new ArrayList();
-        nodeset.add(instanceDocument);
+        nodeset.add(instance.getDocument());
         for (Iterator i = parents.iterator(); i.hasNext();) {
             ModelBind current = (ModelBind) i.next();
             List currentModelBindResults = new ArrayList();
@@ -964,7 +969,7 @@ public class XFormsModel implements EventTarget, Cloneable {
     }
 
     public void dispatchEvent(final PipelineContext pipelineContext, String eventName) {
-        if (XFormsEvent.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
+        if (XFormsServer.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
             // 4.2.1 The xforms-model-construct Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
 
@@ -1007,22 +1012,19 @@ public class XFormsModel implements EventTarget, Cloneable {
             //    Instance may not be specified.
 
             // TODO: support external instance
-            if (instanceDocument == null) {
+            if (instance == null) {
                 // Build initial instance document
                 Element instanceContainer = modelElement.element(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
                 if (instanceContainer != null) {
-                    Element initialInstanceRoot = (Element)
-                            ((Element) instanceContainer.elements().get(0)).clone();
-                    instanceDocument = new NonLazyUserDataDocument();
-                    instanceDocument.setRootElement(initialInstanceRoot);
-                    XFormsUtils.setInitialDecoration(instanceDocument);
+                    Document instanceDocument = Dom4jUtils.createDocument((Element) instanceContainer.elements().get(0));
+                    setInstanceDocument(pipelineContext, instanceDocument);
                 }
             }
             // TODO: throw exception event
 
             // Call special listener to update instance
             if (instanceConstructListener != null) {
-                instanceConstructListener.updateInstance(instanceDocument);
+                instanceConstructListener.updateInstance(instance);
             }
 
             // 3. P3P (N/A)
@@ -1036,44 +1038,44 @@ public class XFormsModel implements EventTarget, Cloneable {
             // TODO: a, b, c xxx
 
             // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-            dispatchEvent(pipelineContext, XFormsEvent.XFORMS_REBUILD);
-            dispatchEvent(pipelineContext, XFormsEvent.XFORMS_RECALCULATE);
-            dispatchEvent(pipelineContext, XFormsEvent.XFORMS_REVALIDATE);
+            dispatchEvent(pipelineContext, XFormsServer.XFORMS_REBUILD);
+            dispatchEvent(pipelineContext, XFormsServer.XFORMS_RECALCULATE);
+            dispatchEvent(pipelineContext, XFormsServer.XFORMS_REVALIDATE);
 
-        } else if (XFormsEvent.XFORMS_MODEL_DONE.equals(eventName)) {
+        } else if (XFormsServer.XFORMS_MODEL_DONE.equals(eventName)) {
             // 4.2.2 The xforms-model-construct-done Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
 
-        } else if (XFormsEvent.XFORMS_READY.equals(eventName)) {
+        } else if (XFormsServer.XFORMS_READY.equals(eventName)) {
             // 4.2.3 The xforms-ready Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
             // The default action for this event results in the following: None
-        } else if (XFormsEvent.XFORMS_MODEL_DESTRUCT.equals(eventName)) {
+        } else if (XFormsServer.XFORMS_MODEL_DESTRUCT.equals(eventName)) {
             // 4.2.4 The xforms-model-destruct Event
             // Bubbles: No / Cancelable: No / Context Info: None
             // The default action for this event results in the following: None
-        } else if (XFormsEvent.XFORMS_REBUILD.equals(eventName)) {
+        } else if (XFormsServer.XFORMS_REBUILD.equals(eventName)) {
             // 4.3.7 The xforms-rebuild Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
             // TODO: rebuild computational dependency data structures
-        } else if (XFormsEvent.XFORMS_RECALCULATE.equals(eventName)) {
+        } else if (XFormsServer.XFORMS_RECALCULATE.equals(eventName)) {
             // 4.3.6 The xforms-recalculate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
-            applyBinds(instanceDocument, new BindRunner() {
+            applyBinds(new BindRunner() {
                 public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
                     handleCalculateBind(pipelineContext, modelBind, documentWrapper, this);
                 }
             });
-            reconcile(instanceDocument.getRootElement());
+            reconcile(instance.getDocument().getRootElement());
 
-        } else if (XFormsEvent.XFORMS_REVALIDATE.equals(eventName)) {
+        } else if (XFormsServer.XFORMS_REVALIDATE.equals(eventName)) {
             // 4.3.5 The xforms-revalidate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
             // Clear all existing errors on instance
-            XFormsUtils.updateInstanceData(instanceDocument, new XFormsUtils.InstanceWalker() {
+            XFormsUtils.updateInstanceData(instance.getDocument(), new XFormsUtils.InstanceWalker() {
                 public void walk(Node node, InstanceData instanceData) {
                     if (instanceData != null)
                         instanceData.clearSchemaErrors();
@@ -1081,21 +1083,21 @@ public class XFormsModel implements EventTarget, Cloneable {
             });
 
             // Run validation
-            applySchema(instanceDocument);
-            applyBinds(instanceDocument, new BindRunner() {
+            applySchema();
+            applyBinds(new BindRunner() {
                 public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
                     handleValidationBind(pipelineContext, modelBind, documentWrapper, this);
                 }
             });
-            reconcile(instanceDocument.getRootElement());
+            reconcile(instance.getDocument().getRootElement());
 
             // TODO: dispatch events
-        } else if (XFormsEvent.XFORMS_REFRESH.equals(eventName)) {
+        } else if (XFormsServer.XFORMS_REFRESH.equals(eventName)) {
             // 4.3.4 The xforms-refresh Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
             // TODO
-        } else if (XFormsEvent.XFORMS_RESET.equals(eventName)) {
+        } else if (XFormsServer.XFORMS_RESET.equals(eventName)) {
             // 4.3.8 The xforms-reset Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
@@ -1110,7 +1112,7 @@ public class XFormsModel implements EventTarget, Cloneable {
     }
 
     public static interface InstanceConstructListener {
-        public void updateInstance(Document instanceDocument);
+        public void updateInstance(XFormsInstance instance);
     }
 
     public void setInstanceConstructListener(InstanceConstructListener instanceConstructListener) {

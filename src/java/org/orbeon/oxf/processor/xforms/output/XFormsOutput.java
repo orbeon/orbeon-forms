@@ -55,8 +55,8 @@ public class XFormsOutput extends ProcessorImpl {
                 }
 
                 // Set annotated instance on model
-                Document instance = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
-                model.setInstance(instance);
+                Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
+                model.setInstanceDocument(pipelineContext, instanceDocument);
 
                 // Create and initialize XForms Engine
                 XFormsContainingDocument containingDocument = new XFormsContainingDocument(null);
@@ -65,7 +65,7 @@ public class XFormsOutput extends ProcessorImpl {
 
                 // Run remaining model item properties
                 // TODO: this has to be done in a different way (events?)
-                model.applyOtherBinds(pipelineContext, instance.getDocument());
+                model.applyOtherBinds(pipelineContext);
 
                 // Create evaluation context
                 XFormsElementContext elementContext =

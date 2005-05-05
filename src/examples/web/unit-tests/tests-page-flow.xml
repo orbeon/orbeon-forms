@@ -183,10 +183,6 @@
                 <parameters/>
                 <parameters>
                     <parameter>
-                        <name>$key</name>
-                        <value/>
-                    </parameter>
-                    <parameter>
                         <name>$instance</name>
                         <value/>
                     </parameter>

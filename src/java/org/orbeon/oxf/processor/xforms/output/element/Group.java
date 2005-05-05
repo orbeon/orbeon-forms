@@ -14,8 +14,6 @@
 package org.orbeon.oxf.processor.xforms.output.element;
 
 import org.dom4j.*;
-import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
@@ -60,17 +58,10 @@ public class Group extends XFormsElement {
             });
 
             // Encode instance in a string and put in hidden field
-            String instanceString = XFormsUtils.instanceToString(context.getPipelineContext(),
-                    context.getEncryptionPassword(), instance);
-            sendHiddenElement(context, "$instance", instanceString);
 
-            // Generate hidden field with random key encrypted with server key
-            if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
-                String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
-                String encryptedRandomKey = SecureUtils.encrypt(context.getPipelineContext(),
-                        serverPassword, context.getEncryptionPassword());
-                sendHiddenElement(context, "$key", encryptedRandomKey);
-            }
+            XFormsUtils.removeXXFormsAttributes(instance);
+            String instanceString = XFormsUtils.encodeXML(context.getPipelineContext(), instance);
+            sendHiddenElement(context, "$instance", instanceString);
         }
 
         // Close form

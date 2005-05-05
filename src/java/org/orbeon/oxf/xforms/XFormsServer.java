@@ -26,7 +26,6 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
-import org.orbeon.oxf.xml.EmbeddedDocumentContentHandler;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.xpath.XPathException;
@@ -44,11 +43,7 @@ public class XFormsServer extends ProcessorImpl {
 
     static private Logger logger = LoggerFactory.createLogger(XFormsServer.class);
 
-    private static final String INPUT_INSTANCES = "instances";
-    private static final String INPUT_MODELS = "models";
-    private static final String INPUT_CONTROLS = "controls";
-    private static final String INPUT_EVENT = "event";
-
+    private static final String INPUT_REQUEST = "request";
     private static final String OUTPUT_RESPONSE = "response";
 
     public static final Map XFORMS_NAMESPACES = new HashMap();
@@ -60,10 +55,7 @@ public class XFormsServer extends ProcessorImpl {
     }
 
     public XFormsServer() {
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_INSTANCES));
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_MODELS));
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONTROLS));
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_EVENT));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_REQUEST));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_RESPONSE));
     }
 
@@ -71,63 +63,55 @@ public class XFormsServer extends ProcessorImpl {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
 
-                // Get XForms model and instance, etc.
-                Document instancesDocument = readInputAsDOM4J(pipelineContext, INPUT_INSTANCES);
-                Document modelsDocument = readInputAsDOM4J(pipelineContext, INPUT_MODELS);
-                Document controlsDocument = readInputAsDOM4J(pipelineContext, INPUT_CONTROLS);
-                Document eventDocument = readInputAsDOM4J(pipelineContext, INPUT_EVENT);
+                // Extract information from request
+                Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
+                Document eventDocument = Dom4jUtils.createDocument(requestDocument.getRootElement().element(new QName("xxf:event", XFormsConstants.XXFORMS_NAMESPACE)));
+
+                // Get controls
+                String encodedControlsString = requestDocument.getRootElement().element(new QName("xxf:controls", XFormsConstants.XXFORMS_NAMESPACE)).getText();
+                Document controlsDocument = XFormsUtils.decodeXML(pipelineContext, encodedControlsString);
 
                 // Create XForms Engine
                 XFormsContainingDocument containingDocument = new XFormsContainingDocument(controlsDocument);
 
                 // Get models
                 {
-                    PooledXPathExpression xpathExpression =
-                        XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(modelsDocument, null).wrap(controlsDocument),
-                                "/xxf:models/*", XFORMS_NAMESPACES);
-                    try {
-                        for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
-                            Element modelElement = (Element) i.next();
-                            Document modelDocument = Dom4jUtils.createDocument(modelElement);
+                    Element encodedModelsElement = requestDocument.getRootElement().element(new QName("xxf:models", XFormsConstants.XXFORMS_NAMESPACE));
+                    String encodedModelsString = encodedModelsElement.getText();
+                    Document modelsDocument = XFormsUtils.decodeXML(pipelineContext, encodedModelsString);
 
-                            XFormsModel model = new XFormsModel(modelDocument);
-                            containingDocument.addModel(model);
-                        }
-                    } catch (XPathException e) {
-                        throw new OXFException(e);
-                    } finally {
-                        if (xpathExpression != null)
-                            xpathExpression.returnToPool();
+                    for (Iterator i = modelsDocument.getRootElement().elements().iterator(); i.hasNext();) {
+                        Element modelElement = (Element) i.next();
+
+                        Document modelDocument = Dom4jUtils.createDocument(modelElement);
+                        XFormsModel model = new XFormsModel(modelDocument);
+                        containingDocument.addModel(model);
                     }
+
                 }
 
                 // Get instances
                 boolean isInitializeEvent;
                 {
-                    PooledXPathExpression xpathExpression =
-                        XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(instancesDocument, null).wrap(controlsDocument),
-                                "/xxf:instances/xxf:instance/*", XFORMS_NAMESPACES);
-                    try {
-                        int instancesCount = 0;
-                        for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
-                            Element instanceElement = (Element) i.next();
-                            Document instanceDocument = Dom4jUtils.createDocument(instanceElement);
 
-                            // Set instance on model
-                            ((XFormsModel) containingDocument.getModels().get(instancesCount)).setInstanceDocument(pipelineContext, instanceDocument);
+                    Element encodedInstancesElement = requestDocument.getRootElement().element(new QName("xxf:instances", XFormsConstants.XXFORMS_NAMESPACE));
+                    String encodedInstancesString = encodedInstancesElement.getText();
+                    Document instancesDocument = XFormsUtils.decodeXML(pipelineContext, encodedInstancesString);
 
-                            instancesCount++;
-                        }
-                        if (instancesCount != 0 && containingDocument.getModels().size() != instancesCount)
-                            throw new OXFException("Number of instances (" + instancesCount + ") doesn't match number of models (" + containingDocument.getModels().size()  + ").");
-                        // Initialization will take place if no instances are provided
-                        isInitializeEvent = instancesCount == 0;
-                    } catch (XPathException e) {
-                        throw new OXFException(e);
-                    } finally {
-                        if (xpathExpression != null)
-                            xpathExpression.returnToPool();
+                    int instancesCount = 0;
+                    for (Iterator i = instancesDocument.getRootElement().elements().iterator(); i.hasNext();) {
+                        Element instanceElement = (Element) i.next();
+
+                        Document instanceDocument = Dom4jUtils.createDocument(instanceElement);
+                        ((XFormsModel) containingDocument.getModels().get(instancesCount)).setInstanceDocument(pipelineContext, instanceDocument);
+
+                        instancesCount++;
                     }
+                    // Number of instances must be zero or match number of models
+                    if (instancesCount != 0 && containingDocument.getModels().size() != instancesCount)
+                        throw new OXFException("Number of instances (" + instancesCount + ") doesn't match number of models (" + containingDocument.getModels().size()  + ").");
+                    // Initialization will take place if no instances are provided
+                    isInitializeEvent = instancesCount == 0;
                 }
 
                 // Initialize XForms Engine
@@ -170,7 +154,7 @@ public class XFormsServer extends ProcessorImpl {
                                     String controlId = controlElement.attributeValue(new QName("id", XFormsConstants.XXFORMS_NAMESPACE));
                                     String controlValue = XFormsUtils.getControlValue(pipelineContext, containingDocument, controlElement);
 
-                                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] {"id", controlId, "value", controlValue });
+                                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] { "id", controlId, "value", controlValue });
                                 }
                             } catch (XPathException e) {
                                 throw new OXFException(e);
@@ -187,13 +171,24 @@ public class XFormsServer extends ProcessorImpl {
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "instances");
 
-                        for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
-                            XFormsModel model = (XFormsModel) i.next();
+                        Document instancesDocument = Dom4jUtils.createDocument();
 
-                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "instance");
-                            model.getInstance().read(new EmbeddedDocumentContentHandler(contentHandler));
-                            ch.endElement();
+                        // Move all instances under a single root element
+                        {
+                            instancesDocument.addElement("instances");
+                            Element instancesElement = instancesDocument.getRootElement();
+
+                            for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
+                                XFormsModel model = (XFormsModel) i.next();
+
+                                instancesElement.add(model.getInstance().getDocument().getRootElement().detach());
+                            }
                         }
+
+                        // Encode all instances
+                        String encodedInstance = XFormsUtils.encodeXML(pipelineContext, instancesDocument);
+                        ch.text(encodedInstance);
+
                         ch.endElement();
                     }
 

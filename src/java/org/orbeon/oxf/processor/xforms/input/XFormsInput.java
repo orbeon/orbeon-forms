@@ -140,7 +140,7 @@ public class XFormsInput extends ProcessorImpl {
                             for (int i = 0; i < actions.length; i++) {
                                 Action action = actions[i];
                                 action.run(pipelineContext, new ActionFunctionContext(),
-                                        requestParameters.getEncryptionPassword(), localInstance.getDocument());
+                                        requestParameters.getEncryptionKey(), localInstance.getDocument());
                             }
                             if (logger.isDebugEnabled())
                                 logger.debug("2) Instance with actions applied:\n"

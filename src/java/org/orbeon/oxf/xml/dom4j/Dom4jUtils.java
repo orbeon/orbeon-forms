@@ -41,129 +41,135 @@ import java.util.Map;
  * happens to be specied in DOM4J's system property. )
  */
 public class Dom4jUtils {
-    
+
     public static final Namespace XSI_NAMESPACE = new Namespace
-        ( XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI );
-    
+            (XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+
     /**
      * 03/30/2005 d : Currently DOM4J doesn't really support read only documents.  ( No real
-     * checks in place.  If/when DOM4J adds real support then NULL_DOCUMENt should be made a 
+     * checks in place.  If/when DOM4J adds real support then NULL_DOCUMENt should be made a
      * read only document.
      */
     public static final Document NULL_DOCUMENT;
 
     static {
         NULL_DOCUMENT = new NonLazyUserDataDocument();
-        final NonLazyUserDataDocumentFactory fctry 
-            = NonLazyUserDataDocumentFactory.getInstance( null );
+        final NonLazyUserDataDocumentFactory fctry
+                = NonLazyUserDataDocumentFactory.getInstance(null);
         Element nullElement = fctry.createElement("null");
         final QName attNm = new QName
-            ( XMLConstants.XSI_NIL_ATTRIBUTE, XSI_NAMESPACE ); 
-        nullElement.addAttribute( attNm, "true" );
-        NULL_DOCUMENT.setRootElement( nullElement );
+                (XMLConstants.XSI_NIL_ATTRIBUTE, XSI_NAMESPACE);
+        nullElement.addAttribute(attNm, "true");
+        NULL_DOCUMENT.setRootElement(nullElement);
     }
-    
+
     private static SAXReader createSAXReader() throws SAXException {
         final SAXParser sxPrs = XMLUtils.newSAXParser();
         final XMLReader xr = sxPrs.getXMLReader();
-        final SAXReader sxRdr = new SAXReader( xr );
-        final NonLazyUserDataDocumentFactory fctry 
-            = NonLazyUserDataDocumentFactory.getInstance( null );
-        sxRdr.setDocumentFactory( fctry );
+        final SAXReader sxRdr = new SAXReader(xr);
+        final NonLazyUserDataDocumentFactory fctry
+                = NonLazyUserDataDocumentFactory.getInstance(null);
+        sxRdr.setDocumentFactory(fctry);
         return sxRdr;
     }
 
     private static String domToString
-    ( final Node n, final OutputFormat frmt ) {
+            (final Node n, final OutputFormat frmt) {
         try {
             final StringWriter wrtr = new StringWriter();
             // Ugh, XMLWriter doesn't accept null formatter _and_ default 
             // formatter is protected.
-            final XMLWriter xmlWrtr 
-                = frmt == null 
-                 ? new XMLWriter( wrtr ) : new XMLWriter( wrtr, frmt );
-            xmlWrtr.write( n );
+            final XMLWriter xmlWrtr
+                    = frmt == null
+                    ? new XMLWriter(wrtr) : new XMLWriter(wrtr, frmt);
+            xmlWrtr.write(n);
             xmlWrtr.close();
             return wrtr.toString();
-        } catch ( final IOException e ) {
+        } catch (final IOException e) {
             throw new OXFException(e);
         }
     }
-    
+
     private static String domToString
-    ( final Branch brnch, final boolean trm, final boolean cmpct  ) {
+            (final Branch brnch, final boolean trm, final boolean cmpct) {
         final OutputFormat frmt = new OutputFormat();
-        if ( cmpct ) {
-            frmt.setIndent( false );
-            frmt.setNewlines( false );
-            frmt.setTrimText( true );
+        if (cmpct) {
+            frmt.setIndent(false);
+            frmt.setNewlines(false);
+            frmt.setTrimText(true);
         } else {
-            frmt.setIndentSize( 4 );
-            frmt.setNewlines( trm );
-            frmt.setTrimText( trm );
+            frmt.setIndentSize(4);
+            frmt.setNewlines(trm);
+            frmt.setTrimText(trm);
         }
-        final String ret = domToString( brnch, frmt );
+        final String ret = domToString(brnch, frmt);
         return ret;
     }
-    
-    
+
+
     /**
      * Replacment for DocumentHelper.parseText.  DocumentHelper.parseText is not
-     * used since it creates work for GC ( because it relies on JAXP ). 
+     * used since it creates work for GC ( because it relies on JAXP ).
      */
-    public static Document parseText( final String s )
-    throws SAXException, DocumentException {
-        final java.io.StringReader strRdr = new java.io.StringReader( s );
-        final Document ret = read( strRdr );
+    public static Document parseText(final String s)
+            throws SAXException, DocumentException {
+        final java.io.StringReader strRdr = new java.io.StringReader(s);
+        final Document ret = read(strRdr);
         return ret;
     }
-    public static Document read( final java.io.Reader rdr )
-    throws SAXException, DocumentException {
+
+    public static Document read(final java.io.Reader rdr)
+            throws SAXException, DocumentException {
         final SAXReader sxRdr = createSAXReader();
-        final Document ret = sxRdr.read( rdr );
+        final Document ret = sxRdr.read(rdr);
         return ret;
     }
-    public static Document read( final java.io.Reader rdr, final String uri )
-    throws SAXException, DocumentException {
+
+    public static Document read(final java.io.Reader rdr, final String uri)
+            throws SAXException, DocumentException {
         final SAXReader sxRdr = createSAXReader();
-        final Document ret = sxRdr.read( rdr, uri );
+        final Document ret = sxRdr.read(rdr, uri);
         return ret;
     }
-    public static Document read( final java.io.InputStream rdr )
-    throws SAXException, DocumentException {
+
+    public static Document read(final java.io.InputStream rdr)
+            throws SAXException, DocumentException {
         final SAXReader sxRdr = createSAXReader();
-        final Document ret = sxRdr.read( rdr );
+        final Document ret = sxRdr.read(rdr);
         return ret;
     }
-    public static Document read( final java.io.InputStream rdr, final String uri )
-    throws SAXException, DocumentException {
+
+    public static Document read(final java.io.InputStream rdr, final String uri)
+            throws SAXException, DocumentException {
         final SAXReader sxRdr = createSAXReader();
-        final Document ret = sxRdr.read( rdr, uri );
+        final Document ret = sxRdr.read(rdr, uri);
         return ret;
     }
 
     /**
-     * Removes the elements and text inside the given element, but not the 
+     * Removes the elements and text inside the given element, but not the
      * attributes or namespace declarations on the element.
      */
-    public static void clearElementContent( final Element elt ) {
+    public static void clearElementContent(final Element elt) {
         final java.util.List cntnt = elt.content();
-        for ( final java.util.ListIterator j = cntnt.listIterator(); 
-              j.hasNext(); ) {
-            final Node chld = ( Node )j.next();
-            if ( chld.getNodeType() == Node.TEXT_NODE
-                 || chld.getNodeType() == Node.ELEMENT_NODE ) {
+        for (final java.util.ListIterator j = cntnt.listIterator();
+             j.hasNext();) {
+            final Node chld = (Node) j.next();
+            if (chld.getNodeType() == Node.TEXT_NODE
+                    || chld.getNodeType() == Node.ELEMENT_NODE) {
                 j.remove();
             }
         }
     }
-    public static String makeSystemId( final Document d ) {
+
+    public static String makeSystemId(final Document d) {
         final Element e = d.getRootElement();
-        final String ret = makeSystemId( e );
+        final String ret = makeSystemId(e);
         return ret;
     }
-    public static String makeSystemId( final Element e ) {
-        final LocationData ld = ( LocationData )e.getData();
+
+    public static String makeSystemId(final Element e) {
+        final LocationData ld = (LocationData) e.getData();
         final String ldSid = ld == null ? null : ld.getSystemID();
         final String ret = ldSid == null ? DOMGenerator.DefaultContext : ldSid;
         return ret;
@@ -177,12 +183,12 @@ public class Dom4jUtils {
         if (o instanceof List) {
             for (Iterator i = ((List) o).iterator(); i.hasNext();) {
                 // this will be a node
-                buff.append(objectToString(i.next())); 
+                buff.append(objectToString(i.next()));
             }
-        } else if(o instanceof Element){
+        } else if (o instanceof Element) {
             buff.append(((Element) o).asXML());
-        } else if(o instanceof Node){
-            buff.append(((Node)o).asXML());
+        } else if (o instanceof Node) {
+            buff.append(((Node) o).asXML());
         } else if (o instanceof String)
             buff.append((String) o);
         else if (o instanceof Number)
@@ -193,70 +199,75 @@ public class Dom4jUtils {
     }
 
     public static String domToString
-    ( final Element e, final boolean trm, final boolean cmpct ) {
+            (final Element e, final boolean trm, final boolean cmpct) {
         final Branch cpy = e.createCopy();
-        final String ret = Dom4jUtils.domToString( cpy, trm, cmpct );
+        final String ret = Dom4jUtils.domToString(cpy, trm, cmpct);
         return ret;
     }
 
-    public static String domToString( final Element e ) {
-        final String ret = domToString( e, true, false );
+    public static String domToString(final Element e) {
+        final String ret = domToString(e, true, false);
         return ret;
     }
 
     public static String domToString
-    ( final Document d, final boolean trm, final boolean cmpct ) {
+            (final Document d, final boolean trm, final boolean cmpct) {
         final Element relt = d.getRootElement();
-        final String ret = domToString( relt, trm, cmpct );
+        final String ret = domToString(relt, trm, cmpct);
         return ret;
     }
 
-    public static String domToString( final Document d ) {
-        final String ret = domToString( d, true, false );
+    public static String domToString(final Document d) {
+        final String ret = domToString(d, true, false);
         return ret;
     }
 
     public static String domToString
-    ( final Text txt, final boolean t, final boolean c ) {
+            (final Text txt, final boolean t, final boolean c) {
         final String ret = txt.getText();
         return ret;
     }
 
-    public static String domToString( final Text t ) {
-        return domToString( t, true, false );
+    public static String domToString(final Text t) {
+        return domToString(t, true, false);
     }
 
     /**
-     * Checks type of n and, if apropriate, downcasts and returns 
+     * Checks type of n and, if apropriate, downcasts and returns
      * domToString( ( Type )n, t, c ).  Otherwise returns domToString( n, null )
      */
     public static String domToString
-    ( final Node n, final boolean t, final boolean c ) {
+            (final Node n, final boolean t, final boolean c) {
         final String ret;
-        switch ( n.getNodeType() ) {
-            case Node.DOCUMENT_NODE :
-            {
-                ret = domToString( ( Document )n, t, c ); break;
-            }
-            case Node.ELEMENT_NODE :
-            {
-                ret = domToString( ( Element )n, t, c ); break;
-            }
-            case Node.TEXT_NODE :
-            {
-                ret = domToString( ( Text )n, t, c ); break;
-            }
-            default : ret = domToString( n, null ); break; 
+        switch (n.getNodeType()) {
+            case Node.DOCUMENT_NODE:
+                {
+                    ret = domToString((Document) n, t, c);
+                    break;
+                }
+            case Node.ELEMENT_NODE:
+                {
+                    ret = domToString((Element) n, t, c);
+                    break;
+                }
+            case Node.TEXT_NODE:
+                {
+                    ret = domToString((Text) n, t, c);
+                    break;
+                }
+            default :
+                ret = domToString(n, null);
+                break;
         }
         return ret;
     }
 
-    public static String domToString( final Node nd ) {
-        return domToString( nd, true, false );
+    public static String domToString(final Node nd) {
+        return domToString(nd, true, false);
     }
 
     public static DocumentSource getDocumentSource
-    ( final Document d ) {
+            (final Document d) {
         /*
          * Saxon's error handler is expensive for the service it provides so we just use our 
          * singeton intead. 
@@ -294,27 +305,27 @@ public class Dom4jUtils {
          * 1.4.2_06-b03 	P4 2.6 Ghz	/ 	50 th	tc 4.1.30	9154 ms ( 150 mb ), 6949 ( 512 mb ) 	1.7316203642295738 ( 150 mb ), 1.479365288194895 ( 512 mb )
          *
          */
-        final LocationDocumentSource lds = new LocationDocumentSource( d );
+        final LocationDocumentSource lds = new LocationDocumentSource(d);
         final XMLReader rdr = lds.getXMLReader();
-        rdr.setErrorHandler( XMLUtils.errorHandler );
+        rdr.setErrorHandler(XMLUtils.errorHandler);
         return lds;
     }
 
     public static byte[] getDigest(Document document) {
-        final DocumentSource ds = getDocumentSource( document );
-        return XMLUtils.getDigest( ds );
+        final DocumentSource ds = getDocumentSource(document);
+        return XMLUtils.getDigest(ds);
     }
 
     /**
-     * Clean-up namespaces. Some tools generate namespace "un-declarations" or 
-     * the form xmlns:abc="". While this is needed to keep the XML infoset 
-     * correct, it is illegal to generate such declarations in XML 1.0 (but it 
-     * is legal in XML 1.1). Technically, this cleanup is incorrect at the DOM 
+     * Clean-up namespaces. Some tools generate namespace "un-declarations" or
+     * the form xmlns:abc="". While this is needed to keep the XML infoset
+     * correct, it is illegal to generate such declarations in XML 1.0 (but it
+     * is legal in XML 1.1). Technically, this cleanup is incorrect at the DOM
      * and SAX level, so this should be used only in rare occasions, when
      * serializing certain documents to XML 1.0.
      */
     public static Document adjustNamespaces
-    (Document document, boolean xml11) {
+            (Document document, boolean xml11) {
         if (xml11)
             return document;
         LocationSAXWriter writer = new LocationSAXWriter();
@@ -327,12 +338,12 @@ public class Dom4jUtils {
         }
         return ch.getDocument();
     }
-    
+
     public static Map getNamespaceContext(Element element) {
         Map namespaces = new HashMap();
-        for ( Element currentNode = element; 
-              currentNode != null; 
-              currentNode = currentNode.getParent()) {
+        for (Element currentNode = element;
+             currentNode != null;
+             currentNode = currentNode.getParent()) {
             List currentNamespaces = currentNode.declaredNamespaces();
             for (Iterator j = currentNamespaces.iterator(); j.hasNext();) {
                 Namespace namespace = (Namespace) j.next();
@@ -380,7 +391,7 @@ public class Dom4jUtils {
         String namespaceURI = (String) namespaces.get(prefix);
         if (namespaceURI == null)
             throw new OXFException("No namespace declaration found for prefix: " + prefix);
-    
+
         return new QName(localName, new Namespace(prefix, namespaceURI));
     }
 
@@ -389,10 +400,10 @@ public class Dom4jUtils {
      */
     public static QName explodedQNameToQName(String qName) {
         int openIndex = qName.indexOf("{");
-    
+
         if (openIndex == -1)
             return new QName(qName);
-    
+
         String namespaceURI = qName.substring(openIndex + 1, qName.indexOf("}"));
         String localName = qName.substring(qName.indexOf("}") + 1);
         return new QName(localName, new Namespace("p1", namespaceURI));
@@ -407,54 +418,58 @@ public class Dom4jUtils {
         else
             return "{" + qName.getNamespaceURI() + "}" + qName.getName();
     }
-    
-    public static XPath createXPath( final String exprsn ) throws InvalidXPathException {
-        final NonLazyUserDataDocumentFactory fctry 
-            = NonLazyUserDataDocumentFactory.getInstance( null );
-        final XPath ret = fctry.createXPath( exprsn );
-        return ret;
-    }
-    public static Text createText( final String txt ) {
-        final NonLazyUserDataDocumentFactory fctry 
-            = NonLazyUserDataDocumentFactory.getInstance( null );
-        final Text ret = fctry.createText( txt );
-        return ret;
-    }
-    public static Element createElement
-    ( final String qualifiedName, final String namespaceURI) {
+
+    public static XPath createXPath(final String exprsn) throws InvalidXPathException {
         final NonLazyUserDataDocumentFactory fctry
-            = NonLazyUserDataDocumentFactory.getInstance( null );
+                = NonLazyUserDataDocumentFactory.getInstance(null);
+        final XPath ret = fctry.createXPath(exprsn);
+        return ret;
+    }
+
+    public static Text createText(final String txt) {
+        final NonLazyUserDataDocumentFactory fctry
+                = NonLazyUserDataDocumentFactory.getInstance(null);
+        final Text ret = fctry.createText(txt);
+        return ret;
+    }
+
+    public static Element createElement
+            (final String qualifiedName, final String namespaceURI) {
+        final NonLazyUserDataDocumentFactory fctry
+                = NonLazyUserDataDocumentFactory.getInstance(null);
         final Element ret = fctry.createElement(qualifiedName, namespaceURI);
         return ret;
     }
+
     public static Attribute createAttribute
-    ( final Element elt, final QName nm, final String val ) {
+            (final Element elt, final QName nm, final String val) {
         final NonLazyUserDataDocumentFactory fctry
-            = NonLazyUserDataDocumentFactory.getInstance( null );
-        final Attribute ret = fctry.createAttribute( elt, nm, val );
+                = NonLazyUserDataDocumentFactory.getInstance(null);
+        final Attribute ret = fctry.createAttribute(elt, nm, val);
         return ret;
     }
-    public static Namespace createNamespace( final String pfx, final String uri ) {
-        final NonLazyUserDataDocumentFactory fctry 
-            = NonLazyUserDataDocumentFactory.getInstance( null );
-        final Namespace ret = fctry.createNamespace( pfx, uri );
+
+    public static Namespace createNamespace(final String pfx, final String uri) {
+        final NonLazyUserDataDocumentFactory fctry
+                = NonLazyUserDataDocumentFactory.getInstance(null);
+        final Namespace ret = fctry.createNamespace(pfx, uri);
         return ret;
     }
 
     /**
      * @return A document from with a _copy_ of root as its root.
      */
-    public static Document createDocument( final Element root ) {
+    public static Document createDocument(final Element root) {
         final Element cpy = root.createCopy();
-        final NonLazyUserDataDocumentFactory fctry 
-            = NonLazyUserDataDocumentFactory.getInstance( null );
-        final Document ret = fctry.createDocument( cpy );
+        final NonLazyUserDataDocumentFactory fctry
+                = NonLazyUserDataDocumentFactory.getInstance(null);
+        final Document ret = fctry.createDocument(cpy);
         return ret;
     }
 
     public static Document createDocument() {
         final NonLazyUserDataDocumentFactory fctry
-            = NonLazyUserDataDocumentFactory.getInstance( null );
+                = NonLazyUserDataDocumentFactory.getInstance(null);
         final Document ret = fctry.createDocument();
         return ret;
     }

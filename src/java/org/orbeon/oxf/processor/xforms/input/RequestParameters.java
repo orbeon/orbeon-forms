@@ -48,7 +48,7 @@ public class RequestParameters {
     private Map idToType = new HashMap();
     private List actions = new ArrayList();
     private Document instance;
-    private String encryptionPassword;
+    private String encryptionKey;
 
     public RequestParameters(PipelineContext pipelineContext, Document requestDocument) {
         try {
@@ -56,15 +56,19 @@ public class RequestParameters {
             List parameters = requestDocument.getRootElement().element("parameters").elements("parameter");
 
             // Get encryption key
-            if (org.orbeon.oxf.xforms.XFormsUtils.isHiddenEncryptionEnabled() || org.orbeon.oxf.xforms.XFormsUtils.isNameEncryptionEnabled()) {
-                for (Iterator i = parameters.iterator(); i.hasNext();) {
-                    Element parameterElement = (Element) i.next();
-                    if ("$key".equals(parameterElement.element("name").getStringValue())) {
-                        String value = parameterElement.element("value").getStringValue();
-                        String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
-                        encryptionPassword = SecureUtils.decrypt(pipelineContext, serverPassword, value);
-                    }
-                }
+//            if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
+//                for (Iterator i = parameters.iterator(); i.hasNext();) {
+//                    Element parameterElement = (Element) i.next();
+//                    if ("$key".equals(parameterElement.element("name").getStringValue())) {
+//                        String value = parameterElement.element("value").getStringValue();
+//                        String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
+//                        encryptionPassword = SecureUtils.decrypt(pipelineContext, serverPassword, value);
+//                    }
+//                }
+//            }
+
+            if (XFormsUtils.isHiddenEncryptionEnabled()) {
+                encryptionKey = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
             }
 
             // Go through parameters
@@ -84,7 +88,7 @@ public class RequestParameters {
 
                     // There is only one value for $instnace
                     String encodedInstance = (String) values.get(0);
-                    instance = XFormsUtils.decodeXML(pipelineContext, encodedInstance, encryptionPassword);
+                    instance = XFormsUtils.decodeXML(pipelineContext, encodedInstance);
                 } else if (name.startsWith("$upload^")) {
 
                     // Split encoded name
@@ -184,7 +188,7 @@ public class RequestParameters {
     private void addValue(String name, List values, String type) {
         String idString = name.substring("$node^".length());
         if (XFormsUtils.isNameEncryptionEnabled())
-            idString = SecureUtils.decrypt(pipelineContext, encryptionPassword, idString);
+            idString = SecureUtils.decrypt(pipelineContext, encryptionKey, idString);
         Integer idObject = new Integer(idString);
         String currentValue = (String) idToValue.get(idObject);
         for (Iterator i = values.iterator(); i.hasNext();) {
@@ -223,7 +227,7 @@ public class RequestParameters {
         return instance;
     }
 
-    public String getEncryptionPassword() {
-        return encryptionPassword;
+    public String getEncryptionKey() {
+        return encryptionKey;
     }
 }

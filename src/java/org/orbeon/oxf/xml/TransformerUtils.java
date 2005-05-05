@@ -18,8 +18,11 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.dom4j.io.DocumentResult;
+import org.dom4j.Document;
 
 import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TemplatesHandler;
 import javax.xml.transform.sax.TransformerHandler;
@@ -248,6 +251,13 @@ public class TransformerUtils {
         factory.setErrorListener(errorListener);
         factory.setURIResolver(uriResolver);
         return factory.newTemplates(source);
+    }
+
+    public static Document domToDom4jDocument(org.w3c.dom.Document document) throws TransformerException {
+        Transformer identity = getIdentityTransformer();
+        DocumentResult documentResult = new DocumentResult();
+        identity.transform(new DOMSource(document), documentResult);
+        return documentResult.getDocument();
     }
 
     public static Transformer testCreateTransformerWrapper(Transformer transformer, String publicProperty, String privateProperty) {

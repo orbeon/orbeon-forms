@@ -15,6 +15,7 @@ package org.orbeon.oxf.pipeline;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.util.*;
 
@@ -78,5 +79,9 @@ public class StaticExternalContext {
     public static String setTitle(String title) {
         getStaticContext().getExternalContext().getResponse().setTitle(title);
         return "";
+    }
+
+    public static String encodeXML(org.w3c.dom.Document document) {
+        return XFormsUtils.encodeXML(getStaticContext().getPipelineContext(), document);
     }
 }

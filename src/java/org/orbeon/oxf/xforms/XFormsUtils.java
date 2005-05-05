@@ -20,6 +20,7 @@ import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -27,12 +28,13 @@ import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
+import javax.xml.transform.TransformerException;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ByteArrayInputStream;
 import java.util.*;
-import java.util.zip.GZIPOutputStream;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class XFormsUtils {
 
@@ -122,23 +124,6 @@ public class XFormsUtils {
             (XFormsConstants.XFORMS_ENCRYPT_HIDDEN_PROPERTY, false).booleanValue();
     }
 
-    public static String instanceToString(PipelineContext pipelineContext, String password, Document instance) {
-        removeXXFormsAttributes(instance);
-        try {
-            ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
-            GZIPOutputStream gzipOutputStream = null;
-            gzipOutputStream = new GZIPOutputStream(gzipByteArray);
-            gzipOutputStream.write(Dom4jUtils.domToString(instance).getBytes());
-            gzipOutputStream.close();
-            String compressed = Base64.encode(gzipByteArray.toByteArray());
-            return XFormsUtils.isHiddenEncryptionEnabled()
-                ? SecureUtils.encrypt(pipelineContext, password, compressed)
-                : compressed;
-        } catch (IOException e) {
-            throw new OXFException(e);
-        }
-    }
-
     public static void removeXXFormsAttributes(Document doc) {
         Visitor visitor = new VisitorSupport() {
             public void visit(Element node) {
@@ -192,12 +177,45 @@ public class XFormsUtils {
         return model.getInstance();
     }
 
+    public static String encodeXML(PipelineContext pipelineContext, org.w3c.dom.Document document) {
+
+        try {
+            return encodeXML(pipelineContext, TransformerUtils.domToDom4jDocument(document), getEncryptionKey());
+        } catch (TransformerException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public static String encodeXML(PipelineContext pipelineContext, Document instance) {
+        return encodeXML(pipelineContext, instance, getEncryptionKey());
+    }
+
+    public static String encodeXML(PipelineContext pipelineContext, Document instance, String encryptionPassword) {
+        try {
+            ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
+            GZIPOutputStream gzipOutputStream = null;
+            gzipOutputStream = new GZIPOutputStream(gzipByteArray);
+            gzipOutputStream.write(Dom4jUtils.domToString(instance).getBytes());
+            gzipOutputStream.close();
+            String result = Base64.encode(gzipByteArray.toByteArray());
+            if (encryptionPassword != null)
+                result = SecureUtils.encrypt(pipelineContext, encryptionPassword, result);
+            return result;
+        } catch (IOException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public static Document decodeXML(PipelineContext pipelineContext, String encodedXML) {
+        return decodeXML(pipelineContext, encodedXML, getEncryptionKey());
+    }
+
     public static Document decodeXML(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
         try {
             // Get raw text
             String xmlText;
             {
-                if (XFormsUtils.isHiddenEncryptionEnabled())
+                if (encryptionPassword != null)
                     encodedXML = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedXML);
                 ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(encodedXML));
                 StringBuffer xml = new StringBuffer();
@@ -215,6 +233,13 @@ public class XFormsUtils {
         } catch (IOException e) {
             throw new OXFException(e);
         }
+    }
+
+    public static String getEncryptionKey() {
+        if (XFormsUtils.isHiddenEncryptionEnabled())
+            return OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
+        else
+            return null;
     }
 
     public static interface InstanceWalker {

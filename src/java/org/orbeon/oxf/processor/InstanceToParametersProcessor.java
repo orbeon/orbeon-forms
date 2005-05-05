@@ -19,16 +19,12 @@ import org.dom4j.Element;
 import org.dom4j.VisitorSupport;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -71,7 +67,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
             public void readImpl(PipelineContext pipelineContext, final ContentHandler contentHandler) {
                 try {
                     Element filterElement = readInputAsDOM4J(pipelineContext, INPUT_FILTER).getRootElement();
-                    Document instance = ( org.dom4j.Document )readInputAsDOM4J( pipelineContext, INPUT_INSTANCE ).clone();
+                    Document instance = ( Document )readInputAsDOM4J( pipelineContext, INPUT_INSTANCE ).clone();
                     DocumentWrapper instanceWrapper = new DocumentWrapper(instance,
                             ((LocationData) instance.getRootElement().getData()).getSystemID());
 
@@ -111,13 +107,8 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     contentHandler.startDocument();
                     contentHandler.startElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
                     if (!allMarked[0]) {
-                        String key = null;
-                        if (org.orbeon.oxf.xforms.XFormsUtils.isHiddenEncryptionEnabled() || org.orbeon.oxf.xforms.XFormsUtils.isNameEncryptionEnabled()) {
-                            key = SecureUtils.generateRandomPassword();
-                            String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
-                            outputParameter("$key", SecureUtils.encrypt(pipelineContext, serverPassword, key), contentHandler);
-                        }
-                        outputParameter("$instance", org.orbeon.oxf.xforms.XFormsUtils.instanceToString(pipelineContext, key, instance), contentHandler);
+                        XFormsUtils.removeXXFormsAttributes(instance);
+                        outputParameter("$instance", XFormsUtils.encodeXML(pipelineContext, instance), contentHandler);
                     }
                     contentHandler.endElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT);
                     contentHandler.endDocument();

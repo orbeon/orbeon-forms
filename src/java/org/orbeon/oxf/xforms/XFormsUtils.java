@@ -186,7 +186,7 @@ public class XFormsUtils {
         }
     }
 
-    public static String encodeXML(PipelineContext pipelineContext, Document instance) {
+    public static String encodeXMLAsDOM(PipelineContext pipelineContext, Document instance) {
         return encodeXML(pipelineContext, instance, getEncryptionKey());
     }
 
@@ -202,6 +202,14 @@ public class XFormsUtils {
                 result = SecureUtils.encrypt(pipelineContext, encryptionPassword, result);
             return result;
         } catch (IOException e) {
+            throw new OXFException(e);
+        }
+    }
+
+    public static org.w3c.dom.Document decodeXMLAsDOM(PipelineContext pipelineContext, String encodedXML) {
+        try {
+            return TransformerUtils.dom4jToDomDocument(XFormsUtils.decodeXML(pipelineContext, encodedXML));
+        } catch (TransformerException e) {
             throw new OXFException(e);
         }
     }

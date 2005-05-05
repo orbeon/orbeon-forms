@@ -81,7 +81,11 @@ public class StaticExternalContext {
         return "";
     }
 
-    public static String encodeXML(org.w3c.dom.Document document) {
-        return XFormsUtils.encodeXML(getStaticContext().getPipelineContext(), document);
+    public static String encodeXML(org.w3c.dom.Node document) {
+        return XFormsUtils.encodeXML(getStaticContext().getPipelineContext(), document.getOwnerDocument());
+    }
+
+    public static org.w3c.dom.Node decodeXML(String encodedXML) {
+        return XFormsUtils.decodeXMLAsDOM(getStaticContext().getPipelineContext(), encodedXML);
     }
 }

@@ -65,10 +65,11 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Extract information from request
                 Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
-                Document eventDocument = Dom4jUtils.createDocument(requestDocument.getRootElement().element(new QName("xxf:event", XFormsConstants.XXFORMS_NAMESPACE)));
+                System.out.println(Dom4jUtils.domToString(requestDocument));
+                Document eventDocument = Dom4jUtils.createDocument(requestDocument.getRootElement().element(new QName("event", XFormsConstants.XXFORMS_NAMESPACE)));
 
                 // Get controls
-                String encodedControlsString = requestDocument.getRootElement().element(new QName("xxf:controls", XFormsConstants.XXFORMS_NAMESPACE)).getText();
+                String encodedControlsString = requestDocument.getRootElement().element(new QName("controls", XFormsConstants.XXFORMS_NAMESPACE)).getText();
                 Document controlsDocument = XFormsUtils.decodeXML(pipelineContext, encodedControlsString);
 
                 // Create XForms Engine
@@ -76,7 +77,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Get models
                 {
-                    Element encodedModelsElement = requestDocument.getRootElement().element(new QName("xxf:models", XFormsConstants.XXFORMS_NAMESPACE));
+                    Element encodedModelsElement = requestDocument.getRootElement().element(new QName("models", XFormsConstants.XXFORMS_NAMESPACE));
                     String encodedModelsString = encodedModelsElement.getText();
                     Document modelsDocument = XFormsUtils.decodeXML(pipelineContext, encodedModelsString);
 
@@ -94,7 +95,7 @@ public class XFormsServer extends ProcessorImpl {
                 boolean isInitializeEvent;
                 {
 
-                    Element encodedInstancesElement = requestDocument.getRootElement().element(new QName("xxf:instances", XFormsConstants.XXFORMS_NAMESPACE));
+                    Element encodedInstancesElement = requestDocument.getRootElement().element(new QName("instances", XFormsConstants.XXFORMS_NAMESPACE));
                     String encodedInstancesString = encodedInstancesElement.getText();
                     Document instancesDocument = XFormsUtils.decodeXML(pipelineContext, encodedInstancesString);
 
@@ -186,7 +187,7 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Encode all instances
-                        String encodedInstance = XFormsUtils.encodeXML(pipelineContext, instancesDocument);
+                        String encodedInstance = XFormsUtils.encodeXMLAsDOM(pipelineContext, instancesDocument);
                         ch.text(encodedInstance);
 
                         ch.endElement();

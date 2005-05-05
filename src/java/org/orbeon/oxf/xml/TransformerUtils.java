@@ -14,14 +14,16 @@
 package org.orbeon.oxf.xml;
 
 import orbeon.apache.xalan.processor.StylesheetHandler;
+import org.dom4j.Document;
+import org.dom4j.io.DocumentResult;
+import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.dom4j.io.DocumentResult;
-import org.dom4j.Document;
 
 import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.sax.TemplatesHandler;
@@ -47,7 +49,7 @@ public class TransformerUtils {
 
     private static final String SAXON_INDENT_AMOUNT_PROPERTY = "{http://saxon.sf.net/}indent-spaces";
 
-    private static Map transformerFactories = new HashMap();
+//    private static Map transformerFactories = new HashMap();
 
 //    private static void createCompilerFactory() {
 //        new Runnable() {
@@ -258,6 +260,13 @@ public class TransformerUtils {
         DocumentResult documentResult = new DocumentResult();
         identity.transform(new DOMSource(document), documentResult);
         return documentResult.getDocument();
+    }
+
+    public static org.w3c.dom.Document dom4jToDomDocument(Document document) throws TransformerException {
+        Transformer identity = getIdentityTransformer();
+        DOMResult domResult = new DOMResult();
+        identity.transform(new DocumentSource(document), domResult);
+        return domResult.getNode().getOwnerDocument();
     }
 
     public static Transformer testCreateTransformerWrapper(Transformer transformer, String publicProperty, String privateProperty) {

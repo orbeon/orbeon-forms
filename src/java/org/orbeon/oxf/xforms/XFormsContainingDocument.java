@@ -84,7 +84,7 @@ public class XFormsContainingDocument implements EventTarget {
         // Create XPath expression
         PooledXPathExpression xpathExpression =
             XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument),
-                    "/xxf:controls//*[@xxf:id = $control-id]/xf:*[@ev:event = $control-name]", XFormsServer.XFORMS_NAMESPACES, variables);
+                    "/xxf:controls//*[@id = $control-id]/xf:*[@ev:event = $control-name]", XFormsServer.XFORMS_NAMESPACES, variables);
 
         // Get action element
         Element actionElement;

@@ -154,7 +154,8 @@ public class XFormsServer extends ProcessorImpl {
                                 for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
                                     Element controlElement = (Element) i.next();
 
-                                    String controlId = controlElement.attributeValue(new QName("id", XFormsConstants.XXFORMS_NAMESPACE));
+                                    //String controlId = controlElement.attributeValue(new QName("id", XFormsConstants.XXFORMS_NAMESPACE));
+                                    String controlId = controlElement.attributeValue("id");
                                     String controlValue = XFormsUtils.getControlValue(pipelineContext, containingDocument, controlElement);
 
                                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[] { "id", controlId, "value", controlValue });

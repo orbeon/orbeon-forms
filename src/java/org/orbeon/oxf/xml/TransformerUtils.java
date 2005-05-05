@@ -31,7 +31,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import java.util.*;
 
 /**
- * Utility class for XSLT and identity transformations.
+ * Utility class for XSLT and other transformations.
  */
 public class TransformerUtils {
 
@@ -255,6 +255,13 @@ public class TransformerUtils {
         return factory.newTemplates(source);
     }
 
+    /**
+     * Transform a W3C DOM document into a dom4j document
+     *
+     * @param   W3C DOM document
+     * @return  dom4j document
+     * @throws TransformerException
+     */
     public static Document domToDom4jDocument(org.w3c.dom.Document document) throws TransformerException {
         Transformer identity = getIdentityTransformer();
         DocumentResult documentResult = new DocumentResult();
@@ -262,6 +269,13 @@ public class TransformerUtils {
         return documentResult.getDocument();
     }
 
+    /**
+     * Transform a dom4j document into a W3C DOM document
+     *
+     * @param   dom4j document
+     * @return  W3C DOM document
+     * @throws TransformerException
+     */
     public static org.w3c.dom.Document dom4jToDomDocument(Document document) throws TransformerException {
         Transformer identity = getIdentityTransformer();
         DOMResult domResult = new DOMResult();

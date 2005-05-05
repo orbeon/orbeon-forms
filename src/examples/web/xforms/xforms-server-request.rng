@@ -30,20 +30,6 @@
             </element>
             <element name="xxforms:models">
                 <data type="string"/>
-<!--                <oneOrMore>-->
-<!--                    <element name="xforms:model">-->
-<!--                        <optional>-->
-<!--                            <attribute name="functions"/>-->
-<!--                        </optional>-->
-<!--                        <optional>-->
-<!--                            <attribute name="schema"/>-->
-<!--                        </optional>-->
-<!--                        <optional>-->
-<!--                            <attribute name="id"/>-->
-<!--                        </optional>-->
-<!--                        <ref name="anyElement"/>-->
-<!--                    </element>-->
-<!--                </oneOrMore>-->
             </element>
             <element name="xxforms:controls">
                 <optional>

@@ -58,6 +58,9 @@ public class XFormsContainingDocument implements org.orbeon.oxf.xforms.EventTarg
         return (XFormsModel) ("".equals(id) ? models.get(0) : modelsMap.get(id));
     }
 
+    /**
+     * Get a list of all the models in this document.
+     */
     public List getModels() {
         return models;
     }

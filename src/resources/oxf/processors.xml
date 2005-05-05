@@ -402,7 +402,7 @@
     </processor>
 
     <processor name="oxf:xforms-server">
-        <class name="org.orbeon.oxf.processor.xforms.event.XFormsServer"/>
+        <class name="org.orbeon.oxf.xforms.XFormsServer"/>
     </processor>
 
     <!-- Other processors -->

@@ -23,13 +23,16 @@ import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.util.*;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.GZIPInputStream;
 
 public class XFormsUtils {
 
@@ -187,6 +190,31 @@ public class XFormsUtils {
 
         org.orbeon.oxf.xforms.XFormsModel model = containingDocument.getModel(modelId == null ? "" : modelId);
         return model.getInstance();
+    }
+
+    public static Document decodeXML(PipelineContext pipelineContext, String encodedXML, String encryptionPassword) {
+        try {
+            // Get raw text
+            String xmlText;
+            {
+                if (XFormsUtils.isHiddenEncryptionEnabled())
+                    encodedXML = SecureUtils.decrypt(pipelineContext, encryptionPassword, encodedXML);
+                ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(encodedXML));
+                StringBuffer xml = new StringBuffer();
+                byte[] buffer = new byte[1024];
+                GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
+                int size;
+                while ((size = gzipInputStream.read(buffer)) != -1)
+                    xml.append(new String(buffer, 0, size));
+                xmlText = xml.toString();
+            }
+            // Parse XML and return documents
+            LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
+            XMLUtils.stringToSAX(xmlText, null, saxContentHandler, false);
+            return saxContentHandler.getDocument();
+        } catch (IOException e) {
+            throw new OXFException(e);
+        }
     }
 
     public static interface InstanceWalker {

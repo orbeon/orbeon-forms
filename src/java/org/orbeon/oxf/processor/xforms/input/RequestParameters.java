@@ -21,20 +21,15 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.input.action.*;
 import org.orbeon.oxf.processor.xforms.input.action.Set;
 import org.orbeon.oxf.resources.OXFProperties;
-import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.util.*;
-import java.util.zip.GZIPInputStream;
 
 public class RequestParameters {
 
@@ -78,35 +73,18 @@ public class RequestParameters {
                 String name = parameterElement.element("name").getStringValue();
 
                 List values = new ArrayList();
-                for(Iterator elementIterator = parameterElement.elementIterator("value"); elementIterator.hasNext();)
-                    values.add( ((Element)elementIterator.next()).getStringValue() );
+                for (Iterator elementIterator = parameterElement.elementIterator("value"); elementIterator.hasNext();)
+                    values.add(((Element) elementIterator.next()).getStringValue());
 
                 String type = parameterElement.element("value").attributeValue
                         (new QName("type", Dom4jUtils.XSI_NAMESPACE));
 
                 if ("$instance".equals(name)) {
-                    // Un-base64, uncompress to get XML as text
-                    String xmlText;
-                    {
-                        // there is only one value for $instnace
-                        String compressed = (String)values.get(0);
-                        if (org.orbeon.oxf.xforms.XFormsUtils.isHiddenEncryptionEnabled())
-                            compressed = SecureUtils.decrypt(pipelineContext, encryptionPassword, compressed);
-                        ByteArrayInputStream compressedData = new ByteArrayInputStream(Base64.decode(compressed));
-                        StringBuffer xml = new StringBuffer();
-                        byte[] buffer = new byte[1024];
-                        GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
-                        int size;
-                        while ((size = gzipInputStream.read(buffer)) != -1)
-                            xml.append(new String(buffer, 0, size));
-                        xmlText = xml.toString();
-                    }
+                    // Un-base64 and uncompress to get XML
 
-                    // Parse XML and store as instance
-                    LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
-                    XMLUtils.stringToSAX(xmlText, null, saxContentHandler, false);
-                    instance = saxContentHandler.getDocument();
-
+                    // There is only one value for $instnace
+                    String encodedInstance = (String) values.get(0);
+                    instance = XFormsUtils.decodeXML(pipelineContext, encodedInstance, encryptionPassword);
                 } else if (name.startsWith("$upload^")) {
 
                     // Split encoded name
@@ -178,7 +156,7 @@ public class RequestParameters {
 
                         // Create action object
                         Class actionClass = (Class) actionClasses.get(actionName);
-                        if  (actionClass == null)
+                        if (actionClass == null)
                             throw new OXFException("Cannot find implementation for action '" + actionName + "'");
                         Action action = (Action) actionClass.newInstance();
                         action.setParameters(actionParameters);
@@ -200,7 +178,7 @@ public class RequestParameters {
     /**
      * Adds (id -> value) in idToValue. If there is already a value for this id,
      * concatenates the two values by adding a space.
-     *
+     * <p/>
      * Also store the value type in idToType if present.
      */
     private void addValue(String name, List values, String type) {
@@ -209,9 +187,9 @@ public class RequestParameters {
             idString = SecureUtils.decrypt(pipelineContext, encryptionPassword, idString);
         Integer idObject = new Integer(idString);
         String currentValue = (String) idToValue.get(idObject);
-        for(Iterator i = values.iterator(); i.hasNext();) {
-            String value = (String)i.next();
-            currentValue =  currentValue == null || "".equals(currentValue) ? value :
+        for (Iterator i = values.iterator(); i.hasNext();) {
+            String value = (String) i.next();
+            currentValue = currentValue == null || "".equals(currentValue) ? value :
                     "".equals(value) ? currentValue : currentValue + ' ' + value;
             idToValue.put(idObject, currentValue);
         }

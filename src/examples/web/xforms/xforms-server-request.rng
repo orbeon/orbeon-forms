@@ -19,30 +19,31 @@
     <include href="xforms-server-common.rng"/>
 
     <start>
-        <element name="xxforms:event-fired">
+        <element name="xxforms:event-request">
             <element name="xxforms:event">
                 <attribute name="name">
                     <ref name="xformsActionName"/>
                 </attribute>
                 <attribute name="source-control-id">
-                    <data type="positiveInteger"/>
+                    <data type="string"/>
                 </attribute>
             </element>
             <element name="xxforms:models">
-                <oneOrMore>
-                    <element name="xforms:model">
-                        <optional>
-                            <attribute name="functions"/>
-                        </optional>
-                        <optional>
-                            <attribute name="schema"/>
-                        </optional>
-                        <optional>
-                            <attribute name="id"/>
-                        </optional>
-                        <ref name="anyElement"/>
-                    </element>
-                </oneOrMore>
+                <data type="string"/>
+<!--                <oneOrMore>-->
+<!--                    <element name="xforms:model">-->
+<!--                        <optional>-->
+<!--                            <attribute name="functions"/>-->
+<!--                        </optional>-->
+<!--                        <optional>-->
+<!--                            <attribute name="schema"/>-->
+<!--                        </optional>-->
+<!--                        <optional>-->
+<!--                            <attribute name="id"/>-->
+<!--                        </optional>-->
+<!--                        <ref name="anyElement"/>-->
+<!--                    </element>-->
+<!--                </oneOrMore>-->
             </element>
             <element name="xxforms:controls">
                 <optional>

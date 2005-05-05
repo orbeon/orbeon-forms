@@ -66,21 +66,22 @@
 
     <define name="xformsInstances">
         <element name="xxforms:instances">
-            <oneOrMore>
-                <element name="xxforms:instance">
-                    <optional>
-                        <attribute name="model-id">
-                            <data type="string"/>
-                        </attribute>
-                    </optional>
-                    <optional>
-                        <attribute name="id">
-                            <data type="string"/>
-                        </attribute>
-                    </optional>
-                    <ref name="anyElement"/>
-                </element>
-            </oneOrMore>
+            <data type="string"/>
+<!--            <oneOrMore>-->
+<!--                <element name="xxforms:instance">-->
+<!--                    <optional>-->
+<!--                        <attribute name="model-id">-->
+<!--                            <data type="string"/>-->
+<!--                        </attribute>-->
+<!--                    </optional>-->
+<!--                    <optional>-->
+<!--                        <attribute name="id">-->
+<!--                            <data type="string"/>-->
+<!--                        </attribute>-->
+<!--                    </optional>-->
+<!--                    <ref name="anyElement"/>-->
+<!--                </element>-->
+<!--            </oneOrMore>-->
         </element>
     </define>
 

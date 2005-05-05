@@ -55,18 +55,6 @@ public class RequestParameters {
             this.pipelineContext = pipelineContext;
             List parameters = requestDocument.getRootElement().element("parameters").elements("parameter");
 
-            // Get encryption key
-//            if (XFormsUtils.isHiddenEncryptionEnabled() || XFormsUtils.isNameEncryptionEnabled()) {
-//                for (Iterator i = parameters.iterator(); i.hasNext();) {
-//                    Element parameterElement = (Element) i.next();
-//                    if ("$key".equals(parameterElement.element("name").getStringValue())) {
-//                        String value = parameterElement.element("value").getStringValue();
-//                        String serverPassword = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
-//                        encryptionPassword = SecureUtils.decrypt(pipelineContext, serverPassword, value);
-//                    }
-//                }
-//            }
-
             if (XFormsUtils.isHiddenEncryptionEnabled()) {
                 encryptionKey = OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
             }

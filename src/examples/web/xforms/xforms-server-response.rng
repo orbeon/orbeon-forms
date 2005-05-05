@@ -24,7 +24,7 @@
                 <zeroOrMore>
                     <element name="xxforms:control">
                         <attribute name="id">
-                            <data type="positiveInteger"/>
+                            <data type="string"/>
                         </attribute>
                         <attribute name="value"/>
                     </element>

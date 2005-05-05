@@ -37,7 +37,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
- * Implements XForms event handling.
+ * The XForms Server processor handles client requests, including events and actions.
  */
 public class XFormsServer extends ProcessorImpl {
 
@@ -88,29 +88,31 @@ public class XFormsServer extends ProcessorImpl {
                         XFormsModel model = new XFormsModel(modelDocument);
                         containingDocument.addModel(model);
                     }
-
                 }
 
                 // Get instances
                 boolean isInitializeEvent;
                 {
-
                     Element encodedInstancesElement = requestDocument.getRootElement().element(new QName("instances", XFormsConstants.XXFORMS_NAMESPACE));
-                    String encodedInstancesString = encodedInstancesElement.getText();
-                    Document instancesDocument = XFormsUtils.decodeXML(pipelineContext, encodedInstancesString);
+                    String encodedInstancesString = encodedInstancesElement.getTextTrim();
 
                     int instancesCount = 0;
-                    for (Iterator i = instancesDocument.getRootElement().elements().iterator(); i.hasNext();) {
-                        Element instanceElement = (Element) i.next();
+                    if (!"".equals(encodedInstancesString)) {
+                        Document instancesDocument = XFormsUtils.decodeXML(pipelineContext, encodedInstancesString);
 
-                        Document instanceDocument = Dom4jUtils.createDocument(instanceElement);
-                        ((XFormsModel) containingDocument.getModels().get(instancesCount)).setInstanceDocument(pipelineContext, instanceDocument);
 
-                        instancesCount++;
+                        for (Iterator i = instancesDocument.getRootElement().elements().iterator(); i.hasNext();) {
+                            Element instanceElement = (Element) i.next();
+
+                            Document instanceDocument = Dom4jUtils.createDocument(instanceElement);
+                            ((XFormsModel) containingDocument.getModels().get(instancesCount)).setInstanceDocument(pipelineContext, instanceDocument);
+
+                            instancesCount++;
+                        }
+                        // Number of instances must be zero or match number of models
+                        if (instancesCount != 0 && containingDocument.getModels().size() != instancesCount)
+                            throw new OXFException("Number of instances (" + instancesCount + ") doesn't match number of models (" + containingDocument.getModels().size()  + ").");
                     }
-                    // Number of instances must be zero or match number of models
-                    if (instancesCount != 0 && containingDocument.getModels().size() != instancesCount)
-                        throw new OXFException("Number of instances (" + instancesCount + ") doesn't match number of models (" + containingDocument.getModels().size()  + ").");
                     // Initialization will take place if no instances are provided
                     isInitializeEvent = instancesCount == 0;
                 }
@@ -226,5 +228,4 @@ public class XFormsServer extends ProcessorImpl {
         addOutput(name, output);
         return output;
     }
-
 }

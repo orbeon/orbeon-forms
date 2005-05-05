@@ -35,7 +35,7 @@ import java.util.*;
  * o instances
  * o controls / handlers hierarchy
  */
-public class XFormsContainingDocument implements org.orbeon.oxf.xforms.EventTarget {
+public class XFormsContainingDocument implements EventTarget {
 
     private List models = new ArrayList();
     private Map modelsMap = new HashMap();
@@ -124,7 +124,7 @@ public class XFormsContainingDocument implements org.orbeon.oxf.xforms.EventTarg
 
             Map namespaceContext = Dom4jUtils.getNamespaceContext(actionElement);
 
-            org.orbeon.oxf.xforms.XFormsInstance instance = org.orbeon.oxf.xforms.XFormsUtils.getInstanceFromSingleNodeBindingElement(this, actionElement);
+            XFormsInstance instance = XFormsUtils.getInstanceFromSingleNodeBindingElement(this, actionElement);
 
             String valueToSet;
             if (value != null) {

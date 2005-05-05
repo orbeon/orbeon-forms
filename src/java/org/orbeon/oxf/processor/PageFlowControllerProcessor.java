@@ -22,7 +22,7 @@ import org.orbeon.oxf.processor.pipeline.PipelineConfig;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.serializer.legacy.HTMLSerializer;
-import org.orbeon.oxf.xforms.XFormsInstance;
+import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.transformer.xupdate.Constants;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -48,7 +48,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     private final static Document FALSE_DOCUMENT = new NonLazyUserDataDocument();
     private final static Map NAMESPACES_WITH_XSI_AND_XSLT = new HashMap();
     public final static String EXTRACT_INSTANCE_XPATH
-            = "/*/*[local-name() = 'instance' and namespace-uri() = '" + org.orbeon.oxf.xforms.XFormsConstants.XFORMS_NAMESPACE_URI + "']/*[1]";
+            = "/*/*[local-name() = 'instance' and namespace-uri() = '" + XFormsConstants.XFORMS_NAMESPACE_URI + "']/*[1]";
 
     // Instance passing configuration
     private final static String INSTANCE_PASSING_REDIRECT = "redirect";

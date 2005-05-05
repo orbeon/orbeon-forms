@@ -79,6 +79,12 @@
         <p:otherwise>
             <p:choose href="#data">
                 <p:when test="//xforms:model">
+                    <!-- Annotate controls in view with and id -->
+                    <p:processor name="oxf:xslt">
+                        <p:input name="data" href="#data"/>
+                        <p:input name="config" href="xforms-annotate-controls.xsl"/>
+                        <p:output name="data" id="annotated-view"/>
+                    </p:processor>
                     <!-- Extract models -->
                     <p:processor name="oxf:identity">
                         <p:input name="data" href="aggregate('xxforms:models', #data#xpointer(//xforms:model))"/>
@@ -86,27 +92,40 @@
                     </p:processor>
                     <!-- Extract controls -->
                     <p:processor name="oxf:xslt">
-                        <p:input name="data" href="#data"/>
+                        <p:input name="data" href="#annotated-view"/>
                         <p:input name="config" href="xforms-extract-controls.xsl"/>
                         <p:output name="data" id="xforms-controls"/>
                     </p:processor>
+                    <!-- Builds request to XForms server -->
+                    <p:processor name="oxf:unsafe-xslt">
+                        <p:input name="data"><dummy/></p:input>
+                        <p:input name="controls" href="#xforms-controls"/>
+                        <p:input name="models" href="#xforms-models"/>
+                        <p:input name="config">
+                            <xxforms:event-request xsl:version="2.0" 
+                                    xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                                <xxforms:event/>
+                                <xxforms:models>
+                                    <xsl:value-of select="context:encodeXML(doc('input:models'))"/>
+                                </xxforms:models>
+                                <xxforms:controls>
+                                    <xsl:value-of select="context:encodeXML(doc('input:controls'))"/>
+                                </xxforms:controls>
+                                <xxforms:instances/>
+                            </xxforms:event-request>
+                        </p:input>
+                        <p:output name="data" id="request"/>
+                    </p:processor>
                     <!-- Get initial instances -->
                     <p:processor name="oxf:xforms-server">
-                        <p:input name="instances"><xxforms:instances/></p:input>
-                        <p:input name="models" href="#xforms-models"/>
-                        <p:input name="controls" href="#xforms-controls"/>
-                        <p:input name="event"><xxforms:events/></p:input>
+                        <p:input name="request" href="#request"/>
                         <p:output name="response" id="response"/>
-                    </p:processor>
-                    <p:processor name="oxf:null-serializer">
-                        <p:input name="data" href="#response"/>
                     </p:processor>
                     <p:processor name="oxf:xslt">
                         <p:input name="config" href="xforms-to-ajax-xhtml.xsl"/>
-                        <p:input name="data" href="#data"/>
-                        <p:input name="models" href="#xforms-models"/>
-                        <p:input name="controls" href="#xforms-controls"/>
-                        <p:input name="initialization-response" href="#response"/>
+                        <p:input name="data" href="#annotated-view"/>
+                        <p:input name="request" href="#request"/>
+                        <p:input name="response" href="#response"/>
                         <p:output name="data" id="xformed-data"/>
                     </p:processor>
                 </p:when>

@@ -23,11 +23,12 @@
     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
     <xsl:output name="xml" method="xml"/>
 
-    <xsl:variable name="controls" as="element()" select="doc('input:controls')/*"/>
-    <xsl:variable name="models" as="element()" 
-        select="doc('input:models')/xxforms:models"/>
-    <xsl:variable name="initialization-response" as="element()" 
-        select="doc('input:initialization-response')/xxforms:event-response"/>
+    <xsl:variable name="request" as="element()" 
+        select="doc('input:request')/xxforms:event-request"/>
+    <xsl:variable name="response" as="element()" 
+        select="doc('input:response')/xxforms:event-response"/>
+    
+    <!-- - - - - - - Form with hidden divs - - - - - - -->
     
     <xsl:template match="xhtml:body">
         <xsl:copy>
@@ -36,13 +37,13 @@
                 <!-- Store private information used by the client-side JavaScript -->
                 <xhtml:div title="xforms-private" style="display: none">
                     <xhtml:div title="models">
-                        <xsl:value-of select="saxon:serialize($models, 'xml')"/>
+                        <xsl:value-of select="$request/xxforms:models"/>
                     </xhtml:div>
                     <xhtml:div title="controls">
-                        <xsl:value-of select="saxon:serialize($controls, 'xml')"/>
+                        <xsl:value-of select="$request/xxforms:controls"/>
                     </xhtml:div>
                     <xhtml:div title="instances">
-                        <xsl:value-of select="saxon:serialize($initialization-response/xxforms:instances, 'xml')"/>
+                        <xsl:value-of select="$response/xxforms:instances"/>
                     </xhtml:div>
                 </xhtml:div>
                 <xhtml:div xhtml:title="xforms-loading" style="visibility: hidden">
@@ -54,32 +55,84 @@
         </xsl:copy>
     </xsl:template>
     
+    <!-- - - - - - - XForms controls - - - - - - -->
+    
     <xsl:template match="xforms:output">
-        <xsl:value-of select="xforms:label"/>
-        <xsl:variable name="control-id" as="xs:integer" select="count(preceding::*)"/>
-        <xsl:variable name="value-element" as="element()" 
-            select="$initialization-response/xxforms:control-values/xxforms:control[@id = $control-id]"/>
-        <xhtml:span id="{$control-id}">
-            <xsl:value-of select="$value-element/@value"/>
+        <xhtml:span>
+            <xsl:call-template name="copy-attributes"/>
+            <xsl:value-of select="xxforms:control-value(@id)"/>
         </xhtml:span>
     </xsl:template>
     
     <xsl:template match="xforms:trigger">
-        <xhtml:button type="button" onclick="xformsFireEvent('DOMActivate', {count(preceding::*)}, this.form); return false;">
+        <xhtml:button type="button" onclick="xformsFireEvent('DOMActivate', '{@id}', this.form); return false;">
             <xsl:value-of select="xforms:label"/>
         </xhtml:button>
     </xsl:template>
     
-    <xsl:template match="xforms:switch">
-        <xsl:for-each select="xforms:case">
-            <xhtml:div id="{@id}">
-                <xsl:attribute name="style" select="concat('display: ', 
-                    if (position() = 1) then 'block' else 'none')"/>
+    <xsl:template match="xforms:input">
+        <xhtml:input type="text" name="{@id}" value="">
+            <xsl:call-template name="copy-attributes"/>
+        </xhtml:input>
+    </xsl:template>
+
+    <xsl:template match="xforms:secret">
+        <xhtml:input type="password" name="{@id}" value="">
+            <xsl:call-template name="copy-attributes"/>
+        </xhtml:input>
+    </xsl:template>
+
+    <xsl:template match="xforms:textarea">
+        <xhtml:textarea name="{@xxforms:id}" value="">
+            <xsl:call-template name="copy-attributes"/>
+        </xhtml:textarea>
+    </xsl:template>
+
+    <!-- - - - - - - XForms containers - - - - - - -->
+
+    <xsl:template match="xforms:group|xforms:switch">
+        <xsl:variable name="attributes" as="attribute()*">
+            <xsl:call-template name="copy-attributes"/>
+        </xsl:variable>
+        <xsl:choose>
+            <xsl:when test="count($attributes) > 0">
+                <xhtml:span>
+                    <xsl:copy-of select="$attributes"/>
+                    <xsl:apply-templates/>
+                </xhtml:span>
+            </xsl:when>
+            <xsl:otherwise>
                 <xsl:apply-templates/>
-            </xhtml:div>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
+    <xsl:template match="xforms:case">
+        <!-- FIXME: use reponse to figure out what case are displayed -->
+        <xhtml:div>
+            <xsl:call-template name="copy-attributes"/>
+            <xsl:attribute name="style" select="concat('display: ', 
+                if (position() = 1) then 'block' else 'none')"/>
+            <xsl:apply-templates/>
+        </xhtml:div>
+    </xsl:template>
+    
+    <!-- - - - - - - Utility templates and functions - - - - - - -->
+
+    <xsl:template match="xforms:*"/>
+    
+    <xsl:template name="copy-attributes">
+        <xsl:if test="@id"><xsl:copy-of select="@id"/></xsl:if>
+        <xsl:for-each select="@xhtml:*">
+            <xsl:attribute name="{local-name}" select="."/>
         </xsl:for-each>
     </xsl:template>
     
-    <xsl:template match="xforms:*"/>
+    <xsl:function name="xxforms:control-value" as="xs:string">
+        <xsl:param name="id" as="xs:string"/>
+        <xsl:variable name="value-element" as="element()" 
+            select="$response/xxforms:control-values/xxforms:control[@id = $id]"/>
+        <xsl:value-of select="$value-element/@value"/>
+    </xsl:function>
     
 </xsl:stylesheet>

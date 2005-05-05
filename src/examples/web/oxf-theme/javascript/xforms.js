@@ -8,9 +8,9 @@ var PATH_TO_JAVASCRIPT = "/oxf-theme/javascript/xforms.js";
 /**
  * Initializes attributes of each form:
  *
- *     Document        xformsModelDocument
- *     Document        xformsControlsDocument
- *     Document        xformsInstancesDocument
+ *     Document        xformsModels
+ *     Document        xformsControls
+ *     Document        xformsInstances
  *     Document        xformsNextRequest
  *     Div             xformsLoading
  *
@@ -44,18 +44,12 @@ function xformsPageLoaded() {
                 var xformsDiv = divs[divIndex];
                 var privateDivs = xformsDiv.getElementsByTagName("div");
                 for (var privateDivIndex = 0; privateDivIndex < privateDivs.length; privateDivIndex++) {
-                    if (privateDivs[privateDivIndex].getAttribute("title") == "models") {
-                        forms[formIndex].xformsModelDocument = Sarissa.getDomDocument();
-                        forms[formIndex].xformsModelDocument.loadXML(privateDivs[privateDivIndex].firstChild.data);
-                    }
-                    if (privateDivs[privateDivIndex].getAttribute("title") == "controls") {
-                        forms[formIndex].xformsControlsDocument = Sarissa.getDomDocument();
-                        forms[formIndex].xformsControlsDocument.loadXML(privateDivs[privateDivIndex].firstChild.data);
-                    }
-                    if (privateDivs[privateDivIndex].getAttribute("title") == "instances") {
-                        forms[formIndex].xformsInstancesDocument = Sarissa.getDomDocument();
-                        forms[formIndex].xformsInstancesDocument.loadXML(privateDivs[privateDivIndex].firstChild.data);
-                    }
+                    if (privateDivs[privateDivIndex].getAttribute("title") == "models") 
+                        forms[formIndex].xformsModels = privateDivs[privateDivIndex].firstChild.data;
+                    if (privateDivs[privateDivIndex].getAttribute("title") == "controls") 
+                        forms[formIndex].xformsControls = privateDivs[privateDivIndex].firstChild.data;
+                    if (privateDivs[privateDivIndex].getAttribute("title") == "instances") 
+                        forms[formIndex].xformsInstances = privateDivs[privateDivIndex].firstChild.data;
                 }
             }
             if (divs[divIndex].getAttribute("title") == "xforms-loading") {
@@ -76,6 +70,13 @@ function xformsCreateElementNS(namespaceURI, qname) {
     var request = Sarissa.getDomDocument();
     request.loadXML("<" + qname + " xmlns" + localName + "='" + namespaceURI + "'/>")
     return request.documentElement;
+}
+
+/**
+ * Adds text content to an element.
+ */
+function xformsAddText(element, text) {
+    element.appendChild(element.ownerDocument.createTextNode(text));
 }
 
 function xformsGetLocalName(element) {
@@ -111,9 +112,8 @@ function xformsHandleResponse() {
             
             // Update instances
             if (xformsGetLocalName(responseRoot.childNodes[i]) == "instances") {
-                var newInstances = Sarissa.getDomDocument();
-                newInstances.appendChild(responseRoot.childNodes[i].cloneNode(true));
-                document.xformsFormOfCurrentRequest.xformsInstancesDocument = newInstances;
+                document.xformsFormOfCurrentRequest.xformsInstances =
+                    responseRoot.childNodes[i].firstChild.data;
             }
 
             // Display or hide divs
@@ -166,14 +166,28 @@ function xformsExecuteNextRequest() {
 function xformsFireEvent(eventName, id, form) {
 
     // Build request
-    var eventFiredElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event-fired");
+    var eventFiredElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event-request");
+    
+    // Add event
     var eventElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event");
     eventFiredElement.appendChild(eventElement);
     eventElement.setAttribute("name", eventName);
     eventElement.setAttribute("source-control-id", id);
-    eventFiredElement.appendChild(form.xformsModelDocument.documentElement.cloneNode(true));
-    eventFiredElement.appendChild(form.xformsControlsDocument.documentElement.cloneNode(true));
-    eventFiredElement.appendChild(form.xformsInstancesDocument.documentElement.cloneNode(true));
+    
+    // Add models
+    var modelsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:models");
+    modelsElement.appendChild(modelsElement.ownerDocument.createTextNode(form.xformsModels));
+    eventFiredElement.appendChild(modelsElement);
+    
+    // Add controls
+    var controlsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:controls");
+    controlsElement.appendChild(controlsElement.ownerDocument.createTextNode(form.xformsControls));
+    eventFiredElement.appendChild(controlsElement);    
+    
+    // Add instances
+    var instancesElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:instances");
+    instancesElement.appendChild(instancesElement.ownerDocument.createTextNode(form.xformsInstances));
+    eventFiredElement.appendChild(instancesElement);    
     
     // Set as next request to execute and trigger execution
     form.xformsNextRequest = eventFiredElement.ownerDocument;

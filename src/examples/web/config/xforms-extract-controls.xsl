@@ -28,9 +28,6 @@
     
     <xsl:template match="xforms:*" priority="2">
         <xsl:copy>
-            <xsl:attribute name="xxforms:id">
-                <xsl:value-of select="count(preceding::*)"/>
-            </xsl:attribute>
             <xsl:copy-of select="@*"/>
             <xsl:apply-templates/>
         </xsl:copy>

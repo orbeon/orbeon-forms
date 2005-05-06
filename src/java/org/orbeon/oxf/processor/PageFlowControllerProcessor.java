@@ -434,7 +434,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
      * Handle &lt;page&gt;
      */
     private void handlePage(final StepProcessorContext stepProcessorContext, final String controllerContext,
-                            List statementsList, Element pageElement, final int pageNumber,
+                            List statementsList, final Element pageElement, final int pageNumber,
                             final ASTOutput requestWithParameters, final ASTOutput matcherOutput,
                             final ASTOutput html, final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel,
                             final Map pageIdToPathInfo,
@@ -479,25 +479,51 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         // Always hook up XForms Input processor
         xformedInstance[0] = new ASTOutput("instance", "xformed-instance");
         final List params = pageElement.elements("param");
-        statementsList.add(new ASTProcessorCall(XMLConstants.XFORMS_INPUT_PROCESSOR_QNAME) {{
-            addInput(new ASTInput("model", new ASTHrefId(xformsModel)));
-            if(!params.isEmpty()) {
-                // Create document with params
-                Document paramsDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("params"));
-                for (Iterator j = params.iterator(); j.hasNext();) {
-                    Element paramElement = (Element) j.next();
-                    paramsDocument.getRootElement()
-                        .add( ( org.dom4j.Element )paramElement.clone() );
+
+        if (xformsAttribute != null) {
+            // Use backward compatility XForms Input processor
+            statementsList.add(new ASTProcessorCall(XMLConstants.XFORMS_INPUT_PROCESSOR_QNAME) {{
+                addInput(new ASTInput("model", new ASTHrefId(xformsModel)));
+                if(!params.isEmpty()) {
+                    // Create document with params
+                    Document paramsDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("params"));
+                    for (Iterator j = params.iterator(); j.hasNext();) {
+                        Element paramElement = (Element) j.next();
+                        paramsDocument.getRootElement().add((Element) paramElement.clone());
+                    }
+                    addInput(new ASTInput("filter", paramsDocument));
+                    addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));
+                } else {
+                    addInput(new ASTInput("filter", Dom4jUtils.NULL_DOCUMENT));
+                    addInput(new ASTInput("matcher-result", Dom4jUtils.NULL_DOCUMENT));
                 }
-                addInput(new ASTInput("filter", paramsDocument));
-                addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));
-            } else {
-                addInput(new ASTInput("filter", Dom4jUtils.NULL_DOCUMENT));
-                addInput(new ASTInput("matcher-result", Dom4jUtils.NULL_DOCUMENT));
-            }
-            addInput(new ASTInput("request", new ASTHrefId(requestWithParameters)));
-            addOutput(xformedInstance[0]);
-        }});
+                addInput(new ASTInput("request", new ASTHrefId(requestWithParameters)));
+                addOutput(xformedInstance[0]);
+            }});
+        } else {
+            // Use XForms Submission processor
+            statementsList.add(new ASTProcessorCall(XMLConstants.XFORMS_SUBMISSION_PROCESSOR_QNAME) {{
+                if(!params.isEmpty()) {
+                    // Create document with params
+                    Document paramsDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("params"));
+                    for (Iterator j = params.iterator(); j.hasNext();) {
+                        Element paramElement = (Element) j.next();
+                        paramsDocument.getRootElement().add((Element) paramElement.clone());
+                    }
+                    addInput(new ASTInput("filter", paramsDocument));
+                    addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));
+                } else {
+                    addInput(new ASTInput("filter", Dom4jUtils.NULL_DOCUMENT));
+                    addInput(new ASTInput("matcher-result", Dom4jUtils.NULL_DOCUMENT));
+                }
+                addInput(new ASTInput("request", new ASTHrefId(requestWithParameters)));
+                addOutput(xformedInstance[0]);
+            }});
+            // Use XForms model for choose
+            statementsList.add(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
+                addInput(new ASTInput("model", new ASTHrefId(xformsModel)));
+            }});
+        }
 
         // Make sure the xformed-instance id is used whether there is a choose or not
         statementsList.add(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{

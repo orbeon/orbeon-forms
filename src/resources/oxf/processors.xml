@@ -409,6 +409,10 @@
         <class name="org.orbeon.oxf.xforms.XFormsServer"/>
     </processor>
 
+    <processor name="oxf:xforms-submission" uri="oxf/processor/xforms-input">
+        <class name="org.orbeon.oxf.xforms.XFormsSubmission"/>
+    </processor>
+
     <!-- Other processors -->
     <processor name="oxf:delegation" uri="oxf/processor/delegation">
         <class name="org.orbeon.oxf.processor.DelegationProcessor"/>

@@ -66,6 +66,13 @@ public class XFormsContainingDocument implements EventTarget {
     }
 
     /**
+     * Return the controls document.
+     */
+    public Document getControlsDocument() {
+        return controlsDocument;
+    }
+
+    /**
      * Initialize the XForms engine.
      */
     public void initialize(PipelineContext pipelineContext) {

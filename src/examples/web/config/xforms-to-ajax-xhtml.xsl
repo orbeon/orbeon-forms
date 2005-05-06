@@ -65,7 +65,8 @@
     </xsl:template>
     
     <xsl:template match="xforms:trigger">
-        <xhtml:button type="button" onclick="xformsFireEvent('DOMActivate', '{@id}', this.form); return false;">
+        <xhtml:button type="button" class="trigger">
+            <xsl:call-template name="copy-attributes"/>
             <xsl:value-of select="xforms:label"/>
         </xhtml:button>
     </xsl:template>

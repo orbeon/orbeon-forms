@@ -18,7 +18,7 @@ function xformsCreateElementNS(namespaceURI, qname) {
     return request.documentElement;
 }
 
-function xformsFireEvent(eventName, id, form) {
+function xformsFireEvent(target, eventName, value) {
 
     // Build request
     var eventFiredElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event-request");
@@ -27,28 +27,34 @@ function xformsFireEvent(eventName, id, form) {
     var eventElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event");
     eventFiredElement.appendChild(eventElement);
     eventElement.setAttribute("name", eventName);
-    eventElement.setAttribute("source-control-id", id);
+    eventElement.setAttribute("source-control-id", target.id);
     
     // Add models
     var modelsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:models");
-    modelsElement.appendChild(modelsElement.ownerDocument.createTextNode(form.xformsModels));
+    modelsElement.appendChild(modelsElement.ownerDocument.createTextNode(target.form.xformsModels));
     eventFiredElement.appendChild(modelsElement);
     
     // Add controls
     var controlsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:controls");
-    controlsElement.appendChild(controlsElement.ownerDocument.createTextNode(form.xformsControls));
+    controlsElement.appendChild(controlsElement.ownerDocument.createTextNode(target.form.xformsControls));
     eventFiredElement.appendChild(controlsElement);    
     
     // Add instances
     var instancesElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:instances");
-    instancesElement.appendChild(instancesElement.ownerDocument.createTextNode(form.xformsInstances));
+    instancesElement.appendChild(instancesElement.ownerDocument.createTextNode(target.form.xformsInstances));
     eventFiredElement.appendChild(instancesElement);    
     
     // Set as next request to execute and trigger execution
-    form.xformsNextRequest = eventFiredElement.ownerDocument;
+    document.xformsNextRequests.push(eventFiredElement.ownerDocument);
+    document.xformsNextForms.push(target.form);
     xformsExecuteNextRequest();
 
     return false;
+}
+
+function getEventTarget(event) {
+    event = event ? event : window.event;
+    return event.srcElement ? event.srcElement : event.target;
 }
 
 /**
@@ -57,11 +63,12 @@ function xformsFireEvent(eventName, id, form) {
  *     Document        xformsModels
  *     Document        xformsControls
  *     Document        xformsInstances
- *     Document        xformsNextRequest
  *     Div             xformsLoading
  *
  * Initializes attributes on the document object:
  *
+ *     Document        xformsNextRequests
+ *     Form            xformsNextForms
  *     boolean         xformsRequestInProgress
  *     Form            xformsFormOfCurrentRequest
  *     XMLHttpRequest  xformsXMLHttpRequest
@@ -88,20 +95,29 @@ function xformsPageLoaded() {
         var elements = forms[formIndex].elements;
         for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
             var element = elements[elementIndex];
+            
+            // Handle value change
             var handleChange = function(event) {
-                event = event ? event : window.event;
-                target = event.srcElement ? event.srcElement : event.target;
-                xformsFireEvent("DOMActivate", "trigger" /*target.id*/, target.form);
+                xformsFireEvent(getEventTarget(event), "DOMActivate", null);
             };
             if (element.addEventListener) {
                 element.addEventListener("change", handleChange, false);
             } else {
                 element.attachEvent("onchange", handleChange);
             }
+            
+            // Handle click 
+            var handleClick = function(event) {
+                xformsFireEvent(getEventTarget(event), "DOMActivate", null);
+            }
+            if (element.addEventListener) {
+                element.addEventListener("click", handleClick, false);
+            } else {
+                element.attachEvent("onclick", handleClick);
+            }
         }
     
         // Initialize attributes on form
-        forms[formIndex].xformsNextRequest = null;
         var divs = forms[formIndex].getElementsByTagName("div");
         for (var divIndex = 0; divIndex < divs.length; divIndex++) {
             if (divs[divIndex].getAttribute("title") == "xforms-private") {
@@ -121,6 +137,8 @@ function xformsPageLoaded() {
             }
         }
     }
+    document.xformsNextRequests = new Array();
+    document.xformsNextForms = new Array();
     document.xformsRequestInProgress = false;
     document.xformsFormOfCurrentRequest = null;
 }
@@ -195,23 +213,18 @@ function xformsHandleResponse() {
 
 function xformsExecuteNextRequest() {
     if (! document.xformsRequestInProgress) {
-        var forms = document.getElementsByTagName("form");
-        for (var formIndex = 0; formIndex < forms.length; formIndex++) {
-            var form = forms[formIndex];
-            if (form.xformsNextRequest != null) {
-                document.xformsRequestInProgress = true;
-                var request = form.xformsNextRequest;
-                form.xformsNextRequest = null;
-                form.xformsLoading.style.visibility = "visible";
-                document.xformsFormOfCurrentRequest = form;
-                document.xformsXMLHttpRequest = new XMLHttpRequest();
-                document.xformsXMLHttpRequest.open("POST", XFORMS_SERVER_URL, true);
-                document.xformsXMLHttpRequest.onreadystatechange = xformsHandleResponse;
-                //alert(Sarissa.serialize(request));
-                document.xformsXMLHttpRequest.send(request);
-                foundRequest = true;
-                break;
-            }
+        if (document.xformsNextRequests.length > 0) {
+            var request = document.xformsNextRequests.shift();
+            var form = document.xformsNextForms.shift();
+            document.xformsRequestInProgress = true;
+            form.xformsLoading.style.visibility = "visible";
+            document.xformsFormOfCurrentRequest = form;
+            document.xformsXMLHttpRequest = new XMLHttpRequest();
+            document.xformsXMLHttpRequest.open("POST", XFORMS_SERVER_URL, true);
+            document.xformsXMLHttpRequest.onreadystatechange = xformsHandleResponse;
+            //alert(Sarissa.serialize(request));
+            document.xformsXMLHttpRequest.send(request);
+            foundRequest = true;
         }
     }
 }

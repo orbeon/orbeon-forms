@@ -26,6 +26,6 @@ public class Index extends XFormsFunction {
     }
 
     public Item evaluateItem(XPathContext c) throws XPathException {
-        return new IntegerValue(xformsElementContext.getRepeatIdIndex(argument[0].evaluateAsString(c), null));
+        return new IntegerValue(getXformsElementContext().getRepeatIdIndex(argument[0].evaluateAsString(c), null));
     }
 }

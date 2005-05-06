@@ -4,7 +4,9 @@ package org.orbeon.oxf.xforms;
  * XForms events definitions.
  */
 public class XFormsEvents {
-    public static final String XXFORMS_INITIALIZE = "xxforms-iniitialize";
+    public static final String XXFORMS_INITIALIZE = "xxforms-initialize";
+    public static final String XXFORMS_INITIALIZE_CONTROLS = "xxforms-initialize-controls";
+
     public static final String XFORMS_SETVALUE_ACTION = "setvalue";
     public static final String XFORMS_TOGGLE_ACTION = "toggle";
     public static final String XFORMS_ACTION_ACTION = "action";

@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.processor.xforms.output.element.XFormsElementContext;
 import org.orbeon.oxf.xforms.function.*;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticProperty;
@@ -34,16 +33,16 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
 
 
     private static Map functionTable = new HashMap();
-    private XFormsElementContext xformsElementContext = null;
+    private XFormsControls xFormsControls = null;
 
 
-    private static StandardFunction.Entry register( String name,
-                                                    Class implementationClass,
-                                                    int opcode,
-                                                    int minArguments,
-                                                    int maxArguments,
-                                                    ItemType itemType,
-                                                    int cardinality ) {
+    private static StandardFunction.Entry register(String name,
+                                                   Class implementationClass,
+                                                   int opcode,
+                                                   int minArguments,
+                                                   int maxArguments,
+                                                   ItemType itemType,
+                                                   int cardinality) {
         StandardFunction.Entry e = new StandardFunction.Entry();
         e.name = name;
         e.implementationClass = implementationClass;
@@ -59,7 +58,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
     }
 
     static {
-      StandardFunction.Entry e;
+        StandardFunction.Entry e;
 
         e = register("last", Last.class, 0, 0, 0, Type.INTEGER_TYPE, StaticProperty.EXACTLY_ONE);
 
@@ -103,17 +102,17 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
     }
 
 
+    public XFormsFunctionLibrary() {
+    }
 
-    public XFormsFunctionLibrary() { }
 
-
-    public XFormsFunctionLibrary(XFormsElementContext xformsElementContext) {
-        this.xformsElementContext = xformsElementContext;
+    public XFormsFunctionLibrary(XFormsControls xFormsControls) {
+        this.xFormsControls = xFormsControls;
     }
 
     public boolean isAvailable(int fingerprint, String uri, String local, int arity) {
         if (uri.equals(NamespaceConstant.FN)) {
-            StandardFunction.Entry entry = (StandardFunction.Entry)functionTable.get(local);
+            StandardFunction.Entry entry = (StandardFunction.Entry) functionTable.get(local);
             if (entry == null) {
                 return false;
             }
@@ -125,19 +124,19 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
 
     public Expression bind(int nameCode, String uri, String local, Expression[] staticArgs) throws XPathException {
         if (uri.equals(NamespaceConstant.FN)) {
-            StandardFunction.Entry entry = (StandardFunction.Entry)functionTable.get(local);
+            StandardFunction.Entry entry = (StandardFunction.Entry) functionTable.get(local);
             if (entry == null) {
                 return null;
             }
             Class functionClass = entry.implementationClass;
             SystemFunction f;
             try {
-                f = (SystemFunction)functionClass.newInstance();
+                f = (SystemFunction) functionClass.newInstance();
             } catch (Exception err) {
                 throw new OXFException("Failed to load XForms function: " + err.getMessage(), err);
             }
-            if(f instanceof XFormsFunction && xformsElementContext != null)
-                ((XFormsFunction)f).setXformsElementContext(xformsElementContext);
+            if (f instanceof XFormsFunction && xFormsControls != null)
+                ((XFormsFunction) f).setXformsElementContext(xFormsControls);
             f.setDetails(entry);
             f.setFunctionNameCode(nameCode);
             f.setArguments(staticArgs);

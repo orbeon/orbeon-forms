@@ -18,15 +18,12 @@ import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.SecureUtils;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.om.NodeInfo;
 import org.orbeon.saxon.style.StandardNames;
-import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -90,18 +87,11 @@ public class XFormsElement {
 
         if (("if".equals(localname) || "when".equals(localname)) && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
             String test = attributes.getValue("test");
-            PooledXPathExpression expr = XPathCache.getXPathExpression(context.getPipelineContext(),
-                    context.getDocumentWrapper().wrap(context.getCurrentSingleNode()),
-                    "boolean(" + test + ")", prefixToURI, context.getRepeatIdToIndex());
-            try {
-                Boolean value = (Boolean) expr.evaluateSingle();
-                addExtensionAttribute(newAttributes, "value", Boolean.toString(value.booleanValue()));
-            } catch (XPathException e) {
-                throw new OXFException(e);
-            } finally {
-                if (expr != null)
-                    expr.returnToPool();
-            }
+
+            Boolean value = (Boolean) context.getCurrentInstance().evaluateXPathSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
+                    "boolean(" + test + ")", prefixToURI, context.getRepeatIdToIndex(), null, null);
+
+            addExtensionAttribute(newAttributes, "value", Boolean.toString(value.booleanValue()));
         } else if (context.getParentElement(0) instanceof Itemset
                 && ("copy".equals(localname) || "label".equals(localname))) {
             // Pass information about the "ref" on the element to the parent "itemset"
@@ -164,51 +154,28 @@ public class XFormsElement {
 
             if (attributes.getIndex("", "at") != -1) {
                 // Evaluate "at" as a number
-                NodeInfo contextNode = context.getDocumentWrapper().wrap(context.getCurrentSingleNode());
-                PooledXPathExpression expr = XPathCache.getXPathExpression(context.getPipelineContext(),
-                        contextNode,
-                        "round(" + attributes.getValue("at") + ")",
-                        context.getCurrentPrefixToURIMap(),
-                        null,
-                        context.getFunctionLibrary());
-                try {
-                    Object at = expr.evaluateSingle();
-                    if (!(at instanceof Number))
-                        throw new ValidationException("'at' expression must return a number",
-                                new LocationData(context.getLocator()));
-                    String atString = at.toString();
-                    if (XFormsUtils.isNameEncryptionEnabled())
-                        atString = SecureUtils.encrypt(context.getPipelineContext(),
-                                context.getEncryptionPassword(), atString);
-                    addExtensionAttribute(newAttributes, "at-value", atString);
-                } catch (XPathException e) {
-                    throw new OXFException(e);
-                } finally {
-                    if (expr != null)
-                        expr.returnToPool();
-                }
+                Object at = context.getCurrentInstance().evaluateXPathSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
+                        "round(" + attributes.getValue("at") + ")", context.getCurrentPrefixToURIMap(), null, context.getFunctionLibrary(), null);
+
+                if (!(at instanceof Number))
+                    throw new ValidationException("'at' expression must return a number",
+                            new LocationData(context.getLocator()));
+                String atString = at.toString();
+                if (XFormsUtils.isNameEncryptionEnabled())
+                    atString = SecureUtils.encrypt(context.getPipelineContext(),
+                            context.getEncryptionPassword(), atString);
+                addExtensionAttribute(newAttributes, "at-value", atString);
             }
             if (attributes.getIndex("", "value") != -1) {
                 // Evaluate "value" as a string
-                PooledXPathExpression expr = XPathCache.getXPathExpression(context.getPipelineContext(),
-                        context.getDocumentWrapper().wrap(context.getCurrentSingleNode()),
-                        "string(" + attributes.getValue("value") + ")",
-                        context.getCurrentPrefixToURIMap(),
-                        null,
-                        context.getFunctionLibrary());
-                try {
-                    Object value = expr.evaluateSingle();
-                    if (!(value instanceof String))
-                        throw new ValidationException("'value' expression must return a string",
-                                new LocationData(context.getLocator()));
+                Object value = context.getCurrentInstance().evaluateXPathSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
+                        "string(" + attributes.getValue("value") + ")", context.getCurrentPrefixToURIMap(), null, context.getFunctionLibrary(), null);
 
-                    addExtensionAttribute(newAttributes, "value-value", (String) value);
-                } catch (XPathException e) {
-                    throw new OXFException(e);
-                } finally {
-                    if(expr != null)
-                        expr.returnToPool();
-                }
+                if (!(value instanceof String))
+                    throw new ValidationException("'value' expression must return a string",
+                            new LocationData(context.getLocator()));
+
+                addExtensionAttribute(newAttributes, "value-value", (String) value);
             }
             // Linking attribute: load content to xxforms:src-value
             if(attributes.getIndex("", "src") != -1 && LINKING_CONTROLS.containsKey(localname)) {

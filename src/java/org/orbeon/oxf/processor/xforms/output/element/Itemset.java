@@ -9,12 +9,9 @@
 package org.orbeon.oxf.processor.xforms.output.element;
 
 import org.dom4j.Node;
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.util.PooledXPathExpression;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -54,21 +51,15 @@ public class Itemset extends XFormsElement {
 
     private void sendElement(XFormsElementContext context, Node node, String localname,
                              String ref, Map prefixToURI) throws SAXException {
-        PooledXPathExpression expression = XPathCache.getXPathExpression(context.getPipelineContext(),
-                context.getDocumentWrapper().wrap(node), "string(" + ref +  ")",
-                prefixToURI, context.getRepeatIdToIndex());
-        try {
-            String value = (String) expression.evaluateSingle();
-            context.getContentHandler().startElement(XFormsConstants.XFORMS_NAMESPACE_URI, localname,
-                    XFormsConstants.XFORMS_PREFIX + ":" + localname, XMLUtils.EMPTY_ATTRIBUTES);
-            context.getContentHandler().characters(value.toCharArray(), 0, value.length());
-            context.getContentHandler().endElement(XFormsConstants.XFORMS_NAMESPACE_URI, localname,
-                    XFormsConstants.XFORMS_PREFIX + ":" + localname);
-        } catch (XPathException e) {
-            throw new OXFException(e);
-        } finally {
-            if (expression != null) expression.returnToPool();
-        }
+
+        String value = (String) context.getCurrentInstance().evaluateXPathSingle(context.getPipelineContext(), node,
+                "string(" + ref +  ")", prefixToURI, context.getRepeatIdToIndex(), null, null);
+
+        context.getContentHandler().startElement(XFormsConstants.XFORMS_NAMESPACE_URI, localname,
+                XFormsConstants.XFORMS_PREFIX + ":" + localname, XMLUtils.EMPTY_ATTRIBUTES);
+        context.getContentHandler().characters(value.toCharArray(), 0, value.length());
+        context.getContentHandler().endElement(XFormsConstants.XFORMS_NAMESPACE_URI, localname,
+                XFormsConstants.XFORMS_PREFIX + ":" + localname);
     }
 
     public void setLabelRef(String labelRef, Map labelPrefixToURI) {

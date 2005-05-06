@@ -16,11 +16,11 @@ package org.orbeon.oxf.processor.xforms.output.element;
 import org.dom4j.*;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-
 
 public class Group extends XFormsElement {
 
@@ -35,7 +35,7 @@ public class Group extends XFormsElement {
         if (isFirstGroup) {
 
             // Go through the instance and wipe out the nodes bound to a control (generated is true)
-            Document instance = context.getInstance();
+            Document instance = context.getCurrentInstance().getDocument();
             instance.accept(new VisitorSupport() {
                 public void visit(Attribute node) {
                     wipeValue(node);
@@ -50,7 +50,7 @@ public class Group extends XFormsElement {
                     if(node instanceof Element)
                         data = (InstanceData)((Element)node).getData();
                     else
-                        data = (org.orbeon.oxf.xforms.InstanceData)((Attribute)node).getData();
+                        data = (InstanceData)((Attribute)node).getData();
 
                     if(data != null && data.isGenerated())
                         node.setText("");

@@ -66,9 +66,9 @@ public class XFormsUtils {
         }
     }
 
-    public static org.orbeon.oxf.xforms.InstanceData getInstanceData(Node node) {
+    public static InstanceData getInstanceData(Node node) {
         return node instanceof Element
-            ? (org.orbeon.oxf.xforms.InstanceData) ((Element) node).getData()
+            ? (InstanceData) ((Element) node).getData()
             : node instanceof Attribute
             ? (InstanceData) ((Attribute) node).getData() : null;
     }
@@ -104,9 +104,9 @@ public class XFormsUtils {
         }
     }
 
-    private static org.orbeon.oxf.xforms.InstanceData newInstanceData(Object existingData, int id) {
+    private static InstanceData newInstanceData(Object existingData, int id) {
         if (existingData instanceof LocationData) {
-            return new org.orbeon.oxf.xforms.InstanceData((LocationData) existingData, id);
+            return new InstanceData((LocationData) existingData, id);
         } else if (existingData instanceof InstanceData) {
             return new InstanceData(((InstanceData) existingData).getLocationData(), id);
         } else {
@@ -160,21 +160,6 @@ public class XFormsUtils {
             Element child = (Element) i.next();
             updateInstanceData(child, instanceWalker);
         }
-    }
-
-    public static String getControlValue(final PipelineContext pipelineContext, org.orbeon.oxf.xforms.XFormsContainingDocument containingDocument, Element controlElement) {
-        String ref = controlElement.attributeValue("ref");// TODO: support relative refs
-        org.orbeon.oxf.xforms.XFormsInstance instance = getInstanceFromSingleNodeBindingElement(containingDocument, controlElement);
-
-        Map namespaceContext = Dom4jUtils.getNamespaceContext(controlElement);
-        return instance.evaluateXPath(pipelineContext, ref, namespaceContext);
-    }
-
-    public static XFormsInstance getInstanceFromSingleNodeBindingElement(org.orbeon.oxf.xforms.XFormsContainingDocument containingDocument, Element element) {
-        String modelId = element.attributeValue("model");
-
-        org.orbeon.oxf.xforms.XFormsModel model = containingDocument.getModel(modelId == null ? "" : modelId);
-        return model.getInstance();
     }
 
     public static String encodeXML(PipelineContext pipelineContext, org.w3c.dom.Document document) {

@@ -13,21 +13,21 @@
  */
 package org.orbeon.oxf.xforms.function;
 
-import org.orbeon.oxf.processor.xforms.output.element.XFormsElementContext;
+import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.saxon.functions.SystemFunction;
 
 abstract public class XFormsFunction extends SystemFunction {
 
-    protected XFormsElementContext xformsElementContext;
+    private XFormsControls xFormsControls;
 
     protected XFormsFunction() {
     }
 
-    public XFormsElementContext getXformsElementContext() {
-        return xformsElementContext;
+    public XFormsControls getXformsElementContext() {
+        return xFormsControls;
     }
 
-    public void setXformsElementContext(XFormsElementContext xformsElementContext) {
-        this.xformsElementContext = xformsElementContext;
+    public void setXformsElementContext(XFormsControls xFormsControls) {
+        this.xFormsControls = xFormsControls;
     }
 }

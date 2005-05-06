@@ -39,9 +39,28 @@
                 </li>
                 <li>
                     <p>
-                        Probably not incompatible, but a clarification: if a page uses XForms, which
-                        means having action elements, reading the instance in the page model or page
-                        view, it must not expect to be able to read the HTTP request body.
+                        
+                    </p>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>Page Flow</title>
+            <p>
+                ...
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        Using XForms no longer implies having an <code>xforms</code> attribute on
+                        the <code>page</code> element.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Clarification: if a page uses XForms, which means having action elements,
+                        reading the instance in the page model or page view, it must not expect to
+                        be able to read the HTTP request body.
                     </p>
                 </li>
             </ul>

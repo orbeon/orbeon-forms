@@ -415,12 +415,8 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
         }
     }
 
-    public org.orbeon.oxf.xforms.XFormsInstance getInstance() {
+    public XFormsInstance getInstance() {
         return instance;
-    }
-
-    public Document getInstanceDocument() {
-        return instance.getDocument();
     }
 
     public void setInstanceDocument(PipelineContext pipelineContext, Document instanceDocument) {
@@ -727,7 +723,7 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
                                 xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
                         try {
                             String value = (String) expr.evaluateSingle();
-                            XFormsUtils.fillNode(node, value);
+                            instance.setValueForNode(node, value);
                         } catch (XPathException e) {
                             throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
                         } finally {
@@ -892,8 +888,8 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
         return encoding;
     }
 
-    public List getBindNodeset(PipelineContext context, ModelBind bind, DocumentWrapper wrapper) {
-        // get a list of parents, orderd by grand father first
+    public List getBindNodeset(PipelineContext pipelineContext, ModelBind bind) {
+        // Get a list of parents, ordered by grandfather first
         List parents = new ArrayList();
         parents.add(bind);
         ModelBind parent = bind;
@@ -902,7 +898,7 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
         }
         Collections.reverse(parents);
 
-        // find the final node
+        // Find the final node
         List nodeset = new ArrayList();
         nodeset.add(instance.getDocument());
         for (Iterator i = parents.iterator(); i.hasNext();) {
@@ -910,22 +906,14 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
             List currentModelBindResults = new ArrayList();
             for (Iterator j = nodeset.iterator(); j.hasNext();) {
                 Node node = (Node) j.next();
-                PooledXPathExpression expr = XPathCache.getXPathExpression(context, wrapper.wrap(node),
-                        current.getNodeset(), current.getNamespaceMap(), null, xformsFunctionLibrary, current.getLocationData().getSystemID());
-                try {
-                    currentModelBindResults.addAll(expr.evaluate());
-                } catch (XPathException e) {
-                    throw new OXFException(e);
-                } finally {
-                    if (expr != null)
-                        expr.returnToPool();
-                }
+                // Execute XPath expresssion
+                currentModelBindResults.addAll(instance.evaluateXPath(pipelineContext, node, current.getNodeset(),
+                        current.getNamespaceMap(), null, xformsFunctionLibrary, current.getLocationData().getSystemID()));
             }
             nodeset.addAll(currentModelBindResults);
-            // last iteration of i: remove all except last
+            // Last iteration of i: remove all except last
             if (!i.hasNext())
                 nodeset.retainAll(currentModelBindResults);
-
         }
         return nodeset;
     }

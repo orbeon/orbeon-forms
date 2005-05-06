@@ -30,9 +30,7 @@ import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The XForms Server processor handles client requests, including events and actions.
@@ -103,16 +101,22 @@ public class XFormsServer extends ProcessorImpl {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
                         {
-                            Document controlsDocument = containingDocument.getControlsDocument();
+                            Document controlsDocument = containingDocument.getxFormsControls().getControlsDocument();
                             PooledXPathExpression xpathExpression =
                                     XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument), "/xxf:controls//(xf:input|xf:secret|xf:textarea|xf:output|xf:upload|xf:range|xf:trigger|xf:submit|xf:select|xf:select1)[@ref]", XFORMS_NAMESPACES);
                             try {
                                 for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
                                     Element controlElement = (Element) i.next();
 
-                                    //String controlId = controlElement.attributeValue(new QName("id", XFormsConstants.XXFORMS_NAMESPACE));
                                     String controlId = controlElement.attributeValue("id");
-                                    String controlValue = XFormsUtils.getControlValue(pipelineContext, containingDocument, controlElement);
+
+                                    // Set current binding for control element
+                                    XFormsControls xFormsControls = containingDocument.getxFormsControls();
+                                    xFormsControls.setBinding(pipelineContext, controlElement);
+
+                                    // Get current control value
+                                    XFormsInstance instance = xFormsControls.getCurrentInstance();
+                                    String controlValue = instance.getValueForNode(xFormsControls.getCurrentSingleNode());
 
                                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[]{"id", controlId, "value", controlValue});
                                 }
@@ -191,10 +195,8 @@ public class XFormsServer extends ProcessorImpl {
         // Get controls
         Document controlsDocument = XFormsUtils.decodeXML(pipelineContext, encodedControlsString);
 
-        // Create XForms Engine
-        XFormsContainingDocument containingDocument = new XFormsContainingDocument(controlsDocument);
-
         // Get models
+        final List models = new ArrayList();
         {
             Document modelsDocument = XFormsUtils.decodeXML(pipelineContext, encodedModelsString);
 
@@ -203,9 +205,12 @@ public class XFormsServer extends ProcessorImpl {
 
                 Document modelDocument = Dom4jUtils.createDocument(modelElement);
                 XFormsModel model = new XFormsModel(modelDocument);
-                containingDocument.addModel(model);
+                models.add(model);
             }
         }
+
+        // Create XForms Engine
+        XFormsContainingDocument containingDocument = new XFormsContainingDocument(models, controlsDocument);
 
         // Get instances
         boolean isInitializeEvent;
@@ -235,6 +240,8 @@ public class XFormsServer extends ProcessorImpl {
         containingDocument.initialize(pipelineContext);
         if (isInitializeEvent)
             containingDocument.dispatchEvent(pipelineContext, XFormsEvents.XXFORMS_INITIALIZE);
+        else
+            containingDocument.dispatchEvent(pipelineContext, XFormsEvents.XXFORMS_INITIALIZE_CONTROLS);
 
         return containingDocument;
     }

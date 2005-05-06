@@ -24,6 +24,8 @@ import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import java.util.Collections;
+
 public class XFormsAnnotate extends ProcessorImpl {
 
     private static final String INPUT_MODEL = "model";
@@ -59,8 +61,7 @@ public class XFormsAnnotate extends ProcessorImpl {
                     model.setInstanceDocument(pipelineContext, instanceDocument);
 
                     // Create and initialize XForms Engine
-                    XFormsContainingDocument containingDocument = new XFormsContainingDocument(null);
-                    containingDocument.addModel(model);
+                    XFormsContainingDocument containingDocument = new XFormsContainingDocument(Collections.singletonList(model), null);
                     containingDocument.initialize(pipelineContext);
                     containingDocument.dispatchEvent(pipelineContext, XFormsEvents.XXFORMS_INITIALIZE);
 

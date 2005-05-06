@@ -31,6 +31,7 @@ import org.xml.sax.ContentHandler;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Collections;
 
 /**
  * Handle XForms decoding.
@@ -149,8 +150,7 @@ public class XFormsInput extends ProcessorImpl {
                     });
 
                     // Create and initialize XForms Engine
-                    XFormsContainingDocument containingDocument = new XFormsContainingDocument(null);
-                    containingDocument.addModel(model);
+                    XFormsContainingDocument containingDocument = new XFormsContainingDocument(Collections.singletonList(model), null);
                     containingDocument.initialize(pipelineContext);
                     containingDocument.dispatchEvent(pipelineContext, XFormsEvents.XXFORMS_INITIALIZE);
 

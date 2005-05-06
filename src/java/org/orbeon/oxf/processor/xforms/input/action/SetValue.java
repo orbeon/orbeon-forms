@@ -20,6 +20,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.InstanceData;
+import org.orbeon.oxf.xforms.XFormsUtils;
 
 import java.util.Map;
 
@@ -41,12 +42,12 @@ public class SetValue implements Action {
         String[] ids = nodeset.split(" ");
         try {
             String id = ids[0];
-            if (org.orbeon.oxf.xforms.XFormsUtils.isNameEncryptionEnabled())
+            if (XFormsUtils.isNameEncryptionEnabled())
                 id = SecureUtils.decrypt(context, encryptionPassword, id);
             Integer idInteger = new Integer(Integer.parseInt(id));
             Node node = (Node) ((InstanceData) instance.getRootElement().getData()).getIdToNodeMap().get(idInteger);
             String newValue = value != null ? value : content == null ? "" : content;
-            org.orbeon.oxf.xforms.XFormsUtils.fillNode(node, newValue);
+            XFormsUtils.fillNode(node, newValue);
         } catch (NumberFormatException e) {
             throw new OXFException("Invalid node-id in setvalue action", e);
         }

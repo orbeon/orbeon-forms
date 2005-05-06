@@ -9,6 +9,7 @@
 package org.orbeon.oxf.processor.xforms.output.element;
 
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.SAXStore;
 import org.xml.sax.Attributes;
@@ -58,8 +59,8 @@ public class ViewContentHandler extends ForwardingContentHandler {
             repeatSAXStore.startElement(uri, localname, qname, attributes);
         } else if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
             // Get ref / bind / nodeset
-            elementContext.pushRelativeXPath(attributes.getValue("bind"),
-                    attributes.getValue("ref"), attributes.getValue("nodeset"));
+
+            elementContext.pushBinding(elementContext.getPipelineContext(), attributes.getValue("ref"), attributes.getValue("nodeset"), null, attributes.getValue("bind"));
 
             // Invoke element
             XFormsElement element = "group".equals(localname) ? new Group()
@@ -103,7 +104,7 @@ public class ViewContentHandler extends ForwardingContentHandler {
                 XFormsElement element = elementContext.peekElement();
                 element.end(elementContext, uri, localname, qname);
                 elementContext.popElement();
-                elementContext.popRelativeXPath();
+                elementContext.popBinding();
             } else {
                 super.endElement(uri, localname, qname);
             }

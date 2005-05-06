@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
+import org.dom4j.Node;
 import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -37,17 +38,19 @@ import java.util.*;
  */
 public class XFormsContainingDocument implements EventTarget {
 
-    private List models = new ArrayList();
+    private List models;
     private Map modelsMap = new HashMap();
-    private Document controlsDocument;
+    private XFormsControls xFormsControls;
 
-    public XFormsContainingDocument(Document controlsDocument) {
-        this.controlsDocument = controlsDocument;
-    }
+    public XFormsContainingDocument(List models, Document controlsDocument) {
+        this.models = models;
 
-    public void addModel(XFormsModel model) {
-        models.add(model);
-        modelsMap.put(model.getId(), model);
+        for (Iterator i = models.iterator(); i.hasNext();) {
+            XFormsModel model = (XFormsModel) i.next();
+            modelsMap.put(model.getId(), model);
+        }
+
+        this.xFormsControls = new XFormsControls(this, controlsDocument);
     }
 
     /**
@@ -68,14 +71,22 @@ public class XFormsContainingDocument implements EventTarget {
     /**
      * Return the controls document.
      */
-    public Document getControlsDocument() {
-        return controlsDocument;
+    private Document getControlsDocument() {
+        return xFormsControls.getControlsDocument();
+    }
+
+    /**
+     * Return the XForms controls.
+     */
+    public XFormsControls getxFormsControls() {
+        return xFormsControls;
     }
 
     /**
      * Initialize the XForms engine.
      */
     public void initialize(PipelineContext pipelineContext) {
+        // NOP for now
     }
 
     /**
@@ -90,7 +101,7 @@ public class XFormsContainingDocument implements EventTarget {
 
         // Create XPath expression
         PooledXPathExpression xpathExpression =
-            XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument),
+            XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(getControlsDocument(), null).wrap(getControlsDocument()),
                     "/xxf:controls//*[@id = $control-id]/xf:*[@ev:event = $control-name]", XFormsServer.XFORMS_NAMESPACES, variables);
 
         // Get action element
@@ -108,11 +119,11 @@ public class XFormsContainingDocument implements EventTarget {
 
         // Interpret action
         ActionResult actionResult = new ActionResult();
-        interpretAction(pipelineContext, actionElement, controlsDocument, actionResult);
+        interpretAction(pipelineContext, actionElement, actionResult);
         return actionResult;
     }
 
-    private void interpretAction(final PipelineContext pipelineContext, Element actionElement, Document controlsDocument, ActionResult actionResult) {
+    private void interpretAction(final PipelineContext pipelineContext, Element actionElement, ActionResult actionResult) {
 
         String actionNamespaceURI = actionElement.getNamespaceURI();
         if (!XFormsConstants.XFORMS_NAMESPACE_URI.equals(actionNamespaceURI)) {
@@ -125,24 +136,28 @@ public class XFormsContainingDocument implements EventTarget {
             // 10.1.9 The setvalue Element
             // xforms:setvalue
 
-            String ref = actionElement.attributeValue("ref");// TODO: support relative refs
-            String value = actionElement.attributeValue("value");
-            String content = actionElement.getStringValue();
 
-            Map namespaceContext = Dom4jUtils.getNamespaceContext(actionElement);
+            // Set binding for current action element
+            xFormsControls.setBinding(pipelineContext, actionElement);
 
-            XFormsInstance instance = XFormsUtils.getInstanceFromSingleNodeBindingElement(this, actionElement);
+            final String value = actionElement.attributeValue("value");
+            final String content = actionElement.getStringValue();
 
-            String valueToSet;
+            final XFormsInstance instance = xFormsControls.getCurrentInstance();
+            final String valueToSet;
             if (value != null) {
                 // Value to set is computed with an XPath expression
+                Map namespaceContext = Dom4jUtils.getNamespaceContext(actionElement);
                 valueToSet = instance.evaluateXPath(pipelineContext, value, namespaceContext);
             } else {
                 // Value to set is static content
                 valueToSet = content;
             }
 
-            instance.setValueForParam(pipelineContext, ref, namespaceContext, valueToSet);
+            // Set value on current node
+            Node currentNode = xFormsControls.getCurrentSingleNode();
+            instance.setValueForNode(currentNode, valueToSet);
+
         } else if (XFormsEvents.XFORMS_TOGGLE_ACTION.equals(actionEventName)) {
             // 9.2.3 The toggle Element
             // xforms:toggle
@@ -157,7 +172,7 @@ public class XFormsContainingDocument implements EventTarget {
                 variables.put("case-id", caseId);
 
                 PooledXPathExpression xpathExpression =
-                    XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument),
+                    XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(getControlsDocument(), null).wrap(getControlsDocument()),
                             "/xxf:controls//xf:case[@id = $case-id]/ancestor::xf:switch[1]//xf:case[not(@id = $case-id)]", XFormsServer.XFORMS_NAMESPACES, variables);
                 try {
 
@@ -184,7 +199,7 @@ public class XFormsContainingDocument implements EventTarget {
 
             for (Iterator i = actionElement.elementIterator(); i.hasNext();) {
                 Element embeddedActionElement = (Element) i.next();
-                interpretAction(pipelineContext, embeddedActionElement, controlsDocument, actionResult);
+                interpretAction(pipelineContext, embeddedActionElement, actionResult);
             }
 
         } else {
@@ -202,12 +217,17 @@ public class XFormsContainingDocument implements EventTarget {
 
             final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_DONE, XFormsEvents.XFORMS_READY };
             for (int i = 0; i < eventsToDispatch.length; i++) {
+                if (XFormsEvents.XFORMS_MODEL_DONE.equals(eventsToDispatch[i])) {
+                    dispatchEvent(pipelineContext, XFormsEvents.XXFORMS_INITIALIZE_CONTROLS);
+                }
                 for (Iterator j = getModels().iterator(); j.hasNext();) {
                     XFormsModel model = (XFormsModel) j.next();
                     model.dispatchEvent(pipelineContext, eventsToDispatch[i]);
                 }
             }
-
+        } else if (XFormsEvents.XXFORMS_INITIALIZE_CONTROLS.equals(eventName)) {
+            // Make sure controls are initialized
+            xFormsControls.initialize();
         } else {
             throw new OXFException("Invalid event dispatched: " + eventName);
         }

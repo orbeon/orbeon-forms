@@ -18,12 +18,10 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.output.element.ViewContentHandler;
-import org.orbeon.oxf.processor.xforms.output.element.XFormsElementContext;
-import org.orbeon.oxf.xforms.XFormsConstants;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsEvents;
-import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.*;
 import org.xml.sax.ContentHandler;
+
+import java.util.Collections;
 
 public class XFormsOutput extends ProcessorImpl {
 
@@ -45,7 +43,7 @@ public class XFormsOutput extends ProcessorImpl {
                 // Get XForms model
                 XFormsModel model = (org.orbeon.oxf.xforms.XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader() {
                         public Object read(PipelineContext context, ProcessorInput input) {
-                            return new org.orbeon.oxf.xforms.XFormsModel(readInputAsDOM4J(context, input));
+                            return new XFormsModel(readInputAsDOM4J(context, input));
                         }
                     });
                 try {
@@ -60,8 +58,7 @@ public class XFormsOutput extends ProcessorImpl {
                 model.setInstanceDocument(pipelineContext, instanceDocument);
 
                 // Create and initialize XForms Engine
-                XFormsContainingDocument containingDocument = new org.orbeon.oxf.xforms.XFormsContainingDocument(null);
-                containingDocument.addModel(model);
+                XFormsContainingDocument containingDocument = new XFormsContainingDocument(Collections.singletonList(model), null);
                 containingDocument.initialize(pipelineContext);
                 containingDocument.dispatchEvent(pipelineContext, XFormsEvents.XXFORMS_INITIALIZE);
 
@@ -71,7 +68,7 @@ public class XFormsOutput extends ProcessorImpl {
 
                 // Create evaluation context
                 XFormsElementContext elementContext =
-                        new XFormsElementContext(pipelineContext, contentHandler, model);
+                        new XFormsElementContext(pipelineContext, containingDocument, contentHandler);
 
                 // Send SAX events of view to ViewContentHandler
                 readInputAsSAX(pipelineContext, INPUT_DATA, new ViewContentHandler(contentHandler, elementContext));

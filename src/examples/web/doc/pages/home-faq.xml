@@ -698,7 +698,24 @@
                         considered "supported" in OPS. Orbeon is hoping to find a sponsor for this
                         work.
                     </p>
-
+            </section>
+            <a name="jboss-log4j"/>
+            <section>
+                <title>
+                    Why am I getting extra <code>xml:base</code> attributes on my documents?
+                </title>
+                <p>
+                    This usually happens when you use XInclude. As per the <a
+                    href="http://www.w3.org/TR/2004/REC-xinclude-20041220/">XInclude
+                    specification</a>, such attributes are added upon inclusion. You can get rid of
+                    them by using XSLT:
+                </p>
+                <xml-source>
+                    <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                        <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                        <xsl:template match="@xml:base"/>
+                    </xsl:stylesheet>
+                </xml-source>
             </section>
             <a name="jboss-log4j"/>
             <section>

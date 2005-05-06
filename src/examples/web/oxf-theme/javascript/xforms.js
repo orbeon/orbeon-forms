@@ -28,6 +28,8 @@ function xformsFireEvent(target, eventName, value) {
     eventFiredElement.appendChild(eventElement);
     eventElement.setAttribute("name", eventName);
     eventElement.setAttribute("source-control-id", target.id);
+    if (value != null)
+        eventElement.setAttribute("value", value);
     
     // Add models
     var modelsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:models");
@@ -86,6 +88,15 @@ function xformsPageLoaded() {
             break;
         }
     }
+    
+    // Event handlers
+    var handleChange = function(event) {
+        var target = getEventTarget(event);
+        xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value);
+    };
+    var handleClick = function(event) {
+        xformsFireEvent(getEventTarget(event), "DOMActivate", null);
+    }
 
     // 
     var forms = document.getElementsByTagName("form");
@@ -97,23 +108,19 @@ function xformsPageLoaded() {
             var element = elements[elementIndex];
             
             // Handle value change
-            var handleChange = function(event) {
-                xformsFireEvent(getEventTarget(event), "DOMActivate", null);
-            };
             if (element.addEventListener) {
                 element.addEventListener("change", handleChange, false);
             } else {
                 element.attachEvent("onchange", handleChange);
             }
             
-            // Handle click 
-            var handleClick = function(event) {
-                xformsFireEvent(getEventTarget(event), "DOMActivate", null);
-            }
-            if (element.addEventListener) {
-                element.addEventListener("click", handleClick, false);
-            } else {
-                element.attachEvent("onclick", handleClick);
+            // Handle click
+            if (element.tagName == "BUTTON") {
+                if (element.addEventListener) {
+                    element.addEventListener("click", handleClick, false);
+                } else {
+                    element.attachEvent("onclick", handleClick);
+                }
             }
         }
     

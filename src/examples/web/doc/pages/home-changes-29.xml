@@ -27,6 +27,17 @@
             <p>
                 ...
             </p>
+            <p>
+                Incompatible changes:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        XSLT views now must always use <code>doc('input:instance')</code> to access
+                        the XForms instance instead of expecting the instance on their main input.
+                    </p>
+                </li>
+            </ul>
         </section>
         <section>
             <title>XSLT processor</title>

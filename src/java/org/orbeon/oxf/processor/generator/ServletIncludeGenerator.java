@@ -32,7 +32,7 @@ import java.io.IOException;
 
 /**
  * NOTE: This generator depends on the Servlet API. Doesn't work with portlets. FIXME!
- *       See an incorrect implementation in NewServletIncludeGenerator.
+ * See an incorrect implementation in NewServletIncludeGenerator.
  */
 public class ServletIncludeGenerator extends ProcessorImpl {
 
@@ -91,12 +91,12 @@ public class ServletIncludeGenerator extends ProcessorImpl {
         return output;
     }
 
-    private RequestDispatcher getRequestDispatcher(ExternalContext context, Config config) {
-        Object sc = context.getNativeContext();
-        if( (sc == null) || !(sc instanceof ServletContext))
+    private RequestDispatcher getRequestDispatcher(ExternalContext externalContext, Config config) {
+        Object sc = externalContext.getNativeContext();
+        if ((sc == null) || !(sc instanceof ServletContext))
             throw new OXFException("Can't find servlet context in pipeline context");
 
-        ServletContext servletContext = (ServletContext)sc;
+        ServletContext servletContext = (ServletContext) sc;
         String name = "";
         if (config.getContextPath() != null) {
             name += config.getContextPath() + '/';

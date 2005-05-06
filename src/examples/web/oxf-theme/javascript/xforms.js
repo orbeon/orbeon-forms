@@ -5,6 +5,52 @@ var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
 var XFORMS_SERVER_URL = null;
 var PATH_TO_JAVASCRIPT = "/oxf-theme/javascript/xforms.js";
 
+/* * * * * * Utility functions * * * * * */
+
+/**
+ * Create an element with a namespace. Offers the same functionality 
+ * as the DOM2 Document.createElementNS method.
+ */
+function xformsCreateElementNS(namespaceURI, qname) {
+    var localName = qname.indexOf(":") == -1 ? "" : ":" + qname.substr(0, qname.indexOf(":"));
+    var request = Sarissa.getDomDocument();
+    request.loadXML("<" + qname + " xmlns" + localName + "='" + namespaceURI + "'/>")
+    return request.documentElement;
+}
+
+function xformsFireEvent(eventName, id, form) {
+
+    // Build request
+    var eventFiredElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event-request");
+    
+    // Add event
+    var eventElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event");
+    eventFiredElement.appendChild(eventElement);
+    eventElement.setAttribute("name", eventName);
+    eventElement.setAttribute("source-control-id", id);
+    
+    // Add models
+    var modelsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:models");
+    modelsElement.appendChild(modelsElement.ownerDocument.createTextNode(form.xformsModels));
+    eventFiredElement.appendChild(modelsElement);
+    
+    // Add controls
+    var controlsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:controls");
+    controlsElement.appendChild(controlsElement.ownerDocument.createTextNode(form.xformsControls));
+    eventFiredElement.appendChild(controlsElement);    
+    
+    // Add instances
+    var instancesElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:instances");
+    instancesElement.appendChild(instancesElement.ownerDocument.createTextNode(form.xformsInstances));
+    eventFiredElement.appendChild(instancesElement);    
+    
+    // Set as next request to execute and trigger execution
+    form.xformsNextRequest = eventFiredElement.ownerDocument;
+    xformsExecuteNextRequest();
+
+    return false;
+}
+
 /**
  * Initializes attributes of each form:
  *
@@ -34,9 +80,27 @@ function xformsPageLoaded() {
         }
     }
 
-    // Initialize attributes of each form
+    // 
     var forms = document.getElementsByTagName("form");
     for (var formIndex = 0; formIndex < forms.length; formIndex++) {
+    
+        // Register listeners on controls
+        var elements = forms[formIndex].elements;
+        for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
+            var element = elements[elementIndex];
+            var handleChange = function(event) {
+                event = event ? event : window.event;
+                target = event.srcElement ? event.srcElement : event.target;
+                xformsFireEvent("DOMActivate", "trigger" /*target.id*/, target.form);
+            };
+            if (element.addEventListener) {
+                element.addEventListener("change", handleChange, false);
+            } else {
+                element.attachEvent("onchange", handleChange);
+            }
+        }
+    
+        // Initialize attributes on form
         forms[formIndex].xformsNextRequest = null;
         var divs = forms[formIndex].getElementsByTagName("div");
         for (var divIndex = 0; divIndex < divs.length; divIndex++) {
@@ -59,24 +123,6 @@ function xformsPageLoaded() {
     }
     document.xformsRequestInProgress = false;
     document.xformsFormOfCurrentRequest = null;
-}
-
-/**
- * Create an element with a namespace. Offers the same functionality 
- * as the DOM2 Document.createElementNS method.
- */
-function xformsCreateElementNS(namespaceURI, qname) {
-    var localName = qname.indexOf(":") == -1 ? "" : ":" + qname.substr(0, qname.indexOf(":"));
-    var request = Sarissa.getDomDocument();
-    request.loadXML("<" + qname + " xmlns" + localName + "='" + namespaceURI + "'/>")
-    return request.documentElement;
-}
-
-/**
- * Adds text content to an element.
- */
-function xformsAddText(element, text) {
-    element.appendChild(element.ownerDocument.createTextNode(text));
 }
 
 function xformsGetLocalName(element) {
@@ -105,7 +151,14 @@ function xformsHandleResponse() {
                         var controlId = controlElement.getAttribute("id");
                         var controlValue = controlElement.getAttribute("value");
                         var documentElement = document.getElementById(controlId);
-                        documentElement.innerHTML = controlValue;
+                        if (typeof(documentElement.value) == "string") {
+                            documentElement.value = controlValue;
+                        } else {
+                            while(documentElement.childNodes.length > 0)
+                                documentElement.removeChild(documentElement.firstChild);
+                            documentElement.appendChild
+                                (documentElement.ownerDocument.createTextNode(controlValue));
+                        }
                     }
                 }
             }
@@ -161,39 +214,6 @@ function xformsExecuteNextRequest() {
             }
         }
     }
-}
-
-function xformsFireEvent(eventName, id, form) {
-
-    // Build request
-    var eventFiredElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event-request");
-    
-    // Add event
-    var eventElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event");
-    eventFiredElement.appendChild(eventElement);
-    eventElement.setAttribute("name", eventName);
-    eventElement.setAttribute("source-control-id", id);
-    
-    // Add models
-    var modelsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:models");
-    modelsElement.appendChild(modelsElement.ownerDocument.createTextNode(form.xformsModels));
-    eventFiredElement.appendChild(modelsElement);
-    
-    // Add controls
-    var controlsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:controls");
-    controlsElement.appendChild(controlsElement.ownerDocument.createTextNode(form.xformsControls));
-    eventFiredElement.appendChild(controlsElement);    
-    
-    // Add instances
-    var instancesElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:instances");
-    instancesElement.appendChild(instancesElement.ownerDocument.createTextNode(form.xformsInstances));
-    eventFiredElement.appendChild(instancesElement);    
-    
-    // Set as next request to execute and trigger execution
-    form.xformsNextRequest = eventFiredElement.ownerDocument;
-    xformsExecuteNextRequest();
-
-    return false;
 }
 
 // Run xformsPageLoaded when the browser has finished loading the page

@@ -71,20 +71,21 @@
     </xsl:template>
     
     <xsl:template match="xforms:input">
-        <xhtml:input type="text" name="{@id}" value="">
+        <xhtml:input type="text" name="{@id}" value="{xxforms:control-value(@id)}">
             <xsl:call-template name="copy-attributes"/>
         </xhtml:input>
     </xsl:template>
 
     <xsl:template match="xforms:secret">
-        <xhtml:input type="password" name="{@id}" value="">
+        <xhtml:input type="password" name="{@id}" value="{xxforms:control-value(@id)}">
             <xsl:call-template name="copy-attributes"/>
         </xhtml:input>
     </xsl:template>
 
     <xsl:template match="xforms:textarea">
-        <xhtml:textarea name="{@xxforms:id}" value="">
+        <xhtml:textarea name="{@id}">
             <xsl:call-template name="copy-attributes"/>
+            <xsl:value-of select="xxforms:control-value(@id)"/>
         </xhtml:textarea>
     </xsl:template>
 

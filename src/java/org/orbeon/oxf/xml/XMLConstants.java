@@ -30,6 +30,7 @@ public class XMLConstants {
 
     public final static QName IDENTITY_PROCESSOR_QNAME = new QName("identity", OXF_PROCESSORS_NAMESPACE);
     public final static QName REQUEST_PROCESSOR_QNAME = new QName("request", OXF_PROCESSORS_NAMESPACE);
+    public final static QName NULL_PROCESSOR_QNAME = new QName("null", OXF_PROCESSORS_NAMESPACE);
     public final static QName NULL_SERIALIZER_PROCESSOR_QNAME = new QName("null-serializer", OXF_PROCESSORS_NAMESPACE);
     public final static QName PIPELINE_PROCESSOR_QNAME = new QName("pipeline", OXF_PROCESSORS_NAMESPACE);
     public final static QName REDIRECT_PROCESSOR_QNAME = new QName("redirect", OXF_PROCESSORS_NAMESPACE);

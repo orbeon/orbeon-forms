@@ -37,6 +37,10 @@
         <class name="org.orbeon.oxf.processor.NullSerializer"/>
     </processor>
 
+    <processor name="oxf:null">
+        <class name="org.orbeon.oxf.processor.NullProcessor"/>
+    </processor>
+
     <processor name="oxf:redirect" uri="oxf/processor/redirect">
         <class name="org.orbeon.oxf.processor.RedirectProcessor"/>
     </processor>

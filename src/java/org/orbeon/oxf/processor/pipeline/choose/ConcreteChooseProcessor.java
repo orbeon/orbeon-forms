@@ -160,7 +160,7 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
             throw new IllegalStateException("ASTChoose Processor already started");
 
         // Choose which branch we want to run (we cache the decision)
-        Node refNode = readCacheInputAsDOM4J(context, AbstractChooseProcessor.CHOOSE_DATA_INPUT);
+        Node refNode = null;
         int branchIndex = 0;
         int selectedBranch = -1;
         for (Iterator i = branchConditions.iterator(); i.hasNext();) {
@@ -180,6 +180,9 @@ public class ConcreteChooseProcessor extends ProcessorImpl {
 //                selectedBranch = branchIndex;
 //                break;
 //            }
+            // Lazily read input in case there is only a p:otherwise
+            if (refNode == null)
+                refNode = readCacheInputAsDOM4J(context, AbstractChooseProcessor.CHOOSE_DATA_INPUT);
             DocumentWrapper wrapper = new DocumentWrapper(refNode.getDocument(), null);
             PooledXPathExpression expr = null;
             Map namespaces = (Map)branchNamespaces.get(branchIndex);

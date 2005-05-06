@@ -68,7 +68,7 @@ public class XFormsInput extends ProcessorImpl {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
 
                 final XFormsInstance instance;
-                org.orbeon.oxf.xforms.XFormsInstance contextInstance = XFormsInstance.createInstanceFromContext(pipelineContext);
+                XFormsInstance contextInstance = XFormsInstance.createInstanceFromContext(pipelineContext);
                 if (contextInstance != null) {
                     // Got instance from context
                     instance = contextInstance;
@@ -77,7 +77,7 @@ public class XFormsInput extends ProcessorImpl {
                     // Get XForms model
                     XFormsModel model = (XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
                         public Object read(PipelineContext pipelineContext, ProcessorInput input) {
-                            return new org.orbeon.oxf.xforms.XFormsModel(readInputAsDOM4J(pipelineContext, input));
+                            return new XFormsModel(readInputAsDOM4J(pipelineContext, input));
                         }
                     });
                     try {

@@ -79,7 +79,7 @@ public class XFormsControls {
         Element currentElement = bindingElement;
         while (currentElement != null) {
             ancestorsOrSelf.add(currentElement);
-            currentElement = bindingElement.getParent();
+            currentElement = currentElement.getParent();
         }
 
         // Bind up to the specified element

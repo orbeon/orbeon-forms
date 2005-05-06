@@ -21,12 +21,14 @@
     <start>
         <element name="xxforms:event-request">
             <element name="xxforms:event">
-                <attribute name="name">
-                    <ref name="xformsActionName"/>
-                </attribute>
-                <attribute name="source-control-id">
-                    <data type="string"/>
-                </attribute>
+                <optional>
+                    <attribute name="name">
+                        <ref name="xformsActionName"/>
+                    </attribute>
+                    <attribute name="source-control-id">
+                        <data type="string"/>
+                    </attribute>
+                </optional>
             </element>
             <element name="xxforms:models">
                 <data type="string"/>

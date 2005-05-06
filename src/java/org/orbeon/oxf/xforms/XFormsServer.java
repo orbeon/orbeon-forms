@@ -76,14 +76,16 @@ public class XFormsServer extends ProcessorImpl {
                         encodedModelsString, encodedInstancesString);
 
                 // Run action if any
-                XFormsContainingDocument.ActionResult actionResult = null;
+                XFormsContainingDocument.EventResult eventResult = null;
                 {
-                    String controlId = eventDocument.getRootElement().attributeValue("source-control-id");
-                    String eventName = eventDocument.getRootElement().attributeValue("name");
+                    final Element eventElement = eventDocument.getRootElement();
+                    String controlId = eventElement.attributeValue("source-control-id");
+                    String eventName = eventElement.attributeValue("name");
+                    String value = eventElement.attributeValue("value");
 
                     if (controlId != null && eventName != null) {
                         // An event is passed
-                        actionResult = containingDocument.executeAction(pipelineContext, controlId, eventName);
+                        eventResult = containingDocument.executeEvent(pipelineContext, controlId, eventName, value);
                     } else if (!(controlId == null && eventName == null)) {
                         throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
                     }
@@ -160,15 +162,15 @@ public class XFormsServer extends ProcessorImpl {
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
 
-                        if (actionResult != null) {
-                            if (actionResult.getDivsToHide() != null) {
-                                for (Iterator i = actionResult.getDivsToHide().iterator(); i.hasNext();) {
+                        if (eventResult != null) {
+                            if (eventResult.getDivsToHide() != null) {
+                                for (Iterator i = eventResult.getDivsToHide().iterator(); i.hasNext();) {
                                     String caseId = (String) i.next();
                                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "hidden"});
                                 }
                             }
-                            if (actionResult.getDivsToShow() != null) {
-                                for (Iterator i = actionResult.getDivsToShow().iterator(); i.hasNext();) {
+                            if (eventResult.getDivsToShow() != null) {
+                                for (Iterator i = eventResult.getDivsToShow().iterator(); i.hasNext();) {
                                     String caseId = (String) i.next();
                                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "visible"});
                                 }

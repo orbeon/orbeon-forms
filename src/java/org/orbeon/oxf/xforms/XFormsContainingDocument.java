@@ -92,7 +92,7 @@ public class XFormsContainingDocument implements EventTarget {
     /**
      * Execute an action on control with id controlId and action/event eventName
      */
-    public ActionResult executeAction(PipelineContext pipelineContext, String controlId, String eventName) {
+    public EventResult executeEvent(PipelineContext pipelineContext, String controlId, String eventName, String eventValue) {
 
         // Create XPath variables
         Map variables = new HashMap();
@@ -118,12 +118,12 @@ public class XFormsContainingDocument implements EventTarget {
         }
 
         // Interpret action
-        ActionResult actionResult = new ActionResult();
-        interpretAction(pipelineContext, actionElement, actionResult);
-        return actionResult;
+        EventResult eventResult = new EventResult();
+        interpretEvent(pipelineContext, actionElement, eventResult, eventValue);
+        return eventResult;
     }
 
-    private void interpretAction(final PipelineContext pipelineContext, Element actionElement, ActionResult actionResult) {
+    private void interpretEvent(final PipelineContext pipelineContext, Element actionElement, EventResult eventResult, String eventValue) {
 
         String actionNamespaceURI = actionElement.getNamespaceURI();
         if (!XFormsConstants.XFORMS_NAMESPACE_URI.equals(actionNamespaceURI)) {
@@ -164,7 +164,7 @@ public class XFormsContainingDocument implements EventTarget {
 
             // Find case with that id and select it
             String caseId = actionElement.attributeValue("case");
-            actionResult.addDivToShow(caseId);
+            eventResult.addDivToShow(caseId);
 
             // Deselect other cases in that switch
             {
@@ -178,7 +178,7 @@ public class XFormsContainingDocument implements EventTarget {
 
                     for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
                         Element caseElement = (Element) i.next();
-                        actionResult.addDivToHide(caseElement.attributeValue(new QName("id")));
+                        eventResult.addDivToHide(caseElement.attributeValue(new QName("id")));
                     }
                 } catch (XPathException e) {
                     throw new OXFException(e);
@@ -192,6 +192,37 @@ public class XFormsContainingDocument implements EventTarget {
             // 1. Dispatching an xforms-deselect event to the currently selected case.
             // 2. Dispatching an xform-select event to the case to be selected.
 
+        } else if (XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE.equals(actionEventName)) {
+            // 4.6.7 Sequence: Value Change with Focus Change
+
+            // 1. xforms-recalculate
+            // 2. xforms-revalidate
+            // 3. [n] xforms-valid/xforms-invalid; xforms-enabled/xforms-disabled; xforms-optional/xforms-required; xforms-readonly/xforms-readwrite
+            // 4. xforms-value-changed
+            // 5. DOMFocusOut
+            // 6. DOMFocusIn
+            // 7. xforms-refresh
+            // Reevaluation of binding expressions must occur before step 3 above.
+
+            // Set current context
+            xFormsControls.setBinding(pipelineContext, actionElement);
+
+            // Set value into the instance
+            xFormsControls.getCurrentInstance().setValueForNode(xFormsControls.getCurrentSingleNode(), eventValue);
+
+            // Dispatch events
+            XFormsModel model = xFormsControls.getCurrentModel();
+            model.dispatchEvent(pipelineContext, XFormsEvents.XFORMS_RECALCULATE);
+            model.dispatchEvent(pipelineContext, XFormsEvents.XFORMS_REVALIDATE);
+
+            xFormsControls.dispatchEvent(pipelineContext, XFormsEvents.XFORMS_DOM_FOCUS_OUT, actionElement);
+            xFormsControls.dispatchEvent(pipelineContext, XFormsEvents.XFORMS_VALUE_CHANGED, actionElement);
+
+            // TODO
+            //xFormsControls.dispatchEvent(pipelineContext, XFormsEvents.XFORMS_DOM_FOCUS_IN, newControlElement);
+
+            model.dispatchEvent(pipelineContext, XFormsEvents.XFORMS_REFRESH);
+
 
         } else if (XFormsEvents.XFORMS_ACTION_ACTION.equals(actionEventName)) {
             // 10.1.1 The action Element
@@ -199,7 +230,7 @@ public class XFormsContainingDocument implements EventTarget {
 
             for (Iterator i = actionElement.elementIterator(); i.hasNext();) {
                 Element embeddedActionElement = (Element) i.next();
-                interpretAction(pipelineContext, embeddedActionElement, actionResult);
+                interpretEvent(pipelineContext, embeddedActionElement, eventResult, eventValue);
             }
 
         } else {
@@ -233,7 +264,7 @@ public class XFormsContainingDocument implements EventTarget {
         }
     }
 
-    public static class ActionResult {
+    public static class EventResult {
 
         private List divsToShow;
         private List divsToHide;

@@ -28,6 +28,11 @@
                     <attribute name="source-control-id">
                         <data type="string"/>
                     </attribute>
+                    <optional>
+                        <attribute name="value">
+                            <data type="string"/>
+                        </attribute>
+                    </optional>
                 </optional>
             </element>
             <element name="xxforms:models">

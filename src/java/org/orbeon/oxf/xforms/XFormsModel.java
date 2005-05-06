@@ -69,7 +69,7 @@ import java.util.List;
 /**
  * Represents an XForms model.
  */
-public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable {
+public class XFormsModel implements EventTarget, Cloneable {
 
     private static class MSVGrammarReaderController implements GrammarReaderController {
 
@@ -224,7 +224,7 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
 
     // Instance
     //private Document instanceDocument;
-    private org.orbeon.oxf.xforms.XFormsInstance instance;
+    private XFormsInstance instance;
     private InstanceConstructListener instanceConstructListener;
 
     // Submission information
@@ -233,9 +233,9 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
     private String encoding;
 
     // Binds
-    private List binds = new ArrayList();
+    private List binds;
 
-    private FunctionLibrary xformsFunctionLibrary = new org.orbeon.oxf.xforms.XFormsFunctionLibrary();
+    private FunctionLibrary xformsFunctionLibrary = new XFormsFunctionLibrary();
 
     public XFormsModel(Document modelDocument) {
         this.modelDocument = modelDocument;
@@ -249,6 +249,11 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
                     (LocationData) modelElement.getData());
 
         // TODO: should rather use schema here or when obtaining document passed to this constructor
+    }
+
+    private void resetBinds() {
+        binds = new ArrayList();
+        handleBindContainer(modelDocument.getRootElement(), null);
     }
 
     /**
@@ -286,10 +291,10 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
     private void addSchemaError(final Attribute att, final String errMsg) {
         // Looks like if n is an element and errMsg == null then the problem is missing character
         // data.
-        final org.orbeon.oxf.xforms.InstanceData instDat = XFormsUtils.getInstanceData(att);
+        final InstanceData instDat = XFormsUtils.getInstanceData(att);
         instDat.addSchemaError(errMsg);
         final Element elt = att.getParent();
-        final org.orbeon.oxf.xforms.InstanceData eltInstDat = XFormsUtils.getInstanceData(elt);
+        final InstanceData eltInstDat = XFormsUtils.getInstanceData(elt);
 
     }
 
@@ -421,7 +426,7 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
 
     public void setInstanceDocument(PipelineContext pipelineContext, Document instanceDocument) {
         XFormsUtils.setInitialDecoration(instanceDocument);
-        this.instance = new org.orbeon.oxf.xforms.XFormsInstance(pipelineContext, instanceDocument);
+        this.instance = new XFormsInstance(pipelineContext, instanceDocument);
     }
 
     public void applyOtherBinds(final PipelineContext pipelineContext) {
@@ -457,6 +462,10 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
      * Apply binds.
      */
     private void applyBinds(BindRunner bindRunner) {
+
+        if (binds == null)
+            resetBinds();
+
         for (Iterator i = binds.iterator(); i.hasNext();) {
             final ModelBind modelBind = (ModelBind) i.next();
             try {
@@ -522,7 +531,7 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
                     try {
                         boolean relevant = ((Boolean) expr.evaluateSingle()).booleanValue();
                         // Mark node
-                        InstanceData instanceData = org.orbeon.oxf.xforms.XFormsUtils.getInstanceData((Node) node);
+                        InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
                         instanceData.getRelevant().set(relevant);
                     } catch (XPathException e) {
                         throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
@@ -610,7 +619,7 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
                                     modelBind.getLocationData());
 
                         // Pass-through the type value
-                        org.orbeon.oxf.xforms.InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
+                        InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
                         instanceData.getType().set(requiredType);
 
                         // Try to perform casting
@@ -666,7 +675,7 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
                     try {
                         boolean required = ((Boolean) expr.evaluateSingle()).booleanValue();
                         // Mark node
-                        org.orbeon.oxf.xforms.InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
+                        InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
                         instanceData.getRequired().set(required);
 
                         // If required, check the string value is not empty
@@ -859,7 +868,7 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
      * </ul>
      */
     private void markValidity(boolean valid, Node node, String id) {
-        org.orbeon.oxf.xforms.InstanceData instanceData = XFormsUtils.getInstanceData(node);
+        InstanceData instanceData = XFormsUtils.getInstanceData(node);
         if (instanceData.getValid().get() || !valid) {
             instanceData.getValid().set(valid);
         }
@@ -919,6 +928,10 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
     }
 
     public ModelBind getModelBindById(String id) {
+
+        if (binds == null)
+            resetBinds();
+
         for (Iterator i = binds.iterator(); i.hasNext();) {
             ModelBind bind = (ModelBind) i.next();
             ModelBind result = getModelBindByIdWorker(bind, id);
@@ -1015,9 +1028,6 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
             //    a. Evaluate nodeset
             //    b. Apply model item properties on nodes
             //    c. Throws xforms-binding-exception if the node has already model item property with same name
-
-            // Get <xforms:bind> elements
-            handleBindContainer(modelElement, null);
             // TODO: a, b, c xxx
 
             // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
@@ -1059,7 +1069,7 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
 
             // Clear all existing errors on instance
             XFormsUtils.updateInstanceData(instance.getDocument(), new XFormsUtils.InstanceWalker() {
-                public void walk(Node node, org.orbeon.oxf.xforms.InstanceData instanceData) {
+                public void walk(Node node, InstanceData instanceData) {
                     if (instanceData != null)
                         instanceData.clearSchemaErrors();
                 }
@@ -1090,12 +1100,15 @@ public class XFormsModel implements org.orbeon.oxf.xforms.EventTarget, Cloneable
         }
     }
 
+    /**
+     * This class is cloneable.
+     */
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
 
     public static interface InstanceConstructListener {
-        public void updateInstance(org.orbeon.oxf.xforms.XFormsInstance instance);
+        public void updateInstance(XFormsInstance instance);
     }
 
     public void setInstanceConstructListener(InstanceConstructListener instanceConstructListener) {

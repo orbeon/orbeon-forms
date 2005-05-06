@@ -243,6 +243,10 @@ public class XFormsControls {
         return elements.size() > level + 1 ? (XFormsElement) elements.get(elements.size() - (level + 2)) : null;
     }
 
+    public XFormsModel getCurrentModel() {
+        return getCurrentContext().model;
+    }
+
     public XFormsInstance getCurrentInstance() {
         return getCurrentContext().model.getInstance();
     }
@@ -254,6 +258,22 @@ public class XFormsControls {
         public Context(XFormsModel model, List nodeSet) {
             this.model = model;
             this.nodeset = nodeSet;
+        }
+    }
+
+    public void dispatchEvent(PipelineContext pipelineContext, String eventName, Element actionElement) {
+        if (XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)) {
+            // 4.4.9 The DOMFocusOut Event
+            // Bubbles: Yes / Cancelable: No / Context Info: None
+            // The default action for this event results in the following: None; notification event only.
+
+        } else if (XFormsEvents.XFORMS_VALUE_CHANGED.equals(eventName)) {
+            // 4.4.2 The xforms-value-changed Event
+            // Bubbles: Yes / Cancelable: No / Context Info: None
+            // The default action for this event results in the following: None; notification event only.
+
+        } else {
+            throw new OXFException("Invalid action requested: " + eventName);
         }
     }
 }

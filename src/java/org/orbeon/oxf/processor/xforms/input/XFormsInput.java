@@ -22,10 +22,7 @@ import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.input.action.Action;
 import org.orbeon.oxf.processor.xforms.input.action.ActionFunctionContext;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsEvents;
-import org.orbeon.oxf.xforms.XFormsInstance;
-import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
 
@@ -152,7 +149,7 @@ public class XFormsInput extends ProcessorImpl {
                     // Create and initialize XForms Engine
                     XFormsContainingDocument containingDocument = new XFormsContainingDocument(Collections.singletonList(model), null);
                     containingDocument.initialize(pipelineContext);
-                    containingDocument.dispatchEvent(pipelineContext, XFormsEvents.XXFORMS_INITIALIZE);
+                    containingDocument.dispatchEvent(pipelineContext, new EventContext(), XFormsEvents.XXFORMS_INITIALIZE);
 
                     // Run remaining model item properties
                     // TODO: this has to be done in a different way (events?)

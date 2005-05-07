@@ -46,6 +46,9 @@
     <!-- Examples that do not work within the examples portal -->
     <page path-info="/examples-standalone/.*" matcher="oxf:perl5-matcher" model="/examples/dispatch.xpl"/>
 
+    <!-- Standalone Counter example -->
+    <page path-info="/counter*" model="/examples/counter/page-flow.xpl"/>
+
     <!-- Standalone BizDoc example -->
     <page path-info="/bizdoc*" model="/examples/bizdoc/page-flow.xpl"/>
 

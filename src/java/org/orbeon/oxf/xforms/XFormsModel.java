@@ -964,7 +964,7 @@ public class XFormsModel implements EventTarget, Cloneable {
         return !schmVldatdObj.booleanValue();
     }
 
-    public void dispatchEvent(final PipelineContext pipelineContext, String eventName) {
+    public void dispatchEvent(final PipelineContext pipelineContext, EventContext eventContext, String eventName) {
         if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
             // 4.2.1 The xforms-model-construct Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
@@ -1031,9 +1031,9 @@ public class XFormsModel implements EventTarget, Cloneable {
             // TODO: a, b, c xxx
 
             // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-            dispatchEvent(pipelineContext, XFormsEvents.XFORMS_REBUILD);
-            dispatchEvent(pipelineContext, XFormsEvents.XFORMS_RECALCULATE);
-            dispatchEvent(pipelineContext, XFormsEvents.XFORMS_REVALIDATE);
+            dispatchEvent(pipelineContext, eventContext, XFormsEvents.XFORMS_REBUILD);
+            dispatchEvent(pipelineContext, eventContext, XFormsEvents.XFORMS_RECALCULATE);
+            dispatchEvent(pipelineContext, eventContext, XFormsEvents.XFORMS_REVALIDATE);
 
         } else if (XFormsEvents.XFORMS_MODEL_DONE.equals(eventName)) {
             // 4.2.2 The xforms-model-construct-done Event

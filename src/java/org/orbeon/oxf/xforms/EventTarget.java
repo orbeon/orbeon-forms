@@ -19,5 +19,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
  * EventTarget is implemented by classes that support XForms events.
  */
 public interface EventTarget {
-    public void dispatchEvent(PipelineContext pipelineContext, String eventName);
+    public void dispatchEvent(PipelineContext pipelineContext, EventContext eventContext, String eventName);
+
 }

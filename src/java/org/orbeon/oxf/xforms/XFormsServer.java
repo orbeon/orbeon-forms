@@ -21,19 +21,15 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.util.PooledXPathExpression;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
-import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.util.*;
 
 /**
- * The XForms Server processor handles client requests, including events and actions.
+ * The XForms Server processor handles client requests, including events.
  */
 public class XFormsServer extends ProcessorImpl {
 
@@ -75,8 +71,8 @@ public class XFormsServer extends ProcessorImpl {
                 XFormsContainingDocument containingDocument = createXFormsEngine(pipelineContext, encodedControlsString,
                         encodedModelsString, encodedInstancesString);
 
-                // Run action if any
-                XFormsContainingDocument.EventResult eventResult = null;
+                // Run event if any
+                EventContext eventContext = null;
                 {
                     final Element eventElement = eventDocument.getRootElement();
                     String controlId = eventElement.attributeValue("source-control-id");
@@ -85,7 +81,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (controlId != null && eventName != null) {
                         // An event is passed
-                        eventResult = containingDocument.executeEvent(pipelineContext, controlId, eventName, value);
+                        eventContext = containingDocument.executeEvent(pipelineContext, controlId, eventName, value);
                     } else if (!(controlId == null && eventName == null)) {
                         throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
                     }
@@ -102,32 +98,20 @@ public class XFormsServer extends ProcessorImpl {
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
-                        {
-                            Document controlsDocument = containingDocument.getxFormsControls().getControlsDocument();
-                            PooledXPathExpression xpathExpression =
-                                    XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument), "/xxf:controls//(xf:input|xf:secret|xf:textarea|xf:output|xf:upload|xf:range|xf:trigger|xf:submit|xf:select|xf:select1)[@ref]", XFORMS_NAMESPACES);
-                            try {
-                                for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
-                                    Element controlElement = (Element) i.next();
+                        XFormsControls xFormsControls = containingDocument.getXFormsControls();
+                        for (Iterator i = xFormsControls.getAllControlElements(pipelineContext).iterator(); i.hasNext();) {
+                            Element controlElement = (Element) i.next();
 
-                                    String controlId = controlElement.attributeValue("id");
+                            String controlId = controlElement.attributeValue("id");
 
-                                    // Set current binding for control element
-                                    XFormsControls xFormsControls = containingDocument.getxFormsControls();
-                                    xFormsControls.setBinding(pipelineContext, controlElement);
+                            // Set current binding for control element
+                            xFormsControls.setBinding(pipelineContext, controlElement);
 
-                                    // Get current control value
-                                    XFormsInstance instance = xFormsControls.getCurrentInstance();
-                                    String controlValue = instance.getValueForNode(xFormsControls.getCurrentSingleNode());
+                            // Get current control value
+                            XFormsInstance instance = xFormsControls.getCurrentInstance();
+                            String controlValue = instance.getValueForNode(xFormsControls.getCurrentSingleNode());
 
-                                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[]{"id", controlId, "value", controlValue});
-                                }
-                            } catch (XPathException e) {
-                                throw new OXFException(e);
-                            } finally {
-                                if (xpathExpression != null)
-                                    xpathExpression.returnToPool();
-                            }
+                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[]{"id", controlId, "value", controlValue});
                         }
 
                         ch.endElement();
@@ -162,15 +146,15 @@ public class XFormsServer extends ProcessorImpl {
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
 
-                        if (eventResult != null) {
-                            if (eventResult.getDivsToHide() != null) {
-                                for (Iterator i = eventResult.getDivsToHide().iterator(); i.hasNext();) {
+                        if (eventContext != null) {
+                            if (eventContext.getDivsToHide() != null) {
+                                for (Iterator i = eventContext.getDivsToHide().iterator(); i.hasNext();) {
                                     String caseId = (String) i.next();
                                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "hidden"});
                                 }
                             }
-                            if (eventResult.getDivsToShow() != null) {
-                                for (Iterator i = eventResult.getDivsToShow().iterator(); i.hasNext();) {
+                            if (eventContext.getDivsToShow() != null) {
+                                for (Iterator i = eventContext.getDivsToShow().iterator(); i.hasNext();) {
                                     String caseId = (String) i.next();
                                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "visible"});
                                 }
@@ -241,9 +225,9 @@ public class XFormsServer extends ProcessorImpl {
         // Initialize XForms Engine
         containingDocument.initialize(pipelineContext);
         if (isInitializeEvent)
-            containingDocument.dispatchEvent(pipelineContext, XFormsEvents.XXFORMS_INITIALIZE);
+            containingDocument.dispatchEvent(pipelineContext, new EventContext(), XFormsEvents.XXFORMS_INITIALIZE);
         else
-            containingDocument.dispatchEvent(pipelineContext, XFormsEvents.XXFORMS_INITIALIZE_CONTROLS);
+            containingDocument.dispatchEvent(pipelineContext, new EventContext(), XFormsEvents.XXFORMS_INITIALIZE_CONTROLS);
 
         return containingDocument;
     }

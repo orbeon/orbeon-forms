@@ -59,32 +59,32 @@ public class SchedulerProcessor extends ProcessorImpl {
                         ProcessorDefinition processorDefinition = new ProcessorDefinition();
                         config.setProcessorDefinition(processorDefinition);
 
-                        Element processorNameElement = startTaskElement.element(new QName("processor-name"));
-                        if (processorNameElement != null) {
-                            // Use processor QName
-                            QName processorQName = Dom4jUtils.extractTextValueQName(processorNameElement);
-                            processorDefinition.setName(processorQName);
-                        } else {
-                            // Deprecated use of processor URI
-                            processorDefinition.setUri(XPathUtils.selectStringValueNormalize(startTaskElement, "processor-uri"));
-                        }
-
-                        for ( final Iterator j = XPathUtils.selectIterator(startTaskElement, "input"); j.hasNext();) {
-                            Element inputElement = (Element) j.next();
-                            String name = inputElement.attributeValue("name");
-                            String url = inputElement.attributeValue("url");
-                            if (url != null) {
-                                processorDefinition.addInput(name, url);
+                        {
+                            Element processorNameElement = startTaskElement.element(new QName("processor-name"));
+                            if (processorNameElement != null) {
+                                // Use processor QName
+                                QName processorQName = Dom4jUtils.extractTextValueQName(processorNameElement);
+                                processorDefinition.setName(processorQName);
                             } else {
-                                final Iterator it = inputElement.elementIterator();
-                                if ( it.hasNext() ) {
-                                    final org.dom4j.Element srcElt = ( org.dom4j.Element )it.next();
-                                    final org.dom4j.Element elt 
-                                        = ( org.dom4j.Element )srcElt.clone(); 
-                                    processorDefinition.addInput( name, elt );
+                                // Deprecated use of processor URI
+                                processorDefinition.setUri(XPathUtils.selectStringValueNormalize(startTaskElement, "processor-uri"));
+                            }
+
+                            for (final Iterator j = XPathUtils.selectIterator(startTaskElement, "input"); j.hasNext();) {
+                                Element inputElement = (Element) j.next();
+                                String name = inputElement.attributeValue("name");
+                                String url = inputElement.attributeValue("url");
+                                if (url != null) {
+                                    processorDefinition.addInput(name, url);
+                                } else {
+                                    final Iterator it = inputElement.elementIterator();
+                                    if (it.hasNext()) {
+                                        final Element srcElt = (Element) it.next();
+                                        final Element elt = (Element) srcElt.clone();
+                                        processorDefinition.addInput(name, elt);
+                                    } else
+                                        throw new OXFException("Node not found input element");
                                 }
-                                else
-                                    throw new OXFException("Node not found input element");
                             }
                         }
 

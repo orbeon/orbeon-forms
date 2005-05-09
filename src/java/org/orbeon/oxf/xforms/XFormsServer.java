@@ -232,6 +232,7 @@ public class XFormsServer extends ProcessorImpl {
                     Document instanceDocument = Dom4jUtils.createDocument(instanceElement);
                     currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument);
 
+                    currentCount++;
                     foundInstancesCount++;
                 }
                 // Number of instances must be zero or match number of models

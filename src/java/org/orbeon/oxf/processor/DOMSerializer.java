@@ -21,8 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xml.XMLUtils;
 
 /**
- * Serializes the data input in a DOM. Once serialized, the content can
- * be retrieved with getNode() method.
+ * Serializes the data input into a DOM.
  */
 public class DOMSerializer extends ProcessorImpl {
 
@@ -44,6 +43,7 @@ public class DOMSerializer extends ProcessorImpl {
     }
 
     public void start(PipelineContext pipelineContext) {
+        // FIXME: should use Context instead?
         pipelineContext.setAttribute(this, readCacheInputAsDOM4J(pipelineContext, INPUT_DATA));
     }
 }

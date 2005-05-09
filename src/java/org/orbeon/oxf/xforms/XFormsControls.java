@@ -59,12 +59,16 @@ public class XFormsControls implements EventTarget {
 
         // Push the default context
         final XFormsModel defaultModel = containingDocument.getModel("");
-        final List defaultNodeset = Arrays.asList(new Object[] { defaultModel.getInstance().getDocument() });
+        final List defaultNodeset = Arrays.asList(new Object[] { defaultModel.getDefaultInstance().getDocument() });
         contextStack.push(new Context(defaultModel, defaultNodeset));
     }
 
     public Document getControlsDocument() {
         return controlsDocument;
+    }
+
+    public XFormsContainingDocument getContainingDocument() {
+        return containingDocument;
     }
 
     /**
@@ -119,7 +123,7 @@ public class XFormsControls implements EventTarget {
                 newNodeset = newModel.getBindNodeset(pipelineContext, newModel.getModelBindById(bind));
             } else if (ref != null || nodeset != null) {
                 // Evaluate new XPath in context of current node
-                newNodeset = newModel.getInstance().evaluateXPath(pipelineContext, getCurrentSingleNode(currentContext),
+                newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, getCurrentSingleNode(currentContext),
                         ref != null ? ref : nodeset, getCurrentPrefixToURIMap(), null, functionLibrary, null);
 
                 if (ref != null && newNodeset.isEmpty())
@@ -249,7 +253,7 @@ public class XFormsControls implements EventTarget {
     }
 
     public XFormsInstance getCurrentInstance() {
-        return getCurrentContext().model.getInstance();
+        return getCurrentContext().model.getDefaultInstance();
     }
 
     protected static class Context {

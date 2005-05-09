@@ -61,10 +61,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Represents an XForms model.
@@ -219,12 +216,14 @@ public class XFormsModel implements EventTarget, Cloneable {
     private Document modelDocument;
 
     // Model attributes
-    private String id;
+    private String modelId;
     private Grammar schemaGrammar;
 
-    // Instance
-    //private Document instanceDocument;
-    private XFormsInstance instance;
+    // Instances
+    private List instanceIds;
+    private List instances;
+    private Map instancesMap;
+
     private InstanceConstructListener instanceConstructListener;
 
     // Submission information
@@ -241,6 +240,7 @@ public class XFormsModel implements EventTarget, Cloneable {
         this.modelDocument = modelDocument;
 
         // Basic check trying to make sure this is an XForms model
+        // TODO: should rather use schema here or when obtaining document passed to this constructor
         Element modelElement = modelDocument.getRootElement();
         String rootNamespaceURI = modelElement.getNamespaceURI();
         if (!rootNamespaceURI.equals(XFormsConstants.XFORMS_NAMESPACE_URI))
@@ -248,7 +248,18 @@ public class XFormsModel implements EventTarget, Cloneable {
                     + XFormsConstants.XFORMS_NAMESPACE_URI + "'. Found instead: '" + rootNamespaceURI + "'",
                     (LocationData) modelElement.getData());
 
-        // TODO: should rather use schema here or when obtaining document passed to this constructor
+        // Extract list of instances ids
+        List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
+        instanceIds = new ArrayList(instanceContainers.size());
+        if (instanceContainers.size() > 0) {
+            for (Iterator i = instanceContainers.iterator(); i.hasNext();) {
+                Element instanceContainer = (Element) i.next();
+                String instanceId = instanceContainer.attributeValue("id");
+                if (instanceId == null)
+                    instanceId = "";
+                instanceIds.add(instanceId);
+            }
+        }
     }
 
     private void resetBinds() {
@@ -420,13 +431,48 @@ public class XFormsModel implements EventTarget, Cloneable {
         }
     }
 
-    public XFormsInstance getInstance() {
-        return instance;
+    public XFormsInstance getDefaultInstance() {
+        return getInstance("");
     }
 
-    public void setInstanceDocument(PipelineContext pipelineContext, Document instanceDocument) {
+    public List getInstances() {
+        return instances;
+    }
+
+    public XFormsInstance getInstance(String instanceId) {
+        return (XFormsInstance) (instanceId == null || "".equals(modelId) ? instances.get(0) : instancesMap.get(instanceId));
+    }
+
+    /**
+     * Return the number of instances on this model.
+     */
+    public int getInstanceCount() {
+        return instanceIds.size();
+    }
+
+    /**
+     * Set an instance document for this model. There may be multiple instance documents. Each
+     * instance document may have an associated id that identifies it.
+     *
+     * @param pipelineContext
+     * @param instanceId
+     * @param instanceDocument
+     */
+    public void setInstanceDocument(PipelineContext pipelineContext, int instancePosition, Document instanceDocument) {
+        // Initialize containers if needed
+        if (instances == null) {
+            instances = Arrays.asList(new XFormsInstance[instanceIds.size()]);
+            instancesMap = new HashMap(instanceIds.size());
+        }
+        // Prepare and set instance
         XFormsUtils.setInitialDecoration(instanceDocument);
-        this.instance = new XFormsInstance(pipelineContext, instanceDocument);
+        XFormsInstance newInstance = new XFormsInstance(pipelineContext, instanceDocument);
+        instances.set(instancePosition, newInstance);
+
+        // Create mapping instance id -> instance
+        final String instanceId = (String) instanceIds.get(instancePosition);
+        if (instanceId != null)
+            instancesMap.put(instanceId, newInstance);
     }
 
     public void applyOtherBinds(final PipelineContext pipelineContext) {
@@ -435,7 +481,9 @@ public class XFormsModel implements EventTarget, Cloneable {
                 handleOtherBinds(pipelineContext, modelBind, documentWrapper, this);
             }
         });
-        reconcile(instance.getDocument().getRootElement());
+        for (Iterator i = instances.iterator(); i.hasNext();) {
+            reconcile(((XFormsInstance) i.next()).getDocument().getRootElement());
+        }
     }
 
     /**
@@ -445,7 +493,7 @@ public class XFormsModel implements EventTarget, Cloneable {
         if (!isSkipInstanceSchemaValidation() && schemaGrammar != null) {
             final REDocumentDeclaration rdd = new REDocumentDeclaration(schemaGrammar);
             final Acceptor acc = rdd.createAcceptor();
-            final Element relt = instance.getDocument().getRootElement();
+            final Element relt = getDefaultInstance().getDocument().getRootElement();//
             final IDConstraintChecker icc = new IDConstraintChecker();
 
             validateElement(relt, acc, icc);
@@ -470,7 +518,7 @@ public class XFormsModel implements EventTarget, Cloneable {
             final ModelBind modelBind = (ModelBind) i.next();
             try {
                 // Create XPath evaluator for this bind
-                final DocumentWrapper documentWrapper = new DocumentWrapper(instance.getDocument(), null);
+                final DocumentWrapper documentWrapper = new DocumentWrapper(((XFormsInstance) instances.get(0)).getDocument(), null);
                 bindRunner.applyBind(modelBind, documentWrapper);
             } catch (final Exception e) {
                 throw new ValidationException(e, modelBind.getLocationData());
@@ -732,7 +780,7 @@ public class XFormsModel implements EventTarget, Cloneable {
                                 xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
                         try {
                             String value = (String) expr.evaluateSingle();
-                            instance.setValueForNode(node, value);
+                            XFormsInstance.setValueForNode(node, value);
                         } catch (XPathException e) {
                             throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
                         } finally {
@@ -877,8 +925,8 @@ public class XFormsModel implements EventTarget, Cloneable {
                     ? id : instanceData.getInvalidBindIds() + " " + id);
     }
 
-    public String getId() {
-        return id == null ? DEFAULT_MODEL_ID : id;
+    public String getModelId() {
+        return modelId == null ? DEFAULT_MODEL_ID : modelId;
     }
 
     public String getMethod() {
@@ -909,14 +957,15 @@ public class XFormsModel implements EventTarget, Cloneable {
 
         // Find the final node
         List nodeset = new ArrayList();
-        nodeset.add(instance.getDocument());
+        XFormsInstance mainInstance = getDefaultInstance();
+        nodeset.add(mainInstance.getDocument());
         for (Iterator i = parents.iterator(); i.hasNext();) {
             ModelBind current = (ModelBind) i.next();
             List currentModelBindResults = new ArrayList();
             for (Iterator j = nodeset.iterator(); j.hasNext();) {
                 Node node = (Node) j.next();
                 // Execute XPath expresssion
-                currentModelBindResults.addAll(instance.evaluateXPath(pipelineContext, node, current.getNodeset(),
+                currentModelBindResults.addAll(mainInstance.evaluateXPath(pipelineContext, node, current.getNodeset(),
                         current.getNamespaceMap(), null, xformsFunctionLibrary, current.getLocationData().getSystemID()));
             }
             nodeset.addAll(currentModelBindResults);
@@ -972,7 +1021,7 @@ public class XFormsModel implements EventTarget, Cloneable {
             Element modelElement = modelDocument.getRootElement();
 
             // Get model id (may be null)
-            id = modelElement.attributeValue("id");
+            modelId = modelElement.attributeValue("id");
 
             // Get info from <xforms:submission> element (may be missing)
             {
@@ -1008,19 +1057,26 @@ public class XFormsModel implements EventTarget, Cloneable {
             //    Instance may not be specified.
 
             // TODO: support external instance
-            if (instance == null) {
+            if (instances == null) {
                 // Build initial instance document
-                Element instanceContainer = modelElement.element(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
-                if (instanceContainer != null) {
-                    Document instanceDocument = Dom4jUtils.createDocument((Element) instanceContainer.elements().get(0));
-                    setInstanceDocument(pipelineContext, instanceDocument);
+                List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
+                if (instanceContainers.size() > 0) {
+                    // Support multiple instances
+                    int instancePosition = 0;
+                    for (Iterator i = instanceContainers.iterator(); i.hasNext(); instancePosition++) {
+                        Element instanceContainer = (Element) i.next();
+                        Document instanceDocument = Dom4jUtils.createDocument((Element) instanceContainer.elements().get(0));
+                        setInstanceDocument(pipelineContext, instancePosition, instanceDocument);
+                    }
                 }
             }
             // TODO: throw exception event
 
             // Call special listener to update instance
             if (instanceConstructListener != null) {
-                instanceConstructListener.updateInstance(instance);
+                for (Iterator i = getInstances().iterator(); i.hasNext();) {
+                    instanceConstructListener.updateInstance((XFormsInstance) i.next());
+                }
             }
 
             // 3. P3P (N/A)
@@ -1061,19 +1117,23 @@ public class XFormsModel implements EventTarget, Cloneable {
                     handleCalculateBind(pipelineContext, modelBind, documentWrapper, this);
                 }
             });
-            reconcile(instance.getDocument().getRootElement());
+            for (Iterator i = instances.iterator(); i.hasNext();) {
+                reconcile(((XFormsInstance) i.next()).getDocument().getRootElement());
+            }
 
         } else if (XFormsEvents.XFORMS_REVALIDATE.equals(eventName)) {
             // 4.3.5 The xforms-revalidate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
             // Clear all existing errors on instance
-            XFormsUtils.updateInstanceData(instance.getDocument(), new XFormsUtils.InstanceWalker() {
-                public void walk(Node node, InstanceData instanceData) {
-                    if (instanceData != null)
-                        instanceData.clearSchemaErrors();
-                }
-            });
+            for (Iterator i = instances.iterator(); i.hasNext();) {
+                XFormsUtils.updateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
+                    public void walk(Node node, InstanceData instanceData) {
+                        if (instanceData != null)
+                            instanceData.clearSchemaErrors();
+                    }
+                });
+            }
 
             // Run validation
             applySchema();
@@ -1082,7 +1142,9 @@ public class XFormsModel implements EventTarget, Cloneable {
                     handleValidationBind(pipelineContext, modelBind, documentWrapper, this);
                 }
             });
-            reconcile(instance.getDocument().getRootElement());
+            for (Iterator i = instances.iterator(); i.hasNext();) {
+                reconcile(((XFormsInstance) i.next()).getDocument().getRootElement());
+            }
 
             // TODO: dispatch events
         } else if (XFormsEvents.XFORMS_REFRESH.equals(eventName)) {

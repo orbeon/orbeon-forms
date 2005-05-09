@@ -84,7 +84,7 @@ public class XFormsInstance {
      * @param currentNode
      * @param valueToSet
      */
-    public void setValueForNode(Node currentNode, String valueToSet) {
+    public static void setValueForNode(Node currentNode, String valueToSet) {
         XFormsUtils.fillNode(currentNode, valueToSet);
     }
 

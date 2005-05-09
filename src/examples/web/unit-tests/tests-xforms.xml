@@ -28,7 +28,7 @@
     xmlns:xf="http://www.w3.org/2002/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events">
 
-    <test description="Annotate" name="oxf:xforms-annotate" >
+    <test description="Annotate" name="oxf:xforms-annotate">
         <input name="instance">
             <d:form>
                 <d:id>42</d:id>
@@ -41,6 +41,7 @@
         </input>
         <input name="model">
             <xforms:model xmlns:d="http://orbeon.org/oxf/xml/document" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xforms:instance/>
                 <xforms:bind nodeset="/d:form/d:id" type="xs:integer"/>
                 <xforms:bind nodeset="/d:form/d:zip" type="xs:integer"/>
                 <xforms:bind nodeset='/d:form/d:firstname[ 2 ]' constraint='false()' />
@@ -618,7 +619,9 @@
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:xforms-output">
                     <p:input name="model">
-                        <xforms:model/>
+                        <xforms:model>
+                            <xforms:instance/>
+                        </xforms:model>
                     </p:input>
                     <p:input name="instance">
                         <instance>
@@ -917,6 +920,7 @@
         </input>
         <input name="model">
             <xforms:model>
+                <xforms:instance/>
                 <xforms:bind nodeset="/instance/*" constraint="matches(.,'[&#x1100;-&#x11FF;]+')"/>
             </xforms:model>
         </input>
@@ -1464,7 +1468,9 @@
                 <p:param type="output" name="data"/>
                 <p:processor name="oxf:xforms-output">
                     <p:input name="model">
-                        <xforms:model/>
+                        <xforms:model>
+                            <xforms:instance/>
+                        </xforms:model>
                     </p:input>
                     <p:input name="instance">
                         <instance>

@@ -40,7 +40,7 @@ public class XFormsContainingDocument implements EventTarget {
 
         for (Iterator i = models.iterator(); i.hasNext();) {
             XFormsModel model = (XFormsModel) i.next();
-            modelsMap.put(model.getId(), model);
+            modelsMap.put(model.getModelId(), model);
         }
 
         this.xFormsControls = new XFormsControls(this, controlsDocument);
@@ -50,8 +50,8 @@ public class XFormsContainingDocument implements EventTarget {
      * Return model with the specified id, null if not found. If the id is the empty string, return
      * the default model, i.e. the first model.
      */
-    public XFormsModel getModel(String id) {
-        return (XFormsModel) ("".equals(id) ? models.get(0) : modelsMap.get(id));
+    public XFormsModel getModel(String modelId) {
+        return (XFormsModel) ("".equals(modelId) ? models.get(0) : modelsMap.get(modelId));
     }
 
     /**

@@ -123,15 +123,17 @@ public class XFormsServer extends ProcessorImpl {
 
                         Document instancesDocument = Dom4jUtils.createDocument();
 
-                        // Move all instances under a single root element
+                        // Move all instances of all models in sequence under a single root element
                         {
                             instancesDocument.addElement("instances");
                             Element instancesElement = instancesDocument.getRootElement();
 
                             for (Iterator i = containingDocument.getModels().iterator(); i.hasNext();) {
-                                XFormsModel model = (XFormsModel) i.next();
+                                XFormsModel currentModel = (XFormsModel) i.next();
 
-                                instancesElement.add(model.getInstance().getDocument().getRootElement().detach());
+                                for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
+                                    instancesElement.add(((XFormsInstance) j.next()).getDocument().getRootElement().detach());
+                                }
                             }
                         }
 
@@ -201,25 +203,43 @@ public class XFormsServer extends ProcessorImpl {
         // Get instances
         boolean isInitializeEvent;
         {
-            int instancesCount = 0;
+            int foundInstancesCount = 0;
+            int expectedInstancesCount = 0;
             if (!"".equals(encodedInstancesString)) {
+                // Aggregate instances document containing all instances in sequence
                 Document instancesDocument = XFormsUtils.decodeXML(pipelineContext, encodedInstancesString);
 
+                // Iterator over all the models
+                Iterator modelIterator = containingDocument.getModels().iterator();
+
+                XFormsModel currentModel = null;
+                int currentModelInstancesCount = 0;
+                int currentCount = 0;
 
                 for (Iterator i = instancesDocument.getRootElement().elements().iterator(); i.hasNext();) {
                     Element instanceElement = (Element) i.next();
 
-                    Document instanceDocument = Dom4jUtils.createDocument(instanceElement);
-                    ((XFormsModel) containingDocument.getModels().get(instancesCount)).setInstanceDocument(pipelineContext, instanceDocument);
+                    // Go to next model if needed
+                    if (currentCount == currentModelInstancesCount) {
+                        currentModel = (XFormsModel) modelIterator.next();
+                        currentModelInstancesCount = currentModel.getInstanceCount();
+                        currentCount = 0;
 
-                    instancesCount++;
+                        expectedInstancesCount += currentModelInstancesCount;
+                    }
+
+                    // Create and set instance document on current model
+                    Document instanceDocument = Dom4jUtils.createDocument(instanceElement);
+                    currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument);
+
+                    foundInstancesCount++;
                 }
                 // Number of instances must be zero or match number of models
-                if (instancesCount != 0 && containingDocument.getModels().size() != instancesCount)
-                    throw new OXFException("Number of instances (" + instancesCount + ") doesn't match number of models (" + containingDocument.getModels().size() + ").");
+                if (foundInstancesCount != 0 && expectedInstancesCount != foundInstancesCount)
+                    throw new OXFException("Number of instances (" + foundInstancesCount + ") doesn't match number of instances in models (" + expectedInstancesCount + ").");
             }
             // Initialization will take place if no instances are provided
-            isInitializeEvent = instancesCount == 0;
+            isInitializeEvent = foundInstancesCount == 0;
         }
 
         // Initialize XForms Engine

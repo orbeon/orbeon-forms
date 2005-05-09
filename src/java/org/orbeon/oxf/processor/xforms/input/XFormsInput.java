@@ -96,7 +96,7 @@ public class XFormsInput extends ProcessorImpl {
 
                     // Set instance on model if provided
                     if (requestParameters.getInstance() != null)
-                        model.setInstanceDocument(pipelineContext, requestParameters.getInstance());
+                        model.setInstanceDocument(pipelineContext, 0, requestParameters.getInstance());
 
                     // Set initialization listener
                     model.setInstanceConstructListener(new XFormsModel.InstanceConstructListener() {
@@ -156,10 +156,10 @@ public class XFormsInput extends ProcessorImpl {
                     model.applyOtherBinds(pipelineContext);
                     if (logger.isDebugEnabled())
                         logger.debug("3) Instance with model item properties applied:\n"
-                                + Dom4jUtils.domToString(model.getInstance().getDocument()));
+                                + Dom4jUtils.domToString(model.getDefaultInstance().getDocument()));
 
                     // Get instance from XForms model
-                    instance = model.getInstance();
+                    instance = model.getDefaultInstance();
                 }
 
                 // Read out instance

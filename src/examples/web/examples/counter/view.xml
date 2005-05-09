@@ -23,6 +23,7 @@
                     <xforms:label>Increment</xforms:label>
                     <xforms:setvalue ref="action">increment</xforms:setvalue>
                 </xforms:submit>
+                
                 <xforms:submit>
                     <xforms:label>Reset</xforms:label>
                     <xforms:setvalue ref="action">reset</xforms:setvalue>

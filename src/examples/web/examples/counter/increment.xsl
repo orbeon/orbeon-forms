@@ -12,5 +12,5 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <new-value xsl:version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-    <xsl:value-of select="/instance/counter + 1"/>
+    <xsl:value-of select="doc('input:instance')/instance/counter + 1"/>
 </new-value>

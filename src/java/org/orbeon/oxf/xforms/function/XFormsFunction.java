@@ -17,6 +17,9 @@ import org.orbeon.oxf.xforms.XFormsControls;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.saxon.functions.SystemFunction;
 
+/**
+ * Base class for all XForms functions.
+ */
 abstract public class XFormsFunction extends SystemFunction {
 
     private XFormsModel xFormsModel;

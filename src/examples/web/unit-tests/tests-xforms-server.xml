@@ -346,12 +346,8 @@
                                 <xforms:trigger id="3">
                                     <xforms:label>Clear</xforms:label>
                                     <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue ref="../equation/first" value="0"/>
-                                        <xforms:setvalue ref="/equaltion/second" value="0"/>
-                                        <xforms:setvalue ref="/*/result" value="0"/>
-                                        <xforms:setvalue ref="screen" value="0"/>
-                                        <xforms:setvalue ref="screenbuffer" value="0"/>
-                                        <xforms:toggle ev:event="DOMActivate" case="add"/>
+                                        <xforms:setvalue ref="../equation/first" value="'3.141592'"/>
+                                        <xforms:setvalue ref="instance('instance2')/other-instance/second" value="'6535'"/>
                                     </xforms:action>
                                 </xforms:trigger>
                             </xforms:group>
@@ -383,7 +379,7 @@
                     </p:input>
                     <p:input name="config">
                         <event-request xmlns="http://orbeon.org/oxf/xml/xforms" xsl:version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
-                            <event/>
+                            <event name="DOMActivate" source-control-id="3"/>
                             <models>
                                 <xsl:value-of select="context:encodeXML(doc('input:models'))"/>
                             </models>
@@ -431,14 +427,14 @@
                         <equation>
                             <screen>0</screen>
                             <screenbuffer>0</screenbuffer>
-                            <first>1592</first>
+                            <first>3.141592</first>
                             <second>0</second>
                             <memory>12</memory>
                             <result/>
                         </equation>
                         <other-instance>
                             <first>314</first>
-                            <second>0</second>
+                            <second>6535</second>
                         </other-instance>
                     </instances>
                 </xxf:instances>

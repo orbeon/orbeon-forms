@@ -33,8 +33,9 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
 
 
     private static Map functionTable = new HashMap();
-    private XFormsControls xFormsControls = null;
 
+    private XFormsModel xFormsModel;
+    private XFormsControls xFormsControls;
 
     private static StandardFunction.Entry register(String name,
                                                    Class implementationClass,
@@ -99,13 +100,26 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
 
         e = register("months", Months.class, 0, 1, 1, Type.INTEGER_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
+
+        // 7.11.1 The instance() Function
+        e = register("instance", Instance.class, 0, 1, 1, Type.NODE_TYPE, StaticProperty.EXACTLY_ONE);
+        StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
     }
 
-
-    public XFormsFunctionLibrary() {
+    /**
+     * This constructor is used when the function context is an XForms model.
+     *
+     * @param xFormsModel
+     */
+    public XFormsFunctionLibrary(XFormsModel xFormsModel) {
+        this.xFormsModel = xFormsModel;
     }
 
-
+    /**
+     * This constructor is used when the function context is XForms controls.
+     *
+     * @param xFormsControls
+     */
     public XFormsFunctionLibrary(XFormsControls xFormsControls) {
         this.xFormsControls = xFormsControls;
     }
@@ -135,8 +149,13 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
             } catch (Exception err) {
                 throw new OXFException("Failed to load XForms function: " + err.getMessage(), err);
             }
-            if (f instanceof XFormsFunction && xFormsControls != null)
-                ((XFormsFunction) f).setXformsElementContext(xFormsControls);
+            // Set function context if it's one of ours
+            if (f instanceof XFormsFunction) {
+                if (xFormsControls != null)
+                    ((XFormsFunction) f).setXFormsControls(xFormsControls);
+                if (xFormsModel != null)
+                    ((XFormsFunction) f).setXFormsModel(xFormsModel);
+            }
             f.setDetails(entry);
             f.setFunctionNameCode(nameCode);
             f.setArguments(staticArgs);

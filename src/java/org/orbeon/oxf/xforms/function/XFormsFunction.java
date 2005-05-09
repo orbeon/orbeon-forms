@@ -14,20 +14,30 @@
 package org.orbeon.oxf.xforms.function;
 
 import org.orbeon.oxf.xforms.XFormsControls;
+import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.saxon.functions.SystemFunction;
 
 abstract public class XFormsFunction extends SystemFunction {
 
+    private XFormsModel xFormsModel;
     private XFormsControls xFormsControls;
 
     protected XFormsFunction() {
     }
 
-    public XFormsControls getXformsElementContext() {
+    public XFormsModel getXFormsModel() {
+        return xFormsModel;
+    }
+
+    public void setXFormsModel(XFormsModel xFormsModel) {
+        this.xFormsModel = xFormsModel;
+    }
+
+    public XFormsControls getXFormsControls() {
         return xFormsControls;
     }
 
-    public void setXformsElementContext(XFormsControls xFormsControls) {
+    public void setXFormsControls(XFormsControls xFormsControls) {
         this.xFormsControls = xFormsControls;
     }
 }

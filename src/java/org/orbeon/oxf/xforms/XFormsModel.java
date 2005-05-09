@@ -234,7 +234,7 @@ public class XFormsModel implements EventTarget, Cloneable {
     // Binds
     private List binds;
 
-    private FunctionLibrary xformsFunctionLibrary = new XFormsFunctionLibrary();
+    private FunctionLibrary xformsFunctionLibrary = new XFormsFunctionLibrary(this);
 
     public XFormsModel(Document modelDocument) {
         this.modelDocument = modelDocument;

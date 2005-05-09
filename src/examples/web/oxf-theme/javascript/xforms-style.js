@@ -28,21 +28,32 @@ function xformsUpdateStyle(element) {
                 element.style.display = "inline";
             }
 
-            /*
             if (className == "xforms-hint") {
+                // Only add listener once
                 if (!element.listenerRegistered) {
                     element.listenerRegistered = true;
+
+                    // Compute class for active state
+                    var activeClass = new Array();
+                    activeClass.push("xforms-hint-active");
+                    for (var i = 0; i < classes.length; i++)
+                        if (classes[i] != "xforms-hint") activeClass.push(classes[i]);
+                        
+                    // What happens when control gets/looses focus
+                    var controlGetsFocus = function() { element.className = activeClass.join(" "); };
+                    var controlLoosesFocus = function() { element.className = classes.join(" "); };
+
+                    // Add listeners on control
                     var control = element.ownerDocument.getElementById(element.htmlFor);
-                    var controlGetsFocus = function() {
-                        alert(element.className);
-                    };
-                    if (control.addEventListener)
+                    if (control.addEventListener) {
                         control.addEventListener("focus", controlGetsFocus, false);
-                    else
+                        control.addEventListener("blur", controlLoosesFocus, false);
+                    } else {
                         control.attachEvent("onfocus", controlGetsFocus);
+                        control.attachEvent("onblur", controlLoosesFocus);
+            	    }
                 }
             }
-            */
         }
     }
 }

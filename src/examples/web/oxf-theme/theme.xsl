@@ -54,6 +54,7 @@
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/overlib_mini.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/time-utils.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/sarissa.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/xforms-style.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/xforms.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/style/theme.js"/>
                 <!-- Title -->
@@ -82,18 +83,19 @@
         </xhtml:html>
     </xsl:template>
 
+    <xsl:template match="xhtml:form">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()"/>
+            <!-- XXX: Generate hidden section with error.gif, hidden -->
+        </xsl:copy>
+    </xsl:template>
+    
     <xsl:template match="xhtml:textarea">
         <xhtml:textarea wrap="soft">
             <xsl:apply-templates select="@*|node()"/>
         </xhtml:textarea>
     </xsl:template>
-
-    <xsl:template match="xhtml:input[@type = 'text']">
-        <xhtml:input>
-            <xsl:apply-templates select="@*|node()"/>
-        </xhtml:input>
-    </xsl:template>
-
+    
     <xsl:template name="ignore-first-empty-lines">
         <xsl:param name="text"/>
         <xsl:variable name="first-line" select="substring-before($text, '&#xA;')"/>

@@ -1,4 +1,18 @@
 /**
+ *  Copyright (C) 2005 Orbeon, Inc.
+ *
+ *  This program is free software; you can redistribute it and/or modify it under the terms of the
+ *  GNU Lesser General Public License as published by the Free Software Foundation; either version
+ *  2.1 of the License, or (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ *  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Lesser General Public License for more details.
+ *
+ *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+ */
+
+/**
  * Constants
  */
 var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
@@ -30,20 +44,20 @@ function xformsFireEvent(target, eventName, value) {
     eventElement.setAttribute("source-control-id", target.id);
     if (value != null)
         eventElement.setAttribute("value", value);
-    
+
     // Add models
     var modelsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:models");
-    modelsElement.appendChild(modelsElement.ownerDocument.createTextNode(target.form.xformsModels));
+    modelsElement.appendChild(modelsElement.ownerDocument.createTextNode(target.form.xformsModels.value));
     eventFiredElement.appendChild(modelsElement);
     
     // Add controls
     var controlsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:controls");
-    controlsElement.appendChild(controlsElement.ownerDocument.createTextNode(target.form.xformsControls));
+    controlsElement.appendChild(controlsElement.ownerDocument.createTextNode(target.form.xformsControls.value));
     eventFiredElement.appendChild(controlsElement);    
     
     // Add instances
     var instancesElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:instances");
-    instancesElement.appendChild(instancesElement.ownerDocument.createTextNode(target.form.xformsInstances));
+    instancesElement.appendChild(instancesElement.ownerDocument.createTextNode(target.form.xformsInstances.value));
     eventFiredElement.appendChild(instancesElement);    
     
     // Set as next request to execute and trigger execution
@@ -62,10 +76,10 @@ function getEventTarget(event) {
 /**
  * Initializes attributes of each form:
  *
- *     Document        xformsModels
- *     Document        xformsControls
- *     Document        xformsInstances
  *     Div             xformsLoading
+ *     Input           xformsModels
+ *     Input           xformsControls
+ *     Input           xformsInstances
  *
  * Initializes attributes on the document object:
  *
@@ -98,52 +112,79 @@ function xformsPageLoaded() {
         xformsFireEvent(getEventTarget(event), "DOMActivate", null);
     }
 
-    // 
-    var forms = document.getElementsByTagName("form");
-    for (var formIndex = 0; formIndex < forms.length; formIndex++) {
+    // Gather all potential form controls
+    var spans = document.getElementsByTagName("span");
+    var buttons = document.getElementsByTagName("button");
+    var inputs = document.getElementsByTagName("input");
+    var textareas = document.getElementsByTagName("textarea");
+    var labels = document.getElementsByTagName("label");
+    var formsControls = new Array();
+    for (var i = 0; i < spans.length; i++) formsControls = formsControls.concat(spans[i]);
+    for (var i = 0; i < buttons.length; i++) formsControls = formsControls.concat(buttons[i]);
+    for (var i = 0; i < inputs.length; i++) formsControls = formsControls.concat(inputs[i]);
+    for (var i = 0; i < textareas.length; i++) formsControls = formsControls.concat(textareas[i]);
+    for (var i = 0; i < labels.length; i++) formsControls = formsControls.concat(labels[i]);
+
+    // Go through potential form controls, add style, and register listeners
+    for (var controlIndex = 0; controlIndex < formsControls.length; controlIndex++) {
     
-        // Register listeners on controls
-        var elements = forms[formIndex].elements;
-        for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
-            var element = elements[elementIndex];
-            
-            // Handle value change
-            if (element.addEventListener) {
-                element.addEventListener("change", handleChange, false);
-            } else {
-                element.attachEvent("onchange", handleChange);
-            }
-            
-            // Handle click
-            if (element.tagName == "BUTTON") {
-                if (element.addEventListener) {
-                    element.addEventListener("click", handleClick, false);
-                } else {
-                    element.attachEvent("onclick", handleClick);
-                }
+        var control = formsControls[controlIndex];
+
+        // Check that this is an XForms control. Otherwise continue.
+        var classes = control.className.split(" ");
+        var isXFormsControl = false;
+        for (var classIndex = 0; classIndex < classes.length; classIndex++) {
+            var className = classes[classIndex];
+            if (className == "xforms-control") {
+                isXFormsControl = true;
+                break;
             }
         }
+        if (!isXFormsControl) continue;
     
-        // Initialize attributes on form
-        var divs = forms[formIndex].getElementsByTagName("div");
-        for (var divIndex = 0; divIndex < divs.length; divIndex++) {
-            if (divs[divIndex].getAttribute("title") == "xforms-private") {
-                var xformsDiv = divs[divIndex];
-                var privateDivs = xformsDiv.getElementsByTagName("div");
-                for (var privateDivIndex = 0; privateDivIndex < privateDivs.length; privateDivIndex++) {
-                    if (privateDivs[privateDivIndex].getAttribute("title") == "models") 
-                        forms[formIndex].xformsModels = privateDivs[privateDivIndex].firstChild.data;
-                    if (privateDivs[privateDivIndex].getAttribute("title") == "controls") 
-                        forms[formIndex].xformsControls = privateDivs[privateDivIndex].firstChild.data;
-                    if (privateDivs[privateDivIndex].getAttribute("title") == "instances") 
-                        forms[formIndex].xformsInstances = privateDivs[privateDivIndex].firstChild.data;
-                }
+        // Handle value change
+        if (control.addEventListener) {
+            control.addEventListener("change", handleChange, false);
+        } else {
+            control.attachEvent("onchange", handleChange);
+        }
+        
+        // Handle click
+        if (control.tagName == "BUTTON") {
+            if (control.addEventListener) {
+                control.addEventListener("click", handleClick, false);
+            } else {
+                control.attachEvent("onclick", handleClick);
             }
+        }
+
+        // Add style to element
+        xformsUpdateStyle(control);
+    }
+    
+    // Initialize attributes on form
+    var forms = document.getElementsByTagName("form");
+    for (var formIndex = 0; formIndex < forms.length; formIndex++) {
+        var form = forms[formIndex];
+        var divs = form.getElementsByTagName("div");
+        for (var divIndex = 0; divIndex < divs.length; divIndex++) {
             if (divs[divIndex].getAttribute("title") == "xforms-loading") {
                 forms[formIndex].xformsLoading = divs[divIndex];
             }
         }
+        var elements = form.elements;
+        for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
+            var element = elements[elementIndex];
+            if (element.name.indexOf("$models") != -1)
+                form.xformsModels = element;
+            if (element.name.indexOf("$controls") != -1)
+                form.xformsControls = element;
+            if (element.name.indexOf("$instances") != -1)
+                form.xformsInstances = element;
+        }
     }
+    
+    // Initialize attributes on document
     document.xformsNextRequests = new Array();
     document.xformsNextForms = new Array();
     document.xformsRequestInProgress = false;
@@ -184,13 +225,14 @@ function xformsHandleResponse() {
                             documentElement.appendChild
                                 (documentElement.ownerDocument.createTextNode(controlValue));
                         }
+                        xformsUpdateStyle(documentElement);
                     }
                 }
             }
             
             // Update instances
             if (xformsGetLocalName(responseRoot.childNodes[i]) == "instances") {
-                document.xformsFormOfCurrentRequest.xformsInstances =
+                document.xformsFormOfCurrentRequest.xformsInstances.value =
                     responseRoot.childNodes[i].firstChild.data;
             }
 

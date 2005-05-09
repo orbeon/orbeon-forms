@@ -25,7 +25,7 @@
     <xsl:template match="xforms:*">
         <xsl:copy>
             <xsl:attribute name="id">
-                <xsl:value-of select="if (@id) then @id else concat('xforms-control-', count(preceding::*))"/>
+                <xsl:value-of select="if (@id) then @id else concat('xforms-control-', count(ancestor::xforms:* | preceding::xforms:*))"/>
             </xsl:attribute>
             <xsl:copy-of select="@*"/>
             <xsl:apply-templates/>

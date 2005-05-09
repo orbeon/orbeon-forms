@@ -461,6 +461,45 @@ ul {
     padding-top: .2em;
     color: &dark-color;;
 }
+    
+.fixed-width {
+    display: -moz-inline-box;
+    display: inline-block;  
+    width: expression('9em'); /* Min-width for IE6 */
+    min-width: 9em;
+}
+    
+.xforms-xhtml {
+    display: none;
+}
+    
+.xforms-control {
+    vertical-align: middle;
+}
+    
+.xforms-hint {
+    color: #666;
+    width: 190px;
+    font-size: 85%;
+    min-height: 2em;
+    background-image: url(../images/greybracket.gif);
+    background-repeat: no-repeat;
+    background-position: left center;       
+    margin-left: 1em;
+    padding-left: 1.5em;
+}
+
+.xforms-hint-active {
+    color: #000;
+    width: 190px;
+    font-size: 85%;
+    min-height: 2em;
+    background-image: url(../images/bracket.gif);
+    background-repeat: no-repeat;
+    background-position: left center;       
+    margin-left: 1em;
+    padding-left: 1.5em;
+}
 
 <!-- Styles used by xforms-to-xhtml.xsl -->
 .xferrtable    { border: 0; margin: 0px; padding: 0px; }

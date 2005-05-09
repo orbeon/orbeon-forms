@@ -12,83 +12,86 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-            xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+            xmlns:f="http://orbeon.org/oxf/xml/formatting" 
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
             xsl:version="2.0">
     <xhtml:head>
         <xhtml:title>XForms Text Controls</xhtml:title>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
+                xmlns:xs="http://www.w3.org/2001/XMLSchema">
+            <xforms:instance>
+                <form>
+                    <text>35</text>
+                    <secret>42</secret>
+                    <textarea>The world is but a canvas for the imagination.</textarea>
+                    <label>Hello, World!</label>
+                    <date/>
+                    <date2/>
+                    <time/>            
+                </form>
+            </xforms:instance>
+            <xforms:instance id="formatted">
+                <formated-instance>&lt;i>Note&lt;/i>: gaga.</formated-instance>
+            </xforms:instance>                
+            <xforms:bind nodeset="/form/text" constraint="number(.) >= 0"/>
+            <xforms:bind nodeset="/form/secret" constraint="string(.) = '42'"/>
+            <xforms:bind nodeset="/form/textarea" constraint="string-length(.) > 10"/>
+            <xforms:bind nodeset="/form/date" type="xs:date"/>
+            <xforms:bind nodeset="/form/date2" type="xs:date"/>
+            <xforms:bind nodeset="/form/time" type="xs:time"/>
+<!--            <xforms:bind nodeset="/form/formated-instance" calculate="''"/>-->
+<!--            <xforms:bind nodeset="/form/formated-instance" calculate="saxon:serialize(/*, 'xml')"/>-->
+        </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:group ref="/form">
-            <table border="0" cellpadding="10" cellspacing="0">
-                <tr>
-                    <td align="right">Age:</td>
-                    <td>
-                        <xforms:input ref="text">
-                            <xforms:alert>The age must be a positive number</xforms:alert>
-                        </xforms:input>
-                    </td>
-                </tr>
-                <tr>
-                    <td align="right">Password:</td>
-                    <td>
-                        <xforms:secret ref="secret">
-                            <xforms:help>
-                                Make sure you enter a valid password.
-                                <p><i>The password is 42.</i></p>
-                            </xforms:help>
-                            <xforms:alert>Invalid password</xforms:alert>
-                        </xforms:secret>
-                    </td>
-                </tr>
-                <tr>
-                    <td align="right">Text area:</td>
-                    <td>
-                        <xforms:textarea ref="textarea">
-                            <xforms:hint  src="oxf:/examples/xforms/xforms-text/message.txt"/>
-                            <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
-                        </xforms:textarea>
-                    </td>
-                </tr>
-                
-                <tr>
-                    <td align="right">Date:</td>
-                    <td>
-                        <xforms:input ref="date"/>
-                    </td>
-                </tr>
-                
-                <tr>
-                    <td align="right">Date 2:</td>
-                    <td>
-                        <xforms:input ref="date2"/>
-                    </td>
-                </tr>
-                
-                <tr>
-                       <td align="right">Time:</td>
-                       <td>
-                           <xforms:input ref="time"/>
-                        </td>
-               </tr>
-                               
-                <tr>
-                    <td/>
-                    <td>
-                        <xforms:submit>
-                            <xforms:label>Submit</xforms:label>
-                        </xforms:submit>
-                    </td>
-                </tr>
-                <tr>
-                    <td align="right">XForms instance:</td>
-                    <td>
-                        <f:xml-source>
-                            <xsl:copy-of select="/*"/>
-                        </f:xml-source>
-                    </td>
-                </tr>
-            </table>
+        <xforms:group ref="form">
+            <p>
+                <xforms:input ref="text" xhtml:class="xforms-valid">
+                    <xforms:label xhtml:class="fixed-width">Age:</xforms:label>
+                    <xforms:hint>Positive number</xforms:hint>
+                    <xforms:alert>The age must be a positive number</xforms:alert>
+                </xforms:input>
+            </p>
+            <p>
+                <xforms:secret ref="secret">
+                    <xforms:label xhtml:class="fixed-width">Password:</xforms:label>
+                    <xforms:hint>The password is 42 ;)</xforms:hint>
+                    <xforms:alert>Invalid password</xforms:alert>
+                </xforms:secret>
+            </p>
+            <p>
+                <xforms:textarea ref="textarea">
+                    <xforms:label xhtml:class="fixed-width">Text area:</xforms:label>
+                    <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
+                </xforms:textarea>
+            </p>
+            <p>
+                <xforms:input ref="date">
+                    <xforms:label xhtml:class="fixed-width">First date:</xforms:label>
+                </xforms:input>
+            </p>
+            <p>
+                <xforms:input ref="date2">
+                    <xforms:label xhtml:class="fixed-width">Second date:</xforms:label>
+                </xforms:input>
+            </p>
+            <p>
+                <xforms:input ref="time">
+                    <xforms:label xhtml:class="fixed-width">Time:</xforms:label>
+                </xforms:input>
+            </p>
+            <p>
+                <xforms:submit>
+                    <xforms:label>Submit</xforms:label>
+                </xforms:submit>
+            </p>
+            <p>
+<!--                <xforms:output ref="instance('formatted')/formated-instance" xhtml:class="xforms-xhtml">-->
+<!--                    <xforms:label xhtml:class="fixed-width">XForms instance:</xforms:label>-->
+<!--                </xforms:output>-->
+            </p>
         </xforms:group>
     </xhtml:body>
 </xhtml:html>

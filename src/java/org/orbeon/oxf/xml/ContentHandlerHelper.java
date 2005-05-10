@@ -96,6 +96,11 @@ public class ContentHandlerHelper {
         }
     }
 
+    public void element(String prefix, String namespaceURI, String name, Attributes attributes) {
+        startElement(prefix, namespaceURI, name, attributes);
+        endElement();
+    }
+
     public void element(String namespaceURI, String name, String[] attributes) {
         startElement("", namespaceURI, name, attributes);
         endElement();

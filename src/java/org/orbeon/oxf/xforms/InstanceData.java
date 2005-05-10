@@ -28,8 +28,8 @@ public class InstanceData {
     private BooleanModelItemProperty relevant = new BooleanModelItemProperty(true);
     private BooleanModelItemProperty required = new BooleanModelItemProperty(false);
     private BooleanModelItemProperty readonly = new BooleanModelItemProperty(false);
-    private org.orbeon.oxf.xforms.BooleanModelItemProperty valid = new BooleanModelItemProperty(true);
-    private org.orbeon.oxf.xforms.TypeModelItemProperty type = new org.orbeon.oxf.xforms.TypeModelItemProperty();
+    private BooleanModelItemProperty valid = new BooleanModelItemProperty(true);
+    private TypeModelItemProperty type = new TypeModelItemProperty();
     private int id = -1;
     private String invalidBindIds = null;
     private Map idToNodeMap;
@@ -124,6 +124,7 @@ public class InstanceData {
 
     public void clearSchemaErrors() {
         valid.set(true);
+        valid.unSet();
         if (schemaErrors != null)
             schemaErrors.clear();
     }

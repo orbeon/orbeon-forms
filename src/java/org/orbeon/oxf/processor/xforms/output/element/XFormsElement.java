@@ -108,7 +108,7 @@ public class XFormsElement {
             boolean nodesetPresent = attributes.getIndex("", "nodeset") != -1;
             boolean positionPresent = attributes.getIndex(XFormsConstants.XXFORMS_NAMESPACE_URI, "position") != -1;
             if (refPresent || bindPresent || nodesetPresent || positionPresent) {
-                org.orbeon.oxf.xforms.InstanceData currentNodeInstanceData = XFormsUtils.getInstanceData(context.getCurrentSingleNode());
+                org.orbeon.oxf.xforms.InstanceData currentNodeInstanceData = XFormsUtils.getLocalInstanceData(context.getCurrentSingleNode());
 
                 int typeCode = currentNodeInstanceData.getType().get();
                 if(typeCode != 0)
@@ -142,7 +142,7 @@ public class XFormsElement {
                     for (Iterator i = context.getCurrentNodeset().iterator(); i.hasNext();) {
                         Node node = (Node) i.next();
                         if (!first) ids.append(' '); else first = false;
-                        String id = Integer.toString(XFormsUtils.getInstanceData(node).getId());
+                        String id = Integer.toString(XFormsUtils.getLocalInstanceData(node).getId());
                         if (XFormsUtils.isNameEncryptionEnabled())
                             id = SecureUtils.encrypt(context.getPipelineContext(), context.getEncryptionPassword(), id);
                         ids.append(id);
@@ -184,7 +184,7 @@ public class XFormsElement {
                     String src = attributes.getValue("src");
                     if ( "orbeon:xforms:schema:errors".equals( src ) ) {
                         final org.dom4j.Node nd = context.getCurrentSingleNode();
-                        final org.orbeon.oxf.xforms.InstanceData instDat = XFormsUtils.getInstanceData( nd );
+                        final org.orbeon.oxf.xforms.InstanceData instDat = XFormsUtils.getLocalInstanceData( nd );
                         final java.util.Iterator itr = instDat.getSchemaErrorsMsgs();
                         val = StringUtils.join( itr, "\n" );
                     } else {

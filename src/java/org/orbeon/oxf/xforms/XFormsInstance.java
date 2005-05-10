@@ -69,7 +69,7 @@ public class XFormsInstance {
      * that it was a file upload.
      */
     public void setValueForId(int id, String value, String type) {
-        InstanceData rootInstanceData = org.orbeon.oxf.xforms.XFormsUtils.getInstanceData(instanceDocument.getRootElement());
+        InstanceData rootInstanceData = XFormsUtils.getLocalInstanceData(instanceDocument.getRootElement());
         Node node = (Node) rootInstanceData.getIdToNodeMap().get(new Integer(id));
         if (node instanceof Element) {
             setElementValue((Element) node, value, type);

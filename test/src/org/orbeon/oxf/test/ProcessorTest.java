@@ -115,7 +115,7 @@ public class ProcessorTest extends TestCase {
             Document tests = resourceManager.getContentAsDOM4J(System.getProperty(TEST_CONFIG));
 
             // If there's a test with the "only" attribute, execute only this one
-            Iterator i = XPathUtils.selectIterator(tests, "(/tests/test | /tests/group/test)[@only = 'true'][1]");
+            Iterator i = XPathUtils.selectIterator(tests, "(/tests/test | /tests/group/test)[@only = 'true'][1] | /tests/group[@only = 'true']/test");
             if (!i.hasNext())
                 i = XPathUtils.selectIterator(tests, "/tests/group/test | /tests/test");
 

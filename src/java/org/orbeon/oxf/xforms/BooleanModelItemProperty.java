@@ -22,6 +22,10 @@ public class BooleanModelItemProperty {
         value = defaultValue;
     }
 
+    public void unSet() {
+        isSet = false;
+    }
+
     public void set(boolean value) {
         this.value = value;
         isSet = true;

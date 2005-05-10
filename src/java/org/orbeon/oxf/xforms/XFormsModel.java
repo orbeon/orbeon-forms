@@ -287,7 +287,7 @@ public class XFormsModel implements EventTarget, Cloneable {
     }
 
     private void addSchemaError(final Element elt, final String errMsg) {
-        final InstanceData instDat = XFormsUtils.getInstanceData(elt);
+        final InstanceData instDat = XFormsUtils.getLocalInstanceData(elt);
         final String em;
         if (errMsg == null) {
             // Looks like if n is an element and errMsg == null then the problem is missing 
@@ -302,10 +302,10 @@ public class XFormsModel implements EventTarget, Cloneable {
     private void addSchemaError(final Attribute att, final String errMsg) {
         // Looks like if n is an element and errMsg == null then the problem is missing character
         // data.
-        final InstanceData instDat = XFormsUtils.getInstanceData(att);
+        final InstanceData instDat = XFormsUtils.getLocalInstanceData(att);
         instDat.addSchemaError(errMsg);
         final Element elt = att.getParent();
-        final InstanceData eltInstDat = XFormsUtils.getInstanceData(elt);
+        final InstanceData eltInstDat = XFormsUtils.getLocalInstanceData(elt);
 
     }
 
@@ -575,7 +575,7 @@ public class XFormsModel implements EventTarget, Cloneable {
                     try {
                         boolean relevant = ((Boolean) expr.evaluateSingle()).booleanValue();
                         // Mark node
-                        InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
+                        InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
                         instanceData.getRelevant().set(relevant);
                     } catch (XPathException e) {
                         throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
@@ -601,7 +601,7 @@ public class XFormsModel implements EventTarget, Cloneable {
                         boolean readonly = ((Boolean) expr.evaluateSingle()).booleanValue();
 
                         // Mark node
-                        InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
+                        InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
                         instanceData.getReadonly().set(readonly);
                     } catch (XPathException e) {
                         throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
@@ -636,7 +636,7 @@ public class XFormsModel implements EventTarget, Cloneable {
 
             iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
                 public void handleNode(Node node) {
-                    if (XFormsUtils.getInstanceData(node).getValid().get()) {
+                    if (XFormsUtils.getLocalInstanceData(node).getValid().get()) {
 
                         // Get type information
                         int requiredType = -1;
@@ -663,12 +663,12 @@ public class XFormsModel implements EventTarget, Cloneable {
                                     modelBind.getLocationData());
 
                         // Pass-through the type value
-                        InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
+                        InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
                         instanceData.getType().set(requiredType);
 
                         // Try to perform casting
                         String nodeStringValue = node.getStringValue();
-                        if (XFormsUtils.getInstanceData(node).getRequired().get() || nodeStringValue.length() != 0) {
+                        if (XFormsUtils.getLocalInstanceData(node).getRequired().get() || nodeStringValue.length() != 0) {
                             try {
                                 StringValue stringValue = new StringValue(nodeStringValue);
                                 XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration());
@@ -719,7 +719,7 @@ public class XFormsModel implements EventTarget, Cloneable {
                     try {
                         boolean required = ((Boolean) expr.evaluateSingle()).booleanValue();
                         // Mark node
-                        InstanceData instanceData = XFormsUtils.getInstanceData((Node) node);
+                        InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
                         instanceData.getRequired().set(required);
 
                         // If required, check the string value is not empty
@@ -860,7 +860,7 @@ public class XFormsModel implements EventTarget, Cloneable {
             if (ns == null) {
                 elt.addNamespace(pfx, qnURI);
             } else if (!nsURI.equals(qnURI)) {
-                final InstanceData instDat = XFormsUtils.getInstanceData(elt);
+                final InstanceData instDat = XFormsUtils.getLocalInstanceData(elt);
                 final LocationData locDat = instDat.getLocationData();
                 throw new ValidationException("Cannot add attribute to node with 'xxforms' prefix"
                         + " as the prefix is already mapped to another URI", locDat);
@@ -912,7 +912,7 @@ public class XFormsModel implements EventTarget, Cloneable {
      * </ul>
      */
     private void markValidity(boolean valid, Node node, String id) {
-        InstanceData instanceData = XFormsUtils.getInstanceData(node);
+        InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
         if (instanceData.getValid().get() || !valid) {
             instanceData.getValid().set(valid);
         }

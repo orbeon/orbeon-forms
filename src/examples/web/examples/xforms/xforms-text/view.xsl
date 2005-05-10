@@ -49,7 +49,7 @@
             <xforms:bind nodeset="/form/date" type="xs:date"/>
             <xforms:bind nodeset="/form/date2" type="xs:date"/>
             <xforms:bind nodeset="/form/time" type="xs:time"/>
-            <xforms:bind nodeset="instance('formatted')/formated-instance" 
+            <xforms:bind nodeset="instance('formatted')" 
                 calculate="saxon:serialize(xxforms:call-xpl
                     ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
         </xforms:model>
@@ -100,7 +100,7 @@
             <p style="margin-top: 2em">
                 <xforms:group>
                     <xforms:label>XForms instance</xforms:label>
-                    <xforms:output ref="instance('formatted')/formated-instance" xhtml:class="xforms-xhtml"/>
+                    <xforms:output ref="instance('formatted')" xhtml:class="xforms-xhtml"/>
                 </xforms:group>
             </p>
         </xforms:group>

@@ -463,7 +463,7 @@
                                     <xforms:label>Clear</xforms:label>
                                     <xforms:action ev:event="DOMActivate">
                                         <xforms:setvalue ref="/*/first" value="'3.141592'"/>
-                                        <xforms:setvalue ref="instance('instance2')/*/third" value="call-xpl('oxf:/unit-tests/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
+                                        <xforms:setvalue ref="instance('instance2')/*/third" value="xxforms:call-xpl('oxf:/unit-tests/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
                                     </xforms:action>
                                 </xforms:trigger>
                             </xforms:group>
@@ -490,9 +490,9 @@
                                     </other-instance>
                                 </xforms:instance>
                                 <xforms:bind nodeset="instance('instance2')/other-instance/first"
-                                    calculate="string(call-xpl('oxf:/unit-tests/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first)"/>
+                                    calculate="string(xxforms:call-xpl('oxf:/unit-tests/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first)"/>
                                 <xforms:bind nodeset="instance('instance2')/other-instance/second"
-                                    calculate="string(call-xpl('oxf:/unit-tests/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/second)"/>
+                                    calculate="string(xxforms:call-xpl('oxf:/unit-tests/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/second)"/>
                             </xforms:model>
                         </models>
                     </p:input>

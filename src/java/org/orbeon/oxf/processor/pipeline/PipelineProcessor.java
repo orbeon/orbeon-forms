@@ -40,19 +40,19 @@ import java.util.*;
 /**
  * <b>Lifecycle</b>
  * <ol>
- *     <li>Call createInput and createOutput methods to connect the pipeline
- *         processor to its config in any order. No verification is done at
- *         this point.
- *     <li>refreshSocketInfo() can be called at any point. If the config is set,
- *         it will read the config and update the socket info.
- *     <li>ASTWhen start() is called, the processor is really executed: each
- *         processor at the end of the pipeline is started and the outputs
- *         of those processors is stored in the SAXStore.
- *     <li>ASTWhen a read() is called on an output: if the processors has not
- *         been started yet, the start method is called. Then the
- *         corresponding SAXStore is replayed.
+ * <li>Call createInput and createOutput methods to connect the pipeline
+ * processor to its config in any order. No verification is done at
+ * this point.
+ * <li>refreshSocketInfo() can be called at any point. If the config is set,
+ * it will read the config and update the socket info.
+ * <li>ASTWhen start() is called, the processor is really executed: each
+ * processor at the end of the pipeline is started and the outputs
+ * of those processors is stored in the SAXStore.
+ * <li>ASTWhen a read() is called on an output: if the processors has not
+ * been started yet, the start method is called. Then the
+ * corresponding SAXStore is replayed.
  * </ol>
- *
+ * <p/>
  * <b>Threading</b>
  * <p>This processor is not only not thread safe, but it can't even be
  * reused: if there is one data output (with a 1 cardinality), one can't call
@@ -205,7 +205,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                             processorFactory = ProcessorFactoryRegistry.lookup(processorCall.getURI());
                         if (processorFactory == null) {
                             throw new ValidationException("Cannot find processor factory with name \""
-                                    + (processorCall.getName() != null ? Dom4jUtils.qNameToexplodedQName(processorCall.getName()) :  processorCall.getURI()) + "\"", processorLocationData);
+                                    + (processorCall.getName() != null ? Dom4jUtils.qNameToexplodedQName(processorCall.getName()) : processorCall.getURI()) + "\"", processorLocationData);
                         }
                         processor = processorFactory.createInstance(context);
                     } else {
@@ -260,23 +260,13 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                         // We have some inline XML in the <input> tag
                         Node inlineNode = input.getContent();
 
-                        final org.dom4j.Document doc;
+                        final Document doc;
                         final int ndTyp = inlineNode.getNodeType();
-                        if ( ndTyp == org.dom4j.Node.ELEMENT_NODE ) {
-                            final org.dom4j.Element elt = ( org.dom4j.Element )inlineNode;
-                            doc = Dom4jUtils.createDocument( elt );
-                            // Make sure the parent namespaces are copied over
-                            final org.dom4j.Element prntElt = elt.getParent();
-                            final java.util.Map parentNamespaceContext 
-                                = Dom4jUtils.getNamespaceContext( prntElt );
-                            final Element rtElt = doc.getRootElement();
-                            for (Iterator k = parentNamespaceContext.keySet().iterator(); k.hasNext();) {
-                                String prefix = (String) k.next();
-                                String uri = (String) parentNamespaceContext.get(prefix);
-                                rtElt.addNamespace(prefix, uri);
-                            }
-                        } else if ( ndTyp == org.dom4j.Node.DOCUMENT_NODE ) {
-                            doc = ( org.dom4j.Document )inlineNode;
+                        if (ndTyp == Node.ELEMENT_NODE) {
+                            final Element elt = (Element) inlineNode;
+                            doc = Dom4jUtils.createDocumentCopyParentNamespaces(elt);
+                        } else if (ndTyp == Node.DOCUMENT_NODE) {
+                            doc = (Document) inlineNode;
                         } else {
                             throw new OXFException("Invalid type for inline document: " + inlineNode.getClass().getName());
                         }
@@ -285,9 +275,9 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                         final Object v = astPipeline.getValidity();
                         final LocationData ld = astPipeline.getLocationData();
                         String sid = ld == null ? DOMGenerator.DefaultContext : ld.getSystemID();
-                        if ( sid == null ) sid = DOMGenerator.DefaultContext;
-                        final DOMGenerator docPrcssr 
-                            = PipelineUtils.createDOMGenerator(doc, "inline config", v, sid );
+                        if (sid == null) sid = DOMGenerator.DefaultContext;
+                        final DOMGenerator docPrcssr
+                                = PipelineUtils.createDOMGenerator(doc, "inline config", v, sid);
 
                         ProcessorOutput pout = docPrcssr.createOutput(OUTPUT_DATA);
                         pin = processor.createInput(input.getName());
@@ -320,8 +310,8 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                             // Connect data input (for now, a null document)
                             ProcessorInput dataInput = templateProcessor.createInput(INPUT_DATA);
                             DOMGenerator nullGenerator = PipelineUtils.createDOMGenerator
-                                ( Dom4jUtils.NULL_DOCUMENT, "null input", DOMGenerator.ZeroValidity
-                                  , DOMGenerator.DefaultContext );
+                                    (Dom4jUtils.NULL_DOCUMENT, "null input", DOMGenerator.ZeroValidity
+                                            , DOMGenerator.DefaultContext);
                             ProcessorOutput nullGeneratorOutput = nullGenerator.createOutput(OUTPUT_DATA);
                             nullGeneratorOutput.setInput(dataInput);
                             dataInput.setOutput(nullGeneratorOutput);
@@ -429,7 +419,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
         for (Iterator i = astPipeline.getParams().iterator(); i.hasNext();) {
             ASTParam param = (ASTParam) i.next();
             if (param.getType() == ASTParam.OUTPUT) {
-                if (! block.isBottomInputConnected(param.getName()))
+                if (!block.isBottomInputConnected(param.getName()))
                     throw new ValidationException("No processor in pipeline is connected to pipeline output '"
                             + param.getName() + "'", param.getLocationData());
             }
@@ -451,7 +441,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
 
             pipelineReaderInput.setOutput(new ProcessorImpl.ProcessorOutputImpl(getClass(), "dummy") {
                 public void readImpl(PipelineContext context, ContentHandler contentHandler) {
-                     ProcessorImpl.readInputAsSAX(context, _configInput, contentHandler); 
+                    ProcessorImpl.readInputAsSAX(context, _configInput, contentHandler);
                 }
 
                 public OutputCacheKey getKeyImpl(PipelineContext context) {

@@ -1330,7 +1330,7 @@
                     <p:output name="data" id="html"/>
                 </p:processor>
                 <p:processor name="oxf:xslt">
-                    <p:input name="data" href="#html" debug="html"/>
+                    <p:input name="data" href="#html"/>
                     <p:input name="config">
                         <result xsl:version="2.0">
                             <xsl:for-each select="//xforms:input">

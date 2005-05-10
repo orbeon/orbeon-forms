@@ -457,14 +457,34 @@ public class Dom4jUtils {
     }
 
     /**
-     * @return A document from with a _copy_ of root as its root.
+     * Return a new document with a copy of newRoot as its root.
      */
-    public static Document createDocument(final Element root) {
-        final Element cpy = root.createCopy();
+    public static Document createDocument(final Element newRoot) {
+        final Element cpy = newRoot.createCopy();
         final NonLazyUserDataDocumentFactory fctry
                 = NonLazyUserDataDocumentFactory.getInstance(null);
         final Document ret = fctry.createDocument(cpy);
         return ret;
+    }
+
+    /**
+     * Return a new document with a copy of newRoot as its root and all parent namespaces copied to
+     * the new root element.
+     */
+    public static Document createDocumentCopyParentNamespaces(final Element newRoot) {
+
+        Document document = Dom4jUtils.createDocument(newRoot);
+
+        final Element parentElement = newRoot.getParent();
+        final Map parentNamespaceContext = Dom4jUtils.getNamespaceContext(parentElement);
+        final Element rootElement = document.getRootElement();
+        for (Iterator k = parentNamespaceContext.keySet().iterator(); k.hasNext();) {
+            String prefix = (String) k.next();
+            String uri = (String) parentNamespaceContext.get(prefix);
+            rootElement.addNamespace(prefix, uri);
+        }
+
+        return document;
     }
 
     public static Document createDocument() {

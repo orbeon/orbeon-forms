@@ -106,7 +106,7 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
 
         // OPS call-xpl function
-        e = register("call-xpl", CallXPL.class, 0, 4, 4, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
+        e = register("{" + XFormsConstants.XXFORMS_NAMESPACE_URI + "}call-xpl", CallXPL.class, 0, 4, 4, Type.NODE_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
         //StandardFunction.arg(e, 0, Type.ANY_URI_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 0, Type.STRING_TYPE, StaticProperty.EXACTLY_ONE);
         StandardFunction.arg(e, 1, Type.STRING_TYPE, StaticProperty.ALLOWS_ZERO_OR_MORE);
@@ -132,44 +132,51 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
         this.xFormsControls = xFormsControls;
     }
 
-    public boolean isAvailable(int fingerprint, String uri, String local, int arity) {
+    private StandardFunction.Entry getEntry(String uri, String local, int arity) {
+        StandardFunction.Entry entry;
         if (uri.equals(NamespaceConstant.FN)) {
-            StandardFunction.Entry entry = (StandardFunction.Entry) functionTable.get(local);
-            if (entry == null) {
-                return false;
-            }
-            return arity == -1 || arity >= entry.minArguments && arity <= entry.maxArguments;
-        } else {
-            return false;
-        }
-    }
-
-    public Expression bind(int nameCode, String uri, String local, Expression[] staticArgs) throws XPathException {
-        if (uri.equals(NamespaceConstant.FN)) {
-            StandardFunction.Entry entry = (StandardFunction.Entry) functionTable.get(local);
-            if (entry == null) {
-                return null;
-            }
-            Class functionClass = entry.implementationClass;
-            SystemFunction f;
-            try {
-                f = (SystemFunction) functionClass.newInstance();
-            } catch (Exception err) {
-                throw new OXFException("Failed to load XForms function: " + err.getMessage(), err);
-            }
-            // Set function context if it's one of ours
-            if (f instanceof XFormsFunction) {
-                if (xFormsControls != null)
-                    ((XFormsFunction) f).setXFormsControls(xFormsControls);
-                if (xFormsModel != null)
-                    ((XFormsFunction) f).setXFormsModel(xFormsModel);
-            }
-            f.setDetails(entry);
-            f.setFunctionNameCode(nameCode);
-            f.setArguments(staticArgs);
-            return f;
+            entry = (StandardFunction.Entry) functionTable.get(local);
+        } else if (uri.equals(XFormsConstants.XXFORMS_NAMESPACE_URI)) {
+            entry = (StandardFunction.Entry) functionTable.get("{" + uri + "}" + local);
         } else {
             return null;
         }
+
+        if (entry == null || !(arity == -1 || arity >= entry.minArguments && arity <= entry.maxArguments)) {
+            return null;
+        }
+
+        return entry;
+    }
+
+    public boolean isAvailable(int fingerprint, String uri, String local, int arity) {
+        StandardFunction.Entry entry = getEntry(uri, local, arity);
+        return entry != null;
+    }
+
+    public Expression bind(int nameCode, String uri, String local, Expression[] staticArgs) throws XPathException {
+        StandardFunction.Entry entry = getEntry(uri, local, staticArgs.length);
+        if (entry == null) {
+            return null;
+        }
+
+        Class functionClass = entry.implementationClass;
+        SystemFunction f;
+        try {
+            f = (SystemFunction) functionClass.newInstance();
+        } catch (Exception err) {
+            throw new OXFException("Failed to load XForms function: " + err.getMessage(), err);
+        }
+        // Set function context if it's one of ours
+        if (f instanceof XFormsFunction) {
+            if (xFormsControls != null)
+                ((XFormsFunction) f).setXFormsControls(xFormsControls);
+            if (xFormsModel != null)
+                ((XFormsFunction) f).setXFormsModel(xFormsModel);
+        }
+        f.setDetails(entry);
+        f.setFunctionNameCode(nameCode);
+        f.setArguments(staticArgs);
+        return f;
     }
 }

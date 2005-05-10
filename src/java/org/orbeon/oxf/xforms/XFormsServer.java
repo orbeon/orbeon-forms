@@ -191,7 +191,7 @@ public class XFormsServer extends ProcessorImpl {
             for (Iterator i = modelsDocument.getRootElement().elements().iterator(); i.hasNext();) {
                 Element modelElement = (Element) i.next();
 
-                Document modelDocument = Dom4jUtils.createDocument(modelElement);
+                Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(modelElement);
                 XFormsModel model = new XFormsModel(modelDocument);
                 models.add(model);
             }
@@ -229,7 +229,7 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Create and set instance document on current model
-                    Document instanceDocument = Dom4jUtils.createDocument(instanceElement);
+                    Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces(instanceElement);
                     currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument);
 
                     currentCount++;

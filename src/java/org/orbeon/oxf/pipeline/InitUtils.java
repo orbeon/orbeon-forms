@@ -42,9 +42,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 
-
 public class InitUtils {
-       
+
 
     private static final String CACHE_SIZE_PROPERTY = "oxf.cache.size";
     public static final String PROLOGUE_PROPERTY = "oxf.prologue";
@@ -135,12 +134,12 @@ public class InitUtils {
      * Run a processor without ExternalContext. Should rarely be used!
      */
     public static void runProcessor(Processor processor) throws Exception {
-       runProcessor(processor, null, new PipelineContext());
+        runProcessor(processor, null, new PipelineContext());
     }
 
     /**
      * Run a processor with a Servlet Context and an optional session.
-     *
+     * <p/>
      * This is used for servlet context and session listeners.
      */
     public static void runProcessor(Processor processor, ServletContext servletContext, HttpSession session) throws Exception {
@@ -168,12 +167,13 @@ public class InitUtils {
                 Processor urlGenerator = PipelineUtils.createURLGenerator(url);
                 PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, processor, name);
             } else if (o instanceof Element) {
-                final Element elt = ( Element )o;
-                final LocationData ld = ( LocationData )elt.getData();
+                final Element elt = (Element) o;
+                final Object elementData = elt.getData();
+                final LocationData ld = (elementData instanceof LocationData) ? (LocationData) elt.getData() : null;
                 final String lsid = ld == null ? null : ld.getSystemID();
                 final String sid = lsid == null ? DOMGenerator.DefaultContext : lsid;
                 DOMGenerator domGenerator = PipelineUtils.createDOMGenerator
-                    ( elt, "init input", DOMGenerator.ZeroValidity, sid );
+                        (elt, "init input", DOMGenerator.ZeroValidity, sid);
                 PipelineUtils.connect(domGenerator, ProcessorImpl.OUTPUT_DATA, processor, name);
             } else
                 throw new IllegalStateException("Incorrect type in map.");
@@ -193,7 +193,7 @@ public class InitUtils {
         }
 
         // Try to obtain a processor definition from the properties
-        ProcessorDefinition  processorDefinition
+        ProcessorDefinition processorDefinition
                 = getDefinitionFromProperties(uriNamePropertyPrefix, processorInputProperty);
 
         // Try to obtain a processor definition from the context

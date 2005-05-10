@@ -131,9 +131,10 @@ public class XFormsInstance {
     /**
      * Evaluate an XPath expression on the instance and return its string value.
      */
-    public String evaluateXPath(PipelineContext pipelineContext, String xpath, Map prefixToURIMap) {
+    public String evaluateXPath(PipelineContext pipelineContext, String xpath, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
         PooledXPathExpression xpathExpression =
-                XPathCache.getXPathExpression(pipelineContext, instanceDocumentNodeInfo, "string(" + xpath + ")", prefixToURIMap);
+                XPathCache.getXPathExpression(pipelineContext, instanceDocumentNodeInfo, "string(" + xpath + ")",
+                        prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
         try {
             return (String) xpathExpression.evaluateSingle();
         } catch (XPathException e) {

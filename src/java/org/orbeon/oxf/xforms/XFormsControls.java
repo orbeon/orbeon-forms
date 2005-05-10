@@ -395,7 +395,7 @@ public class XFormsControls implements EventTarget {
             if (value != null) {
                 // Value to set is computed with an XPath expression
                 Map namespaceContext = Dom4jUtils.getNamespaceContext(eventHandlerElement);
-                valueToSet = instance.evaluateXPath(pipelineContext, value, namespaceContext);
+                valueToSet = instance.evaluateXPath(pipelineContext, value, namespaceContext, null, functionLibrary, null);
             } else {
                 // Value to set is static content
                 valueToSet = content;

@@ -50,13 +50,13 @@
                     <xsl:copy-of select="."/>
                 </xsl:for-each>
                 <!-- Standard scripts -->
+                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/wz_tooltip.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/calendar.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/overlib_mini.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/time-utils.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/sarissa.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/xforms-style.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/xforms.js"/>
-                <xhtml:script type="text/javascript" src="/oxf-theme/style/theme.js"/>
                 <!-- Title -->
                 <xhtml:title>
                     <xsl:choose>

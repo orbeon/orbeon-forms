@@ -12,16 +12,18 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
-            xmlns:f="http://orbeon.org/oxf/xml/formatting" 
-            xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-            xmlns:ev="http://www.w3.org/2001/xml-events"
-            xsl:version="2.0">
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" 
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xsl:version="2.0">
+    
     <xhtml:head>
         <xhtml:title>XForms Text Controls</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema">
-            <xforms:instance>
+            <xforms:instance id="instance">
                 <form>
                     <text>35</text>
                     <secret>42</secret>
@@ -41,8 +43,8 @@
             <xforms:bind nodeset="/form/date" type="xs:date"/>
             <xforms:bind nodeset="/form/date2" type="xs:date"/>
             <xforms:bind nodeset="/form/time" type="xs:time"/>
-<!--            <xforms:bind nodeset="/form/formated-instance" calculate="''"/>-->
-<!--            <xforms:bind nodeset="/form/formated-instance" calculate="saxon:serialize(/*, 'xml')"/>-->
+            <xforms:bind nodeset="instance('formatted')/formated-instance" 
+                calculate="saxon:serialize(xxforms:call-xpl('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'xml')"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -69,13 +71,15 @@
             </p>
             <p>
                 <xforms:input ref="date">
-                    <xforms:label xhtml:class="fixed-width">First date:</xforms:label>
+                    <xforms:label xhtml:class="fixed-width">Birth date:</xforms:label>
+                    <xforms:help>This date must be in the past.</xforms:help>
                 </xforms:input>
             </p>
             <p>
                 <xforms:input ref="date2">
                     <xforms:label xhtml:class="fixed-width">Second date:</xforms:label>
                 </xforms:input>
+                <xhtml:script>document.write(tt_Htm(this, "id", "text text text text text text text"))</xhtml:script>
             </p>
             <p>
                 <xforms:input ref="time">

@@ -16,7 +16,6 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
@@ -59,14 +58,14 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Extract information from request
                 Document requestDocument = readInputAsDOM4J(pipelineContext, INPUT_REQUEST);
-                Document eventDocument = Dom4jUtils.createDocument(requestDocument.getRootElement().element(new QName("event", XFormsConstants.XXFORMS_NAMESPACE)));
+                Document eventDocument = Dom4jUtils.createDocument(requestDocument.getRootElement().element(XFormsConstants.XXFORMS_EVENT_QNAME));
 
-                String encodedControlsString = requestDocument.getRootElement().element(new QName("controls", XFormsConstants.XXFORMS_NAMESPACE)).getTextTrim();
+                String encodedControlsString = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_CONTROLS_QNAME).getTextTrim();
 
-                Element encodedModelsElement = requestDocument.getRootElement().element(new QName("models", XFormsConstants.XXFORMS_NAMESPACE));
+                Element encodedModelsElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_MODELS_QNAME);
                 String encodedModelsString = encodedModelsElement.getTextTrim();
 
-                Element encodedInstancesElement = requestDocument.getRootElement().element(new QName("instances", XFormsConstants.XXFORMS_NAMESPACE));
+                Element encodedInstancesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_INSTANCES_QNAME);
                 String encodedInstancesString = encodedInstancesElement.getTextTrim();
 
                 // Create and initialize XForms engine from encoded data
@@ -96,7 +95,7 @@ public class XFormsServer extends ProcessorImpl {
                     contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
 
-                    // Output new controls values
+                    // Output new controls values and associated information
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
@@ -109,18 +108,43 @@ public class XFormsServer extends ProcessorImpl {
 
                             // Set current binding for control element
                             xFormsControls.setBinding(pipelineContext, controlElement);
-
-                            // Get current control value
-                            //XFormsInstance instance = xFormsControls.getCurrentInstance();
                             Node currentNode = xFormsControls.getCurrentSingleNode();
+
+                            // Instance data
                             InstanceData instanceData = XFormsUtils.getLocalInstanceData(currentNode);
 
                             attributesImpl.clear();
 
+                            // Control id
                             attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, controlId);
+
+                            // Get current value
                             String controlValue = XFormsInstance.getValueForNode(currentNode);
                             attributesImpl.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, controlValue);
 
+                            // Get control children values
+                            String labelValue = xFormsControls.getLabelValue(pipelineContext);
+                            String helpValue = xFormsControls.getHelpValue(pipelineContext);
+                            String hintValue = xFormsControls.getHintValue(pipelineContext);
+                            String alertValue = xFormsControls.getAlertValue(pipelineContext);
+
+                            if (labelValue != null) {
+                                attributesImpl.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, labelValue);
+                            }
+
+                            if (helpValue != null) {
+                                attributesImpl.addAttribute("", "help", "help", ContentHandlerHelper.CDATA, helpValue);
+                            }
+
+                            if (hintValue != null) {
+                                attributesImpl.addAttribute("", "hint", "hint", ContentHandlerHelper.CDATA, hintValue);
+                            }
+
+                            if (alertValue != null) {
+                                attributesImpl.addAttribute("", "alert", "alert", ContentHandlerHelper.CDATA, alertValue);
+                            }
+
+                            // Get model item properties
                             BooleanModelItemProperty readonly = instanceData.getReadonly();
                             if (readonly.isSet()) {
                                 attributesImpl.addAttribute("", XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
@@ -221,6 +245,7 @@ public class XFormsServer extends ProcessorImpl {
         final List models = new ArrayList();
         {
             Document modelsDocument = XFormsUtils.decodeXML(pipelineContext, encodedModelsString);
+            // FIXME: we don't get a System ID here. Is there a simple solution?
 
             for (Iterator i = modelsDocument.getRootElement().elements().iterator(); i.hasNext();) {
                 Element modelElement = (Element) i.next();

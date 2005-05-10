@@ -60,7 +60,8 @@ public class ViewContentHandler extends ForwardingContentHandler {
         } else if (XFormsConstants.XFORMS_NAMESPACE_URI.equals(uri) || XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
             // Get ref / bind / nodeset
 
-            elementContext.pushBinding(elementContext.getPipelineContext(), attributes.getValue("ref"), attributes.getValue("nodeset"), null, attributes.getValue("bind"));
+            elementContext.pushBinding(elementContext.getPipelineContext(), attributes.getValue("ref"),
+                    attributes.getValue("nodeset"), null, attributes.getValue("bind"), null);
 
             // Invoke element
             XFormsElement element = "group".equals(localname) ? new Group()

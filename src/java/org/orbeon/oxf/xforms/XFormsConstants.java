@@ -46,6 +46,16 @@ public class XFormsConstants {
     public static final String XXFORMS_NODE_IDS_ATTRIBUTE_NAME = "node-ids";
     public static final QName XXFORMS_NODE_IDS_ATTRIBUTE_QNAME = new QName(XXFORMS_READONLY_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
 
+    public static final QName XXFORMS_CONTROLS_QNAME = new QName("controls", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_MODELS_QNAME = new QName("models", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_INSTANCES_QNAME = new QName("instances", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_EVENT_QNAME = new QName("event", XFormsConstants.XXFORMS_NAMESPACE);
+
+    public static final QName XFORMS_LABEL_QNAME = new QName("label", XFormsConstants.XFORMS_NAMESPACE);
+    public static final QName XFORMS_HELP_QNAME = new QName("help", XFormsConstants.XFORMS_NAMESPACE);
+    public static final QName XFORMS_HINT_QNAME = new QName("hint", XFormsConstants.XFORMS_NAMESPACE);
+    public static final QName XFORMS_ALERT_QNAME = new QName("alert", XFormsConstants.XFORMS_NAMESPACE);
+
     public static final String XFORMS_PASSWORD_PROPERTY = "oxf.xforms.password";
     public static final String XFORMS_ENCRYPT_NAMES_PROPERTY = "oxf.xforms.encrypt-names";
     public static final String XFORMS_ENCRYPT_HIDDEN_PROPERTY = "oxf.xforms.encrypt-hidden";

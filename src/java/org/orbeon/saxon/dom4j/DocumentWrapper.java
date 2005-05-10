@@ -24,8 +24,8 @@ public class DocumentWrapper extends NodeWrapper implements DocumentInfo {
     protected Configuration configuration;
 
     /**
-     * Create a Saxon wrapper for a JDOM document
-     * @param doc     The JDOM document
+     * Create a Saxon wrapper for a dom4j document
+     * @param doc     The dom4j document
      * @param baseURI The base URI for all the nodes in the document
      */
 
@@ -51,7 +51,7 @@ public class DocumentWrapper extends NodeWrapper implements DocumentInfo {
     }
 
     /**
-     * Wrap a node in the JDOM document.
+     * Wrap a node in the dom4j document.
      * @param node The node to be wrapped. This must be a node in the same document
      * (the system does not check for this).
      * @return the wrapping NodeInfo object
@@ -94,7 +94,7 @@ public class DocumentWrapper extends NodeWrapper implements DocumentInfo {
     /**
     * Get the element with a given ID, if any
     * @param id the required ID value
-    * @return null: JDOM does not provide any information about attribute types.
+    * @return null: dom4j does not provide any information about attribute types.
     */
 
     public NodeInfo selectID(String id) {
@@ -104,7 +104,7 @@ public class DocumentWrapper extends NodeWrapper implements DocumentInfo {
     /**
     * Get the unparsed entity with a given name
     * @param name the name of the entity
-    * @return null: JDOM does not provide access to unparsed entities
+    * @return null: dom4j does not provide access to unparsed entities
     */
 
     public String[] getUnparsedEntity(String name) {

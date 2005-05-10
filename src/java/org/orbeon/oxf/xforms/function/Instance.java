@@ -13,13 +13,17 @@
  */
 package org.orbeon.oxf.xforms.function;
 
+import org.dom4j.Document;
 import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.xforms.XFormsModel;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
-import org.orbeon.saxon.om.Item;
+import org.orbeon.saxon.om.ListIterator;
+import org.orbeon.saxon.om.SequenceIterator;
 import org.orbeon.saxon.xpath.XPathException;
+
+import java.util.Collections;
 
 /**
  * XForms instance() function.
@@ -28,17 +32,23 @@ import org.orbeon.saxon.xpath.XPathException;
  */
 public class Instance extends XFormsFunction {
 
-    public Item evaluateItem(XPathContext c) throws XPathException {
-
-        // Get model id
+    public SequenceIterator iterate(XPathContext xpathContext) throws XPathException {
+        // Get instance id
         Expression instanceIdExpression = argument[0];
-        String instanceId = instanceIdExpression.evaluateAsString(c);
+        String instanceId = instanceIdExpression.evaluateAsString(xpathContext);
 
-        // Get model and instance with given id for that model
+        // Get model and instance with given id for that model only
         XFormsModel model = (getXFormsControls() != null) ? getXFormsControls().getCurrentModel() : getXFormsModel();
         XFormsInstance instance = model.getInstance(instanceId);
 
         // Return instance document
-        return new DocumentWrapper(instance.getDocument(), null);
+        if (instance != null) {
+            final Document instanceDocument = instance.getDocument();
+            // "this function returns a node-set containing just the root element node"
+            return new ListIterator(Collections.singletonList(new DocumentWrapper(instanceDocument, null).wrap(instanceDocument.getRootElement())));
+        } else {
+            // "an empty node-set is returned"
+            return new ListIterator(Collections.EMPTY_LIST);
+        }
     }
 }

@@ -60,7 +60,7 @@ public class XFormsControls implements EventTarget {
         // Push the default context
         final XFormsModel defaultModel = containingDocument.getModel("");
         final List defaultNodeset = Arrays.asList(new Object[] { defaultModel.getDefaultInstance().getDocument() });
-        contextStack.push(new Context(defaultModel, defaultNodeset));
+        contextStack.push(new Context(defaultModel, defaultNodeset, true, null));
     }
 
     public Document getControlsDocument() {
@@ -86,9 +86,9 @@ public class XFormsControls implements EventTarget {
             ancestorsOrSelf.add(currentElement);
             currentElement = currentElement.getParent();
         }
+        Collections.reverse(ancestorsOrSelf);
 
         // Bind up to the specified element
-        Collections.reverse(ancestorsOrSelf);
         for (Iterator i = ancestorsOrSelf.iterator(); i.hasNext();) {
             pushBinding(pipelineContext, (Element) i.next());
         }
@@ -99,10 +99,10 @@ public class XFormsControls implements EventTarget {
      */
     public void pushBinding(PipelineContext pipelineContext, Element bindingElement) {
         pushBinding(pipelineContext, bindingElement.attributeValue("ref"), bindingElement.attributeValue("nodeset"),
-                bindingElement.attributeValue("model"), bindingElement.attributeValue("bind"));
+                bindingElement.attributeValue("model"), bindingElement.attributeValue("bind"), bindingElement);
     }
 
-    public void pushBinding(PipelineContext pipelineContext, String ref, String nodeset, String model, String bind) {
+    public void pushBinding(PipelineContext pipelineContext, String ref, String nodeset, String model, String bind, Element bindingElement) {
 
         // Determine current context
         Context currentContext = getCurrentContext();
@@ -136,13 +136,16 @@ public class XFormsControls implements EventTarget {
         }
 
         // Push new context
-        contextStack.push(new Context(newModel, newNodeset));
+        contextStack.push(new Context(newModel, newNodeset, newNodeset != currentContext.nodeset, bindingElement));
     }
 
     private Context getCurrentContext() {
         return (Context) contextStack.peek();
     }
 
+    /**
+     * Get the current single node binding, if any.
+     */
     public Node getCurrentSingleNode(Context currentContext) {
         if (currentContext.nodeset.size() == 0)
             throw new ValidationException("Single node binding to unexistant node in instance", new LocationData(locator));
@@ -150,10 +153,16 @@ public class XFormsControls implements EventTarget {
         return (Node) currentContext.nodeset.get(0);
     }
 
+    /**
+     * Get the current single node binding, if any.
+     */
     public Node getCurrentSingleNode() {
         return getCurrentSingleNode(getCurrentContext());
     }
 
+    /**
+     * Get the current nodeset binding, if any.
+     */
     public List getCurrentNodeset() {
         return getCurrentContext().nodeset;
     }
@@ -196,7 +205,7 @@ public class XFormsControls implements EventTarget {
         popBinding();
         List newNodeset = new ArrayList();
         newNodeset.add(getCurrentNodeset().get(index - 1));
-        contextStack.push(new Context(getCurrentContext().model, newNodeset));
+        contextStack.push(new Context(getCurrentContext().model, newNodeset, true, null));
 
         if (repeatId != null)
             repeatIdToIndex.put(repeatId, new Integer(index));
@@ -259,10 +268,14 @@ public class XFormsControls implements EventTarget {
     protected static class Context {
         public List nodeset;
         public XFormsModel model;
+        public boolean newBind;
+        public Element controlElement;
 
-        public Context(XFormsModel model, List nodeSet) {
+        public Context(XFormsModel model, List nodeSet, boolean newBind, Element controlElement) {
             this.model = model;
             this.nodeset = nodeSet;
+            this.newBind = newBind;
+            this.controlElement = controlElement;
         }
     }
 
@@ -308,6 +321,79 @@ public class XFormsControls implements EventTarget {
             if (xpathExpression != null)
                 xpathExpression.returnToPool();
         }
+    }
+
+    /**
+     * Return the value of the label element for the current control, null if none.
+     *
+     * 8.3.3 The label Element
+     */
+    public String getLabelValue(PipelineContext pipelineContext) {
+        return getChildElementValue(pipelineContext, XFormsConstants.XFORMS_LABEL_QNAME);
+    }
+
+    /**
+     * Return the value of the help element for the current control, null if none.
+     *
+     * 8.3.4 The help Element
+     */
+    public String getHelpValue(PipelineContext pipelineContext) {
+        return getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HELP_QNAME);
+    }
+
+    /**
+     * Return the value of the hint element for the current control, null if none.
+     *
+     * 8.3.5 The hint Element
+     */
+    public String getHintValue(PipelineContext pipelineContext) {
+        return getChildElementValue(pipelineContext, XFormsConstants.XFORMS_HINT_QNAME);
+    }
+
+    /**
+     * Return the value of the alert element for the current control, null if none.
+     *
+     * 8.3.6 The alert Element
+     */
+    public String getAlertValue(PipelineContext pipelineContext) {
+        return getChildElementValue(pipelineContext, XFormsConstants.XFORMS_ALERT_QNAME);
+    }
+
+    private String getChildElementValue(PipelineContext pipelineContext, QName qName) {
+        // Check first if there is a current control element
+        Element controlElement = getCurrentContext().controlElement;
+        if (controlElement == null)
+            return null;
+
+        // Check that there is a current child element
+        Element childElement = controlElement.element(qName);
+        if (childElement == null)
+            return null;
+
+        // Child element becomes the new binding
+        pushBinding(pipelineContext, childElement);
+        String result = null;
+
+        // "the order of precedence is: single node binding attributes, linking attributes, inline text."
+        if (getCurrentContext().newBind) {
+            final Node currentNode = getCurrentSingleNode();
+            if (currentNode != null)
+                result = XFormsInstance.getValueForNode(currentNode);
+        }
+
+        if (result == null) {
+            String srcAttributeValue = childElement.attributeValue("src");
+            if (srcAttributeValue != null) {
+                // TODO: linking attribute
+                // TODO: throw xforms-link-error
+            }
+        }
+
+        if (result == null)
+            result = childElement.getStringValue();
+
+        popBinding();
+        return result;
     }
 
     private Element getEventHandler(PipelineContext pipelineContext, Element controlElement, String eventName) {
@@ -403,7 +489,7 @@ public class XFormsControls implements EventTarget {
 
             // Set value on current node
             Node currentNode = getCurrentSingleNode();
-            instance.setValueForNode(currentNode, valueToSet);
+            XFormsInstance.setValueForNode(currentNode, valueToSet);
 
         } else if (XFormsEvents.XFORMS_TOGGLE_ACTION.equals(actionEventName)) {
             // 9.2.3 The toggle Element

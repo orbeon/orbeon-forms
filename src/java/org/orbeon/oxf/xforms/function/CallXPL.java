@@ -17,6 +17,7 @@ import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.QName;
+import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
@@ -28,14 +29,15 @@ import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
+import org.orbeon.saxon.dom4j.NodeWrapper;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.om.ListIterator;
 import org.orbeon.saxon.om.SequenceIterator;
-import org.orbeon.saxon.value.AnyURIValue;
 import org.orbeon.saxon.xpath.XPathException;
 
 import java.net.URL;
@@ -59,7 +61,10 @@ public class CallXPL extends XFormsFunction {
             {
                 Expression xplURIExpression = argument[0];
                 //xplURL = new URL(((AnyURIValue) xplURIExpression.evaluateItem(xpathContext)).getStringValue());
-                xplURL = URLFactory.createURL(xplURIExpression.evaluateAsString(xpathContext));
+                if (getSystemId() == null)
+                    xplURL = URLFactory.createURL(xplURIExpression.evaluateAsString(xpathContext));
+                else
+                    xplURL = URLFactory.createURL(getSystemId(), xplURIExpression.evaluateAsString(xpathContext));
             }
 
             // Get list of input names
@@ -75,20 +80,20 @@ public class CallXPL extends XFormsFunction {
             }
 
             // Get list of input documents
-            final List inputDocuments = new ArrayList();
+            final List inputNodes = new ArrayList();
             {
                 Expression inputDocumentsExpression = argument[2];
                 SequenceIterator i = inputDocumentsExpression.iterate(xpathContext);
 
                 Item currentItem;
                 while ((currentItem = (Item) i.next()) != null) {
-                    inputDocuments.add(((DocumentWrapper) currentItem).getUnderlyingNode());
+                    inputNodes.add(((NodeWrapper) currentItem).getUnderlyingNode());
                 }
             }
 
-            if (inputNames.size() != inputDocuments.size())
+            if (inputNames.size() != inputNodes.size())
                 throw new OXFException("The length of sequence of input names (" + inputNames.size()
-                        + "must be equal to the length of the sequence of input documents (" + inputDocuments.size() + ").");//getDisplayName()
+                        + ") must be equal to the length of the sequence of input nodes (" + inputNodes.size() + ").");//getDisplayName()
 
             // Get list of output names
             final List outputNames = new ArrayList();
@@ -110,12 +115,23 @@ public class CallXPL extends XFormsFunction {
                     processorDefinition.setName(new QName("pipeline", XMLConstants.OXF_PROCESSORS_NAMESPACE));
                     processorDefinition.addInput("config", xplURL.toExternalForm());
 
-                    Iterator inputDocumentsIterator = inputDocuments.iterator();
+                    Iterator inputNodesIterator = inputNodes.iterator();
                     for (Iterator i = inputNames.iterator(); i.hasNext();) {
                         String inputName = (String) i.next();
 
-                        Node inputNode = (Node) inputDocumentsIterator.next();
-                        Element rootElement = inputNode.getDocument().getRootElement();
+                        Node inputNode = (Node) inputNodesIterator.next();
+
+                        // For now we accept dom4j Document and Element
+                        // TODO: must support Saxon's other format (e.g. result of doc() function or contructed trees)
+                        Element rootElement;
+                        if (inputNode instanceof Document)
+                            rootElement = ((Document) inputNode).getRootElement();
+                        else if (inputNode instanceof Element && inputNode.getParent() == null)
+                            rootElement = (Element) inputNode;
+                        else if (inputNode instanceof Element)
+                            rootElement = Dom4jUtils.createDocumentCopyParentNamespaces((Element) inputNode).getRootElement();
+                        else
+                            throw new OXFException("Input node must be an instance of Document or Element");
                         processorDefinition.addInput(inputName, rootElement);
                     }
                 }

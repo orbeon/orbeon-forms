@@ -149,7 +149,7 @@ public class XFormsInput extends ProcessorImpl {
                     // Create and initialize XForms Engine
                     XFormsContainingDocument containingDocument = new XFormsContainingDocument(Collections.singletonList(model), null);
                     containingDocument.initialize(pipelineContext);
-                    containingDocument.dispatchEvent(pipelineContext, new EventContext(), XFormsEvents.XXFORMS_INITIALIZE);
+                    containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE);
 
                     // Run remaining model item properties
                     // TODO: this has to be done in a different way (events?)

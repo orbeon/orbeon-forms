@@ -17,6 +17,7 @@ import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.Base64;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -32,11 +33,15 @@ import javax.xml.transform.TransformerException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+import java.net.URL;
 
 public class XFormsUtils {
+
+    private static final int BUFFER_SIZE = 1024;
 
     /**
      * Adds to <code>target</code> all the attributes in <code>source</code>
@@ -236,6 +241,24 @@ public class XFormsUtils {
             return OXFProperties.instance().getPropertySet().getString(XFormsConstants.XFORMS_PASSWORD_PROPERTY);
         else
             return null;
+    }
+
+    public static String retrieveSrcValue(String src) throws IOException {
+        URL url = URLFactory.createURL(src);
+
+        // Load file into buffer
+        InputStreamReader reader = new InputStreamReader(url.openStream());
+        try {
+            StringBuffer value = new StringBuffer();
+            char[] buff = new char[BUFFER_SIZE];
+            int c = 0;
+            while ((c = reader.read(buff, 0, BUFFER_SIZE - 1)) != -1)
+                value.append(buff, 0, c);
+            return value.toString();
+        } finally {
+            if (reader != null)
+                reader.close();
+        }
     }
 
     public static interface InstanceWalker {

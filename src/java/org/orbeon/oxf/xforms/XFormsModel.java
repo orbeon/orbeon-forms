@@ -211,8 +211,6 @@ public class XFormsModel implements EventTarget, Cloneable {
 
     private static final ValidationContext validationContext = new ValidationContext();
 
-    private static final String DEFAULT_MODEL_ID = "wsrp_rewrite_xforms";
-
     private Document modelDocument;
 
     // Model attributes
@@ -247,6 +245,9 @@ public class XFormsModel implements EventTarget, Cloneable {
             throw new ValidationException("Root element of XForms model must be in namespace '"
                     + XFormsConstants.XFORMS_NAMESPACE_URI + "'. Found instead: '" + rootNamespaceURI + "'",
                     (LocationData) modelElement.getData());
+
+        // Get model id (may be null)
+        modelId = modelElement.attributeValue("id");
 
         // Extract list of instances ids
         List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
@@ -922,7 +923,7 @@ public class XFormsModel implements EventTarget, Cloneable {
     }
 
     public String getModelId() {
-        return modelId == null ? DEFAULT_MODEL_ID : modelId;
+        return modelId;
     }
 
     public String getMethod() {
@@ -1009,15 +1010,16 @@ public class XFormsModel implements EventTarget, Cloneable {
         return !schmVldatdObj.booleanValue();
     }
 
-    public void dispatchEvent(final PipelineContext pipelineContext, EventContext eventContext, String eventName) {
+    public void dispatchEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
+        dispatchEvent(pipelineContext, xformsEvent, xformsEvent.getEventName());
+    }
+
+    public void dispatchEvent(final PipelineContext pipelineContext, XFormsGenericEvent xformsEvent, String eventName) {
         if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
             // 4.2.1 The xforms-model-construct Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
 
             Element modelElement = modelDocument.getRootElement();
-
-            // Get model id (may be null)
-            modelId = modelElement.attributeValue("id");
 
             // Get info from <xforms:submission> element (may be missing)
             {
@@ -1083,9 +1085,9 @@ public class XFormsModel implements EventTarget, Cloneable {
             // TODO: a, b, c xxx
 
             // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-            dispatchEvent(pipelineContext, eventContext, XFormsEvents.XFORMS_REBUILD);
-            dispatchEvent(pipelineContext, eventContext, XFormsEvents.XFORMS_RECALCULATE);
-            dispatchEvent(pipelineContext, eventContext, XFormsEvents.XFORMS_REVALIDATE);
+            dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_REBUILD);
+            dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_RECALCULATE);
+            dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_REVALIDATE);
 
         } else if (XFormsEvents.XFORMS_MODEL_DONE.equals(eventName)) {
             // 4.2.2 The xforms-model-construct-done Event
@@ -1153,6 +1155,17 @@ public class XFormsModel implements EventTarget, Cloneable {
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
             // TODO
+        } else if (XFormsEvents.XFORMS_LINK_ERROR.equals(eventName)) {
+            // 4.5.2 The xforms-link-error Event
+            // Bubbles: Yes / Cancelable: No / Context Info: The URI that failed to load (xsd:anyURI)
+
+            //callEventHandlers(pipelineContext, xformsEvent, eventName, xformsEvent.getControlElement());
+
+            // The default action for this event results in the following: None; notification event only.
+            //XFormsLinkError xFormsLinkError = (XFormsLinkError) xformsEvent;
+
+            // TODO
+
         } else {
             throw new OXFException("Invalid event dispatched: " + eventName);
         }

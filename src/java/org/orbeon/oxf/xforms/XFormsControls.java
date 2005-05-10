@@ -18,15 +18,16 @@ import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.xforms.output.element.XFormsElement;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.event.XFormsLinkError;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.xml.sax.Locator;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -35,12 +36,11 @@ import java.util.*;
 public class XFormsControls implements EventTarget {
 
     private Locator locator;
-    private Stack elements = new Stack();
 
     private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
     private Map repeatIdToIndex = new HashMap();
 
-    XFormsContainingDocument containingDocument;
+    private XFormsContainingDocument containingDocument;
     private Document controlsDocument;
 
     private Stack contextStack = new Stack();
@@ -123,7 +123,7 @@ public class XFormsControls implements EventTarget {
                 newNodeset = newModel.getBindNodeset(pipelineContext, newModel.getModelBindById(bind));
             } else if (ref != null || nodeset != null) {
                 // Evaluate new XPath in context of current node
-                newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, getCurrentSingleNode(currentContext),
+                newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, getCurrentSingleNode(newModel.getModelId()),
                         ref != null ? ref : nodeset, getCurrentPrefixToURIMap(), null, functionLibrary, null);
 
                 if (ref != null && newNodeset.isEmpty())
@@ -148,9 +148,26 @@ public class XFormsControls implements EventTarget {
      */
     public Node getCurrentSingleNode(Context currentContext) {
         if (currentContext.nodeset.size() == 0)
-            throw new ValidationException("Single node binding to unexistant node in instance", new LocationData(locator));
+            throw new ValidationException("Single node binding to nonexistent node in instance", new LocationData(locator));
 
         return (Node) currentContext.nodeset.get(0);
+    }
+
+    /**
+     * Get the current single node binding for the given model id.
+     */
+    public Node getCurrentSingleNode(String modelId) {
+
+        for (int i = contextStack.size() - 1; i >=0; i--) {
+            Context currentContext = (Context) contextStack.get(i);
+
+            String currentModelId = currentContext.model.getModelId();
+            if ((currentModelId == null && modelId == null) || (modelId != null && modelId.equals(currentModelId)))
+                return (Node) currentContext.nodeset.get(0);
+        }
+
+        // If not found, return the document element of the model's default instance
+        return containingDocument.getModel(modelId).getInstance("").getDocument();
     }
 
     /**
@@ -237,26 +254,6 @@ public class XFormsControls implements EventTarget {
         this.locator = locator;
     }
 
-    public NamespaceSupport2 getNamespaceSupport() {
-        return namespaceSupport;
-    }
-
-    public void pushElement(XFormsElement element) {
-        elements.push(element);
-    }
-
-    public XFormsElement popElement() {
-        return (XFormsElement) elements.pop();
-    }
-
-    public XFormsElement peekElement() {
-        return (XFormsElement) elements.peek();
-    }
-
-    public XFormsElement getParentElement(int level) {
-        return elements.size() > level + 1 ? (XFormsElement) elements.get(elements.size() - (level + 2)) : null;
-    }
-
     public XFormsModel getCurrentModel() {
         return getCurrentContext().model;
     }
@@ -308,6 +305,8 @@ public class XFormsControls implements EventTarget {
         PooledXPathExpression xpathExpression =
                 XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument),
                         "/xxf:controls//(xf:input|xf:secret|xf:textarea|xf:output|xf:upload|xf:range|xf:trigger|xf:submit|xf:select|xf:select1)[@ref]", XFormsServer.XFORMS_NAMESPACES);
+
+        // TODO: xf:group
         try {
             return xpathExpression.evaluate();
 //            List result = new ArrayList();
@@ -375,20 +374,29 @@ public class XFormsControls implements EventTarget {
         String result = null;
 
         // "the order of precedence is: single node binding attributes, linking attributes, inline text."
+
+        // Try to get single node binding
         if (getCurrentContext().newBind) {
             final Node currentNode = getCurrentSingleNode();
             if (currentNode != null)
                 result = XFormsInstance.getValueForNode(currentNode);
         }
 
+        // Try to get linking attribute
         if (result == null) {
             String srcAttributeValue = childElement.attributeValue("src");
             if (srcAttributeValue != null) {
-                // TODO: linking attribute
-                // TODO: throw xforms-link-error
+                try {
+                    // TODO: should cache this?
+                    result = XFormsUtils.retrieveSrcValue(srcAttributeValue);
+                } catch (IOException e) {
+                    // Dispatch xforms-link-error to model
+                    getCurrentModel().dispatchEvent(pipelineContext, new XFormsLinkError(srcAttributeValue, childElement, e));
+                }
             }
         }
 
+        // Try to get static value
         if (result == null)
             result = childElement.getStringValue();
 
@@ -421,43 +429,51 @@ public class XFormsControls implements EventTarget {
         return eventHandlerElement;
     }
 
-    public void dispatchEvent(PipelineContext pipelineContext, EventContext eventContext, String eventName) {
+    public void dispatchEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
+        dispatchEvent(pipelineContext, xformsEvent, xformsEvent.getEventName());
+    }
+
+    public void dispatchEvent(PipelineContext pipelineContext, XFormsGenericEvent xformsEvent, String eventName) {
         if (XFormsEvents.XFORMS_DOM_ACTIVATE.equals(eventName)) {
             // 4.4.1 The DOMActivate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             // The default action for this event results in the following: None; notification event only.
 
-            callEventHandlers(pipelineContext, eventContext, eventName, eventContext.getControlElement());
+            callEventHandlers(pipelineContext, xformsEvent, eventName, xformsEvent.getControlElement());
 
         } else if (XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)) {
             // 4.4.9 The DOMFocusOut Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
             // The default action for this event results in the following: None; notification event only.
 
-            callEventHandlers(pipelineContext, eventContext, eventName, eventContext.getControlElement());
+            callEventHandlers(pipelineContext, xformsEvent, eventName, xformsEvent.getControlElement());
 
         } else if (XFormsEvents.XFORMS_VALUE_CHANGED.equals(eventName)) {
             // 4.4.2 The xforms-value-changed Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
             // The default action for this event results in the following: None; notification event only.
 
-            callEventHandlers(pipelineContext, eventContext, eventName, eventContext.getControlElement());
+            callEventHandlers(pipelineContext, xformsEvent, eventName, xformsEvent.getControlElement());
 
         } else {
             throw new OXFException("Invalid action requested: " + eventName);
         }
     }
 
-    private void callEventHandlers(PipelineContext pipelineContext, EventContext eventContext, String eventName, Element controlElement) {
+    private boolean callEventHandlers(PipelineContext pipelineContext, XFormsGenericEvent XFormsEvent, String eventName, Element controlElement) {
         // Find event handler
         Element eventHandlerElement = getEventHandler(pipelineContext, controlElement, eventName);
         // If found, run actions
-        if (eventHandlerElement != null)
-            runAction(pipelineContext, eventHandlerElement, eventContext);
+        if (eventHandlerElement != null) {
+            runAction(pipelineContext, eventHandlerElement, XFormsEvent);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void runAction(final PipelineContext pipelineContext, Element eventHandlerElement,
-                                EventContext eventContext) {
+                                XFormsGenericEvent XFormsEvent) {
 
         String actionNamespaceURI = eventHandlerElement.getNamespaceURI();
         if (!XFormsConstants.XFORMS_NAMESPACE_URI.equals(actionNamespaceURI)) {
@@ -497,7 +513,7 @@ public class XFormsControls implements EventTarget {
 
             // Find case with that id and select it
             String caseId = eventHandlerElement.attributeValue("case");
-            eventContext.addDivToShow(caseId);
+            XFormsEvent.addDivToShow(caseId);
 
             // Deselect other cases in that switch
             {
@@ -511,7 +527,7 @@ public class XFormsControls implements EventTarget {
 
                     for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
                         Element caseElement = (Element) i.next();
-                        eventContext.addDivToHide(caseElement.attributeValue(new QName("id")));
+                        XFormsEvent.addDivToHide(caseElement.attributeValue(new QName("id")));
                     }
                 } catch (org.orbeon.saxon.xpath.XPathException e) {
                     throw new OXFException(e);
@@ -531,7 +547,7 @@ public class XFormsControls implements EventTarget {
 
             for (Iterator i = eventHandlerElement.elementIterator(); i.hasNext();) {
                 Element embeddedActionElement = (Element) i.next();
-                runAction(pipelineContext, embeddedActionElement, eventContext);
+                runAction(pipelineContext, embeddedActionElement, XFormsEvent);
             }
 
         } else {

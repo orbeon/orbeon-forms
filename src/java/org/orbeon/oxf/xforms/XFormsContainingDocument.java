@@ -18,7 +18,10 @@ import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Represents an XForms containing document.
@@ -40,7 +43,8 @@ public class XFormsContainingDocument implements EventTarget {
 
         for (Iterator i = models.iterator(); i.hasNext();) {
             XFormsModel model = (XFormsModel) i.next();
-            modelsMap.put(model.getModelId(), model);
+            if (model.getModelId() != null)
+                modelsMap.put(model.getModelId(), model);
         }
 
         this.xFormsControls = new XFormsControls(this, controlsDocument);
@@ -78,25 +82,25 @@ public class XFormsContainingDocument implements EventTarget {
     /**
      * Execute an event on control with id controlId and event eventName
      */
-    public EventContext executeEvent(PipelineContext pipelineContext, String controlId, String eventName, String eventValue) {
+    public XFormsGenericEvent executeEvent(PipelineContext pipelineContext, String controlId, String eventName, String eventValue) {
 
         // Get control element and event handler element
         Element controlElement = xFormsControls.getControlElement(pipelineContext, controlId);
 
         // Interpret event
-        EventContext eventContext = new EventContext(controlElement, eventValue);
-        interpretEvent(pipelineContext, eventContext, eventName);
-        return eventContext;
+        XFormsGenericEvent XFormsEvent = new XFormsGenericEvent(controlElement, eventValue);
+        interpretEvent(pipelineContext, XFormsEvent, eventName);
+        return XFormsEvent;
     }
 
-    private void interpretEvent(final PipelineContext pipelineContext, EventContext eventContext, String eventName) {
+    private void interpretEvent(final PipelineContext pipelineContext, XFormsGenericEvent XFormsEvent, String eventName) {
 
         if (XFormsEvents.XFORMS_DOM_ACTIVATE.equals(eventName)) {
             // 4.4.1 The DOMActivate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             // The default action for this event results in the following: None; notification event only.
 
-            xFormsControls.dispatchEvent(pipelineContext, eventContext, eventName);
+            xFormsControls.dispatchEvent(pipelineContext, XFormsEvent, eventName);
 
         } else if (XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE.equals(eventName)) {
             // 4.6.7 Sequence: Value Change with Focus Change
@@ -111,30 +115,34 @@ public class XFormsContainingDocument implements EventTarget {
             // Reevaluation of binding expressions must occur before step 3 above.
 
             // Set current context to control
-            xFormsControls.setBinding(pipelineContext, eventContext.getControlElement());
+            xFormsControls.setBinding(pipelineContext, XFormsEvent.getControlElement());
 
             // Set value into the instance
-            xFormsControls.getCurrentInstance().setValueForNode(xFormsControls.getCurrentSingleNode(), eventContext.getValue());
+            XFormsInstance.setValueForNode(xFormsControls.getCurrentSingleNode(), XFormsEvent.getValue());
 
             // Dispatch events
             XFormsModel model = xFormsControls.getCurrentModel();
-            model.dispatchEvent(pipelineContext, eventContext, XFormsEvents.XFORMS_RECALCULATE);
-            model.dispatchEvent(pipelineContext, eventContext, XFormsEvents.XFORMS_REVALIDATE);
+            model.dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XFORMS_RECALCULATE);
+            model.dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XFORMS_REVALIDATE);
 
-            xFormsControls.dispatchEvent(pipelineContext, eventContext, XFormsEvents.XFORMS_DOM_FOCUS_OUT);
-            xFormsControls.dispatchEvent(pipelineContext, eventContext, XFormsEvents.XFORMS_VALUE_CHANGED);
+            xFormsControls.dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XFORMS_DOM_FOCUS_OUT);
+            xFormsControls.dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XFORMS_VALUE_CHANGED);
 
             // TODO
             //xFormsControls.dispatchEvent(pipelineContext, XFormsEvents.XFORMS_DOM_FOCUS_IN, newControlElement);
 
-            model.dispatchEvent(pipelineContext, eventContext, XFormsEvents.XFORMS_REFRESH);
+            model.dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XFORMS_REFRESH);
 
         } else {
             throw new OXFException("Invalid event requested: " + eventName);
         }
     }
 
-    public void dispatchEvent(PipelineContext pipelineContext, EventContext eventContext, String eventName) {
+    public void dispatchEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
+        dispatchEvent(pipelineContext, xformsEvent, xformsEvent.getEventName());
+    }
+
+    public void dispatchEvent(PipelineContext pipelineContext, XFormsGenericEvent XFormsEvent, String eventName) {
         if (XFormsEvents.XXFORMS_INITIALIZE.equals(eventName)) {
             // 4.2 Initialization Events
 
@@ -145,11 +153,11 @@ public class XFormsContainingDocument implements EventTarget {
             final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_DONE, XFormsEvents.XFORMS_READY };
             for (int i = 0; i < eventsToDispatch.length; i++) {
                 if (XFormsEvents.XFORMS_MODEL_DONE.equals(eventsToDispatch[i])) {
-                    dispatchEvent(pipelineContext, eventContext, XFormsEvents.XXFORMS_INITIALIZE_CONTROLS);
+                    dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XXFORMS_INITIALIZE_CONTROLS);
                 }
                 for (Iterator j = getModels().iterator(); j.hasNext();) {
                     XFormsModel model = (XFormsModel) j.next();
-                    model.dispatchEvent(pipelineContext, eventContext, eventsToDispatch[i]);
+                    model.dispatchEvent(pipelineContext, XFormsEvent, eventsToDispatch[i]);
                 }
             }
         } else if (XFormsEvents.XXFORMS_INITIALIZE_CONTROLS.equals(eventName)) {

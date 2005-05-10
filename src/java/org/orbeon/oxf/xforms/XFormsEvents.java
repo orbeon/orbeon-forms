@@ -27,7 +27,12 @@ public class XFormsEvents {
 
     public static final String XFORMS_VALUE_CHANGED = "xforms-value-changed";
 
+    // DOM events
     public static final String XFORMS_DOM_ACTIVATE = "DOMActivate";
     public static final String XFORMS_DOM_FOCUS_OUT = "DOMFocusOut";
     public static final String XFORMS_DOM_FOCUS_IN = "DOMFocusIn";
+
+    // Exceptions and errors
+    public static final String XFORMS_LINK_EXCEPTION = "xforms-link-exception";
+    public static final String XFORMS_LINK_ERROR = "xforms-link-error";
 }

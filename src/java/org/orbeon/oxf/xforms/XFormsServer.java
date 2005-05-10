@@ -73,7 +73,7 @@ public class XFormsServer extends ProcessorImpl {
                         encodedModelsString, encodedInstancesString);
 
                 // Run event if any
-                EventContext eventContext = null;
+                XFormsGenericEvent XFormsEvent = null;
                 {
                     final Element eventElement = eventDocument.getRootElement();
                     String controlId = eventElement.attributeValue("source-control-id");
@@ -82,7 +82,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (controlId != null && eventName != null) {
                         // An event is passed
-                        eventContext = containingDocument.executeEvent(pipelineContext, controlId, eventName, value);
+                        XFormsEvent = containingDocument.executeEvent(pipelineContext, controlId, eventName, value);
                     } else if (!(controlId == null && eventName == null)) {
                         throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
                     }
@@ -206,15 +206,15 @@ public class XFormsServer extends ProcessorImpl {
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
 
-                        if (eventContext != null) {
-                            if (eventContext.getDivsToHide() != null) {
-                                for (Iterator i = eventContext.getDivsToHide().iterator(); i.hasNext();) {
+                        if (XFormsEvent != null) {
+                            if (XFormsEvent.getDivsToHide() != null) {
+                                for (Iterator i = XFormsEvent.getDivsToHide().iterator(); i.hasNext();) {
                                     String caseId = (String) i.next();
                                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "hidden"});
                                 }
                             }
-                            if (eventContext.getDivsToShow() != null) {
-                                for (Iterator i = eventContext.getDivsToShow().iterator(); i.hasNext();) {
+                            if (XFormsEvent.getDivsToShow() != null) {
+                                for (Iterator i = XFormsEvent.getDivsToShow().iterator(); i.hasNext();) {
                                     String caseId = (String) i.next();
                                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "visible"});
                                 }
@@ -305,9 +305,9 @@ public class XFormsServer extends ProcessorImpl {
         // Initialize XForms Engine
         containingDocument.initialize(pipelineContext);
         if (isInitializeEvent)
-            containingDocument.dispatchEvent(pipelineContext, new EventContext(), XFormsEvents.XXFORMS_INITIALIZE);
+            containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE);
         else
-            containingDocument.dispatchEvent(pipelineContext, new EventContext(), XFormsEvents.XXFORMS_INITIALIZE_CONTROLS);
+            containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE_CONTROLS);
 
         return containingDocument;
     }

@@ -219,7 +219,7 @@
         </output>
     </test>
 
-    <test description="Relative refs" name="oxf:pipeline">
+    <test description="Nested refs with multiple models and instances" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>
@@ -228,24 +228,52 @@
                     <p:input name="data"><dummy/></p:input>
                     <p:input name="controls">
                         <xxforms:controls>
-                            <xforms:group ref="/equation">
-                                <xforms:group ref="screen">
-                                    <xforms:output ref="." id="1"/>
+                            <!-- First model, first instance -->
+                            <xforms:group ref="/">
+                                <xforms:group ref="nested111">
+                                    <xforms:group ref="nested112">
+                                        <xforms:output ref="first" id="id111"/>
+                                        <xforms:output ref="second" id="id112"/>
+                                        <xforms:output ref="third" id="id113"/>
+                                        <xforms:output ref="fourth" id="id114"/>
+                                    </xforms:group>
                                 </xforms:group>
-                                <xforms:output ref="memory" id="2">
-                                    <xforms:label>M:</xforms:label>
-                                </xforms:output>
-                                <xforms:trigger id="3">
-                                    <xforms:label>Clear</xforms:label>
-                                    <xforms:action ev:event="DOMActivate">
-                                        <xforms:setvalue ref="../equation/first" value="0"/>
-                                        <xforms:setvalue ref="/equaltion/second" value="0"/>
-                                        <xforms:setvalue ref="/*/result" value="0"/>
-                                        <xforms:setvalue ref="screen" value="0"/>
-                                        <xforms:setvalue ref="screenbuffer" value="0"/>
-                                        <xforms:toggle ev:event="DOMActivate" case="add"/>
-                                    </xforms:action>
-                                </xforms:trigger>
+                            </xforms:group>
+                            <!-- First model, second instance -->
+                            <xforms:group ref="instance('instance12')">
+                                <xforms:group ref="nested122">
+                                    <xforms:output ref="first" id="id121"/>
+                                    <xforms:output ref="second" id="id122"/>
+                                    <xforms:output ref="third" id="id123"/>
+                                    <xforms:output ref="fourth" id="id124"/>
+                                </xforms:group>
+                            </xforms:group>
+                            <!-- Mixed models -->
+                            <xforms:group ref="/">
+                                <xforms:group ref="nested211" model="model2">
+                                    <xforms:group ref="nested212">
+                                        <xforms:output ref="first" id="id211"/>
+                                        <xforms:output ref="second" id="id212"/>
+                                        <xforms:output ref="third" id="id213"/>
+                                        <xforms:output ref="fourth" id="id214"/>
+                                    </xforms:group>
+                                    <xforms:group ref="instance('instance22')">
+                                        <xforms:group ref="nested222">
+                                            <xforms:output ref="first" id="id221"/>
+                                            <xforms:output ref="second" id="id222"/>
+                                            <xforms:output ref="third" id="id223"/>
+                                            <xforms:output ref="fourth" id="id224"/>
+                                            <xforms:group ref="instance('instance21')">
+                                                <xforms:group ref="nested212">
+                                                    <xforms:output ref="first" id="id211b"/>
+                                                    <xforms:output ref="second" id="id212b"/>
+                                                    <xforms:output ref="third" id="id213b"/>
+                                                    <xforms:output ref="fourth" id="id214b"/>
+                                                </xforms:group>
+                                            </xforms:group>
+                                        </xforms:group>
+                                    </xforms:group>
+                                </xforms:group>
                             </xforms:group>
                         </xxforms:controls>
                     </p:input>
@@ -253,14 +281,46 @@
                         <models>
                             <xforms:model>
                                 <xforms:instance>
-                                    <equation xmlns="">
-                                        <screen>0</screen>
-                                        <screenbuffer>0</screenbuffer>
-                                        <first>0</first>
-                                        <second>0</second>
-                                        <memory>12</memory>
-                                        <result/>
-                                    </equation>
+                                    <nested111>
+                                        <nested112>
+                                            <first>111</first>
+                                            <second>112</second>
+                                            <third>113</third>
+                                            <fourth>114</fourth>
+                                        </nested112>
+                                    </nested111>
+                                </xforms:instance>
+                                <xforms:instance id="instance12">
+                                    <nested121>
+                                        <nested122>
+                                            <first>121</first>
+                                            <second>122</second>
+                                            <third>123</third>
+                                            <fourth>124</fourth>
+                                        </nested122>
+                                    </nested121>
+                                </xforms:instance>
+                            </xforms:model>
+                            <xforms:model id="model2">
+                                <xforms:instance id="instance21">
+                                    <nested211>
+                                        <nested212>
+                                            <first>211</first>
+                                            <second>212</second>
+                                            <third>213</third>
+                                            <fourth>214</fourth>
+                                        </nested212>
+                                    </nested211>
+                                </xforms:instance>
+                                <xforms:instance id="instance22">
+                                    <nested221>
+                                        <nested222>
+                                            <first>221</first>
+                                            <second>222</second>
+                                            <third>223</third>
+                                            <fourth>224</fourth>
+                                        </nested222>
+                                    </nested221>
                                 </xforms:instance>
                             </xforms:model>
                         </models>
@@ -307,19 +367,61 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:control-values>
-                    <xxf:control id="1" value="0"/>
-                    <xxf:control id="2" value="12" label="M:"/>
+                    <xxf:control id="id111" value="111"/>
+                    <xxf:control id="id112" value="112"/>
+                    <xxf:control id="id113" value="113"/>
+                    <xxf:control id="id114" value="114"/>
+                    <xxf:control id="id121" value="121"/>
+                    <xxf:control id="id122" value="122"/>
+                    <xxf:control id="id123" value="123"/>
+                    <xxf:control id="id124" value="124"/>
+                    <xxf:control id="id211" value="211"/>
+                    <xxf:control id="id212" value="212"/>
+                    <xxf:control id="id213" value="213"/>
+                    <xxf:control id="id214" value="214"/>
+                    <xxf:control id="id221" value="221"/>
+                    <xxf:control id="id222" value="222"/>
+                    <xxf:control id="id223" value="223"/>
+                    <xxf:control id="id224" value="224"/>
+                    <xxf:control id="id211b" value="211"/>
+                    <xxf:control id="id212b" value="212"/>
+                    <xxf:control id="id213b" value="213"/>
+                    <xxf:control id="id214b" value="214"/>
                 </xxf:control-values>
                 <xxf:instances>
                     <instances>
-                        <equation>
-                            <screen>0</screen>
-                            <screenbuffer>0</screenbuffer>
-                            <first>0</first>
-                            <second>0</second>
-                            <memory>12</memory>
-                            <result/>
-                        </equation>
+                        <nested111>
+                            <nested112>
+                                <first>111</first>
+                                <second>112</second>
+                                <third>113</third>
+                                <fourth>114</fourth>
+                            </nested112>
+                        </nested111>
+                        <nested121>
+                            <nested122>
+                                <first>121</first>
+                                <second>122</second>
+                                <third>123</third>
+                                <fourth>124</fourth>
+                            </nested122>
+                        </nested121>
+                        <nested211>
+                            <nested212>
+                                <first>211</first>
+                                <second>212</second>
+                                <third>213</third>
+                                <fourth>214</fourth>
+                            </nested212>
+                        </nested211>
+                        <nested221>
+                            <nested222>
+                                <first>221</first>
+                                <second>222</second>
+                                <third>223</third>
+                                <fourth>224</fourth>
+                            </nested222>
+                        </nested221>
                     </instances>
                 </xxf:instances>
                 <xxf:divs/>

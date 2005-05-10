@@ -17,7 +17,6 @@ import org.apache.commons.lang.StringUtils;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsElementContext;
@@ -29,9 +28,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -41,8 +38,6 @@ import java.util.Map;
  * - Adding annotations: type, invalid-bind-ids, invalid-instance-ids
  */
 public class XFormsElement {
-
-    private static final int BUFFER_SIZE = 1024;
 
     /**
      * Controls that contain the referenced value (which means that we won't
@@ -111,7 +106,7 @@ public class XFormsElement {
                 org.orbeon.oxf.xforms.InstanceData currentNodeInstanceData = XFormsUtils.getLocalInstanceData(context.getCurrentSingleNode());
 
                 int typeCode = currentNodeInstanceData.getType().get();
-                if(typeCode != 0)
+                if (typeCode != 0)
                     addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME,
                             StandardNames.getPrefix(typeCode) + ":" + StandardNames.getLocalName(typeCode));
                 addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
@@ -131,11 +126,11 @@ public class XFormsElement {
                         id = SecureUtils.encrypt(context.getPipelineContext(), context.getEncryptionPassword(), id);
                     addExtensionAttribute(newAttributes, "name", "$node^" + id);
                     addExtensionAttribute(newAttributes, "value", context.getRefValue());
-                } else  if (ACTION_CONTROLS.containsKey(localname)) {
+                } else if (ACTION_CONTROLS.containsKey(localname)) {
                     addExtensionAttribute(newAttributes, "value", context.getRefValue());
                 }
 
-                if(!positionPresent) {
+                if (!positionPresent) {
                     // Get ids of node
                     StringBuffer ids = new StringBuffer();
                     boolean first = true;
@@ -178,28 +173,20 @@ public class XFormsElement {
                 addExtensionAttribute(newAttributes, "value-value", (String) value);
             }
             // Linking attribute: load content to xxforms:src-value
-            if(attributes.getIndex("", "src") != -1 && LINKING_CONTROLS.containsKey(localname)) {
+            if (attributes.getIndex("", "src") != -1 && LINKING_CONTROLS.containsKey(localname)) {
                 try {
                     final String val;
                     String src = attributes.getValue("src");
-                    if ( "orbeon:xforms:schema:errors".equals( src ) ) {
+                    if ("orbeon:xforms:schema:errors".equals(src)) {
                         final org.dom4j.Node nd = context.getCurrentSingleNode();
-                        final org.orbeon.oxf.xforms.InstanceData instDat = XFormsUtils.getLocalInstanceData( nd );
+                        final org.orbeon.oxf.xforms.InstanceData instDat = XFormsUtils.getLocalInstanceData(nd);
                         final java.util.Iterator itr = instDat.getSchemaErrorsMsgs();
-                        val = StringUtils.join( itr, "\n" );
+                        val = StringUtils.join(itr, "\n");
                     } else {
-                        URL url = URLFactory.createURL(src);
+                        val = XFormsUtils.retrieveSrcValue(src);
 
-                        // Load file into buffer
-                        InputStreamReader stream = new InputStreamReader(url.openStream());
-                        StringBuffer value = new StringBuffer();
-                        char[] buff = new char[BUFFER_SIZE];
-                        int c = 0;
-                        while( (c = stream.read(buff, 0, BUFFER_SIZE-1)) != -1)
-                            value.append(buff, 0, c);
-                        val = value.toString();
                     }
-                    addExtensionAttribute(newAttributes, "src-value", val );
+                    addExtensionAttribute(newAttributes, "src-value", val);
                 } catch (MalformedURLException e) {
                     throw new OXFException(e);
                 } catch (IOException ioe) {

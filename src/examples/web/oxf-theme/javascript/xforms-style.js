@@ -56,21 +56,25 @@ function xformsUpdateStyle(element) {
             }
             
             if (className == "xforms-help") {
-                var showHelp = function(event) {
-                    tt_Show(event, "id", false, 0, false, false, ttOffsetX, ttOffsetY, false, false, ttTemp);
-                };
-                var hideHelp = function() {
-                    tt_Hide();
-                };
-                if (element.addEventListener)  {
-                    element.addEventListener("mouseover", showHelp, false);
-                    element.addEventListener("mouseout", hideHelp, false);
-                    
-                } else {
-                    element.attachEvent("onmouseover", hideHelp);
-                    element.attachEvent("onmouseout", hideHelp);
+                if (!element.divId) {
+                    element.divId = element.id + "-div";
+                    var divHTML = tt_Htm(this, element.divId, element.firstChild.data);
+                    var container = element.cloneNode(true);
+                    container.innerHTML = divHTML;
+                    document.body.appendChild(container.firstChild);
                 }
+
+                
+                xformsAddEventListener(element, "mouseover", showHelp);
+                xformsAddEventListener(element, "mouseout", function() {
+                    tt_Hide();
+                });
             }
         }
     }
 }
+
+                function showHelp(event) {
+                    tt_Show(event, getEventTarget(event).divId, false, 0, false, false, 
+                        ttOffsetX, ttOffsetY, false, false, ttTemp);
+                }

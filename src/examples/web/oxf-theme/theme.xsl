@@ -86,7 +86,6 @@
     <xsl:template match="xhtml:form">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
-            <!-- XXX: Generate hidden section with error.gif, hidden -->
         </xsl:copy>
     </xsl:template>
     

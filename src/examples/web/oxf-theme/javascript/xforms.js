@@ -121,6 +121,9 @@ function xformsHandleClick(event) {
  */
 function xformsPageLoaded() {
 
+    // Initialize tooltip library
+    tt_init();
+
     // Initialize XForms server URL
     var scripts = document.getElementsByTagName("script");
     for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {

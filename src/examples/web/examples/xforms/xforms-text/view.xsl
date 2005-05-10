@@ -86,7 +86,6 @@
                 <xforms:input ref="date2">
                     <xforms:label xhtml:class="fixed-width">Second date:</xforms:label>
                 </xforms:input>
-                <xhtml:script>document.write(tt_Htm(this, "id", "text text text text text text text"))</xhtml:script>
             </p>
             <p>
                 <xforms:input ref="time">

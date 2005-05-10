@@ -511,7 +511,7 @@ ul {
     white-space: no-wrap;
     padding-left: 20px;
     width: 20px;
-    height: 20px;
+    height: 22px;
     overflow: hidden;
     font-size: 10px;
     color: black;

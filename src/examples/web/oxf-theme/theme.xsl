@@ -96,6 +96,17 @@
         </xhtml:textarea>
     </xsl:template>
     
+    <xsl:template match="xhtml:span[tokenize(@class, ' ') = 'xforms-group' and xhtml:label]">
+        <xhtml:fieldset>
+            <xsl:apply-templates select="@*"/>
+            <xhtml:legend>
+                <xsl:apply-templates select="xhtml:label/@*"/>
+                <xsl:value-of select="xhtml:label"/>
+            </xhtml:legend>
+            <xsl:apply-templates select="node() except xhtml:label"/>
+        </xhtml:fieldset>
+    </xsl:template>
+    
     <xsl:template name="ignore-first-empty-lines">
         <xsl:param name="text"/>
         <xsl:variable name="first-line" select="substring-before($text, '&#xA;')"/>

@@ -32,6 +32,22 @@ function xformsCreateElementNS(namespaceURI, qname) {
     return request.documentElement;
 }
 
+function xformsAddEventListener(target, eventName, handler) {
+    if (target.addEventListener) {
+        target.addEventListener(eventName, handler, false);
+    } else {
+        target.attachEvent("on" + eventName, handler);
+    }
+}
+
+function xformsRemoveEventListener(target, eventName, handler) {
+    if (target.removeEventListener) {
+        target.removeEventListener(eventName, handler, false);
+    } else {
+        target.detachEvent("on" + eventName, handler);
+    }
+}
+
 function xformsFireEvent(target, eventName, value) {
 
     // Build request
@@ -64,13 +80,26 @@ function xformsFireEvent(target, eventName, value) {
     document.xformsNextRequests.push(eventFiredElement.ownerDocument);
     document.xformsNextForms.push(target.form);
     xformsExecuteNextRequest();
-
+    
     return false;
 }
 
 function getEventTarget(event) {
     event = event ? event : window.event;
     return event.srcElement ? event.srcElement : event.target;
+}
+
+// Event handlers
+function xformsHandleChange(event) {
+    var target = getEventTarget(event);
+    if (target.value != target.previousValue) {
+        target.previousValue = target.value;
+        xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value);
+    }
+}
+
+function xformsHandleClick(event) {
+    xformsFireEvent(getEventTarget(event), "DOMActivate", null);
 }
 
 /**
@@ -103,16 +132,8 @@ function xformsPageLoaded() {
         }
     }
     
-    // Event handlers
-    var handleChange = function(event) {
-        var target = getEventTarget(event);
-        xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value);
-    };
-    var handleClick = function(event) {
-        xformsFireEvent(getEventTarget(event), "DOMActivate", null);
-    }
-
     // Gather all potential form controls
+    document.xformsChangeEventElements = new Array();
     var spans = document.getElementsByTagName("span");
     var buttons = document.getElementsByTagName("button");
     var inputs = document.getElementsByTagName("input");
@@ -132,31 +153,23 @@ function xformsPageLoaded() {
 
         // Check that this is an XForms control. Otherwise continue.
         var classes = control.className.split(" ");
-        var isXFormsControl = false;
+        var isXFormsElement = false;
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
             var className = classes[classIndex];
-            if (className == "xforms-control") {
-                isXFormsControl = true;
+            if (className.indexOf("xforms-") == 0) {
+                isXFormsElement = true;
                 break;
             }
         }
-        if (!isXFormsControl) continue;
+        if (!isXFormsElement) continue;
     
         // Handle value change
-        if (control.addEventListener) {
-            control.addEventListener("change", handleChange, false);
-        } else {
-            control.attachEvent("onchange", handleChange);
-        }
+        control.previousValue = null;
+        xformsAddEventListener(control, "change", xformsHandleChange);
         
         // Handle click
-        if (control.tagName == "BUTTON") {
-            if (control.addEventListener) {
-                control.addEventListener("click", handleClick, false);
-            } else {
-                control.attachEvent("onclick", handleClick);
-            }
-        }
+        if (control.tagName == "BUTTON") 
+            xformsAddEventListener(control, "click", xformsHandleClick);
 
         // Add style to element
         xformsUpdateStyle(control);
@@ -175,12 +188,14 @@ function xformsPageLoaded() {
         var elements = form.elements;
         for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
             var element = elements[elementIndex];
-            if (element.name.indexOf("$models") != -1)
-                form.xformsModels = element;
-            if (element.name.indexOf("$controls") != -1)
-                form.xformsControls = element;
-            if (element.name.indexOf("$instances") != -1)
-                form.xformsInstances = element;
+            if (element.name) {
+                if (element.name.indexOf("$models") != -1)
+                    form.xformsModels = element;
+                if (element.name.indexOf("$controls") != -1)
+                    form.xformsControls = element;
+                if (element.name.indexOf("$instances") != -1)
+                    form.xformsInstances = element;
+            }
         }
     }
     
@@ -203,9 +218,8 @@ function xformsGetLocalName(element) {
 
 function xformsHandleResponse() {
     if (document.xformsXMLHttpRequest.readyState == 4) {
-        //alert(document.xformsXMLHttpRequest.responseText);
-        //alert(Sarissa.serialize(document.xformsXMLHttpRequest.responseXML));
         var responseRoot = document.xformsXMLHttpRequest.responseXML.documentElement;
+        
         for (var i = 0; i < responseRoot.childNodes.length; i++) {
         
             // Update control values
@@ -218,7 +232,9 @@ function xformsHandleResponse() {
                         var controlValue = controlElement.getAttribute("value");
                         var documentElement = document.getElementById(controlId);
                         if (typeof(documentElement.value) == "string") {
-                            documentElement.value = controlValue;
+                            if (documentElement.value != controlValue) {
+                                documentElement.value = controlValue;
+                            }
                         } else {
                             while(documentElement.childNodes.length > 0)
                                 documentElement.removeChild(documentElement.firstChild);
@@ -271,7 +287,6 @@ function xformsExecuteNextRequest() {
             document.xformsXMLHttpRequest = new XMLHttpRequest();
             document.xformsXMLHttpRequest.open("POST", XFORMS_SERVER_URL, true);
             document.xformsXMLHttpRequest.onreadystatechange = xformsHandleResponse;
-            //alert(Sarissa.serialize(request));
             document.xformsXMLHttpRequest.send(request);
             foundRequest = true;
         }
@@ -279,8 +294,4 @@ function xformsExecuteNextRequest() {
 }
 
 // Run xformsPageLoaded when the browser has finished loading the page
-if (window.addEventListener) {
-    window.addEventListener("load", xformsPageLoaded, false);
-} else {
-    window.attachEvent("onload", xformsPageLoaded);
-}
+xformsAddEventListener(window, "load", xformsPageLoaded);

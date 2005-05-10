@@ -440,8 +440,9 @@ ul {
     padding: 10px
 }
 
-.rd {margin-left: 0px; margin-top: 0px; margin-bottom: 0px}
-.id {margin-left: 2em; margin-top: 0px; margin-bottom: 0px}
+.rd {margin-left: 0px; margin-top: 0px; margin-bottom: 0px; display: block; }
+.cd {margin-left: 0px; margin-top: 0px; margin-bottom: 0px; display: block; }
+.id {margin-left: 2em; margin-top: 0px; margin-bottom: 0px; display: block; }
 .x {cursor: pointer; cursor:hand}
 .c {}
 .t {}
@@ -504,14 +505,19 @@ ul {
 .xforms-help {
     background-image: url(../images/help.gif);
     background-repeat: no-repeat;
-    background-position: left;
+    background-position: top left;
     display: -moz-inline-box;
     display: inline-block;  
-    height: 20px;
-    color: white;
-    font-size:0;
-    margin-left: .5em;
+    white-space: no-wrap;
     padding-left: 20px;
+    width: 20px;
+    height: 20px;
+    overflow: hidden;
+    font-size: 10px;
+    color: black;
+    line-height: 10px;
+    margin-left: 1em;
+    vertical-align: middle;
 }
     
 <!-- Styles used by xforms-to-xhtml.xsl -->

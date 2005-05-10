@@ -31,11 +31,17 @@
                     <label>Hello, World!</label>
                     <date/>
                     <date2/>
-                    <time/>            
+                    <time/>     
+                    <gaga>
+                        <b>Hey</b>
+                    </gaga>
                 </form>
             </xforms:instance>
             <xforms:instance id="formatted">
-                <formated-instance>&lt;i>Note&lt;/i>: gaga.</formated-instance>
+                <formated-instance>
+                    &lt;span>
+                    &lt;/span>
+                </formated-instance>
             </xforms:instance>                
             <xforms:bind nodeset="/form/text" constraint="number(.) >= 0"/>
             <xforms:bind nodeset="/form/secret" constraint="string(.) = '42'"/>
@@ -44,7 +50,8 @@
             <xforms:bind nodeset="/form/date2" type="xs:date"/>
             <xforms:bind nodeset="/form/time" type="xs:time"/>
             <xforms:bind nodeset="instance('formatted')/formated-instance" 
-                calculate="saxon:serialize(xxforms:call-xpl('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'xml')"/>
+                calculate="saxon:serialize(xxforms:call-xpl
+                    ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -91,10 +98,11 @@
                     <xforms:label>Submit</xforms:label>
                 </xforms:submit>
             </p>
-            <p>
-<!--                <xforms:output ref="instance('formatted')/formated-instance" xhtml:class="xforms-xhtml">-->
-<!--                    <xforms:label xhtml:class="fixed-width">XForms instance:</xforms:label>-->
-<!--                </xforms:output>-->
+            <p style="margin-top: 2em">
+                <xforms:group>
+                    <xforms:label>XForms instance</xforms:label>
+                    <xforms:output ref="instance('formatted')/formated-instance" xhtml:class="xforms-xhtml"/>
+                </xforms:group>
             </p>
         </xforms:group>
     </xhtml:body>

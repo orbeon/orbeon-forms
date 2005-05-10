@@ -27,6 +27,51 @@
                             <data type="string"/>
                         </attribute>
                         <attribute name="value"/>
+
+                        <optional>
+                            <attribute name="hint"/>
+                        </optional>
+                        <optional>
+                            <attribute name="alert"/>
+                        </optional>
+                        <optional>
+                            <attribute name="label"/>
+                        </optional>
+                        <optional>
+                            <attribute name="help"/>
+                        </optional>
+                        <optional>
+                            <attribute name="readonly">
+                                <choice>
+                                    <value>true</value>
+                                    <value>false</value>
+                                </choice>
+                            </attribute>
+                        </optional>
+                        <optional>
+                            <attribute name="required">
+                                <choice>
+                                    <value>true</value>
+                                    <value>false</value>
+                                </choice>
+                            </attribute>
+                        </optional>
+                        <optional>
+                            <attribute name="relevant">
+                                <choice>
+                                    <value>true</value>
+                                    <value>false</value>
+                                </choice>
+                            </attribute>
+                        </optional>
+                        <optional>
+                            <attribute name="valid">
+                                <choice>
+                                    <value>true</value>
+                                    <value>false</value>
+                                </choice>
+                            </attribute>
+                        </optional>
                     </element>
                 </zeroOrMore>
             </element>

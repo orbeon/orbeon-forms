@@ -88,7 +88,7 @@ public class XFormsInstance {
         XFormsUtils.fillNode(currentNode, valueToSet);
     }
 
-    public String getValueForNode(Node currentNode) {
+    public static String getValueForNode(Node currentNode) {
         if (currentNode instanceof Element) {
             Element elementnode = (Element) currentNode;
             return elementnode.getStringValue();

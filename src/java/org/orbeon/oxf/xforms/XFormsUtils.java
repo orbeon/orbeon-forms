@@ -66,6 +66,9 @@ public class XFormsUtils {
         }
     }
 
+    /**
+     * Return XForms instance data for the given node, null if not available. 
+     */
     public static InstanceData getInstanceData(Node node) {
         return node instanceof Element
             ? (InstanceData) ((Element) node).getData()

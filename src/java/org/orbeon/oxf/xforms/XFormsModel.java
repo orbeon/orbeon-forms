@@ -440,7 +440,7 @@ public class XFormsModel implements EventTarget, Cloneable {
     }
 
     public XFormsInstance getInstance(String instanceId) {
-        return (XFormsInstance) (instanceId == null || "".equals(modelId) ? instances.get(0) : instancesMap.get(instanceId));
+        return (XFormsInstance) (instanceId == null || "".equals(instanceId) ? instances.get(0) : instancesMap.get(instanceId));
     }
 
     /**
@@ -453,10 +453,6 @@ public class XFormsModel implements EventTarget, Cloneable {
     /**
      * Set an instance document for this model. There may be multiple instance documents. Each
      * instance document may have an associated id that identifies it.
-     *
-     * @param pipelineContext
-     * @param instanceId
-     * @param instanceDocument
      */
     public void setInstanceDocument(PipelineContext pipelineContext, int instancePosition, Document instanceDocument) {
         // Initialize containers if needed

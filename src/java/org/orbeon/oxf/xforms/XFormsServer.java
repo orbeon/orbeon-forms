@@ -16,6 +16,7 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.QName;
+import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
@@ -109,7 +110,11 @@ public class XFormsServer extends ProcessorImpl {
 
                             // Get current control value
                             XFormsInstance instance = xFormsControls.getCurrentInstance();
-                            String controlValue = instance.getValueForNode(xFormsControls.getCurrentSingleNode());
+                            Node currentNode = xFormsControls.getCurrentSingleNode();
+                            InstanceData instanceData = XFormsUtils.getInstanceData(currentNode);
+
+
+                            String controlValue = XFormsInstance.getValueForNode(currentNode);
 
                             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", new String[]{"id", controlId, "value", controlValue});
                         }

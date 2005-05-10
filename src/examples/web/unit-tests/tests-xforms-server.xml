@@ -443,7 +443,7 @@
         </output>
     </test>
 
-    <test description="Test for call-xpl() function" name="oxf:pipeline" only="true">
+    <test description="Test for call-xpl() function" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                 <p:param name="response" type="output"/>

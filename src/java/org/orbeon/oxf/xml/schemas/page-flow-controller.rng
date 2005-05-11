@@ -139,6 +139,9 @@
     </define>
     <define name="resultContent">
         <optional>
+            <attribute name="trace"/>
+        </optional>
+        <optional>
             <attribute name="id"/>
         </optional>
         <optional>

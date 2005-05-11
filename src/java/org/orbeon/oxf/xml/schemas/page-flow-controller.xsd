@@ -47,6 +47,7 @@
                                                         <attribute name="page" type="string" use="optional"/>
                                                         <attribute name="id" type="string" use="optional"/>
                                                         <attribute name="when" type="string" use="optional" default="true()"/>
+                                                        <attribute name="trace" type="string" use="optional"/>
                                                         <attribute name="instance-passing" type="c:instance-passing-type" use="optional"/>
                                                      </extension> 
                                                  </complexContent> 

@@ -804,6 +804,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         final boolean useCurrentPageInstance = resultPageId == null || otherXForms == null;
         final ASTOutput instanceToUpdate = useCurrentPageInstance ? paramedInstance[0]
                 : new ASTOutput("data", "other-page-instance");
+
         if (!useCurrentPageInstance) {
             final ASTOutput otherPageXFormsModel = new ASTOutput("data", "other-page-model");
             when.addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, otherXForms) {{
@@ -843,13 +844,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             }
 
             // Run XUpdate
+            final String resultTraceAttribute = resultElement.attributeValue("trace");
             when.addStatement(new ASTProcessorCall(XMLConstants.XUPDATE_PROCESSOR_QNAME) {{
                 addInput(new ASTInput("config", xuCfg));
                 addInput(new ASTInput("data", new ASTHrefId(instanceToUpdate)));
                 addInput(new ASTInput("instance", new ASTHrefId(paramedInstance[0])));
                 if (actionData != null)
                     addInput(new ASTInput("action", new ASTHrefId(actionData)));
-                addOutput(new ASTOutput("data", internalXUpdatedInstance));
+                addOutput(new ASTOutput("data", internalXUpdatedInstance) {{ setDebug(resultTraceAttribute);}});
             }});
         }
 

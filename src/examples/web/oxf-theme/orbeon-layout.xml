@@ -486,8 +486,9 @@ ul {
     background-image: url(../images/greybracket.gif);
     background-repeat: no-repeat;
     background-position: left center;       
-    margin-left: 1em;
+    margin-left: .5em;
     padding-left: 1.5em;
+    vertical-align: middle;
 }
 
 .xforms-hint-active {
@@ -502,6 +503,28 @@ ul {
     padding-left: 1.5em;
 }
 
+.xforms-alert-inactive {
+    display: none;
+}
+    
+.xforms-alert-active {
+    background-image: url(../images/error.gif);
+    background-repeat: no-repeat;
+    background-position: top left;
+    display: -moz-inline-box;
+    display: inline-block;  
+    white-space: no-wrap;
+    padding-left: 20px;
+    width: 18px;
+    height: 18px;
+    overflow: hidden;
+    font-size: 10px;
+    color: black;
+    line-height: 10px;
+    margin-left: .5em;
+    vertical-align: middle;
+}
+    
 .xforms-help {
     background-image: url(../images/help.gif);
     background-repeat: no-repeat;
@@ -516,7 +539,7 @@ ul {
     font-size: 10px;
     color: black;
     line-height: 10px;
-    margin-left: 1em;
+    margin-left: .5em;
     vertical-align: middle;
 }
     

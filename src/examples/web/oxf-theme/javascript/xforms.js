@@ -157,12 +157,13 @@ function xformsPageLoaded() {
         // Check that this is an XForms control. Otherwise continue.
         var classes = control.className.split(" ");
         var isXFormsElement = false;
+        var isXFormsAlert = false;
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
             var className = classes[classIndex];
-            if (className.indexOf("xforms-") == 0) {
+            if (className.indexOf("xforms-") == 0)
                 isXFormsElement = true;
-                break;
-            }
+            if (className.indexOf("xforms-alert") == 0)
+                isXFormsAlert = true;
         }
         if (!isXFormsElement) continue;
     
@@ -173,6 +174,10 @@ function xformsPageLoaded() {
         // Handle click
         if (control.tagName == "BUTTON") 
             xformsAddEventListener(control, "click", xformsHandleClick);
+
+        // If alert, store reference in control element to this alert element
+        if (isXFormsAlert) 
+            document.getElementById(control.htmlFor).alertElement = control;
 
         // Add style to element
         xformsUpdateStyle(control);
@@ -225,7 +230,7 @@ function xformsHandleResponse() {
         
         for (var i = 0; i < responseRoot.childNodes.length; i++) {
         
-            // Update control values
+            // Update controls
             if (xformsGetLocalName(responseRoot.childNodes[i]) == "control-values") {
                 var controlValuesElement = responseRoot.childNodes[i];
                 for (var j = 0; j < controlValuesElement.childNodes.length; j++) {
@@ -234,6 +239,8 @@ function xformsHandleResponse() {
                         var controlId = controlElement.getAttribute("id");
                         var controlValue = controlElement.getAttribute("value");
                         var documentElement = document.getElementById(controlId);
+                        
+                        // Update value
                         if (typeof(documentElement.value) == "string") {
                             if (documentElement.value != controlValue) {
                                 documentElement.value = controlValue;
@@ -244,6 +251,11 @@ function xformsHandleResponse() {
                             documentElement.appendChild
                                 (documentElement.ownerDocument.createTextNode(controlValue));
                         }
+                        
+                        // Update validity
+                        documentElement.valid = controlElement.getAttribute("valid") != "false";
+                        
+                        // Update style
                         xformsUpdateStyle(documentElement);
                     }
                 }

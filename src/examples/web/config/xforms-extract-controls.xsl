@@ -38,8 +38,8 @@
     </xsl:template>
 
     <xsl:template match="text()" priority="1">
-        <xsl:if test="parent::xforms:*">
-            <xsl:value-of select="node()"/>
+        <xsl:if test="parent::xforms:alert | parent::xforms:hint | parent::xforms:help | parent::xforms:label">
+            <xsl:value-of select="."/>
         </xsl:if>
     </xsl:template>
     

@@ -18,11 +18,6 @@ function xformsUpdateStyle(element) {
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
             var className = classes[classIndex];
             
-            if (className == "xforms-valid") {
-                //alert(element.tagName);
-                // Copy hidden section at top of form
-            }
-            
             if (className == "xforms-xhtml") {
                 element.innerHTML = element.firstChild.data;
                 element.style.display = "inline";
@@ -65,16 +60,19 @@ function xformsUpdateStyle(element) {
                 }
 
                 
-                xformsAddEventListener(element, "mouseover", showHelp);
+                xformsAddEventListener(element, "mouseover", function(event) {
+                    tt_Show(event, getEventTarget(event).divId, false, 0, false, false, 
+                        ttOffsetX, ttOffsetY, false, false, ttTemp);
+                });
                 xformsAddEventListener(element, "mouseout", function() {
                     tt_Hide();
                 });
             }
+            
+            if (element.alertElement) {
+                element.alertElement.className = element.valid ? "xforms-alert-inactive" 
+                    : "xforms-alert-active";
+            }
         }
     }
 }
-
-                function showHelp(event) {
-                    tt_Show(event, getEventTarget(event).divId, false, 0, false, false, 
-                        ttOffsetX, ttOffsetY, false, false, ttTemp);
-                }

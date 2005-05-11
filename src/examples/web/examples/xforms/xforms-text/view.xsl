@@ -43,7 +43,9 @@
                     &lt;/span>
                 </formated-instance>
             </xforms:instance>                
-            <xforms:bind nodeset="/form/text" constraint="number(.) >= 0"/>
+            <xforms:bind nodeset="form">
+                <xforms:bind nodeset="text" constraint="number(.) >= 0"/>
+            </xforms:bind>
             <xforms:bind nodeset="/form/secret" constraint="string(.) = '42'"/>
             <xforms:bind nodeset="/form/textarea" constraint="string-length(.) > 10"/>
             <xforms:bind nodeset="/form/date" type="xs:date"/>
@@ -99,7 +101,7 @@
             </p>
             <p style="margin-top: 2em">
                 <xforms:group>
-                    <xforms:label>XForms instance</xforms:label>
+<!--                    <xforms:label>XForms instance</xforms:label>-->
                     <xforms:output ref="instance('formatted')" xhtml:class="xforms-xhtml"/>
                 </xforms:group>
             </p>

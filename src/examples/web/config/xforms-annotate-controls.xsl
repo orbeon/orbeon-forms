@@ -25,11 +25,20 @@
     <xsl:template match="xforms:*">
         <xsl:copy>
             <xsl:attribute name="id">
-                <xsl:value-of select="if (@id) then @id else concat('xforms-element-', count(ancestor::xforms:* | preceding::xforms:*))"/>
+                <xsl:value-of select="if (@id) then @id else xxforms:generate-id(.)"/>
             </xsl:attribute>
             <xsl:copy-of select="@*"/>
+            <xsl:if test="local-name() = ('input', 'secret', 'textarea') and not(xforms:alert)">
+                <xforms:alert id="{concat(xxforms:generate-id(.), '-alert')}"/>
+            </xsl:if>
             <xsl:apply-templates/>
         </xsl:copy>
     </xsl:template>
+
+    <xsl:function name="xxforms:generate-id" as="xs:string">
+        <xsl:param name="current" as="element()"/>
+        <xsl:value-of select="concat('xforms-element-', 
+            count($current/ancestor::xforms:* | $current/preceding::xforms:*))"/>
+    </xsl:function>
     
 </xsl:stylesheet>

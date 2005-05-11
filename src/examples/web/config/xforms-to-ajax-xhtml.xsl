@@ -49,13 +49,24 @@
     
     <!-- - - - - - - XForms controls - - - - - - -->
     
-    <xsl:template match="xforms:output">
+    <xsl:template match="xforms:output | xforms:trigger | xforms:input 
+            | xforms:secret | xforms:textarea" priority="2">
         <xsl:apply-templates select="xforms:label"/>
+        <xsl:next-match/>
+        <xhtml:label for="{@id}">
+            <xsl:copy-of select="xxforms:copy-attributes(xforms:alert, concat('xforms-alert-', 
+                if (xxforms:control(@id)/@valid = 'false') then 'active' else 'inactive'))"/>
+            <xsl:value-of select="xxforms:control(@id)/@alert"/>
+        </xhtml:label>
+        <xsl:apply-templates select="xforms:help"/>
+        <xsl:apply-templates select="xforms:hint"/>
+    </xsl:template>
+    
+    <xsl:template match="xforms:output">
         <xhtml:span>
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
-            <xsl:value-of select="xxforms:control-value(@id)"/>
+            <xsl:value-of select="xxforms:control(@id)/@value"/>
         </xhtml:span>
-        <xsl:apply-templates select="xforms:hint | xforms:help"/>
     </xsl:template>
     
     <xsl:template match="xforms:trigger">
@@ -63,38 +74,34 @@
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
             <xsl:value-of select="xforms:label"/>
         </xhtml:button>
-        <xsl:apply-templates select="xforms:hint | xforms:help"/>
     </xsl:template>
     
     <xsl:template match="xforms:input">
-        <xsl:apply-templates select="xforms:label"/>
-        <xhtml:input type="text" name="{@id}" value="{xxforms:control-value(@id)}">
+        <xhtml:input type="text" name="{@id}" value="{xxforms:control(@id)/@value}">
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
         </xhtml:input>
-        <xsl:apply-templates select="xforms:hint | xforms:help"/>
     </xsl:template>
 
     <xsl:template match="xforms:secret">
-        <xsl:apply-templates select="xforms:label"/>
-        <xhtml:input type="password" name="{@id}" value="{xxforms:control-value(@id)}">
+        <xhtml:input type="password" name="{@id}" value="{xxforms:control(@id)/@value}">
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
         </xhtml:input>
-        <xsl:apply-templates select="xforms:hint | xforms:help"/>
     </xsl:template>
 
     <xsl:template match="xforms:textarea">
-        <xsl:apply-templates select="xforms:label"/>
         <xhtml:textarea name="{@id}">
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
-            <xsl:value-of select="xxforms:control-value(@id)"/>
+            <xsl:value-of select="xxforms:control(@id)/@value"/>
         </xhtml:textarea>
-        <xsl:apply-templates select="xforms:hint | xforms:help"/>
     </xsl:template>
     
-    <xsl:template match="xforms:hint | xforms:label | xforms:help">
+    <xsl:template match="xforms:label | xforms:hint | xforms:help">
         <xhtml:label for="{../@id}">
             <xsl:copy-of select="xxforms:copy-attributes(., concat('xforms-', local-name()))"/>
-            <xsl:value-of select="."/>
+            <xsl:variable name="value-element" as="element()" select="xxforms:control(../@id)"/>
+            <xsl:value-of select="if (local-name() = 'label') then $value-element/@label
+                else if (local-name() = 'hint') then $value-element/@hint
+                else $value-element/@help"/>
         </xhtml:label>
     </xsl:template>
 
@@ -122,7 +129,7 @@
     <xsl:template match="xforms:*"/>
     
     <xsl:function name="xxforms:copy-attributes">
-        <xsl:param name="element" as="element()"/>
+        <xsl:param name="element" as="element()?"/>
         <xsl:param name="classes" as="xs:string*"/>
         <xsl:copy-of select="$element/@id"/>
         <xsl:variable name="class" as="xs:string" select="string-join
@@ -134,11 +141,9 @@
         </xsl:for-each>
     </xsl:function>
     
-    <xsl:function name="xxforms:control-value" as="xs:string">
+    <xsl:function name="xxforms:control" as="element()">
         <xsl:param name="id" as="xs:string"/>
-        <xsl:variable name="value-element" as="element()" 
-            select="$response/xxforms:control-values/xxforms:control[@id = $id]"/>
-        <xsl:value-of select="$value-element/@value"/>
+        <xsl:sequence select="$response/xxforms:control-values/xxforms:control[@id = $id]"/>
     </xsl:function>
     
 </xsl:stylesheet>

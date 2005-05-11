@@ -96,14 +96,6 @@
     <!-- XForms Server -->
     <page path-info="/xforms-server*" model="/xforms/xforms-server.xpl"/>
 
-    <!-- TEST -->
-    <page path-info="/metadat*" model="/examples/erik/metadat/page-flow.xpl"/>
-
-    <page path-info="/epilogues/s1*" model="/examples/erik/emil/s1/page-flow.xpl"/>
-    <page path-info="/epilogues/s2*" model="/examples/erik/emil/s2/page-flow.xpl"/>
-
-    <page path-info="/xtech*" model="/examples/erik/xtech/model.xpl" view="/examples/erik/xtech/docbook/html/docbook.xsl"/>
-
     <!-- "Not Found" page displayed when no page matches the request URL -->
     <page id="not-found" path-info="/not-found" view="/config/not-found.xml"/>
 

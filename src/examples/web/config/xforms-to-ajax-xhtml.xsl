@@ -133,11 +133,18 @@
     <xsl:function name="xxforms:copy-attributes">
         <xsl:param name="element" as="element()?"/>
         <xsl:param name="classes" as="xs:string*"/>
-        <xsl:copy-of select="$element/@id"/>
+        <!-- Copy attributes with no namespaces -->
+        <xsl:copy-of select="$element/@id | $element/@accesskey | $element/@tabindex | $element/@style"/>
+        <!-- Convert navindex to tabindex -->
+        <xsl:if test="$element/@navindex">
+            <xsl:attribute name="tabindex" select="$element/@navindex"/>
+        </xsl:if>
+        <!-- Copy class attribute, both in xhtml namespace and no namespace -->
         <xsl:variable name="class" as="xs:string" select="string-join
-            ((if ($element/@xhtml:class) then $element/@xhtml:class else (),
-            $classes), ' ')"/>
+            (($element/@xhtml:class, $element/@class, $classes, 
+            if ($element/@incremental = 'true') then 'xforms-incremental' else ()), ' ')"/>
         <xsl:attribute name="class" select="$class"/>
+        <!-- Copy attributes in the xhtml namespace to no namespace -->
         <xsl:for-each select="$element/@xhtml:* except $element/@xhtml:class">
             <xsl:attribute name="{local-name()}" select="."/>
         </xsl:for-each>

@@ -284,7 +284,7 @@ a:hover {
     background-color: white;
 }
 
-.maincontent b {
+.maincontent b, .bold {
     color: &dark-color;;
 }
 
@@ -468,6 +468,17 @@ ul {
     display: inline-block;  
     width: expression('9em'); /* Min-width for IE6 */
     min-width: 9em;
+}
+    
+.wide-textarea {
+    height: 6em;
+    width:100%;
+}
+
+.wide-text {
+    display: block;
+    background: #FFFFCC;
+    height: 6em;
 }
     
 .xforms-xhtml {

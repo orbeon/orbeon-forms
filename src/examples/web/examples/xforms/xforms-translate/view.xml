@@ -1,0 +1,58 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+    <xhtml:head>
+        <xhtml:title>Translate This</xhtml:title>
+        <xforms:model>
+            <xforms:instance>
+                <translation>
+                    <source/>
+                    <target/>
+                </translation>
+            </xforms:instance>
+            <!-- FIXME: We shouldn't need string() here -->
+            <xforms:bind nodeset="/translation/target" 
+                calculate="string(xxforms:call-xpl('oxf:/examples/xforms/xforms-translate/translate.xpl', 
+                'data', /translation/source, 'data'))"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <p>
+            Try typing English text below and watch the second text area getting updated with 
+            the French translation of your text.
+        </p>
+        <xforms:group ref="translation" xhtml:style="display: block; margin-top: 2em; margin-bottom: 2em">
+            <p>
+                <xforms:textarea ref="source" class="wide-textarea" incremental="true">
+                    <xforms:label class="bold">English:</xforms:label>
+                </xforms:textarea>
+            </p>
+            <p>
+                <xforms:output ref="target" class="wide-text">
+                    <xforms:label class="bold">French:</xforms:label>
+                </xforms:output>
+            </p>
+        </xforms:group>
+        <p>
+            <a href="http://www.google.com/">
+                <img src="/images/powered_by_google_135x35.gif" border="0"/>
+            </a>
+        </p>
+        <p id="debug"/>
+    </xhtml:body>
+</xhtml:html>

@@ -48,7 +48,11 @@ function xformsRemoveEventListener(target, eventName, handler) {
     }
 }
 
-function xformsFireEvent(target, eventName, value) {
+function log(text) {
+    document.getElementById("debug").innerHTML += text + " | ";
+}
+
+function xformsFireEvent(target, eventName, value, incremental) {
 
     // Build request
     var eventFiredElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event-request");
@@ -75,10 +79,17 @@ function xformsFireEvent(target, eventName, value) {
     var instancesElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:instances");
     instancesElement.appendChild(instancesElement.ownerDocument.createTextNode(target.form.xformsInstances.value));
     eventFiredElement.appendChild(instancesElement);    
-    
+
+    // If last request added to queue is incremental, remove it    
+    if (document.xformsLastRequestIsIncremental && document.xformsNextRequests.length > 0) {
+        document.xformsNextRequests.pop();
+        document.xformsNextTargets.pop();
+    }
+
     // Set as next request to execute and trigger execution
+    document.xformsLastRequestIsIncremental = incremental;
     document.xformsNextRequests.push(eventFiredElement.ownerDocument);
-    document.xformsNextForms.push(target.form);
+    document.xformsNextTargets.push(target);
     xformsExecuteNextRequest();
     
     return false;
@@ -87,19 +98,6 @@ function xformsFireEvent(target, eventName, value) {
 function getEventTarget(event) {
     event = event ? event : window.event;
     return event.srcElement ? event.srcElement : event.target;
-}
-
-// Event handlers
-function xformsHandleChange(event) {
-    var target = getEventTarget(event);
-    if (target.value != target.previousValue) {
-        target.previousValue = target.value;
-        xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value);
-    }
-}
-
-function xformsHandleClick(event) {
-    xformsFireEvent(getEventTarget(event), "DOMActivate", null);
 }
 
 /**
@@ -112,10 +110,11 @@ function xformsHandleClick(event) {
  *
  * Initializes attributes on the document object:
  *
- *     Document        xformsNextRequests
- *     Form            xformsNextForms
+ *     Document[]      xformsNextRequests
+ *     boolean         xformsLastRequestIsIncremental
+ *     Form            xformsNextTargets
  *     boolean         xformsRequestInProgress
- *     Form            xformsFormOfCurrentRequest
+ *     Form            xformsTargetOfCurrentRequest
  *     XMLHttpRequest  xformsXMLHttpRequest
  *
  */
@@ -158,23 +157,41 @@ function xformsPageLoaded() {
         var classes = control.className.split(" ");
         var isXFormsElement = false;
         var isXFormsAlert = false;
+        var isIncremental = false;
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
             var className = classes[classIndex];
             if (className.indexOf("xforms-") == 0)
                 isXFormsElement = true;
             if (className.indexOf("xforms-alert") == 0)
                 isXFormsAlert = true;
+            if (className.indexOf("xforms-incremental") == 0)
+                isIncremental = true;
         }
         if (!isXFormsElement) continue;
     
-        // Handle value change
+        // Function called when value changed
+        function valueChanged(event, incremental) {
+            var target = getEventTarget(event);
+            if (target.value != target.previousValue) {
+                target.previousValue = target.value;
+                xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value, incremental);
+            }
+        }
+    
+        // Handle value change and incremental modification
         control.previousValue = null;
-        xformsAddEventListener(control, "change", xformsHandleChange);
+        control.userModications = false;
+        xformsAddEventListener(control, "change", function(event) { valueChanged(event, false); });
+        if (isIncremental)
+            xformsAddEventListener(control, "keyup", function(event) { valueChanged(event, true); });
         
         // Handle click
-        if (control.tagName == "BUTTON") 
-            xformsAddEventListener(control, "click", xformsHandleClick);
-
+        if (control.tagName == "BUTTON") {
+            xformsAddEventListener(control, "click", function(event) {
+                xformsFireEvent(getEventTarget(event), "DOMActivate", null, false);
+            });
+        }
+            
         // If alert, store reference in control element to this alert element
         if (isXFormsAlert) 
             document.getElementById(control.htmlFor).alertElement = control;
@@ -209,9 +226,10 @@ function xformsPageLoaded() {
     
     // Initialize attributes on document
     document.xformsNextRequests = new Array();
-    document.xformsNextForms = new Array();
+    document.xformsLastRequestIsIncremental = false;
+    document.xformsNextTargets = new Array();
     document.xformsRequestInProgress = false;
-    document.xformsFormOfCurrentRequest = null;
+    document.xformsTargetOfCurrentRequest = null;
 }
 
 function xformsGetLocalName(element) {
@@ -241,16 +259,20 @@ function xformsHandleResponse() {
                         var documentElement = document.getElementById(controlId);
                         
                         // Update value
-                        if (controlValue != null) {
-                            if (typeof(documentElement.value) == "string") {
-                                if (documentElement.value != controlValue) {
-                                    documentElement.value = controlValue;
+                        if (controlValue != null
+                                && document.xformsTargetOfCurrentRequest.id != controlId) {
+                            // Check if this element has been modified since this event has been fired
+                            if (true) {
+                                if (typeof(documentElement.value) == "string") {
+                                    if (documentElement.value != controlValue) {
+                                        documentElement.value = controlValue;
+                                    }
+                                } else {
+                                    while(documentElement.childNodes.length > 0)
+                                        documentElement.removeChild(documentElement.firstChild);
+                                    documentElement.appendChild
+                                        (documentElement.ownerDocument.createTextNode(controlValue));
                                 }
-                            } else {
-                                while(documentElement.childNodes.length > 0)
-                                    documentElement.removeChild(documentElement.firstChild);
-                                documentElement.appendChild
-                                    (documentElement.ownerDocument.createTextNode(controlValue));
                             }
                         }
                         
@@ -265,7 +287,7 @@ function xformsHandleResponse() {
             
             // Update instances
             if (xformsGetLocalName(responseRoot.childNodes[i]) == "instances") {
-                document.xformsFormOfCurrentRequest.xformsInstances.value =
+                document.xformsTargetOfCurrentRequest.form.xformsInstances.value =
                     responseRoot.childNodes[i].firstChild.data;
             }
 
@@ -286,7 +308,7 @@ function xformsHandleResponse() {
 
         // End this request
         document.xformsRequestInProgress = false;
-        document.xformsFormOfCurrentRequest.xformsLoading.style.visibility = "hidden";
+        document.xformsTargetOfCurrentRequest.form.xformsLoading.style.visibility = "hidden";
         
         // Go ahead with next request, if any
         xformsExecuteNextRequest();
@@ -297,10 +319,10 @@ function xformsExecuteNextRequest() {
     if (! document.xformsRequestInProgress) {
         if (document.xformsNextRequests.length > 0) {
             var request = document.xformsNextRequests.shift();
-            var form = document.xformsNextForms.shift();
+            var target = document.xformsNextTargets.shift();
             document.xformsRequestInProgress = true;
-            form.xformsLoading.style.visibility = "visible";
-            document.xformsFormOfCurrentRequest = form;
+            target.form.xformsLoading.style.visibility = "visible";
+            document.xformsTargetOfCurrentRequest = target;
             document.xformsXMLHttpRequest = new XMLHttpRequest();
             document.xformsXMLHttpRequest.open("POST", XFORMS_SERVER_URL, true);
             document.xformsXMLHttpRequest.onreadystatechange = xformsHandleResponse;

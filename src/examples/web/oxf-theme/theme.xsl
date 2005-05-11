@@ -95,7 +95,7 @@
         </xhtml:textarea>
     </xsl:template>
     
-    <xsl:template match="xhtml:span[tokenize(@class, ' ') = 'xforms-group' and xhtml:label]">
+    <xsl:template match="xhtml:span[tokenize(@class, ' ') = 'xforms-group' and xhtml:label[not(@for)]]">
         <xhtml:fieldset>
             <xsl:apply-templates select="@*"/>
             <xhtml:legend>

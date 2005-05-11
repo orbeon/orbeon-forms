@@ -23,8 +23,8 @@
         <xhtml:title>XForms Text Controls</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema">
-            <xforms:instance id="instance">
-                <form>
+            <xforms:instance id="text">
+                <instance>
                     <text>35</text>
                     <secret>42</secret>
                     <textarea>The world is but a canvas for the imagination.</textarea>
@@ -35,7 +35,7 @@
                     <gaga>
                         <b>Hey</b>
                     </gaga>
-                </form>
+                </instance>
             </xforms:instance>
             <xforms:instance id="formatted">
                 <formated-instance>
@@ -43,21 +43,21 @@
                     &lt;/span>
                 </formated-instance>
             </xforms:instance>                
-            <xforms:bind nodeset="form">
+            <xforms:bind nodeset="instance('text')">
                 <xforms:bind nodeset="text" constraint="number(.) >= 0"/>
+                <xforms:bind nodeset="secret" constraint="string(.) = '42'"/>
+                <xforms:bind nodeset="textarea" constraint="string-length(.) > 10"/>
+                <xforms:bind nodeset="date" type="xs:date"/>
+                <xforms:bind nodeset="date2" type="xs:date"/>
+                <xforms:bind nodeset="time" type="xs:time"/>
             </xforms:bind>
-            <xforms:bind nodeset="/form/secret" constraint="string(.) = '42'"/>
-            <xforms:bind nodeset="/form/textarea" constraint="string-length(.) > 10"/>
-            <xforms:bind nodeset="/form/date" type="xs:date"/>
-            <xforms:bind nodeset="/form/date2" type="xs:date"/>
-            <xforms:bind nodeset="/form/time" type="xs:time"/>
             <xforms:bind nodeset="instance('formatted')" 
                 calculate="saxon:serialize(xxforms:call-xpl
-                    ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
+                    ('oxf:/oxf-theme/format.xpl', 'data', instance('text'), 'data')/*, 'html')"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:group ref="form">
+        <xforms:group ref="instance('text')">
             <p>
                 <xforms:input ref="text" xhtml:class="xforms-valid">
                     <xforms:label xhtml:class="fixed-width">Age:</xforms:label>
@@ -94,14 +94,14 @@
                     <xforms:label xhtml:class="fixed-width">Time:</xforms:label>
                 </xforms:input>
             </p>
-            <p>
-                <xforms:submit>
-                    <xforms:label>Submit</xforms:label>
-                </xforms:submit>
-            </p>
+<!--            <p>-->
+<!--                <xforms:submit>-->
+<!--                    <xforms:label>Submit</xforms:label>-->
+<!--                </xforms:submit>-->
+<!--            </p>-->
             <p style="margin-top: 2em">
                 <xforms:group>
-<!--                    <xforms:label>XForms instance</xforms:label>-->
+                    <xforms:label>XForms instance</xforms:label>
                     <xforms:output ref="instance('formatted')" xhtml:class="xforms-xhtml"/>
                 </xforms:group>
             </p>

@@ -115,6 +115,31 @@
                 <xxf:control-values>
                     <xxf:control id="1" value="7"/>
                     <xxf:control id="2" value="0" label="M:"/>
+                    <xxf:control id="3" label="Clear"/>
+                    <xxf:control id="4" label="MC"/>
+                    <xxf:control id="5" label="7"/>
+                    <xxf:control id="6" label="8"/>
+                    <xxf:control id="7" label="9"/>
+                    <xxf:control id="8" label="/"/>
+                    <xxf:control id="9" label="MR"/>
+                    <xxf:control id="10" label="4"/>
+                    <xxf:control id="11" label="5"/>
+                    <xxf:control id="12" label="6"/>
+                    <xxf:control id="13" label="*"/>
+                    <xxf:control id="14" label="MS"/>
+                    <xxf:control id="15" label="1"/>
+                    <xxf:control id="16" label="2"/>
+                    <xxf:control id="17" label="3"/>
+                    <xxf:control id="18" label="-"/>
+                    <xxf:control id="19" label="1/x"/>
+                    <xxf:control id="20" label="M+"/>
+                    <xxf:control id="21" label="0"/>
+                    <xxf:control id="22" label="+/-"/>
+                    <xxf:control id="23" label="+"/>
+                    <xxf:control id="24" label="="/>
+                    <xxf:control id="25" label="="/>
+                    <xxf:control id="26" label="="/>
+                    <xxf:control id="27" label="="/>
                 </xxf:control-values>
                 <xxf:instances>
                     <instances>
@@ -201,6 +226,31 @@
                 <xxf:control-values>
                     <xxf:control id="1" value="7"/>
                     <xxf:control id="2" value="12" label="M:"/>
+                    <xxf:control id="3" label="Clear"/>
+                    <xxf:control id="4" label="MC"/>
+                    <xxf:control id="5" label="7"/>
+                    <xxf:control id="6" label="8"/>
+                    <xxf:control id="7" label="9"/>
+                    <xxf:control id="8" label="/"/>
+                    <xxf:control id="9" label="MR"/>
+                    <xxf:control id="10" label="4"/>
+                    <xxf:control id="11" label="5"/>
+                    <xxf:control id="12" label="6"/>
+                    <xxf:control id="13" label="*"/>
+                    <xxf:control id="14" label="MS"/>
+                    <xxf:control id="15" label="1"/>
+                    <xxf:control id="16" label="2"/>
+                    <xxf:control id="17" label="3"/>
+                    <xxf:control id="18" label="-"/>
+                    <xxf:control id="19" label="1/x"/>
+                    <xxf:control id="20" label="M+"/>
+                    <xxf:control id="21" label="0"/>
+                    <xxf:control id="22" label="+/-"/>
+                    <xxf:control id="23" label="+"/>
+                    <xxf:control id="24" label="="/>
+                    <xxf:control id="25" label="="/>
+                    <xxf:control id="26" label="="/>
+                    <xxf:control id="27" label="="/>
                 </xxf:control-values>
                 <xxf:instances>
                     <instances>
@@ -537,6 +587,7 @@
                     <xxf:control id="group2"/>
                     <xxf:control id="1" value="0"/>
                     <xxf:control id="2" value="12" label="M:"/>
+                    <xxf:control id="3" label="Clear"/>
                 </xxf:control-values>
                 <xxf:instances>
                     <instances>
@@ -662,6 +713,7 @@
                     <xxf:control id="group2" valid="false"/>
                     <xxf:control id="1" value="0" valid="false"/>
                     <xxf:control id="2" value="12" label="M:"/>
+                    <xxf:control id="3" label="Clear"/>
                 </xxf:control-values>
                 <xxf:instances>
                     <instances>

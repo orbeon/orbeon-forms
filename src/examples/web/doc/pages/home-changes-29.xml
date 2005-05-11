@@ -27,6 +27,28 @@
             <p>
                 ...
             </p>
+            <ul>
+                <li>
+                    <p>
+                        XForms event model...
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Support for multiple XForms models and instances...
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Ajax-style XForms engine...
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <code>xxforms:call-xpl()</code> and XForms <code>instance()</code> functions...
+                    </p>
+                </li>
+            </ul>
             <p>
                 Incompatible changes:
             </p>

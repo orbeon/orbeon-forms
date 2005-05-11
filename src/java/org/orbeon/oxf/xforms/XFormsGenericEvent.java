@@ -34,8 +34,12 @@ public class XFormsGenericEvent {
     public XFormsGenericEvent() {
     }
 
-    public XFormsGenericEvent(Element controlElement, String value) {
+    protected XFormsGenericEvent(Element controlElement) {
         this.controlElement = controlElement;
+    }
+
+    public XFormsGenericEvent(Element controlElement, String value) {
+        this(controlElement);
         this.value = value;
     }
 

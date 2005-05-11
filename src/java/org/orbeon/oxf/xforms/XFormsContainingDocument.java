@@ -26,11 +26,11 @@ import java.util.Map;
 /**
  * Represents an XForms containing document.
  *
- * Includes:
+ * The containing document includes:
  *
- * o models
- * o instances
- * o controls / handlers hierarchy
+ * o XForms models (including multiple instances)
+ * o XForms controls
+ * o Event handlers hierarchy
  */
 public class XFormsContainingDocument implements EventTarget {
 

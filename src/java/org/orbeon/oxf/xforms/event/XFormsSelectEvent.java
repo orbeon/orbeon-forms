@@ -11,27 +11,18 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms;
+package org.orbeon.oxf.xforms.event;
 
 import org.dom4j.Element;
+import org.orbeon.oxf.xforms.XFormsEvent;
+import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
- * XFormsEvent represents an XForms event passed to all events and actions.
+ * 4.4.3 The xforms-select and xforms-deselect Events
  */
-public abstract class XFormsEvent extends XFormsGenericEvent {
+public class XFormsSelectEvent extends XFormsEvent {
 
-    private String eventName;
-
-    protected XFormsEvent(String eventName, Element controlElement) {
-        super(controlElement);
-        this.eventName = eventName;
-    }
-
-    protected XFormsEvent(String eventName) {
-        this.eventName = eventName;
-    }
-
-    public String getEventName() {
-        return eventName;
+    public XFormsSelectEvent(Element itemOrCaseElement) {
+        super(XFormsEvents.XFORMS_SELECT, itemOrCaseElement);
     }
 }

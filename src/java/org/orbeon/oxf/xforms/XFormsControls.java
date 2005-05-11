@@ -18,12 +18,11 @@ import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.util.PooledXPathExpression;
-import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.event.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.XFormsLinkError;
+import org.orbeon.oxf.xforms.event.XFormsSelectEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.xml.sax.Locator;
 
@@ -42,6 +41,7 @@ public class XFormsControls implements EventTarget {
 
     private XFormsContainingDocument containingDocument;
     private Document controlsDocument;
+    private DocumentXPathEvaluator documentXPathEvaluator;
 
     private Stack contextStack = new Stack();
 
@@ -50,6 +50,8 @@ public class XFormsControls implements EventTarget {
     public XFormsControls(XFormsContainingDocument containingDocument, Document controlsDocument) {
         this.containingDocument = containingDocument;
         this.controlsDocument = controlsDocument;
+        if (controlsDocument != null)
+            this.documentXPathEvaluator = new DocumentXPathEvaluator(controlsDocument);
     }
 
     public void initialize() {
@@ -59,7 +61,7 @@ public class XFormsControls implements EventTarget {
 
         // Push the default context
         final XFormsModel defaultModel = containingDocument.getModel("");
-        final List defaultNodeset = Arrays.asList(new Object[] { defaultModel.getDefaultInstance().getDocument() });
+        final List defaultNodeset = Arrays.asList(new Object[]{defaultModel.getDefaultInstance().getDocument()});
         contextStack.push(new Context(defaultModel, defaultNodeset, true, null));
     }
 
@@ -158,7 +160,7 @@ public class XFormsControls implements EventTarget {
      */
     public Node getCurrentSingleNode(String modelId) {
 
-        for (int i = contextStack.size() - 1; i >=0; i--) {
+        for (int i = contextStack.size() - 1; i >= 0; i--) {
             Context currentContext = (Context) contextStack.get(i);
 
             String currentModelId = currentContext.model.getModelId();
@@ -209,8 +211,8 @@ public class XFormsControls implements EventTarget {
     public String getRefValue() {
         Node node = getCurrentSingleNode(getCurrentContext());
         return node instanceof Element ? ((Element) node).getStringValue()
-            : node instanceof Attribute ? ((Attribute) node).getValue()
-            : null;
+                : node instanceof Attribute ? ((Attribute) node).getValue()
+                : null;
     }
 
     public void startRepeatId(String repeatId) {
@@ -285,23 +287,12 @@ public class XFormsControls implements EventTarget {
         Map variables = new HashMap();
         variables.put("control-id", controlId);
 
-        // Create XPath expression
-        PooledXPathExpression xpathExpression =
-            XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(getControlsDocument(), null).wrap(getControlsDocument()),
-                    "/xxf:controls//*[@id = $control-id]", XFormsServer.XFORMS_NAMESPACES, variables);
-
         // Get action element
         Element controlElement;
-        try {
-            controlElement = (Element) xpathExpression.evaluateSingle();
-            if (controlElement == null)
-                throw new OXFException("Cannot find control with id '" + controlId + "'.");
-        } catch (org.orbeon.saxon.xpath.XPathException e) {
-            throw new OXFException(e);
-        } finally {
-            if (xpathExpression != null)
-                xpathExpression.returnToPool();
-        }
+        controlElement = (Element) documentXPathEvaluator.evaluateSingle(pipelineContext, getControlsDocument(),
+                "/xxf:controls//*[@id = $control-id]", XFormsServer.XFORMS_NAMESPACES, variables, null, null);
+        if (controlElement == null)
+            throw new OXFException("Cannot find control with id '" + controlId + "'.");
         return controlElement;
     }
 
@@ -309,22 +300,14 @@ public class XFormsControls implements EventTarget {
      * Return an ordered list of all the control elements, with the addition of xforms:group.
      */
     public List getAllControlElements(PipelineContext pipelineContext) {
-        PooledXPathExpression xpathExpression =
-                XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument),
-                        "/xxf:controls//(xf:group|xf:input|xf:secret|xf:textarea|xf:output|xf:upload|xf:range|xf:trigger|xf:submit|xf:select|xf:select1)[@ref]", XFormsServer.XFORMS_NAMESPACES);
-        try {
-            return xpathExpression.evaluate();
-        } catch (org.orbeon.saxon.xpath.XPathException e) {
-            throw new OXFException(e);
-        } finally {
-            if (xpathExpression != null)
-                xpathExpression.returnToPool();
-        }
+        return documentXPathEvaluator.evaluate(pipelineContext, controlsDocument,
+                "/xxf:controls//(xf:group|xf:input|xf:secret|xf:textarea|xf:output|xf:upload|xf:range|xf:trigger|xf:submit|xf:select|xf:select1)",
+                XFormsServer.XFORMS_NAMESPACES, null, null, null);
     }
 
     /**
      * Return the value of the label element for the current control, null if none.
-     *
+     * <p/>
      * 8.3.3 The label Element
      */
     public String getLabelValue(PipelineContext pipelineContext) {
@@ -333,7 +316,7 @@ public class XFormsControls implements EventTarget {
 
     /**
      * Return the value of the help element for the current control, null if none.
-     *
+     * <p/>
      * 8.3.4 The help Element
      */
     public String getHelpValue(PipelineContext pipelineContext) {
@@ -342,7 +325,7 @@ public class XFormsControls implements EventTarget {
 
     /**
      * Return the value of the hint element for the current control, null if none.
-     *
+     * <p/>
      * 8.3.5 The hint Element
      */
     public String getHintValue(PipelineContext pipelineContext) {
@@ -351,7 +334,7 @@ public class XFormsControls implements EventTarget {
 
     /**
      * Return the value of the alert element for the current control, null if none.
-     *
+     * <p/>
      * 8.3.6 The alert Element
      */
     public String getAlertValue(PipelineContext pipelineContext) {
@@ -409,23 +392,12 @@ public class XFormsControls implements EventTarget {
         Map variables = new HashMap();
         variables.put("event-name", eventName);
 
-        // Create XPath expression
-        PooledXPathExpression xpathExpression =
-            XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(getControlsDocument(), null).wrap(controlElement),
-                    "*[@ev:event = $event-name]", XFormsServer.XFORMS_NAMESPACES, variables);
-
         // Get event handler element
         Element eventHandlerElement;
-        try {
-            eventHandlerElement = (Element) xpathExpression.evaluateSingle();
+        eventHandlerElement = (Element) documentXPathEvaluator.evaluateSingle(pipelineContext, controlElement,
+                "*[@ev:event = $event-name]", XFormsServer.XFORMS_NAMESPACES, variables, null, null);
 //            if (eventHandlerElement == null)
 //                throw new OXFException("Cannot find event handler with name '" + eventName + "'.");
-        } catch (org.orbeon.saxon.xpath.XPathException e) {
-            throw new OXFException(e);
-        } finally {
-            if (xpathExpression != null)
-                xpathExpression.returnToPool();
-        }
         return eventHandlerElement;
     }
 
@@ -455,6 +427,13 @@ public class XFormsControls implements EventTarget {
 
             callEventHandlers(pipelineContext, xformsEvent, eventName, xformsEvent.getControlElement());
 
+        } else if (XFormsEvents.XFORMS_SELECT.equals(eventName) || XFormsEvents.XFORMS_DESELECT.equals(eventName)) {
+            // 4.4.3 The xforms-select and xforms-deselect Events
+            // Bubbles: Yes / Cancelable: No / Context Info: None
+            // The default action for this event results in the following: None; notification event only.
+
+            callEventHandlers(pipelineContext, xformsEvent, eventName, xformsEvent.getControlElement());
+
         } else {
             throw new OXFException("Invalid action requested: " + eventName);
         }
@@ -473,7 +452,7 @@ public class XFormsControls implements EventTarget {
     }
 
     private void runAction(final PipelineContext pipelineContext, Element eventHandlerElement,
-                                XFormsGenericEvent XFormsEvent) {
+                           XFormsGenericEvent XFormsEvent) {
 
         String actionNamespaceURI = eventHandlerElement.getNamespaceURI();
         if (!XFormsConstants.XFORMS_NAMESPACE_URI.equals(actionNamespaceURI)) {
@@ -497,7 +476,7 @@ public class XFormsControls implements EventTarget {
             if (value != null) {
                 // Value to set is computed with an XPath expression
                 Map namespaceContext = Dom4jUtils.getNamespaceContext(eventHandlerElement);
-                valueToSet = instance.evaluateXPath(pipelineContext, value, namespaceContext, null, functionLibrary, null);
+                valueToSet = instance.evaluateXPathAsString(pipelineContext, value, namespaceContext, null, functionLibrary, null);
             } else {
                 // Value to set is static content
                 valueToSet = content;
@@ -515,31 +494,29 @@ public class XFormsControls implements EventTarget {
             String caseId = eventHandlerElement.attributeValue("case");
             XFormsEvent.addDivToShow(caseId);
 
+            // Find case element with current case id
+            final Element currentCaseElement;
+            Map variables = new HashMap();
+            variables.put("case-id", caseId);
+            currentCaseElement = (Element) documentXPathEvaluator.evaluateSingle(pipelineContext, getControlsDocument(),
+                    "/xxf:controls//xf:case[@id = $case-id]", XFormsServer.XFORMS_NAMESPACES, variables, null, null);
+            // "1. Dispatching an xforms-deselect event to the currently selected case."
+            dispatchEvent(pipelineContext, new XFormsDeselectEvent(currentCaseElement));
+
             // Deselect other cases in that switch
             {
-                Map variables = new HashMap();
-                variables.put("case-id", caseId);
+                final List xpathExpressionResult = documentXPathEvaluator.evaluate(pipelineContext, currentCaseElement,
+                        "./ancestor::xf:switch[1]//xf:case[not(@id = $case-id)]",
+                        XFormsServer.XFORMS_NAMESPACES, variables, null, null);
 
-                PooledXPathExpression xpathExpression =
-                    XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(getControlsDocument(), null).wrap(getControlsDocument()),
-                            "/xxf:controls//xf:case[@id = $case-id]/ancestor::xf:switch[1]//xf:case[not(@id = $case-id)]", XFormsServer.XFORMS_NAMESPACES, variables);
-                try {
+                for (Iterator i = xpathExpressionResult.iterator(); i.hasNext();) {
+                    Element caseElement = (Element) i.next();
+                    XFormsEvent.addDivToHide(caseElement.attributeValue(new QName("id")));
 
-                    for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
-                        Element caseElement = (Element) i.next();
-                        XFormsEvent.addDivToHide(caseElement.attributeValue(new QName("id")));
-                    }
-                } catch (org.orbeon.saxon.xpath.XPathException e) {
-                    throw new OXFException(e);
-                } finally {
-                    if (xpathExpression != null)
-                        xpathExpression.returnToPool();
+                    // "2. Dispatching an xform-select event to the case to be selected."
+                    dispatchEvent(pipelineContext, new XFormsSelectEvent(caseElement));
                 }
             }
-
-            // TODO:
-            // 1. Dispatching an xforms-deselect event to the currently selected case.
-            // 2. Dispatching an xform-select event to the case to be selected.
 
         } else if (XFormsEvents.XFORMS_ACTION_ACTION.equals(actionEventName)) {
             // 10.1.1 The action Element

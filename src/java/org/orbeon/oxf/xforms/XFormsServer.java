@@ -118,7 +118,7 @@ public class XFormsServer extends ProcessorImpl {
                             attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, controlId);
 
                             // Get current value unless it's a group
-                            if (!controlElement.getName().equals("group")) {
+                            if (!(controlElement.getName().equals("group") || controlElement.getName().equals("submit") || controlElement.getName().equals("trigger"))) {
                                 String controlValue = XFormsInstance.getValueForNode(currentNode);
                                 attributesImpl.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, controlValue);
                             }

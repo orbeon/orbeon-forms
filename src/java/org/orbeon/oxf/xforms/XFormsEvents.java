@@ -27,6 +27,9 @@ public class XFormsEvents {
 
     public static final String XFORMS_VALUE_CHANGED = "xforms-value-changed";
 
+    public static final String XFORMS_DESELECT = "xforms-deselect";
+    public static final String XFORMS_SELECT = "xforms-select";
+
     // DOM events
     public static final String XFORMS_DOM_ACTIVATE = "DOMActivate";
     public static final String XFORMS_DOM_FOCUS_OUT = "DOMFocusOut";

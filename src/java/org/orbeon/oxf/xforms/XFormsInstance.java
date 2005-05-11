@@ -22,16 +22,11 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.scope.ScopeStore;
-import org.orbeon.oxf.util.PooledXPathExpression;
-import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
-import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.om.NodeInfo;
-import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -48,14 +43,12 @@ public class XFormsInstance {
 
     private PipelineContext pipelineContext;
     private Document instanceDocument;
-    private DocumentWrapper documentWrapper;
-    private NodeInfo instanceDocumentNodeInfo;
+    private DocumentXPathEvaluator documentXPathEvaluator;
 
     public XFormsInstance(PipelineContext pipelineContext, Document instance) {
         this.pipelineContext = pipelineContext;
         this.instanceDocument = instance;
-        this.documentWrapper = new DocumentWrapper(instance, null);
-        instanceDocumentNodeInfo = documentWrapper.wrap(instance);
+        this.documentXPathEvaluator = new DocumentXPathEvaluator(instance);
     }
 
     public Document getDocument() {
@@ -109,39 +102,25 @@ public class XFormsInstance {
      * @param value
      */
     public void setValueForParam(PipelineContext pipelineContext, String refXPath, Map prefixToURIMap, String value) {
-        PooledXPathExpression xpathExpression =
-                XPathCache.getXPathExpression(pipelineContext, instanceDocumentNodeInfo, refXPath, prefixToURIMap);
-        try {
-            Node node = (Node) xpathExpression.evaluateSingle();
-            if (node == null)
-                throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
 
-            if (node instanceof Element) {
-                setElementValue((Element) node, value, null);
-            } else {
-                setAttributeValue((Attribute) node, value);
-            }
-        } catch (XPathException e) {
-            throw new OXFException(e);
-        } finally {
-            if (xpathExpression != null) xpathExpression.returnToPool();
+        Node node = (Node) evaluateXPathSingle(pipelineContext, instanceDocument, refXPath, prefixToURIMap, null, null, null);
+        if (node == null)
+            throw new OXFException("Cannot find node instance for param '" + refXPath + "'");
+
+        if (node instanceof Element) {
+            setElementValue((Element) node, value, null);
+        } else {
+            setAttributeValue((Attribute) node, value);
         }
     }
 
     /**
      * Evaluate an XPath expression on the instance and return its string value.
      */
-    public String evaluateXPath(PipelineContext pipelineContext, String xpath, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
-        PooledXPathExpression xpathExpression =
-                XPathCache.getXPathExpression(pipelineContext, instanceDocumentNodeInfo, "string(" + xpath + ")",
-                        prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
-        try {
-            return (String) xpathExpression.evaluateSingle();
-        } catch (XPathException e) {
-            throw new OXFException(e);
-        } finally {
-            if (xpathExpression != null) xpathExpression.returnToPool();
-        }
+    public String evaluateXPathAsString(PipelineContext pipelineContext, String xpathExpression, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
+
+        return documentXPathEvaluator.evaluateAsString(pipelineContext, xpathExpression, prefixToURIMap,
+                variableToValueMap, functionLibrary, baseURI);
     }
 
     /**
@@ -150,16 +129,8 @@ public class XFormsInstance {
     public List evaluateXPath(PipelineContext pipelineContext, Node contextNode, String xpathExpression,
                               Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
 
-        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext, documentWrapper.wrap(contextNode),
-                xpathExpression, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
-        try {
-            return expr.evaluate();
-        } catch (XPathException e) {
-            throw new OXFException(e);
-        } finally {
-            if (expr != null)
-                expr.returnToPool();
-        }
+        return documentXPathEvaluator.evaluate(pipelineContext, contextNode, xpathExpression, prefixToURIMap,
+                variableToValueMap, functionLibrary, baseURI);
     }
 
     /**
@@ -168,16 +139,8 @@ public class XFormsInstance {
     public Object evaluateXPathSingle(PipelineContext pipelineContext, Node contextNode, String xpathExpression,
                               Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
 
-        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext, documentWrapper.wrap(contextNode),
-                xpathExpression, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
-        try {
-            return expr.evaluateSingle();
-        } catch (XPathException e) {
-            throw new OXFException(e);
-        } finally {
-            if (expr != null)
-                expr.returnToPool();
-        }
+        return documentXPathEvaluator.evaluateSingle(pipelineContext, contextNode, xpathExpression, prefixToURIMap,
+                variableToValueMap, functionLibrary, baseURI);
     }
 
     private void setAttributeValue(Attribute attribute, String value) {

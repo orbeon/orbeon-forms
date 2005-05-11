@@ -659,9 +659,9 @@
                                     </other-instance>
                                 </xforms:instance>
                                 <xforms:bind nodeset="instance('instance2')/first"
-                                    calculate="string(xxforms:call-xpl('oxf:/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first)"/>
+                                    calculate="xxforms:call-xpl('oxf:/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
                                 <xforms:bind nodeset="instance('instance2')/second"
-                                    calculate="string(xxforms:call-xpl('oxf:/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/second)"/>
+                                    calculate="xxforms:call-xpl('oxf:/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/second"/>
                                 <xforms:bind nodeset="/*/screen"
                                     constraint="false()"/>
                             </xforms:model>

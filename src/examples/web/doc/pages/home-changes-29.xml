@@ -48,6 +48,13 @@
                         <code>xxforms:call-xpl()</code> and XForms <code>instance()</code> functions...
                     </p>
                 </li>
+                <li>
+                    <p>
+                        TODO: document (X)HTML attributes supported on XForms elements: id, class,
+                        navindex, accesskey, plus tabindex, style, and how to handle other
+                        attributes (xhtml:*).
+                    </p>
+                </li>
             </ul>
             <p>
                 Incompatible changes:

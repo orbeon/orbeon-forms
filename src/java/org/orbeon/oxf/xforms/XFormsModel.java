@@ -745,23 +745,15 @@ public class XFormsModel implements EventTarget, Cloneable {
                     if (node instanceof Element) {
                         // Compute calculated value
                         PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                                documentWrapper.wrap(node), modelBind.getCalculate(), modelBind.getNamespaceMap(), null,
+                                documentWrapper.wrap(node), "string(" + modelBind.getCalculate() + ")", modelBind.getNamespaceMap(), null,
                                 xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
                         try {
-                            List result = expr.evaluate();
+                            final Object result = expr.evaluateSingle();
+                            final String stringResult = result.toString(); // even with string(), the result may not be a Java String object
                             // Place in element
                             Element elt = (Element) node;
                             Dom4jUtils.clearElementContent(elt);
-                            for (Iterator k = result.iterator(); k.hasNext();) {
-                                Object resultItem = k.next();
-                                if (resultItem instanceof Node) {
-                                    elt.add((Node) elt.clone());
-                                } else if (resultItem instanceof Item) {
-                                    elt.add(Dom4jUtils.createText(((Item) resultItem).getStringValue()));
-                                } else {
-                                    elt.add(Dom4jUtils.createText(resultItem.toString()));
-                                }
-                            }
+                            elt.add(Dom4jUtils.createText(stringResult));
                         } catch (XPathException e) {
                             throw new ValidationException(e.getMessage() + " when evaluating '" + modelBind.getCalculate() + "'", modelBind.getLocationData());
                         } finally {

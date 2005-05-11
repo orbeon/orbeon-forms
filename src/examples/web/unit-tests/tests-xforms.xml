@@ -795,7 +795,7 @@
                         <arg>2</arg>
                         <arg>4</arg>
                         <arg>6</arg>
-                        <result>4.0</result>
+                        <result>4</result>
                     </avg>
                     <min>
                         <arg>2</arg>
@@ -807,7 +807,7 @@
                         <arg>2</arg>
                         <arg>4</arg>
                         <arg>6</arg>
-                        <result>6.0</result>
+                        <result>6</result>
                     </max>
                     <count-non-empty>
                         <arg>2</arg>
@@ -831,10 +831,10 @@
                     <seconds-from-date-1>1009809630</seconds-from-date-1>
                     <seconds-from-date-2>NaN</seconds-from-date-2>
                     <seconds-from-date-3>-3600</seconds-from-date-3>
-                    <seconds-1>0.0</seconds-1>
+                    <seconds-1>0</seconds-1>
                     <seconds-2>297001.5</seconds-2>
                     <seconds-3>NaN</seconds-3>
-                    <seconds-4>-1.0</seconds-4>
+                    <seconds-4>-1</seconds-4>
                     <months-1>14</months-1>
                     <months-2>-19</months-2>
                     <months-3>NaN</months-3>

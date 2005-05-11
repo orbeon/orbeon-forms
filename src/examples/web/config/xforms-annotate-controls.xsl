@@ -28,7 +28,7 @@
                 <xsl:value-of select="if (@id) then @id else xxforms:generate-id(.)"/>
             </xsl:attribute>
             <xsl:copy-of select="@*"/>
-            <xsl:if test="local-name() = ('input', 'secret', 'textarea') and not(xforms:alert)">
+            <xsl:if test="local-name() = ('input', 'secret', 'textarea', 'trigger') and not(xforms:alert)">
                 <xforms:alert id="{concat(xxforms:generate-id(.), '-alert')}"/>
             </xsl:if>
             <xsl:apply-templates/>

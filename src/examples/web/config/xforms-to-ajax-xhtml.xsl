@@ -143,6 +143,7 @@
     
     <xsl:function name="xxforms:control" as="element()">
         <xsl:param name="id" as="xs:string"/>
+        <xsl:message><xsl:value-of select="$id"/></xsl:message>
         <xsl:sequence select="$response/xxforms:control-values/xxforms:control[@id = $id]"/>
     </xsl:function>
     

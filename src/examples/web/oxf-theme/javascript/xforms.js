@@ -241,15 +241,17 @@ function xformsHandleResponse() {
                         var documentElement = document.getElementById(controlId);
                         
                         // Update value
-                        if (typeof(documentElement.value) == "string") {
-                            if (documentElement.value != controlValue) {
-                                documentElement.value = controlValue;
+                        if (controlValue != null) {
+                            if (typeof(documentElement.value) == "string") {
+                                if (documentElement.value != controlValue) {
+                                    documentElement.value = controlValue;
+                                }
+                            } else {
+                                while(documentElement.childNodes.length > 0)
+                                    documentElement.removeChild(documentElement.firstChild);
+                                documentElement.appendChild
+                                    (documentElement.ownerDocument.createTextNode(controlValue));
                             }
-                        } else {
-                            while(documentElement.childNodes.length > 0)
-                                documentElement.removeChild(documentElement.firstChild);
-                            documentElement.appendChild
-                                (documentElement.ownerDocument.createTextNode(controlValue));
                         }
                         
                         // Update validity

@@ -499,8 +499,9 @@ ul {
     background-image: url(../images/bracket.gif);
     background-repeat: no-repeat;
     background-position: left center;       
-    margin-left: 1em;
+    margin-left: .5em;
     padding-left: 1.5em;
+    vertical-align: middle;
 }
 
 .xforms-alert-inactive {

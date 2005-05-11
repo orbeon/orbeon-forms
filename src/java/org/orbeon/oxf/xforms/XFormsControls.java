@@ -246,6 +246,10 @@ public class XFormsControls implements EventTarget {
         return repeatIdToIndex;
     }
 
+    public NamespaceSupport2 getNamespaceSupport() {
+        return namespaceSupport;
+    }
+
     public Locator getLocator() {
         return locator;
     }
@@ -301,19 +305,15 @@ public class XFormsControls implements EventTarget {
         return controlElement;
     }
 
+    /**
+     * Return an ordered list of all the control elements, with the addition of xforms:group.
+     */
     public List getAllControlElements(PipelineContext pipelineContext) {
         PooledXPathExpression xpathExpression =
                 XPathCache.getXPathExpression(pipelineContext, new DocumentWrapper(controlsDocument, null).wrap(controlsDocument),
-                        "/xxf:controls//(xf:input|xf:secret|xf:textarea|xf:output|xf:upload|xf:range|xf:trigger|xf:submit|xf:select|xf:select1)[@ref]", XFormsServer.XFORMS_NAMESPACES);
-
-        // TODO: xf:group
+                        "/xxf:controls//(xf:group|xf:input|xf:secret|xf:textarea|xf:output|xf:upload|xf:range|xf:trigger|xf:submit|xf:select|xf:select1)[@ref]", XFormsServer.XFORMS_NAMESPACES);
         try {
             return xpathExpression.evaluate();
-//            List result = new ArrayList();
-//            for (Iterator i = xpathExpression.evaluate().iterator(); i.hasNext();) {
-//                result.add(i.next());
-//            }
-//            return result;
         } catch (org.orbeon.saxon.xpath.XPathException e) {
             throw new OXFException(e);
         } finally {

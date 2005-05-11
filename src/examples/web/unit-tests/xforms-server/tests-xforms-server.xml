@@ -229,9 +229,9 @@
                     <p:input name="controls">
                         <xxforms:controls>
                             <!-- First model, first instance -->
-                            <xforms:group ref="/">
-                                <xforms:group ref="nested111">
-                                    <xforms:group ref="nested112">
+                            <xforms:group ref="/" id="group111">
+                                <xforms:group ref="nested111" id="group112">
+                                    <xforms:group ref="nested112" id="group113">
                                         <xforms:output ref="first" id="id111"/>
                                         <xforms:output ref="second" id="id112"/>
                                         <xforms:output ref="third" id="id113"/>
@@ -240,8 +240,8 @@
                                 </xforms:group>
                             </xforms:group>
                             <!-- First model, second instance -->
-                            <xforms:group ref="instance('instance12')">
-                                <xforms:group ref="nested122">
+                            <xforms:group ref="instance('instance12')" id="group121">
+                                <xforms:group ref="nested122" id="group122">
                                     <xforms:output ref="first" id="id121"/>
                                     <xforms:output ref="second" id="id122"/>
                                     <xforms:output ref="third" id="id123"/>
@@ -249,22 +249,22 @@
                                 </xforms:group>
                             </xforms:group>
                             <!-- Mixed models -->
-                            <xforms:group ref="/">
-                                <xforms:group ref="nested211" model="model2">
-                                    <xforms:group ref="nested212">
+                            <xforms:group ref="/" id="group211">
+                                <xforms:group ref="nested211" model="model2" id="group212">
+                                    <xforms:group ref="nested212" id="group213">
                                         <xforms:output ref="first" id="id211"/>
                                         <xforms:output ref="second" id="id212"/>
                                         <xforms:output ref="third" id="id213"/>
                                         <xforms:output ref="fourth" id="id214"/>
                                     </xforms:group>
-                                    <xforms:group ref="instance('instance22')">
-                                        <xforms:group ref="nested222">
+                                    <xforms:group ref="instance('instance22')" id="group214">
+                                        <xforms:group ref="nested222" id="group8">
                                             <xforms:output ref="first" id="id221"/>
                                             <xforms:output ref="second" id="id222"/>
                                             <xforms:output ref="third" id="id223"/>
                                             <xforms:output ref="fourth" id="id224"/>
-                                            <xforms:group ref="instance('instance21')">
-                                                <xforms:group ref="nested212">
+                                            <xforms:group ref="instance('instance21')" id="group214">
+                                                <xforms:group ref="nested212" id="group10">
                                                     <xforms:output ref="first" id="id211b"/>
                                                     <xforms:output ref="second" id="id212b"/>
                                                     <xforms:output ref="third" id="id213b"/>
@@ -367,22 +367,34 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:control-values>
+                    <xxf:control id="group111"/>
+                    <xxf:control id="group112"/>
+                    <xxf:control id="group113"/>
                     <xxf:control id="id111" value="111"/>
                     <xxf:control id="id112" value="112"/>
                     <xxf:control id="id113" value="113"/>
                     <xxf:control id="id114" value="114"/>
+                    <xxf:control id="group121"/>
+                    <xxf:control id="group122"/>
                     <xxf:control id="id121" value="121"/>
                     <xxf:control id="id122" value="122"/>
                     <xxf:control id="id123" value="123"/>
                     <xxf:control id="id124" value="124"/>
+                    <xxf:control id="group211"/>
+                    <xxf:control id="group212"/>
+                    <xxf:control id="group213"/>
                     <xxf:control id="id211" value="211"/>
                     <xxf:control id="id212" value="212"/>
                     <xxf:control id="id213" value="213"/>
                     <xxf:control id="id214" value="214"/>
+                    <xxf:control id="group214"/>
+                    <xxf:control id="group8"/>
                     <xxf:control id="id221" value="221"/>
                     <xxf:control id="id222" value="222"/>
                     <xxf:control id="id223" value="223"/>
                     <xxf:control id="id224" value="224"/>
+                    <xxf:control id="group214"/>
+                    <xxf:control id="group10"/>
                     <xxf:control id="id211b" value="211"/>
                     <xxf:control id="id212b" value="212"/>
                     <xxf:control id="id213b" value="213"/>
@@ -438,8 +450,8 @@
                     <p:input name="data"><dummy/></p:input>
                     <p:input name="controls">
                         <xxforms:controls>
-                            <xforms:group ref="/equation">
-                                <xforms:group ref="screen">
+                            <xforms:group ref="/equation" id="group1">
+                                <xforms:group ref="screen" id="group2">
                                     <xforms:output ref="." id="1"/>
                                 </xforms:group>
                                 <xforms:output ref="memory" id="2">
@@ -521,6 +533,8 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:control-values>
+                    <xxf:control id="group1"/>
+                    <xxf:control id="group2"/>
                     <xxf:control id="1" value="0"/>
                     <xxf:control id="2" value="12" label="M:"/>
                 </xxf:control-values>
@@ -554,8 +568,8 @@
                     <p:input name="data"><dummy/></p:input>
                     <p:input name="controls">
                         <xxforms:controls>
-                            <xforms:group ref="/equation">
-                                <xforms:group ref="screen">
+                            <xforms:group ref="/equation" id="group1">
+                                <xforms:group ref="screen" id="group2">
                                     <xforms:output ref="." id="1"/>
                                 </xforms:group>
                                 <xforms:output ref="memory" id="2">
@@ -644,6 +658,8 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:control-values>
+                    <xxf:control id="group1"/>
+                    <xxf:control id="group2" valid="false"/>
                     <xxf:control id="1" value="0" valid="false"/>
                     <xxf:control id="2" value="12" label="M:"/>
                 </xxf:control-values>

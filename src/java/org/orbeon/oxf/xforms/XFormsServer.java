@@ -23,6 +23,7 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.saxon.style.StandardNames;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -172,6 +173,12 @@ public class XFormsServer extends ProcessorImpl {
                                         attributesImpl.addAttribute("", XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
                                                 XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
                                                 ContentHandlerHelper.CDATA, Boolean.toString(valid.get()));
+                                    }
+                                    int typeCode = instanceData.getType().get();
+                                    if (typeCode != 0) {
+                                        attributesImpl.addAttribute("", XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME,
+                                                XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME, ContentHandlerHelper.CDATA,
+                                                StandardNames.getPrefix(typeCode) + ":" + StandardNames.getLocalName(typeCode));
                                     }
                                 }
                                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);

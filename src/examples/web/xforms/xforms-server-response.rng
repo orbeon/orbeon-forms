@@ -73,6 +73,9 @@
                                 </choice>
                             </attribute>
                         </optional>
+                        <optional>
+                            <attribute name="type"/>
+                        </optional>
                     </element>
                 </zeroOrMore>
             </element>

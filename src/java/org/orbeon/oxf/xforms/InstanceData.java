@@ -69,7 +69,7 @@ public class InstanceData {
         return valid;
     }
 
-    public org.orbeon.oxf.xforms.TypeModelItemProperty getType() {
+    public TypeModelItemProperty getType() {
         return type;
     }
 

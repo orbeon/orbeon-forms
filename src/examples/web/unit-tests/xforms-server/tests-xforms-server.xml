@@ -418,7 +418,7 @@
 
     <test description="Test for instance() function" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xs="http://www.w3.org/2001/XMLSchema">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -466,6 +466,7 @@
                                 </xforms:instance>
                                 <xforms:bind nodeset="instance('instance2')/first" calculate="314"/>
                                 <xforms:bind nodeset="/*/first" calculate="1592"/>
+<!--                                <xforms:bind nodeset="/*/first" type="xs:integer"/>-->
                             </xforms:model>
                         </models>
                     </p:input>

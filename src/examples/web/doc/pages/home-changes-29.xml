@@ -40,6 +40,12 @@
                 </li>
                 <li>
                     <p>
+                        TODO: document change in coding style (with need for separate XForms model
+                        declaration gone).
+                    </p>
+                </li>
+                <li>
+                    <p>
                         Ajax-style XForms engine...
                     </p>
                 </li>

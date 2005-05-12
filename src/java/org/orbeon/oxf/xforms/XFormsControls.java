@@ -21,6 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.event.XFormsDeselectEvent;
 import org.orbeon.oxf.xforms.event.XFormsLinkError;
 import org.orbeon.oxf.xforms.event.XFormsSelectEvent;
+import org.orbeon.oxf.xforms.event.XFormsInsertEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -346,15 +347,16 @@ public class XFormsControls implements EventTarget {
     }
 
     /**
-     * Visit all the control elements, with the addition of xforms:group, and handling
-     * xforms:repeat.
+     * Visit all the effective controls elements. Handle xforms:repeat if updateRepeats is true.
      */
-    public void visitAllControls(PipelineContext pipelineContext, ControlVisitorListener controlVisitorListener) {
+    public void visitAllControls(PipelineContext pipelineContext, ControlVisitorListener controlVisitorListener, boolean updateRepeats) {
         initialize();
-        handleControls(pipelineContext, controlVisitorListener, controlsDocument.getRootElement(), "", null);
+        handleControls(pipelineContext, controlVisitorListener, controlsDocument.getRootElement(), "", updateRepeats, null);
     }
 
-    private void handleControls(PipelineContext pipelineContext, ControlVisitorListener controlVisitorListener, Element container, String idPostfix, RepeatInfo repeatInfo) {
+    private boolean handleControls(PipelineContext pipelineContext, ControlVisitorListener controlVisitorListener,
+                                   Element container, String idPostfix, boolean updateRepeats, RepeatInfo repeatInfo) {
+        boolean doContinue = true;
         for (Iterator i = container.elements().iterator(); i.hasNext();) {
             final Element controlElement = (Element) i.next();
             final String controlName = controlElement.getName();
@@ -365,18 +367,22 @@ public class XFormsControls implements EventTarget {
                 // Handle xforms:repeat
                 String repeatId = controlElement.attributeValue("id");
 
-                if (repeatInfo == null)
-                    this.repeatInfo = repeatInfo = new RepeatInfo(repeatId);
-                else {
-                    RepeatInfo childRepeatInfo = new RepeatInfo(repeatId);
-                    repeatInfo.addChild(childRepeatInfo);
-                    repeatInfo = childRepeatInfo;
+                if (updateRepeats) {
+                    if (repeatInfo == null)
+                        this.repeatInfo = repeatInfo = new RepeatInfo(repeatId);
+                    else {
+                        RepeatInfo childRepeatInfo = new RepeatInfo(repeatId);
+                        repeatInfo.addChild(childRepeatInfo);
+                        repeatInfo = childRepeatInfo;
+                    }
                 }
 
                 String startIndexString = controlElement.attributeValue("startindex");
                 //String numberString = controlElement.attributeValue("number");
 
                 // Handle repeat index and default repeat index
+                // TODO: this must be done in a separate pass so that forward ids are available
+                // TODO: must support obtaining
                 if (repeatIdToIndex.get(repeatId) == null) {
                     Integer startIndex = new Integer((startIndexString != null) ? Integer.parseInt(startIndexString) : 1);
                     repeatIdToIndex.put(repeatId, startIndex);
@@ -384,43 +390,64 @@ public class XFormsControls implements EventTarget {
 
                 // Push binding for xforms:repeat
                 pushBinding(pipelineContext, controlElement);
-                final Context currentContext = getCurrentContext();
+                try {
+                    final Context currentContext = getCurrentContext();
 
-                // Visit xforms:repeat element
-                controlVisitorListener.visitControl(controlElement, currentControlId);
+                    // Visit xforms:repeat element
+                    doContinue = controlVisitorListener.startVisitControl(controlElement, currentControlId);
 
-                // Iterate over current xforms:repeat nodeset
-                final List currentNodeset = getCurrentNodeset();
-                int currentIndex = 1;
-                for (Iterator j = currentNodeset.iterator(); j.hasNext(); currentIndex++) {
-                    Node currentNode = (Node) j.next();
+                    // Iterate over current xforms:repeat nodeset
+                    final List currentNodeset = getCurrentNodeset();
+                    int currentIndex = 1;
+                    for (Iterator j = currentNodeset.iterator(); j.hasNext(); currentIndex++) {
+                        Node currentNode = (Node) j.next();
 
-                    // Push "artificial" binding with just current node in nodeset
-                    contextStack.push(new Context(currentContext.model, Collections.singletonList(currentNode), true, null));
+                        // Push "artificial" binding with just current node in nodeset
+                        contextStack.push(new Context(currentContext.model, Collections.singletonList(currentNode), true, null));
+                        try {
+                            // Handle children of xforms:repeat
+                            if (doContinue)
+                                doContinue = handleControls(pipelineContext, controlVisitorListener, controlElement, idPostfix + "-" + currentIndex, updateRepeats, repeatInfo);
+                        } finally {
+                            contextStack.pop();
+                        }
+                        if (!doContinue)
+                            break;
+                    }
+                    if (updateRepeats)
+                        repeatInfo.setOccurs(currentIndex - 1);
 
-                    // Handle children
-                    handleControls(pipelineContext, controlVisitorListener, controlElement, idPostfix + "-" + currentIndex, repeatInfo);
+                    doContinue = doContinue && controlVisitorListener.endVisitControl(controlElement, currentControlId);
 
-                    contextStack.pop();
+                } finally {
+                    popBinding();
                 }
-
-                popBinding();
-
-                repeatInfo.setOccurs(currentIndex - 1);
 
             } else  if (isGroupingControl(controlName)) {
                 // Handle XForms grouping controls
                 pushBinding(pipelineContext, controlElement);
-                controlVisitorListener.visitControl(controlElement, currentControlId);
-                handleControls(pipelineContext, controlVisitorListener, controlElement, idPostfix, repeatInfo);
-                popBinding();
+                try {
+                    doContinue = controlVisitorListener.startVisitControl(controlElement, currentControlId);
+                    if (doContinue)
+                        doContinue = handleControls(pipelineContext, controlVisitorListener, controlElement, idPostfix, updateRepeats, repeatInfo);
+                    doContinue = doContinue && controlVisitorListener.endVisitControl(controlElement, currentControlId);
+                } finally {
+                    popBinding();
+                }
             } else if (isLeafControl(controlName)) {
                 // Handle leaf control
                 pushBinding(pipelineContext, controlElement);
-                controlVisitorListener.visitControl(controlElement, currentControlId);
-                popBinding();
+                try {
+                    doContinue = controlVisitorListener.startVisitControl(controlElement, currentControlId);
+                    doContinue = doContinue && controlVisitorListener.endVisitControl(controlElement, currentControlId);
+                } finally {
+                    popBinding();
+                }
             }
+            if (!doContinue)
+                break;
         }
+        return doContinue;
     }
 
     /**
@@ -429,68 +456,6 @@ public class XFormsControls implements EventTarget {
     public RepeatInfo getRepeatInfo() {
         return repeatInfo;
     }
-
-//    /**
-//     * Annotate Controls document with information about xforms:repeat, etc.
-//     *
-//     * Annotations:
-//     *
-//     * o xxforms:repeat-occurs
-//     */
-//    private void annotateControls(PipelineContext pipelineContext, Element container, String idPostfix) {
-//        for (Iterator i = container.elements().iterator(); i.hasNext();) {
-//            final Element controlElement = (Element) i.next();
-//            final String controlName = controlElement.getName();
-//
-//            final String currentControlId = controlElement.attributeValue("id") + idPostfix;
-//            // Annotate with xxforms:id
-//            //controlElement.addAttribute(new QName("xxforms:id", XFormsConstants.XXFORMS_NAMESPACE), currentControlId);
-//
-//            if (controlName.equals("repeat")) {
-//                // Handle xforms:repeat
-//                String repeatId = controlElement.attributeValue("id");
-//
-//                String startIndexString = controlElement.attributeValue("startindex");
-//                //String numberString = controlElement.attributeValue("number");
-//
-//                // Handle repeat index and default repeat index
-//                if (repeatIdToIndex.get(repeatId) == null) {
-//                    Integer startIndex = new Integer((startIndexString != null) ? Integer.parseInt(startIndexString) : 1);
-//                    repeatIdToIndex.put(repeatId, startIndex);
-//                }
-//
-//                // Push binding for xforms:repeat
-//                pushBinding(pipelineContext, controlElement);
-//                final Context currentContext = getCurrentContext();
-//
-//                // Iterate over current xforms:repeat nodeset
-//                final List currentNodeset = getCurrentNodeset();
-//                int currentIndex = 1;
-//                for (Iterator j = currentNodeset.iterator(); j.hasNext(); currentIndex++) {
-//                    Node currentNode = (Node) j.next();
-//
-//                    // Push "artificial" binding with just current node in nodeset
-//                    contextStack.push(new Context(currentContext.model, Collections.singletonList(currentNode), true, null));
-//
-//                    // Handle children
-//                    annotateControls(pipelineContext, controlElement, idPostfix + "-" + currentIndex);
-//
-//                    contextStack.pop();
-//                }
-//
-//                popBinding();
-//            } else  if (isGroupingControl(controlName)) {
-//                // Handle XForms grouping controls
-//                pushBinding(pipelineContext, controlElement);
-//                annotateControls(pipelineContext, controlElement, idPostfix);
-//                popBinding();
-//            } else if (isLeafControl(controlName)) {
-//                // Handle leaf control
-//                pushBinding(pipelineContext, controlElement);
-//                popBinding();
-//            }
-//        }
-//    }
 
     /**
      * Return the value of the label element for the current control, null if none.
@@ -673,6 +638,15 @@ public class XFormsControls implements EventTarget {
             Node currentNode = getCurrentSingleNode();
             XFormsInstance.setValueForNode(currentNode, valueToSet);
 
+        } else if (XFormsEvents.XFORMS_ACTION_ACTION.equals(actionEventName)) {
+            // 10.1.1 The action Element
+            // xforms:action
+
+            for (Iterator i = eventHandlerElement.elementIterator(); i.hasNext();) {
+                Element embeddedActionElement = (Element) i.next();
+                runAction(pipelineContext, embeddedActionElement, XFormsEvent);
+            }
+
         } else if (XFormsEvents.XFORMS_TOGGLE_ACTION.equals(actionEventName)) {
             // 9.2.3 The toggle Element
             // xforms:toggle
@@ -705,14 +679,101 @@ public class XFormsControls implements EventTarget {
                 }
             }
 
-        } else if (XFormsEvents.XFORMS_ACTION_ACTION.equals(actionEventName)) {
-            // 10.1.1 The action Element
-            // xforms:action
+        } else if (XFormsEvents.XFORMS_INSERT_ACTION.equals(actionEventName)) {
+            // 9.3.5 The insert Element
+            final String atAttribute = eventHandlerElement.attributeValue("at");
+            final String positionAttribute = eventHandlerElement.attributeValue("position");
 
-            for (Iterator i = eventHandlerElement.elementIterator(); i.hasNext();) {
-                Element embeddedActionElement = (Element) i.next();
-                runAction(pipelineContext, embeddedActionElement, XFormsEvent);
+            // Set current binding in order to evaluate the current nodeset
+            // "1. The homogeneous collection to be updated is determined by evaluating binding attribute nodeset."
+            setBinding(pipelineContext, eventHandlerElement);
+            final List collectionToBeUpdated = getCurrentNodeset();
+
+            // "2. The corresponding node-set of the initial instance data is located to determine
+            // the prototypical member of the collection. The final member of this collection is
+            // cloned to produce the node that will be inserted."
+            final Element clonedElement;
+            {
+                final List initialInstanceNodeset = collectionToBeUpdated; // TODO: use initial instance to compute this!!!
+                final Element lastElement = (Element) initialInstanceNodeset.get(initialInstanceNodeset.size() - 1);
+                clonedElement = (Element) lastElement.createCopy();
             }
+
+            // "Finally, this newly created node is inserted into the instance data at the location
+            // specified by attributes position and at."
+            final XFormsInstance currentInstance = getCurrentInstance();
+            final String insersionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
+                    "round(" + atAttribute + ")", getCurrentPrefixToURIMap(), null, functionLibrary, null);
+
+            // Don't think we will get NaN with XPath 2.0...
+            int insersionIndex = "NaN".equals(insersionIndexString) ? collectionToBeUpdated.size() : Integer.parseInt(insersionIndexString) ;
+
+            // Adjust index to be in range
+            if (insersionIndex > collectionToBeUpdated.size())
+                insersionIndex = collectionToBeUpdated.size();
+
+            if (insersionIndex < 1)
+                insersionIndex = 1;
+
+            // Find actual insersion point and insert
+            final Element indexElement = (Element) collectionToBeUpdated.get(insersionIndex - 1);
+
+            final Element parentElement = indexElement.getParent();
+            final List siblingElements = parentElement.elements();
+            final int actualIndex = siblingElements.indexOf(indexElement);
+
+            // Insert new element (changes to the list are reflected in the document)
+            final int newNodeIndex;
+            if ("after".equals(positionAttribute) || "NaN".equals(insersionIndexString)) {
+                siblingElements.add(actualIndex + 1, clonedElement);
+                newNodeIndex = insersionIndex + 1;
+            } else if ("before".equals(positionAttribute)) {
+                siblingElements.add(actualIndex, clonedElement);
+                newNodeIndex = insersionIndex;
+            } else {
+                throw new OXFException("Invalid 'position' attribute: " + positionAttribute + ". Must be either 'before' or 'after'.");
+            }
+
+            // "3. The index for any repeating sequence that is bound to the homogeneous collection
+            // where the node was added is updated to point to the newly added node. The indexes for
+            // inner nested repeat collections are re-initialized to 1."
+
+            visitAllControls(pipelineContext, new ControlVisitorListener() {
+                private Element xformsRepeatElement;
+                public boolean startVisitControl(Element controlElement, String effectiveControlId) {
+                    if (controlElement.getName().equals("repeat")) {
+                        setBinding(pipelineContext, controlElement);
+                        Element currentNode = (Element) getCurrentSingleNode();
+                        Element currentParent = currentNode.getParent();
+                        if (xformsRepeatElement != null) {
+                            // This is a child of the updated xforms:repeat
+                            // Set index to 1
+                            setRepeatIdIndex(controlElement.attributeValue("id"), 1);
+                        } else if (currentParent == parentElement) {
+                            // Found the xforms:repeat for which the insert was done
+                            xformsRepeatElement = controlElement;
+
+                            // Set index to new position
+                            setRepeatIdIndex(controlElement.attributeValue("id"), newNodeIndex);
+                        }
+                    }
+                    return true;
+                }
+                public boolean endVisitControl(Element controlElement, String effectiveControlId) {
+                    // Stop when we have handled all the children of the found xforms:repeat element
+                    return ((xformsRepeatElement != null) && (controlElement != xformsRepeatElement));
+                }
+            }, false);
+
+            // "4. If the insert is successful, the event xforms-insert is dispatched."
+            currentInstance.dispatchEvent(pipelineContext, new XFormsInsertEvent(atAttribute));
+
+        } else if (XFormsEvents.XFORMS_DELETE_ACTION.equals(actionEventName)) {
+            // 9.3.6 The delete Element
+
+
+        } else if (XFormsEvents.XFORMS_SETINDEX_ACTION.equals(actionEventName)) {
+            // 9.3.7 The setindex Element
 
         } else {
             throw new OXFException("Invalid action requested: " + actionEventName);
@@ -720,9 +781,13 @@ public class XFormsControls implements EventTarget {
     }
 
     public static interface ControlVisitorListener {
-        public void visitControl(Element controlElement, String effectiveControlId);
+        public boolean startVisitControl(Element controlElement, String effectiveControlId);
+        public boolean endVisitControl(Element controlElement, String effectiveControlId);
     }
 
+    /**
+     * Represents xforms:repeat information.
+     */
     public static class RepeatInfo {
         private String id;
         private int occurs;

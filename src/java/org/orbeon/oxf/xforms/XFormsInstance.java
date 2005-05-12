@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * Represent an XForms instance.
  */
-public class XFormsInstance {
+public class XFormsInstance implements EventTarget {
 
     public static final String REQUEST_INSTANCE_DOCUMENT = "org.orbeon.oxf.request.xforms-instance-document";
     public static final String DEFAULT_UPLOAD_TYPE = "xs:anyURI";
@@ -223,5 +223,20 @@ public class XFormsInstance {
             throw new OXFException("Missing external context");
         ExternalContext.Request request = externalContext.getRequest();
         return request;
+    }
+
+    public void dispatchEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
+        dispatchEvent(pipelineContext, xformsEvent, xformsEvent.getEventName());
+    }
+
+    public void dispatchEvent(PipelineContext pipelineContext, XFormsGenericEvent xformsEvent, String eventName) {
+        if (XFormsEvents.XFORMS_INSERT.equals(eventName)) {
+            // 4.4.5 The xforms-insert and xforms-delete Events
+            // Bubbles: Yes / Cancelable: No / Context Info: Path expression used for insert/delete (xsd:string).
+            // The default action for this event results in the following: None; notification event only.
+
+        } else {
+            throw new OXFException("Invalid action requested: " + eventName);
+        }
     }
 }

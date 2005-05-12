@@ -103,7 +103,7 @@ public class XFormsServer extends ProcessorImpl {
 
                         final AttributesImpl attributesImpl = new AttributesImpl();
                         xFormsControls.visitAllControls(pipelineContext, new XFormsControls.ControlVisitorListener() {
-                            public void visitControl(Element controlElement, String effectiveControlId) {
+                            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
 
                                 if (effectiveControlId == null)
                                     throw new OXFException("Control element doesn't have an id: " + controlElement.getQualifiedName());
@@ -182,8 +182,10 @@ public class XFormsServer extends ProcessorImpl {
                                     }
                                 }
                                 ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
+                                return true;
                             }
-                        });
+                            public boolean endVisitControl(Element controlElement, String effectiveControlId) { return true; }
+                        }, true);
 
                         ch.endElement();
                     }

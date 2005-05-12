@@ -461,10 +461,8 @@ public class Dom4jUtils {
      */
     public static Document createDocument(final Element newRoot) {
         final Element cpy = newRoot.createCopy();
-        final NonLazyUserDataDocumentFactory fctry
-                = NonLazyUserDataDocumentFactory.getInstance(null);
-        final Document ret = fctry.createDocument(cpy);
-        return ret;
+        final NonLazyUserDataDocumentFactory fctry = NonLazyUserDataDocumentFactory.getInstance(null);
+        return fctry.createDocument(cpy);
     }
 
     /**

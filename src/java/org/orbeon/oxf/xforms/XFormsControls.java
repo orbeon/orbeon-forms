@@ -38,6 +38,7 @@ public class XFormsControls implements EventTarget {
 
     private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
     private Map repeatIdToIndex = new HashMap();
+    private RepeatInfo repeatInfo;
 
     private XFormsContainingDocument containingDocument;
     private Document controlsDocument;
@@ -350,10 +351,10 @@ public class XFormsControls implements EventTarget {
      */
     public void visitAllControls(PipelineContext pipelineContext, ControlVisitorListener controlVisitorListener) {
         initialize();
-        handleControls(pipelineContext, controlVisitorListener, controlsDocument.getRootElement(), "");
+        handleControls(pipelineContext, controlVisitorListener, controlsDocument.getRootElement(), "", null);
     }
 
-    private void handleControls(PipelineContext pipelineContext, ControlVisitorListener controlVisitorListener, Element container, String idPostfix) {
+    private void handleControls(PipelineContext pipelineContext, ControlVisitorListener controlVisitorListener, Element container, String idPostfix, RepeatInfo repeatInfo) {
         for (Iterator i = container.elements().iterator(); i.hasNext();) {
             final Element controlElement = (Element) i.next();
             final String controlName = controlElement.getName();
@@ -363,6 +364,14 @@ public class XFormsControls implements EventTarget {
             if (controlName.equals("repeat")) {
                 // Handle xforms:repeat
                 String repeatId = controlElement.attributeValue("id");
+
+                if (repeatInfo == null)
+                    this.repeatInfo = repeatInfo = new RepeatInfo(repeatId);
+                else {
+                    RepeatInfo childRepeatInfo = new RepeatInfo(repeatId);
+                    repeatInfo.addChild(childRepeatInfo);
+                    repeatInfo = childRepeatInfo;
+                }
 
                 String startIndexString = controlElement.attributeValue("startindex");
                 //String numberString = controlElement.attributeValue("number");
@@ -390,17 +399,20 @@ public class XFormsControls implements EventTarget {
                     contextStack.push(new Context(currentContext.model, Collections.singletonList(currentNode), true, null));
 
                     // Handle children
-                    handleControls(pipelineContext, controlVisitorListener, controlElement, idPostfix + "-" + currentIndex);
+                    handleControls(pipelineContext, controlVisitorListener, controlElement, idPostfix + "-" + currentIndex, repeatInfo);
 
                     contextStack.pop();
                 }
 
                 popBinding();
+
+                repeatInfo.setOccurs(currentIndex - 1);
+
             } else  if (isGroupingControl(controlName)) {
                 // Handle XForms grouping controls
                 pushBinding(pipelineContext, controlElement);
                 controlVisitorListener.visitControl(controlElement, currentControlId);
-                handleControls(pipelineContext, controlVisitorListener, controlElement, idPostfix);
+                handleControls(pipelineContext, controlVisitorListener, controlElement, idPostfix, repeatInfo);
                 popBinding();
             } else if (isLeafControl(controlName)) {
                 // Handle leaf control
@@ -410,6 +422,75 @@ public class XFormsControls implements EventTarget {
             }
         }
     }
+
+    /**
+     * Get xforms:repeat information.
+     */
+    public RepeatInfo getRepeatInfo() {
+        return repeatInfo;
+    }
+
+//    /**
+//     * Annotate Controls document with information about xforms:repeat, etc.
+//     *
+//     * Annotations:
+//     *
+//     * o xxforms:repeat-occurs
+//     */
+//    private void annotateControls(PipelineContext pipelineContext, Element container, String idPostfix) {
+//        for (Iterator i = container.elements().iterator(); i.hasNext();) {
+//            final Element controlElement = (Element) i.next();
+//            final String controlName = controlElement.getName();
+//
+//            final String currentControlId = controlElement.attributeValue("id") + idPostfix;
+//            // Annotate with xxforms:id
+//            //controlElement.addAttribute(new QName("xxforms:id", XFormsConstants.XXFORMS_NAMESPACE), currentControlId);
+//
+//            if (controlName.equals("repeat")) {
+//                // Handle xforms:repeat
+//                String repeatId = controlElement.attributeValue("id");
+//
+//                String startIndexString = controlElement.attributeValue("startindex");
+//                //String numberString = controlElement.attributeValue("number");
+//
+//                // Handle repeat index and default repeat index
+//                if (repeatIdToIndex.get(repeatId) == null) {
+//                    Integer startIndex = new Integer((startIndexString != null) ? Integer.parseInt(startIndexString) : 1);
+//                    repeatIdToIndex.put(repeatId, startIndex);
+//                }
+//
+//                // Push binding for xforms:repeat
+//                pushBinding(pipelineContext, controlElement);
+//                final Context currentContext = getCurrentContext();
+//
+//                // Iterate over current xforms:repeat nodeset
+//                final List currentNodeset = getCurrentNodeset();
+//                int currentIndex = 1;
+//                for (Iterator j = currentNodeset.iterator(); j.hasNext(); currentIndex++) {
+//                    Node currentNode = (Node) j.next();
+//
+//                    // Push "artificial" binding with just current node in nodeset
+//                    contextStack.push(new Context(currentContext.model, Collections.singletonList(currentNode), true, null));
+//
+//                    // Handle children
+//                    annotateControls(pipelineContext, controlElement, idPostfix + "-" + currentIndex);
+//
+//                    contextStack.pop();
+//                }
+//
+//                popBinding();
+//            } else  if (isGroupingControl(controlName)) {
+//                // Handle XForms grouping controls
+//                pushBinding(pipelineContext, controlElement);
+//                annotateControls(pipelineContext, controlElement, idPostfix);
+//                popBinding();
+//            } else if (isLeafControl(controlName)) {
+//                // Handle leaf control
+//                pushBinding(pipelineContext, controlElement);
+//                popBinding();
+//            }
+//        }
+//    }
 
     /**
      * Return the value of the label element for the current control, null if none.
@@ -640,5 +721,37 @@ public class XFormsControls implements EventTarget {
 
     public static interface ControlVisitorListener {
         public void visitControl(Element controlElement, String effectiveControlId);
+    }
+
+    public static class RepeatInfo {
+        private String id;
+        private int occurs;
+        private List children;
+
+        public RepeatInfo(String id) {
+            this.id = id;
+        }
+
+        public void setOccurs(int occurs) {
+            this.occurs = occurs;
+        }
+
+        public void addChild(RepeatInfo repeatInfo) {
+            if (children == null)
+                children = new ArrayList();
+            children.add(repeatInfo);
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public int getOccurs() {
+            return occurs;
+        }
+
+        public List getChildren() {
+            return children;
+        }
     }
 }

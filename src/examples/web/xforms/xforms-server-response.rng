@@ -90,7 +90,24 @@
                     </element>
                 </zeroOrMore>
             </element>
+            <element name="xxforms:repeats">
+                <zeroOrMore>
+                    <ref name="repeatInfo"/>
+                </zeroOrMore>
+            </element>
         </element>
     </start>
+
+    <define name="repeatInfo">
+        <element name="xxforms:repeat">
+            <attribute name="id"/>
+            <attribute name="occurs">
+                <data type="nonNegativeInteger"/>
+            </attribute>
+            <zeroOrMore>
+                <ref name="repeatInfo"/>
+            </zeroOrMore>
+        </element>
+    </define>
 
 </grammar>

@@ -127,6 +127,7 @@
                     </instances>
                 </xxf:instances>
                 <xxf:divs/>
+                <xxf:repeats/>
             </xxf:event-response>
         </output>
     </test>
@@ -215,6 +216,7 @@
                     </instances>
                 </xxf:instances>
                 <xxf:divs/>
+                <xxf:repeats/>
             </xxf:event-response>
         </output>
     </test>
@@ -409,6 +411,7 @@
                     </instances>
                 </xxf:instances>
                 <xxf:divs/>
+                <xxf:repeats/>
             </xxf:event-response>
         </output>
     </test>
@@ -500,6 +503,7 @@
                     </instances>
                 </xxf:instances>
                 <xxf:divs/>
+                <xxf:repeats/>
             </xxf:event-response>
         </output>
     </test>
@@ -600,13 +604,14 @@
                     </instances>
                 </xxf:instances>
                 <xxf:divs/>
+                <xxf:repeats/>
             </xxf:event-response>
         </output>
     </test>
 
     <test description="Test for xforms:repeat initialization" name="oxf:pipeline">
         <input name="config">
-            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
 
                 <p:processor name="oxf:pipeline">
@@ -619,7 +624,48 @@
                     <p:input name="instances">
                         <xxforms:instances/>
                     </p:input>
-                    <p:output name="response" ref="response"/>
+                    <p:output name="response" id="repeat-response"/>
+                </p:processor>
+
+                <p:processor name="oxf:unsafe-xslt">
+                    <p:input name="data" href="#repeat-response"/>
+                    <p:input name="controls" href="xforms-server/repeat-full-controls.xml"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0">
+                            <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
+                            <xsl:variable name="repeats" select="/xxforms:event-response/xxforms:repeats/xxforms:repeat" as="element()"/>
+                            <xsl:template match="xxforms:repeats">
+                                <xsl:copy>
+                                    <xsl:apply-templates/>
+                                </xsl:copy>
+                                <xsl:apply-templates select="doc('input:controls')" mode="controls">
+                                    <xsl:with-param name="current-repeats" select="$repeats" tunnel="yes"/>
+                                    <xsl:with-param name="id-postfix" select="''" tunnel="yes"/>
+                                </xsl:apply-templates>
+                            </xsl:template>
+                            <xsl:template match="xforms:repeat" mode="controls">
+                                <xsl:param name="current-repeats" tunnel="yes"/>
+                                <xsl:param name="id-postfix" tunnel="yes"/>
+
+                                <xsl:variable name="xforms-repeat" select="." as="element()"/>
+                                <xsl:variable name="current-repeat" select="$current-repeats[@id = $xforms-repeat/@id]" as="element()"/>
+
+                                <xsl:for-each select="(1 to $current-repeat/@occurs)">
+                                    <xsl:apply-templates select="$xforms-repeat/*" mode="controls">
+                                        <xsl:with-param name="current-repeats" select="$current-repeat/xxforms:repeat[current()]" tunnel="yes"/>
+                                        <xsl:with-param name="id-postfix" select="concat($id-postfix, '-', current())" tunnel="yes"/>
+                                    </xsl:apply-templates>
+                                </xsl:for-each>
+                            </xsl:template>
+                            <xsl:template match="xforms:*/@id" mode="controls">
+                                <xsl:param name="current-repeats" tunnel="yes"/>
+                                <xsl:param name="id-postfix" tunnel="yes"/>
+
+                                <xsl:attribute name="id" select="concat(., $id-postfix)"/>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" ref="response"/>
                 </p:processor>
 
             </p:config>
@@ -668,6 +714,91 @@
                     </instances>
                 </xxf:instances>
                 <xxf:divs/>
+                <xxf:repeats>
+                    <xxf:repeat id="id123" occurs="3">
+                        <xxf:repeat id="id124" occurs="2"/>
+                        <xxf:repeat id="id124" occurs="1"/>
+                        <xxf:repeat id="id124" occurs="4"/>
+                    </xxf:repeat>
+                </xxf:repeats>
+                <xxforms:controls xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                    <table>
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <xforms:output ref="@first" id="id125-1-1"/>
+                                        </td>
+                                        <td>
+                                            <xforms:output ref="@last" id="id126-1-1"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <xforms:output ref="@first" id="id125-1-2"/>
+                                        </td>
+                                        <td>
+                                            <xforms:output ref="@last" id="id126-1-2"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <xforms:output ref="@first" id="id125-2-1"/>
+                                        </td>
+                                        <td>
+                                            <xforms:output ref="@last" id="id126-2-1"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <xforms:output ref="@first" id="id125-3-1"/>
+                                        </td>
+                                        <td>
+                                            <xforms:output ref="@last" id="id126-3-1"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <xforms:output ref="@first" id="id125-3-2"/>
+                                        </td>
+                                        <td>
+                                            <xforms:output ref="@last" id="id126-3-2"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <xforms:output ref="@first" id="id125-3-3"/>
+                                        </td>
+                                        <td>
+                                            <xforms:output ref="@last" id="id126-3-3"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <xforms:output ref="@first" id="id125-3-4"/>
+                                        </td>
+                                        <td>
+                                            <xforms:output ref="@last" id="id126-3-4"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </xxforms:controls>
             </xxf:event-response>
         </output>
     </test>

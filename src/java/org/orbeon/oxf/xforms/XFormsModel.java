@@ -1157,6 +1157,13 @@ public class XFormsModel implements EventTarget, Cloneable {
 
             // TODO
 
+        } else if (XFormsEvents.XFORMS_COMPUTE_EXCEPTION.equals(eventName)) {
+            // 4.5.4 The xforms-compute-exception Event
+            // Bubbles: Yes / Cancelable: No / Context Info: Implementation-specific error string.
+            // The default action for this event results in the following: Fatal error.
+
+            // TODO
+
         } else {
             throw new OXFException("Invalid event dispatched: " + eventName);
         }

@@ -51,8 +51,8 @@
 
     <!-- Run XForms Server -->
     <p:processor name="oxf:xforms-server">
-        <p:input name="request" href="#request"/>
-        <p:output name="response" id="encoded-response"/>
+        <p:input name="request" href="#request" schema-href="/xforms/xforms-server-request.rng"/>
+        <p:output name="response" id="encoded-response" schema-href="/xforms/xforms-server-response.rng"/>
     </p:processor>
 
     <!-- Decode -->

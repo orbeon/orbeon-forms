@@ -89,6 +89,7 @@ public class XFormsServer extends ProcessorImpl {
                 }
 
                 // Create resulting document
+                final XFormsControls xFormsControls = containingDocument.getXFormsControls();
                 try {
                     final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
                     ch.startDocument();
@@ -98,8 +99,6 @@ public class XFormsServer extends ProcessorImpl {
                     // Output new controls values and associated information
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
-
-                        final XFormsControls xFormsControls = containingDocument.getXFormsControls();
 
                         final AttributesImpl attributesImpl = new AttributesImpl();
                         xFormsControls.visitAllControls(pipelineContext, new XFormsControls.ControlVisitorListener() {
@@ -209,25 +208,25 @@ public class XFormsServer extends ProcessorImpl {
                         ch.endElement();
                     }
 
-                    // Output divs
+                    // Output divs information
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
-
-                        if (xformsEvent != null) {
-                            if (xformsEvent.getDivsToHide() != null) {
-                                for (Iterator i = xformsEvent.getDivsToHide().iterator(); i.hasNext();) {
-                                    String caseId = (String) i.next();
-                                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "hidden"});
-                                }
-                            }
-                            if (xformsEvent.getDivsToShow() != null) {
-                                for (Iterator i = xformsEvent.getDivsToShow().iterator(); i.hasNext();) {
-                                    String caseId = (String) i.next();
-                                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "visible"});
-                                }
-                            }
+                        if (xformsEvent == null) {
+                            outputInitialDivs();
+                        } else {
+                            outputDivsUpdates(ch, xformsEvent);
                         }
+                        ch.endElement();
+                    }
 
+                    // Output repeats information
+                    {
+                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeats");
+                        if (xformsEvent == null) {
+                            outputInitialRepeats(ch, xFormsControls.getRepeatInfo());
+                        } else {
+                            outputRepeatsUpdates();
+                        }
                         ch.endElement();
                     }
 
@@ -241,6 +240,43 @@ public class XFormsServer extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
+    }
+
+    private void outputInitialDivs() {
+        // TODO
+    }
+
+    private void outputDivsUpdates(ContentHandlerHelper ch, XFormsGenericEvent xformsEvent) {
+        if (xformsEvent.getDivsToHide() != null) {
+            for (Iterator i = xformsEvent.getDivsToHide().iterator(); i.hasNext();) {
+                String caseId = (String) i.next();
+                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "hidden"});
+            }
+        }
+        if (xformsEvent.getDivsToShow() != null) {
+            for (Iterator i = xformsEvent.getDivsToShow().iterator(); i.hasNext();) {
+                String caseId = (String) i.next();
+                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "visible"});
+            }
+        }
+    }
+
+    private void outputInitialRepeats(ContentHandlerHelper ch, XFormsControls.RepeatInfo repeatInfo) {
+        if (repeatInfo != null) {
+            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat",
+                    new String[]{ "id", repeatInfo.getId(), "occurs", Integer.toString(repeatInfo.getOccurs()) });
+            if (repeatInfo.getChildren() != null) {
+                for (Iterator i = repeatInfo.getChildren().iterator(); i.hasNext();) {
+                    XFormsControls.RepeatInfo childRepeatInfo = (XFormsControls.RepeatInfo) i.next();
+                    outputInitialRepeats(ch, childRepeatInfo);
+                }
+            }
+            ch.endElement();
+        }
+    }
+
+    private void outputRepeatsUpdates() {
+        // TODO
     }
 
     public static XFormsContainingDocument createXFormsEngine(PipelineContext pipelineContext, String encodedControlsString,

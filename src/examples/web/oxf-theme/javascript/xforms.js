@@ -49,6 +49,16 @@ function xformsRemoveEventListener(target, eventName, handler) {
     }
 }
 
+function xformsDispatchEvent(target, eventName) {
+    if (target.dispatchEvent) {
+        var event = document.createEvent("MouseEvent");
+        event.initEvent("change", 0, 0);
+        target.dispatchEvent(event);
+    } else {
+        target.fireEvent("on" + eventName);
+    }
+}
+
 function log(text) {
     document.getElementById("debug").innerHTML += text + " | ";
 }
@@ -101,6 +111,14 @@ function getEventTarget(event) {
     return event.srcElement ? event.srcElement : event.target;
 }
 
+// Function called when value changed
+function xformsValueChanged(target, incremental) {
+    if (target.value != target.previousValue) {
+        target.previousValue = target.value;
+        xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value, incremental);
+    }
+}
+    
 /**
  * Initializes attributes of each form:
  *
@@ -171,21 +189,14 @@ function xformsPageLoaded() {
         }
         if (!isXFormsElement) continue;
     
-        // Function called when value changed
-        function valueChanged(event, incremental) {
-            var target = getEventTarget(event);
-            if (target.value != target.previousValue) {
-                target.previousValue = target.value;
-                xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value, incremental);
-            }
-        }
-    
         // Handle value change and incremental modification
         control.previousValue = null;
         control.userModications = false;
-        xformsAddEventListener(control, "change", function(event) { valueChanged(event, false); });
+        xformsAddEventListener(control, "change", function(event) 
+            { xformsValueChanged(getEventTarget(event), false); });
         if (isIncremental)
-            xformsAddEventListener(control, "keyup", function(event) { valueChanged(event, true); });
+            xformsAddEventListener(control, "keyup", function(event) 
+                { xformsValueChanged(getEventTarget(event), true); });
         
         // Handle click
         if (control.tagName == "BUTTON") {

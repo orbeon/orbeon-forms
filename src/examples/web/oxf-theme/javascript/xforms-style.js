@@ -84,7 +84,9 @@ function xformsUpdateStyle(element) {
                         button         :    showCalendarId,
                         singleClick    :    false,
                         step           :    1,
-                        onUpdate       :    function() { this.inputField.fireEvent("onchange"); }
+                        onUpdate       :    function() { 
+                            xformsValueChanged(this.inputField, false); 
+                        }
                     });
                 }
             }

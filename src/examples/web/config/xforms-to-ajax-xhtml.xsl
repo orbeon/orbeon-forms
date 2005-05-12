@@ -55,12 +55,12 @@
             <xsl:apply-templates select="xforms:label"/>
         </xsl:if>
         <xsl:next-match/>
+        <xsl:apply-templates select="xforms:help"/>
         <xhtml:label for="{@id}">
             <xsl:copy-of select="xxforms:copy-attributes(xforms:alert, concat('xforms-alert-', 
                 if (xxforms:control(@id)/@valid = 'false') then 'active' else 'inactive'))"/>
             <xsl:value-of select="xxforms:control(@id)/@alert"/>
         </xhtml:label>
-        <xsl:apply-templates select="xforms:help"/>
         <xsl:apply-templates select="xforms:hint"/>
     </xsl:template>
     

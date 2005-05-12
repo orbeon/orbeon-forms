@@ -57,7 +57,7 @@
     <xhtml:body>
         <xforms:switch class="switch-tabs">
             <xforms:case id="text" selected="true">
-<!--                <xforms:label>Text Controls</xforms:label>-->
+                <xforms:label>Text Controls</xforms:label>
                 <xforms:group ref="instance('text')">
                     <p>
                         <xforms:input ref="text">

@@ -561,7 +561,7 @@ ul {
     
 .xforms-showcalendar {
     margin-left: .5em;
-    background-image: url(../images/showCalendar.gif);
+    background-image: url(../images/showCalendar2.gif);
     background-repeat: no-repeat;
     background-position: top left;
     display: -moz-inline-box;

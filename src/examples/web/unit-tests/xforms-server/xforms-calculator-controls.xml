@@ -169,7 +169,7 @@
             <xf:toggle ev:event="DOMActivate" case="add"/>
         </xf:action>
     </xf:trigger>
-    <xf:switch>
+    <xf:switch id="23a">
         <xf:case id="add" selected="true">
             <xf:trigger id="24">
                 <xf:label>=</xf:label>
@@ -204,6 +204,7 @@
             </xf:trigger>
         </xf:case>
         <xf:case id="divide">
+            <xf:label>Hello Divide!!!</xf:label>
             <xf:trigger id="27">
                 <xf:label>=</xf:label>
                 <xf:action ev:event="DOMActivate">

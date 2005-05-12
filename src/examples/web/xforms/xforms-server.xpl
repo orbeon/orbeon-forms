@@ -14,9 +14,7 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xforms="http://www.w3.org/2002/xforms">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <!-- Extract request body -->
     <p:processor name="oxf:request">
@@ -34,11 +32,10 @@
         <p:output name="data" id="xml-request" debug="xxxrequest"/>
     </p:processor>
 
-    <!-- Execute event action -->
-    <p:processor name="oxf:pipeline">
-        <p:input name="config" href="xforms-event.xpl"/>
-        <p:input name="request" href="#xml-request"/>
-        <p:output name="response" id="xml-response"/>
+    <!-- Run XForms Server -->
+    <p:processor name="oxf:xforms-server">
+        <p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng"/>
+        <p:output name="response" id="xml-response" schema-href="xforms-server-response.rng"/>
     </p:processor>
 
     <!-- Generate response -->

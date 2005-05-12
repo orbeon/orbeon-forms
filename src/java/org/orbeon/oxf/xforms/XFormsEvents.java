@@ -38,4 +38,5 @@ public class XFormsEvents {
     // Exceptions and errors
     public static final String XFORMS_LINK_EXCEPTION = "xforms-link-exception";
     public static final String XFORMS_LINK_ERROR = "xforms-link-error";
+    public static final String XFORMS_COMPUTE_EXCEPTION = "xforms-compute-exception";
 }

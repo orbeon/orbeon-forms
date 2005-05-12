@@ -45,7 +45,6 @@ import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.type.ItemType;
 import org.orbeon.saxon.type.Type;
 import org.orbeon.saxon.value.StringValue;

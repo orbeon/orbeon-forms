@@ -47,6 +47,33 @@ public class XFormsControls implements EventTarget {
 
     private FunctionLibrary functionLibrary = new XFormsFunctionLibrary(this);
 
+    private static final Map groupingControls = new HashMap();
+    private static final Map valueControls = new HashMap();
+    private static final Map noValueControls = new HashMap();
+    private static final Map leafControls = new HashMap();
+
+    static {
+        groupingControls.put("group", "group");
+        groupingControls.put("repeat", "repeat");
+        groupingControls.put("switch", "switch");
+        groupingControls.put("case", "case");
+
+        valueControls.put("input", "input");
+        valueControls.put("secret", "secret");
+        valueControls.put("textarea", "textarea");
+        valueControls.put("output", "output");
+        valueControls.put("upload", "upload");
+        valueControls.put("range", "range");
+        valueControls.put("select", "select");
+        valueControls.put("select1", "select1");
+
+        noValueControls.put("submit", "submit");
+        noValueControls.put("trigger", "trigger");
+
+        leafControls.putAll(valueControls);
+        leafControls.putAll(noValueControls);
+    }
+
     public XFormsControls(XFormsContainingDocument containingDocument, Document controlsDocument) {
         this.containingDocument = containingDocument;
         this.controlsDocument = controlsDocument;
@@ -71,6 +98,18 @@ public class XFormsControls implements EventTarget {
 
     public XFormsContainingDocument getContainingDocument() {
         return containingDocument;
+    }
+
+    public boolean isValueControl(String controlName) {
+        return valueControls.get(controlName) != null;
+    }
+
+    public boolean isGroupingControl(String controlName) {
+        return groupingControls.get(controlName) != null;
+    }
+
+    public boolean isLeafControl(String controlName) {
+        return leafControls.get(controlName) != null;
     }
 
     /**
@@ -219,12 +258,15 @@ public class XFormsControls implements EventTarget {
         contextStack.push(null);
     }
 
+    /**
+     * Set the current index of xforms:repeat with specified id.
+     */
     public void setRepeatIdIndex(String repeatId, int index) {
         // Update current element of nodeset in stack
         popBinding();
         List newNodeset = new ArrayList();
         newNodeset.add(getCurrentNodeset().get(index - 1));
-        contextStack.push(new Context(getCurrentContext().model, newNodeset, true, null));
+        contextStack.push(new Context(getCurrentContext().model, newNodeset, true, null));//TODO: check this
 
         if (repeatId != null)
             repeatIdToIndex.put(repeatId, new Integer(index));
@@ -236,12 +278,18 @@ public class XFormsControls implements EventTarget {
         popBinding();
     }
 
-    public int getRepeatIdIndex(String repeatId, LocationData locationData) {
-        Object index = repeatIdToIndex.get(repeatId);
-        if (index == null)
-            throw new ValidationException("Function index uses repeat id '" + repeatId
-                    + "' which it not in scope", locationData);
-        return ((Integer) index).intValue();
+    /**
+     * Set all current repeat indices.
+     */
+    public void setRepeatIndices(Map repeatIds) {
+        // TODO
+    }
+
+    /**
+     * Return the current repeat index for the given xforms:repeat id. Null if the id is not found.
+     */
+    public Integer getRepeatIdIndex(String repeatId) {
+        return (Integer) repeatIdToIndex.get(repeatId);
     }
 
     public Map getRepeatIdToIndex() {
@@ -297,17 +345,75 @@ public class XFormsControls implements EventTarget {
     }
 
     /**
-     * Return an ordered list of all the control elements, with the addition of xforms:group.
+     * Visit all the control elements, with the addition of xforms:group, and handling
+     * xforms:repeat.
      */
-    public List getAllControlElements(PipelineContext pipelineContext) {
-        return documentXPathEvaluator.evaluate(pipelineContext, controlsDocument,
-                "/xxf:controls//(xf:group|xf:input|xf:secret|xf:textarea|xf:output|xf:upload|xf:range|xf:trigger|xf:submit|xf:select|xf:select1)",
-                XFormsServer.XFORMS_NAMESPACES, null, null, null);
+    public void visitAllControls(PipelineContext pipelineContext, ControlVisitorListener controlVisitorListener) {
+        initialize();
+        handleControls(pipelineContext, controlVisitorListener, controlsDocument.getRootElement(), "");
+    }
+
+    private void handleControls(PipelineContext pipelineContext, ControlVisitorListener controlVisitorListener, Element container, String idPostfix) {
+        for (Iterator i = container.elements().iterator(); i.hasNext();) {
+            final Element controlElement = (Element) i.next();
+            final String controlName = controlElement.getName();
+
+            final String currentControlId = controlElement.attributeValue("id") + idPostfix;
+
+            if (controlName.equals("repeat")) {
+                // Handle xforms:repeat
+                String repeatId = controlElement.attributeValue("id");
+
+                String startIndexString = controlElement.attributeValue("startindex");
+                //String numberString = controlElement.attributeValue("number");
+
+                // Handle repeat index and default repeat index
+                if (repeatIdToIndex.get(repeatId) == null) {
+                    Integer startIndex = new Integer((startIndexString != null) ? Integer.parseInt(startIndexString) : 1);
+                    repeatIdToIndex.put(repeatId, startIndex);
+                }
+
+                // Push binding for xforms:repeat
+                pushBinding(pipelineContext, controlElement);
+                final Context currentContext = getCurrentContext();
+
+                // Visit xforms:repeat element
+                controlVisitorListener.visitControl(controlElement, currentControlId);
+
+                // Iterate over current xforms:repeat nodeset
+                final List currentNodeset = getCurrentNodeset();
+                int currentIndex = 1;
+                for (Iterator j = currentNodeset.iterator(); j.hasNext(); currentIndex++) {
+                    Node currentNode = (Node) j.next();
+
+                    // Push "artificial" binding with just current node in nodeset
+                    contextStack.push(new Context(currentContext.model, Collections.singletonList(currentNode), true, null));
+
+                    // Handle children
+                    handleControls(pipelineContext, controlVisitorListener, controlElement, idPostfix + "-" + currentIndex);
+
+                    contextStack.pop();
+                }
+
+                popBinding();
+            } else  if (isGroupingControl(controlName)) {
+                // Handle XForms grouping controls
+                pushBinding(pipelineContext, controlElement);
+                controlVisitorListener.visitControl(controlElement, currentControlId);
+                handleControls(pipelineContext, controlVisitorListener, controlElement, idPostfix);
+                popBinding();
+            } else if (isLeafControl(controlName)) {
+                // Handle leaf control
+                pushBinding(pipelineContext, controlElement);
+                controlVisitorListener.visitControl(controlElement, currentControlId);
+                popBinding();
+            }
+        }
     }
 
     /**
      * Return the value of the label element for the current control, null if none.
-     * <p/>
+     *
      * 8.3.3 The label Element
      */
     public String getLabelValue(PipelineContext pipelineContext) {
@@ -316,7 +422,7 @@ public class XFormsControls implements EventTarget {
 
     /**
      * Return the value of the help element for the current control, null if none.
-     * <p/>
+     *
      * 8.3.4 The help Element
      */
     public String getHelpValue(PipelineContext pipelineContext) {
@@ -325,7 +431,7 @@ public class XFormsControls implements EventTarget {
 
     /**
      * Return the value of the hint element for the current control, null if none.
-     * <p/>
+     *
      * 8.3.5 The hint Element
      */
     public String getHintValue(PipelineContext pipelineContext) {
@@ -334,7 +440,7 @@ public class XFormsControls implements EventTarget {
 
     /**
      * Return the value of the alert element for the current control, null if none.
-     * <p/>
+     *
      * 8.3.6 The alert Element
      */
     public String getAlertValue(PipelineContext pipelineContext) {
@@ -530,5 +636,9 @@ public class XFormsControls implements EventTarget {
         } else {
             throw new OXFException("Invalid action requested: " + actionEventName);
         }
+    }
+
+    public static interface ControlVisitorListener {
+        public void visitControl(Element controlElement, String effectiveControlId);
     }
 }

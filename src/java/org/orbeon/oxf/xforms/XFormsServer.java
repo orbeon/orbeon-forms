@@ -73,7 +73,7 @@ public class XFormsServer extends ProcessorImpl {
                         encodedModelsString, encodedInstancesString);
 
                 // Run event if any
-                XFormsGenericEvent XFormsEvent = null;
+                XFormsGenericEvent xformsEvent = null;
                 {
                     final Element eventElement = eventDocument.getRootElement();
                     String controlId = eventElement.attributeValue("source-control-id");
@@ -82,7 +82,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (controlId != null && eventName != null) {
                         // An event is passed
-                        XFormsEvent = containingDocument.executeEvent(pipelineContext, controlId, eventName, value);
+                        xformsEvent = containingDocument.executeEvent(pipelineContext, controlId, eventName, value);
                     } else if (!(controlId == null && eventName == null)) {
                         throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
                     }
@@ -90,7 +90,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Create resulting document
                 try {
-                    ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
+                    final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
                     ch.startDocument();
                     contentHandler.startPrefixMapping("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI);
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "event-response");
@@ -99,82 +99,85 @@ public class XFormsServer extends ProcessorImpl {
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
-                        AttributesImpl attributesImpl = new AttributesImpl();
-                        XFormsControls xFormsControls = containingDocument.getXFormsControls();
-                        for (Iterator i = xFormsControls.getAllControlElements(pipelineContext).iterator(); i.hasNext();) {
-                            Element controlElement = (Element) i.next();
+                        final XFormsControls xFormsControls = containingDocument.getXFormsControls();
 
-                            String controlId = controlElement.attributeValue("id");
-                            if (controlId == null)
-                                throw new OXFException("Control element doesn't have an id: " + controlElement.getQualifiedName());
+                        final AttributesImpl attributesImpl = new AttributesImpl();
+                        xFormsControls.visitAllControls(pipelineContext, new XFormsControls.ControlVisitorListener() {
+                            public void visitControl(Element controlElement, String effectiveControlId) {
 
-                            // Set current binding for control element
-                            xFormsControls.setBinding(pipelineContext, controlElement);
-                            Node currentNode = xFormsControls.getCurrentSingleNode();
+                                if (effectiveControlId == null)
+                                    throw new OXFException("Control element doesn't have an id: " + controlElement.getQualifiedName());
 
-                            attributesImpl.clear();
+                                // Set current binding for control element
+                                //xFormsControls.setBinding(pipelineContext, controlElement);
+                                Node currentNode = xFormsControls.getCurrentSingleNode();
 
-                            // Control id
-                            attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, controlId);
+                                attributesImpl.clear();
 
-                            // Get current value unless it's a group
-                            if (!(controlElement.getName().equals("group") || controlElement.getName().equals("submit") || controlElement.getName().equals("trigger"))) {
-                                String controlValue = XFormsInstance.getValueForNode(currentNode);
-                                attributesImpl.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, controlValue);
-                            }
+                                // Control id
+                                attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, effectiveControlId);
 
-                            // Get control children values
-                            String labelValue = xFormsControls.getLabelValue(pipelineContext);
-                            String helpValue = xFormsControls.getHelpValue(pipelineContext);
-                            String hintValue = xFormsControls.getHintValue(pipelineContext);
-                            String alertValue = xFormsControls.getAlertValue(pipelineContext);
-
-                            if (labelValue != null) {
-                                attributesImpl.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, labelValue);
-                            }
-
-                            if (helpValue != null) {
-                                attributesImpl.addAttribute("", "help", "help", ContentHandlerHelper.CDATA, helpValue);
-                            }
-
-                            if (hintValue != null) {
-                                attributesImpl.addAttribute("", "hint", "hint", ContentHandlerHelper.CDATA, hintValue);
-                            }
-
-                            if (alertValue != null) {
-                                attributesImpl.addAttribute("", "alert", "alert", ContentHandlerHelper.CDATA, alertValue);
-                            }
-
-                            // Get model item properties
-                            InstanceData instanceData = XFormsUtils.getLocalInstanceData(currentNode);
-                            if (instanceData != null) {
-                                BooleanModelItemProperty readonly = instanceData.getReadonly();
-                                if (readonly.isSet()) {
-                                    attributesImpl.addAttribute("", XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
-                                            XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
-                                            ContentHandlerHelper.CDATA, Boolean.toString(readonly.get()));
+                                // Get current value if possible for this control
+                                if (xFormsControls.isValueControl(controlElement.getName())) {
+                                    String controlValue = XFormsInstance.getValueForNode(currentNode);
+                                    attributesImpl.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, controlValue);
                                 }
-                                BooleanModelItemProperty required = instanceData.getRequired();
-                                if (required.isSet()) {
-                                    attributesImpl.addAttribute("", XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
-                                            XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
-                                            ContentHandlerHelper.CDATA, Boolean.toString(required.get()));
+
+                                // TODO: for xforms:case, must provide whether it is selected or not
+
+                                // Get control children values
+                                String labelValue = xFormsControls.getLabelValue(pipelineContext);
+                                String helpValue = xFormsControls.getHelpValue(pipelineContext);
+                                String hintValue = xFormsControls.getHintValue(pipelineContext);
+                                String alertValue = xFormsControls.getAlertValue(pipelineContext);
+
+                                if (labelValue != null) {
+                                    attributesImpl.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, labelValue);
                                 }
-                                BooleanModelItemProperty relevant = instanceData.getRelevant();
-                                if (relevant.isSet()) {
-                                    attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
-                                            XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
-                                            ContentHandlerHelper.CDATA, Boolean.toString(relevant.get()));
+
+                                if (helpValue != null) {
+                                    attributesImpl.addAttribute("", "help", "help", ContentHandlerHelper.CDATA, helpValue);
                                 }
-                                BooleanModelItemProperty valid = instanceData.getValid();
-                                if (valid.isSet()) {
-                                    attributesImpl.addAttribute("", XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
-                                            XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
-                                            ContentHandlerHelper.CDATA, Boolean.toString(valid.get()));
+
+                                if (hintValue != null) {
+                                    attributesImpl.addAttribute("", "hint", "hint", ContentHandlerHelper.CDATA, hintValue);
                                 }
+
+                                if (alertValue != null) {
+                                    attributesImpl.addAttribute("", "alert", "alert", ContentHandlerHelper.CDATA, alertValue);
+                                }
+
+                                // Get model item properties
+                                InstanceData instanceData = XFormsUtils.getLocalInstanceData(currentNode);
+                                if (instanceData != null) {
+                                    BooleanModelItemProperty readonly = instanceData.getReadonly();
+                                    if (readonly.isSet()) {
+                                        attributesImpl.addAttribute("", XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
+                                                XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
+                                                ContentHandlerHelper.CDATA, Boolean.toString(readonly.get()));
+                                    }
+                                    BooleanModelItemProperty required = instanceData.getRequired();
+                                    if (required.isSet()) {
+                                        attributesImpl.addAttribute("", XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
+                                                XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
+                                                ContentHandlerHelper.CDATA, Boolean.toString(required.get()));
+                                    }
+                                    BooleanModelItemProperty relevant = instanceData.getRelevant();
+                                    if (relevant.isSet()) {
+                                        attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                                                XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                                                ContentHandlerHelper.CDATA, Boolean.toString(relevant.get()));
+                                    }
+                                    BooleanModelItemProperty valid = instanceData.getValid();
+                                    if (valid.isSet()) {
+                                        attributesImpl.addAttribute("", XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
+                                                XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
+                                                ContentHandlerHelper.CDATA, Boolean.toString(valid.get()));
+                                    }
+                                }
+                                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
                             }
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
-                        }
+                        });
 
                         ch.endElement();
                     }
@@ -210,15 +213,15 @@ public class XFormsServer extends ProcessorImpl {
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
 
-                        if (XFormsEvent != null) {
-                            if (XFormsEvent.getDivsToHide() != null) {
-                                for (Iterator i = XFormsEvent.getDivsToHide().iterator(); i.hasNext();) {
+                        if (xformsEvent != null) {
+                            if (xformsEvent.getDivsToHide() != null) {
+                                for (Iterator i = xformsEvent.getDivsToHide().iterator(); i.hasNext();) {
                                     String caseId = (String) i.next();
                                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "hidden"});
                                 }
                             }
-                            if (XFormsEvent.getDivsToShow() != null) {
-                                for (Iterator i = XFormsEvent.getDivsToShow().iterator(); i.hasNext();) {
+                            if (xformsEvent.getDivsToShow() != null) {
+                                for (Iterator i = xformsEvent.getDivsToShow().iterator(); i.hasNext();) {
                                     String caseId = (String) i.next();
                                     ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "visible"});
                                 }

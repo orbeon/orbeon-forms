@@ -19,7 +19,16 @@ import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.value.IntegerValue;
 import org.orbeon.saxon.xpath.XPathException;
+import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.xforms.event.XFormsComputeException;
+import org.orbeon.oxf.pipeline.StaticExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
 
+/**
+ * XForms index() function.
+ *
+ * 7.8.5 The index() Function
+ */
 public class Index extends XFormsFunction {
 
     /**
@@ -30,7 +39,31 @@ public class Index extends XFormsFunction {
         return this;
     }
 
-    public Item evaluateItem(XPathContext c) throws XPathException {
-        return new IntegerValue(getXFormsControls().getRepeatIdIndex(argument[0].evaluateAsString(c), null));
+    public Item evaluateItem(XPathContext xpathContext) throws XPathException {
+
+        final String repeatId = argument[0].evaluateAsString(xpathContext);
+        final Integer index = getXFormsControls().getRepeatIdIndex(repeatId);
+
+        if (index == null) {
+            // Dispatch exception event
+            final String message = "Function index uses repeat id '" + repeatId + "' which it not in scope";
+            final RuntimeException exception = new ValidationException(message, null);
+
+            // Obtain PipelineContext - this function is always called from controls so
+            // PipelineContext should be present
+            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
+            PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
+
+            getXFormsControls().getCurrentModel().dispatchEvent(pipelineContext,
+                    new XFormsComputeException(message, exception));
+
+            // TODO: stop processing!
+            // How do we do this: throw special exception? Or should throw exception with
+            // XFormsComputeException() and then dispatch the event?
+            throw exception;
+        }
+
+        // Return value found
+        return new IntegerValue(index.intValue());
     }
 }

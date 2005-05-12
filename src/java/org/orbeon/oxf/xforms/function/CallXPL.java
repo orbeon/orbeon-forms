@@ -139,6 +139,8 @@ public class CallXPL extends XFormsFunction {
             }
 
             // Try to obtain an existing PipelineContext, otherwise create a new one
+            // PipelineContext should be found when this is called from controls. It is likely to
+            // be missing when called from the model.
             final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
             PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
             final boolean newPipelineContext = pipelineContext == null;

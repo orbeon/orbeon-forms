@@ -39,8 +39,6 @@
                 <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:links">
                     <xsl:copy-of select="."/>
                 </xsl:for-each>
-                <!-- Standard links -->
-                <xhtml:link rel="stylesheet" href="/oxf-theme/orbeon-layout.cssd" type="text/css"/>
                 <!-- Copy user-defined stylesheets -->
                 <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:style">
                     <xsl:copy-of select="."/>
@@ -49,14 +47,19 @@
                 <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
                     <xsl:copy-of select="."/>
                 </xsl:for-each>
+                <!-- Standard CSS -->
+                <xhtml:link rel="stylesheet" href="/oxf-theme/orbeon-layout.cssd" type="text/css"/>
+                <xhtml:link rel="stylesheet" href="/oxf-theme/jscalendar/calendar-blue.css" type="text/css"/>
                 <!-- Standard scripts -->
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/wz_tooltip.js"/>
-                <xhtml:script type="text/javascript" src="/oxf-theme/javascript/calendar.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/overlib_mini.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/time-utils.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/sarissa.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/xforms-style.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/xforms.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/jscalendar/calendar.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/jscalendar/lang/calendar-en.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/jscalendar/calendar-setup.js"/>
                 <!-- Title -->
                 <xhtml:title>
                     <xsl:choose>
@@ -95,17 +98,25 @@
         </xhtml:textarea>
     </xsl:template>
     
-    <xsl:template match="xhtml:span[tokenize(@class, ' ') = 'xforms-group' and xhtml:label[not(@for)]]">
+    <xsl:template match="xhtml:span[tokenize(@class, ' ') = 'xforms-group' and xhtml:label[@class = 'xforms-label' and @for = ../@id]]">
         <xhtml:fieldset>
             <xsl:apply-templates select="@*"/>
             <xhtml:legend>
-                <xsl:apply-templates select="xhtml:label/@*"/>
-                <xsl:value-of select="xhtml:label"/>
+                <xsl:variable name="label" as="element()" select="xhtml:label[@class = 'xforms-label']"/>
+                <xsl:apply-templates select="$label/@*"/>
+                <xsl:value-of select="$label"/>
             </xhtml:legend>
             <xsl:apply-templates select="node() except xhtml:label"/>
         </xhtml:fieldset>
     </xsl:template>
     
+    <!-- Add date picker -->
+    <xsl:template match="xhtml:*[tokenize(@class, ' ') = 'xforms-date' 
+            and not(following-sibling::*[@class = 'xforms-showcalendar'])]">
+        <xsl:next-match/>
+        <xhtml:span class='xforms-showcalendar'/>
+    </xsl:template>
+
     <xsl:template name="ignore-first-empty-lines">
         <xsl:param name="text"/>
         <xsl:variable name="first-line" select="substring-before($text, '&#xA;')"/>

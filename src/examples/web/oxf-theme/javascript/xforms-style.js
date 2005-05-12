@@ -69,6 +69,26 @@ function xformsUpdateStyle(element) {
                 });
             }
             
+            if (className == "xforms-date") {
+                if (!element.setupDone) {
+                    element.setupDone = true;
+                    
+                    var showCalendarId = element.id + "-showcalendar";
+                    element.nextSibling.id = showCalendarId;
+                        
+                    // Setup calendar library
+                    Calendar.setup({
+                        inputField     :    element.id,
+                        ifFormat       :    "%Y-%m-%d",
+                        showsTime      :    false,
+                        button         :    showCalendarId,
+                        singleClick    :    false,
+                        step           :    1,
+                        onUpdate       :    function() { this.inputField.fireEvent("onchange"); }
+                    });
+                }
+            }
+            
             if (element.alertElement) {
                 element.alertElement.className = element.valid ? "xforms-alert-inactive" 
                     : "xforms-alert-active";

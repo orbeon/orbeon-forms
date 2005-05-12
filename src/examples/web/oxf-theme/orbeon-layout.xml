@@ -39,6 +39,10 @@ input[type = "submit"] {
     font-size: 8pt;
 }
 
+fieldset {
+    padding: 1em;
+}
+    
 .tt, textarea {
     font-family: Lucida Console, Courrier;
     font-size: 12px;
@@ -553,6 +557,19 @@ ul {
     line-height: 10px;
     margin-left: .5em;
     vertical-align: middle;
+}
+    
+.xforms-showcalendar {
+    margin-left: .5em;
+    background-image: url(../images/showCalendar.gif);
+    background-repeat: no-repeat;
+    background-position: top left;
+    display: -moz-inline-box;
+    display: inline-block;  
+    width: 26px;
+    height: 19px;
+    vertical-align: middle;
+    cursor: pointer;
 }
     
 <!-- Styles used by xforms-to-xhtml.xsl -->

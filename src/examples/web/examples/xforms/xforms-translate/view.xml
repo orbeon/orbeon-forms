@@ -25,10 +25,10 @@
                     <target/>
                 </translation>
             </xforms:instance>
-            <!-- FIXME: We shouldn't need string() here -->
             <xforms:bind nodeset="/translation/target" 
-                calculate="string(xxforms:call-xpl('oxf:/examples/xforms/xforms-translate/translate.xpl', 
-                'data', /translation/source, 'data'))"/>
+                calculate="if (/translation/source = '') then '' else
+                xxforms:call-xpl('oxf:/examples/xforms/xforms-translate/translate.xpl', 
+                'data', /translation/source, 'data')"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

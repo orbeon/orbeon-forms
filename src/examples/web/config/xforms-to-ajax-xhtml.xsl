@@ -121,7 +121,7 @@
         <xhtml:span>
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-case')"/>
             <xsl:attribute name="style" select="concat('display: ', 
-                if (position() = 1) then 'block' else 'none')"/>
+                if (true()) then 'block' else 'none')"/>
             <xsl:apply-templates/>
         </xhtml:span>
     </xsl:template>

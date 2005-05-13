@@ -119,40 +119,13 @@
     </xsl:template>
     
     <!-- Add date picker -->
-    <xsl:template match="xhtml:*[tokenize(@class, ' ') = 'xforms-date' 
-            and not(following-sibling::*[@class = 'xforms-showcalendar'])]">
+    <xsl:template match="xhtml:*[tokenize(@class, ' ') = 'xforms-date']">
         <xsl:next-match/>
         <xhtml:span class='xforms-showcalendar'/>
     </xsl:template>
 
-    <!-- Use tabs for switch -->
-    <xsl:template match="xhtml:span[tokenize(@class, ' ') = 'tabtastic']">
-        <xsl:copy>
-            <!-- Remove the tabtastic class -->
-            <xsl:attribute name="class" select="string-join(
-                for $c in tokenize(@class, ' ') return if ($c = 'tabtastic') then () else $c, ' ')"/>
-            <xsl:apply-templates select="@* except @class"/>
-            
-            <!-- Generate links with titles -->
-            <ul class="tabset_tabs">
-                <xsl:for-each select="xhtml:span">
-                    <li><a href="#{@id}"><xsl:value-of select="xhtml:label[1]"/></a></li>
-                </xsl:for-each>
-            </ul>
-            
-            <!-- Add class on each case -->
-            <xsl:for-each select="xhtml:span">
-                <xhtml:div class="tabset_content">
-                    <xsl:apply-templates select="@id"/>
-<!--                    <h2 class="tabset_label"><xsl:value-of select="xhtml:label[1]"/></h2>-->
-                    <xsl:apply-templates select="node() except xhtml:label[1]"/>
-                </xhtml:div>
-            </xsl:for-each>
-        </xsl:copy>
-    </xsl:template>
-    
     <!-- Populate content of loading indicator -->
-    <xsl:template match="xhtml:span[@class = 'xforms-loading-loading' and not(node())]">
+    <xsl:template match="xhtml:span[@class = 'xforms-loading-loading']">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <xhtml:img src="/images/loading.gif" style="float: left"/>

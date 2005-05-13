@@ -563,7 +563,20 @@ ul {
     margin-left: .5em;
     vertical-align: middle;
 }
-    
+
+.xforms-loading-indicator {
+    visibility: hidden;
+}
+
+.xforms-loading-error {
+    background-image: url(../images/error.gif);
+    background-repeat: no-repeat;
+    background-position: top left;
+    padding-left: 20px;
+    margin-left: 0;
+    color: #c00;
+}
+
 .xforms-showcalendar {
     margin-left: .5em;
     background-image: url(../images/showCalendar2.gif);
@@ -576,7 +589,7 @@ ul {
     vertical-align: middle;
     cursor: pointer;
 }
-    
+
 <!-- Styles used by xforms-to-xhtml.xsl -->
 .xferrtable    { border: 0; margin: 0px; padding: 0px; }
 .xferrtable td { border: 0; margin: 0px; padding: 0px; }

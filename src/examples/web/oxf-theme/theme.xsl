@@ -146,6 +146,15 @@
         </xsl:copy>
     </xsl:template>
     
+    <!-- Populate content of loading indicator -->
+    <xsl:template match="xhtml:span[@class = 'xforms-loading-indicator' and not(node())]">
+        <xsl:copy>
+            <xsl:apply-templates select="@*"/>
+            <xhtml:img src="/images/loading.gif" style="float: left"/>
+            Loading...
+        </xsl:copy>
+    </xsl:template>
+    
     <xsl:template name="ignore-first-empty-lines">
         <xsl:param name="text"/>
         <xsl:variable name="first-line" select="substring-before($text, '&#xA;')"/>

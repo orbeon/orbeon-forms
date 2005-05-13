@@ -78,7 +78,7 @@ return
 
     </xhtml:head>
     <xhtml:body>
-        <p>
+        <xhtml:p>
             <xforms:group ref="sandbox-instance">
                 <xforms:group>
                     <xforms:label>Input</xforms:label>
@@ -93,6 +93,6 @@ return
                     <xforms:output ref="formatted-output" xhtml:class="xforms-xhtml"/>
                 </xforms:group>
             </xforms:group>
-        </p>
+        </xhtml:p>
     </xhtml:body>
 </xhtml:html>

@@ -122,7 +122,8 @@ function xformsValueChanged(target, incremental) {
 /**
  * Initializes attributes of each form:
  *
- *     Div             xformsLoading
+ *     Div             xformsLoadingIndicator
+ *     Div             xformsLoadingError
  *     Input           xformsModels
  *     Input           xformsControls
  *     Input           xformsInstances
@@ -217,10 +218,13 @@ function xformsPageLoaded() {
     var forms = document.getElementsByTagName("form");
     for (var formIndex = 0; formIndex < forms.length; formIndex++) {
         var form = forms[formIndex];
-        var divs = form.getElementsByTagName("div");
-        for (var divIndex = 0; divIndex < divs.length; divIndex++) {
-            if (divs[divIndex].getAttribute("title") == "xforms-loading-indicator") {
-                forms[formIndex].xformsLoading = divs[divIndex];
+        var spans = form.getElementsByTagName("span");
+        for (var spanIndex = 0; spanIndex < spans.length; spanIndex++) {
+            if (spans[spanIndex].className == "xforms-loading-indicator") {
+                forms[formIndex].xformsLoadingIndicator = spans[spanIndex];
+            }
+            if (spans[spanIndex].className == "xforms-loading-error") {
+                forms[formIndex].xformsLoadingError = spans[spanIndex];
             }
         }
         var elements = form.elements;
@@ -257,10 +261,10 @@ function xformsGetLocalName(element) {
 
 function xformsHandleResponse() {
     if (document.xformsXMLHttpRequest.readyState == 4) {
-        if (document.xformsXMLHttpRequest.responseXML) {
-            //alert(document.xformsXMLHttpRequest.responseXML);
+        var responseXML = document.xformsXMLHttpRequest.responseXML;
+        if (responseXML && responseXML.documentElement) {
             // Good: we received an XML document from the server
-            var responseRoot = document.xformsXMLHttpRequest.responseXML.documentElement;
+            var responseRoot = responseXML.documentElement;
             for (var i = 0; i < responseRoot.childNodes.length; i++) {
 
                 // Update controls
@@ -322,12 +326,20 @@ function xformsHandleResponse() {
             }
         } else {
             // There was error
-            //alert(document.xformsXMLHttpRequest.responseText);
+            var responseText = document.xformsXMLHttpRequest.responseText;
+            var messageString = "<th>Message</th>";
+            // Remove section before message
+            responseText = responseText.substring(responseText.indexOf(messageString), responseText.length);
+            responseText = responseText.substring(responseText.indexOf("<td>") + 4, responseText.indexOf("</td>"));
+            var xformsLoadingError = document.xformsTargetOfCurrentRequest.form.xformsLoadingError;
+            responseText = responseText.replace(/&nbsp;/, " ");
+            xformsLoadingError.innerHTML = responseText;
+            xformsLoadingError.style.display = "block";
         }
 
         // End this request
         document.xformsRequestInProgress = false;
-        document.xformsTargetOfCurrentRequest.form.xformsLoading.style.visibility = "hidden";
+        document.xformsTargetOfCurrentRequest.form.xformsLoadingIndicator.style.visibility = "hidden";
         
         // Go ahead with next request, if any
         xformsExecuteNextRequest();
@@ -340,7 +352,8 @@ function xformsExecuteNextRequest() {
             var request = document.xformsNextRequests.shift();
             var target = document.xformsNextTargets.shift();
             document.xformsRequestInProgress = true;
-            target.form.xformsLoading.style.visibility = "visible";
+            target.form.xformsLoadingIndicator.style.visibility = "visible";
+            target.form.xformsLoadingError.style.display = "none";
             document.xformsTargetOfCurrentRequest = target;
             document.xformsXMLHttpRequest = new XMLHttpRequest();
             document.xformsXMLHttpRequest.open("POST", XFORMS_SERVER_URL, true);

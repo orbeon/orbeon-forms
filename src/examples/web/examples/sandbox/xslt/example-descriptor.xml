@@ -13,10 +13,10 @@
 -->
 <example-descriptor>
     <title>XSLT Sandbox</title>
-    <source>model.xpl</source>
-    <source>form.xml</source>
-    <source>view.xsl</source>
-    <source>input.xml</source>
+    <source>view.xml</source>
+    <source>run-xsl.xpl</source>
+    <source>initial-xsl.xml</source>
+    <source>page-flow.xml</source>
     <description>
         <p>
             This example demonstrates the use of XSLT 2.0 to transform XML documents. 

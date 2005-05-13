@@ -30,40 +30,15 @@
     &lt;/department>
     &lt;department id="2" name="Engineering">
         &lt;employee firstname="Letticia" lastname="Vallejo"/>
-        &lt;employee firstname="Bruce" lastname="Wilson">b&lt;/employee>
-        &lt;employee firstname="David" lastname="Williams"/>
+        &lt;employee firstname="Bruce" lastname="Wilson"/>
     &lt;/department>
 &lt;/company></input>
-                    <xquery>xquery version "1.0";
-declare namespace xs = "http://www.w3.org/2001/XMLSchema";
-declare namespace local = "http://orbeon.org/oxf/xml/local";
-
-(: Find employees of a certain department :)
-declare function local:employees($company as element(), $name as xs:string) as element()* {
-     $company/department[@name = $name]/employee
-};
-
-(: Compute longest last name :)
-declare function local:maxLastnameLength($employees as element()*) as xs:integer {
-    let $lengths :=
-        for $e in $employees
-        return string-length($e/@lastname)
-    return max($lengths)
-};
-
-let $company := doc('input:data')/*
-let $hrEmployees := local:employees($company, "HR")
-let $engineeringEmployees := local:employees($company, "Engineering")
-
-return
-    &lt;mixed-up-company employee-count="{count($company/department/employee)}"
-            max-lastname-length="{local:maxLastnameLength($company/department/employee)}">
-        {
-            for $first in $hrEmployees
-            for $second in $engineeringEmployees
-            return &lt;employee firstname="{$first/@firstname}" lastname="{$second/@lastname}"/>
-        }
-    &lt;/mixed-up-company></xquery>
+                    <xquery>&lt;company>
+    {
+    for $d in /company/department return 
+    &lt;department employee-count="{count($d/employee)}"/>
+    }
+&lt;/company></xquery>
                     <formatted-output/>
                 </sandbox-instance>
             </xforms:instance>
@@ -78,14 +53,16 @@ return
     <xhtml:body>
         <xhtml:p>
             <xforms:group ref="sandbox-instance">
-                <xforms:group>
-                    <xforms:label>Input</xforms:label>
-                    <xforms:textarea ref="input" class="wide-textarea" incremental="true" xhtml:wrap="off"/>
-                </xforms:group>
-                <xforms:group>
-                    <xforms:label>XQuery</xforms:label>
-                    <xforms:textarea ref="xquery" class="wide-textarea" incremental="true"/>
-                </xforms:group>
+                <p>
+                    <xforms:textarea ref="input" class="wide-textarea" incremental="true" xhtml:wrap="off">
+                        <xforms:label>Input:</xforms:label>
+                    </xforms:textarea>
+                </p>
+                <p>
+                    <xforms:textarea ref="xquery" class="wide-textarea" incremental="true">
+                        <xforms:label>XQuery:</xforms:label>
+                    </xforms:textarea>
+                </p>
                 <xforms:group>
                     <xforms:label>Output</xforms:label>
                     <xforms:output ref="formatted-output" xhtml:class="xforms-xhtml"/>

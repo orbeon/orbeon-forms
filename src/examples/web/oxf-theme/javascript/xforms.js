@@ -283,7 +283,9 @@ function xformsGetLocalName(element) {
 function xformsHandleResponse() {
     if (document.xformsXMLHttpRequest.readyState == 4) {
         var responseXML = document.xformsXMLHttpRequest.responseXML;
-        if (responseXML && responseXML.documentElement) {
+        if (responseXML && responseXML.documentElement 
+                && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
+                
             // Good: we received an XML document from the server
             var responseRoot = responseXML.documentElement;
             for (var i = 0; i < responseRoot.childNodes.length; i++) {
@@ -346,18 +348,26 @@ function xformsHandleResponse() {
                 }
             }
             xformsDisplayLoading(document.xformsTargetOfCurrentRequest.form, "none");
-        } else {
-            // There was error
-            var responseText = document.xformsXMLHttpRequest.responseText;
-            var messageString = "<th>Message</th>";
-            // Remove section before message
-            responseText = responseText.substring(responseText.indexOf(messageString), responseText.length);
-            responseText = responseText.substring(responseText.indexOf("<td>") + 4, responseText.indexOf("</td>"));
-            var xformsLoadingError = document.xformsTargetOfCurrentRequest.form.xformsLoadingError;
-            responseText = responseText.replace(/&nbsp;/, " ");
+            
+        } else if (responseXML && responseXML.documentElement 
+                && responseXML.documentElement.tagName.indexOf("exceptions") != -1) {
+                
+            // We received an error from the server
+            var errorMessageNode = document.createTextNode
+                (responseXML.getElementsByTagName("message")[0].firstChild.data);
+            var errorContainer = document.xformsTargetOfCurrentRequest.form.xformsLoadingError;
+            while (errorContainer.firstChild)
+                errorContainer.removeChild(errorContainer.firstChild);
+            errorContainer.appendChild(errorMessageNode);
             xformsDisplayLoading(document.xformsTargetOfCurrentRequest.form, "error");
-            xformsLoadingError.innerHTML = responseText;
-            xformsLoadingError.style.display = "block";
+            
+        } else {
+        
+            // The server didn't send valid XML
+            document.xformsTargetOfCurrentRequest.form.xformsLoadingError.innerHTML = 
+                "Unexpected response received from server";
+            xformsDisplayLoading(document.xformsTargetOfCurrentRequest.form, "error");
+            
         }
 
         // End this request

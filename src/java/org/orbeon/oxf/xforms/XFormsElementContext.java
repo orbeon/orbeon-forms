@@ -16,8 +16,11 @@ package org.orbeon.oxf.xforms;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.output.element.XFormsElement;
 import org.xml.sax.ContentHandler;
+import org.dom4j.Node;
+import org.dom4j.Element;
+import org.dom4j.Attribute;
 
-import java.util.Stack;
+import java.util.*;
 
 /**
  * Context in which control elements are executed.
@@ -27,6 +30,7 @@ public class XFormsElementContext extends XFormsControls {
     private PipelineContext pipelineContext;
     private ContentHandler contentHandler;
 
+    private Map repeatIdToIndex = new HashMap();
     private Stack elements = new Stack();
 
     private String encryptionPassword;
@@ -34,7 +38,7 @@ public class XFormsElementContext extends XFormsControls {
     public XFormsElementContext(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, ContentHandler contentHandler) {
 
         super(containingDocument, null);
-        super.initialize();
+        super.initialize(pipelineContext);
 
         this.pipelineContext = pipelineContext;
         this.contentHandler = contentHandler;
@@ -67,5 +71,40 @@ public class XFormsElementContext extends XFormsControls {
 
     public String getEncryptionPassword() {
         return encryptionPassword;
+    }
+
+    public void setRepeatIdIndex(String repeatId, int index) {
+        // Update current element of nodeset in stack
+        popBinding();
+        List newNodeset = new ArrayList();
+        newNodeset.add(getCurrentNodeset().get(index - 1));
+        contextStack.push(new Context(getCurrentContext().model, newNodeset, true, null));//TODO: check this
+
+        if (repeatId != null)
+            repeatIdToIndex.put(repeatId, new Integer(index));
+    }
+
+    public void endRepeatId(String repeatId) {
+        if (repeatId != null)
+            repeatIdToIndex.remove(repeatId);
+        popBinding();
+    }
+
+    public void startRepeatId(String repeatId) {
+        contextStack.push(null);
+    }
+
+    public Map getRepeatIdToIndex() {
+        return repeatIdToIndex;
+    }
+
+    /**
+     * Returns the text value of the currently referenced node in the instance.
+     */
+    public String getRefValue() {
+        Node node = getCurrentSingleNode(getCurrentContext());
+        return node instanceof Element ? ((Element) node).getStringValue()
+                : node instanceof Attribute ? ((Attribute) node).getValue()
+                : null;
     }
 }

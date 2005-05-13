@@ -107,6 +107,9 @@
             <attribute name="occurs">
                 <data type="nonNegativeInteger"/>
             </attribute>
+            <attribute name="index">
+                <data type="positiveInteger"/>
+            </attribute>
             <zeroOrMore>
                 <ref name="repeatInfo"/>
             </zeroOrMore>

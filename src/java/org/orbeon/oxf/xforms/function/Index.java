@@ -21,6 +21,7 @@ import org.orbeon.saxon.value.IntegerValue;
 import org.orbeon.saxon.xpath.XPathException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xforms.event.XFormsComputeException;
+import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 
@@ -42,28 +43,37 @@ public class Index extends XFormsFunction {
     public Item evaluateItem(XPathContext xpathContext) throws XPathException {
 
         final String repeatId = argument[0].evaluateAsString(xpathContext);
-        final Integer index = getXFormsControls().getRepeatIdIndex(repeatId);
 
-        if (index == null) {
-            // Dispatch exception event
-            final String message = "Function index uses repeat id '" + repeatId + "' which it not in scope";
-            final RuntimeException exception = new ValidationException(message, null);
+        if (getXFormsControls() instanceof XFormsElementContext) {
+            // Legacy implementation
+            XFormsElementContext xFormsElementContext = (XFormsElementContext) getXFormsControls();
 
-            // Obtain PipelineContext - this function is always called from controls so
-            // PipelineContext should be present
-            final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
-            PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
+            return new IntegerValue(((Integer) xFormsElementContext.getRepeatIdToIndex().get(repeatId)).intValue());
+        } else {
+            // New implementation
+            final int index = getXFormsControls().getRepeatIdIndex(repeatId);
 
-            getXFormsControls().getCurrentModel().dispatchEvent(pipelineContext,
-                    new XFormsComputeException(message, exception));
+            if (index == -1) {
+                // Dispatch exception event
+                final String message = "Function index uses repeat id '" + repeatId + "' which it not in scope";
+                final RuntimeException exception = new ValidationException(message, null);
 
-            // TODO: stop processing!
-            // How do we do this: throw special exception? Or should throw exception with
-            // XFormsComputeException() and then dispatch the event?
-            throw exception;
+                // Obtain PipelineContext - this function is always called from controls so
+                // PipelineContext should be present
+                final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
+                PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
+
+                getXFormsControls().getCurrentModel().dispatchEvent(pipelineContext,
+                        new XFormsComputeException(message, exception));
+
+                // TODO: stop processing!
+                // How do we do this: throw special exception? Or should throw exception with
+                // XFormsComputeException() and then dispatch the event?
+                throw exception;
+            }
+
+            // Return value found
+            return new IntegerValue(index);
         }
-
-        // Return value found
-        return new IntegerValue(index.intValue());
     }
 }

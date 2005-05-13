@@ -65,7 +65,7 @@
                     <td align="right">XForms instance:</td>
                     <td>
                         <f:xml-source>
-                            <xsl:copy-of select="/*"/>
+                            <xsl:copy-of select="doc('input:instance')/*"/>
                         </f:xml-source>
                     </td>
                 </tr>

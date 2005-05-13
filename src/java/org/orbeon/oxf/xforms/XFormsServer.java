@@ -185,7 +185,7 @@ public class XFormsServer extends ProcessorImpl {
                                 return true;
                             }
                             public boolean endVisitControl(Element controlElement, String effectiveControlId) { return true; }
-                        }, true);
+                        });
 
                         ch.endElement();
                     }
@@ -234,9 +234,12 @@ public class XFormsServer extends ProcessorImpl {
                         if (xformsEvent == null) {
                             outputInitialRepeats(ch, xFormsControls.getRepeatInfo());
                         } else {
-                            outputRepeatsUpdates();
+                            outputInitialRepeats(ch, xFormsControls.getRepeatInfo());
+                            //outputRepeatsUpdates();
+                            // TODO
                         }
                         ch.endElement();
+
                     }
 
                     ch.endElement();
@@ -273,7 +276,7 @@ public class XFormsServer extends ProcessorImpl {
     private void outputInitialRepeats(ContentHandlerHelper ch, XFormsControls.RepeatInfo repeatInfo) {
         if (repeatInfo != null) {
             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat",
-                    new String[]{ "id", repeatInfo.getId(), "occurs", Integer.toString(repeatInfo.getOccurs()) });
+                    new String[]{ "id", repeatInfo.getId(), "occurs", Integer.toString(repeatInfo.getOccurs()), "index", Integer.toString(repeatInfo.getIndex()) });
             if (repeatInfo.getChildren() != null) {
                 for (Iterator i = repeatInfo.getChildren().iterator(); i.hasNext();) {
                     XFormsControls.RepeatInfo childRepeatInfo = (XFormsControls.RepeatInfo) i.next();
@@ -360,6 +363,8 @@ public class XFormsServer extends ProcessorImpl {
             containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE);
         else
             containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE_CONTROLS);
+
+        // TODO: update repeat indexes from request if needed
 
         return containingDocument;
     }

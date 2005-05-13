@@ -162,7 +162,7 @@ public class XFormsContainingDocument implements EventTarget {
             }
         } else if (XFormsEvents.XXFORMS_INITIALIZE_CONTROLS.equals(eventName)) {
             // Make sure controls are initialized
-            xFormsControls.initialize();
+            xFormsControls.initialize(pipelineContext);
         } else {
             throw new OXFException("Invalid event dispatched: " + eventName);
         }

@@ -152,7 +152,7 @@
     </xsl:template>
     
     <!-- Populate content of loading indicator -->
-    <xsl:template match="xhtml:span[@class = 'xforms-loading-indicator' and not(node())]">
+    <xsl:template match="xhtml:span[@class = 'xforms-loading-loading' and not(node())]">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <xhtml:img src="/images/loading.gif" style="float: left"/>

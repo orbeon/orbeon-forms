@@ -95,7 +95,7 @@ function xformsUpdateStyle(element) {
                 if (!element.changeHeightHandlerRegistered) {
                     function changeHeightHandler() {
                         var lineNumber = element.value.split("\n").length;
-                        element.style.height = lineNumber * 1.2 + "em";
+                        element.style.height = lineNumber * 1.30 + "em";
                     }
                     element.changeHeightHandlerRegistered = true;
                     changeHeightHandler();

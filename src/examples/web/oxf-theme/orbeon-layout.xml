@@ -480,8 +480,8 @@ ul {
 }
     
 .wide-textarea {
-    width:100%;
     font-size: 11px;
+    width: 100%;
 }
 
 .wide-text {
@@ -564,8 +564,9 @@ ul {
     vertical-align: middle;
 }
 
-.xforms-loading-indicator {
-    visibility: hidden;
+.xforms-loading-loading {
+    display: none;
+    height: 18px;
 }
 
 .xforms-loading-error {
@@ -575,8 +576,15 @@ ul {
     padding-left: 20px;
     margin-left: 0;
     color: #c00;
+    display: none;
+    height: 18px;
 }
 
+.xforms-loading-none {
+    display: block;
+    height: 18px;
+}
+    
 .xforms-showcalendar {
     margin-left: .5em;
     background-image: url(../images/showCalendar2.gif);

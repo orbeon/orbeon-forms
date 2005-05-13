@@ -33,8 +33,7 @@
         &lt;employee firstname="Bruce" lastname="Wilson">b&lt;/employee>
         &lt;employee firstname="David" lastname="Williams"/>
     &lt;/department>
-&lt;/company>
-                    </input>
+&lt;/company></input>
                     <xquery>xquery version "1.0";
 declare namespace xs = "http://www.w3.org/2001/XMLSchema";
 declare namespace local = "http://orbeon.org/oxf/xml/local";
@@ -64,8 +63,7 @@ return
             for $second in $engineeringEmployees
             return &lt;employee firstname="{$first/@firstname}" lastname="{$second/@lastname}"/>
         }
-    &lt;/mixed-up-company>
-                    </xquery>
+    &lt;/mixed-up-company></xquery>
                     <formatted-output/>
                 </sandbox-instance>
             </xforms:instance>

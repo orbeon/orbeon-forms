@@ -63,6 +63,26 @@ function log(text) {
     document.getElementById("debug").innerHTML += text + " | ";
 }
 
+function xformsDisplayLoading(form, state) {
+    switch (state) {
+        case "loading" :
+            form.xformsLoadingLoading.style.display = "block";
+            form.xformsLoadingError.style.display = "none";
+            form.xformsLoadingNone.style.display = "none";
+            break;
+        case "error":
+            form.xformsLoadingLoading.style.display = "none";
+            form.xformsLoadingError.style.display = "block";
+            form.xformsLoadingNone.style.display = "none";
+            break;
+        case "none":
+            form.xformsLoadingLoading.style.display = "none";
+            form.xformsLoadingError.style.display = "none";
+            form.xformsLoadingNone.style.display = "block";
+            break;
+    }
+}
+
 function xformsFireEvent(target, eventName, value, incremental) {
 
     // Build request
@@ -122,8 +142,9 @@ function xformsValueChanged(target, incremental) {
 /**
  * Initializes attributes of each form:
  *
- *     Div             xformsLoadingIndicator
+ *     Div             xformsLoadingLoading
  *     Div             xformsLoadingError
+ *     Div             xformsLoadingNone
  *     Input           xformsModels
  *     Input           xformsControls
  *     Input           xformsInstances
@@ -220,12 +241,12 @@ function xformsPageLoaded() {
         var form = forms[formIndex];
         var spans = form.getElementsByTagName("span");
         for (var spanIndex = 0; spanIndex < spans.length; spanIndex++) {
-            if (spans[spanIndex].className == "xforms-loading-indicator") {
-                forms[formIndex].xformsLoadingIndicator = spans[spanIndex];
-            }
-            if (spans[spanIndex].className == "xforms-loading-error") {
+            if (spans[spanIndex].className == "xforms-loading-loading") 
+                forms[formIndex].xformsLoadingLoading = spans[spanIndex];
+            if (spans[spanIndex].className == "xforms-loading-error") 
                 forms[formIndex].xformsLoadingError = spans[spanIndex];
-            }
+            if (spans[spanIndex].className == "xforms-loading-none") 
+                forms[formIndex].xformsLoadingNone = spans[spanIndex];
         }
         var elements = form.elements;
         for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
@@ -324,6 +345,7 @@ function xformsHandleResponse() {
                     }
                 }
             }
+            xformsDisplayLoading(document.xformsTargetOfCurrentRequest.form, "none");
         } else {
             // There was error
             var responseText = document.xformsXMLHttpRequest.responseText;
@@ -333,15 +355,15 @@ function xformsHandleResponse() {
             responseText = responseText.substring(responseText.indexOf("<td>") + 4, responseText.indexOf("</td>"));
             var xformsLoadingError = document.xformsTargetOfCurrentRequest.form.xformsLoadingError;
             responseText = responseText.replace(/&nbsp;/, " ");
+            xformsDisplayLoading(document.xformsTargetOfCurrentRequest.form, "error");
             xformsLoadingError.innerHTML = responseText;
             xformsLoadingError.style.display = "block";
         }
 
         // End this request
-        document.xformsRequestInProgress = false;
-        document.xformsTargetOfCurrentRequest.form.xformsLoadingIndicator.style.visibility = "hidden";
         
         // Go ahead with next request, if any
+        document.xformsRequestInProgress = false;
         xformsExecuteNextRequest();
     }
 }
@@ -352,8 +374,7 @@ function xformsExecuteNextRequest() {
             var request = document.xformsNextRequests.shift();
             var target = document.xformsNextTargets.shift();
             document.xformsRequestInProgress = true;
-            target.form.xformsLoadingIndicator.style.visibility = "visible";
-            target.form.xformsLoadingError.style.display = "none";
+            xformsDisplayLoading(target.form, "loading");
             document.xformsTargetOfCurrentRequest = target;
             document.xformsXMLHttpRequest = new XMLHttpRequest();
             document.xformsXMLHttpRequest.open("POST", XFORMS_SERVER_URL, true);

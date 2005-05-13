@@ -188,7 +188,7 @@ public class XFormsUtils {
             ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
             GZIPOutputStream gzipOutputStream = null;
             gzipOutputStream = new GZIPOutputStream(gzipByteArray);
-            gzipOutputStream.write(Dom4jUtils.domToString(instance).getBytes());
+            gzipOutputStream.write(Dom4jUtils.domToString(instance, false, false).getBytes());
             gzipOutputStream.close();
             String result = Base64.encode(gzipByteArray.toByteArray());
             if (encryptionPassword != null)

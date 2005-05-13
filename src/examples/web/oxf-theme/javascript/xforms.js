@@ -258,7 +258,7 @@ function xformsGetLocalName(element) {
 function xformsHandleResponse() {
     if (document.xformsXMLHttpRequest.readyState == 4) {
         if (document.xformsXMLHttpRequest.responseXML) {
-            alert(document.xformsXMLHttpRequest.responseXML);
+            //alert(document.xformsXMLHttpRequest.responseXML);
             // Good: we received an XML document from the server
             var responseRoot = document.xformsXMLHttpRequest.responseXML.documentElement;
             for (var i = 0; i < responseRoot.childNodes.length; i++) {
@@ -322,7 +322,7 @@ function xformsHandleResponse() {
             }
         } else {
             // There was error
-            alert(document.xformsXMLHttpRequest.responseText);
+            //alert(document.xformsXMLHttpRequest.responseText);
         }
 
         // End this request

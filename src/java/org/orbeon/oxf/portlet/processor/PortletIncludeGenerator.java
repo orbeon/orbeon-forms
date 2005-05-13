@@ -41,8 +41,8 @@ public class PortletIncludeGenerator extends ProcessorImpl {
 
     private static Logger logger = LoggerFactory.createLogger(PortletIncludeGenerator.class);
 
-    public static final String PORTLET_INCLUDE_NAMESPACE_URI = "http://www.orbeon.org/oxf/portlet-include";
-    public static final String PORTLET_NAMESPACE_URI = "http://www.orbeon.org/oxf/portlet";
+    public static final String PORTLET_INCLUDE_NAMESPACE_URI = "http://orbeon.org/oxf/xml/portlet-include";
+    public static final String PORTLET_NAMESPACE_URI = "http://orbeon.org/oxf/xml/portlet";
 
     public PortletIncludeGenerator() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, PORTLET_INCLUDE_NAMESPACE_URI));

@@ -29,9 +29,7 @@
                         <data type="string"/>
                     </attribute>
                     <optional>
-                        <attribute name="value">
-                            <data type="string"/>
-                        </attribute>
+                        <data type="string"/>
                     </optional>
                 </optional>
             </element>

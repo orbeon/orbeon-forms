@@ -435,7 +435,7 @@
                 <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xferrtable">
                     <xhtml:tr>
                         <xhtml:td><xsl:next-match/></xhtml:td>
-                        <xhtml:td xxforms:error-cell='true' />
+                        <xhtml:td xxforms:error-cell='true'/>
                     </xhtml:tr>
                 </xhtml:table>
             </xsl:otherwise>

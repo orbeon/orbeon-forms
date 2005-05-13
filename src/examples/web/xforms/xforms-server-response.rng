@@ -27,9 +27,6 @@
                             <data type="string"/>
                         </attribute>
                         <optional>
-                            <attribute name="value"/>
-                        </optional>
-                        <optional>
                             <attribute name="hint"/>
                         </optional>
                         <optional>
@@ -75,6 +72,9 @@
                         </optional>
                         <optional>
                             <attribute name="type"/>
+                        </optional>
+                        <optional>
+                            <data type="string"/>
                         </optional>
                     </element>
                 </zeroOrMore>

@@ -13,9 +13,7 @@
 -->
 <xsl:stylesheet version="2.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:portlet="http://www.orbeon.org/oxf/portlet">
+    xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
     <xsl:template match="/">
         <xhtml:html>

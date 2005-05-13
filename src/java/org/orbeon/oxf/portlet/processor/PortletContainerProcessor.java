@@ -41,7 +41,7 @@ import java.util.*;
  */
 public class PortletContainerProcessor extends ProcessorImpl {
 
-    public static final String PORTLET_CONTAINER_NAMESPACE_URI = "http://www.orbeon.org/oxf/portlet-container";
+    public static final String PORTLET_CONTAINER_NAMESPACE_URI = "http://orbeon.org/oxf/xml/portlet-container";
 
     private static final String INPUT_PORTAL_CONFIG = "portal-config";
     private static final String INPUT_PORTAL_STATUS = "portal-status";

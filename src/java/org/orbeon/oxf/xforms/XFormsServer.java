@@ -79,7 +79,7 @@ public class XFormsServer extends ProcessorImpl {
                     final Element eventElement = eventDocument.getRootElement();
                     String controlId = eventElement.attributeValue("source-control-id");
                     String eventName = eventElement.attributeValue("name");
-                    String value = eventElement.attributeValue("value");
+                    String value = eventElement.getText();
 
                     if (controlId != null && eventName != null) {
                         // An event is passed
@@ -116,12 +116,6 @@ public class XFormsServer extends ProcessorImpl {
 
                                 // Control id
                                 attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, effectiveControlId);
-
-                                // Get current value if possible for this control
-                                if (xFormsControls.isValueControl(controlElement.getName())) {
-                                    String controlValue = XFormsInstance.getValueForNode(currentNode);
-                                    attributesImpl.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, controlValue);
-                                }
 
                                 // TODO: for xforms:case, must provide whether it is selected or not
 
@@ -181,7 +175,19 @@ public class XFormsServer extends ProcessorImpl {
                                                 StandardNames.getPrefix(typeCode) + ":" + StandardNames.getLocalName(typeCode));
                                     }
                                 }
-                                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
+
+                                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
+
+                                // Get current value if possible for this control
+                                if (xFormsControls.isValueControl(controlElement.getName())) {
+                                    String controlValue = XFormsInstance.getValueForNode(currentNode);
+                                    ch.text(controlValue);
+                                    //attributesImpl.addAttribute("", "value", "value", ContentHandlerHelper.CDATA, );
+                                }
+
+                                ch.endElement();
+
+
                                 return true;
                             }
                             public boolean endVisitControl(Element controlElement, String effectiveControlId) { return true; }

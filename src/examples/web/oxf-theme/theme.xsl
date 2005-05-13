@@ -19,6 +19,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
+    xmlns:portlet="http://orbeon.org/oxf/xml/portlet"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
@@ -26,8 +27,10 @@
     <xsl:include href="formatting.xsl"/>
     <xsl:include href="oxf:/inspector/xml-formatting.xsl"/>
 
+    <!-- This contains some useful request information -->
     <xsl:variable name="request" select="doc('input:request')" as="document-node()"/>
 
+    <!-- - - - - - - Themed page template - - - - - - -->
     <xsl:template match="/">
         <xhtml:html>
             <xhtml:head>
@@ -86,6 +89,8 @@
             </xhtml:body>
         </xhtml:html>
     </xsl:template>
+
+    <!-- - - - - - - Form controls - - - - - - -->
 
     <xsl:template match="xhtml:form">
         <xsl:copy>
@@ -155,6 +160,22 @@
         </xsl:copy>
     </xsl:template>
     
+    <!-- Should this be here? -->
+    <xsl:template match='xhtml:td[ @xxforms:error-cell="true" ]' >
+        <xhtml:td>
+            <xhtml:img src="/images/error.gif" style="margin: 5px"/>
+        </xhtml:td>
+    </xsl:template>
+
+    <!-- - - - - - - Named templates - - - - - - -->
+    
+    <!-- Should this be here? -->
+    <xsl:template match='xhtml:td[ @xxforms:error-cell="true" ]' >
+        <xhtml:td>
+            <xhtml:img src="/images/error.gif" style="margin: 5px"/>
+        </xhtml:td>
+    </xsl:template>
+    
     <xsl:template name="ignore-first-empty-lines">
         <xsl:param name="text"/>
         <xsl:variable name="first-line" select="substring-before($text, '&#xA;')"/>
@@ -211,6 +232,8 @@
         </xsl:if>
     </xsl:template>
 
+    <!-- - - - - - - Generic copy rules - - - - - - -->
+
     <!-- Copy attributes in XHTML namespace to no namespace -->
     <xsl:template match="@xhtml:*">
         <xsl:attribute name="{local-name()}">
@@ -218,17 +241,29 @@
         </xsl:attribute>
     </xsl:template>
 
+    <!-- Simply copy everything that's not matched -->
     <xsl:template match="@*|node()" priority="-2">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
     </xsl:template>
 
-    <!-- Should this be here? -->
-    <xsl:template match='xhtml:td[ @xxforms:error-cell="true" ]' >
-        <xhtml:td>
-            <xhtml:img src="/images/error.gif" style="margin: 5px"/>
-        </xhtml:td>
+    <!-- - - - - - - Make sure that portlet content is never rewritten in the theme - - - - - - -->
+
+    <!-- Any element with portlet:is-portlet-content = 'true' attribute doesn't have theme applied -->
+    <xsl:template match="xhtml:div[@portlet:is-portlet-content='true']" priority="200">
+        <xsl:copy>
+            <xsl:copy-of select="@*[namespace-uri() = '']"/>
+            <xsl:copy-of select="@f:url-norewrite"/>
+            <xsl:apply-templates mode="notheme"/>
+        </xsl:copy>
+    </xsl:template>
+
+    <!-- Simply copy everything without ever applying theme-->
+    <xsl:template match="@*|node()" mode="notheme">
+        <xsl:copy>
+            <xsl:apply-templates select="@*|node()" mode="#current"/>
+        </xsl:copy>
     </xsl:template>
 
 </xsl:stylesheet>

@@ -98,6 +98,17 @@
                         <td></td>
                     </tr>
                     <tr>
+                        <td>http://orbeon.org/oxf/xml/portlet</td>
+                        <td>portlet</td>
+                        <td>
+                            OPS portlet tagging
+                        </td>
+                        <td>
+                            <code>portlet:is-portlet-content</code>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
                         <td>http://orbeon.org/oxf/xml/xmldb</td>
                         <td>xdb</td>
                         <td>

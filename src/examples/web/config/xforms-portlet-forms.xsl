@@ -16,7 +16,7 @@
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
-    xmlns:portlet="http://www.orbeon.org/oxf/portlet"
+    xmlns:portlet="http://orbeon.org/oxf/xml/portlet"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xforms-utils="java:org.orbeon.oxf.processor.xforms.XFormsUtils">
 

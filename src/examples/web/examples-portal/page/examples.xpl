@@ -18,7 +18,7 @@
           xmlns:xf="http://www.w3.org/2002/xforms"
           xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
           xmlns:f="http://orbeon.org/oxf/xml/formatting"
-          xmlns:portlet="http://www.orbeon.org/oxf/portlet"
+          xmlns:portlet="http://orbeon.org/oxf/xml/portlet"
           xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
     <p:param name="data" type="input"/>

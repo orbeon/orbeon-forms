@@ -97,12 +97,15 @@ public class SchemaRepository {
         schemas.put(PortletIncludeGenerator.PORTLET_INCLUDE_NAMESPACE_URI, "schemas/portlet-include-config.rng");
         schemas.put(PortletContainerProcessor.PORTLET_CONTAINER_NAMESPACE_URI, "schemas/portlet-container-config.rng");
 
+        // XSLT schemas
         schemas.put(XSLTTransformer.XSLT_TRANSFORMER_CONFIG_NAMESPACE_URI, "schemas/xslt-transformer-config.rng");
         schemas.put(XSLTTransformer.XSLT_PREFERENCES_CONFIG_NAMESPACE_URI, "schemas/xslt-preferences-config.rng");
         schemas.put(TraxTransformer.TRAX_TRANSFORMER_CONFIG_NAMESPACE_URI, "schemas/trax-transformer-config.rng");
+
         schemas.put(PageFlowControllerProcessor.CONTROLLER_NAMESPACE_URI, "schemas/page-flow-controller-runtime.xsd");
         schemas.put(MSVValidationProcessor.ORBEON_ERROR_NS, "schemas/validation-config.rng");
         schemas.put(DirectoryGenerator.DIRECTORY_GENERATOR_NAMESPACE_URI, "schemas/directory-generator-config.rng");
+        
         // SQL processor schemas
         schemas.put(SQLProcessor.SQL_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "sql/sql-processor-config.rng");
         schemas.put(SQLProcessor.SQL_DATASOURCE_URI, PROCESSORS_SCHEMA_PATH + "sql/sql-processor-datasource.rng");

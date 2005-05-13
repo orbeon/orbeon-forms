@@ -81,8 +81,8 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:control-values>
-                    <xxf:control id="1" value="7"/>
-                    <xxf:control id="2" value="0" label="M:"/>
+                    <xxf:control id="1">7</xxf:control>
+                    <xxf:control id="2" label="M:">0</xxf:control>
                     <xxf:control id="3" label="Clear"/>
                     <xxf:control id="4" label="MC"/>
                     <xxf:control id="5" label="7"/>
@@ -170,8 +170,8 @@
         <output name="response">
             <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
                 <xxf:control-values>
-                    <xxf:control id="1" value="7"/>
-                    <xxf:control id="2" value="12" label="M:"/>
+                    <xxf:control id="1">7</xxf:control>
+                    <xxf:control id="2" label="M:">12</xxf:control>
                     <xxf:control id="3" label="Clear"/>
                     <xxf:control id="4" label="MC"/>
                     <xxf:control id="5" label="7"/>
@@ -344,35 +344,35 @@
                     <xxf:control id="group111"/>
                     <xxf:control id="group112"/>
                     <xxf:control id="group113"/>
-                    <xxf:control id="id111" value="111"/>
-                    <xxf:control id="id112" value="112"/>
-                    <xxf:control id="id113" value="113"/>
-                    <xxf:control id="id114" value="114"/>
+                    <xxf:control id="id111">111</xxf:control>
+                    <xxf:control id="id112">112</xxf:control>
+                    <xxf:control id="id113">113</xxf:control>
+                    <xxf:control id="id114">114</xxf:control>
                     <xxf:control id="group121"/>
                     <xxf:control id="group122"/>
-                    <xxf:control id="id121" value="121"/>
-                    <xxf:control id="id122" value="122"/>
-                    <xxf:control id="id123" value="123"/>
-                    <xxf:control id="id124" value="124"/>
+                    <xxf:control id="id121">121</xxf:control>
+                    <xxf:control id="id122">122</xxf:control>
+                    <xxf:control id="id123">123</xxf:control>
+                    <xxf:control id="id124">124</xxf:control>
                     <xxf:control id="group211"/>
                     <xxf:control id="group212"/>
                     <xxf:control id="group213"/>
-                    <xxf:control id="id211" value="211"/>
-                    <xxf:control id="id212" value="212"/>
-                    <xxf:control id="id213" value="213"/>
-                    <xxf:control id="id214" value="214"/>
+                    <xxf:control id="id211">211</xxf:control>
+                    <xxf:control id="id212">212</xxf:control>
+                    <xxf:control id="id213">213</xxf:control>
+                    <xxf:control id="id214">214</xxf:control>
                     <xxf:control id="group214"/>
                     <xxf:control id="group8"/>
-                    <xxf:control id="id221" value="221"/>
-                    <xxf:control id="id222" value="222"/>
-                    <xxf:control id="id223" value="223"/>
-                    <xxf:control id="id224" value="224"/>
+                    <xxf:control id="id221">221</xxf:control>
+                    <xxf:control id="id222">222</xxf:control>
+                    <xxf:control id="id223">223</xxf:control>
+                    <xxf:control id="id224">224</xxf:control>
                     <xxf:control id="group214"/>
                     <xxf:control id="group10"/>
-                    <xxf:control id="id211b" value="211"/>
-                    <xxf:control id="id212b" value="212"/>
-                    <xxf:control id="id213b" value="213"/>
-                    <xxf:control id="id214b" value="214"/>
+                    <xxf:control id="id211b">211</xxf:control>
+                    <xxf:control id="id212b">212</xxf:control>
+                    <xxf:control id="id213b">213</xxf:control>
+                    <xxf:control id="id214b">214</xxf:control>
                 </xxf:control-values>
                 <xxf:instances>
                     <instances>
@@ -483,8 +483,8 @@
                 <xxf:control-values>
                     <xxf:control id="group1"/>
                     <xxf:control id="group2"/>
-                    <xxf:control id="1" value="0"/>
-                    <xxf:control id="2" value="12" label="M:"/>
+                    <xxf:control id="1">0</xxf:control>
+                    <xxf:control id="2" label="M:">12</xxf:control>
                     <xxf:control id="3" label="Clear"/>
                 </xxf:control-values>
                 <xxf:instances>
@@ -582,8 +582,8 @@
                 <xxf:control-values>
                     <xxf:control id="group1"/>
                     <xxf:control id="group2" valid="false"/>
-                    <xxf:control id="1" value="0" valid="false"/>
-                    <xxf:control id="2" value="12" label="M:"/>
+                    <xxf:control id="1" valid="false">0</xxf:control>
+                    <xxf:control id="2" label="M:">12</xxf:control>
                     <xxf:control id="3" label="Clear"/>
                 </xxf:control-values>
                 <xxf:instances>
@@ -676,22 +676,22 @@
                 <xxf:control-values>
                     <xxf:control id="id123"/>
                     <xxf:control id="id124-1"/>
-                    <xxf:control id="id125-1-1" value="f11"/>
-                    <xxf:control id="id126-1-1" value="l11"/>
-                    <xxf:control id="id125-1-2" value="f12"/>
-                    <xxf:control id="id126-1-2" value="l12"/>
+                    <xxf:control id="id125-1-1">f11</xxf:control>
+                    <xxf:control id="id126-1-1">l11</xxf:control>
+                    <xxf:control id="id125-1-2">f12</xxf:control>
+                    <xxf:control id="id126-1-2">l12</xxf:control>
                     <xxf:control id="id124-2"/>
-                    <xxf:control id="id125-2-1" value="f21"/>
-                    <xxf:control id="id126-2-1" value="l21"/>
+                    <xxf:control id="id125-2-1">f21</xxf:control>
+                    <xxf:control id="id126-2-1">l21</xxf:control>
                     <xxf:control id="id124-3"/>
-                    <xxf:control id="id125-3-1" value="f31"/>
-                    <xxf:control id="id126-3-1" value="l31"/>
-                    <xxf:control id="id125-3-2" value="f32"/>
-                    <xxf:control id="id126-3-2" value="l32"/>
-                    <xxf:control id="id125-3-3" value="f33"/>
-                    <xxf:control id="id126-3-3" value="l33"/>
-                    <xxf:control id="id125-3-4" value="f34"/>
-                    <xxf:control id="id126-3-4" value="l34"/>
+                    <xxf:control id="id125-3-1">f31</xxf:control>
+                    <xxf:control id="id126-3-1">l31</xxf:control>
+                    <xxf:control id="id125-3-2">f32</xxf:control>
+                    <xxf:control id="id126-3-2">l32</xxf:control>
+                    <xxf:control id="id125-3-3">f33</xxf:control>
+                    <xxf:control id="id126-3-3">l33</xxf:control>
+                    <xxf:control id="id125-3-4">f34</xxf:control>
+                    <xxf:control id="id126-3-4">l34</xxf:control>
                 </xxf:control-values>
                 <xxf:instances>
                     <instances>
@@ -871,24 +871,24 @@
                 <xxf:control-values>
                     <xxf:control id="id123"/>
                     <xxf:control id="id124-1"/>
-                    <xxf:control id="id125-1-1" value="f11"/>
-                    <xxf:control id="id126-1-1" value="l11"/>
-                    <xxf:control id="id125-1-2" value="f12"/>
-                    <xxf:control id="id126-1-2" value="l12"/>
-                    <xxf:control id="id125-1-3" value="f12"/>
-                    <xxf:control id="id126-1-3" value="l12"/>
+                    <xxf:control id="id125-1-1">f11</xxf:control>
+                    <xxf:control id="id126-1-1">l11</xxf:control>
+                    <xxf:control id="id125-1-2">f12</xxf:control>
+                    <xxf:control id="id126-1-2">l12</xxf:control>
+                    <xxf:control id="id125-1-3">f12</xxf:control>
+                    <xxf:control id="id126-1-3">l12</xxf:control>
                     <xxf:control id="id124-2"/>
-                    <xxf:control id="id125-2-1" value="f21"/>
-                    <xxf:control id="id126-2-1" value="l21"/>
+                    <xxf:control id="id125-2-1">f21</xxf:control>
+                    <xxf:control id="id126-2-1">l21</xxf:control>
                     <xxf:control id="id124-3"/>
-                    <xxf:control id="id125-3-1" value="f31"/>
-                    <xxf:control id="id126-3-1" value="l31"/>
-                    <xxf:control id="id125-3-2" value="f32"/>
-                    <xxf:control id="id126-3-2" value="l32"/>
-                    <xxf:control id="id125-3-3" value="f33"/>
-                    <xxf:control id="id126-3-3" value="l33"/>
-                    <xxf:control id="id125-3-4" value="f34"/>
-                    <xxf:control id="id126-3-4" value="l34"/>
+                    <xxf:control id="id125-3-1">f31</xxf:control>
+                    <xxf:control id="id126-3-1">l31</xxf:control>
+                    <xxf:control id="id125-3-2">f32</xxf:control>
+                    <xxf:control id="id126-3-2">l32</xxf:control>
+                    <xxf:control id="id125-3-3">f33</xxf:control>
+                    <xxf:control id="id126-3-3">l33</xxf:control>
+                    <xxf:control id="id125-3-4">f34</xxf:control>
+                    <xxf:control id="id126-3-4">l34</xxf:control>
                 </xxf:control-values>
                 <xxf:instances>
                     <instances>

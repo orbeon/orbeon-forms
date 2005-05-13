@@ -148,6 +148,10 @@
                 either convert your stylesheet to use Saxon features instead, or use
                 <code>oxf:xalan</code>.
             </p>
+            <p>
+                TODO: document the fact that transformation is separate from serialization in OPS.
+                See XML serializer.
+            </p>
         </section>
         <section>
             <title>XQuery processor</title>

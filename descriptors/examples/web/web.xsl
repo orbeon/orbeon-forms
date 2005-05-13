@@ -79,26 +79,6 @@
                 <param-value>oxf:/config/properties.xml</param-value>
             </context-param>
 
-            <xsl:comment> Set main processor </xsl:comment>
-            <context-param>
-                <param-name>oxf.main-processor.name</param-name>
-                <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
-            </context-param>
-            <context-param>
-                <param-name>oxf.main-processor.input.controller</param-name>
-                <param-value>oxf:/page-flow.xml</param-value>
-            </context-param>
-
-            <xsl:comment> Set error processor </xsl:comment>
-            <context-param>
-                <param-name>oxf.error-processor.name</param-name>
-                <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
-            </context-param>
-            <context-param>
-                <param-name>oxf.error-processor.input.config</param-name>
-                <param-value>oxf:/config/error.xpl</param-value>
-            </context-param>
-
             <xsl:comment> Set XML Server configuration file </xsl:comment>
             <context-param>
                 <param-name>oxf.xml-server.config</param-name>
@@ -210,19 +190,61 @@
             </xsl:call-template>
 
             <servlet>
-                <servlet-name>oxf</servlet-name>
+                <servlet-name>ops-main-servlet</servlet-name>
                 <servlet-class>org.orbeon.oxf.servlet.OXFServlet</servlet-class>
+                <xsl:comment> Set main processor </xsl:comment>
+                <init-param>
+                    <param-name>oxf.main-processor.name</param-name>
+                    <param-value>{http://www.orbeon.com/oxf/processors}page-flow</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.main-processor.input.controller</param-name>
+                    <param-value>oxf:/page-flow.xml</param-value>
+                </init-param>
+                <xsl:comment> Set error processor </xsl:comment>
+                <init-param>
+                    <param-name>oxf.error-processor.name</param-name>
+                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.error-processor.input.config</param-name>
+                    <param-value>oxf:/config/error.xpl</param-value>
+                </init-param>
                 <load-on-startup>1</load-on-startup>
             </servlet>
 
             <servlet>
-                <servlet-name>DisplayChart</servlet-name>
+                <servlet-name>ops-xforms-server-servlet</servlet-name>
+                <servlet-class>org.orbeon.oxf.servlet.OXFServlet</servlet-class>
+                <xsl:comment> Set main processor </xsl:comment>
+                <init-param>
+                    <param-name>oxf.main-processor.name</param-name>
+                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.main-processor.input.config</param-name>
+                    <param-value>oxf:/xforms/xforms-server.xpl</param-value>
+                </init-param>
+                <xsl:comment> Set error processor </xsl:comment>
+                <init-param>
+                    <param-name>oxf.error-processor.name</param-name>
+                    <param-value>{http://www.orbeon.com/oxf/processors}pipeline</param-value>
+                </init-param>
+                <init-param>
+                    <param-name>oxf.error-processor.input.config</param-name>
+                    <param-value>oxf:/xforms/error.xpl</param-value>
+                </init-param>
+                <load-on-startup>1</load-on-startup>
+            </servlet>
+
+            <servlet>
+                <servlet-name>display-chart-servlet</servlet-name>
                 <servlet-class>org.jfree.chart.servlet.DisplayChart</servlet-class>
                 <load-on-startup>2</load-on-startup>
             </servlet>
 
             <servlet>
-                <servlet-name>struts</servlet-name>
+                <servlet-name>struts-servlet</servlet-name>
                 <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
                 <init-param>
                     <param-name>config</param-name>
@@ -240,7 +262,7 @@
                 <xsl:with-param name="commented" select="$target = 'war'"/>
                 <xsl:with-param name="content">
                     <servlet>
-                        <servlet-name>hsqldb</servlet-name>
+                        <servlet-name>hsqldb-servlet</servlet-name>
                         <servlet-class>org.hsqldb.Servlet</servlet-class>
                         <init-param>
                             <param-name>hsqldb.server.database</param-name>
@@ -267,12 +289,17 @@
             -->
 
             <servlet-mapping>
-                <servlet-name>oxf</servlet-name>
+                <servlet-name>ops-main-servlet</servlet-name>
                 <url-pattern>/</url-pattern>
             </servlet-mapping>
 
             <servlet-mapping>
-                <servlet-name>struts</servlet-name>
+                <servlet-name>ops-xforms-server-servlet</servlet-name>
+                <url-pattern>/xforms-server</url-pattern>
+            </servlet-mapping>
+
+            <servlet-mapping>
+                <servlet-name>struts-servlet</servlet-name>
                 <url-pattern>/struts/*</url-pattern>
             </servlet-mapping>
 
@@ -281,14 +308,14 @@
                 <xsl:with-param name="commented" select="$target = 'war'"/>
                 <xsl:with-param name="content">
                     <servlet-mapping>
-                        <servlet-name>hsqldb</servlet-name>
+                        <servlet-name>hsqldb-servlet</servlet-name>
                         <url-pattern>/db</url-pattern>
                     </servlet-mapping>
                 </xsl:with-param>
             </xsl:call-template>
 
             <servlet-mapping>
-                <servlet-name>DisplayChart</servlet-name>
+                <servlet-name>display-chart-servlet</servlet-name>
                 <url-pattern>/chartDisplay</url-pattern>
             </servlet-mapping>
 

@@ -93,9 +93,6 @@
     <page path-info="/examples/oxfmark-vms"
         model="/oxfmark/vms.xpl"/>
 
-    <!-- XForms Server -->
-    <page path-info="/xforms-server*" model="/xforms/xforms-server.xpl"/>
-
     <!-- "Not Found" page displayed when no page matches the request URL -->
     <page id="not-found" path-info="/not-found" view="/config/not-found.xml"/>
 

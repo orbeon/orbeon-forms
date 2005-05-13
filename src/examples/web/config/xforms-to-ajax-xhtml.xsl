@@ -119,8 +119,11 @@
         <!-- FIXME: use reponse to figure out what case are displayed -->
         <xhtml:span>
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-case')"/>
+            <xsl:variable name="id" as="xs:string" select="@id"/>
+            <xsl:variable name="div-information" as="element()"
+                select="$response/xxforms:divs/xxforms:div[@id = $id]"/>
             <xsl:attribute name="style" select="concat('display: ', 
-                if (true()) then 'block' else 'none')"/>
+                if ($div-information/@visibility = 'visible') then 'block' else 'none')"/>
             <xsl:apply-templates/>
         </xhtml:span>
     </xsl:template>

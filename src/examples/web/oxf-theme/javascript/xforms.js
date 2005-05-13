@@ -301,7 +301,8 @@ function xformsHandleResponse() {
 
                             // Update value
                             if (document.xformsTargetOfCurrentRequest.id != controlId
-                                   && documentElement.className.indexOf("xforms-control") != -1) {
+                                   && documentElement.className.indexOf("xforms-control") != -1
+                                   && documentElement.tagName.toLowerCase() != "button") {
                                 var controlValue = controlElement.firstChild ? 
                                     controlElement.firstChild.data : "";
                                 if (typeof(documentElement.value) == "string") {

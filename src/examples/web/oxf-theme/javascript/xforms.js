@@ -74,7 +74,7 @@ function xformsFireEvent(target, eventName, value, incremental) {
     eventElement.setAttribute("name", eventName);
     eventElement.setAttribute("source-control-id", target.id);
     if (value != null)
-        eventElement.setAttribute("value", value);
+        eventElement.appendChild(eventElement.ownerDocument.createTextNode(value));
 
     // Add models
     var modelsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:models");
@@ -274,14 +274,14 @@ function xformsHandleResponse() {
                         if (xformsGetLocalName(controlValuesElement.childNodes[j]) == "control") {
                             var controlElement = controlValuesElement.childNodes[j];
                             var controlId = controlElement.getAttribute("id");
-                            var controlValue = controlElement.getAttribute("value");
                             var documentElement = document.getElementById(controlId);
 
                             // Update value
-                            if (controlValue != null
+                            if (controlElement.firstChild
                                     && document.xformsTargetOfCurrentRequest.id != controlId) {
                                 // Check if this element has been modified since this event has been fired
                                 if (true) {
+                                    var controlValue = controlElement.firstChild.data;
                                     if (typeof(documentElement.value) == "string") {
                                         if (documentElement.value != controlValue) {
                                             documentElement.value = controlValue;

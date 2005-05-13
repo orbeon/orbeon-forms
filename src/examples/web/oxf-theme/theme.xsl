@@ -160,6 +160,14 @@
         </xsl:copy>
     </xsl:template>
     
+    <!-- Use vertical scroll in wide-text area (no text-wrapping) -->
+    <xsl:template match="xhtml:textarea[tokenize(@class, ' ') = 'wide-textarea']">
+        <xsl:copy>
+            <xsl:attribute name="wrap">off</xsl:attribute>
+            <xsl:apply-templates select="@*|node()"/>
+        </xsl:copy>
+    </xsl:template>
+    
     <!-- Should this be here? -->
     <xsl:template match='xhtml:td[ @xxforms:error-cell="true" ]' >
         <xhtml:td>

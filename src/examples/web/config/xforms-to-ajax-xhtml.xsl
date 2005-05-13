@@ -65,7 +65,7 @@
     <xsl:template match="xforms:output">
         <xhtml:span>
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
-            <xsl:value-of select="xxforms:control(@id)/@value"/>
+            <xsl:value-of select="xxforms:control(@id)"/>
         </xhtml:span>
     </xsl:template>
     
@@ -77,13 +77,13 @@
     </xsl:template>
     
     <xsl:template match="xforms:input">
-        <xhtml:input type="text" name="{@id}" value="{xxforms:control(@id)/@value}">
+        <xhtml:input type="text" name="{@id}" value="{xxforms:control(@id)}">
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
         </xhtml:input>
     </xsl:template>
 
     <xsl:template match="xforms:secret">
-        <xhtml:input type="password" name="{@id}" value="{xxforms:control(@id)/@value}">
+        <xhtml:input type="password" name="{@id}" value="{xxforms:control(@id)}">
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
         </xhtml:input>
     </xsl:template>
@@ -91,7 +91,7 @@
     <xsl:template match="xforms:textarea">
         <xhtml:textarea name="{@id}">
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
-            <xsl:value-of select="xxforms:control(@id)/@value"/>
+            <xsl:value-of select="xxforms:control(@id)"/>
         </xhtml:textarea>
     </xsl:template>
     

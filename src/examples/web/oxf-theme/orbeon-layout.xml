@@ -480,8 +480,8 @@ ul {
 }
     
 .wide-textarea {
-    height: 6em;
     width:100%;
+    font-size: 11px;
 }
 
 .wide-text {

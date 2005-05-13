@@ -82,7 +82,7 @@ return
             <xforms:group ref="sandbox-instance">
                 <xforms:group>
                     <xforms:label>Input</xforms:label>
-                    <xforms:textarea ref="input" class="wide-textarea" incremental="true"/>
+                    <xforms:textarea ref="input" class="wide-textarea" incremental="true" xhtml:wrap="off"/>
                 </xforms:group>
                 <xforms:group>
                     <xforms:label>XQuery</xforms:label>

@@ -91,6 +91,19 @@ function xformsUpdateStyle(element) {
                 }
             }
             
+            if (className == "wide-textarea") {
+                if (!element.changeHeightHandlerRegistered) {
+                    function changeHeightHandler() {
+                        var lineNumber = element.value.split("\n").length;
+                        element.style.height = lineNumber * 1.2 + "em";
+                    }
+                    element.changeHeightHandlerRegistered = true;
+                    changeHeightHandler();
+                    xformsAddEventListener(element, "keyup", changeHeightHandler);
+                }
+                
+            }
+            
             if (element.alertElement) {
                 element.alertElement.className = element.valid ? "xforms-alert-inactive" 
                     : "xforms-alert-active";

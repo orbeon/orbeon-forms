@@ -75,6 +75,7 @@ public class XFormsServer extends ProcessorImpl {
 
                 // Run event if any
                 XFormsGenericEvent xformsEvent = null;
+                final boolean isInitializationRun;
                 {
                     final Element eventElement = eventDocument.getRootElement();
                     String controlId = eventElement.attributeValue("source-control-id");
@@ -84,8 +85,11 @@ public class XFormsServer extends ProcessorImpl {
                     if (controlId != null && eventName != null) {
                         // An event is passed
                         xformsEvent = containingDocument.executeEvent(pipelineContext, controlId, eventName, value);
+                        isInitializationRun = false;
                     } else if (!(controlId == null && eventName == null)) {
                         throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
+                    } else {
+                        isInitializationRun = true;
                     }
                 }
 
@@ -211,7 +215,7 @@ public class XFormsServer extends ProcessorImpl {
                                 XFormsModel currentModel = (XFormsModel) i.next();
 
                                 for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
-                                    instancesElement.add(((XFormsInstance) j.next()).getDocument().getRootElement().detach());
+                                    instancesElement.add(((XFormsInstance) j.next()).getDocument().getRootElement().createCopy());
                                 }
                             }
                         }
@@ -226,8 +230,8 @@ public class XFormsServer extends ProcessorImpl {
                     // Output divs information
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
-                        if (xformsEvent == null) {
-                            outputInitialDivs();
+                        if (isInitializationRun) {
+                            outputInitialDivs(pipelineContext, ch, xFormsControls);
                         } else {
                             outputDivsUpdates(ch, xformsEvent);
                         }
@@ -237,12 +241,10 @@ public class XFormsServer extends ProcessorImpl {
                     // Output repeats information
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeats");
-                        if (xformsEvent == null) {
+                        if (isInitializationRun) {
                             outputInitialRepeats(ch, xFormsControls.getRepeatInfo());
                         } else {
-                            outputInitialRepeats(ch, xFormsControls.getRepeatInfo());
-                            //outputRepeatsUpdates();
-                            // TODO
+                            outputRepeatsUpdates(ch, xFormsControls.getRepeatInfo());
                         }
                         ch.endElement();
 
@@ -260,21 +262,42 @@ public class XFormsServer extends ProcessorImpl {
         return output;
     }
 
-    private void outputInitialDivs() {
-        // TODO
+    private void outputInitialDivs(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsControls xFormsControls) {
+
+        List switchInfoList = xFormsControls.computeSwitchInfo(pipelineContext);
+        if (switchInfoList != null) {
+            // There are some xforms:switch/xforms:case controls
+
+            for (Iterator i = switchInfoList.iterator(); i.hasNext();) {
+                XFormsControls.SwitchInfo switchInfo = (XFormsControls.SwitchInfo) i.next();
+
+                // Output selected ids
+                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", switchInfo.getSelectedCaseId(), "visibility", "visible"});
+
+                // Output deselected ids
+                if (switchInfo.getDeselectedCaseIds() != null) {
+                    for (Iterator j = switchInfo.getDeselectedCaseIds().iterator(); j.hasNext();) {
+                        String caseId = (String) j.next();
+                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "hidden"});
+                    }
+                }
+            }
+        }
     }
 
     private void outputDivsUpdates(ContentHandlerHelper ch, XFormsGenericEvent xformsEvent) {
-        if (xformsEvent.getDivsToHide() != null) {
-            for (Iterator i = xformsEvent.getDivsToHide().iterator(); i.hasNext();) {
-                String caseId = (String) i.next();
-                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "hidden"});
+        if (xformsEvent != null) {
+            if (xformsEvent.getDivsToHide() != null) {
+                for (Iterator i = xformsEvent.getDivsToHide().iterator(); i.hasNext();) {
+                    String caseId = (String) i.next();
+                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "hidden"});
+                }
             }
-        }
-        if (xformsEvent.getDivsToShow() != null) {
-            for (Iterator i = xformsEvent.getDivsToShow().iterator(); i.hasNext();) {
-                String caseId = (String) i.next();
-                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "visible"});
+            if (xformsEvent.getDivsToShow() != null) {
+                for (Iterator i = xformsEvent.getDivsToShow().iterator(); i.hasNext();) {
+                    String caseId = (String) i.next();
+                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "visible"});
+                }
             }
         }
     }
@@ -293,8 +316,8 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private void outputRepeatsUpdates() {
-        // TODO
+    private void outputRepeatsUpdates(ContentHandlerHelper ch, XFormsControls.RepeatInfo repeatInfo) {
+        outputInitialRepeats(ch, repeatInfo);
     }
 
     public static XFormsContainingDocument createXFormsEngine(PipelineContext pipelineContext, String encodedControlsString,

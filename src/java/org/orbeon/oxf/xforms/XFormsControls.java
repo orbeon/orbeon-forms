@@ -292,6 +292,59 @@ public class XFormsControls implements EventTarget {
     }
 
     /**
+     * Compute all default xforms:switch/xforms:case information.
+     */
+    public List computeSwitchInfo(PipelineContext pipelineContext) {
+        final List switchInfoList = new ArrayList();
+        visitAllControls(pipelineContext, new ControlVisitorListener() {
+            private Stack switchStack = new Stack();
+            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
+                final String controlName = controlElement.getName();
+                final String controlId = controlElement.attributeValue("id");
+                if (controlName.equals("switch")) {
+                    switchStack.push(new SwitchInfo(controlId));
+                } else if (controlName.equals("case")) {
+                    final SwitchInfo switchInfo = (SwitchInfo) switchStack.peek();
+                    if (switchInfo.getSelectedCaseId() == null) {
+                        // If case is not already selected and there is a select attribute, set it
+                        final String selectedAttribute = controlElement.attributeValue("selected");
+                        if ("true".equals(selectedAttribute))
+                            switchInfo.setSelectedCaseId(controlId);
+                        else
+                            switchInfo.addDeselectedCaseId(controlId);
+                    } else {
+                        // Remember deselected case id
+                        switchInfo.addDeselectedCaseId(controlId);
+                    }
+                }
+
+                return true;
+            }
+            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
+                final String controlName = controlElement.getName();
+                if (controlName.equals("switch")) {
+                    final SwitchInfo switchInfo = (SwitchInfo) switchStack.peek();
+                    if (switchInfo.getSelectedCaseId() == null) {
+                        // No case was selected, select first id
+                        final List deselectedCaseIds = switchInfo.getDeselectedCaseIds();
+                        if (deselectedCaseIds.size() > 0) {
+                            switchInfo.setSelectedCaseId((String) deselectedCaseIds.get(0));
+                            deselectedCaseIds.remove(0);
+                        }
+                    }
+
+                    // Add new switchInfo
+                    switchInfoList.add(switchInfo);
+
+                    switchStack.pop();
+                }
+                return true;
+            }
+        });
+        return switchInfoList;
+    }
+
+    /**
      * Return the current repeat index for the given xforms:repeat id, -1 if the id is not found.
      */
     public int getRepeatIdIndex(String repeatId) {
@@ -786,6 +839,39 @@ public class XFormsControls implements EventTarget {
     public static interface ControlVisitorListener {
         public boolean startVisitControl(Element controlElement, String effectiveControlId);
         public boolean endVisitControl(Element controlElement, String effectiveControlId);
+    }
+
+    /**
+     * Represents xforms:case information.
+     */
+    public static class SwitchInfo {
+        private String switchId;
+        private String selectedCaseId;
+        private List deselectedCaseIds = new ArrayList();
+
+        public SwitchInfo(String switchId) {
+            this.switchId = switchId;
+        }
+
+        public String getSwitchId() {
+            return switchId;
+        }
+
+        public String getSelectedCaseId() {
+            return selectedCaseId;
+        }
+
+        public void setSelectedCaseId(String selectedCaseId) {
+            this.selectedCaseId = selectedCaseId;
+        }
+
+        public List getDeselectedCaseIds() {
+            return deselectedCaseIds;
+        }
+
+        public void addDeselectedCaseId(String caseId) {
+            deselectedCaseIds.add(caseId);
+        }
     }
 
     /**

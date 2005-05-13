@@ -13,10 +13,10 @@
 -->
 <example-descriptor>
     <title>XPL Sandbox</title>
-    <source>model.xpl</source>
-    <source>form.xml</source>
-    <source>view.xsl</source>
-    <source>input.xml</source>
+    <source>view.xml</source>
+    <source>run-xpl.xpl</source>
+    <source>initial-xpl.xml</source>
+    <source>page-flow.xml</source>
     <description>
         <p>
             This examples illustrates the use of XPL, the PresentationServer XML Pipeline

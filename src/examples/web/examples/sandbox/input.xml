@@ -11,15 +11,14 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<example-descriptor>
-    <title>XPath Sandbox</title>
-    <source>view.xml</source>
-    <source>run-xpath.xpl</source>
-    <source>initial-xpath.xml</source>
-    <source>page-flow.xml</source>
-    <description>
-        <p>
-            This example demonstrates the use of XPath 2.0. 
-        </p>
-    </description>
-</example-descriptor>
+<input>&lt;company>
+    &lt;department id="1" name="HR">
+        &lt;employee firstname="John" lastname="Smith">a&lt;/employee>
+        &lt;employee firstname="Peter" lastname="Strain"/>
+        &lt;employee firstname="Carl" lastname="Thompson"/>
+    &lt;/department>
+    &lt;department id="2" name="Engineering">
+        &lt;employee firstname="Letticia" lastname="Vallejo"/>
+        &lt;employee firstname="Bruce" lastname="Wilson"/>
+    &lt;/department>
+&lt;/company></input>

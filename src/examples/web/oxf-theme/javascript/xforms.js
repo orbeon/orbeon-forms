@@ -300,21 +300,19 @@ function xformsHandleResponse() {
                             var documentElement = document.getElementById(controlId);
 
                             // Update value
-                            if (controlElement.firstChild
-                                    && document.xformsTargetOfCurrentRequest.id != controlId) {
-                                // Check if this element has been modified since this event has been fired
-                                if (true) {
-                                    var controlValue = controlElement.firstChild.data;
-                                    if (typeof(documentElement.value) == "string") {
-                                        if (documentElement.value != controlValue) {
-                                            documentElement.value = controlValue;
-                                        }
-                                    } else {
-                                        while(documentElement.childNodes.length > 0)
-                                            documentElement.removeChild(documentElement.firstChild);
-                                        documentElement.appendChild
-                                            (documentElement.ownerDocument.createTextNode(controlValue));
+                            if (document.xformsTargetOfCurrentRequest.id != controlId
+                                   && documentElement.className.indexOf("xforms-control") != -1) {
+                                var controlValue = controlElement.firstChild ? 
+                                    controlElement.firstChild.data : "";
+                                if (typeof(documentElement.value) == "string") {
+                                    if (documentElement.value != controlValue) {
+                                        documentElement.value = controlValue;
                                     }
+                                } else {
+                                    while(documentElement.childNodes.length > 0)
+                                        documentElement.removeChild(documentElement.firstChild);
+                                    documentElement.appendChild
+                                        (documentElement.ownerDocument.createTextNode(controlValue));
                                 }
                             }
 

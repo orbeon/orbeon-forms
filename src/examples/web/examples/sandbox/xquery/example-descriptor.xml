@@ -13,11 +13,10 @@
 -->
 <example-descriptor>
     <title>XQuery Sandbox</title>
-    <source>xforms-model.xml</source>
-    <source>model.xpl</source>
-    <source>view.xsl</source>
+    <source>view.xml</source>
+    <source>run-xquery.xpl</source>
+    <source>initial-xquery.xml</source>
     <source>page-flow.xml</source>
-    <source>input.xml</source>
     <description>
         <p>
             XQuery is an XML query language being developed by the W3C.
@@ -26,11 +25,6 @@
             This page lets you experiment with the XQuery processor by writing your own XQuery
             program, and running on a given input document. XQuery support in PresentationServer
             uses the <a href="http://saxon.sourceforge.net/">Saxon</a> XQuery engine.
-
-            <!--
-            <a href="http://www.gnu.org/software/qexo/">Qexo engine</a> created by Per
-            Bothner.
-            -->
         </p>
         <p>
             For more information about XQuery, visit the <a

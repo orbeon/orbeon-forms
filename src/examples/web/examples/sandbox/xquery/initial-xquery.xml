@@ -11,15 +11,9 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<example-descriptor>
-    <title>XPath Sandbox</title>
-    <source>view.xml</source>
-    <source>run-xpath.xpl</source>
-    <source>initial-xpath.xml</source>
-    <source>page-flow.xml</source>
-    <description>
-        <p>
-            This example demonstrates the use of XPath 2.0. 
-        </p>
-    </description>
-</example-descriptor>
+<xquery>&lt;company>
+    {
+    for $d in /company/department return 
+    &lt;department employee-count="{count($d/employee)}"/>
+    }
+&lt;/company></xquery>

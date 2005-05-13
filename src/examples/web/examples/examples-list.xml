@@ -60,7 +60,7 @@
         <example id="counter" label="Counter Page Flow"/>
     </section>
     <section label="Form Handling w/XForms">
-        <example id="xforms-text" path="xforms/xforms-text" label="Text Controls"/>
+        <example id="xforms-text" path="xforms/xforms-text" label="Text Controls" xforms-ng="true"/>
         <example id="xforms-selection" path="xforms/xforms-selection" label="Selection Controls"/>
         <example id="xforms-submit" path="xforms/xforms-submit" label="Submit Controls"/>
         <example id="xforms-upload" path="xforms/xforms-upload" label="Upload Control"/>
@@ -69,8 +69,8 @@
         <example id="xforms-report" path="xforms/xforms-report" label="Sortable Table"/>
         <example id="xforms-wizard" path="xforms/xforms-wizard" label="Multi-Screen Wizard"/>
         <example id="xforms-ubl" path="xforms/xforms-ubl" label="Complex UBL Order"/>
-        <example id="xforms-calculator" path="xforms/xforms-calculator" label="Calculator"/>
-        <example id="xforms-translate" path="xforms/xforms-translate" label="Translate This"/>
+        <example id="xforms-calculator" path="xforms/xforms-calculator" label="Calculator" xforms-ng="true"/>
+        <example id="xforms-translate" path="xforms/xforms-translate" label="Translate This" xforms-ng="true"/>
     </section>
     <section label="Presenting Data">
         <example id="reports" label="Data in multiple formats"/>
@@ -83,11 +83,11 @@
         <example id="xmldb" label="XML:DB Databases"/>
     </section>
     <section label="Query &amp; Transformation">
-        <example id="xquery" path="sandbox/xquery" label="XQuery Sandbox"/>
-        <example id="xupdate" path="sandbox/xupdate" label="XUpdate Sandbox"/>
-        <example id="xpath" path="sandbox/xpath" label="XPath Sandbox"/>
-        <example id="xpl" path="sandbox/xpl" label="XPL Sandbox"/>
-        <example id="xslt" path="sandbox/xslt" label="XSLT Sandbox"/>
+        <example id="xquery" path="sandbox/xquery" label="XQuery Sandbox" xforms-ng="true"/>
+        <example id="xupdate" path="sandbox/xupdate" label="XUpdate Sandbox" xforms-ng="true"/>
+        <example id="xpath" path="sandbox/xpath" label="XPath Sandbox" xforms-ng="true"/>
+        <example id="xpl" path="sandbox/xpl" label="XPL Sandbox" xforms-ng="true"/>
+        <example id="xslt" path="sandbox/xslt" label="XSLT Sandbox" xforms-ng="true"/>
         <example id="knight" label="Computations using XSLT"/>
         <example id="stx" label="Streaming Transformations"/>
     </section>

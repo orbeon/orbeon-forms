@@ -38,10 +38,11 @@
                 <xhtml:input type="hidden" name="$models" value="{$request/xxforms:models}"/>
                 <xhtml:input type="hidden" name="$controls" value="{$request/xxforms:controls}"/>
                 <xhtml:input type="hidden" name="$instances" value="{$response/xxforms:instances}"/>
-                <xhtml:div xhtml:title="xforms-loading" style="visibility: hidden">
+                <xhtml:div xhtml:title="xforms-loading-indicator" style="visibility: hidden">
                     <img src="/images/loading.gif" style="float: left"/>
                     Loading...
                 </xhtml:div>
+                <xhtml:div xhtml:title="xforms-loading-error"/>
                 <xsl:apply-templates/>
             </xhtml:form>
         </xsl:copy>

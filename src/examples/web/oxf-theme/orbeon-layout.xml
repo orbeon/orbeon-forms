@@ -40,7 +40,12 @@ input[type = "submit"] {
 }
 
 fieldset {
-    padding: 1em;
+    margin-bottom: 1em;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    padding-left: 1.5em;
+    padding-right: 1.5em;
+    border: &light-color; 1px solid;
 }
     
 .tt, textarea {

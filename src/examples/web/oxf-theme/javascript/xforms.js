@@ -219,7 +219,7 @@ function xformsPageLoaded() {
         var form = forms[formIndex];
         var divs = form.getElementsByTagName("div");
         for (var divIndex = 0; divIndex < divs.length; divIndex++) {
-            if (divs[divIndex].getAttribute("title") == "xforms-loading") {
+            if (divs[divIndex].getAttribute("title") == "xforms-loading-indicator") {
                 forms[formIndex].xformsLoading = divs[divIndex];
             }
         }
@@ -257,66 +257,72 @@ function xformsGetLocalName(element) {
 
 function xformsHandleResponse() {
     if (document.xformsXMLHttpRequest.readyState == 4) {
-        var responseRoot = document.xformsXMLHttpRequest.responseXML.documentElement;
-        
-        for (var i = 0; i < responseRoot.childNodes.length; i++) {
-        
-            // Update controls
-            if (xformsGetLocalName(responseRoot.childNodes[i]) == "control-values") {
-                var controlValuesElement = responseRoot.childNodes[i];
-                for (var j = 0; j < controlValuesElement.childNodes.length; j++) {
-                    if (xformsGetLocalName(controlValuesElement.childNodes[j]) == "control") {
-                        var controlElement = controlValuesElement.childNodes[j];
-                        var controlId = controlElement.getAttribute("id");
-                        var controlValue = controlElement.getAttribute("value");
-                        var documentElement = document.getElementById(controlId);
-                        
-                        // Update value
-                        if (controlValue != null
-                                && document.xformsTargetOfCurrentRequest.id != controlId) {
-                            // Check if this element has been modified since this event has been fired
-                            if (true) {
-                                if (typeof(documentElement.value) == "string") {
-                                    if (documentElement.value != controlValue) {
-                                        documentElement.value = controlValue;
+        if (document.xformsXMLHttpRequest.responseXML) {
+            alert(document.xformsXMLHttpRequest.responseXML);
+            // Good: we received an XML document from the server
+            var responseRoot = document.xformsXMLHttpRequest.responseXML.documentElement;
+            for (var i = 0; i < responseRoot.childNodes.length; i++) {
+
+                // Update controls
+                if (xformsGetLocalName(responseRoot.childNodes[i]) == "control-values") {
+                    var controlValuesElement = responseRoot.childNodes[i];
+                    for (var j = 0; j < controlValuesElement.childNodes.length; j++) {
+                        if (xformsGetLocalName(controlValuesElement.childNodes[j]) == "control") {
+                            var controlElement = controlValuesElement.childNodes[j];
+                            var controlId = controlElement.getAttribute("id");
+                            var controlValue = controlElement.getAttribute("value");
+                            var documentElement = document.getElementById(controlId);
+
+                            // Update value
+                            if (controlValue != null
+                                    && document.xformsTargetOfCurrentRequest.id != controlId) {
+                                // Check if this element has been modified since this event has been fired
+                                if (true) {
+                                    if (typeof(documentElement.value) == "string") {
+                                        if (documentElement.value != controlValue) {
+                                            documentElement.value = controlValue;
+                                        }
+                                    } else {
+                                        while(documentElement.childNodes.length > 0)
+                                            documentElement.removeChild(documentElement.firstChild);
+                                        documentElement.appendChild
+                                            (documentElement.ownerDocument.createTextNode(controlValue));
                                     }
-                                } else {
-                                    while(documentElement.childNodes.length > 0)
-                                        documentElement.removeChild(documentElement.firstChild);
-                                    documentElement.appendChild
-                                        (documentElement.ownerDocument.createTextNode(controlValue));
                                 }
                             }
-                        }
-                        
-                        // Update validity
-                        documentElement.valid = controlElement.getAttribute("valid") != "false";
-                        
-                        // Update style
-                        xformsUpdateStyle(documentElement);
-                    }
-                }
-            }
-            
-            // Update instances
-            if (xformsGetLocalName(responseRoot.childNodes[i]) == "instances") {
-                document.xformsTargetOfCurrentRequest.form.xformsInstances.value =
-                    responseRoot.childNodes[i].firstChild.data;
-            }
 
-            // Display or hide divs
-            if (xformsGetLocalName(responseRoot.childNodes[i]) == "divs") {
-                var divsElement = responseRoot.childNodes[i];
-                for (var j = 0; j < divsElement.childNodes.length; j++) {
-                    if (xformsGetLocalName(divsElement.childNodes[j]) == "div") {
-                        var divElement = divsElement.childNodes[j];
-                        var controlId = divElement.getAttribute("id");
-                        var visibile = divElement.getAttribute("visibility") == "visible";
-                        var documentElement = document.getElementById(controlId);
-                        documentElement.style.display = visibile ? "block" : "none";
+                            // Update validity
+                            documentElement.valid = controlElement.getAttribute("valid") != "false";
+
+                            // Update style
+                            xformsUpdateStyle(documentElement);
+                        }
+                    }
+                }
+
+                // Update instances
+                if (xformsGetLocalName(responseRoot.childNodes[i]) == "instances") {
+                    document.xformsTargetOfCurrentRequest.form.xformsInstances.value =
+                        responseRoot.childNodes[i].firstChild.data;
+                }
+
+                // Display or hide divs
+                if (xformsGetLocalName(responseRoot.childNodes[i]) == "divs") {
+                    var divsElement = responseRoot.childNodes[i];
+                    for (var j = 0; j < divsElement.childNodes.length; j++) {
+                        if (xformsGetLocalName(divsElement.childNodes[j]) == "div") {
+                            var divElement = divsElement.childNodes[j];
+                            var controlId = divElement.getAttribute("id");
+                            var visibile = divElement.getAttribute("visibility") == "visible";
+                            var documentElement = document.getElementById(controlId);
+                            documentElement.style.display = visibile ? "block" : "none";
+                        }
                     }
                 }
             }
+        } else {
+            // There was error
+            alert(document.xformsXMLHttpRequest.responseText);
         }
 
         // End this request

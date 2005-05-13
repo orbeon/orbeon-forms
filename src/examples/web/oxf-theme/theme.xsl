@@ -47,19 +47,20 @@
                 <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
                     <xsl:copy-of select="."/>
                 </xsl:for-each>
-                <!-- Standard CSS -->
-                <xhtml:link rel="stylesheet" href="/oxf-theme/orbeon-layout.cssd" type="text/css"/>
+                <!-- Calendar -->
                 <xhtml:link rel="stylesheet" href="/oxf-theme/jscalendar/calendar-blue.css" type="text/css"/>
-                <!-- Standard scripts -->
+                <xhtml:script type="text/javascript" src="/oxf-theme/jscalendar/calendar.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/jscalendar/lang/calendar-en.js"/>
+                <xhtml:script type="text/javascript" src="/oxf-theme/jscalendar/calendar-setup.js"/>
+                <!-- Other standard scripts/styles -->
+                <xhtml:link rel="stylesheet" href="/oxf-theme/tabtastic/tabtastic.css" type="text/css"/>
+                <xhtml:link rel="stylesheet" href="/oxf-theme/orbeon-layout.cssd" type="text/css"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/wz_tooltip.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/overlib_mini.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/time-utils.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/sarissa.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/xforms-style.js"/>
                 <xhtml:script type="text/javascript" src="/oxf-theme/javascript/xforms.js"/>
-                <xhtml:script type="text/javascript" src="/oxf-theme/jscalendar/calendar.js"/>
-                <xhtml:script type="text/javascript" src="/oxf-theme/jscalendar/lang/calendar-en.js"/>
-                <xhtml:script type="text/javascript" src="/oxf-theme/jscalendar/calendar-setup.js"/>
                 <!-- Title -->
                 <xhtml:title>
                     <xsl:choose>
@@ -98,7 +99,9 @@
         </xhtml:textarea>
     </xsl:template>
     
-    <xsl:template match="xhtml:span[tokenize(@class, ' ') = 'xforms-group' and xhtml:label[@class = 'xforms-label' and @for = ../@id]]">
+    <!-- Generate fieldset for groups that contain a label -->
+    <xsl:template match="xhtml:span[tokenize(@class, ' ') = 'xforms-group' 
+            and xhtml:label[@class = 'xforms-label' and @for = ../@id]]">
         <xhtml:fieldset>
             <xsl:apply-templates select="@*"/>
             <xhtml:legend>
@@ -117,6 +120,32 @@
         <xhtml:span class='xforms-showcalendar'/>
     </xsl:template>
 
+    <!-- Use tabs for switch -->
+    <xsl:template match="xhtml:span[tokenize(@class, ' ') = 'tabtastic']">
+        <xsl:copy>
+            <!-- Remove the tabtastic class -->
+            <xsl:attribute name="class" select="string-join(
+                for $c in tokenize(@class, ' ') return if ($c = 'tabtastic') then () else $c, ' ')"/>
+            <xsl:apply-templates select="@* except @class"/>
+            
+            <!-- Generate links with titles -->
+            <ul class="tabset_tabs">
+                <xsl:for-each select="xhtml:span">
+                    <li><a href="#{@id}"><xsl:value-of select="xhtml:label[1]"/></a></li>
+                </xsl:for-each>
+            </ul>
+            
+            <!-- Add class on each case -->
+            <xsl:for-each select="xhtml:span">
+                <xhtml:div class="tabset_content">
+                    <xsl:apply-templates select="@id"/>
+<!--                    <h2 class="tabset_label"><xsl:value-of select="xhtml:label[1]"/></h2>-->
+                    <xsl:apply-templates select="node() except xhtml:label[1]"/>
+                </xhtml:div>
+            </xsl:for-each>
+        </xsl:copy>
+    </xsl:template>
+    
     <xsl:template name="ignore-first-empty-lines">
         <xsl:param name="text"/>
         <xsl:variable name="first-line" select="substring-before($text, '&#xA;')"/>

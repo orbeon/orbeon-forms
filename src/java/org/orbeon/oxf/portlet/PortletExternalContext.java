@@ -329,7 +329,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         private String rewritePortletURL(String urlString, int urlType) {
             // Case where a protocol is specified: the URL is left untouched (is
             // this a correct way of detecting the situation?)
-            if (urlString.indexOf(":") != -1) return urlString;
+            if (urlString.indexOf(":") != -1 || urlString.startsWith("#")) return urlString;
 
             try {
                 // Parse URL

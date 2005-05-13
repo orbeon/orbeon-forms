@@ -1,0 +1,98 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting" 
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events">
+    
+    <xhtml:head>
+        <xhtml:title>XQuery Sandbox</xhtml:title>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms" >
+            <xforms:instance id="instance">
+                <sandbox-instance>
+                    <input>&lt;company>
+    &lt;department id="1" name="HR">
+        &lt;employee firstname="John" lastname="Smith">a&lt;/employee>
+        &lt;employee firstname="Peter" lastname="Strain"/>
+        &lt;employee firstname="Carl" lastname="Thompson"/>
+    &lt;/department>
+    &lt;department id="2" name="Engineering">
+        &lt;employee firstname="Letticia" lastname="Vallejo"/>
+        &lt;employee firstname="Bruce" lastname="Wilson">b&lt;/employee>
+        &lt;employee firstname="David" lastname="Williams"/>
+    &lt;/department>
+&lt;/company>
+                    </input>
+                    <xquery>xquery version "1.0";
+declare namespace xs = "http://www.w3.org/2001/XMLSchema";
+declare namespace local = "http://orbeon.org/oxf/xml/local";
+
+(: Find employees of a certain department :)
+declare function local:employees($company as element(), $name as xs:string) as element()* {
+     $company/department[@name = $name]/employee
+};
+
+(: Compute longest last name :)
+declare function local:maxLastnameLength($employees as element()*) as xs:integer {
+    let $lengths :=
+        for $e in $employees
+        return string-length($e/@lastname)
+    return max($lengths)
+};
+
+let $company := doc('input:data')/*
+let $hrEmployees := local:employees($company, "HR")
+let $engineeringEmployees := local:employees($company, "Engineering")
+
+return
+    &lt;mixed-up-company employee-count="{count($company/department/employee)}"
+            max-lastname-length="{local:maxLastnameLength($company/department/employee)}">
+        {
+            for $first in $hrEmployees
+            for $second in $engineeringEmployees
+            return &lt;employee firstname="{$first/@firstname}" lastname="{$second/@lastname}"/>
+        }
+    &lt;/mixed-up-company>
+                    </xquery>
+                    <formatted-output/>
+                </sandbox-instance>
+            </xforms:instance>
+            <xforms:bind nodeset="/sandbox-instance/formatted-output" 
+                calculate="saxon:serialize(xxforms:call-xpl
+                    ('oxf:/examples/sandbox/xquery/run-xquery.xpl', ('input', 'xquery'), 
+                    (instance('instance')/input, instance('instance')/xquery), 
+                    'formatted-output')/*, 'html')"/>
+        </xforms:model>
+
+    </xhtml:head>
+    <xhtml:body>
+        <p>
+            <xforms:group ref="sandbox-instance">
+                <xforms:group>
+                    <xforms:label>Input</xforms:label>
+                    <xforms:textarea ref="input" class="wide-textarea" incremental="true"/>
+                </xforms:group>
+                <xforms:group>
+                    <xforms:label>XQuery</xforms:label>
+                    <xforms:textarea ref="xquery" class="wide-textarea" incremental="true"/>
+                </xforms:group>
+                <xforms:group>
+                    <xforms:label>Output</xforms:label>
+                    <xforms:output ref="formatted-output" xhtml:class="xforms-xhtml"/>
+                </xforms:group>
+            </xforms:group>
+        </p>
+    </xhtml:body>
+</xhtml:html>

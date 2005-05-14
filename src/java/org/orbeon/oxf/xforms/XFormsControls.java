@@ -407,8 +407,10 @@ public class XFormsControls implements EventTarget {
         SwitchInfo switchInfo = (SwitchInfo) caseIdToSwitchInfoMap.get(caseId);
         if (switchInfo == null)
             throw new OXFException("No SwitchInfo found for case id '" + caseId + "'.");
-        if (visible)
+        if (visible) {
             switchInfo.startUpdateSelectedCaseId(caseId);
+            switchInfo.endUpdateSelectedCaseId();
+        }
     }
 
     /**
@@ -937,24 +939,27 @@ public class XFormsControls implements EventTarget {
             return  (Element) ((controlsMap == null) ? null : controlsMap.get(id));
         }
 
-        public String startUpdateSelectedCaseId(String selectedCaseId) {
+        public String startUpdateSelectedCaseId(String newSelectedCaseId) {
+
             // Remember previously selected case id
-            previouslySelectedCaseId = getSelectedCaseId();
+            previouslySelectedCaseId = selectedCaseId;
 
-            // Set new selected case id
-            setSelectedCaseId(selectedCaseId);
+            if (!newSelectedCaseId.equals(selectedCaseId)) {
 
-            // Remove new selected case id from list of deselected ids
-            final List previouslyDeselected = getDeselectedCaseIds();
-            if (previouslyDeselected != null) {
-                int index = previouslyDeselected.indexOf(selectedCaseId);
-                if (index != -1)
-                    previouslyDeselected.remove(index);
+                // Set new selected case id
+                setSelectedCaseId(newSelectedCaseId);
+
+                // Remove new selected case id from list of deselected ids
+                final List previouslyDeselected = getDeselectedCaseIds();
+                if (previouslyDeselected != null) {
+                    int index = previouslyDeselected.indexOf(newSelectedCaseId);
+                    if (index != -1)
+                        previouslyDeselected.remove(index);
+                }
+
+                // Add previously selected case id to list of deselected ids
+                addDeselectedCaseId(previouslySelectedCaseId);
             }
-
-            // Add previously selected case id to list of deselected ids
-            addDeselectedCaseId(previouslySelectedCaseId);
-
             return previouslySelectedCaseId;
         }
 

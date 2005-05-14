@@ -26,7 +26,7 @@
     xmlns:xi="http://www.w3.org/2003/XInclude"
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xf="http://www.w3.org/2002/xforms"
-    xmlns:ev="http://www.w3.org/2001/xml-events">
+    xmlns:ev="http://www.w3.org/2001/xml-events" only="true">
 
     <!--
         TODO:
@@ -262,7 +262,7 @@
                         <xxforms:event/>
                     </p:input>
                     <p:input name="controls">
-                        <xxforms:controls>
+                        <controls>
                             <!-- First model, first instance -->
                             <xforms:group ref="/" id="group111">
                                 <xforms:group ref="nested111" id="group112">
@@ -310,7 +310,7 @@
                                     </xforms:group>
                                 </xforms:group>
                             </xforms:group>
-                        </xxforms:controls>
+                        </controls>
                     </p:input>
                     <p:input name="models">
                         <models>
@@ -462,7 +462,7 @@
                         <xxforms:event name="DOMActivate" source-control-id="3"/>
                     </p:input>
                     <p:input name="controls">
-                        <xxforms:controls>
+                        <controls>
                             <xforms:group ref="/equation" id="group1">
                                 <xforms:group ref="screen" id="group2">
                                     <xforms:output ref="." id="1"/>
@@ -478,7 +478,7 @@
                                     </xforms:action>
                                 </xforms:trigger>
                             </xforms:group>
-                        </xxforms:controls>
+                        </controls>
                     </p:input>
                     <p:input name="models">
                         <models>
@@ -560,7 +560,7 @@
                         <xxforms:event name="DOMActivate" source-control-id="3"/>
                     </p:input>
                     <p:input name="controls">
-                        <xxforms:controls>
+                        <controls>
                             <xforms:group ref="/equation" id="group1">
                                 <xforms:group ref="screen" id="group2">
                                     <xforms:output ref="." id="1"/>
@@ -577,7 +577,7 @@
                                     </xforms:action>
                                 </xforms:trigger>
                             </xforms:group>
-                        </xxforms:controls>
+                        </controls>
                     </p:input>
                     <p:input name="models">
                         <models>

@@ -1,4 +1,4 @@
-<xxforms:controls
+<controls
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events">
@@ -30,4 +30,4 @@
 <!--            </tr>-->
         </xforms:repeat>
 <!--    </table>-->
-</xxforms:controls>
+</controls>

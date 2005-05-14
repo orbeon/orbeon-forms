@@ -55,54 +55,66 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:switch class="switch-tabs">
-            <xforms:case id="text" selected="true">
-                <xforms:label>Text Controls</xforms:label>
-                <xforms:group ref="instance('text')">
-                    <p>
-                        <xforms:input ref="text">
-                            <xforms:label xhtml:class="fixed-width">Age:</xforms:label>
-                            <xforms:hint>Positive number</xforms:hint>
-                            <xforms:alert>The age must be a positive number</xforms:alert>
-                        </xforms:input>
-                    </p>
-                    <p>
-                        <xforms:secret ref="secret">
-                            <xforms:label xhtml:class="fixed-width">Password:</xforms:label>
-                            <xforms:hint>The password is 42 ;)</xforms:hint>
-                            <xforms:alert>Invalid password</xforms:alert>
-                        </xforms:secret>
-                    </p>
-                    <p>
-                        <xforms:textarea ref="textarea">
-                            <xforms:label xhtml:class="fixed-width">Text area:</xforms:label>
-                            <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
-                        </xforms:textarea>
-                    </p>
-                    <p>
-                        <xforms:input ref="date" class="xforms-date">
-                            <xforms:label xhtml:class="fixed-width">Birth date:</xforms:label>
-                            <xforms:help>This date must be in the past.</xforms:help>
-                        </xforms:input>
-                    </p>
-                    <p>
-                        <xforms:input ref="date2">
-                            <xforms:label xhtml:class="fixed-width">Second date:</xforms:label>
-                        </xforms:input>
-                    </p>
-                    <p>
-                        <xforms:input ref="time">
-                            <xforms:label xhtml:class="fixed-width">Time:</xforms:label>
-                        </xforms:input>
-                    </p>
-                    <p style="margin-top: 2em">
-                        <xforms:group>
-                            <xforms:label>XForms instance</xforms:label>
-                            <xforms:output ref="instance('formatted')" xhtml:class="xforms-xhtml"/>
-                        </xforms:group>
-                    </p>
-                </xforms:group>
-            </xforms:case>
-        </xforms:switch>
+        <xhtml:p class="tab-view">
+            <xforms:trigger>
+                <xforms:label>Text controls</xforms:label>
+                <xforms:toggle ev:event="DOMActivate" case="text"/>
+            </xforms:trigger>
+            <xforms:trigger>
+                <xforms:label>Selection controls</xforms:label>
+                <xforms:toggle ev:event="DOMActivate" case="selection"/>
+            </xforms:trigger>
+            <xforms:switch>
+                <xforms:case id="text" selected="true">
+                    <xforms:group ref="instance('text')">
+                        <p>
+                            <xforms:input ref="text">
+                                <xforms:label xhtml:class="fixed-width">Age:</xforms:label>
+                                <xforms:hint>Positive number</xforms:hint>
+                                <xforms:alert>The age must be a positive number</xforms:alert>
+                            </xforms:input>
+                        </p>
+                        <p>
+                            <xforms:secret ref="secret">
+                                <xforms:label xhtml:class="fixed-width">Password:</xforms:label>
+                                <xforms:hint>The password is 42 ;)</xforms:hint>
+                                <xforms:alert>Invalid password</xforms:alert>
+                            </xforms:secret>
+                        </p>
+                        <p>
+                            <xforms:textarea ref="textarea">
+                                <xforms:label xhtml:class="fixed-width">Text area:</xforms:label>
+                                <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
+                            </xforms:textarea>
+                        </p>
+                        <p>
+                            <xforms:input ref="date" class="xforms-date">
+                                <xforms:label xhtml:class="fixed-width">Birth date:</xforms:label>
+                                <xforms:help>This date must be in the past.</xforms:help>
+                            </xforms:input>
+                        </p>
+                        <p>
+                            <xforms:input ref="date2">
+                                <xforms:label xhtml:class="fixed-width">Second date:</xforms:label>
+                            </xforms:input>
+                        </p>
+                        <p>
+                            <xforms:input ref="time">
+                                <xforms:label xhtml:class="fixed-width">Time:</xforms:label>
+                            </xforms:input>
+                        </p>
+                        <p style="margin-top: 2em">
+                            <xforms:group>
+                                <xforms:label>XForms instance</xforms:label>
+                                <xforms:output ref="instance('formatted')" xhtml:class="xforms-xhtml"/>
+                            </xforms:group>
+                        </p>
+                    </xforms:group>
+                </xforms:case>
+                <xforms:case id="selection">
+                    <xforms:label>Selection Controls</xforms:label>
+                </xforms:case>
+            </xforms:switch>
+        </xhtml:p>
     </xhtml:body>
 </xhtml:html>

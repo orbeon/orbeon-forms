@@ -88,28 +88,27 @@ function xformsFireEvent(target, eventName, value, incremental) {
     // Build request
     var eventFiredElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event-request");
     
+    // Add static state
+    var staticStateElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:static-state");
+    staticStateElement.appendChild(staticStateElement.ownerDocument.createTextNode(target.form.xformsStaticState.value));
+    eventFiredElement.appendChild(staticStateElement);
+    
+    // Add dynamic state
+    var dynamicStateElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:dynamic-state");
+    dynamicStateElement.appendChild(dynamicStateElement.ownerDocument.createTextNode(target.form.xformsDynamicState.value));
+    eventFiredElement.appendChild(dynamicStateElement);
+
+    // Add action
+    var actionElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:action");
+    eventFiredElement.appendChild(actionElement);
+
     // Add event
     var eventElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event");
-    eventFiredElement.appendChild(eventElement);
+    actionElement.appendChild(eventElement);
     eventElement.setAttribute("name", eventName);
     eventElement.setAttribute("source-control-id", target.id);
     if (value != null)
         eventElement.appendChild(eventElement.ownerDocument.createTextNode(value));
-
-    // Add models
-    var modelsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:models");
-    modelsElement.appendChild(modelsElement.ownerDocument.createTextNode(target.form.xformsModels.value));
-    eventFiredElement.appendChild(modelsElement);
-    
-    // Add controls
-    var controlsElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:controls");
-    controlsElement.appendChild(controlsElement.ownerDocument.createTextNode(target.form.xformsControls.value));
-    eventFiredElement.appendChild(controlsElement);    
-    
-    // Add instances
-    var instancesElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:instances");
-    instancesElement.appendChild(instancesElement.ownerDocument.createTextNode(target.form.xformsInstances.value));
-    eventFiredElement.appendChild(instancesElement);    
 
     // If last request added to queue is incremental, remove it    
     if (document.xformsLastRequestIsIncremental && document.xformsNextRequests.length > 0) {
@@ -145,9 +144,9 @@ function xformsValueChanged(target, incremental) {
  *     Div             xformsLoadingLoading
  *     Div             xformsLoadingError
  *     Div             xformsLoadingNone
- *     Input           xformsModels
- *     Input           xformsControls
- *     Input           xformsInstances
+ *     Input           xformsStaticState
+ *     Input           xformsDynamicState
+ *     Element         xformsCurrentDivs
  *
  * Initializes attributes on the document object:
  *
@@ -252,12 +251,10 @@ function xformsPageLoaded() {
         for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
             var element = elements[elementIndex];
             if (element.name) {
-                if (element.name.indexOf("$models") != -1)
-                    form.xformsModels = element;
-                if (element.name.indexOf("$controls") != -1)
-                    form.xformsControls = element;
-                if (element.name.indexOf("$instances") != -1)
-                    form.xformsInstances = element;
+                if (element.name.indexOf("$static-state") != -1)
+                    form.xformsStaticState = element;
+                if (element.name.indexOf("$dynamic-state") != -1)
+                    form.xformsDynamicState = element;
             }
         }
     }
@@ -282,6 +279,7 @@ function xformsGetLocalName(element) {
 
 function xformsHandleResponse() {
     if (document.xformsXMLHttpRequest.readyState == 4) {
+        var form = document.xformsTargetOfCurrentRequest.form;
         var responseXML = document.xformsXMLHttpRequest.responseXML;
         if (responseXML && responseXML.documentElement 
                 && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
@@ -290,63 +288,68 @@ function xformsHandleResponse() {
             var responseRoot = responseXML.documentElement;
             for (var i = 0; i < responseRoot.childNodes.length; i++) {
 
-                // Update controls
-                if (xformsGetLocalName(responseRoot.childNodes[i]) == "control-values") {
-                    var controlValuesElement = responseRoot.childNodes[i];
-                    for (var j = 0; j < controlValuesElement.childNodes.length; j++) {
-                        if (xformsGetLocalName(controlValuesElement.childNodes[j]) == "control") {
-                            var controlElement = controlValuesElement.childNodes[j];
-                            var controlId = controlElement.getAttribute("id");
-                            var documentElement = document.getElementById(controlId);
+                // Update instances
+                if (xformsGetLocalName(responseRoot.childNodes[i]) == "dynamic-state")
+                    form.xformsDynamicState.value = responseRoot.childNodes[i].firstChild.data;
 
-                            // Update value
-                            if (document.xformsTargetOfCurrentRequest.id != controlId
-                                   && documentElement.className.indexOf("xforms-control") != -1
-                                   && documentElement.tagName.toLowerCase() != "button") {
-                                var controlValue = controlElement.firstChild ? 
-                                    controlElement.firstChild.data : "";
-                                if (typeof(documentElement.value) == "string") {
-                                    if (documentElement.value != controlValue) {
-                                        documentElement.value = controlValue;
+                // Things to do are in the action element
+                if (xformsGetLocalName(responseRoot.childNodes[i]) == "action") {
+                    var actionElement = responseRoot.childNodes[i];
+                    for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
+
+                        // Update controls
+                        if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "control-values") {
+                            var controlValuesElement = actionElement.childNodes[actionIndex];
+                            for (var j = 0; j < controlValuesElement.childNodes.length; j++) {
+                                if (xformsGetLocalName(controlValuesElement.childNodes[j]) == "control") {
+                                    var controlElement = controlValuesElement.childNodes[j];
+                                    var controlId = controlElement.getAttribute("id");
+                                    var documentElement = document.getElementById(controlId);
+
+                                    // Update value
+                                    if (document.xformsTargetOfCurrentRequest.id != controlId
+                                           && documentElement.className.indexOf("xforms-control") != -1
+                                           && documentElement.tagName.toLowerCase() != "button") {
+                                        var controlValue = controlElement.firstChild ?
+                                            controlElement.firstChild.data : "";
+                                        if (typeof(documentElement.value) == "string") {
+                                            if (documentElement.value != controlValue) {
+                                                documentElement.value = controlValue;
+                                            }
+                                        } else {
+                                            while(documentElement.childNodes.length > 0)
+                                                documentElement.removeChild(documentElement.firstChild);
+                                            documentElement.appendChild
+                                                (documentElement.ownerDocument.createTextNode(controlValue));
+                                        }
                                     }
-                                } else {
-                                    while(documentElement.childNodes.length > 0)
-                                        documentElement.removeChild(documentElement.firstChild);
-                                    documentElement.appendChild
-                                        (documentElement.ownerDocument.createTextNode(controlValue));
+
+                                    // Update validity
+                                    documentElement.valid = controlElement.getAttribute("valid") != "false";
+
+                                    // Update style
+                                    xformsUpdateStyle(documentElement);
                                 }
                             }
-
-                            // Update validity
-                            documentElement.valid = controlElement.getAttribute("valid") != "false";
-
-                            // Update style
-                            xformsUpdateStyle(documentElement);
                         }
-                    }
-                }
 
-                // Update instances
-                if (xformsGetLocalName(responseRoot.childNodes[i]) == "instances") {
-                    document.xformsTargetOfCurrentRequest.form.xformsInstances.value =
-                        responseRoot.childNodes[i].firstChild.data;
-                }
-
-                // Display or hide divs
-                if (xformsGetLocalName(responseRoot.childNodes[i]) == "divs") {
-                    var divsElement = responseRoot.childNodes[i];
-                    for (var j = 0; j < divsElement.childNodes.length; j++) {
-                        if (xformsGetLocalName(divsElement.childNodes[j]) == "div") {
-                            var divElement = divsElement.childNodes[j];
-                            var controlId = divElement.getAttribute("id");
-                            var visibile = divElement.getAttribute("visibility") == "visible";
-                            var documentElement = document.getElementById(controlId);
-                            documentElement.style.display = visibile ? "block" : "none";
+                        // Display or hide divs
+                        if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "divs") {
+                            var divsElement = actionElement.childNodes[actionIndex];
+                            for (var j = 0; j < divsElement.childNodes.length; j++) {
+                                if (xformsGetLocalName(divsElement.childNodes[j]) == "div") {
+                                    var divElement = divsElement.childNodes[j];
+                                    var controlId = divElement.getAttribute("id");
+                                    var visibile = divElement.getAttribute("visibility") == "visible";
+                                    var documentElement = document.getElementById(controlId);
+                                    documentElement.style.display = visibile ? "block" : "none";
+                                }
+                            }
                         }
                     }
                 }
             }
-            xformsDisplayLoading(document.xformsTargetOfCurrentRequest.form, "none");
+            xformsDisplayLoading(form, "none");
             
         } else if (responseXML && responseXML.documentElement 
                 && responseXML.documentElement.tagName.indexOf("exceptions") != -1) {
@@ -354,18 +357,17 @@ function xformsHandleResponse() {
             // We received an error from the server
             var errorMessageNode = document.createTextNode
                 (responseXML.getElementsByTagName("message")[0].firstChild.data);
-            var errorContainer = document.xformsTargetOfCurrentRequest.form.xformsLoadingError;
+            var errorContainer = form.xformsLoadingError;
             while (errorContainer.firstChild)
                 errorContainer.removeChild(errorContainer.firstChild);
             errorContainer.appendChild(errorMessageNode);
-            xformsDisplayLoading(document.xformsTargetOfCurrentRequest.form, "error");
+            xformsDisplayLoading(form, "error");
             
         } else {
         
             // The server didn't send valid XML
-            document.xformsTargetOfCurrentRequest.form.xformsLoadingError.innerHTML = 
-                "Unexpected response received from server";
-            xformsDisplayLoading(document.xformsTargetOfCurrentRequest.form, "error");
+            form.xformsLoadingError.innerHTML = "Unexpected response received from server";
+            xformsDisplayLoading(form, "error");
             
         }
 

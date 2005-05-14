@@ -35,9 +35,8 @@
             <xsl:apply-templates select="@*"/>
             <xhtml:form class="xforms-form">
                 <!-- Store private information used by the client-side JavaScript -->
-                <xhtml:input type="hidden" name="$models" value="{$request/xxforms:models}"/>
-                <xhtml:input type="hidden" name="$controls" value="{$request/xxforms:controls}"/>
-                <xhtml:input type="hidden" name="$instances" value="{$response/xxforms:instances}"/>
+                <xhtml:input type="hidden" name="$static-state" value="{$request/xxforms:static-state}"/>
+                <xhtml:input type="hidden" name="$dynamic-state" value="{$response/xxforms:dynamic-state}"/>
                 <xhtml:span class="xforms-loading-loading"/>
                 <xhtml:span class="xforms-loading-error"/>
                 <xhtml:span class="xforms-loading-none"/>
@@ -121,7 +120,7 @@
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-case')"/>
             <xsl:variable name="id" as="xs:string" select="@id"/>
             <xsl:variable name="div-information" as="element()"
-                select="$response/xxforms:divs/xxforms:div[@id = $id]"/>
+                select="$response/xxforms:action/xxforms:divs/xxforms:div[@id = $id]"/>
             <xsl:attribute name="style" select="concat('display: ', 
                 if ($div-information/@visibility = 'visible') then 'block' else 'none')"/>
             <xsl:apply-templates/>
@@ -154,7 +153,8 @@
     
     <xsl:function name="xxforms:control" as="element()">
         <xsl:param name="id" as="xs:string"/>
-        <xsl:sequence select="$response/xxforms:control-values/xxforms:control[@id = $id]"/>
+        <xsl:message><xsl:value-of select="$id"/></xsl:message>
+        <xsl:sequence select="$response/xxforms:action/xxforms:control-values/xxforms:control[@id = $id]"/>
     </xsl:function>
     
 </xsl:stylesheet>

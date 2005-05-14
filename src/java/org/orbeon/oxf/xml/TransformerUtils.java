@@ -256,16 +256,16 @@ public class TransformerUtils {
     }
 
     /**
-     * Transform a W3C DOM document into a dom4j document
+     * Transform a W3C DOM node into a dom4j document
      *
-     * @param   W3C DOM document
+     * @param   W3C DOM node
      * @return  dom4j document
      * @throws TransformerException
      */
-    public static Document domToDom4jDocument(org.w3c.dom.Document document) throws TransformerException {
+    public static Document domToDom4jDocument(org.w3c.dom.Node node) throws TransformerException {
         Transformer identity = getIdentityTransformer();
         DocumentResult documentResult = new DocumentResult();
-        identity.transform(new DOMSource(document), documentResult);
+        identity.transform(new DOMSource(node), documentResult);
         return documentResult.getDocument();
     }
 

@@ -42,6 +42,8 @@ public class XFormsControls implements EventTarget {
 
     private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
     private RepeatInfo repeatInfo;
+    private Map switchIdToToSwitchInfoMap;
+    private Map caseIdToSwitchInfoMap;
 
     private XFormsContainingDocument containingDocument;
     private Document controlsDocument;
@@ -89,9 +91,12 @@ public class XFormsControls implements EventTarget {
 
         initializeContextStack();
 
-        // Initialize repeat information
-        if (controlsDocument != null)
+        if (controlsDocument != null) {
+            // Initialize repeat information
             initializeRepeatInfo(pipelineContext);
+            // Initialize swtich information
+            initializeSwitchInfo(pipelineContext);
+        }
     }
 
     private void initializeContextStack() {
@@ -294,8 +299,9 @@ public class XFormsControls implements EventTarget {
     /**
      * Compute all default xforms:switch/xforms:case information.
      */
-    public List computeSwitchInfo(PipelineContext pipelineContext) {
-        final List switchInfoList = new ArrayList();
+    private void initializeSwitchInfo(PipelineContext pipelineContext) {
+        final Map switchInfoMap = new HashMap();
+        final Map caseIdToSwitchInfoMap = new HashMap();
         visitAllControls(pipelineContext, new ControlVisitorListener() {
             private Stack switchStack = new Stack();
             public boolean startVisitControl(Element controlElement, String effectiveControlId) {
@@ -305,6 +311,9 @@ public class XFormsControls implements EventTarget {
                     switchStack.push(new SwitchInfo(controlId));
                 } else if (controlName.equals("case")) {
                     final SwitchInfo switchInfo = (SwitchInfo) switchStack.peek();
+
+                    caseIdToSwitchInfoMap.put(controlId, switchInfo);
+
                     if (switchInfo.getSelectedCaseId() == null) {
                         // If case is not already selected and there is a select attribute, set it
                         final String selectedAttribute = controlElement.attributeValue("selected");
@@ -334,14 +343,72 @@ public class XFormsControls implements EventTarget {
                     }
 
                     // Add new switchInfo
-                    switchInfoList.add(switchInfo);
+                    switchInfoMap.put(switchInfo.getSwitchId(), switchInfo);
 
                     switchStack.pop();
                 }
                 return true;
             }
         });
-        return switchInfoList;
+        this.switchIdToToSwitchInfoMap = switchInfoMap;
+        this.caseIdToSwitchInfoMap = caseIdToSwitchInfoMap;
+    }
+
+    /**
+     * Update xforms:switch/xforms:case information with newly selected case id.
+     */
+    private void updateSwitchInfo(final PipelineContext pipelineContext, final String selectedCaseId) {
+        visitAllControls(pipelineContext, new ControlVisitorListener() {
+            private Stack switchStack = new Stack();
+            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
+                final String controlName = controlElement.getName();
+                final String controlId = controlElement.attributeValue("id");
+                if (controlName.equals("switch")) {
+                    switchStack.push(switchIdToToSwitchInfoMap.get(controlId));
+                } else if (controlName.equals("case")) {
+                    final SwitchInfo switchInfo = (SwitchInfo) switchStack.peek();
+
+                    switchInfo.setControlForId(controlId, controlElement);
+
+                    if (selectedCaseId.equals(controlId) && !selectedCaseId.equals(switchInfo.getSelectedCaseId())) {
+                        // This is the case that just got selected, and it was not previously selected
+                        switchInfo.startUpdateSelectedCaseId(selectedCaseId);
+                    }
+                }
+
+                return true;
+            }
+            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
+                final String controlName = controlElement.getName();
+                if (controlName.equals("switch")) {
+                    final SwitchInfo switchInfo = (SwitchInfo) switchStack.peek();
+
+                    final String previouslySelected = switchInfo.getPreviouslySelectedCaseId();
+                    if (previouslySelected != null) {
+                        // A new selection occurred on this switch
+
+                        // "1. Dispatching an xforms-deselect event to the currently selected case."
+                        dispatchEvent(pipelineContext, new XFormsDeselectEvent(switchInfo.getControlForId(previouslySelected)));
+
+                        // "2. Dispatching an xform-select event to the case to be selected."
+                        dispatchEvent(pipelineContext, new XFormsSelectEvent(switchInfo.getControlForId(switchInfo.getSelectedCaseId())));
+
+                        switchInfo.endUpdateSelectedCaseId();
+                    }
+
+                    switchStack.pop();
+                }
+                return true;
+            }
+        });
+    }
+
+    public void updateSwitchInfo(String caseId, boolean visible) {
+        SwitchInfo switchInfo = (SwitchInfo) caseIdToSwitchInfoMap.get(caseId);
+        if (switchInfo == null)
+            throw new OXFException("No SwitchInfo found for case id '" + caseId + "'.");
+        if (visible)
+            switchInfo.startUpdateSelectedCaseId(caseId);
     }
 
     /**
@@ -488,6 +555,13 @@ public class XFormsControls implements EventTarget {
      */
     public RepeatInfo getRepeatInfo() {
         return repeatInfo;
+    }
+
+    /**
+     * Get xforms:switch information.
+     */
+    public Map getSwitchIdToToSwitchInfoMap() {
+        return switchIdToToSwitchInfoMap;
     }
 
     /**
@@ -684,33 +758,10 @@ public class XFormsControls implements EventTarget {
             // 9.2.3 The toggle Element
             // xforms:toggle
 
-            // Find case with that id and select it
             String caseId = eventHandlerElement.attributeValue("case");
-            XFormsEvent.addDivToShow(caseId);
 
-            // Find case element with current case id
-            final Element currentCaseElement;
-            Map variables = new HashMap();
-            variables.put("case-id", caseId);
-            currentCaseElement = (Element) documentXPathEvaluator.evaluateSingle(pipelineContext, getControlsDocument(),
-                    "/xxf:controls//xf:case[@id = $case-id]", XFormsServer.XFORMS_NAMESPACES, variables, null, null);
-            // "1. Dispatching an xforms-deselect event to the currently selected case."
-            dispatchEvent(pipelineContext, new XFormsDeselectEvent(currentCaseElement));
-
-            // Deselect other cases in that switch
-            {
-                final List xpathExpressionResult = documentXPathEvaluator.evaluate(pipelineContext, currentCaseElement,
-                        "./ancestor::xf:switch[1]//xf:case[not(@id = $case-id)]",
-                        XFormsServer.XFORMS_NAMESPACES, variables, null, null);
-
-                for (Iterator i = xpathExpressionResult.iterator(); i.hasNext();) {
-                    Element caseElement = (Element) i.next();
-                    XFormsEvent.addDivToHide(caseElement.attributeValue(new QName("id")));
-
-                    // "2. Dispatching an xform-select event to the case to be selected."
-                    dispatchEvent(pipelineContext, new XFormsSelectEvent(caseElement));
-                }
-            }
+            // Update xforms:switch info and dispatch events
+            updateSwitchInfo(pipelineContext, caseId);
 
         } else if (XFormsEvents.XFORMS_INSERT_ACTION.equals(actionEventName)) {
             // 9.3.5 The insert Element
@@ -849,6 +900,9 @@ public class XFormsControls implements EventTarget {
         private String selectedCaseId;
         private List deselectedCaseIds = new ArrayList();
 
+        private Map controlsMap;
+        private String previouslySelectedCaseId;
+
         public SwitchInfo(String switchId) {
             this.switchId = switchId;
         }
@@ -871,6 +925,46 @@ public class XFormsControls implements EventTarget {
 
         public void addDeselectedCaseId(String caseId) {
             deselectedCaseIds.add(caseId);
+        }
+
+        public void setControlForId(String id, Element controlElement) {
+            if (controlsMap == null)
+                controlsMap = new HashMap();
+            controlsMap.put(id, controlElement);
+        }
+
+        public Element getControlForId(String id) {
+            return  (Element) ((controlsMap == null) ? null : controlsMap.get(id));
+        }
+
+        public String startUpdateSelectedCaseId(String selectedCaseId) {
+            // Remember previously selected case id
+            previouslySelectedCaseId = getSelectedCaseId();
+
+            // Set new selected case id
+            setSelectedCaseId(selectedCaseId);
+
+            // Remove new selected case id from list of deselected ids
+            final List previouslyDeselected = getDeselectedCaseIds();
+            if (previouslyDeselected != null) {
+                int index = previouslyDeselected.indexOf(selectedCaseId);
+                if (index != -1)
+                    previouslyDeselected.remove(index);
+            }
+
+            // Add previously selected case id to list of deselected ids
+            addDeselectedCaseId(previouslySelectedCaseId);
+
+            return previouslySelectedCaseId;
+        }
+
+        public void endUpdateSelectedCaseId() {
+            controlsMap = null;
+            previouslySelectedCaseId = null;
+        }
+
+        public String getPreviouslySelectedCaseId() {
+            return previouslySelectedCaseId;
         }
     }
 

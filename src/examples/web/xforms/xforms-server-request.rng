@@ -20,31 +20,27 @@
 
     <start>
         <element name="xxforms:event-request">
-            <element name="xxforms:event">
-                <optional>
-                    <attribute name="name">
-                        <ref name="xformsActionName"/>
-                    </attribute>
-                    <attribute name="source-control-id">
-                        <data type="string"/>
-                    </attribute>
-                    <optional>
-                        <data type="string"/>
-                    </optional>
-                </optional>
-            </element>
-            <element name="xxforms:models">
+            <element name="xxforms:static-state">
                 <data type="string"/>
             </element>
-            <element name="xxforms:controls">
-                <optional>
-                    <attribute name="xml:base"/>
-                </optional>
-                <zeroOrMore>
-                    <ref name="anyElement"/>
-                </zeroOrMore>
+            <element name="xxforms:dynamic-state">
+                <data type="string"/>
             </element>
-            <ref name="xformsInstances"/>
+            <element name="xxforms:action">
+                <element name="xxforms:event">
+                    <optional>
+                        <attribute name="name">
+                            <ref name="xformsActionName"/>
+                        </attribute>
+                        <attribute name="source-control-id">
+                            <data type="string"/>
+                        </attribute>
+                        <optional>
+                            <data type="string"/>
+                        </optional>
+                    </optional>
+                </element>
+            </element>
         </element>
     </start>
 

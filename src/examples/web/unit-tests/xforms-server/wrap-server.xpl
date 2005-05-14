@@ -16,7 +16,8 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xforms="http://www.w3.org/2002/xforms">
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:saxon="http://saxon.sf.net/">
 
     <p:param name="event" type="input"/>
     <p:param name="controls" type="input"/>
@@ -34,16 +35,30 @@
         <p:input name="instances" href="#instances"/>
         <p:input name="config">
             <event-request xmlns="http://orbeon.org/oxf/xml/xforms" xsl:version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
-                <xsl:copy-of select="doc('input:event')/*"/>
-                <models>
-                    <xsl:value-of select="context:encodeXML(doc('input:models'))"/>
-                </models>
-                <controls>
-                    <xsl:value-of select="context:encodeXML(doc('input:controls'))"/>
-                </controls>
-                <instances>
-                    <xsl:value-of select="context:encodeXML(doc('input:instances'))"/>
-                </instances>
+                <static-state>
+                    <xsl:variable name="static-state" as="document-node()">
+                        <xsl:document>
+                            <static-state xmlns="">
+                                <xsl:copy-of select="doc('input:controls')/*"/>
+                                <xsl:copy-of select="doc('input:models')/*"/>
+                            </static-state>
+                        </xsl:document>
+                    </xsl:variable>
+                    <xsl:value-of select="context:encodeXML($static-state)"/>
+                </static-state>
+                <dynamic-state>
+                    <xsl:variable name="dynamic-state" as="document-node()">
+                        <xsl:document>
+                            <dynamic-state xmlns="">
+                                <xsl:copy-of select="doc('input:instances')/*"/>
+                            </dynamic-state>
+                        </xsl:document>
+                    </xsl:variable>
+                    <xsl:value-of select="context:encodeXML($dynamic-state)"/>
+                </dynamic-state>
+                <action>
+                    <xsl:copy-of select="doc('input:event')/*"/>
+                </action>
             </event-request>
         </p:input>
         <p:output name="data" id="request"/>
@@ -61,7 +76,7 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-                <xsl:template match="xxforms:instances">
+                <xsl:template match="xxforms:static-state|xxforms:dynamic-state">
                     <xsl:copy>
                         <xsl:copy-of select="context:decodeXML(normalize-space(.))"/>
                     </xsl:copy>

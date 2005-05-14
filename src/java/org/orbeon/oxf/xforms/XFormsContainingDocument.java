@@ -80,9 +80,9 @@ public class XFormsContainingDocument implements EventTarget {
     }
 
     /**
-     * Execute an event on control with id controlId and event eventName
+     * Execute an event on control with id controlId and event eventName.
      */
-    public XFormsGenericEvent executeEvent(PipelineContext pipelineContext, String controlId, String eventName, String eventValue) {
+    public void executeEvent(PipelineContext pipelineContext, String controlId, String eventName, String eventValue) {
 
         // Get control element and event handler element
         Element controlElement = xFormsControls.getControlElement(pipelineContext, controlId);
@@ -90,7 +90,6 @@ public class XFormsContainingDocument implements EventTarget {
         // Interpret event
         XFormsGenericEvent XFormsEvent = new XFormsGenericEvent(controlElement, eventValue);
         interpretEvent(pipelineContext, XFormsEvent, eventName);
-        return XFormsEvent;
     }
 
     private void interpretEvent(final PipelineContext pipelineContext, XFormsGenericEvent XFormsEvent, String eventName) {

@@ -46,10 +46,15 @@ public class XFormsConstants {
     public static final String XXFORMS_NODE_IDS_ATTRIBUTE_NAME = "node-ids";
     public static final QName XXFORMS_NODE_IDS_ATTRIBUTE_QNAME = new QName(XXFORMS_READONLY_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
 
+    public static final QName XXFORMS_STATIC_STATE_QNAME = new QName("static-state", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_DYNAMIC_STATE_QNAME = new QName("dynamic-state", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_ACTION_QNAME = new QName("action", XFormsConstants.XXFORMS_NAMESPACE);
+
     public static final QName XXFORMS_CONTROLS_QNAME = new QName("controls", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_MODELS_QNAME = new QName("models", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_INSTANCES_QNAME = new QName("instances", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_EVENT_QNAME = new QName("event", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_DIVS_QNAME = new QName("divs", XFormsConstants.XXFORMS_NAMESPACE);
 
     public static final QName XFORMS_LABEL_QNAME = new QName("label", XFormsConstants.XFORMS_NAMESPACE);
     public static final QName XFORMS_HELP_QNAME = new QName("help", XFormsConstants.XFORMS_NAMESPACE);

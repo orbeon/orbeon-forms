@@ -170,10 +170,10 @@ public class XFormsUtils {
         }
     }
 
-    public static String encodeXML(PipelineContext pipelineContext, org.w3c.dom.Document document) {
+    public static String encodeXML(PipelineContext pipelineContext, org.w3c.dom.Node node) {
 
         try {
-            return encodeXML(pipelineContext, TransformerUtils.domToDom4jDocument(document), getEncryptionKey());
+            return encodeXML(pipelineContext, TransformerUtils.domToDom4jDocument(node), getEncryptionKey());
         } catch (TransformerException e) {
             throw new OXFException(e);
         }

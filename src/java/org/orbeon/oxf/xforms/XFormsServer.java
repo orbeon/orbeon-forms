@@ -356,7 +356,7 @@ public class XFormsServer extends ProcessorImpl {
                         String dynamicStateString) {
 
         final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, staticStateString);
-        final Document dynamicStateDocument = (dynamicStateString == null) ? null : XFormsUtils.decodeXML(pipelineContext, dynamicStateString);
+        final Document dynamicStateDocument = (dynamicStateString == null || "".equals(dynamicStateString)) ? null : XFormsUtils.decodeXML(pipelineContext, dynamicStateString);
 
         // Get controls from static state
         final Document controlsDocument = Dom4jUtils.createDocument(staticStateDocument.getRootElement().element("controls"));

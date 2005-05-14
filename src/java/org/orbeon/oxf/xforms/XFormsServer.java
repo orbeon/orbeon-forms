@@ -357,8 +357,9 @@ public class XFormsServer extends ProcessorImpl {
         final Document dynamicStateDocument = (dynamicStateString == null || "".equals(dynamicStateString)) ? null : XFormsUtils.decodeXML(pipelineContext, dynamicStateString);
 
         // Get controls from static state
-        final Document controlsDocument = Dom4jUtils.createDocument();
-        controlsDocument.add(staticStateDocument.getRootElement().element("controls").detach());
+//        final Document controlsDocument = Dom4jUtils.createDocument();
+//        controlsDocument.add(staticStateDocument.getRootElement().element("controls").detach());
+        final Document controlsDocument = Dom4jUtils.createDocumentCopyParentNamespaces(staticStateDocument.getRootElement().element("controls"));
 
         // Get models from static state
         final Element modelsElement = staticStateDocument.getRootElement().element("models");
@@ -376,8 +377,9 @@ public class XFormsServer extends ProcessorImpl {
             for (Iterator i = modelsElement.elements().iterator(); i.hasNext();) {
                 Element modelElement = (Element) i.next();
 
-                final Document modelDocument = Dom4jUtils.createDocument();
-                modelDocument.add(modelElement.detach());
+//                final Document modelDocument = Dom4jUtils.createDocument();
+//                modelDocument.add(modelElement.detach());
+                final Document modelDocument = Dom4jUtils.createDocumentCopyParentNamespaces(modelElement);
 
                 XFormsModel model = new XFormsModel(modelDocument);
                 models.add(model);
@@ -415,9 +417,9 @@ public class XFormsServer extends ProcessorImpl {
 
                     // Create and set instance document on current model
 
-                    final Document instanceDocument = Dom4jUtils.createDocument();
-                    instanceDocument.add(instanceElement.detach());
-                    //Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces(instanceElement);
+//                    final Document instanceDocument = Dom4jUtils.createDocument();
+//                    instanceDocument.add(instanceElement.detach());
+                    Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces(instanceElement);
                     currentModel.setInstanceDocument(pipelineContext, currentCount, instanceDocument);
 
                     currentCount++;

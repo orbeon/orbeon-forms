@@ -463,7 +463,7 @@ public class XFormsControls implements EventTarget {
         // Get action element
         Element controlElement;
         controlElement = (Element) documentXPathEvaluator.evaluateSingle(pipelineContext, getControlsDocument(),
-                "/xxf:controls//*[@id = $control-id]", XFormsServer.XFORMS_NAMESPACES, variables, null, null);
+                "/controls//*[@id = $control-id]", XFormsServer.XFORMS_NAMESPACES, variables, null, null);
         if (controlElement == null)
             throw new OXFException("Cannot find control with id '" + controlId + "'.");
         return controlElement;

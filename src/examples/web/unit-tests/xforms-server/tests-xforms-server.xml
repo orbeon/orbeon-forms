@@ -674,40 +674,24 @@
                 </p:processor>
 
                 <p:processor name="oxf:unsafe-xslt">
-                    <p:input name="data" href="#repeat-response"/>
+                    <p:input name="data"><dummy/></p:input>
+                    <p:input name="response" href="#repeat-response"/>
                     <p:input name="controls" href="xforms-server/repeat-full-controls.xml"/>
                     <p:input name="config">
                         <xsl:stylesheet version="2.0">
                             <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
-                            <xsl:variable name="repeats" select="/xxforms:event-response/xxforms:action/xxforms:repeats/xxforms:repeat" as="element()"/>
+                            <xsl:import href="/config/xforms-to-ajax-xhtml.xsl"/>
+
+                            <xsl:template match="/">
+                                <xsl:apply-templates select="doc('input:response')/*"/>
+                            </xsl:template>
                             <xsl:template match="xxforms:repeats">
                                 <xsl:copy>
                                     <xsl:apply-templates/>
                                 </xsl:copy>
-                                <xsl:apply-templates select="doc('input:controls')" mode="controls">
-                                    <xsl:with-param name="current-repeats" select="$repeats" tunnel="yes"/>
-                                    <xsl:with-param name="id-postfix" select="''" tunnel="yes"/>
-                                </xsl:apply-templates>
-                            </xsl:template>
-                            <xsl:template match="xforms:repeat" mode="controls">
-                                <xsl:param name="current-repeats" tunnel="yes"/>
-                                <xsl:param name="id-postfix" tunnel="yes"/>
-
-                                <xsl:variable name="xforms-repeat" select="." as="element()"/>
-                                <xsl:variable name="current-repeat" select="$current-repeats[@id = $xforms-repeat/@id]" as="element()"/>
-
-                                <xsl:for-each select="(1 to $current-repeat/@occurs)">
-                                    <xsl:apply-templates select="$xforms-repeat/*" mode="controls">
-                                        <xsl:with-param name="current-repeats" select="$current-repeat/xxforms:repeat[current()]" tunnel="yes"/>
-                                        <xsl:with-param name="id-postfix" select="concat($id-postfix, '-', current())" tunnel="yes"/>
-                                    </xsl:apply-templates>
-                                </xsl:for-each>
-                            </xsl:template>
-                            <xsl:template match="xforms:*/@id" mode="controls">
-                                <xsl:param name="current-repeats" tunnel="yes"/>
-                                <xsl:param name="id-postfix" tunnel="yes"/>
-
-                                <xsl:attribute name="id" select="concat(., $id-postfix)"/>
+                                <xxforms:controls>
+                                    <xsl:apply-templates select="doc('input:controls')/*/*"/>
+                                </xxforms:controls>
                             </xsl:template>
                         </xsl:stylesheet>
                     </p:input>
@@ -778,32 +762,22 @@
                                     <table>
                                         <tr>
                                             <td>
-                                                <xforms:output ref="@first" id="id125-1-1"/>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-1-1" class="xforms-control">f11</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-1-1" id="id125-1-1" class="xforms-alert-inactive"/>
                                             </td>
                                             <td>
-                                                <xforms:output ref="@last" id="id126-1-1"/>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-1-1" class="xforms-control">l11</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-1-1" id="id126-1-1" class="xforms-alert-inactive"/>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
-                                                <xforms:output ref="@first" id="id125-1-2"/>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-1-2" class="xforms-control">f12</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-1-2" id="id125-1-2" class="xforms-alert-inactive"/>
                                             </td>
                                             <td>
-                                                <xforms:output ref="@last" id="id126-1-2"/>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <table>
-                                        <tr>
-                                            <td>
-                                                <xforms:output ref="@first" id="id125-2-1"/>
-                                            </td>
-                                            <td>
-                                                <xforms:output ref="@last" id="id126-2-1"/>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-1-2" class="xforms-control">l12</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-1-2" id="id126-1-2" class="xforms-alert-inactive"/>
                                             </td>
                                         </tr>
                                     </table>
@@ -814,34 +788,58 @@
                                     <table>
                                         <tr>
                                             <td>
-                                                <xforms:output ref="@first" id="id125-3-1"/>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-2-1" class="xforms-control">f21</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-2-1" id="id125-2-1" class="xforms-alert-inactive"/>
                                             </td>
                                             <td>
-                                                <xforms:output ref="@last" id="id126-3-1"/>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-2-1" class="xforms-control">l21</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-2-1" id="id126-2-1" class="xforms-alert-inactive"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <table>
+                                        <tr>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-1" class="xforms-control">f31</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-3-1" id="id125-3-1" class="xforms-alert-inactive"/>
+                                            </td>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-1" class="xforms-control">l31</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-3-1" id="id126-3-1" class="xforms-alert-inactive"/>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
-                                                <xforms:output ref="@first" id="id125-3-2"/>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-2" class="xforms-control">f32</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-3-2" id="id125-3-2" class="xforms-alert-inactive"/>
                                             </td>
                                             <td>
-                                                <xforms:output ref="@last" id="id126-3-2"/>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <xforms:output ref="@first" id="id125-3-3"/>
-                                            </td>
-                                            <td>
-                                                <xforms:output ref="@last" id="id126-3-3"/>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-2" class="xforms-control">l32</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-3-2" id="id126-3-2" class="xforms-alert-inactive"/>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
-                                                <xforms:output ref="@first" id="id125-3-4"/>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-3" class="xforms-control">f33</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-3-3" id="id125-3-3" class="xforms-alert-inactive"/>
                                             </td>
                                             <td>
-                                                <xforms:output ref="@last" id="id126-3-4"/>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-3" class="xforms-control">l33</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-3-3" id="id126-3-3" class="xforms-alert-inactive"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-4" class="xforms-control">f34</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-3-4" id="id125-3-4" class="xforms-alert-inactive"/>
+                                            </td>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-4" class="xforms-control">l34</xhtml:span>
+                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-3-4" id="id126-3-4" class="xforms-alert-inactive"/>
                                             </td>
                                         </tr>
                                     </table>

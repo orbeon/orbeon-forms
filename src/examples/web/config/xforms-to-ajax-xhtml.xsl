@@ -27,7 +27,10 @@
         select="doc('input:request')/xxforms:event-request"/>
     <xsl:variable name="response" as="element()" 
         select="doc('input:response')/xxforms:event-response"/>
-    
+
+    <xsl:variable name="repeats" as="element()*"
+        select="$response/xxforms:action/xxforms:repeats/xxforms:repeat" />
+
     <!-- - - - - - - Form with hidden divs - - - - - - -->
     
     <xsl:template match="xhtml:body">
@@ -48,59 +51,73 @@
     <!-- - - - - - - XForms controls - - - - - - -->
     
     <xsl:template match="xforms:output | xforms:trigger | xforms:input 
-            | xforms:secret | xforms:textarea | xforms:select1" priority="2">
+            | xforms:secret | xforms:textarea" priority="2">
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xsl:if test="local-name() != 'trigger'">
             <xsl:apply-templates select="xforms:label"/>
         </xsl:if>
         <xsl:next-match/>
         <xsl:apply-templates select="xforms:help"/>
-        <xhtml:label for="{@id}">
+        <xhtml:label for="{$id}">
             <xsl:copy-of select="xxforms:copy-attributes(xforms:alert, concat('xforms-alert-', 
-                if (xxforms:control(@id)/@valid = 'false') then 'active' else 'inactive'))"/>
-            <xsl:value-of select="xxforms:control(@id)/@alert"/>
+                if (xxforms:control($id)/@valid = 'false') then 'active' else 'inactive'), $id)"/>
+            <xsl:value-of select="xxforms:control($id)/@alert"/>
         </xhtml:label>
         <xsl:apply-templates select="xforms:hint"/>
     </xsl:template>
     
     <xsl:template match="xforms:output">
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:span>
-            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
-            <xsl:value-of select="xxforms:control(@id)"/>
+            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
+            <xsl:value-of select="xxforms:control($id)"/>
         </xhtml:span>
     </xsl:template>
     
     <xsl:template match="xforms:trigger">
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:button type="button" class="trigger">
-            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
+            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
             <xsl:value-of select="xforms:label"/>
         </xhtml:button>
     </xsl:template>
     
     <xsl:template match="xforms:input">
-        <xhtml:input type="text" name="{@id}" value="{xxforms:control(@id)}">
-            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xhtml:input type="text" name="{$id}" value="{xxforms:control($id)}">
+            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
         </xhtml:input>
     </xsl:template>
 
     <xsl:template match="xforms:secret">
-        <xhtml:input type="password" name="{@id}" value="{xxforms:control(@id)}">
-            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xhtml:input type="password" name="{$id}" value="{xxforms:control($id)}">
+            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
         </xhtml:input>
     </xsl:template>
 
     <xsl:template match="xforms:textarea">
-        <xhtml:textarea name="{@id}">
-            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
-            <xsl:value-of select="xxforms:control(@id)"/>
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xhtml:textarea name="{$id}">
+            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
+            <xsl:value-of select="xxforms:control($id)"/>
         </xhtml:textarea>
     </xsl:template>
     
     <xsl:template match="xforms:select1">
-        <xhtml:select name="{@id}">
-            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xhtml:select name="{$id}">
+            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
             <xsl:for-each select="xforms:item">
                 <xhtml:option value="{xforms:value}">
-                    <xsl:if test="xforms:value = xxforms:control(../@id)">
+                    <xsl:if test="xforms:value = xxforms:control($id)">
                         <xsl:attribute name="selected">selected</xsl:attribute>
                     </xsl:if>
                     <xsl:value-of select="xforms:label"/>
@@ -110,29 +127,51 @@
     </xsl:template>
 
     <xsl:template match="xforms:label | xforms:hint | xforms:help">
-        <xhtml:label for="{../@id}">
-            <xsl:copy-of select="xxforms:copy-attributes(., concat('xforms-', local-name()))"/>
-            <xsl:variable name="value-element" as="element()" select="xxforms:control(../@id)"/>
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:variable name="id" select="concat(../@id, $id-postfix)"/>
+        <xhtml:label for="{$id}">
+            <xsl:copy-of select="xxforms:copy-attributes(., concat('xforms-', local-name()), $id)"/>
+            <xsl:variable name="value-element" as="element()" select="xxforms:control($id)"/>
             <xsl:value-of select="if (local-name() = 'label') then $value-element/@label
                 else if (local-name() = 'hint') then $value-element/@hint
                 else $value-element/@help"/>
         </xhtml:label>
     </xsl:template>
 
+    <!-- - - - - - - XForms repeat - - - - - - -->
+
+    <xsl:template match="xforms:repeat">
+        <xsl:param name="current-repeats" select="$repeats" tunnel="yes"/>
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+
+        <xsl:variable name="xforms-repeat" select="." as="element()"/>
+        <xsl:variable name="current-repeat" select="$current-repeats[@id = $xforms-repeat/@id]" as="element()"/>
+
+        <xsl:for-each select="(1 to $current-repeat/@occurs)">
+            <xsl:apply-templates select="$xforms-repeat/*">
+                <xsl:with-param name="current-repeats" select="$current-repeat/xxforms:repeat[current()]" tunnel="yes"/>
+                <xsl:with-param name="id-postfix" select="concat($id-postfix, '-', current())" tunnel="yes"/>
+            </xsl:apply-templates>
+        </xsl:for-each>
+    </xsl:template>
+
     <!-- - - - - - - XForms containers - - - - - - -->
 
     <xsl:template match="xforms:group|xforms:switch">
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:span>
-            <xsl:copy-of select="xxforms:copy-attributes(., concat('xforms-', local-name()))"/>
+            <xsl:copy-of select="xxforms:copy-attributes(., concat('xforms-', local-name()), $id)"/>
             <xsl:apply-templates/>
         </xhtml:span>
     </xsl:template>
     
     <xsl:template match="xforms:case">
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <!-- FIXME: use reponse to figure out what case are displayed -->
         <xhtml:span>
-            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-case')"/>
-            <xsl:variable name="id" as="xs:string" select="@id"/>
+            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-case', $id)"/>
             <xsl:variable name="div-information" as="element()"
                 select="$response/xxforms:action/xxforms:divs/xxforms:div[@id = $id]"/>
             <xsl:attribute name="style" select="concat('display: ', 
@@ -148,8 +187,13 @@
     <xsl:function name="xxforms:copy-attributes">
         <xsl:param name="element" as="element()?"/>
         <xsl:param name="classes" as="xs:string*"/>
+        <xsl:param name="id" as="xs:string?"/>
+        <!-- Handle id attribute -->
+        <xsl:if test="$id">
+            <xsl:attribute name="id" select="$id"/>
+        </xsl:if>
         <!-- Copy attributes with no namespaces -->
-        <xsl:copy-of select="$element/@id | $element/@accesskey | $element/@tabindex | $element/@style"/>
+        <xsl:copy-of select="$element/@accesskey | $element/@tabindex | $element/@style"/>
         <!-- Convert navindex to tabindex -->
         <xsl:if test="$element/@navindex">
             <xsl:attribute name="tabindex" select="$element/@navindex"/>

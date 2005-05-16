@@ -182,12 +182,14 @@ function xformsPageLoaded() {
     var inputs = document.getElementsByTagName("input");
     var textareas = document.getElementsByTagName("textarea");
     var labels = document.getElementsByTagName("label");
+    var selects = document.getElementsByTagName("select");
     var formsControls = new Array();
     for (var i = 0; i < spans.length; i++) formsControls = formsControls.concat(spans[i]);
     for (var i = 0; i < buttons.length; i++) formsControls = formsControls.concat(buttons[i]);
     for (var i = 0; i < inputs.length; i++) formsControls = formsControls.concat(inputs[i]);
     for (var i = 0; i < textareas.length; i++) formsControls = formsControls.concat(textareas[i]);
     for (var i = 0; i < labels.length; i++) formsControls = formsControls.concat(labels[i]);
+    for (var i = 0; i < selects.length; i++) formsControls = formsControls.concat(selects[i]);
 
     // Go through potential form controls, add style, and register listeners
     for (var controlIndex = 0; controlIndex < formsControls.length; controlIndex++) {
@@ -210,24 +212,24 @@ function xformsPageLoaded() {
         }
         if (!isXFormsElement) continue;
     
-        // Handle value change and incremental modification
-        control.previousValue = null;
-        control.userModications = false;
-        xformsAddEventListener(control, "change", function(event) 
-            { xformsValueChanged(getEventTarget(event), false); });
-        if (isIncremental)
-            xformsAddEventListener(control, "keyup", function(event) 
-                { xformsValueChanged(getEventTarget(event), true); });
-        
-        // Handle click
         if (control.tagName == "BUTTON") {
+            // Handle click
             xformsAddEventListener(control, "click", function(event) {
                 xformsFireEvent(getEventTarget(event), "DOMActivate", null, false);
             });
+        } else {
+            // Handle value change and incremental modification
+            control.previousValue = null;
+            control.userModications = false;
+            xformsAddEventListener(control, "change", function(event) 
+                { xformsValueChanged(getEventTarget(event), false); });
+            if (isIncremental)
+                xformsAddEventListener(control, "keyup", function(event) 
+                    { xformsValueChanged(getEventTarget(event), true); });
         }
             
         // If alert, store reference in control element to this alert element
-        if (isXFormsAlert) 
+        if (isXFormsAlert)
             document.getElementById(control.htmlFor).alertElement = control;
 
         // Add style to element
@@ -325,7 +327,7 @@ function xformsHandleResponse() {
                                     }
 
                                     // Update validity
-                                    documentElement.valid = controlElement.getAttribute("valid") != "false";
+                                    documentElement.isValid = controlElement.getAttribute("valid") != "false";
 
                                     // Update style
                                     xformsUpdateStyle(documentElement);

@@ -48,7 +48,7 @@
     <!-- - - - - - - XForms controls - - - - - - -->
     
     <xsl:template match="xforms:output | xforms:trigger | xforms:input 
-            | xforms:secret | xforms:textarea" priority="2">
+            | xforms:secret | xforms:textarea | xforms:select1" priority="2">
         <xsl:if test="local-name() != 'trigger'">
             <xsl:apply-templates select="xforms:label"/>
         </xsl:if>
@@ -95,6 +95,20 @@
         </xhtml:textarea>
     </xsl:template>
     
+    <xsl:template match="xforms:select1">
+        <xhtml:select name="{@id}">
+            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control')"/>
+            <xsl:for-each select="xforms:item">
+                <xhtml:option value="{xforms:value}">
+                    <xsl:if test="xforms:value = xxforms:control(../@id)">
+                        <xsl:attribute name="selected">selected</xsl:attribute>
+                    </xsl:if>
+                    <xsl:value-of select="xforms:label"/>
+                </xhtml:option>
+            </xsl:for-each>
+        </xhtml:select>            
+    </xsl:template>
+
     <xsl:template match="xforms:label | xforms:hint | xforms:help">
         <xhtml:label for="{../@id}">
             <xsl:copy-of select="xxforms:copy-attributes(., concat('xforms-', local-name()))"/>
@@ -153,7 +167,6 @@
     
     <xsl:function name="xxforms:control" as="element()">
         <xsl:param name="id" as="xs:string"/>
-        <xsl:message><xsl:value-of select="$id"/></xsl:message>
         <xsl:sequence select="$response/xxforms:action/xxforms:control-values/xxforms:control[@id = $id]"/>
     </xsl:function>
     

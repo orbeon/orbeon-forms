@@ -15,14 +15,22 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
     
-    <p:param name="data" type="input"/>
+    <p:param name="source" type="input"/>
+    <p:param name="language-pair" type="input"/>
     <p:param name="data" type="output"/>
 
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#data"/>
+        <p:input name="data"><dummy/></p:input>
+        <p:input name="source" href="#source"/>
+        <p:input name="language-pair" href="#language-pair"/>
         <p:input name="config">
             <config xsl:version="2.0">
-                <url>http://translate.google.com/translate_t?text=<xsl:value-of select="escape-uri(/*, true())"/>&amp;langpair=en|fr</url>
+                <url>
+                    <xsl:text>http://translate.google.com/translate_t?text=</xsl:text>
+                    <xsl:value-of select="escape-uri(doc('input:source'), true())"/>
+                    <xsl:text>&amp;langpair=</xsl:text>
+                    <xsl:value-of select="escape-uri(doc('input:language-pair'), true())"/>
+                </url>
                 <content-type>text/html</content-type>
                 <header>
                     <name>User-Agent</name>

@@ -92,9 +92,8 @@ public class XFormsSubmission extends ProcessorImpl {
                     if (submitted) {
                         // Instance submitted, handle submission
 
-                        String encodedInstancesString;
-                        String encodedModelsString;
-                        String encodedControlsString;
+                        final String staticStateString;
+                        final String dynamicStateString;
                         {
                             // Create XPath variables
                             Map variables = new HashMap();
@@ -107,12 +106,10 @@ public class XFormsSubmission extends ProcessorImpl {
 
                             // Extract parameters
                             try {
-                                variables.put("parameter-name", "$instances");
-                                encodedInstancesString = (String) xpathExpression.evaluateSingle();
-                                variables.put("parameter-name", "$models");
-                                encodedModelsString = (String) xpathExpression.evaluateSingle();
-                                variables.put("parameter-name", "$controls");
-                                encodedControlsString = (String) xpathExpression.evaluateSingle();
+                                variables.put("parameter-name", "$static-state");
+                                staticStateString = (String) xpathExpression.evaluateSingle();
+                                variables.put("parameter-name", "$dynamic-state");
+                                dynamicStateString = (String) xpathExpression.evaluateSingle();
 
                             } catch (XPathException e) {
                                 throw new OXFException(e);
@@ -123,8 +120,8 @@ public class XFormsSubmission extends ProcessorImpl {
                         }
 
                         // Create and initialize XForms engine from encoded data
-                        XFormsContainingDocument containingDocument = XFormsServer.createXFormsEngine(pipelineContext, encodedControlsString,
-                                encodedModelsString, encodedInstancesString);
+                        XFormsContainingDocument containingDocument = XFormsServer.createXFormsEngine(pipelineContext,
+                                staticStateString, dynamicStateString);
 
                         // TODO: set instance values from current controls values
 //                        final RequestParameters requestParameters = (RequestParameters) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_REQUEST), new CacheableInputReader() {

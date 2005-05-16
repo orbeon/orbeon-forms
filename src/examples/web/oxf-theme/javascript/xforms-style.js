@@ -95,6 +95,7 @@ function xformsUpdateStyle(element) {
                 if (!element.changeHeightHandlerRegistered) {
                     function changeHeightHandler() {
                         var lineNumber = element.value.split("\n").length;
+                        if (lineNumber < 5) lineNumber = 5;
                         element.style.height = 3 + lineNumber * 1.1 + "em";
                     }
                     element.changeHeightHandlerRegistered = true;
@@ -104,8 +105,8 @@ function xformsUpdateStyle(element) {
                 
             }
             
-            if (element.alertElement) {
-                element.alertElement.className = element.valid ? "xforms-alert-inactive" 
+            if (element.alertElement && typeof(element.isValid) != "undefined") {
+                element.alertElement.className = element.isValid ? "xforms-alert-inactive" 
                     : "xforms-alert-active";
             }
         }

@@ -201,14 +201,20 @@ function xformsPageLoaded() {
         var isXFormsElement = false;
         var isXFormsAlert = false;
         var isIncremental = false;
+        var isXFormsCheckboxes = false;
+        var isXFormsCheckbox = false;
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
             var className = classes[classIndex];
             if (className.indexOf("xforms-") == 0)
                 isXFormsElement = true;
             if (className.indexOf("xforms-alert") == 0)
                 isXFormsAlert = true;
-            if (className.indexOf("xforms-incremental") == 0)
+            if (className == "xforms-incremental")
                 isIncremental = true;
+            if (className == "xforms-checkboxes")
+                isXFormsCheckboxes = true;
+            if (className == "xforms-checkbox")
+                isXFormsCheckbox = true;
         }
         if (!isXFormsElement) continue;
     
@@ -217,6 +223,43 @@ function xformsPageLoaded() {
             xformsAddEventListener(control, "click", function(event) {
                 xformsFireEvent(getEventTarget(event), "DOMActivate", null, false);
             });
+        } else if (isXFormsCheckboxes) {
+
+            function computeCheckboxesValue(span) {
+                var inputs = span.getElementsByTagName("input");
+                var spanValue = "";
+                for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
+                    var input = inputs[inputIndex];
+                    if (input.checked) {
+                        if (spanValue != "") spanValue += " ";
+                        spanValue += input.value;
+                    }
+                }
+                span.value = spanValue;
+            }
+            
+            function checkboxSelected(event) {
+                var checkbox = getEventTarget(event);
+                computeCheckboxesValue(checkbox.parentNode);
+                xformsFireEvent(checkbox.parentNode, "xxforms-value-change-with-focus-change",
+                    checkbox.parentNode.value, false);
+            }
+            
+            // Register event listener on every checkbox
+            var inputs = control.getElementsByTagName("input");
+            for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) 
+                xformsAddEventListener(inputs[inputIndex], "click", checkboxSelected);
+                
+            // Find parent form and store this in span
+            var parent = control;
+            while (parent.tagName != "FORM")
+               parent = parent.parentNode;
+            control.form = parent;
+                
+        } else if (isXFormsCheckbox) {
+            // Don't add listeners on individual checkboxes
+        } else if (control.tagName == "SPAN") {
+            // Don't add listeners on spans
         } else {
             // Handle value change and incremental modification
             control.previousValue = null;
@@ -227,7 +270,7 @@ function xformsPageLoaded() {
                 xformsAddEventListener(control, "keyup", function(event) 
                     { xformsValueChanged(getEventTarget(event), true); });
         }
-            
+
         // If alert, store reference in control element to this alert element
         if (isXFormsAlert)
             document.getElementById(control.htmlFor).alertElement = control;

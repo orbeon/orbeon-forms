@@ -60,8 +60,9 @@
         <xsl:next-match/>
         <xsl:apply-templates select="xforms:help"/>
         <xhtml:label for="{$id}">
+            <xsl:variable name="alert-id" as="xs:string" select="concat(@id, $id-postfix)"/>
             <xsl:copy-of select="xxforms:copy-attributes(xforms:alert, concat('xforms-alert-', 
-                if (xxforms:control($id)/@valid = 'false') then 'active' else 'inactive'), $id)"/>
+                if (xxforms:control($id)/@valid = 'false') then 'active' else 'inactive'), $alert-id)"/>
             <xsl:value-of select="xxforms:control($id)/@alert"/>
         </xhtml:label>
         <xsl:apply-templates select="xforms:hint"/>
@@ -110,6 +111,23 @@
         </xhtml:textarea>
     </xsl:template>
     
+    <xsl:template match="xforms:select">
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xhtml:span>
+            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-checkboxes'), $id)"/>
+            <xsl:for-each select="xforms:item">
+                <xhtml:input type="checkbox" value="{xforms:value}">
+                    <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-checkbox', ())"/>
+                    <xsl:if test="xforms:value = xxforms:control(../@id)">
+                        <xsl:attribute name="checked">checked</xsl:attribute>
+                    </xsl:if>
+                </xhtml:input>
+                <xsl:value-of select="xforms:label"/>
+            </xsl:for-each>
+        </xhtml:span>
+    </xsl:template>
+
     <xsl:template match="xforms:select1">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
@@ -128,10 +146,11 @@
 
     <xsl:template match="xforms:label | xforms:hint | xforms:help">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
-        <xsl:variable name="id" select="concat(../@id, $id-postfix)"/>
-        <xhtml:label for="{$id}">
-            <xsl:copy-of select="xxforms:copy-attributes(., concat('xforms-', local-name()), $id)"/>
-            <xsl:variable name="value-element" as="element()" select="xxforms:control($id)"/>
+        <xsl:variable name="parent-id" as="xs:string" select="concat(../@id, $id-postfix)"/>
+        <xsl:variable name="current-id" as="xs:string" select="concat(@id, $id-postfix)"/>
+        <xhtml:label for="{$parent-id}">
+            <xsl:copy-of select="xxforms:copy-attributes(., concat('xforms-', local-name()), $current-id)"/>
+            <xsl:variable name="value-element" as="element()" select="xxforms:control($parent-id)"/>
             <xsl:value-of select="if (local-name() = 'label') then $value-element/@label
                 else if (local-name() = 'hint') then $value-element/@hint
                 else $value-element/@help"/>
@@ -211,7 +230,12 @@
     
     <xsl:function name="xxforms:control" as="element()">
         <xsl:param name="id" as="xs:string"/>
-        <xsl:sequence select="$response/xxforms:action/xxforms:control-values/xxforms:control[@id = $id]"/>
+        <xsl:variable name="control" 
+            select="$response/xxforms:action/xxforms:control-values/xxforms:control[@id = $id]"/>
+        <xsl:if test="not($control)">
+            <xsl:message terminate="yes">Can't find control with id = '<xsl:value-of select="$id"/>'</xsl:message>
+        </xsl:if>
+        <xsl:sequence select="$control"/>
     </xsl:function>
     
 </xsl:stylesheet>

@@ -65,7 +65,7 @@
         <example id="xforms-repeat" path="xforms/xforms-repeat" label="Repeating Elements"/>
         <example id="xforms-credit-card" path="xforms/xforms-credit-card" label="Credit Card Verifier"/>
         <example id="xforms-report" path="xforms/xforms-report" label="Sortable Table"/>
-        <example id="xforms-wizard" path="xforms/xforms-wizard" label="Multi-Screen Wizard"/>
+        <example id="xforms-wizard" path="xforms/xforms-wizard" label="Wizard" xforms-ng="true"/>
         <example id="xforms-ubl" path="xforms/xforms-ubl" label="Complex UBL Order"/>
         <example id="xforms-calculator" path="xforms/xforms-calculator" label="Calculator" xforms-ng="true"/>
         <example id="xforms-translate" path="xforms/xforms-translate" label="Translate This" xforms-ng="true"/>

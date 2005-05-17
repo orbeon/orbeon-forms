@@ -60,9 +60,7 @@
         <example id="counter" label="Counter Page Flow"/>
     </section>
     <section label="Form Handling w/XForms">
-        <example id="xforms-text" path="xforms/xforms-text" label="Text Controls" xforms-ng="true"/>
-        <example id="xforms-selection" path="xforms/xforms-selection" label="Selection Controls"/>
-        <example id="xforms-submit" path="xforms/xforms-submit" label="Submit Controls"/>
+        <example id="xforms-controls" path="xforms/xforms-controls" label="Controls" xforms-ng="true"/>
         <example id="xforms-upload" path="xforms/xforms-upload" label="Upload Control"/>
         <example id="xforms-repeat" path="xforms/xforms-repeat" label="Repeating Elements"/>
         <example id="xforms-credit-card" path="xforms/xforms-credit-card" label="Credit Card Verifier"/>

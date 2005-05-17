@@ -46,7 +46,7 @@ public class TomcatClasspathFix {
     /*
      * Work around broken Tomcat loader if need be
      * According to servlet spec and j2ee spec the container should honor
-     * Class-Path entry in our jar's manifest.mf.   However Tomcat doesn't do
+     * Class-Path entry in our jar's manifest.mf.   However Tomcat doesn't 
      * follow the spec and so we have to work around it.  ( A note on versions:
      * version 2.3, which Tomcat 4 supports, has stipulation so this pbm has
      * been around for some time now. )

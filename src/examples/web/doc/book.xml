@@ -74,6 +74,7 @@
         <menu label="Document Formats">
             <menu-item label="Image Server" href="processors-image"/>
             <menu-item label="Charts and Spreadsheets" href="processors-charts-spreadsheets"/>
+            <menu-item label="PDF Extraction" href="processors-pdf-extraction"/> 
         </menu>
         <menu label="Messaging">
             <menu-item label="Email" href="processors-messaging-email"/>

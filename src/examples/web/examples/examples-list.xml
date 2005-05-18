@@ -80,6 +80,9 @@
         <example id="address-book" label="Address Book"/>
         <example id="xmldb" label="XML:DB Databases"/>
     </section>
+    <section label="PDF Processing">
+        <example id="pdf-upload" path="pdf/pdf-upload" label="Extract PDF Info"/>
+    </section>
     <section label="Query &amp; Transformation">
         <example id="xquery" path="sandbox/xquery" label="XQuery Sandbox" xforms-ng="true"/>
         <example id="xupdate" path="sandbox/xupdate" label="XUpdate Sandbox" xforms-ng="true"/>

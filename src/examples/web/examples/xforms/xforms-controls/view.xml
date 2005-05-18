@@ -33,6 +33,7 @@
                     <gaga>
                         <b>Hey</b>
                     </gaga>
+                    <show-instance/><!-- FIXME: Erik added this -->
                 </instance>
             </xforms:instance>
             <xforms:instance id="formatted">
@@ -99,7 +100,7 @@
                     </xforms:input>
                 </p>
                 <p>
-                    <xforms:select appearance="full">
+                    <xforms:select appearance="full" ref="show-instance"><!-- FIXME: Erik added this -->
                         <xforms:item>
                             <xforms:label>Show instance</xforms:label>
                             <xforms:value>true</xforms:value>

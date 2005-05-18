@@ -57,27 +57,65 @@ public class XFormsControls implements EventTarget {
     private static final Map valueControls = new HashMap();
     private static final Map noValueControls = new HashMap();
     private static final Map leafControls = new HashMap();
+    private static final Map mandatorySingleNodeControls = new HashMap();
+    private static final Map optionalSingleNodeControls = new HashMap();
+    private static final Map noSingleNodeControls = new HashMap();
+    private static final Map mandatoryNodesetControls = new HashMap();
+    private static final Map noNodesetControls = new HashMap();
 
     static {
-        groupingControls.put("group", "group");
-        groupingControls.put("repeat", "repeat");
-        groupingControls.put("switch", "switch");
-        groupingControls.put("case", "case");
+        groupingControls.put("group", "");
+        groupingControls.put("repeat", "");
+        groupingControls.put("switch", "");
+        groupingControls.put("case", "");
 
-        valueControls.put("input", "input");
-        valueControls.put("secret", "secret");
-        valueControls.put("textarea", "textarea");
-        valueControls.put("output", "output");
-        valueControls.put("upload", "upload");
-        valueControls.put("range", "range");
-        valueControls.put("select", "select");
-        valueControls.put("select1", "select1");
+        valueControls.put("input", "");
+        valueControls.put("secret", "");
+        valueControls.put("textarea", "");
+        valueControls.put("output", "");
+        valueControls.put("upload", "");
+        valueControls.put("range", "");
+        valueControls.put("select", "");
+        valueControls.put("select1", "");
 
-        noValueControls.put("submit", "submit");
-        noValueControls.put("trigger", "trigger");
+        noValueControls.put("submit", "");
+        noValueControls.put("trigger", "");
 
         leafControls.putAll(valueControls);
         leafControls.putAll(noValueControls);
+
+        mandatorySingleNodeControls.putAll(valueControls);
+        mandatorySingleNodeControls.remove("output");
+        mandatorySingleNodeControls.put("filename", "");
+        mandatorySingleNodeControls.put("mediatype", "");
+        mandatorySingleNodeControls.put("setvalue", "");
+
+        optionalSingleNodeControls.putAll(noValueControls);
+        optionalSingleNodeControls.put("output", ""); // can have @value attribute
+        optionalSingleNodeControls.put("value", "");
+        optionalSingleNodeControls.put("label", "");   // can have linking or inline text
+        optionalSingleNodeControls.put("help", "");    // can have linking or inline text
+        optionalSingleNodeControls.put("hint", "");    // can have linking or inline text
+        optionalSingleNodeControls.put("alert", "");   // can have linking or inline text
+        optionalSingleNodeControls.put("copy", "");
+        optionalSingleNodeControls.put("load", "");     // can have linking
+        optionalSingleNodeControls.put("message", "");  // can have linking or inline text
+        optionalSingleNodeControls.put("group", "");
+        optionalSingleNodeControls.put("switch", "");
+
+        noSingleNodeControls.put("choices", "");
+        noSingleNodeControls.put("item", "");
+        noSingleNodeControls.put("case", "");
+        noSingleNodeControls.put("toggle", "");
+
+        mandatoryNodesetControls.put("repeat", "");
+        mandatoryNodesetControls.put("itemset", "");
+        mandatoryNodesetControls.put("insert", "");
+        mandatoryNodesetControls.put("delete", "");
+
+        noNodesetControls.putAll(mandatorySingleNodeControls);
+        noNodesetControls.putAll(optionalSingleNodeControls);
+        noNodesetControls.putAll(noSingleNodeControls);
     }
 
     public XFormsControls(XFormsContainingDocument containingDocument, Document controlsDocument) {
@@ -134,6 +172,7 @@ public class XFormsControls implements EventTarget {
      * parents.
      */
     public void setBinding(PipelineContext pipelineContext, Element bindingElement) {
+
         // Reinitialize context stack
         initializeContextStack();
 
@@ -161,6 +200,27 @@ public class XFormsControls implements EventTarget {
     }
 
     public void pushBinding(PipelineContext pipelineContext, String ref, String nodeset, String model, String bind, Element bindingElement) {
+
+        // Check for mandatory and optional bindings
+        if (bindingElement != null && XFormsConstants.XFORMS_NAMESPACE_URI.equals(bindingElement.getNamespaceURI())) {
+            final String controlName = bindingElement.getName();
+            if (mandatorySingleNodeControls.get(controlName) != null
+                    && !(bindingElement.attribute("ref") != null || bindingElement.attribute("bind") != null)) {
+                throw new OXFException("Missing mandatory single node binding for element: " + bindingElement.getQualifiedName());
+            }
+            if (noSingleNodeControls.get(controlName) != null
+                    && (bindingElement.attribute("ref") != null || bindingElement.attribute("bind") != null)) {
+                throw new OXFException("Single node binding is prohibited for element: " + bindingElement.getQualifiedName());
+            }
+            if (mandatoryNodesetControls.get(controlName) != null
+                    && !(bindingElement.attribute("nodeset") != null)) {
+                throw new OXFException("Node-set binding is prohibited for element: " + bindingElement.getQualifiedName());
+            }
+            if (noNodesetControls.get(controlName) != null
+                    && bindingElement.attribute("nodeset") != null) {
+                throw new OXFException("Node-set binding is prohibited for element: " + bindingElement.getQualifiedName());
+            }
+        }
 
         // Determine current context
         Context currentContext = getCurrentContext();

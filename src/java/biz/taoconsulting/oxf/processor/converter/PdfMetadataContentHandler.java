@@ -19,37 +19,37 @@ import org.xml.sax.SAXException;
 
 /**
  * created 26-Apr-2005 11:33:49
- * 
+ *
  * @author stw file PdfMetadataContentHandler.java We just need to forward all
  *         sax events with the exception of start and end document. All other
  *         events are handled by the superclass
- *  
  */
 public class PdfMetadataContentHandler extends ForwardingContentHandler {
 
-   /**
-    * @param contentHandler
-    *           We activate the forwarding mechanism per default So we don't
-    *           need to call the two parameter fucntion
-    */
-   public PdfMetadataContentHandler() {
-      super();
-   }
-   public PdfMetadataContentHandler(ContentHandler contentHandler) {
-      super(contentHandler, true);
-   }
-   public PdfMetadataContentHandler(ContentHandler contentHandler, boolean forward) {
-      super(contentHandler, forward);
-   }
+    /**
+     * @param contentHandler We activate the forwarding mechanism per default So we don't
+     *                       need to call the two parameter fucntion
+     */
+    public PdfMetadataContentHandler() {
+        super();
+    }
 
-   // The superclass does all we need, we just need to strip out
-   // the start & End document events since we add the content into
-   // the middle of an existing fle
-   public void endDocument() throws SAXException {
-      // We don't take action and don't call the super event
-   }
+    public PdfMetadataContentHandler(ContentHandler contentHandler) {
+        super(contentHandler, true);
+    }
 
-     public void startDocument() throws SAXException {
-      //    We don't take action and don't call the super event
-   }
+    public PdfMetadataContentHandler(ContentHandler contentHandler, boolean forward) {
+        super(contentHandler, forward);
+    }
+
+    // The superclass does all we need, we just need to strip out
+    // the start & End document events since we add the content into
+    // the middle of an existing fle
+    public void endDocument() throws SAXException {
+        // We don't take action and don't call the super event
+    }
+
+    public void startDocument() throws SAXException {
+        //    We don't take action and don't call the super event
+    }
 }

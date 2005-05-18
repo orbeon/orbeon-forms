@@ -65,8 +65,7 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
             float width = psize.width();
             float height = psize.height();
 
-            String previewMode = XPathUtils.selectStringValue(configDocument, "/*/template/@preview");
-            if (previewMode == null) previewMode = "";
+            String showGrid = XPathUtils.selectStringValue(configDocument, "/*/template/@show-grid");
 
             // Create result document and writer
             Document document = new Document(psize, 50, 50, 50, 50);
@@ -117,8 +116,8 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                     cb.endText();
                 }
 
-                // Handle preview mode
-                if (previewMode.equalsIgnoreCase("true")) {
+                // Handle preview grid
+                if ("true".equalsIgnoreCase(showGrid)) {
                     float topPosition = 10f;
 
                     BaseFont baseFont2 = BaseFont.createFont("Courier", BaseFont.CP1252, BaseFont.NOT_EMBEDDED);

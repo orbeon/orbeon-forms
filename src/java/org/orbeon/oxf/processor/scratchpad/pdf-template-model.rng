@@ -19,7 +19,7 @@
             <interleave>
                 <element name="template">
                     <optional>
-                        <attribute name="preview">
+                        <attribute name="show-grid">
                             <choice>
                                 <value>true</value>
                                 <value>false</value>

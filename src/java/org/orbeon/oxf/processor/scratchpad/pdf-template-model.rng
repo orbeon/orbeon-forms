@@ -18,6 +18,14 @@
         <element name="config">
             <interleave>
                 <element name="template">
+                    <optional>
+                        <attribute name="preview">
+                            <choice>
+                                <value>true</value>
+                                <value>false</value>
+                            </choice>
+                        </attribute>
+                    </optional>
                     <attribute name="href">
                         <data type="anyURI"/>
                     </attribute>

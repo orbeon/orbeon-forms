@@ -65,6 +65,9 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
             float width = psize.width();
             float height = psize.height();
 
+            String previewMode = XPathUtils.selectStringValue(configDocument, "/*/template/@preview");
+            if (previewMode == null) previewMode = "";
+
             // Create result document and writer
             Document document = new Document(psize, 50, 50, 50, 50);
             PdfWriter writer = PdfWriter.getInstance(document, outputStream);
@@ -109,6 +112,51 @@ public class PDFTemplateProcessor extends HttpBinarySerializer {
                             int len = Math.min(text.length(), (size != null) ? Integer.parseInt(size) : Integer.MAX_VALUE);
                             for (int j = 0; j < len; j++)
                                 cb.showTextAligned(PdfContentByte.ALIGN_CENTER, text.substring(j, j + 1), xPosition + ((float) j) * space, yPosition, 0);
+                        }
+                    }
+                    cb.endText();
+                }
+
+                // Handle preview mode
+                if (previewMode.equalsIgnoreCase("true")) {
+                    float topPosition = 10f;
+
+                    BaseFont baseFont2 = BaseFont.createFont("Courier", BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+                    cb.beginText();
+                    {
+                        // 20-pixel lines and side legences
+
+                        cb.setFontAndSize(baseFont2, (float) 7);
+
+                        for (int w = 0; w <= width; w += 20) {
+                            for (int h = 0; h <= height; h += 2)
+                                cb.showTextAligned(PdfContentByte.ALIGN_CENTER, ".", (float) w, height - h, 0);
+                        }
+                        for (int h = 0; h <= height; h += 20) {
+                            for (int w = 0; w <= width; w += 2)
+                                cb.showTextAligned(PdfContentByte.ALIGN_CENTER, ".", (float) w, height - h, 0);
+                        }
+
+                        for (int w = 0; w <= width; w += 20) {
+                            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "" + w, (float) w, height - topPosition, 0);
+                            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "" + w, (float) w, topPosition, 0);
+                        }
+                        for (int h = 0; h <= height; h += 20) {
+                            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "" + h, (float) 5, height - h, 0);
+                            cb.showTextAligned(PdfContentByte.ALIGN_CENTER, "" + h, width - (float) 5, height - h, 0);
+                        }
+
+                        // 10-pixel lines
+
+                        cb.setFontAndSize(baseFont2, (float) 3);
+
+                        for (int w = 10; w <= width; w += 10) {
+                            for (int h = 0; h <= height; h += 2)
+                                cb.showTextAligned(PdfContentByte.ALIGN_CENTER, ".", (float) w, height - h, 0);
+                        }
+                        for (int h = 10; h <= height; h += 10) {
+                            for (int w = 0; w <= width; w += 2)
+                                cb.showTextAligned(PdfContentByte.ALIGN_CENTER, ".", (float) w, height - h, 0);
                         }
                     }
                     cb.endText();

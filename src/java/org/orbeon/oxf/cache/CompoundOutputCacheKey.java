@@ -14,18 +14,18 @@
 package org.orbeon.oxf.cache;
 
 public class CompoundOutputCacheKey extends OutputCacheKey {
-    
+
     private final java.util.List keys;
     private final int hash;
 
-    public CompoundOutputCacheKey( final Class c, final String onam, final CacheKey[] kys ) {
-        super( c, onam );
-        if ( kys == null ) {
-            throw new IllegalArgumentException( "key must not be null" );
+    public CompoundOutputCacheKey(final Class c, final String onam, final CacheKey[] kys) {
+        super(c, onam);
+        if (kys == null) {
+            throw new IllegalArgumentException("key must not be null");
         }
-        keys = new java.util.ArrayList( kys.length );
-        for ( int i = 0; i < kys.length; i++ ) {
-            keys.add( kys[ i ] );
+        keys = new java.util.ArrayList(kys.length);
+        for (int i = 0; i < kys.length; i++) {
+            keys.add(kys[i]);
         }
         int tmp = 1;
         tmp += 31 * tmp + super.hashCode();
@@ -34,13 +34,13 @@ public class CompoundOutputCacheKey extends OutputCacheKey {
         hash = tmp;
     }
 
-    public boolean equals( final Object rhsObj ) {
+    public boolean equals(final Object rhsObj) {
         boolean ret = this == rhsObj;
-        done : if ( !ret ) {
-            ret = rhsObj instanceof CompoundOutputCacheKey && super.equals( rhsObj );
-            if ( !ret ) break done;
-            final CompoundOutputCacheKey rhs = ( CompoundOutputCacheKey )rhsObj;
-            ret = keys.equals( rhs.keys );
+        done : if (!ret) {
+            ret = rhsObj instanceof CompoundOutputCacheKey && super.equals(rhsObj);
+            if (!ret) break done;
+            final CompoundOutputCacheKey rhs = (CompoundOutputCacheKey) rhsObj;
+            ret = keys.equals(rhs.keys);
         }
         return ret;
     }
@@ -51,6 +51,6 @@ public class CompoundOutputCacheKey extends OutputCacheKey {
 
     public String toString() {
         return "CompoundOutputCacheKey [class: " + CacheUtils.getShortClassName(getClazz())
-                + ", outputName: " + outputName + ", key: " + keys + "]"; 
+                + ", outputName: " + outputName + ", key: " + keys + "]";
     }
 }

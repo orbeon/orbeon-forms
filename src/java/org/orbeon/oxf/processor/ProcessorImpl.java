@@ -441,7 +441,7 @@ public abstract class ProcessorImpl implements Processor {
 
         if (output instanceof Cacheable) {
             // Get cache instance
-            Cache cache = ObjectCache.instance();
+            final Cache cache = ObjectCache.instance();
 
             // Check in cache first
             KeyValidity keyValidity = getInputKeyValidity(context, input);

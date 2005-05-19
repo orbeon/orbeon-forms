@@ -15,16 +15,15 @@ package org.orbeon.oxf.cache;
 
 import org.orbeon.oxf.processor.Processor;
 
-
 public abstract class OutputCacheKey extends CacheKey {
 
     protected final String outputName;
 
-    public OutputCacheKey( final Class c, final String onam ) {
-        if ( !Processor.class.isAssignableFrom( c ) ) {
-            throw new IllegalArgumentException( "c must be a sub-class of PipelineProcessor" );
+    public OutputCacheKey(final Class c, final String onam) {
+        if (!Processor.class.isAssignableFrom(c)) {
+            throw new IllegalArgumentException("c must be a sub-class of PipelineProcessor");
         }
         outputName = onam;
-        setClazz( c );
+        setClazz(c);
     }
 }

@@ -18,7 +18,6 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Namespace;
 import org.dom4j.io.DocumentSource;
-import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
@@ -80,77 +79,83 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
 
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
                 try {
-                    Document xqueryDocument = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
-                    Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
+                    final Document dataDocument = readInputAsDOM4J(pipelineContext, INPUT_DATA);
 
-                    // Read XQuery into String
-
-                    String xqueryBody;
-                    if (XMLConstants.XS_STRING_QNAME.equals(Dom4jUtils.extractAttributeValueQName(xqueryDocument.getRootElement(), XMLConstants.XSI_TYPE_QNAME))) {
-                        // Content is text under an XML root element
-                        xqueryBody = xqueryDocument.getRootElement().getStringValue();
-                    } else {
-                        // Content is XQuery embedded into XML
-                        xqueryBody = Dom4jUtils.domToString(xqueryDocument);
-                        xqueryBody = xqueryBody.substring(xqueryBody.indexOf(">") + 1);
-                        xqueryBody = xqueryBody.substring(0, xqueryBody.lastIndexOf("<"));
-                    }
-
-                    // Create XQuery configuration
-                    Configuration config = new Configuration();
-                    config.setErrorListener(new StringErrorListener(logger));
-                    config.setURIResolver(new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext));
-
-                    // Read attributes
-                    Map attributes = null;
+                    // Create XQuery configuration (depends on attributes input)
+                    final Configuration config = new Configuration();
                     {
-                        // Read attributes input only if connected
-                        if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
-                            // Read input as an attribute Map and cache it
-                            attributes = (Map) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
-                                public Object read(PipelineContext context, ProcessorInput input) {
-                                    Document preferencesDocument = readInputAsDOM4J(context, input);
-                                    OXFPropertiesSerializer.PropertyStore propertyStore = OXFPropertiesSerializer.createPropertyStore(preferencesDocument);
-                                    OXFProperties.PropertySet propertySet = propertyStore.getGlobalPropertySet();
-                                    return propertySet.getObjectMap();
-                                }
-                            });
+                        config.setErrorListener(new StringErrorListener(logger));
+                        config.setURIResolver(new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext));
+
+                        // Read attributes
+                        Map attributes = null;
+                        {
+                            // Read attributes input only if connected
+                            if (getConnectedInputs().get(INPUT_ATTRIBUTES) != null) {
+                                // Read input as an attribute Map and cache it
+                                attributes = (Map) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_ATTRIBUTES), new CacheableInputReader() {
+                                    public Object read(PipelineContext context, ProcessorInput input) {
+                                        Document preferencesDocument = readInputAsDOM4J(context, input);
+                                        OXFPropertiesSerializer.PropertyStore propertyStore = OXFPropertiesSerializer.createPropertyStore(preferencesDocument);
+                                        OXFProperties.PropertySet propertySet = propertyStore.getGlobalPropertySet();
+                                        return propertySet.getObjectMap();
+                                    }
+                                });
+                            }
                         }
+                        if (attributes != null)
+                            setConfigurationAttributes(config, attributes);
                     }
-                    if (attributes != null)
-                        setConfigurationAttributes(config, attributes);
 
                     // Create static context
-                    LocalStaticQueryContext staticContext = new LocalStaticQueryContext(config);
+                    final LocalStaticQueryContext staticContext = new LocalStaticQueryContext(config);
 
-                    // Add namespaces declarations
-                    Map namespaces = new HashMap();
-                    getDeclaredNamespaces(namespaces, xqueryDocument.getRootElement());
-                    for (Iterator i = namespaces.keySet().iterator(); i.hasNext();) {
-                        String prefix = (String) i.next();
-                        String uri = (String) namespaces.get(prefix);
-                        staticContext.declareActiveNamespace(prefix, uri);
-                    }
+                    // Create XQuery expression (depends on config input and static context)
+                    // TODO: caching of query must also depend on attributes input
+                    XQueryExpression xqueryExpression = (XQueryExpression) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+                        public Object read(PipelineContext context, ProcessorInput input) {
 
-                    // Create XQuery expression and run it
-                    XQueryExpression exp = staticContext.compileQuery(xqueryBody);
+                            // Read XQuery into String
+                            final Document xqueryDocument = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
+                            String xqueryBody;
+                            if (XMLConstants.XS_STRING_QNAME.equals(Dom4jUtils.extractAttributeValueQName(xqueryDocument.getRootElement(), XMLConstants.XSI_TYPE_QNAME))) {
+                                // Content is text under an XML root element
+                                xqueryBody = xqueryDocument.getRootElement().getStringValue();
+                            } else {
+                                // Content is XQuery embedded into XML
+                                xqueryBody = Dom4jUtils.domToString(xqueryDocument);
+                                xqueryBody = xqueryBody.substring(xqueryBody.indexOf(">") + 1);
+                                xqueryBody = xqueryBody.substring(0, xqueryBody.lastIndexOf("<"));
+                            }
+
+                            // Add namespaces declarations
+                            final Map namespaces = new HashMap();
+                            getDeclaredNamespaces(namespaces, xqueryDocument.getRootElement());
+                            for (Iterator i = namespaces.keySet().iterator(); i.hasNext();) {
+                                String prefix = (String) i.next();
+                                String uri = (String) namespaces.get(prefix);
+                                staticContext.declareActiveNamespace(prefix, uri);
+                            }
+
+                            try {
+                                return staticContext.compileQuery(xqueryBody);
+                            } catch (Exception e) {
+                                throw new OXFException(e);
+                            }
+                        }
+                    });
+
+                    // Create dynamic context and run query
                     DynamicQueryContext dynamicContext =  new DynamicQueryContext(config);
                     dynamicContext.setContextNode(staticContext.buildDocument(new DocumentSource(dataDocument)));
-                    exp.run(dynamicContext, new SAXResult(contentHandler), new Properties());
+                    // TODO: use xqueryExpression.getStaticContext() when Saxon is upgraded
+                    xqueryExpression.run(dynamicContext, new SAXResult(contentHandler), new Properties());
 
                 } catch (Exception e) {
                     throw new OXFException(e);
                 }
-            }
-
-            public OutputCacheKey getKeyImpl(PipelineContext context) {
-                return null;
-            }
-
-            public Object getValidityImpl(PipelineContext context) {
-                return null;
             }
         };
         addOutput(name, output);

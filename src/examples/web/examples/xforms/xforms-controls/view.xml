@@ -21,19 +21,14 @@
         <xhtml:title>XForms Text Controls</xhtml:title>
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema">
-            <xforms:instance id="text">
+            <xforms:instance id="instance">
                 <instance>
-                    <text>35</text>
+                    <age>35</age>
                     <secret>42</secret>
                     <textarea>The world is but a canvas for the imagination.</textarea>
                     <label>Hello, World!</label>
                     <date/>
-                    <date2/>
-                    <time/>     
-                    <gaga>
-                        <b>Hey</b>
-                    </gaga>
-                    <show-instance/><!-- FIXME: Erik added this -->
+                    <flavor>v c</flavor>
                 </instance>
             </xforms:instance>
             <xforms:instance id="formatted">
@@ -42,83 +37,108 @@
                     &lt;/span>
                 </formated-instance>
             </xforms:instance>                
-            <xforms:bind nodeset="instance('text')">
-                <xforms:bind nodeset="text" constraint="number(.) >= 0"/>
+            <xforms:instance id="ui">
+                <ui>
+                    <show-instance>false</show-instance>
+                </ui>
+            </xforms:instance>                
+            <xforms:bind nodeset="instance('instance')">
+                <xforms:bind nodeset="age" constraint="number(.) >= 0"/>
                 <xforms:bind nodeset="secret" constraint="string(.) = '42'"/>
                 <xforms:bind nodeset="textarea" constraint="string-length(.) > 10"/>
                 <xforms:bind nodeset="date" type="xs:date"/>
                 <xforms:bind nodeset="date2" type="xs:date"/>
                 <xforms:bind nodeset="time" type="xs:time"/>
             </xforms:bind>
+            <xforms:bind nodeset="instance('ui')/show-instance" relevant=". = 'true'"/>
             <xforms:bind nodeset="instance('formatted')" 
                 calculate="saxon:serialize(xxforms:call-xpl
-                    ('oxf:/oxf-theme/format.xpl', 'data', instance('text'), 'data')/*, 'html')"/>
+                    ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xhtml:p class="tab-view">
-            <xforms:group ref="instance('text')">
-                <p>
-                    <xforms:input ref="text">
-                        <xforms:label xhtml:class="fixed-width">Age:</xforms:label>
-                        <xforms:hint>Positive number</xforms:hint>
-                        <xforms:alert>The age must be a positive number</xforms:alert>
-                    </xforms:input>
-                </p>
-                <p>
-                    <xforms:secret ref="secret">
-                        <xforms:label xhtml:class="fixed-width">Password:</xforms:label>
-                        <xforms:hint>The password is 42 ;)</xforms:hint>
-                        <xforms:alert>Invalid password</xforms:alert>
-                    </xforms:secret>
-                </p>
-                <p>
-                    <xforms:textarea ref="textarea">
-                        <xforms:label xhtml:class="fixed-width">Text area:</xforms:label>
-                        <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
-                    </xforms:textarea>
-                </p>
-                <p>
-                    <xforms:input ref="date" class="xforms-date">
-                        <xforms:label xhtml:class="fixed-width">Birth date:</xforms:label>
-                        <xforms:help>This date must be in the past.</xforms:help>
-                    </xforms:input>
-                </p>
-                <p>
-                    <xforms:input ref="date2">
-                        <xforms:label xhtml:class="fixed-width">Second date:</xforms:label>
-                    </xforms:input>
-                </p>
-                <p>
-                    <xforms:input ref="time">
-                        <xforms:label xhtml:class="fixed-width">Time:</xforms:label>
-                    </xforms:input>
-                </p>
-                <p>
-                    <xforms:input ref="time">
-                        <xforms:label xhtml:class="fixed-width">Time:</xforms:label>
-                    </xforms:input>
-                </p>
-                <p>
-                    <xforms:select appearance="full" ref="show-instance"><!-- FIXME: Erik added this -->
-                        <xforms:item>
-                            <xforms:label>Show instance</xforms:label>
-                            <xforms:value>true</xforms:value>
-                        </xforms:item>
-                    </xforms:select>
-                </p>                            
+        <xforms:group ref="instance('instance')">
+            <xforms:trigger>
+                <xforms:label>Text controls</xforms:label>
+                <xforms:toggle ev:event="DOMActivate" case="text-controls"/>
+            </xforms:trigger>
+            <xforms:trigger>
+                <xforms:label>Selection controls</xforms:label>
+                <xforms:toggle ev:event="DOMActivate" case="selection-controls"/>
+            </xforms:trigger>
+            <xforms:switch>
+                <xforms:case id="text-controls">
+                    <xhtml:p>
+                        <xforms:input ref="age">
+                            <xforms:label xhtml:class="fixed-width">Age:</xforms:label>
+                            <xforms:hint>Positive number</xforms:hint>
+                        </xforms:input>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:secret ref="secret">
+                            <xforms:label xhtml:class="fixed-width">Password:</xforms:label>
+                            <xforms:hint>The password is 42 ;)</xforms:hint>
+                            <xforms:alert>Invalid password</xforms:alert>
+                        </xforms:secret>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:textarea ref="textarea">
+                            <xforms:label xhtml:class="fixed-width">Text area:</xforms:label>
+                            <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
+                        </xforms:textarea>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:input ref="date" class="xforms-date">
+                            <xforms:label xhtml:class="fixed-width">Birth date:</xforms:label>
+                            <xforms:help>
+                                This is supposed to be a help message explaining what a birth date is. 
+                                But since you already know, it mostly serves the purpose of showing how 
+                                help messages can be attached to controls, and that they can be pretty 
+                                long as they can be displayed on multiple lines.
+                            </xforms:help>
+                        </xforms:input>
+                    </xhtml:p>
+                </xforms:case>
+                <xforms:case id="selection-controls">
+                    <xhtml:p>
+                        <xforms:select ref="flavor" appearance="full">
+                            <xforms:label>Flavors</xforms:label>
+                            <xforms:item>
+                              <xforms:label>Vanilla</xforms:label>
+                              <xforms:value>v</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                              <xforms:label>Strawberry</xforms:label>
+                              <xforms:value>s</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                              <xforms:label>Chocolate</xforms:label>
+                              <xforms:value>c</xforms:value>
+                            </xforms:item>
+                        </xforms:select>
+                    </xhtml:p>
+                </xforms:case>
+            </xforms:switch>
+            <xhtml:p style="margin-top: 2em">
                 <xforms:switch>
-                    <xforms:case id="text-instance-hidden"/>
-                    <xforms:case id="text-instance-visible">
-                        <p style="margin-top: 2em">
-                            <xforms:group>
-                                <xforms:label>XForms instance</xforms:label>
-                                <xforms:output ref="instance('formatted')" xhtml:class="xforms-xhtml"/>
-                            </xforms:group>
-                        </p>
+                    <xforms:case id="instance-hidden">
+                        <xforms:trigger>
+                            <xforms:label>Show instance</xforms:label>
+                            <xforms:toggle ev:event="DOMActivate" case="instance-visible"/>
+                        </xforms:trigger>
+                    </xforms:case>
+                    <xforms:case id="instance-visible">
+                        <xforms:trigger>
+                            <xforms:label>Hide instance</xforms:label>
+                            <xforms:toggle ev:event="DOMActivate" case="instance-hidden"/>
+                        </xforms:trigger>
+                        <xforms:group ref="instance('ui')/show-instance">
+                            <xforms:label>XForms instance</xforms:label>
+                            <xforms:output ref="instance('formatted')" xhtml:class="xforms-xhtml"/>
+                        </xforms:group>
                     </xforms:case>
                 </xforms:switch>
-            </xforms:group>
-        </xhtml:p>
+            </xhtml:p>
+        </xforms:group>
     </xhtml:body>
 </xhtml:html>

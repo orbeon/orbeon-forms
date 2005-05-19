@@ -98,10 +98,10 @@
                                 <xforms:label>&lt; Previous</xforms:label>
                                 <xforms:toggle ev:event="DOMActivate" case="lastname"/>
                             </xforms:trigger>
-                            <xforms:trigger ref="instance('buttons-state')/finish">
-                                <xforms:label>Finish ></xforms:label>
-                                <xforms:toggle ev:event="DOMActivate" case="showinstance"/>
-                            </xforms:trigger>
+    <xforms:trigger ref="instance('buttons-state')/finish">
+        <xforms:label>Finish ></xforms:label>
+        <xforms:toggle ev:event="DOMActivate" case="showinstance"/>
+    </xforms:trigger>
                         </xhtml:p>
                     </xforms:case>
                     <xforms:case id="showinstance">

@@ -59,6 +59,13 @@ function xformsDispatchEvent(target, eventName) {
     }
 }
 
+function xformsArrayContains(array, element) {
+    for (var i = 0; i < array.length; i++)
+        if (array[i] == element)
+            return true;
+    return false;
+}
+
 function log(text) {
     document.getElementById("debug").innerHTML += text + " | ";
 }
@@ -211,7 +218,7 @@ function xformsPageLoaded() {
                 isXFormsAlert = true;
             if (className == "xforms-incremental")
                 isIncremental = true;
-            if (className == "xforms-checkboxes")
+            if (className == "xforms-select-full")
                 isXFormsCheckboxes = true;
             if (className == "xforms-checkbox")
                 isXFormsCheckbox = true;
@@ -255,6 +262,9 @@ function xformsPageLoaded() {
             while (parent.tagName != "FORM")
                parent = parent.parentNode;
             control.form = parent;
+            
+            // Compute the checkes value for the first time
+            computeCheckboxesValue(control);
                 
         } else if (isXFormsCheckbox) {
             // Don't add listeners on individual checkboxes
@@ -348,24 +358,36 @@ function xformsHandleResponse() {
                             for (var j = 0; j < controlValuesElement.childNodes.length; j++) {
                                 if (xformsGetLocalName(controlValuesElement.childNodes[j]) == "control") {
                                     var controlElement = controlValuesElement.childNodes[j];
+                                    var controlValue = controlElement.firstChild ?
+                                        controlElement.firstChild.data : "";
                                     var controlId = controlElement.getAttribute("id");
                                     var documentElement = document.getElementById(controlId);
+                                    var documentElementClasses = documentElement.className.split(" ");
 
                                     // Update value
-                                    if (document.xformsTargetOfCurrentRequest.id != controlId
-                                           && documentElement.className.indexOf("xforms-control") != -1
-                                           && documentElement.tagName.toLowerCase() != "button") {
-                                        var controlValue = controlElement.firstChild ?
-                                            controlElement.firstChild.data : "";
-                                        if (typeof(documentElement.value) == "string") {
-                                            if (documentElement.value != controlValue) {
-                                                documentElement.value = controlValue;
-                                            }
-                                        } else {
-                                            while(documentElement.childNodes.length > 0)
-                                                documentElement.removeChild(documentElement.firstChild);
-                                            documentElement.appendChild
-                                                (documentElement.ownerDocument.createTextNode(controlValue));
+                                    if (document.xformsTargetOfCurrentRequest.id == controlId) {
+                                        // Don't update the control that we just modified
+                                    } else if (xformsArrayContains(documentElementClasses, "xforms-trigger")) {
+                                        // Triggers don't have a value: don't update them
+                                    } else if (xformsArrayContains(documentElementClasses, "xforms-select-full")) {
+                                        // Handle checkboxes
+                                        var selectedValues = controlValue.split(" ");
+                                        var checkboxInputs = documentElement.getElementsByTagName("input");
+                                        for (var checkboxInputIndex = 0; checkboxInputIndex < checkboxInputs.length; checkboxInputIndex++) {
+                                            var checkboxInput = checkboxInputs[checkboxInputIndex];
+                                            checkboxInput.checked = xformsArrayContains(selectedValues, checkboxInput.value);
+                                        }
+                                    } else if (xformsArrayContains(documentElementClasses, "xforms-output")) {
+                                        // XForms output
+                                        while(documentElement.childNodes.length > 0)
+                                            documentElement.removeChild(documentElement.firstChild);
+                                        documentElement.appendChild
+                                            (documentElement.ownerDocument.createTextNode(controlValue));
+                                    } else if (xformsArrayContains(documentElementClasses, "xforms-output")
+                                            && typeof(documentElement.value) == "string") {
+                                        // Other controls that have a value (textfield, etc)
+                                        if (documentElement.value != controlValue) {
+                                            documentElement.value = controlValue;
                                         }
                                     }
 

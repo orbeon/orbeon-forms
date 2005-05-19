@@ -22,15 +22,14 @@
 body {
     margin: .71em .71em .71em .71em;
     padding: 0em;
-    min-width: 800px;
 }
 
-body, input, table {
+body, input, button, table {
     font-family: Arial, Helvetica, Geneva, sans-serif;
     font-size: 9pt;
     line-height: 13pt;
 }
-
+    
 th {
     color: #333333;
 }
@@ -55,6 +54,8 @@ fieldset {
 
 #main {
     border-bottom:1px solid &dark-color;;
+    min-width: 650px;
+    width: expression(650 > document.body.clientWidth ? '650px' : '100%' );
 }
 
 #main1 {
@@ -500,7 +501,6 @@ ul {
 
 .xforms-hint {
     color: #666;
-    width: 190px;
     font-size: 85%;
     min-height: 2em;
     background-image: url(../images/greybracket.gif);
@@ -513,7 +513,6 @@ ul {
 
 .xforms-hint-active {
     color: #000;
-    width: 190px;
     font-size: 85%;
     min-height: 2em;
     background-image: url(../images/bracket.gif);
@@ -533,7 +532,7 @@ ul {
     background-repeat: no-repeat;
     background-position: top left;
     display: -moz-inline-box;
-    display: inline-block;  
+    display: inline-block; 
     white-space: no-wrap;
     padding-left: 20px;
     width: 18px;

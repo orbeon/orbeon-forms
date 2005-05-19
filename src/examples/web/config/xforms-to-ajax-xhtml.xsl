@@ -72,7 +72,7 @@
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:span>
-            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
+            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output'), $id)"/>
             <xsl:value-of select="xxforms:control($id)"/>
         </xhtml:span>
     </xsl:template>
@@ -81,7 +81,7 @@
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:button type="button" class="trigger">
-            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
+            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
             <xsl:value-of select="xforms:label"/>
         </xhtml:button>
     </xsl:template>
@@ -115,11 +115,11 @@
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:span>
-            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-checkboxes'), $id)"/>
+            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-select-full'), $id)"/>
             <xsl:for-each select="xforms:item">
                 <xhtml:input type="checkbox" value="{xforms:value}">
                     <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-checkbox', ())"/>
-                    <xsl:if test="xforms:value = xxforms:control(../@id)">
+                    <xsl:if test="xforms:value = tokenize(xxforms:control(../@id), ' ')">
                         <xsl:attribute name="checked">checked</xsl:attribute>
                     </xsl:if>
                 </xhtml:input>

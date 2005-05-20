@@ -29,6 +29,7 @@
                     <label>Hello, World!</label>
                     <date/>
                     <flavor>v c</flavor>
+                    <carrier>fedex</carrier>
                 </instance>
             </xforms:instance>
             <xforms:instance id="formatted">
@@ -102,7 +103,7 @@
                 <xforms:case id="selection-controls">
                     <xhtml:p>
                         <xforms:select ref="flavor" appearance="full">
-                            <xforms:label>Flavors</xforms:label>
+                            <xforms:label xhtml:class="fixed-width">Flavors:</xforms:label>
                             <xforms:item>
                               <xforms:label>Vanilla</xforms:label>
                               <xforms:value>v</xforms:value>
@@ -116,6 +117,57 @@
                               <xforms:value>c</xforms:value>
                             </xforms:item>
                         </xforms:select>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:select ref="flavor" appearance="compact">
+                            <xforms:label xhtml:class="fixed-width"/>
+                            <xforms:item>
+                              <xforms:label>Vanilla</xforms:label>
+                              <xforms:value>v</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                              <xforms:label>Strawberry</xforms:label>
+                              <xforms:value>s</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                              <xforms:label>Chocolate</xforms:label>
+                              <xforms:value>c</xforms:value>
+                            </xforms:item>
+                        </xforms:select>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:select1 ref="carrier" appearance="full">
+                            <xforms:label xhtml:class="fixed-width">Carrier:</xforms:label>
+                            <xforms:item>
+                              <xforms:label>UPS</xforms:label>
+                              <xforms:value>ups</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                              <xforms:label>FedEx</xforms:label>
+                              <xforms:value>fedex</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                              <xforms:label>DHL</xforms:label>
+                              <xforms:value>dhl</xforms:value>
+                            </xforms:item>
+                        </xforms:select1>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:select1 ref="carrier" appearance="minimal">
+                            <xforms:label xhtml:class="fixed-width"/>
+                            <xforms:item>
+                              <xforms:label>UPS</xforms:label>
+                              <xforms:value>ups</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                              <xforms:label>FedEx</xforms:label>
+                              <xforms:value>fedex</xforms:value>
+                            </xforms:item>
+                            <xforms:item>
+                              <xforms:label>DHL</xforms:label>
+                              <xforms:value>dhl</xforms:value>
+                            </xforms:item>
+                        </xforms:select1>
                     </xhtml:p>
                 </xforms:case>
             </xforms:switch>

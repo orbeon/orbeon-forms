@@ -137,14 +137,6 @@ function getEventTarget(event) {
     return event.srcElement ? event.srcElement : event.target;
 }
 
-// Function called when value changed
-function xformsValueChanged(target, incremental) {
-    if (target.value != target.previousValue) {
-        target.previousValue = target.value;
-        xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value, incremental);
-    }
-}
-    
 /**
  * Initializes attributes of each form:
  *
@@ -208,8 +200,8 @@ function xformsPageLoaded() {
         var isXFormsElement = false;
         var isXFormsAlert = false;
         var isIncremental = false;
-        var isXFormsCheckboxes = false;
-        var isXFormsCheckbox = false;
+        var isXFormsCheckboxRadio = false;
+        var isXFormsComboboxList = false;
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
             var className = classes[classIndex];
             if (className.indexOf("xforms-") == 0)
@@ -218,10 +210,10 @@ function xformsPageLoaded() {
                 isXFormsAlert = true;
             if (className == "xforms-incremental")
                 isIncremental = true;
-            if (className == "xforms-select-full")
-                isXFormsCheckboxes = true;
-            if (className == "xforms-checkbox")
-                isXFormsCheckbox = true;
+            if (className == "xforms-select-full" || className == "xforms-select1-full")
+                isXFormsCheckboxRadio = true;
+            if (className == "xforms-select-compact" || className == "xforms-select1-minimal")
+                isXFormsComboboxList = true;
         }
         if (!isXFormsElement) continue;
     
@@ -230,9 +222,9 @@ function xformsPageLoaded() {
             xformsAddEventListener(control, "click", function(event) {
                 xformsFireEvent(getEventTarget(event), "DOMActivate", null, false);
             });
-        } else if (isXFormsCheckboxes) {
+        } else if (isXFormsCheckboxRadio) {
 
-            function computeCheckboxesValue(span) {
+            function computeSpanValue(span) {
                 var inputs = span.getElementsByTagName("input");
                 var spanValue = "";
                 for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
@@ -245,9 +237,9 @@ function xformsPageLoaded() {
                 span.value = spanValue;
             }
             
-            function checkboxSelected(event) {
+            function inputSelected(event) {
                 var checkbox = getEventTarget(event);
-                computeCheckboxesValue(checkbox.parentNode);
+                computeSpanValue(checkbox.parentNode);
                 xformsFireEvent(checkbox.parentNode, "xxforms-value-change-with-focus-change",
                     checkbox.parentNode.value, false);
             }
@@ -255,7 +247,7 @@ function xformsPageLoaded() {
             // Register event listener on every checkbox
             var inputs = control.getElementsByTagName("input");
             for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) 
-                xformsAddEventListener(inputs[inputIndex], "click", checkboxSelected);
+                xformsAddEventListener(inputs[inputIndex], "click", inputSelected);
                 
             // Find parent form and store this in span
             var parent = control;
@@ -264,13 +256,46 @@ function xformsPageLoaded() {
             control.form = parent;
             
             // Compute the checkes value for the first time
-            computeCheckboxesValue(control);
+            computeSpanValue(control);
                 
-        } else if (isXFormsCheckbox) {
-            // Don't add listeners on individual checkboxes
+        } else if (isXFormsComboboxList) {
+        
+            function computeSelectValue(select) {
+                var options = select.options;
+                var selectValue = "";
+                for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
+                    var option = options[optionIndex];
+                    if (option.selected) {
+                        if (selectValue != "") selectValue += " ";
+                        selectValue += option.value;
+                    }
+                }
+                select.selectValue = selectValue;
+            }
+            
+            function selectChanged(event) {
+                var select = getEventTarget(event);
+                computeSelectValue(select);
+                xformsFireEvent(select, "xxforms-value-change-with-focus-change",
+                    select.selectValue, false);
+            }
+            
+            // Register event listener on select
+            xformsAddEventListener(control, "change", selectChanged);
+            // Compute the checkes value for the first time
+            computeSelectValue(control);
+                
         } else if (control.tagName == "SPAN") {
             // Don't add listeners on spans
         } else {
+            // Regular listener for controls using a simple "value" attribute
+            function xformsValueChanged(target, incremental) {
+                if (target.value != target.previousValue) {
+                    target.previousValue = target.value;
+                    xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value, incremental);
+                }
+            }
+        
             // Handle value change and incremental modification
             control.previousValue = null;
             control.userModications = false;
@@ -369,13 +394,25 @@ function xformsHandleResponse() {
                                         // Don't update the control that we just modified
                                     } else if (xformsArrayContains(documentElementClasses, "xforms-trigger")) {
                                         // Triggers don't have a value: don't update them
-                                    } else if (xformsArrayContains(documentElementClasses, "xforms-select-full")) {
-                                        // Handle checkboxes
-                                        var selectedValues = controlValue.split(" ");
+                                    } else if (xformsArrayContains(documentElementClasses, "xforms-select-full")
+                                            || xformsArrayContains(documentElementClasses, "xforms-select1-full")) {
+                                        // Handle checkboxes and radio buttons
+                                        var selectedValues = xformsArrayContains(documentElementClasses, "xforms-select-full")
+                                            ? controlValue.split(" ") : new Array(controlValue);
                                         var checkboxInputs = documentElement.getElementsByTagName("input");
                                         for (var checkboxInputIndex = 0; checkboxInputIndex < checkboxInputs.length; checkboxInputIndex++) {
                                             var checkboxInput = checkboxInputs[checkboxInputIndex];
                                             checkboxInput.checked = xformsArrayContains(selectedValues, checkboxInput.value);
+                                        }
+                                    } else if (xformsArrayContains(documentElementClasses, "xforms-select-compact")
+                                            || xformsArrayContains(documentElementClasses, "xforms-select1-minimal")) {
+                                        // Handle lists and comboboxes
+                                        var selectedValues = xformsArrayContains(documentElementClasses, "xforms-select-compact")
+                                            ? controlValue.split(" ") : new Array(controlValue);
+                                        var options = documentElement.options;
+                                        for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
+                                            var option = options[optionIndex];
+                                            option.selected = xformsArrayContains(selectedValues, option.value);
                                         }
                                     } else if (xformsArrayContains(documentElementClasses, "xforms-output")) {
                                         // XForms output

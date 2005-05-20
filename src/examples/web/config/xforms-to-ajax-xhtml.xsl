@@ -51,7 +51,7 @@
     <!-- - - - - - - XForms controls - - - - - - -->
     
     <xsl:template match="xforms:output | xforms:trigger | xforms:input 
-            | xforms:secret | xforms:textarea" priority="2">
+            | xforms:secret | xforms:textarea | xforms:select | xforms:select1" priority="2">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xsl:if test="local-name() != 'trigger'">
@@ -111,14 +111,17 @@
         </xhtml:textarea>
     </xsl:template>
     
-    <xsl:template match="xforms:select">
+    <xsl:template match="xforms:select[@appearance = 'full'] | xforms:select1[@appearance = 'full']">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xsl:variable name="type" as="xs:string" select="if (local-name() = 'select') then 'checkbox' else 'radio'"/>
         <xhtml:span>
-            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-select-full'), $id)"/>
+            <xsl:variable name="class" as="xs:string" select="if (local-name() = 'select') 
+                then 'xforms-select-full' else 'xforms-select1-full'"/>
+            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', $class), $id)"/>
             <xsl:for-each select="xforms:item">
-                <xhtml:input type="checkbox" value="{xforms:value}">
-                    <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-checkbox', ())"/>
+                <xhtml:input type="{$type}" name="{$id}" value="{xforms:value}">
+                    <xsl:copy-of select="xxforms:copy-attributes(., (), ())"/>
                     <xsl:if test="xforms:value = tokenize(xxforms:control(../@id), ' ')">
                         <xsl:attribute name="checked">checked</xsl:attribute>
                     </xsl:if>
@@ -128,14 +131,18 @@
         </xhtml:span>
     </xsl:template>
 
-    <xsl:template match="xforms:select1">
+    <xsl:template match="xforms:select1[@appearance = 'minimal'] | xforms:select[@appearance = 'compact']">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:select name="{$id}">
-            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
+            <xsl:if test="local-name() = 'select'"><xsl:attribute name="multiple">multiple</xsl:attribute></xsl:if>
+            <xsl:variable name="class" as="xs:string" select="if (local-name() = 'select') 
+                then 'xforms-select-compact' else 'xforms-select1-minimal'"/>
+            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', $class), $id)"/>
             <xsl:for-each select="xforms:item">
                 <xhtml:option value="{xforms:value}">
-                    <xsl:if test="xforms:value = xxforms:control($id)">
+                    <xsl:if test="xforms:value = (if (local-name(..) = 'select') 
+                            then tokenize(xxforms:control($id), ' ') else xxforms:control($id))">
                         <xsl:attribute name="selected">selected</xsl:attribute>
                     </xsl:if>
                     <xsl:value-of select="xforms:label"/>
@@ -221,7 +228,9 @@
         <xsl:variable name="class" as="xs:string" select="string-join
             (($element/@xhtml:class, $element/@class, $classes, 
             if ($element/@incremental = 'true') then 'xforms-incremental' else ()), ' ')"/>
-        <xsl:attribute name="class" select="$class"/>
+        <xsl:if test="string-length($class) > 0">
+            <xsl:attribute name="class" select="$class"/>
+        </xsl:if>
         <!-- Copy attributes in the xhtml namespace to no namespace -->
         <xsl:for-each select="$element/@xhtml:* except $element/@xhtml:class">
             <xsl:attribute name="{local-name()}" select="."/>

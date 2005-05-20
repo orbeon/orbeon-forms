@@ -130,8 +130,8 @@
                         <p:input name="config" href="xforms-to-ajax-xhtml.xsl"/>
                         <p:input name="data" href="#annotated-view"/>
                         <p:input name="request" href="#request"/>
-                        <p:input name="response" href="#response"/>
-                        <p:output name="data" id="xformed-data"/>
+                        <p:input name="response" href="#response" debug="response"/>
+                        <p:output name="data" id="xformed-data" debug="xformed"/>
                     </p:processor>
                 </p:when>
                 <p:otherwise>

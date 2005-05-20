@@ -110,10 +110,12 @@
                     <zeroOrMore>
                         <element name="xxforms:itemset">
                             <attribute name="id"/>
-                            <element name="xxforms:item">
-                                <attribute name="label"/>
-                                <attribute name="value"/>
-                            </element>
+                            <zeroOrMore>
+                                <element name="xxforms:item">
+                                    <attribute name="label"/>
+                                    <attribute name="value"/>
+                                </element>
+                            </zeroOrMore>
                         </element>
                     </zeroOrMore>
                 </element>

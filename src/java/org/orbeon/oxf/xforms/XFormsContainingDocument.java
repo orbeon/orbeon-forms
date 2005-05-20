@@ -17,6 +17,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.event.XFormsRefreshEvent;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,14 +41,14 @@ public class XFormsContainingDocument implements EventTarget {
 
     public XFormsContainingDocument(List models, Document controlsDocument) {
         this.models = models;
+        this.xFormsControls = new XFormsControls(this, controlsDocument);
 
         for (Iterator i = models.iterator(); i.hasNext();) {
             XFormsModel model = (XFormsModel) i.next();
             if (model.getModelId() != null)
                 modelsMap.put(model.getModelId(), model);
+            model.setControls(xFormsControls);
         }
-
-        this.xFormsControls = new XFormsControls(this, controlsDocument);
     }
 
     /**
@@ -92,14 +93,14 @@ public class XFormsContainingDocument implements EventTarget {
         interpretEvent(pipelineContext, XFormsEvent, eventName);
     }
 
-    private void interpretEvent(final PipelineContext pipelineContext, XFormsGenericEvent XFormsEvent, String eventName) {
+    private void interpretEvent(final PipelineContext pipelineContext, XFormsGenericEvent xformsEvent, String eventName) {
 
         if (XFormsEvents.XFORMS_DOM_ACTIVATE.equals(eventName)) {
             // 4.4.1 The DOMActivate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             // The default action for this event results in the following: None; notification event only.
 
-            xFormsControls.dispatchEvent(pipelineContext, XFormsEvent, eventName);
+            xFormsControls.dispatchEvent(pipelineContext, xformsEvent, eventName);
 
         } else if (XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE.equals(eventName)) {
             // 4.6.7 Sequence: Value Change with Focus Change
@@ -114,23 +115,23 @@ public class XFormsContainingDocument implements EventTarget {
             // Reevaluation of binding expressions must occur before step 3 above.
 
             // Set current context to control
-            xFormsControls.setBinding(pipelineContext, XFormsEvent.getControlElement());
+            xFormsControls.setBinding(pipelineContext, xformsEvent.getControlElement());
 
             // Set value into the instance
-            XFormsInstance.setValueForNode(xFormsControls.getCurrentSingleNode(), XFormsEvent.getValue());
+            XFormsInstance.setValueForNode(xFormsControls.getCurrentSingleNode(), xformsEvent.getValue());
 
             // Dispatch events
             XFormsModel model = xFormsControls.getCurrentModel();
-            model.dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XFORMS_RECALCULATE);
-            model.dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XFORMS_REVALIDATE);
+            model.dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_RECALCULATE);
+            model.dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_REVALIDATE);
 
-            xFormsControls.dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XFORMS_DOM_FOCUS_OUT);
-            xFormsControls.dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XFORMS_VALUE_CHANGED);
+            xFormsControls.dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_DOM_FOCUS_OUT);
+            xFormsControls.dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_VALUE_CHANGED);
 
-            // TODO
+            // TODO (missing new control information!)
             //xFormsControls.dispatchEvent(pipelineContext, XFormsEvents.XFORMS_DOM_FOCUS_IN, newControlElement);
 
-            model.dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XFORMS_REFRESH);
+            model.dispatchEvent(pipelineContext, new XFormsRefreshEvent());
 
         } else {
             throw new OXFException("Invalid event requested: " + eventName);

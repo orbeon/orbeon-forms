@@ -46,6 +46,8 @@ public class XFormsControls implements EventTarget {
     private Map caseIdToSwitchInfoMap;
     private Map itemsetIdToItemsetInfoMap;
 
+    private Map itemsetIdToItemsetInfoUpdateMap;
+
     private XFormsContainingDocument containingDocument;
     private Document controlsDocument;
     private DocumentXPathEvaluator documentXPathEvaluator;
@@ -136,7 +138,7 @@ public class XFormsControls implements EventTarget {
             // Initialize switch information
             initializeSwitchInfo(pipelineContext);
             // Initialize itemset information
-            initializeItemsetInfo(pipelineContext);
+            itemsetIdToItemsetInfoMap = getItemsetInfo(pipelineContext, null);
         }
     }
 
@@ -487,7 +489,8 @@ public class XFormsControls implements EventTarget {
     /**
      * Compute all default xforms:itemset information.
      */
-    public void initializeItemsetInfo(final PipelineContext pipelineContext) {
+    private Map getItemsetInfo(final PipelineContext pipelineContext, final XFormsModel model) {
+        final Map[] resultMap = new Map[1];
         visitAllControls(pipelineContext, new ControlVisitorListener() {
             public boolean startVisitControl(Element controlElement, String effectiveControlId) {
                 final String controlName = controlElement.getName();
@@ -501,38 +504,40 @@ public class XFormsControls implements EventTarget {
                         // Iterate through the collection
                         pushBinding(pipelineContext, itemsetElement);
                         {
-                            final List items = new ArrayList();
-
                             final Context currentContext = getCurrentContext();
-                            for (Iterator i = getCurrentNodeset().iterator(); i.hasNext();) {
-                                Node currentNode = (Node) i.next();
 
-                                // Push "artificial" binding with just current node in nodeset
-                                contextStack.push(new Context(currentContext.model, Collections.singletonList(currentNode), true, null));
-                                {
-                                    // Handle children of xforms:itemset
+                            if (model == null || model == currentContext.model) { // it is possible to filter on a particular model
+                                final List items = new ArrayList();
+                                for (Iterator i = getCurrentNodeset().iterator(); i.hasNext();) {
+                                    Node currentNode = (Node) i.next();
 
-                                    pushBinding(pipelineContext, itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME));
-                                    final String label = getCurrentSingleNodeValue();
-                                    popBinding();
-                                    final Element valueCopyElement;
+                                    // Push "artificial" binding with just current node in nodeset
+                                    contextStack.push(new Context(currentContext.model, Collections.singletonList(currentNode), true, null));
                                     {
-                                        final Element valueElement = itemsetElement.element(XFormsConstants.XFORMS_VALUE_QNAME);
-                                        valueCopyElement = (valueElement != null)
-                                            ? valueElement : itemsetElement.element(XFormsConstants.XFORMS_COPY_QNAME);
-                                    }
-                                    pushBinding(pipelineContext, valueCopyElement);
-                                    final String value = getCurrentSingleNodeValue();;
-                                    // TODO: handle xforms:copy
-                                    items.add(new ItemsetInfo(selectControlId, label, value));
+                                        // Handle children of xforms:itemset
 
-                                    popBinding();
+                                        pushBinding(pipelineContext, itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME));
+                                        final String label = getCurrentSingleNodeValue();
+                                        popBinding();
+                                        final Element valueCopyElement;
+                                        {
+                                            final Element valueElement = itemsetElement.element(XFormsConstants.XFORMS_VALUE_QNAME);
+                                            valueCopyElement = (valueElement != null)
+                                                ? valueElement : itemsetElement.element(XFormsConstants.XFORMS_COPY_QNAME);
+                                        }
+                                        pushBinding(pipelineContext, valueCopyElement);
+                                        final String value = getCurrentSingleNodeValue();;
+                                        // TODO: handle xforms:copy
+                                        items.add(new ItemsetInfo(selectControlId, label, value));
+
+                                        popBinding();
+                                    }
+                                    contextStack.pop();
                                 }
-                                contextStack.pop();
+                                if (resultMap[0] == null)
+                                    resultMap[0] = new HashMap();
+                                resultMap[0].put(selectControlId, items);
                             }
-                            if (itemsetIdToItemsetInfoMap == null)
-                                itemsetIdToItemsetInfoMap = new HashMap();
-                            itemsetIdToItemsetInfoMap.put(selectControlId, items);
                         }
                         popBinding();
                     }
@@ -544,6 +549,22 @@ public class XFormsControls implements EventTarget {
                 return true;
             }
         });
+        return resultMap[0];
+    }
+
+    /**
+     * Perform a refresh of the controls for a given model
+     */
+    public void refreshForModel(final PipelineContext pipelineContext, final XFormsModel model) {
+
+        // Get xforms:itemset info for this model
+        final Map result = getItemsetInfo(pipelineContext, model);
+
+        if (itemsetIdToItemsetInfoUpdateMap == null) {
+            itemsetIdToItemsetInfoUpdateMap = result;
+        } else {
+            itemsetIdToItemsetInfoUpdateMap.putAll(result);
+        }
     }
 
     /**
@@ -568,15 +589,6 @@ public class XFormsControls implements EventTarget {
             }
         }
         return null;
-    }
-
-    /**
-     * Refresh form values and attributes and itemsets for the given model.
-     */
-    public void refreshForModel(XFormsModel model) {
-        
-
-        // TODO: refresh controls
     }
 
     public NamespaceSupport2 getNamespaceSupport() {
@@ -713,6 +725,13 @@ public class XFormsControls implements EventTarget {
      */
     public Map getItemsetIdToItemsetInfoMap() {
         return itemsetIdToItemsetInfoMap;
+    }
+
+    /**
+     * Get xforms:itemset information to update.
+     */
+    public Map getItemsetIdToItemsetInfoUpdateMap() {
+        return itemsetIdToItemsetInfoUpdateMap;
     }
 
     /**

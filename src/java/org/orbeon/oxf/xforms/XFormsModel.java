@@ -230,8 +230,10 @@ public class XFormsModel implements EventTarget, Cloneable {
 
     // Binds
     private List binds;
-
     private FunctionLibrary xformsFunctionLibrary = new XFormsFunctionLibrary(this);
+
+    // Controls if available
+    private XFormsControls xFormsControls;
 
     public XFormsModel(Document modelDocument) {
         this.modelDocument = modelDocument;
@@ -260,6 +262,10 @@ public class XFormsModel implements EventTarget, Cloneable {
                 instanceIds.add(instanceId);
             }
         }
+    }
+
+    public void setControls(XFormsControls xFormsControls) {
+        this.xFormsControls = xFormsControls;
     }
 
     private void resetBinds() {
@@ -1141,12 +1147,10 @@ public class XFormsModel implements EventTarget, Cloneable {
             // 4.3.4 The xforms-refresh Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
-            //XFormsRefreshEvent event = (XFormsRefreshEvent) genericXFormsEvent;
-
             // Must ask controls to refresh for this model
-
-
-            // TODO
+            if (xFormsControls != null) {
+                xFormsControls.refreshForModel(pipelineContext, this);
+            }
 
         } else if (XFormsEvents.XFORMS_RESET.equals(eventName)) {
             // 4.3.8 The xforms-reset Event

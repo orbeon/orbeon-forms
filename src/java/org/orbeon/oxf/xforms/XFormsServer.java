@@ -268,9 +268,9 @@ public class XFormsServer extends ProcessorImpl {
                         {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemsets");
                             if (isInitializationRun) {
-                                outputInitialItemsets(ch, xFormsControls);
+                                outputItemsets(ch, xFormsControls.getItemsetIdToItemsetInfoMap());
                             } else {
-                                //outputItemsetsUpdates(ch, xFormsControls.getItemsetIdToItemsetInfoMap());
+                                outputItemsets(ch, xFormsControls.getItemsetIdToItemsetInfoUpdateMap());
                             }
                             ch.endElement();
                         }
@@ -290,8 +290,7 @@ public class XFormsServer extends ProcessorImpl {
         return output;
     }
 
-    private void outputInitialItemsets(ContentHandlerHelper ch, XFormsControls xFormsControls) {
-        Map itemsetIdToItemsetInfoMap = xFormsControls.getItemsetIdToItemsetInfoMap();
+    private void outputItemsets(ContentHandlerHelper ch, Map itemsetIdToItemsetInfoMap) {
         if (itemsetIdToItemsetInfoMap != null) {
             // There are some xforms:itemset controls
 
@@ -306,8 +305,6 @@ public class XFormsServer extends ProcessorImpl {
 
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "item",
                             new String[] { "label", itemsetInfo.getLabel(), "value", itemsetInfo.getValue() });
-    //                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "label", itemsetInfo.getLabel());
-    //                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "value", itemsetInfo.getValue());
                     ch.endElement();
                 }
                 ch.endElement();

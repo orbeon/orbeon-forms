@@ -1005,7 +1005,7 @@ public class XFormsModel implements EventTarget, Cloneable {
         dispatchEvent(pipelineContext, xformsEvent, xformsEvent.getEventName());
     }
 
-    public void dispatchEvent(final PipelineContext pipelineContext, XFormsGenericEvent xformsEvent, String eventName) {
+    public void dispatchEvent(final PipelineContext pipelineContext, XFormsGenericEvent genericXFormsEvent, String eventName) {
         if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
             // 4.2.1 The xforms-model-construct Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
@@ -1076,9 +1076,9 @@ public class XFormsModel implements EventTarget, Cloneable {
             // TODO: a, b, c xxx
 
             // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-            dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_REBUILD);
-            dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_RECALCULATE);
-            dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_REVALIDATE);
+            dispatchEvent(pipelineContext, genericXFormsEvent, XFormsEvents.XFORMS_REBUILD);
+            dispatchEvent(pipelineContext, genericXFormsEvent, XFormsEvents.XFORMS_RECALCULATE);
+            dispatchEvent(pipelineContext, genericXFormsEvent, XFormsEvents.XFORMS_REVALIDATE);
 
         } else if (XFormsEvents.XFORMS_MODEL_DONE.equals(eventName)) {
             // 4.2.2 The xforms-model-construct-done Event
@@ -1136,11 +1136,18 @@ public class XFormsModel implements EventTarget, Cloneable {
             }
 
             // TODO: dispatch events
+
         } else if (XFormsEvents.XFORMS_REFRESH.equals(eventName)) {
             // 4.3.4 The xforms-refresh Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
+            //XFormsRefreshEvent event = (XFormsRefreshEvent) genericXFormsEvent;
+
+            // Must ask controls to refresh for this model
+
+
             // TODO
+
         } else if (XFormsEvents.XFORMS_RESET.equals(eventName)) {
             // 4.3.8 The xforms-reset Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None

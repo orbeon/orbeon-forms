@@ -570,6 +570,15 @@ public class XFormsControls implements EventTarget {
         return null;
     }
 
+    /**
+     * Refresh form values and attributes and itemsets for the given model.
+     */
+    public void refreshForModel(XFormsModel model) {
+        
+
+        // TODO: refresh controls
+    }
+
     public NamespaceSupport2 getNamespaceSupport() {
         return namespaceSupport;
     }

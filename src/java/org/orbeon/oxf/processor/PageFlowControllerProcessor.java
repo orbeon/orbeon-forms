@@ -1136,11 +1136,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 // XSLT 1.0: There is no xsl:version = '2.0' attribute (therefore the namespace of the
                                 //           root element is xsl as per the condition above) and the version attribute
                                 //           is exactly '1.0'
-                                addXSLTWhen("not(/*/@xsl:version = '2.0') and /*/@version = '1.0'", XMLConstants.XSLT10_PROCESSOR_QNAME);
+                                addXSLTWhen("not(/*/@xsl:version = '2.0') and /*/@version = '1.0'", XMLConstants.PFC_XSLT10_PROCESSOR_QNAME);
 
                                 // XSLT 2.0: There is an xsl:version = '2.0' attribute or the namespace or the root
                                 //           element is xsl and the version is different from '1.0'
-                                addXSLTWhen(null, XMLConstants.XSLT20_PROCESSOR_QNAME);
+                                addXSLTWhen(null, XMLConstants.PFC_XSLT20_PROCESSOR_QNAME);
                         }});
                     }});
 

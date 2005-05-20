@@ -207,6 +207,14 @@
         <instantiation name="oxf:saxon8"/>
     </processor>
 
+    <processor name="oxf:pfc-xslt-1.0" uri="oxf/processor/xslt-1.0">
+        <instantiation name="oxf:saxon8"/>
+    </processor>
+
+    <processor name="oxf:pfc-xslt-2.0" uri="oxf/processor/xslt-2.0">
+        <instantiation name="oxf:saxon8"/>
+    </processor>
+
     <processor name="oxf:jdxsltc" uri="oxf/processor/jdxsltc">
         <instantiation name="oxf:generic-xslt-1.0">
             <input name="transformer">

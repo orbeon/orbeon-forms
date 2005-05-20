@@ -43,6 +43,8 @@ public class XMLConstants {
     public final static QName XSLT_PROCESSOR_QNAME = new QName("xslt", OXF_PROCESSORS_NAMESPACE);
     public final static QName XSLT10_PROCESSOR_QNAME = new QName("xslt-1.0", OXF_PROCESSORS_NAMESPACE);
     public final static QName XSLT20_PROCESSOR_QNAME = new QName("xslt-2.0", OXF_PROCESSORS_NAMESPACE);
+    public final static QName PFC_XSLT10_PROCESSOR_QNAME = new QName("pfc-xslt-1.0", OXF_PROCESSORS_NAMESPACE);
+    public final static QName PFC_XSLT20_PROCESSOR_QNAME = new QName("pfc-xslt-2.0", OXF_PROCESSORS_NAMESPACE);
     public final static QName INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME = new QName("instance-to-parameters", OXF_PROCESSORS_NAMESPACE);
     public final static QName SCOPE_SERIALIZER_PROCESSOR_QNAME = new QName("scope-serializer", OXF_PROCESSORS_NAMESPACE);
     public final static QName RESOURCE_SERVER_PROCESSOR_QNAME = new QName("resource-server", OXF_PROCESSORS_NAMESPACE);

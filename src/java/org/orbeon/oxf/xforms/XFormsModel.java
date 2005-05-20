@@ -232,7 +232,7 @@ public class XFormsModel implements EventTarget, Cloneable {
     private List binds;
     private FunctionLibrary xformsFunctionLibrary = new XFormsFunctionLibrary(this);
 
-    // Controls if available
+    // Controls if available (mostly for event dispatching)
     private XFormsControls xFormsControls;
 
     public XFormsModel(Document modelDocument) {

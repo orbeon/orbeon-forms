@@ -731,7 +731,31 @@ public class XFormsControls implements EventTarget {
      * Get xforms:itemset information to update.
      */
     public Map getItemsetIdToItemsetInfoUpdateMap() {
-        return itemsetIdToItemsetInfoUpdateMap;
+
+        if (itemsetIdToItemsetInfoUpdateMap == null) {
+            // There is no update in the first place
+            return null;
+        } else if (itemsetIdToItemsetInfoMap == null) {
+            // There was nothing before, return update
+            return itemsetIdToItemsetInfoUpdateMap;
+        } else {
+            // Merge differences
+            final Map result = new HashMap();
+
+            for (Iterator i = itemsetIdToItemsetInfoUpdateMap.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String itemsetId = (String) currentEntry.getKey();
+                final List items = (List) currentEntry.getValue();
+
+                final List existingItems = (List) itemsetIdToItemsetInfoMap.get(itemsetId);
+                if (existingItems == null || !existingItems.equals(items)) {
+                    // No existing items or new items are different from existing items
+                    result.put(itemsetId, items);
+                }
+            }
+
+            return result;
+        }
     }
 
     /**
@@ -1226,6 +1250,14 @@ public class XFormsControls implements EventTarget {
 
         public String getValue() {
             return value;
+        }
+
+        public boolean equals(Object obj) {
+            if (obj == null || !(obj instanceof ItemsetInfo))
+                return false;
+
+            final ItemsetInfo other = (ItemsetInfo) obj;
+            return id.equals(other.id) && label.equals(other.label) && value.equals(other.value);
         }
     }
 }

@@ -163,6 +163,11 @@
                         </xforms:select1>
                     </xhtml:p>
                     <xhtml:p>
+                        <xforms:input ref="instance('itemsets')/carriers/item[3]/label">
+                            <xforms:label xhtml:class="fixed-width">Carrier Name:</xforms:label>
+                        </xforms:input>
+                    </xhtml:p>
+                    <xhtml:p>
                         <xforms:select1 ref="carrier" appearance="minimal">
                             <xforms:label xhtml:class="fixed-width"/>
                             <xforms:item>

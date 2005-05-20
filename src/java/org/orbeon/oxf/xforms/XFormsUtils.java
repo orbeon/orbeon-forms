@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.resources.URLFactory;
@@ -132,20 +133,89 @@ public class XFormsUtils {
             (XFormsConstants.XFORMS_ENCRYPT_HIDDEN_PROPERTY, false).booleanValue();
     }
 
-    public static void removeXXFormsAttributes(Document doc) {
+    /**
+     * Reconcile "DOM InstanceData annotations" with "attribute annotations"
+     */
+    public static void addInstanceAttributes(Document instanceDocument) {
+        addInstanceAttributes(instanceDocument.getRootElement());
+    }
+
+    private static void addInstanceAttributes(final Element element) {
+        final Object instanceDataObject = element.getData();
+        if (instanceDataObject instanceof InstanceData) {
+            final InstanceData instanceData = (InstanceData) element.getData();
+            final String invldBnds = instanceData.getInvalidBindIds();
+            updateAttribute(element, XFormsConstants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME, invldBnds, null);
+
+            // Reconcile boolean model item properties
+            reconcileBoolean(instanceData.getReadonly(), element, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME, false);
+            reconcileBoolean(instanceData.getRelevant(), element, XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_QNAME, true);
+            reconcileBoolean(instanceData.getRequired(), element, XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_QNAME, false);
+            reconcileBoolean(instanceData.getValid(), element, XFormsConstants.XXFORMS_VALID_ATTRIBUTE_QNAME, true);
+        }
+
+        for (final Iterator i = element.elements().iterator(); i.hasNext();) {
+            final Object o = i.next();
+            addInstanceAttributes((Element) o);
+        }
+    }
+
+    private static void reconcileBoolean(final BooleanModelItemProperty prp, final Element elt, final QName qnm, final boolean defaultValue) {
+        final String currentBooleanValue;
+        if (prp.isSet()) {
+            final boolean b = prp.get();
+            currentBooleanValue = Boolean.toString(b);
+        } else {
+            currentBooleanValue = null;
+        }
+        updateAttribute(elt, qnm, currentBooleanValue, Boolean.toString(defaultValue));
+    }
+
+    private static void updateAttribute(final Element elt, final QName qnam, final String currentValue, final String defaultValue) {
+        Attribute attr = elt.attribute(qnam);
+        if (((currentValue == null) || (currentValue != null && currentValue.equals(defaultValue))) && attr != null) {
+            elt.remove(attr);
+        } else if (currentValue != null && !currentValue.equals(defaultValue)) {
+            // Add a namespace declaration if necessary
+            final String pfx = qnam.getNamespacePrefix();
+            final String qnURI = qnam.getNamespaceURI();
+            final Namespace ns = elt.getNamespaceForPrefix(pfx);
+            final String nsURI = ns == null ? null : ns.getURI();
+            if (ns == null) {
+                elt.addNamespace(pfx, qnURI);
+            } else if (!nsURI.equals(qnURI)) {
+                final InstanceData instDat = XFormsUtils.getLocalInstanceData(elt);
+                final LocationData locDat = instDat.getLocationData();
+                throw new ValidationException("Cannot add attribute to node with 'xxforms' prefix"
+                        + " as the prefix is already mapped to another URI", locDat);
+            }
+            // Add attribute
+            if (attr == null) {
+                attr = Dom4jUtils.createAttribute(elt, qnam, currentValue);
+                final LocationData ld = (LocationData) attr.getData();
+                final InstanceData instDat = new InstanceData(ld);
+                attr.setData(instDat);
+                elt.add(attr);
+            } else {
+                attr.setValue(currentValue);
+            }
+        }
+    }
+
+    public static void removeInstanceAttributes(Document instanceDocument) {
         Visitor visitor = new VisitorSupport() {
             public void visit(Element node) {
                 List newAttributes = new ArrayList();
-                for(Iterator i = node.attributeIterator(); i.hasNext();) {
-                    Attribute attr = (Attribute)i.next();
-                    if(!XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attr.getNamespaceURI()))
+                for (Iterator i = node.attributeIterator(); i.hasNext();) {
+                    Attribute attr = (Attribute) i.next();
+                    if (!XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attr.getNamespaceURI()))
                         newAttributes.add(attr);
 
                 }
                 node.setAttributes(newAttributes);
             }
         };
-        doc.accept(visitor);
+        instanceDocument.accept(visitor);
     }
 
     /**

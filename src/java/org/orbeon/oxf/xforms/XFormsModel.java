@@ -310,9 +310,9 @@ public class XFormsModel implements EventTarget, Cloneable {
         // data.
         final InstanceData instDat = XFormsUtils.getLocalInstanceData(att);
         instDat.addSchemaError(errMsg);
-        final Element elt = att.getParent();
-        final InstanceData eltInstDat = XFormsUtils.getLocalInstanceData(elt);
-
+        // FIXME: The code below does nothing. Why is it here at all?
+//        final Element elt = att.getParent();
+//        final InstanceData eltInstDat = XFormsUtils.getLocalInstanceData(elt);
     }
 
     private Acceptor getChildAcceptor
@@ -468,7 +468,7 @@ public class XFormsModel implements EventTarget, Cloneable {
         }
         // Prepare and set instance
         XFormsUtils.setInitialDecoration(instanceDocument);
-        XFormsInstance newInstance = new XFormsInstance(pipelineContext, instanceDocument);
+        XFormsInstance newInstance = new XFormsInstance(pipelineContext, instanceDocument, this);
         instances.set(instancePosition, newInstance);
 
         // Create mapping instance id -> instance
@@ -483,9 +483,6 @@ public class XFormsModel implements EventTarget, Cloneable {
                 handleOtherBinds(pipelineContext, modelBind, documentWrapper, this);
             }
         });
-        for (Iterator i = instances.iterator(); i.hasNext();) {
-            reconcile(((XFormsInstance) i.next()).getDocument().getRootElement());
-        }
     }
 
     /**
@@ -814,68 +811,6 @@ public class XFormsModel implements EventTarget, Cloneable {
         }
     }
 
-    /**
-     * Reconcile "DOM InstanceData annotations" with "attribute annotations"
-     */
-    private void reconcile(final Element element) {
-        final InstanceData instDat = (InstanceData) element.getData();
-        final String invldBnds = instDat.getInvalidBindIds();
-        updateAttribute(element, XFormsConstants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_QNAME, invldBnds, null);
-
-        // Reconcile boolean model item properties
-        reconcileBoolean(instDat.getReadonly(), element, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_QNAME, false);
-        reconcileBoolean(instDat.getRelevant(), element, XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_QNAME, true);
-        reconcileBoolean(instDat.getRequired(), element, XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_QNAME, false);
-        reconcileBoolean(instDat.getValid(), element, XFormsConstants.XXFORMS_VALID_ATTRIBUTE_QNAME, true);
-
-        for (final Iterator i = element.elements().iterator(); i.hasNext();) {
-            final Object o = i.next();
-            reconcile((Element) o);
-        }
-    }
-
-    private void reconcileBoolean(final BooleanModelItemProperty prp, final Element elt, final QName qnm, final boolean defaultValue) {
-        final String currentBooleanValue;
-        if (prp.isSet()) {
-            final boolean b = prp.get();
-            currentBooleanValue = Boolean.toString(b);
-        } else {
-            currentBooleanValue = null;
-        }
-        updateAttribute(elt, qnm, currentBooleanValue, Boolean.toString(defaultValue));
-    }
-
-    private void updateAttribute(final Element elt, final QName qnam, final String currentValue, final String defaultValue) {
-        Attribute attr = elt.attribute(qnam);
-        if (((currentValue == null) || (currentValue != null && currentValue.equals(defaultValue))) && attr != null) {
-            elt.remove(attr);
-        } else if (currentValue != null && !currentValue.equals(defaultValue)) {
-            // Add a namespace declaration if necessary
-            final String pfx = qnam.getNamespacePrefix();
-            final String qnURI = qnam.getNamespaceURI();
-            final Namespace ns = elt.getNamespaceForPrefix(pfx);
-            final String nsURI = ns == null ? null : ns.getURI();
-            if (ns == null) {
-                elt.addNamespace(pfx, qnURI);
-            } else if (!nsURI.equals(qnURI)) {
-                final InstanceData instDat = XFormsUtils.getLocalInstanceData(elt);
-                final LocationData locDat = instDat.getLocationData();
-                throw new ValidationException("Cannot add attribute to node with 'xxforms' prefix"
-                        + " as the prefix is already mapped to another URI", locDat);
-            }
-            // Add attribute
-            if (attr == null) {
-                attr = Dom4jUtils.createAttribute(elt, qnam, currentValue);
-                final LocationData ld = (LocationData) attr.getData();
-                final InstanceData instDat = new InstanceData(ld);
-                attr.setData(instDat);
-                elt.add(attr);
-            } else {
-                attr.setValue(currentValue);
-            }
-        }
-    }
-
     private void iterateNodeSet(PipelineContext pipelineContext, DocumentWrapper documentWrapper,
                                 ModelBind modelBind, NodeHandler nodeHandler) {
         PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
@@ -1112,9 +1047,6 @@ public class XFormsModel implements EventTarget, Cloneable {
                     handleCalculateBind(pipelineContext, modelBind, documentWrapper, this);
                 }
             });
-            for (Iterator i = instances.iterator(); i.hasNext();) {
-                reconcile(((XFormsInstance) i.next()).getDocument().getRootElement());
-            }
 
         } else if (XFormsEvents.XFORMS_REVALIDATE.equals(eventName)) {
             // 4.3.5 The xforms-revalidate Event
@@ -1137,9 +1069,6 @@ public class XFormsModel implements EventTarget, Cloneable {
                     handleValidationBind(pipelineContext, modelBind, documentWrapper, this);
                 }
             });
-            for (Iterator i = instances.iterator(); i.hasNext();) {
-                reconcile(((XFormsInstance) i.next()).getDocument().getRootElement());
-            }
 
             // TODO: dispatch events
 

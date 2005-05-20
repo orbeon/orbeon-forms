@@ -43,11 +43,14 @@ public class XFormsInstance implements EventTarget {
 
     private PipelineContext pipelineContext;
     private Document instanceDocument;
+    private XFormsModel model;
+
     private DocumentXPathEvaluator documentXPathEvaluator;
 
-    public XFormsInstance(PipelineContext pipelineContext, Document instance) {
+    public XFormsInstance(PipelineContext pipelineContext, Document instance, XFormsModel model) {
         this.pipelineContext = pipelineContext;
         this.instanceDocument = instance;
+        this.model = model;
         this.documentXPathEvaluator = new DocumentXPathEvaluator(instance);
     }
 
@@ -186,9 +189,12 @@ public class XFormsInstance implements EventTarget {
      */
     public void read(ContentHandler contentHandler) {
         try {
+            XFormsUtils.addInstanceAttributes(getDocument());
             LocationSAXWriter saxw = new LocationSAXWriter();
             saxw.setContentHandler(contentHandler);
             saxw.write(instanceDocument);
+            XFormsUtils.removeInstanceAttributes(getDocument());
+
         } catch (SAXException e) {
             throw new OXFException(e);
         }
@@ -214,7 +220,7 @@ public class XFormsInstance implements EventTarget {
     public static XFormsInstance createInstanceFromContext(PipelineContext pipelineContext) {
         ExternalContext.Request request = getRequest(pipelineContext);
         ScopeStore instanceContextStore = (ScopeStore) request.getAttributesMap().get(REQUEST_INSTANCE_DOCUMENT);
-        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, instanceContextStore.getSaxStore().getDocument());
+        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, instanceContextStore.getSaxStore().getDocument(), null);
     }
 
     private static ExternalContext.Request getRequest(PipelineContext context) {

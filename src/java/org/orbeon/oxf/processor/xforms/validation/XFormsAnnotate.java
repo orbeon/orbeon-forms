@@ -43,40 +43,34 @@ public class XFormsAnnotate extends ProcessorImpl {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
 
-                try {
-                    // Get XForms model
-                    XFormsModel model = (org.orbeon.oxf.xforms.XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
-                        public Object read(PipelineContext context, ProcessorInput input) {
-                            return new XFormsModel(readInputAsDOM4J(context, input));
-                        }
-                    });
-                    try {
-                        // Clone because we set the instance, and that must not be cached
-                        model = (XFormsModel) model.clone();
-                    } catch (CloneNotSupportedException e) {
-                        throw new OXFException(e);
+                // Get XForms model
+                XFormsModel model = (org.orbeon.oxf.xforms.XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
+                    public Object read(PipelineContext context, ProcessorInput input) {
+                        return new XFormsModel(readInputAsDOM4J(context, input));
                     }
-
-                    // Set annotated instance on model
-                    Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
-                    model.setInstanceDocument(pipelineContext, 0, instanceDocument);
-
-                    // Create and initialize XForms Engine
-                    XFormsContainingDocument containingDocument = new XFormsContainingDocument(Collections.singletonList(model), null);
-                    containingDocument.initialize(pipelineContext);
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE);
-
-                    // Run remaining model item properties
-                    // TODO: this has to be done in a different way (events?)
-                    model.applyOtherBinds(pipelineContext);
-
-                    // Output the instance to the specified content handler
-                    LocationSAXWriter saxw = new LocationSAXWriter();
-                    saxw.setContentHandler(contentHandler);
-                    saxw.write(instanceDocument);
-                } catch (SAXException e) {
+                });
+                try {
+                    // Clone model because we set the instance, and that must not be cached
+                    model = (XFormsModel) model.clone();
+                } catch (CloneNotSupportedException e) {
                     throw new OXFException(e);
                 }
+
+                // Set annotated instance on model
+                Document instanceDocument = (Document) readCacheInputAsDOM4J(pipelineContext, INPUT_INSTANCE).clone();
+                model.setInstanceDocument(pipelineContext, 0, instanceDocument);
+
+                // Create and initialize XForms Engine
+                XFormsContainingDocument containingDocument = new XFormsContainingDocument(Collections.singletonList(model), null);
+                containingDocument.initialize(pipelineContext);
+                containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE);
+
+                // Run remaining model item properties
+                // TODO: this has to be done in a different way (events?)
+                model.applyOtherBinds(pipelineContext);
+
+                // Output the instance to the specified content handler
+                model.getDefaultInstance().read(contentHandler);
             }
         };
         addOutput(name, output);

@@ -268,9 +268,9 @@ public class XFormsServer extends ProcessorImpl {
                         {
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemsets");
                             if (isInitializationRun) {
-                                outputItemsets(ch, xFormsControls.getItemsetIdToItemsetInfoMap());
+                                outputItemsets(ch, xFormsControls.getItemsetFull());
                             } else {
-                                outputItemsets(ch, xFormsControls.getItemsetIdToItemsetInfoUpdateMap());
+                                outputItemsets(ch, xFormsControls.getItemsetUpdate());
                             }
                             ch.endElement();
                         }

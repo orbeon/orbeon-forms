@@ -107,7 +107,7 @@ public class InstanceToParametersProcessor extends ProcessorImpl {
                     contentHandler.startDocument();
                     contentHandler.startElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT, XMLUtils.EMPTY_ATTRIBUTES);
                     if (!allMarked[0]) {
-                        XFormsUtils.removeXXFormsAttributes(instance);
+                        XFormsUtils.removeInstanceAttributes(instance);
                         outputParameter("$instance", XFormsUtils.encodeXMLAsDOM(pipelineContext, instance), contentHandler);
                     }
                     contentHandler.endElement("", PARAMETERS_ELEMENT, PARAMETERS_ELEMENT);

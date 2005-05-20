@@ -627,7 +627,7 @@
                     <dynamic-state>
                         <instances>
                             <equation>
-                                <screen xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:valid="false">0</screen>
+                                <screen>0</screen>
                                 <screenbuffer/>
                                 <first>3.141592</first>
                                 <second>456</second>

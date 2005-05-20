@@ -721,16 +721,16 @@ public class XFormsControls implements EventTarget {
     }
 
     /**
-     * Get xforms:itemset information.
+     * Get full xforms:itemset information.
      */
-    public Map getItemsetIdToItemsetInfoMap() {
+    public Map getItemsetFull() {
         return itemsetIdToItemsetInfoMap;
     }
 
     /**
      * Get xforms:itemset information to update.
      */
-    public Map getItemsetIdToItemsetInfoUpdateMap() {
+    public Map getItemsetUpdate() {
 
         if (itemsetIdToItemsetInfoUpdateMap == null) {
             // There is no update in the first place
@@ -745,12 +745,12 @@ public class XFormsControls implements EventTarget {
             for (Iterator i = itemsetIdToItemsetInfoUpdateMap.entrySet().iterator(); i.hasNext();) {
                 final Map.Entry currentEntry = (Map.Entry) i.next();
                 final String itemsetId = (String) currentEntry.getKey();
-                final List items = (List) currentEntry.getValue();
+                final List newItems = (List) currentEntry.getValue();
 
                 final List existingItems = (List) itemsetIdToItemsetInfoMap.get(itemsetId);
-                if (existingItems == null || !existingItems.equals(items)) {
+                if (existingItems == null || !existingItems.equals(newItems)) {
                     // No existing items or new items are different from existing items
-                    result.put(itemsetId, items);
+                    result.put(itemsetId, newItems);
                 }
             }
 

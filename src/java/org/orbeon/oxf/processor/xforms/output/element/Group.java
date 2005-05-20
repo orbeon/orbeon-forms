@@ -59,7 +59,7 @@ public class Group extends XFormsElement {
 
             // Encode instance in a string and put in hidden field
 
-            XFormsUtils.removeXXFormsAttributes(instance);
+            XFormsUtils.removeInstanceAttributes(instance);
             String instanceString = XFormsUtils.encodeXMLAsDOM(context.getPipelineContext(), instance);
             sendHiddenElement(context, "$instance", instanceString);
         }

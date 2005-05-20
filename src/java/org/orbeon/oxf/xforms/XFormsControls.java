@@ -44,6 +44,7 @@ public class XFormsControls implements EventTarget {
     private RepeatInfo repeatInfo;
     private Map switchIdToToSwitchInfoMap;
     private Map caseIdToSwitchInfoMap;
+    private Map itemsetIdToItemsetInfoMap;
 
     private XFormsContainingDocument containingDocument;
     private Document controlsDocument;
@@ -91,8 +92,8 @@ public class XFormsControls implements EventTarget {
         mandatorySingleNodeControls.put("setvalue", "");
 
         optionalSingleNodeControls.putAll(noValueControls);
-        optionalSingleNodeControls.put("output", ""); // can have @value attribute
-        optionalSingleNodeControls.put("value", "");
+        optionalSingleNodeControls.put("output", "");  // can have @value attribute
+        optionalSingleNodeControls.put("value", "");   // can have inline text
         optionalSingleNodeControls.put("label", "");   // can have linking or inline text
         optionalSingleNodeControls.put("help", "");    // can have linking or inline text
         optionalSingleNodeControls.put("hint", "");    // can have linking or inline text
@@ -132,8 +133,10 @@ public class XFormsControls implements EventTarget {
         if (controlsDocument != null) {
             // Initialize repeat information
             initializeRepeatInfo(pipelineContext);
-            // Initialize swtich information
+            // Initialize switch information
             initializeSwitchInfo(pipelineContext);
+            // Initialize itemset information
+            initializeItemsetInfo(pipelineContext);
         }
     }
 
@@ -293,6 +296,14 @@ public class XFormsControls implements EventTarget {
      */
     public Node getCurrentSingleNode() {
         return getCurrentSingleNode(getCurrentContext());
+    }
+
+    public String getCurrentSingleNodeValue() {
+        final Node currentSingleNode = getCurrentSingleNode();
+        if (currentSingleNode != null)
+            return XFormsInstance.getValueForNode(currentSingleNode);
+        else
+            return null;
     }
 
     /**
@@ -474,6 +485,68 @@ public class XFormsControls implements EventTarget {
     }
 
     /**
+     * Compute all default xforms:itemset information.
+     */
+    public void initializeItemsetInfo(final PipelineContext pipelineContext) {
+        visitAllControls(pipelineContext, new ControlVisitorListener() {
+            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
+                final String controlName = controlElement.getName();
+                if (controlName.equals("select") || controlName.equals("select1")) {
+
+                    final Element itemsetElement = controlElement.element(XFormsConstants.XFORMS_ITEMSET_QNAME);
+
+                    if (itemsetElement != null) {
+                        final String selectControlId = controlElement.attributeValue("id");
+
+                        // Iterate through the collection
+                        pushBinding(pipelineContext, itemsetElement);
+                        {
+                            final List items = new ArrayList();
+
+                            final Context currentContext = getCurrentContext();
+                            for (Iterator i = getCurrentNodeset().iterator(); i.hasNext();) {
+                                Node currentNode = (Node) i.next();
+
+                                // Push "artificial" binding with just current node in nodeset
+                                contextStack.push(new Context(currentContext.model, Collections.singletonList(currentNode), true, null));
+                                {
+                                    // Handle children of xforms:itemset
+
+                                    pushBinding(pipelineContext, itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME));
+                                    final String label = getCurrentSingleNodeValue();
+                                    popBinding();
+                                    final Element valueCopyElement;
+                                    {
+                                        final Element valueElement = itemsetElement.element(XFormsConstants.XFORMS_VALUE_QNAME);
+                                        valueCopyElement = (valueElement != null)
+                                            ? valueElement : itemsetElement.element(XFormsConstants.XFORMS_COPY_QNAME);
+                                    }
+                                    pushBinding(pipelineContext, valueCopyElement);
+                                    final String value = getCurrentSingleNodeValue();;
+                                    // TODO: handle xforms:copy
+                                    items.add(new ItemsetInfo(selectControlId, label, value));
+
+                                    popBinding();
+                                }
+                                contextStack.pop();
+                            }
+                            if (itemsetIdToItemsetInfoMap == null)
+                                itemsetIdToItemsetInfoMap = new HashMap();
+                            itemsetIdToItemsetInfoMap.put(selectControlId, items);
+                        }
+                        popBinding();
+                    }
+                }
+
+                return true;
+            }
+            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
+                return true;
+            }
+        });
+    }
+
+    /**
      * Return the current repeat index for the given xforms:repeat id, -1 if the id is not found.
      */
     public int getRepeatIdIndex(String repeatId) {
@@ -624,6 +697,13 @@ public class XFormsControls implements EventTarget {
      */
     public Map getSwitchIdToToSwitchInfoMap() {
         return switchIdToToSwitchInfoMap;
+    }
+
+    /**
+     * Get xforms:itemset information.
+     */
+    public Map getItemsetIdToItemsetInfoMap() {
+        return itemsetIdToItemsetInfoMap;
     }
 
     /**
@@ -1091,6 +1171,33 @@ public class XFormsControls implements EventTarget {
 
         public void setOccurs(int occurs) {
             this.occurs = occurs;
+        }
+    }
+
+    /**
+     * Represents xforms:repeat information.
+     */
+    public static class ItemsetInfo {
+        private String id;
+        private String label;
+        private String value;
+
+        public ItemsetInfo(String id, String label, String value) {
+            this.id = id;
+            this.label = label;
+            this.value = value;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public String getValue() {
+            return value;
         }
     }
 }

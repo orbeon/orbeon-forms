@@ -106,6 +106,17 @@
                         <ref name="repeatInfo"/>
                     </zeroOrMore>
                 </element>
+                <element name="xxforms:itemsets">
+                    <zeroOrMore>
+                        <element name="xxforms:itemset">
+                            <attribute name="id"/>
+                            <element name="xxforms:item">
+                                <attribute name="label"/>
+                                <attribute name="value"/>
+                            </element>
+                        </element>
+                    </zeroOrMore>
+                </element>
             </element>
         </element>
     </start>

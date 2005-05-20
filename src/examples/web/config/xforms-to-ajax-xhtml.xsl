@@ -31,6 +31,9 @@
     <xsl:variable name="repeats" as="element()*"
         select="$response/xxforms:action/xxforms:repeats/xxforms:repeat" />
 
+    <xsl:variable name="itemsets" as="element()*"
+        select="$response/xxforms:action/xxforms:itemsets/xxforms:itemset"/>
+
     <!-- - - - - - - Form with hidden divs - - - - - - -->
     
     <xsl:template match="xhtml:body">
@@ -114,20 +117,49 @@
     <xsl:template match="xforms:select[@appearance = 'full'] | xforms:select1[@appearance = 'full']">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xsl:variable name="type" as="xs:string" select="if (local-name() = 'select') then 'checkbox' else 'radio'"/>
+        <xsl:variable name="type" as="xs:string"
+            select="if (local-name() = 'select') then 'checkbox' else 'radio'"/>
+        <xsl:variable name="class" as="xs:string"
+            select="if (local-name() = 'select') then 'xforms-select-full' else 'xforms-select1-full'"/>
         <xhtml:span>
-            <xsl:variable name="class" as="xs:string" select="if (local-name() = 'select') 
-                then 'xforms-select-full' else 'xforms-select1-full'"/>
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', $class), $id)"/>
-            <xsl:for-each select="xforms:item">
-                <xhtml:input type="{$type}" name="{$id}" value="{xforms:value}">
-                    <xsl:copy-of select="xxforms:copy-attributes(., (), ())"/>
-                    <xsl:if test="xforms:value = tokenize(xxforms:control(../@id), ' ')">
-                        <xsl:attribute name="checked">checked</xsl:attribute>
-                    </xsl:if>
-                </xhtml:input>
-                <xsl:value-of select="xforms:label"/>
-            </xsl:for-each>
+            <xsl:choose>
+                <xsl:when test="xforms:itemset">
+                    <!-- There is an itemset -->
+                    <xsl:variable name="itemset-element" select="." as="element()"/>
+
+                    <!-- Obtain dynamic item labels and values -->
+                    <xsl:for-each select="$itemsets[@id = $id]/xxforms:item">
+                        <xhtml:input type="{$type}" name="{$id}" value="{@value}">
+                            <xsl:copy-of select="xxforms:copy-attributes($itemset-element, (), ())"/>
+                            <xsl:if test="@value = tokenize(xxforms:control($id), ' ')">
+                                <xsl:attribute name="checked">checked</xsl:attribute>
+                            </xsl:if>
+                        </xhtml:input>
+                        <xsl:value-of select="@label"/>
+                    </xsl:for-each>
+
+                    <!-- Produce template -->
+                    <xhtml:div id="template-{$id}" style="display: none">
+                        <xhtml:input type="{$type}" name="{$id}" value="$ops-dummy-value$">
+                            <xsl:copy-of select="xxforms:copy-attributes(., (), ())"/>
+                        </xhtml:input>
+                        <xsl:value-of select="xforms:label"/>
+                    </xhtml:div>
+                </xsl:when>
+                <xsl:otherwise>
+                    <!-- Static list of items -->
+                    <xsl:for-each select="xforms:item">
+                        <xhtml:input type="{$type}" name="{$id}" value="{xforms:value}">
+                            <xsl:copy-of select="xxforms:copy-attributes(., (), ())"/>
+                            <xsl:if test="xforms:value = tokenize(xxforms:control($id), ' ')">
+                                <xsl:attribute name="checked">checked</xsl:attribute>
+                            </xsl:if>
+                        </xhtml:input>
+                        <xsl:value-of select="xforms:label"/>
+                    </xsl:for-each>
+                </xsl:otherwise>
+            </xsl:choose>
         </xhtml:span>
     </xsl:template>
 

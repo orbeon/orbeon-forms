@@ -142,6 +142,7 @@
                         <xxf:div id="divide" visibility="hidden"/>
                     </xxf:divs>
                     <xxf:repeats/>
+                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -246,6 +247,7 @@
                         <xxf:div id="divide" visibility="hidden"/>
                     </xxf:divs>
                     <xxf:repeats/>
+                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -446,6 +448,7 @@
                     </xxf:control-values>
                     <xxf:divs/>
                     <xxf:repeats/>
+                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -544,6 +547,7 @@
                     </xxf:control-values>
                     <xxf:divs/>
                     <xxf:repeats/>
+                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -650,6 +654,7 @@
                     </xxf:control-values>
                     <xxf:divs/>
                     <xxf:repeats/>
+                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>
@@ -685,7 +690,7 @@
                             <xsl:template match="/">
                                 <xsl:apply-templates select="doc('input:response')/*"/>
                             </xsl:template>
-                            <xsl:template match="xxforms:repeats">
+                            <xsl:template match="xxforms:itemsets">
                                 <xsl:copy>
                                     <xsl:apply-templates/>
                                 </xsl:copy>
@@ -755,6 +760,7 @@
                             <xxf:repeat id="id124" occurs="4" index="1"/>
                         </xxf:repeat>
                     </xxf:repeats>
+                    <xxf:itemsets/>
                     <xxforms:controls xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
                         <table>
                             <tr>
@@ -972,6 +978,7 @@
                             <xxf:repeat id="id124" occurs="4" index="1"/>
                         </xxf:repeat>
                     </xxf:repeats>
+                    <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
         </output>

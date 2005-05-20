@@ -262,7 +262,17 @@ public class XFormsServer extends ProcessorImpl {
                                 outputRepeatsUpdates(ch, xFormsControls.getRepeatInfo());
                             }
                             ch.endElement();
+                        }
 
+                        // Output itemset information
+                        {
+                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemsets");
+                            if (isInitializationRun) {
+                                outputInitialItemsets(ch, xFormsControls);
+                            } else {
+                                //outputItemsetsUpdates(ch, xFormsControls.getItemsetIdToItemsetInfoMap());
+                            }
+                            ch.endElement();
                         }
 
                         ch.endElement();
@@ -278,6 +288,31 @@ public class XFormsServer extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
+    }
+
+    private void outputInitialItemsets(ContentHandlerHelper ch, XFormsControls xFormsControls) {
+        Map itemsetIdToItemsetInfoMap = xFormsControls.getItemsetIdToItemsetInfoMap();
+        if (itemsetIdToItemsetInfoMap != null) {
+            // There are some xforms:itemset controls
+
+            for (Iterator i = itemsetIdToItemsetInfoMap.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String itemsetId = (String) currentEntry.getKey();
+                final List items = (List) currentEntry.getValue();
+
+                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "itemset", new String[] { "id", itemsetId });
+                for (Iterator j = items.iterator(); j.hasNext();) {
+                    final XFormsControls.ItemsetInfo itemsetInfo = (XFormsControls.ItemsetInfo) j.next();
+
+                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "item",
+                            new String[] { "label", itemsetInfo.getLabel(), "value", itemsetInfo.getValue() });
+    //                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "label", itemsetInfo.getLabel());
+    //                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "value", itemsetInfo.getValue());
+                    ch.endElement();
+                }
+                ch.endElement();
+            }
+        }
     }
 
     private void outputSwitchDivs(Element divsElement, XFormsControls xFormsControls) {

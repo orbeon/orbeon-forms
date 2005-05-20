@@ -60,6 +60,9 @@ public class XFormsConstants {
     public static final QName XFORMS_HELP_QNAME = new QName("help", XFormsConstants.XFORMS_NAMESPACE);
     public static final QName XFORMS_HINT_QNAME = new QName("hint", XFormsConstants.XFORMS_NAMESPACE);
     public static final QName XFORMS_ALERT_QNAME = new QName("alert", XFormsConstants.XFORMS_NAMESPACE);
+    public static final QName XFORMS_VALUE_QNAME = new QName("value", XFormsConstants.XFORMS_NAMESPACE);
+    public static final QName XFORMS_COPY_QNAME = new QName("copy", XFormsConstants.XFORMS_NAMESPACE);
+    public static final QName XFORMS_ITEMSET_QNAME = new QName("itemset", XFormsConstants.XFORMS_NAMESPACE);
 
     public static final String XFORMS_PASSWORD_PROPERTY = "oxf.xforms.password";
     public static final String XFORMS_ENCRYPT_NAMES_PROPERTY = "oxf.xforms.encrypt-names";

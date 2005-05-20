@@ -182,6 +182,7 @@ function xformsPageLoaded() {
     var textareas = document.getElementsByTagName("textarea");
     var labels = document.getElementsByTagName("label");
     var selects = document.getElementsByTagName("select");
+    var tds = document.getElementsByTagName("td");
     var formsControls = new Array();
     for (var i = 0; i < spans.length; i++) formsControls = formsControls.concat(spans[i]);
     for (var i = 0; i < buttons.length; i++) formsControls = formsControls.concat(buttons[i]);
@@ -189,6 +190,7 @@ function xformsPageLoaded() {
     for (var i = 0; i < textareas.length; i++) formsControls = formsControls.concat(textareas[i]);
     for (var i = 0; i < labels.length; i++) formsControls = formsControls.concat(labels[i]);
     for (var i = 0; i < selects.length; i++) formsControls = formsControls.concat(selects[i]);
+    for (var i = 0; i < tds.length; i++) formsControls = formsControls.concat(tds[i]);
 
     // Go through potential form controls, add style, and register listeners
     for (var controlIndex = 0; controlIndex < formsControls.length; controlIndex++) {
@@ -202,6 +204,7 @@ function xformsPageLoaded() {
         var isIncremental = false;
         var isXFormsCheckboxRadio = false;
         var isXFormsComboboxList = false;
+        var isWidget = false;
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
             var className = classes[classIndex];
             if (className.indexOf("xforms-") == 0)
@@ -214,104 +217,113 @@ function xformsPageLoaded() {
                 isXFormsCheckboxRadio = true;
             if (className == "xforms-select-compact" || className == "xforms-select1-minimal")
                 isXFormsComboboxList = true;
+            if (className.indexOf("widget-") != -1)
+                isWidget = true;
         }
-        if (!isXFormsElement) continue;
-    
-        if (control.tagName == "BUTTON") {
-            // Handle click
-            xformsAddEventListener(control, "click", function(event) {
-                xformsFireEvent(getEventTarget(event), "DOMActivate", null, false);
-            });
-        } else if (isXFormsCheckboxRadio) {
-
-            function computeSpanValue(span) {
-                var inputs = span.getElementsByTagName("input");
-                var spanValue = "";
-                for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
-                    var input = inputs[inputIndex];
-                    if (input.checked) {
-                        if (spanValue != "") spanValue += " ";
-                        spanValue += input.value;
-                    }
-                }
-                span.value = spanValue;
-            }
-            
-            function inputSelected(event) {
-                var checkbox = getEventTarget(event);
-                computeSpanValue(checkbox.parentNode);
-                xformsFireEvent(checkbox.parentNode, "xxforms-value-change-with-focus-change",
-                    checkbox.parentNode.value, false);
-            }
-            
-            // Register event listener on every checkbox
-            var inputs = control.getElementsByTagName("input");
-            for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) 
-                xformsAddEventListener(inputs[inputIndex], "click", inputSelected);
-                
-            // Find parent form and store this in span
-            var parent = control;
-            while (parent.tagName != "FORM")
-               parent = parent.parentNode;
-            control.form = parent;
-            
-            // Compute the checkes value for the first time
-            computeSpanValue(control);
-                
-        } else if (isXFormsComboboxList) {
         
-            function computeSelectValue(select) {
-                var options = select.options;
-                var selectValue = "";
-                for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
-                    var option = options[optionIndex];
-                    if (option.selected) {
-                        if (selectValue != "") selectValue += " ";
-                        selectValue += option.value;
-                    }
-                }
-                select.selectValue = selectValue;
-            }
-            
-            function selectChanged(event) {
-                var select = getEventTarget(event);
-                computeSelectValue(select);
-                xformsFireEvent(select, "xxforms-value-change-with-focus-change",
-                    select.selectValue, false);
-            }
-            
-            // Register event listener on select
-            xformsAddEventListener(control, "change", selectChanged);
-            // Compute the checkes value for the first time
-            computeSelectValue(control);
-                
-        } else if (control.tagName == "SPAN") {
-            // Don't add listeners on spans
-        } else {
-            // Regular listener for controls using a simple "value" attribute
-            function xformsValueChanged(target, incremental) {
-                if (target.value != target.previousValue) {
-                    target.previousValue = target.value;
-                    xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value, incremental);
-                }
-            }
-        
-            // Handle value change and incremental modification
-            control.previousValue = null;
-            control.userModications = false;
-            xformsAddEventListener(control, "change", function(event) 
-                { xformsValueChanged(getEventTarget(event), false); });
-            if (isIncremental)
-                xformsAddEventListener(control, "keyup", function(event) 
-                    { xformsValueChanged(getEventTarget(event), true); });
+        if (isWidget && !isXFormsElement) {
+            // For widget: just add style
+            xformsUpdateStyle(control);
         }
 
-        // If alert, store reference in control element to this alert element
-        if (isXFormsAlert)
-            document.getElementById(control.htmlFor).alertElement = control;
+        if (isXFormsElement) {
 
-        // Add style to element
-        xformsUpdateStyle(control);
+            if (control.tagName == "BUTTON") {
+                // Handle click
+                xformsAddEventListener(control, "click", function(event) {
+                    xformsFireEvent(getEventTarget(event), "DOMActivate", null, false);
+                });
+            } else if (isXFormsCheckboxRadio) {
+
+                function computeSpanValue(span) {
+                    var inputs = span.getElementsByTagName("input");
+                    var spanValue = "";
+                    for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
+                        var input = inputs[inputIndex];
+                        if (input.checked) {
+                            if (spanValue != "") spanValue += " ";
+                            spanValue += input.value;
+                        }
+                    }
+                    span.value = spanValue;
+                }
+
+                function inputSelected(event) {
+                    var checkbox = getEventTarget(event);
+                    computeSpanValue(checkbox.parentNode);
+                    xformsFireEvent(checkbox.parentNode, "xxforms-value-change-with-focus-change",
+                        checkbox.parentNode.value, false);
+                }
+
+                // Register event listener on every checkbox
+                var inputs = control.getElementsByTagName("input");
+                for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++)
+                    xformsAddEventListener(inputs[inputIndex], "click", inputSelected);
+
+                // Find parent form and store this in span
+                var parent = control;
+                while (parent.tagName != "FORM")
+                   parent = parent.parentNode;
+                control.form = parent;
+
+                // Compute the checkes value for the first time
+                computeSpanValue(control);
+
+            } else if (isXFormsComboboxList) {
+
+                function computeSelectValue(select) {
+                    var options = select.options;
+                    var selectValue = "";
+                    for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
+                        var option = options[optionIndex];
+                        if (option.selected) {
+                            if (selectValue != "") selectValue += " ";
+                            selectValue += option.value;
+                        }
+                    }
+                    select.selectValue = selectValue;
+                }
+
+                function selectChanged(event) {
+                    var select = getEventTarget(event);
+                    computeSelectValue(select);
+                    xformsFireEvent(select, "xxforms-value-change-with-focus-change",
+                        select.selectValue, false);
+                }
+
+                // Register event listener on select
+                xformsAddEventListener(control, "change", selectChanged);
+                // Compute the checkes value for the first time
+                computeSelectValue(control);
+
+            } else if (control.tagName == "SPAN") {
+                // Don't add listeners on spans
+            } else {
+                // Regular listener for controls using a simple "value" attribute
+                function xformsValueChanged(target, incremental) {
+                    if (target.value != target.previousValue) {
+                        target.previousValue = target.value;
+                        xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value, incremental);
+                    }
+                }
+
+                // Handle value change and incremental modification
+                control.previousValue = null;
+                control.userModications = false;
+                xformsAddEventListener(control, "change", function(event)
+                    { xformsValueChanged(getEventTarget(event), false); });
+                if (isIncremental)
+                    xformsAddEventListener(control, "keyup", function(event)
+                        { xformsValueChanged(getEventTarget(event), true); });
+            }
+
+            // If alert, store reference in control element to this alert element
+            if (isXFormsAlert)
+                document.getElementById(control.htmlFor).alertElement = control;
+
+            // Add style to element
+            xformsUpdateStyle(control);
+        }
     }
     
     // Initialize attributes on form

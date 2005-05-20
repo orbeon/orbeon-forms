@@ -15,6 +15,7 @@
     xmlns:f="http://orbeon.org/oxf/xml/formatting" 
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events">
     
     <xhtml:head>
@@ -59,16 +60,9 @@
     </xhtml:head>
     <xhtml:body>
         <xforms:group ref="instance('instance')">
-            <xforms:trigger>
-                <xforms:label>Text controls</xforms:label>
-                <xforms:toggle ev:event="DOMActivate" case="text-controls"/>
-            </xforms:trigger>
-            <xforms:trigger>
-                <xforms:label>Selection controls</xforms:label>
-                <xforms:toggle ev:event="DOMActivate" case="selection-controls"/>
-            </xforms:trigger>
-            <xforms:switch>
-                <xforms:case id="text-controls">
+            <widget:tabs>
+                <widget:tab id="text-controls">
+                    <widget:label>Text controls</widget:label>
                     <xhtml:p>
                         <xforms:input ref="age">
                             <xforms:label xhtml:class="fixed-width">Age:</xforms:label>
@@ -99,8 +93,9 @@
                             </xforms:help>
                         </xforms:input>
                     </xhtml:p>
-                </xforms:case>
-                <xforms:case id="selection-controls">
+                </widget:tab>
+                <widget:tab id="selection-controls">
+                    <widget:label>Selection controls</widget:label>
                     <xhtml:p>
                         <xforms:select ref="flavor" appearance="full">
                             <xforms:label xhtml:class="fixed-width">Flavors:</xforms:label>
@@ -169,8 +164,8 @@
                             </xforms:item>
                         </xforms:select1>
                     </xhtml:p>
-                </xforms:case>
-            </xforms:switch>
+                </widget:tab>
+            </widget:tabs>
             <xhtml:p style="margin-top: 2em">
                 <xforms:switch>
                     <xforms:case id="instance-hidden">

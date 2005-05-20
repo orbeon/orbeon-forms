@@ -79,15 +79,21 @@
         <p:otherwise>
             <p:choose href="#data">
                 <p:when test="//xforms:model">
-                    <!-- Annotate controls in view with and id -->
+                    <!-- Handle widgets -->
                     <p:processor name="oxf:xslt">
                         <p:input name="data" href="#data"/>
+                        <p:input name="config" href="xforms-widgets.xsl"/>
+                        <p:output name="data" id="widgeted-view"/>
+                    </p:processor>
+                    <!-- Annotate controls in view with and id -->
+                    <p:processor name="oxf:xslt">
+                        <p:input name="data" href="#widgeted-view"/>
                         <p:input name="config" href="xforms-annotate-controls.xsl"/>
                         <p:output name="data" id="annotated-view"/>
                     </p:processor>
                     <!-- Extract models -->
                     <p:processor name="oxf:identity">
-                        <p:input name="data" href="aggregate('models', #data#xpointer(//xforms:model))"/>
+                        <p:input name="data" href="aggregate('models', #widgeted-view#xpointer(//xforms:model))"/>
                         <p:output name="data" id="xforms-models"/>
                     </p:processor>
                     <!-- Extract controls -->

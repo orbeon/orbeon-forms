@@ -12,10 +12,11 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <!DOCTYPE document [
-    <!ENTITY xlight-color "#D5D5EA">
-    <!ENTITY light-color "#9999CC">
-    <!ENTITY medium-color "#666699">
-    <!ENTITY dark-color "#333366">
+    <!ENTITY xxlight-color "#eee">
+    <!ENTITY xlight-color "#dde">
+    <!ENTITY light-color "#99c">
+    <!ENTITY medium-color "#669">
+    <!ENTITY dark-color "#336">
 ]>
 <root>
 
@@ -45,6 +46,55 @@ fieldset {
     padding-left: 1.5em;
     padding-right: 1.5em;
     border: &light-color; 1px solid;
+}
+
+.widget-tabs {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+.widget-tab-spacer-side {
+    border-bottom: 1px solid &medium-color;;
+    width: 1.5em;
+}
+    
+.widget-tab-spacer-between {
+    border-bottom: 1px solid &medium-color;;
+    width: 1em;
+}
+        
+.widget-tab-trigger {
+    display: none;
+}
+    
+.widget-tab-active {
+    border-top: 1px solid &medium-color;;
+    border-left: 1px solid &medium-color;;
+    border-right: 1px solid &medium-color;;
+    background: &xlight-color;;
+    color: &dark-color;;
+    font-weight: bold;
+    text-align: center;
+    cursor: pointer;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+    
+.widget-tab-inactive {
+    background: &xxlight-color;;
+    cursor: pointer;
+    border-bottom: 1px solid &medium-color;;
+    text-align: center;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+    
+.widget-tabs-panel {
+    border-left: 1px solid &medium-color;;
+    border-right: 1px solid &medium-color;;
+    border-bottom: 1px solid &medium-color;;
+    padding-left: 2em;
+    padding-right: 2em;
 }
     
 .tt, textarea {

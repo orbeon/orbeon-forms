@@ -104,11 +104,41 @@ function xformsUpdateStyle(element) {
                 }
                 
             }
-            
+
             if (element.alertElement && typeof(element.isValid) != "undefined") {
                 element.alertElement.className = element.isValid ? "xforms-alert-inactive" 
                     : "xforms-alert-active";
             }
+
+            // This is for widgets. Code for widgets should be modularized and moved out of this file
+            
+            if (className == "widget-tab-inactive" || className == "widget-tab-active") {
+                if (!element.eventRegistered) {
+                    element.eventRegistered = true;
+                    function clickEventHandler(event) {
+                        var td = getEventTarget(event);
+                        
+                        // Change class of all tds
+                        var tr = td.parentNode;
+                        for (var i = 0; i < tr.childNodes.length; i++) {
+                            var child = tr.childNodes[i];
+                            if (child.className == "widget-tab-inactive" || child.className == "widget-tab-active")
+                                child.className = child == td ? "widget-tab-active" : "widget-tab-inactive";
+                        }
+                        
+                        // Click the trigger contained in this td
+                        for (var i = 0; i < td.childNodes.length; i++) {
+                            var child = td.childNodes[i];
+                            if (typeof(child.className) != "undefined" 
+                                    && xformsArrayContains(child.className.split(" "), "xforms-trigger")) {
+                                xformsFireEvent(child, "DOMActivate", null, false);
+                            }
+                        }
+                    }
+                    xformsAddEventListener(element, "click", clickEventHandler);
+                }
+            }
+            
         }
     }
 }

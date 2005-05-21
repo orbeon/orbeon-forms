@@ -38,6 +38,7 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
+import org.orbeon.oxf.xforms.event.EventTarget;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -223,9 +224,7 @@ public class XFormsModel implements EventTarget, Cloneable {
     private InstanceConstructListener instanceConstructListener;
 
     // Submission information
-    private String method;
-    private String action;
-    private String encoding;
+    private Map xformsModelSubmissions;
 
     // Binds
     private List binds;
@@ -250,21 +249,41 @@ public class XFormsModel implements EventTarget, Cloneable {
         modelId = modelElement.attributeValue("id");
 
         // Extract list of instances ids
-        List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
-        instanceIds = new ArrayList(instanceContainers.size());
-        if (instanceContainers.size() > 0) {
-            for (Iterator i = instanceContainers.iterator(); i.hasNext();) {
-                Element instanceContainer = (Element) i.next();
-                String instanceId = instanceContainer.attributeValue("id");
-                if (instanceId == null)
-                    instanceId = "";
-                instanceIds.add(instanceId);
+        {
+            List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
+            instanceIds = new ArrayList(instanceContainers.size());
+            if (instanceContainers.size() > 0) {
+                for (Iterator i = instanceContainers.iterator(); i.hasNext();) {
+                    final Element instanceContainer = (Element) i.next();
+                    String instanceId = instanceContainer.attributeValue("id");
+                    if (instanceId == null)
+                        instanceId = "";
+                    instanceIds.add(instanceId);
+                }
+            }
+        }
+
+        // Get <xforms:submission> elements (may be missing)
+        {
+            for (Iterator i = modelElement.elements(new QName("submission", XFormsConstants.XFORMS_NAMESPACE)).iterator(); i.hasNext();) {
+                final Element submissionElement = (Element) i.next();
+                String submissionId = submissionElement.attributeValue("id");
+                if (submissionId == null)
+                    submissionId = "";
+
+                if (xformsModelSubmissions == null)
+                    xformsModelSubmissions = new HashMap();
+                xformsModelSubmissions.put(submissionId, new XFormsModelSubmission(submissionElement, this));
             }
         }
     }
 
     public void setControls(XFormsControls xFormsControls) {
         this.xFormsControls = xFormsControls;
+    }
+
+    public XFormsControls getControls() {
+        return xFormsControls;
     }
 
     private void resetBinds() {
@@ -859,22 +878,6 @@ public class XFormsModel implements EventTarget, Cloneable {
         return modelId;
     }
 
-    public String getMethod() {
-        return method;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public String getEncoding() {
-        return encoding;
-    }
-
     public List getBindNodeset(PipelineContext pipelineContext, ModelBind bind) {
         // Get a list of parents, ordered by grandfather first
         List parents = new ArrayList();
@@ -959,16 +962,6 @@ public class XFormsModel implements EventTarget, Cloneable {
             // Bubbles: Yes / Cancelable: No / Context Info: None
 
             Element modelElement = modelDocument.getRootElement();
-
-            // Get info from <xforms:submission> element (may be missing)
-            {
-                Element submissionElement = modelElement.element(new QName("submission", XFormsConstants.XFORMS_NAMESPACE));
-                if (submissionElement != null) {
-                    method = submissionElement.attributeValue("method");
-                    action = submissionElement.attributeValue("action");
-                    encoding = submissionElement.attributeValue("encoding");
-                }
-            }
 
             // 1. All XML Schemas loaded (throws xforms-link-exception)
 

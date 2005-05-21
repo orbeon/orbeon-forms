@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.scope.ScopeStore;
+import org.orbeon.oxf.xforms.event.EventTarget;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -42,20 +43,30 @@ public class XFormsInstance implements EventTarget {
     public static final String DEFAULT_UPLOAD_TYPE = "xs:anyURI";
 
     private PipelineContext pipelineContext;
-    private Document instanceDocument;
     private XFormsModel model;
+    private Document instanceDocument;
 
     private DocumentXPathEvaluator documentXPathEvaluator;
 
-    public XFormsInstance(PipelineContext pipelineContext, Document instance, XFormsModel model) {
+    public XFormsInstance(PipelineContext pipelineContext, Document instanceDocument, XFormsModel model) {
         this.pipelineContext = pipelineContext;
-        this.instanceDocument = instance;
         this.model = model;
-        this.documentXPathEvaluator = new DocumentXPathEvaluator(instance);
+        setInstanceDocument(instanceDocument);
     }
 
+    /**
+     * Return the instance document.
+     */
     public Document getDocument() {
         return instanceDocument;
+    }
+
+    /**
+     * Set the instance document.
+     */
+    public void setInstanceDocument(Document instanceDocument) {
+        this.instanceDocument = instanceDocument;
+        this.documentXPathEvaluator = new DocumentXPathEvaluator(instanceDocument);
     }
 
     /**

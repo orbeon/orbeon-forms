@@ -11,27 +11,29 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms;
+package org.orbeon.oxf.xforms.event;
 
-import org.dom4j.Element;
+import org.orbeon.oxf.xforms.XFormsEvent;
+import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
- * XFormsEvent represents an XForms event passed to all events and actions.
+ * 4.4.19 The xforms-submit-error Event
  */
-public class XFormsEvent extends XFormsGenericEvent {
+public class XFormsSubmitErrorEvent extends XFormsEvent {
+    private Throwable throwable;
+    private String urlString;
 
-    private String eventName;
-
-    public XFormsEvent(String eventName) {
-        this.eventName = eventName;
+    public XFormsSubmitErrorEvent(String urlString, Throwable throwable) {
+        super(XFormsEvents.XFORMS_SUBMIT_ERROR);
+        this.urlString = urlString;
+        this.throwable = throwable;
     }
 
-    protected XFormsEvent(String eventName, Element controlElement) {
-        super(controlElement);
-        this.eventName = eventName;
+    public Throwable getThrowable() {
+        return throwable;
     }
 
-    public String getEventName() {
-        return eventName;
+    public String getUrlString() {
+        return urlString;
     }
 }

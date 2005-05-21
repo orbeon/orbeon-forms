@@ -232,7 +232,7 @@ public class XFormsUtils {
         instanceWalker.walk(element, (InstanceData) element.getData());
         for (Iterator i = element.attributes().iterator(); i.hasNext();) {
             Attribute attribute = (Attribute) i.next();
-            instanceWalker.walk(attribute,  (InstanceData) element.getData());
+            instanceWalker.walk(attribute, (InstanceData) element.getData());
         }
         for (Iterator i = element.elements().iterator(); i.hasNext();) {
             Element child = (Element) i.next();

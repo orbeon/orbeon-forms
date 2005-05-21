@@ -21,10 +21,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.event.XFormsDeselectEvent;
-import org.orbeon.oxf.xforms.event.XFormsInsertEvent;
-import org.orbeon.oxf.xforms.event.XFormsLinkError;
-import org.orbeon.oxf.xforms.event.XFormsSelectEvent;
+import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -34,7 +31,7 @@ import java.io.IOException;
 import java.util.*;
 
 /**
- * Context in which control elements are executed.
+ * Represents all this XForms containing document controls and the context in which they operate.
  */
 public class XFormsControls implements EventTarget {
 
@@ -609,6 +606,7 @@ public class XFormsControls implements EventTarget {
 
     public XFormsInstance getCurrentInstance() {
         return getCurrentContext().model.getDefaultInstance();
+        // TODO: this is wrong! Current node may be associated with different instance.
     }
 
     public Element getControlElement(PipelineContext pipelineContext, String controlId) {

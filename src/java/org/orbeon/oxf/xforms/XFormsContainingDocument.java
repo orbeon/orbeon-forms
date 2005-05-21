@@ -17,7 +17,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.xforms.event.XFormsRefreshEvent;
+import org.orbeon.oxf.xforms.event.*;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -33,7 +33,7 @@ import java.util.Map;
  * o XForms controls
  * o Event handlers hierarchy
  */
-public class XFormsContainingDocument implements EventTarget {
+public class XFormsContainingDocument implements org.orbeon.oxf.xforms.event.EventTarget {
 
     private List models;
     private Map modelsMap = new HashMap();

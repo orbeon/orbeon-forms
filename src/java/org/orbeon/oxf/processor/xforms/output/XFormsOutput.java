@@ -60,7 +60,7 @@ public class XFormsOutput extends ProcessorImpl {
                 // Create and initialize XForms Engine
                 XFormsContainingDocument containingDocument = new XFormsContainingDocument(Collections.singletonList(model), null);
                 containingDocument.initialize(pipelineContext);
-                containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE);
+                containingDocument.dispatchEvent(pipelineContext, new XFormsEvent(XFormsEvents.XXFORMS_INITIALIZE));
 
                 // Create evaluation context
                 XFormsElementContext elementContext =

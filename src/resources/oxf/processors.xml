@@ -418,7 +418,7 @@
     </processor>
 
     <processor name="oxf:xforms-submission" uri="oxf/processor/xforms-input">
-        <class name="org.orbeon.oxf.xforms.XFormsSubmission"/>
+        <class name="org.orbeon.oxf.xforms.XFormsSubmissionProcessor"/>
     </processor>
 
     <!-- Other processors -->

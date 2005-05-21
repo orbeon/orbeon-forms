@@ -11,27 +11,16 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms;
+package org.orbeon.oxf.xforms.event;
 
-import org.dom4j.Element;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.XFormsGenericEvent;
+import org.orbeon.oxf.xforms.XFormsEvent;
 
 /**
- * XFormsEvent represents an XForms event passed to all events and actions.
+ * EventTarget is implemented by classes that support XForms events.
  */
-public class XFormsEvent extends XFormsGenericEvent {
-
-    private String eventName;
-
-    public XFormsEvent(String eventName) {
-        this.eventName = eventName;
-    }
-
-    protected XFormsEvent(String eventName, Element controlElement) {
-        super(controlElement);
-        this.eventName = eventName;
-    }
-
-    public String getEventName() {
-        return eventName;
-    }
+public interface EventTarget {
+    public void dispatchEvent(PipelineContext pipelineContext, XFormsGenericEvent xformsEvent, String eventName);
+    public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent xformsEvent);
 }

@@ -112,14 +112,22 @@ function xformsUpdateStyle(element) {
 
             // This is for widgets. Code for widgets should be modularized and moved out of this file
             
+            if (className == "widget-tabs" || className == "widget-tab-inactive" 
+                    || className == "widget-tab-active" || className == "widget-tab-spacer-side"
+                    || className == "widget-tab-spacer-between") {
+                // Once the size of the table is set, do not change it
+                if (!element.width)
+                    element.width = element.clientWidth;
+            }
+            
             if (className == "widget-tab-inactive" || className == "widget-tab-active") {
                 if (!element.eventRegistered) {
                     element.eventRegistered = true;
                     function clickEventHandler(event) {
                         var td = getEventTarget(event);
+                        var tr = td.parentNode;
                         
                         // Change class of all tds
-                        var tr = td.parentNode;
                         for (var i = 0; i < tr.childNodes.length; i++) {
                             var child = tr.childNodes[i];
                             if (child.className == "widget-tab-inactive" || child.className == "widget-tab-active")
@@ -129,11 +137,13 @@ function xformsUpdateStyle(element) {
                         // Click the trigger contained in this td
                         for (var i = 0; i < td.childNodes.length; i++) {
                             var child = td.childNodes[i];
-                            if (typeof(child.className) != "undefined" 
+                            if (typeof(child.className) != "undefined"
                                     && xformsArrayContains(child.className.split(" "), "xforms-trigger")) {
                                 xformsFireEvent(child, "DOMActivate", null, false);
                             }
                         }
+                        
+                        
                     }
                     xformsAddEventListener(element, "click", clickEventHandler);
                 }

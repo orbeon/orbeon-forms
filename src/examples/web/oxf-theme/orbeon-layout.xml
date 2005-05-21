@@ -87,6 +87,8 @@ fieldset {
     border-bottom: 1px solid &medium-color;;
     border-right: 1px solid &xlight-color;;
     background: &xxlight-color;;
+    color: &medium-color;;
+    font-weight: bold;
     text-align: center;
     cursor: pointer;
     padding-left: 1em;
@@ -97,6 +99,8 @@ fieldset {
     border-left: 1px solid &medium-color;;
     border-right: 1px solid &medium-color;;
     border-bottom: 1px solid &medium-color;;
+    padding-top: 1em;
+    padding-bottom: 1em;
     padding-left: 2em;
     padding-right: 2em;
 }

@@ -183,6 +183,7 @@ function xformsPageLoaded() {
     var labels = document.getElementsByTagName("label");
     var selects = document.getElementsByTagName("select");
     var tds = document.getElementsByTagName("td");
+    var tables = document.getElementsByTagName("table");
     var formsControls = new Array();
     for (var i = 0; i < spans.length; i++) formsControls = formsControls.concat(spans[i]);
     for (var i = 0; i < buttons.length; i++) formsControls = formsControls.concat(buttons[i]);
@@ -191,6 +192,7 @@ function xformsPageLoaded() {
     for (var i = 0; i < labels.length; i++) formsControls = formsControls.concat(labels[i]);
     for (var i = 0; i < selects.length; i++) formsControls = formsControls.concat(selects[i]);
     for (var i = 0; i < tds.length; i++) formsControls = formsControls.concat(tds[i]);
+    for (var i = 0; i < tables.length; i++) formsControls = formsControls.concat(tables[i]);
 
     // Go through potential form controls, add style, and register listeners
     for (var controlIndex = 0; controlIndex < formsControls.length; controlIndex++) {

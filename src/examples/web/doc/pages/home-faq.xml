@@ -762,9 +762,9 @@
                     256 MB to 1 GB in production.
                 </p>
             </section>
-            <a name="upload-trouble"/>
+            <a name="xforms-upload-trouble"/>
             <section added="2005-05-21">
-                <title>My upload doesn't work. What can I do?</title>
+                <title>My XForms upload doesn't work. What can I do?</title>
                 <p>
                     Make sure, in your XForms model, that you have the correct submission method and
                     encoding:

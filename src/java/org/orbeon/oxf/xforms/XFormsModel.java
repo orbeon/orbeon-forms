@@ -181,7 +181,6 @@ public class XFormsModel implements EventTarget, Cloneable {
         Grammar getGrammar() {
             return grammar;
         }
-
     }
 
     private static class ValidationContext implements IDContextProvider2 {

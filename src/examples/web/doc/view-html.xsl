@@ -68,7 +68,7 @@
                                     <ul>
                                         <xsl:for-each select="/document/body/section">
                                             <xsl:variable name="anchor" 
-                                                select="if (preceding-sibling::a) 
+                                                select="if (local-name(preceding-sibling::*[1]) = 'a') 
                                                 then preceding-sibling::a[1]/@name else generate-id()"/>
                                             <li>
                                                 <xsl:number level="single" count="section" format="1. "/>
@@ -81,7 +81,7 @@
                                                         <xsl:variable name="subsection-count" select="count(section)"/>
                                                         <xsl:for-each select="section">
                                                             <xsl:variable name="anchor" 
-                                                                select="if (preceding-sibling::a) 
+                                                                select="if (local-name(preceding-sibling::*[1]) = 'a')
                                                                 then preceding-sibling::a[1]/@name else generate-id()"/>
                                                             <li>
                                                                 <xsl:number level="multiple" count="section" format="1.1. "/>
@@ -94,7 +94,7 @@
                                                                         <xsl:variable name="subsubsection-count" select="count(section)"/>
                                                                         <xsl:for-each select="section">
                                                                             <xsl:variable name="anchor" 
-                                                                                select="if (preceding-sibling::a) 
+                                                                                select="if (local-name(preceding-sibling::*[1]) = 'a')
                                                                                 then preceding-sibling::a[1]/@name else generate-id()"/>
                                                                             <li>
                                                                                 <xsl:number level="multiple" count="section" format="1.1.1. "/>

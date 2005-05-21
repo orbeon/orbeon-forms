@@ -134,22 +134,20 @@
                     </div>
 
             </section>
-            <a name="xpl-impl"/>
+            <a name="xpl-spec"/>
             <section>
                 <title>Is there a specification for XPL?</title>
-
-                    <p>As of February 2005, a <a
-                    href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">draft specification</a>
-                    has been completed amd submitted to W3C. It serves as a basis of discussion for an
-                    XPL 1.0 specification. </p>
-
+                <p>
+                    As of February 2005, a <a
+                    href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">draft
+                    specification</a> has been completed amd submitted to W3C. It serves as a basis
+                    of discussion for an XPL 1.0 specification.
+                </p>
             </section>
             <a name="xpl-impl"/>
             <section>
                 <title>Is anybody free to implement XPL?</title>
-
-                    <p>Yes.</p>
-
+                <p>Yes.</p>
             </section>
             <a name="compare-model2x"/>
             <section>
@@ -182,38 +180,33 @@
             <a name="xforms-support"/>
             <section>
                 <title>How much of the XForms specification does PresentationServer support?</title>
-
-                    <p>
-                        The XForms specification assumes that XForms is implemented on the client-side.
-                        Ideally an XForms implementation would be implemented in a Web browser, and
-                        until XForms becomes standard on mainstream browsers, XForms-based applications
-                        need to use server-side implementations, such as the one implemented by the
-                        PresentationServer. It is believed that using server-side implementation is a
-                        great migration path towards XForms.
-                    </p>
-                    <p>
-                        A server-side implementation of XForms translates your forms described in terms
-                        of the XForms specification into HTML forms. It also creates an XML document,
-                        the
-                        <i>XForms instance</i>, based on the data entered by the end-user with a
-                        browser. The following diagram shows a high-level overview of the architecture
-                        of a server-side XForms implementation:
-                    </p>
-                    <div class="image">
-                        <img width="516" height="370" src="pages/faq-xforms.png"/>
-                        <div class="legend">Server-Side XForms</div>
-                    </div>
-                    <p>
-                        The PresentationServer implementation is based on the
-                        <a
-                            href="http://www.w3.org/TR/xforms/">W3C XForms 1.0 Recommendation</a> (14
-                        October 2003). For more detailed information on what features are supported in
-                        the latest version of PresentationServer, see the
-                        <a
-                            href="/ops/doc/reference-xforms-compliance">XForms conformance matrix</a>
-                        section of the documentation.
-                    </p>
-
+                <p>
+                    The XForms specification assumes that XForms is implemented on the
+                    client-side. Ideally an XForms implementation would be implemented in a web
+                    browser, and until XForms becomes standard on mainstream browsers,
+                    XForms-based applications need to use server-side implementations, such as
+                    the one implemented by the PresentationServer. It is believed that using
+                    server-side implementation is a great migration path towards XForms.
+                </p>
+                <p>
+                    A server-side implementation of XForms translates your forms described in
+                    terms of the XForms specification into HTML forms. It also creates one or
+                    more XML documents, the <i>XForms instances</i>, based on the data entered
+                    by the end-user with a browser. The following diagram shows a high-level
+                    overview of the architecture of a server-side XForms implementation:
+                </p>
+                <div class="image">
+                    <img width="600" height="380" src="pages/faq-xforms.png"/>
+                    <div class="legend">Server-Side XForms</div>
+                </div>
+                <p>
+                    The PresentationServer implementation is based on the <a
+                    href="http://www.w3.org/TR/xforms/">W3C XForms 1.0 Recommendation</a> (14
+                    October 2003). For more detailed information on what features are supported
+                    in the latest version of PresentationServer, see the <a
+                    href="/ops/doc/reference-xforms-compliance">XForms conformance matrix</a>
+                    section of the documentation.
+                </p>
             </section>
             <a name="xpointer-support"/>
             <section>
@@ -477,8 +470,8 @@
                         output, and for instance connect it to the input of another processor. Ids are
                         similar to variable names in most programming languages.
                     </p>
-
             </section>
+            <a name="dom4j-illegal-add"/>
             <section>
                 <title>
                     Why am I getting an "org.dom4j.IllegalAddException" error?
@@ -518,8 +511,8 @@
                         The XSLT output will be <tt>&lt;x/>&lt;x/></tt>, which is a not legal XML
                         document (of course, you can only have one root element in an XML document).
                     </p>
-
             </section>
+            <a name="parse-xml-string"/>
             <section>
                 <title>
                     How can I parse a string containing XML into a document that PresentationServer can process?
@@ -572,93 +565,88 @@
                     </p>
 
             </section>
+            <a name="app-server-hangs"/>
             <section>
                 <title>
                     What can I do if the application server hangs?
                 </title>
-
-                    <p>
-                        <ul>
-                            <li>
-                                Some versions of Chainsaw have a bug where Chainsaw stops responding
-                                in certain situations, which blocks the application server. If you are
-                                using Chainsaw, this might be the problem: use the FileAppender
-                                instead, or use <a href="http://www.orbeon.com/software/studio">Orbeon
-                                Studio</a> instead of Chainsaw to view log messages.
-                            </li>
-                            <li>
-                                If you are running RedHat 9, set the environment variable
-                                LD_ASSUME_KERNEL=2.4.1 and restart the application server.
-                            </li>
-                        </ul>
-                    </p>
-
+                <p>
+                    <ul>
+                        <li>
+                            Some versions of Chainsaw have a bug where Chainsaw stops responding
+                            in certain situations, which blocks the application server. If you are
+                            using Chainsaw, this might be the problem: use the FileAppender
+                            instead, or use <a href="http://www.orbeon.com/software/studio">Orbeon
+                            Studio</a> instead of Chainsaw to view log messages.
+                        </li>
+                        <li>
+                            If you are running RedHat 9, set the environment variable
+                            LD_ASSUME_KERNEL=2.4.1 and restart the application server.
+                        </li>
+                    </ul>
+                </p>
             </section>
+            <a name="saxon-namespace-node"/>
             <section>
                 <title>
                     What can I do about the error "Cannot output a namespace node for the default
                     namespace when the element is in no namespace"?
                 </title>
-
-                    <p>
-                        This is a Saxon issue. It might happen when in the input document of a
-                        stylesheet or in the output of the stylesheet you have an element declared with
-                        no prefix as the child of an element with a prefix. One way to get around this
-                        is to add a prefix to all the element having a parent declared with a prefix.
-                    </p>
-
+                <p>
+                    This is a Saxon issue. It might happen when in the input document of a
+                    stylesheet or in the output of the stylesheet you have an element declared with
+                    no prefix as the child of an element with a prefix. One way to get around this
+                    is to add a prefix to all the element having a parent declared with a prefix.
+                </p>
             </section>
+            <a name="xupdate"/>
             <section>
                 <title>
                     Where can I find more information about XUpdate?
                 </title>
-
-                    <p>
-                        Efforts around the XUpdate language appear to be stalled. XML databases now
-                        tend to bid on proprietary extensions to the standard XQuery language (e.g. see
-                        what Tamino does, and there are talks about implementing something similar in
-                        the open source eXist database). In the future, XQuery will support standard
-                        update features, but that is probably years away.
-                    </p>
-                    <p>
-                        We do recognize that XUpdate has definite advantages over XSLT in certain use
-                        cases (which is why we implemented it in the first place), but it seems that the
-                        market is currently not supporting what is considered "yet another XML
-                        transformation language".
-                    </p>
-                    <p>
-                        For use as a general-purpose XML update language with Orbeon Presentation
-                        Server, we now recommend using XSLT. Use either XSLT 1.0 or XSLT 2.0 (12
-                        November 2003 Draft as implemented by Saxon) instead of using the XUpdate
-                        processor. The only place where XUpdate is not deprecated is within Page Flow,
-                        but only a subset of XUpdate is required and you can simply consider that it is
-                        part of the Page Flow syntax.
-                    </p>
-                    <p>
-                        This being said, our XUpdate implementation is functional and of course anybody
-                        is free to use it or contribute to it. Like the rest of PresentationServer, it
-                        is available under the LGPL license.
-                    </p>
-
+                <p>
+                    Efforts around the XUpdate language appear to be stalled. XML databases now
+                    tend to bid on proprietary extensions to the standard XQuery language (e.g. see
+                    what Tamino does, and there are talks about implementing something similar in
+                    the open source eXist database). In the future, XQuery will support standard
+                    update features, but that is probably years away.
+                </p>
+                <p>
+                    We do recognize that XUpdate has definite advantages over XSLT in certain use
+                    cases (which is why we implemented it in the first place), but it seems that the
+                    market is currently not supporting what is considered "yet another XML
+                    transformation language".
+                </p>
+                <p>
+                    For use as a general-purpose XML update language with Orbeon Presentation
+                    Server, we now recommend using XSLT. Use either XSLT 1.0 or XSLT 2.0 (12
+                    November 2003 Draft as implemented by Saxon) instead of using the XUpdate
+                    processor. The only place where XUpdate is not deprecated is within Page Flow,
+                    but only a subset of XUpdate is required and you can simply consider that it is
+                    part of the Page Flow syntax.
+                </p>
+                <p>
+                    This being said, our XUpdate implementation is functional and of course anybody
+                    is free to use it or contribute to it. Like the rest of PresentationServer, it
+                    is available under the LGPL license.
+                </p>
             </section>
+            <a name="empty-local-name"/>
             <section>
                 <title>
                     Why am I getting a "Empty local name in SAX event" exception?
                 </title>
-
-                    <p>
-                        If this exception is thrown from the class TransformerImpl class in a Xalan
-                        package ( <code>orbeon.apache.xalan.transformer</code>), a bug in Xalan is at
-                        the source of the problem. Xalan calls the SAX <code>startElement()</code>
-                        method with an attribute that has an empty local name.
-                    </p>
-                    <p>
-                        Switching to Saxon will solve the problem. You can do this globally by modifying
-                        in processors.xml the definition for "oxf:xslt-1.0", or you can convert your
-                        stylesheet to XSLT 2.0 (in most cases just setting the version attribute to
-                        "2.0" instead of "1.0" is enough).
-                    </p>
-
+                <p>
+                    If this exception is thrown from the class TransformerImpl class in a Xalan
+                    package (<code>orbeon.apache.xalan.transformer</code>), a bug in Xalan is at
+                    the source of the problem. Xalan calls the SAX <code>startElement()</code>
+                    method with an attribute that has an empty local name.
+                </p>
+                <p>
+                    Switching to Saxon will solve the problem. Saxon is now the default XSLT 1.0 and
+                    XSLT 2.0 processor in OPS, and will get used when using <code>oxf:xslt</code>.
+                    See the <a href="processors-xslt">XSLT documentation</a> for more information.
+                </p>
             </section>
             <a name="jsr-168"/>
             <section>
@@ -699,7 +687,7 @@
                         work.
                     </p>
             </section>
-            <a name="jboss-log4j"/>
+            <a name="xml-base"/>
             <section>
                 <title>
                     Why am I getting extra <code>xml:base</code> attributes on my documents?
@@ -723,85 +711,125 @@
                     What should I do about the error message
                     <code>ERROR: invalid console appender config detected, console stream looping when deploying to JBOSS:</code>
                 </title>
-
-                    <p>
-                        This used to happen with JBoss 3.2.1 and OXF 2.2. The work around a the
-                        time was to add
-                        <code>-Dorg.jboss.logging.Log4jService.catchSystemOut=false</code> to the
-                        end of the JAVA_OPTS line in JBOSS_HOME/bin/run.bat. ( run.sh on UNIX )
-                    </p>
-
+                <p>
+                    This used to happen with JBoss 3.2.1 and OXF 2.2. The work around a the time
+                    was to add <code>-Dorg.jboss.logging.Log4jService.catchSystemOut=false</code> to
+                    the end of the JAVA_OPTS line in JBOSS_HOME/bin/run.bat. (run.sh on UNIX)
+                </p>
+            </section>
+            <a name="out-of-memory"/>
+            <section added="2005-05-21">
+                <title>
+                    I am getting frequent Out of Memory errors with Orbeon PresentationServer. What
+                    can I do?
+                </title>
+                <p>
+                    Often, this is due to too many threads doing processing within OPS at the same
+                    time. There is just a lot going on in OPS when a request is processed, including
+                    typically several XSLT transformations.
+                </p>
+                <p>
+                    Servlet containers like Tomcat, or application servers like WebLogic, by default
+                    allow a very large number of concurrent threads to enter a servlet. For Tomcat,
+                    the default is 200. This means that memory usage cannot be effectively bound. It
+                    is enough to have a few requests slightly overlapping to cause extra memory
+                    consuption that can lead to Out of Memory errors. In addition, extra memory
+                    usage leads to poorer performance.
+                </p>
+                <p>
+                    It is recommended to start by changing the container parameters that control
+                    threads. With Tomcat (see the <a
+                    href="http://jakarta.apache.org/tomcat/tomcat-5.5-doc/config/http.html
+                    ">documentation</a>), try first:
+                </p>
+                <ul>
+                    <li>maxThreads="3"</li>
+                    <li>acceptCount="50"</li>
+                </ul>
+                <p>
+                    This setting will set a small maximum of 3 concurrent requests, and 50 more
+                    requests being queued. This will ensure that memory usage does not go out of
+                    control.
+                </p>
+                <p>
+                    Then, experiment with a tool like Apache JMeter to test load, and adjust those
+                    parameters, as well as your virtual machine heap, until you get results that are
+                    satisfactory as far as memory consumption and number of concurrent requests are
+                    concerned.
+                </p>
+                <p>
+                    Note that it is typical for Java virtual machines to have maximum heap sizes of
+                    256 MB to 1 GB in production.
+                </p>
             </section>
         </section>
         <section>
             <title>Studio FAQ</title>
+            <a name="studio-vm-args"/>
             <section>
                 <title>
                     In Studio, how can I add my own VM arguments (e.g. heap size, debugging)
                 </title>
-
-                    <ul>
-                        <li>For version 1.0.3 or higher :
-                            <ol>
-                                <li>Select the menu item
-                                    <code>Run | Run...</code>
-                                </li>
-                                <li>
-                                    Either create a new J2EE Container Container for PresentationServer launch configuration
-                                    or select an existing one.
-                                </li>
-                                <li>Select the Argguments tab.</li>
-                                <li>In the VM arguments field add your VM arguments.</li>
-                                <li>Click the Apply button to save the change.</li>
-                            </ol>
-                        </li>
-                        <li>For versions lower than 1.0.3 :
-                            <ol>
-                                <li>Open the
-                                    <i>Window | Preferences</i> dialog.
-                                </li>
-                                <li>Under
-                                    <i>Java | Installed JRE</i>, select the "Standard VM".
-                                </li>
-                                <li>Click on the
-                                    <i>Edit</i> button.
-                                </li>
-                                <li>Enter your own VM arguments in the
-                                    <i>Default VM Arguments</i> text field.
-                                </li>
-                            </ol>
-                            <p>
-                                Note that this sets the VM arguments for all the applications you run
-                                from Eclipse. At this point there is no way to set VM arguments that
-                                are only used when starting the J2EE container.
-                            </p>
-                        </li>
-                    </ul>
-
+                <ul>
+                    <li>For version 1.0.3 or higher :
+                        <ol>
+                            <li>Select the menu item
+                                <code>Run | Run...</code>
+                            </li>
+                            <li>
+                                Either create a new J2EE Container Container for PresentationServer launch configuration
+                                or select an existing one.
+                            </li>
+                            <li>Select the Argguments tab.</li>
+                            <li>In the VM arguments field add your VM arguments.</li>
+                            <li>Click the Apply button to save the change.</li>
+                        </ol>
+                    </li>
+                    <li>For versions lower than 1.0.3 :
+                        <ol>
+                            <li>Open the
+                                <i>Window | Preferences</i> dialog.
+                            </li>
+                            <li>Under
+                                <i>Java | Installed JRE</i>, select the "Standard VM".
+                            </li>
+                            <li>Click on the
+                                <i>Edit</i> button.
+                            </li>
+                            <li>Enter your own VM arguments in the
+                                <i>Default VM Arguments</i> text field.
+                            </li>
+                        </ol>
+                        <p>
+                            Note that this sets the VM arguments for all the applications you run
+                            from Eclipse. At this point there is no way to set VM arguments that
+                            are only used when starting the J2EE container.
+                        </p>
+                    </li>
+                </ul>
             </section>
+            <a name="studio-empty-events"/>
             <section>
                 <title>
                     In Studio, why is the Logging Events view always empty?
                 </title>
-
-                    <p>Check the following:</p>
-                    <ol>
-                        <li>
-                            Make you don't have any "Address already in use" error in the Console view
-                            when you start the application server. If you do, it means that you already
-                            have another application (other program, or other PresentationServer
-                            application maybe deployed in the same application server) using the same
-                            port. On Windows, you can use <a
-                            href="http://www.sysinternals.com/ntw2k/source/tcpview.shtml">TCPView</a>
-                            to determine what application is using the port you mention in the
-                            <code>log4j.xml</code>.
-                        </li>
-                        <li>
-                            Make sure you don't have any filter setup in Logging Events view by
-                            right-clicking on the "down arrow" icon and selecting "Filters".
-                        </li>
-                    </ol>
-
+                <p>Check the following:</p>
+                <ol>
+                    <li>
+                        Make you don't have any "Address already in use" error in the Console view
+                        when you start the application server. If you do, it means that you already
+                        have another application (other program, or other PresentationServer
+                        application maybe deployed in the same application server) using the same
+                        port. On Windows, you can use <a
+                        href="http://www.sysinternals.com/ntw2k/source/tcpview.shtml">TCPView</a>
+                        to determine what application is using the port you mention in the
+                        <code>log4j.xml</code>.
+                    </li>
+                    <li>
+                        Make sure you don't have any filter setup in Logging Events view by
+                        right-clicking on the "down arrow" icon and selecting "Filters".
+                    </li>
+                </ol>
             </section>
         </section>
     </body>

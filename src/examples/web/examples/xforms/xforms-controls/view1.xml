@@ -59,6 +59,20 @@
                           <value>dhl</value>
                         </item>
                     </carriers>
+                    <flavors>
+                        <item>
+                          <label>Vanilla</label>
+                          <value>v</value>
+                        </item>
+                        <item>
+                          <label>Strawberry</label>
+                          <value>s</value>
+                        </item>
+                        <item>
+                          <label>Chocolate</label>
+                          <value>c</value>
+                        </item>
+                    </flavors>
                 </itemsets>
             </xforms:instance>
             <xforms:bind nodeset="instance('instance')">
@@ -137,20 +151,17 @@
                         </xforms:select>
                     </xhtml:p>
                     <xhtml:p>
+                        <xforms:input ref="instance('itemsets')/flavors/item[3]/label">
+                            <xforms:label xhtml:class="fixed-width">Flavor Name:</xforms:label>
+                        </xforms:input>
+                    </xhtml:p>
+                    <xhtml:p>
                         <xforms:select ref="flavor" appearance="compact">
                             <xforms:label xhtml:class="fixed-width"/>
-                            <xforms:item>
-                              <xforms:label>Vanilla</xforms:label>
-                              <xforms:value>v</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                              <xforms:label>Strawberry</xforms:label>
-                              <xforms:value>s</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                              <xforms:label>Chocolate</xforms:label>
-                              <xforms:value>c</xforms:value>
-                            </xforms:item>
+                            <xforms:itemset nodeset="instance('itemsets')/flavors/item">
+                                <xforms:label ref="label"/>
+                                <xforms:value ref="value"/>
+                            </xforms:itemset>
                         </xforms:select>
                     </xhtml:p>
                     <xhtml:p>

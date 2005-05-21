@@ -117,16 +117,18 @@
     <xsl:template match="xforms:select[@appearance = 'full'] | xforms:select1[@appearance = 'full']">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xsl:variable name="many" as="xs:boolean" select="local-name() = 'select'"/>
         <xsl:variable name="type" as="xs:string"
-            select="if (local-name() = 'select') then 'checkbox' else 'radio'"/>
+            select="if ($many) then 'checkbox' else 'radio'"/>
         <xsl:variable name="class" as="xs:string"
-            select="if (local-name() = 'select') then 'xforms-select-full' else 'xforms-select1-full'"/>
+            select="if ($many) then 'xforms-select-full' else 'xforms-select1-full'"/>
+
         <xhtml:span>
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', $class), $id)"/>
             <xsl:choose>
                 <xsl:when test="xforms:itemset">
                     <!-- There is an itemset -->
-                    <xsl:variable name="itemset-element" select="." as="element()"/>
+                    <xsl:variable name="itemset-element" select="xforms:itemset" as="element()"/>
 
                     <!-- Obtain dynamic item labels and values -->
                     <xsl:for-each select="$itemsets[@id = $id]/xxforms:item">
@@ -138,17 +140,6 @@
                             <xsl:with-param name="value" select="@value"/>
                         </xsl:call-template>
                     </xsl:for-each>
-
-                    <!-- Produce template -->
-                    <xhtml:div id="ops-template-{$id}" style="display: none">
-                        <xsl:call-template name="select-full-item">
-                            <xsl:with-param name="type" select="$type"/>
-                            <xsl:with-param name="id" select="$id"/>
-                            <xsl:with-param name="attributes-element" select="$itemset-element"/>
-                            <xsl:with-param name="label" select="'$ops-template-label$'"/>
-                            <xsl:with-param name="value" select="'$ops-template-value$'"/>
-                        </xsl:call-template>
-                    </xhtml:div>
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- Static list of items -->
@@ -164,6 +155,19 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xhtml:span>
+
+        <xsl:if test="xforms:itemset">
+            <!-- Produce template -->
+            <xhtml:div id="ops-template-{$id}" style="display: none">
+                <xsl:call-template name="select-full-item">
+                    <xsl:with-param name="type" select="$type"/>
+                    <xsl:with-param name="id" select="$id"/>
+                    <xsl:with-param name="attributes-element" select="xforms:itemset"/>
+                    <xsl:with-param name="label" select="'$ops-template-label$'"/>
+                    <xsl:with-param name="value" select="'$ops-template-value$'"/>
+                </xsl:call-template>
+            </xhtml:div>
+        </xsl:if>
     </xsl:template>
     
     <xsl:template name="select-full-item">
@@ -185,21 +189,74 @@
     <xsl:template match="xforms:select1[@appearance = 'minimal'] | xforms:select[@appearance = 'compact']">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xsl:variable name="many" as="xs:boolean" select="local-name() = 'select'"/>
+        <xsl:variable name="class" as="xs:string"
+            select="if ($many) then 'xforms-select-compact' else 'xforms-select1-minimal'"/>
+        
         <xhtml:select name="{$id}">
-            <xsl:if test="local-name() = 'select'"><xsl:attribute name="multiple">multiple</xsl:attribute></xsl:if>
-            <xsl:variable name="class" as="xs:string" select="if (local-name() = 'select') 
-                then 'xforms-select-compact' else 'xforms-select1-minimal'"/>
+            <xsl:if test="$many"><xsl:attribute name="multiple">multiple</xsl:attribute></xsl:if>
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', $class), $id)"/>
-            <xsl:for-each select="xforms:item">
-                <xhtml:option value="{xforms:value}">
-                    <xsl:if test="xforms:value = (if (local-name(..) = 'select') 
-                            then tokenize(xxforms:control($id), ' ') else xxforms:control($id))">
-                        <xsl:attribute name="selected">selected</xsl:attribute>
-                    </xsl:if>
-                    <xsl:value-of select="xforms:label"/>
-                </xhtml:option>
-            </xsl:for-each>
-        </xhtml:select>            
+
+            <xsl:choose>
+                <xsl:when test="xforms:itemset">
+                    <!-- There is an itemset -->
+                    <xsl:variable name="itemset-element" select="xforms:itemset" as="element()"/>
+
+                    <!-- Obtain dynamic item labels and values -->
+                    <xsl:for-each select="$itemsets[@id = $id]/xxforms:item">
+                        <xsl:call-template name="select-minimal-compact-item">
+                            <xsl:with-param name="many" select="$many"/>
+                            <xsl:with-param name="id" select="$id"/>
+                            <xsl:with-param name="attributes-element" select="$itemset-element"/>
+                            <xsl:with-param name="label" select="@label"/>
+                            <xsl:with-param name="value" select="@value"/>
+                        </xsl:call-template>
+                    </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                    <!-- Static list of items -->
+                    <xsl:for-each select="xforms:item">
+                        <xsl:call-template name="select-minimal-compact-item">
+                            <xsl:with-param name="many" select="$many"/>
+                            <xsl:with-param name="id" select="$id"/>
+                            <xsl:with-param name="attributes-element" select="."/>
+                            <xsl:with-param name="label" select="xforms:label"/>
+                            <xsl:with-param name="value" select="xforms:value"/>
+                        </xsl:call-template>
+                    </xsl:for-each>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xhtml:select>
+        
+        <xsl:if test="xforms:itemset">
+            <!-- Produce template -->
+            <xhtml:div id="ops-template-{$id}" style="display: none">
+                <xsl:call-template name="select-minimal-compact-item">
+                    <xsl:with-param name="many" select="$many"/>
+                    <xsl:with-param name="id" select="$id"/>
+                    <xsl:with-param name="attributes-element" select="xforms:itemset"/>
+                    <xsl:with-param name="label" select="'$ops-template-label$'"/>
+                    <xsl:with-param name="value" select="'$ops-template-value$'"/>
+                </xsl:call-template>
+            </xhtml:div>
+        </xsl:if>
+        
+    </xsl:template>
+
+    <xsl:template name="select-minimal-compact-item">
+        <xsl:param name="many" as="xs:boolean"/>
+        <xsl:param name="id" as="xs:string"/>
+        <xsl:param name="attributes-element" as="element()"/>
+        <xsl:param name="label" as="xs:string"/>
+        <xsl:param name="value" as="xs:string"/>
+
+        <xhtml:option value="{$value}">
+            <xsl:copy-of select="xxforms:copy-attributes($attributes-element, (), ())"/>
+            <xsl:if test="$value = (if ($many) then tokenize(xxforms:control($id), ' ') else xxforms:control($id))">
+                <xsl:attribute name="selected">selected</xsl:attribute>
+            </xsl:if>
+            <xsl:value-of select="$label"/>
+        </xhtml:option>
     </xsl:template>
 
     <xsl:template match="xforms:label | xforms:hint | xforms:help">

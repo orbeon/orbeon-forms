@@ -20,6 +20,7 @@ public class XFormsEvents {
     // Custom initialization events
     public static final String XXFORMS_INITIALIZE = "xxforms-initialize";
     public static final String XXFORMS_INITIALIZE_CONTROLS = "xxforms-initialize-controls";
+    public static final String XXFORMS_INITIALIZE_STATE = "xxforms-initialize-state";
 
     // Standard sequences
     public static final String XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE = "xxforms-value-change-with-focus-change";

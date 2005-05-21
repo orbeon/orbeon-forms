@@ -477,10 +477,13 @@ public class XFormsModel implements EventTarget, Cloneable {
             instancesMap.put(instanceId, newInstance);
     }
 
-    public void applyOtherBinds(final PipelineContext pipelineContext) {
+    /**
+     * Apply relevant and readonly binds only.
+     */
+    public void applyRelevantReadonlyBinds(final PipelineContext pipelineContext) {
         applyBinds(new BindRunner() {
             public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
-                handleOtherBinds(pipelineContext, modelBind, documentWrapper, this);
+                handleRelevantReadonlyBinds(pipelineContext, modelBind, documentWrapper, this);
             }
         });
     }
@@ -564,8 +567,7 @@ public class XFormsModel implements EventTarget, Cloneable {
         }
     }
 
-    //
-    private void handleOtherBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
+    private void handleRelevantReadonlyBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
         // Handle relevant
         if (modelBind.getRelevant() != null) {
             iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
@@ -947,7 +949,13 @@ public class XFormsModel implements EventTarget, Cloneable {
     }
 
     public void dispatchEvent(final PipelineContext pipelineContext, XFormsGenericEvent genericXFormsEvent, String eventName) {
-        if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
+        if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
+            // Internal event to restore state
+
+            applyRelevantReadonlyBinds(pipelineContext);
+            dispatchEvent(pipelineContext, genericXFormsEvent, XFormsEvents.XFORMS_REVALIDATE);
+
+        } else if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
             // 4.2.1 The xforms-model-construct Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
 
@@ -1025,6 +1033,9 @@ public class XFormsModel implements EventTarget, Cloneable {
             // 4.2.2 The xforms-model-construct-done Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
 
+            // TODO: if instance exists (for now it does!), check that controls can bind, otherwise control must be "irrelevant"
+            // TODO: implicit lazy instance construction
+
         } else if (XFormsEvents.XFORMS_READY.equals(eventName)) {
             // 4.2.3 The xforms-ready Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
@@ -1047,6 +1058,10 @@ public class XFormsModel implements EventTarget, Cloneable {
                     handleCalculateBind(pipelineContext, modelBind, documentWrapper, this);
                 }
             });
+
+            // Here we assume that we update those after recaculate, because recalculate is always
+            // called after values are changed in the instance - may have to be changed...
+            applyRelevantReadonlyBinds(pipelineContext);
 
         } else if (XFormsEvents.XFORMS_REVALIDATE.equals(eventName)) {
             // 4.3.5 The xforms-revalidate Event

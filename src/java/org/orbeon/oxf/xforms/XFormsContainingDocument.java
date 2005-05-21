@@ -160,6 +160,13 @@ public class XFormsContainingDocument implements EventTarget {
                     model.dispatchEvent(pipelineContext, XFormsEvent, eventsToDispatch[i]);
                 }
             }
+        } else if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
+            // Restore models state
+            for (Iterator j = getModels().iterator(); j.hasNext();) {
+                XFormsModel model = (XFormsModel) j.next();
+                model.dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XXFORMS_INITIALIZE_STATE);
+            }
+            dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XXFORMS_INITIALIZE_CONTROLS);
         } else if (XFormsEvents.XXFORMS_INITIALIZE_CONTROLS.equals(eventName)) {
             // Make sure controls are initialized
             xFormsControls.initialize(pipelineContext);

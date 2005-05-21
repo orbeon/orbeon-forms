@@ -470,9 +470,10 @@ public class XFormsServer extends ProcessorImpl {
         if (isInitializeEvent)
             containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE);
         else
-            containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE_CONTROLS);
+            containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE_STATE);
 
-        // Set controls state
+        // Set switch state
+        // TODO: send this info with XFormsEvents.XXFORMS_INITIALIZE_STATE event?
         final XFormsControls xFormsControls = containingDocument.getXFormsControls();
         if (divsElement != null) {
             for (Iterator i = divsElement.elements().iterator(); i.hasNext();) {

@@ -151,9 +151,6 @@ public class XFormsInput extends ProcessorImpl {
                     containingDocument.initialize(pipelineContext);
                     containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE);
 
-                    // Run remaining model item properties
-                    // TODO: this has to be done in a different way (events?)
-                    model.applyOtherBinds(pipelineContext);
                     if (logger.isDebugEnabled())
                         logger.debug("3) Instance with model item properties applied:\n"
                                 + Dom4jUtils.domToString(model.getDefaultInstance().getDocument()));

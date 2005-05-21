@@ -973,7 +973,8 @@ public class XFormsControls implements EventTarget {
             // cloned to produce the node that will be inserted."
             final Element clonedElement;
             {
-                final List initialInstanceNodeset = collectionToBeUpdated; // TODO: use initial instance to compute this!!!
+                final List initialInstanceNodeset = collectionToBeUpdated;
+                // TODO: use initial instance to compute this - well: errata appears to have canceled this
                 final Element lastElement = (Element) initialInstanceNodeset.get(initialInstanceNodeset.size() - 1);
                 clonedElement = (Element) lastElement.createCopy();
             }

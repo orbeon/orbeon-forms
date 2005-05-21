@@ -65,11 +65,11 @@
                 <xforms:bind nodeset="age" constraint="number(.) >= 0"/>
                 <xforms:bind nodeset="secret" constraint="string(.) = '42'"/>
                 <xforms:bind nodeset="textarea" constraint="string-length(.) > 10"/>
-                <xforms:bind nodeset="date" type="xs:date"/>
                 <xforms:bind nodeset="date2" type="xs:date"/>
                 <xforms:bind nodeset="time" type="xs:time"/>
             </xforms:bind>
             <xforms:bind nodeset="instance('ui')/show-instance" relevant=". = 'true'"/>
+            <xforms:bind nodeset="instance('instance')/date" type="xs:date" relevant="false()"/>
             <xforms:bind nodeset="instance('formatted')"
                 calculate="saxon:serialize(xxforms:call-xpl
                     ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>

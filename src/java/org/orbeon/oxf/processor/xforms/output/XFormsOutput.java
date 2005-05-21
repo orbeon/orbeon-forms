@@ -62,10 +62,6 @@ public class XFormsOutput extends ProcessorImpl {
                 containingDocument.initialize(pipelineContext);
                 containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE);
 
-                // Run remaining model item properties
-                // TODO: this has to be done in a different way (events?)
-                model.applyOtherBinds(pipelineContext);
-
                 // Create evaluation context
                 XFormsElementContext elementContext =
                         new XFormsElementContext(pipelineContext, containingDocument, contentHandler);

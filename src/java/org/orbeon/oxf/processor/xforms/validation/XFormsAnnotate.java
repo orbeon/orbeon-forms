@@ -65,10 +65,6 @@ public class XFormsAnnotate extends ProcessorImpl {
                 containingDocument.initialize(pipelineContext);
                 containingDocument.dispatchEvent(pipelineContext, new XFormsGenericEvent(), XFormsEvents.XXFORMS_INITIALIZE);
 
-                // Run remaining model item properties
-                // TODO: this has to be done in a different way (events?)
-                model.applyOtherBinds(pipelineContext);
-
                 // Output the instance to the specified content handler
                 model.getDefaultInstance().read(contentHandler);
             }

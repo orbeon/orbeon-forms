@@ -70,6 +70,7 @@ fieldset {
 .widget-tab-active {
     border-top: 1px solid &medium-color;;
     border-left: 1px solid &medium-color;;
+    border-bottom: 1px solid &xlight-color;;
     border-right: 1px solid &medium-color;;
     background: &xlight-color;;
     color: &dark-color;;
@@ -81,10 +82,13 @@ fieldset {
 }
     
 .widget-tab-inactive {
-    background: &xxlight-color;;
-    cursor: pointer;
+    border-top: 1px solid &xlight-color;;
+    border-left: 1px solid &xlight-color;;
     border-bottom: 1px solid &medium-color;;
+    border-right: 1px solid &xlight-color;;
+    background: &xxlight-color;;
     text-align: center;
+    cursor: pointer;
     padding-left: 1em;
     padding-right: 1em;
 }

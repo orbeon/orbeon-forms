@@ -45,7 +45,7 @@
             </xhtml:tr>
             <!-- Main area with the switch -->
             <xhtml:tr>
-                <xhtml:td class="widget-tabs-panel" colspan="5">
+                <xhtml:td class="widget-tabs-panel" colspan="{count(widget:tab) * 2 + 1}">
                     <xforms:switch>
                         <xsl:for-each select="widget:tab">
                             <xforms:case id="{@id}">

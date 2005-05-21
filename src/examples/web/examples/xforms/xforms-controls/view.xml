@@ -165,6 +165,10 @@
                         </xforms:select1>
                     </xhtml:p>
                 </widget:tab>
+                <widget:tab id="slider">
+                    <widget:label>Slider</widget:label>
+                    <xhtml:p>Nothing yet here</xhtml:p>
+                </widget:tab>
             </widget:tabs>
             <xhtml:p style="margin-top: 2em">
                 <xforms:switch>

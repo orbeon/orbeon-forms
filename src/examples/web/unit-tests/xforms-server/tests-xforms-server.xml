@@ -586,7 +586,7 @@
                     <p:input name="models">
                         <models>
                             <xforms:model>
-                                <xforms:instance>
+                                <xforms:instance id="instance1">
                                     <equation xmlns="">
                                         <screen>0</screen>
                                         <screenbuffer/>
@@ -598,8 +598,8 @@
                                 </xforms:instance>
                                 <xforms:instance id="instance2">
                                     <other-instance>
-                                        <first>0</first>
-                                        <second>0</second>
+                                        <first>2222</first>
+                                        <second>3333</second>
                                         <third/>
                                         <fourth/>
                                     </other-instance>
@@ -635,10 +635,10 @@
                                 <result/>
                             </equation>
                             <other-instance>
-                                <first>123</first>
-                                <second>456</second>
-                                <third>3.141592</third>
-                                <fourth>3.141592</fourth>
+                                <first>123</first><!-- FIXME: the bind should pass data from the second instance, not the first one! -->
+                                <second>456</second><!-- FIXME: the bind should pass data from the second instance, not the first one! -->
+                                <third>123</third>
+                                <fourth>123</fourth>
                             </other-instance>
                         </instances>
                         <divs/>

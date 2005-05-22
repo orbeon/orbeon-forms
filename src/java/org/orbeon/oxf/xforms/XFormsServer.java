@@ -441,7 +441,7 @@ public class XFormsServer extends ProcessorImpl {
                     // Go to next model if needed
                     if (currentCount == currentModelInstancesCount) {
                         currentModel = (XFormsModel) modelIterator.next();
-                        currentModelInstancesCount = currentModel.getInstances().size();
+                        currentModelInstancesCount = currentModel.getInstanceCount();
                         currentCount = 0;
 
                         expectedInstancesCount += currentModelInstancesCount;

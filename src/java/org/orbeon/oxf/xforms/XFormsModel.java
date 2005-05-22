@@ -492,6 +492,13 @@ public class XFormsModel implements EventTarget, Cloneable {
     }
 
     /**
+     * Return the number of instances in this model.
+     */
+    public int getInstanceCount() {
+        return instanceIds.size();
+    }
+
+    /**
      * Return the XFormsInstance with given id, null if not found.
      */
     public XFormsInstance getInstance(String instanceId) {
@@ -577,7 +584,7 @@ public class XFormsModel implements EventTarget, Cloneable {
             final ModelBind modelBind = (ModelBind) i.next();
             try {
                 // Create XPath evaluator for this bind
-                final DocumentWrapper documentWrapper = new DocumentWrapper(((XFormsInstance) instances.get(0)).getDocument(), null);
+                final DocumentWrapper documentWrapper = new DocumentWrapper(getDefaultInstance().getDocument(), null);
                 bindRunner.applyBind(modelBind, documentWrapper);
             } catch (final Exception e) {
                 throw new ValidationException(e, modelBind.getLocationData());

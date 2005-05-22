@@ -27,7 +27,7 @@
         <xhtml:html>
             <xhtml:head><xhtml:title>XForms Sortable Table</xhtml:title></xhtml:head>
             <xhtml:body>
-                <xforms:group ref="form">
+                <xforms:group ref="/form">
                     <xhtml:p>
                         <table border="0" cellpadding="10" cellspacing="0">
                             <tr><td>

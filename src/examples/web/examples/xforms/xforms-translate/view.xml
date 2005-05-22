@@ -37,7 +37,7 @@
             Try typing English text below and watch the second text area getting updated with 
             the French translation of your text.
         </p>
-        <xforms:group ref="translation" xhtml:style="display: block; margin-top: 2em; margin-bottom: 2em">
+        <xforms:group ref="/translation" xhtml:style="display: block; margin-top: 2em; margin-bottom: 2em">
             <xhtml:p>
                 <xforms:select1 appearance="minimal" ref="language-pair">
                     <xforms:label class="bold">From: </xforms:label>

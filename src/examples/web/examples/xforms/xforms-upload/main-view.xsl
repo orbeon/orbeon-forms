@@ -26,7 +26,7 @@
                 <xsl:value-of select="/result/message"/>
             </p>
         </xsl:if>
-        <xf:group ref="form">
+        <xf:group ref="/form">
             <table>
                 <tr>
                     <td rowspan="3">

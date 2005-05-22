@@ -27,7 +27,7 @@
                     </xsl:choose>
                 </page-title>
                 <xsl:if test="count(/cart/item) > 0">
-                    <xforms:group ref="form">
+                    <xforms:group ref="/form">
                         <box-table>
                             <!-- List products in cart -->
                             <xsl:for-each select="/cart/item">

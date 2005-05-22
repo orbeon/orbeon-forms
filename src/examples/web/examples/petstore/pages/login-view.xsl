@@ -21,7 +21,7 @@
             <title>Sign On</title>
             <body>
                 <page-title><i18n:text key="sign-in"/></page-title>
-                <xforms:group ref="form">
+                <xforms:group ref="/form">
                 <box-table>
                     <xsl:if test="/root/failure">
                         <tr>

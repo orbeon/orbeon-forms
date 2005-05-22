@@ -20,7 +20,7 @@
          <xhtml:title>Charts</xhtml:title>
      </xhtml:head>
      <xhtml:body>
-         <xforms:group ref="form">
+         <xforms:group ref="/form">
              <xhtml:p>
                  <xhtml:table class="gridtable">
                      <xhtml:tr>

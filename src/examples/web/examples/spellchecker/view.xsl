@@ -20,7 +20,7 @@
         xsl:version="2.0">
     <head><title>Google Spell Checker</title></head>
     <body>
-        <xforms:group ref="form">
+        <xforms:group ref="/form">
             <xsl:choose>
                 <xsl:when test="/null">
                     <table>

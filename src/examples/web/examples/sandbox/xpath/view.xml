@@ -37,7 +37,7 @@
     </xhtml:head>
     <xhtml:body>
         <xhtml:p>
-            <xforms:group ref="sandbox-instance">
+            <xforms:group ref="/sandbox-instance">
                 <p>
                     <xforms:textarea ref="input" class="wide-textarea" incremental="true">
                         <xforms:label>Input:</xforms:label>

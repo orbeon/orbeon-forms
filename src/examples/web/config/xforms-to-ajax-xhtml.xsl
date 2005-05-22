@@ -85,7 +85,7 @@
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:button type="button" class="trigger">
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
-            <xsl:value-of select="if (xxforms:control($id)/@label) then xxforms:control($id)/@label else xforms:label"/>
+            <xsl:value-of select="xxforms:control($id)/@label"/>
         </xhtml:button>
     </xsl:template>
 
@@ -94,7 +94,7 @@
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:button type="button" class="trigger">
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
-            <xsl:value-of select="if (xxforms:control($id)/@label) then xxforms:control($id)/@label else xforms:label"/>
+            <xsl:value-of select="xxforms:control($id)/@label"/>
         </xhtml:button>
     </xsl:template>
 

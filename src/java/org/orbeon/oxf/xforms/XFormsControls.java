@@ -287,7 +287,7 @@ public class XFormsControls implements EventTarget {
         }
 
         // If not found, return the document element of the model's default instance
-        return containingDocument.getModel(modelId).getInstance("").getDocument();
+        return containingDocument.getModel(modelId).getDefaultInstance().getDocument();
     }
 
     /**
@@ -605,8 +605,7 @@ public class XFormsControls implements EventTarget {
     }
 
     public XFormsInstance getCurrentInstance() {
-        return getCurrentContext().model.getDefaultInstance();
-        // TODO: this is wrong! Current node may be associated with different instance.
+        return getCurrentContext().model.getInstanceForNode(getCurrentSingleNode());
     }
 
     /**
@@ -951,12 +950,12 @@ public class XFormsControls implements EventTarget {
             final String value = eventHandlerElement.attributeValue("value");
             final String content = eventHandlerElement.getStringValue();
 
-            final XFormsInstance instance = getCurrentInstance();
+            final XFormsInstance currentInstance = getCurrentInstance();
             final String valueToSet;
             if (value != null) {
                 // Value to set is computed with an XPath expression
                 Map namespaceContext = Dom4jUtils.getNamespaceContext(eventHandlerElement);
-                valueToSet = instance.evaluateXPathAsString(pipelineContext, value, namespaceContext, null, functionLibrary, null);
+                valueToSet = currentInstance.evaluateXPathAsString(pipelineContext, value, namespaceContext, null, functionLibrary, null);
             } else {
                 // Value to set is static content
                 valueToSet = content;

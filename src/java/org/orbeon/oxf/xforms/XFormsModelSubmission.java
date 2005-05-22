@@ -126,7 +126,6 @@ public class XFormsModelSubmission implements EventTarget {
             }
 
             final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
-            // TODO: fix getCurrentInstance() in controls
 
             // Revalidate instance
             // TODO: we should only revalidate relevant parts

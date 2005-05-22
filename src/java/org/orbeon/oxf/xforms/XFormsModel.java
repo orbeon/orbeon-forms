@@ -476,23 +476,41 @@ public class XFormsModel implements EventTarget, Cloneable {
         }
     }
 
+    /**
+     * Return the default instance for this model, i.e. the first instance. Return null if there is
+     * no instance in this model.
+     */
     public XFormsInstance getDefaultInstance() {
-        return getInstance("");
+        return (XFormsInstance) ((instances.size() > 0) ? instances.get(0) : null);
     }
 
+    /**
+     * Return all XFormsInstance objects for this model, in the order they appear in the model.
+     */
     public List getInstances() {
         return instances;
     }
 
+    /**
+     * Return the XFormsInstance with given id, null if not found.
+     */
     public XFormsInstance getInstance(String instanceId) {
-        return (XFormsInstance) (instanceId == null || "".equals(instanceId) ? instances.get(0) : instancesMap.get(instanceId));
+        return (XFormsInstance) (instancesMap.get(instanceId));
     }
 
     /**
-     * Return the number of instances on this model.
+     * Return the XFormsInstance object containing the given node.
      */
-    public int getInstanceCount() {
-        return instanceIds.size();
+    public XFormsInstance getInstanceForNode(Node node) {
+        final Document document = node.getDocument();
+
+        for (Iterator i = instances.iterator(); i.hasNext();) {
+            final XFormsInstance currentInstance = (XFormsInstance) i.next();
+            if (currentInstance.getDocument() == document)
+                return currentInstance;
+        }
+
+        return null;
     }
 
     /**
@@ -533,7 +551,8 @@ public class XFormsModel implements EventTarget, Cloneable {
         if (!isSkipInstanceSchemaValidation() && schemaGrammar != null) {
             final REDocumentDeclaration rdd = new REDocumentDeclaration(schemaGrammar);
             final Acceptor acc = rdd.createAcceptor();
-            final Element relt = getDefaultInstance().getDocument().getRootElement();//
+            final Element relt = getDefaultInstance().getDocument().getRootElement();
+            // TODO: should probably iterate over all instances!
             final IDConstraintChecker icc = new IDConstraintChecker();
 
             validateElement(relt, acc, icc);
@@ -909,16 +928,16 @@ public class XFormsModel implements EventTarget, Cloneable {
         Collections.reverse(parents);
 
         // Find the final node
-        List nodeset = new ArrayList();
-        XFormsInstance mainInstance = getDefaultInstance();
-        nodeset.add(mainInstance.getDocument());
+        final List nodeset = new ArrayList();
+        final XFormsInstance defaultInstance = getDefaultInstance();
+        nodeset.add(defaultInstance.getDocument());
         for (Iterator i = parents.iterator(); i.hasNext();) {
             ModelBind current = (ModelBind) i.next();
             List currentModelBindResults = new ArrayList();
             for (Iterator j = nodeset.iterator(); j.hasNext();) {
                 Node node = (Node) j.next();
                 // Execute XPath expresssion
-                currentModelBindResults.addAll(mainInstance.evaluateXPath(pipelineContext, node, current.getNodeset(),
+                currentModelBindResults.addAll(defaultInstance.evaluateXPath(pipelineContext, node, current.getNodeset(),
                         current.getNamespaceMap(), null, xformsFunctionLibrary, current.getLocationData().getSystemID()));
             }
             nodeset.addAll(currentModelBindResults);

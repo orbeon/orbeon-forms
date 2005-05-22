@@ -21,9 +21,14 @@
     exclude-result-prefixes="xforms xxforms xs saxon xhtml f">
 
     <xsl:template match="/">
-        <controls>
-            <xsl:apply-templates select="//xforms:*[local-name() != 'model' and not(ancestor::xforms:*)]"/>
-        </controls>
+        <static-state>
+            <models>
+                <xsl:copy-of select="//xforms:model"/>
+            </models>
+            <controls>
+                <xsl:apply-templates select="//xforms:*[local-name() != 'model' and not(ancestor::xforms:*)]"/>
+            </controls>
+        </static-state>
     </xsl:template>
     
     <xsl:template match="xforms:*" priority="2">

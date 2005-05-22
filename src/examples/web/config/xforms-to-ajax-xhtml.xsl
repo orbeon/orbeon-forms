@@ -64,7 +64,7 @@
         <xsl:apply-templates select="xforms:help"/>
         <xhtml:label for="{$id}">
             <xsl:variable name="alert-id" as="xs:string" select="concat(@id, $id-postfix)"/>
-            <xsl:copy-of select="xxforms:copy-attributes(xforms:alert, concat('xforms-alert-', 
+            <xsl:copy-of select="xxforms:copy-attributes(xforms:alert, concat('xforms-alert-',
                 if (xxforms:control($id)/@valid = 'false') then 'active' else 'inactive'), $alert-id)"/>
             <xsl:value-of select="xxforms:control($id)/@alert"/>
         </xhtml:label>
@@ -85,7 +85,7 @@
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:button type="button" class="trigger">
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
-            <xsl:value-of select="xforms:label"/>
+            <xsl:value-of select="if (xxforms:control($id)/@label) then xxforms:control($id)/@label else xforms:label"/>
         </xhtml:button>
     </xsl:template>
 
@@ -94,7 +94,7 @@
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:button type="button" class="trigger">
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
-            <xsl:value-of select="xforms:label"/>
+            <xsl:value-of select="if (xxforms:control($id)/@label) then xxforms:control($id)/@label else xforms:label"/>
         </xhtml:button>
     </xsl:template>
 

@@ -91,22 +91,15 @@
                         <p:input name="config" href="xforms-annotate-controls.xsl"/>
                         <p:output name="data" id="annotated-view"/>
                     </p:processor>
-                    <!-- Extract models -->
-                    <p:processor name="oxf:identity">
-                        <p:input name="data" href="aggregate('models', #widgeted-view#xpointer(//xforms:model))"/>
-                        <p:output name="data" id="xforms-models"/>
-                    </p:processor>
-                    <!-- Extract controls -->
+                    <!-- Extract models and controls -->
                     <p:processor name="oxf:xslt">
                         <p:input name="data" href="#annotated-view"/>
                         <p:input name="config" href="xforms-extract-controls.xsl"/>
-                        <p:output name="data" id="xforms-controls"/>
+                        <p:output name="data" id="xforms-models-controls"/>
                     </p:processor>
                     <!-- Builds request to XForms server -->
                     <p:processor name="oxf:unsafe-xslt">
-                        <p:input name="data"><dummy/></p:input>
-                        <p:input name="controls" href="#xforms-controls"/>
-                        <p:input name="models" href="#xforms-models"/>
+                        <p:input name="data" href="#xforms-models-controls"/>
                         <p:input name="config">
                             <xxforms:event-request xsl:version="2.0" 
                                     xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
@@ -114,8 +107,8 @@
                                     <xsl:variable name="static-state" as="document-node()">
                                         <xsl:document>
                                             <static-state>
-                                                <xsl:copy-of select="doc('input:controls')/*"/>
-                                                <xsl:copy-of select="doc('input:models')/*"/>
+                                                <xsl:copy-of select="/*/models"/>
+                                                <xsl:copy-of select="/*/controls"/>
                                             </static-state>
                                         </xsl:document>
                                     </xsl:variable>
@@ -129,8 +122,8 @@
                     </p:processor>
                     <!-- Get initial instances -->
                     <p:processor name="oxf:xforms-server">
-                        <p:input name="request" href="#request"/>
-                        <p:output name="response" id="response"/>
+                        <p:input name="request" href="#request" debug="xxxrequest"/>
+                        <p:output name="response" id="response" debug="xxxresponse"/>
                     </p:processor>
                     <p:processor name="oxf:xslt">
                         <p:input name="config" href="xforms-to-ajax-xhtml.xsl"/>

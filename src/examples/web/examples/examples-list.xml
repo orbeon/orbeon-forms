@@ -68,6 +68,7 @@
         <example id="xforms-wizard" path="xforms/xforms-wizard" label="Wizard" xforms-ng="true"/>
         <example id="xforms-ubl" path="xforms/xforms-ubl" label="Complex UBL Order"/>
         <example id="xforms-calculator" path="xforms/xforms-calculator" label="Calculator" xforms-ng="true"/>
+        <example id="xforms-tax" path="xforms/xforms-tax" label="Tax Form" xforms-ng="true"/>
         <example id="xforms-translate" path="xforms/xforms-translate" label="Translate This" xforms-ng="true"/>
     </section>
     <section label="Presenting Data">

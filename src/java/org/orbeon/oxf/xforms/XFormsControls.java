@@ -145,7 +145,7 @@ public class XFormsControls implements EventTarget {
 
         // Push the default context
         final XFormsModel defaultModel = containingDocument.getModel("");
-        final List defaultNodeset = Arrays.asList(new Object[]{defaultModel.getDefaultInstance().getDocument()});
+        final List defaultNodeset = Arrays.asList(new Object[]{defaultModel.getDefaultInstance().getDocument().getRootElement()});
         contextStack.push(new Context(defaultModel, defaultNodeset, true, null));
     }
 

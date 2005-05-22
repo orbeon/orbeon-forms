@@ -631,7 +631,7 @@
                         </instance>
                     </p:input>
                     <p:input name="data">
-                        <xforms:group ref="instance">
+                        <xforms:group ref="/instance">
                             <xforms:input ref="data"/>
                         </xforms:group>
                     </p:input>
@@ -1480,7 +1480,7 @@
                         </instance>
                     </p:input>
                     <p:input name="data">
-                        <xforms:group ref="instance">
+                        <xforms:group ref="/instance">
                             <xforms:input ref="data"/>
                         </xforms:group>
                     </p:input>

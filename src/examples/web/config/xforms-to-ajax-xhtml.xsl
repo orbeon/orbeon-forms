@@ -53,11 +53,11 @@
     
     <!-- - - - - - - XForms controls - - - - - - -->
     
-    <xsl:template match="xforms:output | xforms:trigger | xforms:input 
+    <xsl:template match="xforms:output | xforms:trigger | xforms:submit | xforms:input
             | xforms:secret | xforms:textarea | xforms:select | xforms:select1" priority="2">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xsl:if test="local-name() != 'trigger'">
+        <xsl:if test="local-name() != 'trigger' and local-name() != 'submit'">
             <xsl:apply-templates select="xforms:label"/>
         </xsl:if>
         <xsl:next-match/>
@@ -88,7 +88,16 @@
             <xsl:value-of select="xforms:label"/>
         </xhtml:button>
     </xsl:template>
-    
+
+    <xsl:template match="xforms:submit">
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xhtml:button type="button" class="trigger">
+            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
+            <xsl:value-of select="xforms:label"/>
+        </xhtml:button>
+    </xsl:template>
+
     <xsl:template match="xforms:input">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>

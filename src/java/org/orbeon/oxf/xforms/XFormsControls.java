@@ -609,7 +609,12 @@ public class XFormsControls implements EventTarget {
         // TODO: this is wrong! Current node may be associated with different instance.
     }
 
-    public Element getControlElement(PipelineContext pipelineContext, String controlId) {
+    /**
+     * Get element with the id specified.
+     */
+    public Element getElementById(PipelineContext pipelineContext, String controlId) {
+        // TODO: do this without XPath, and remove need for pipelineContext
+
         // Create XPath variables
         Map variables = new HashMap();
         variables.put("control-id", controlId);
@@ -838,20 +843,6 @@ public class XFormsControls implements EventTarget {
         return result;
     }
 
-    private Element getEventHandler(PipelineContext pipelineContext, Element controlElement, String eventName) {
-        // Create XPath variables
-        Map variables = new HashMap();
-        variables.put("event-name", eventName);
-
-        // Get event handler element
-        Element eventHandlerElement;
-        eventHandlerElement = (Element) documentXPathEvaluator.evaluateSingle(pipelineContext, controlElement,
-                "*[@ev:event = $event-name]", XFormsServer.XFORMS_NAMESPACES, variables, null, null);
-//            if (eventHandlerElement == null)
-//                throw new OXFException("Cannot find event handler with name '" + eventName + "'.");
-        return eventHandlerElement;
-    }
-
     public void dispatchEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
         dispatchEvent(pipelineContext, xformsEvent, xformsEvent.getEventName());
     }
@@ -862,7 +853,28 @@ public class XFormsControls implements EventTarget {
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             // The default action for this event results in the following: None; notification event only.
 
-            callEventHandlers(pipelineContext, xformsEvent, eventName, xformsEvent.getControlElement());
+            final Element controlElement = xformsEvent.getControlElement();
+            if (controlElement.getName().equals("submit")) {
+                // xforms:submit reacts to DOMActivate in a special way
+
+                // Find submission id
+                final String submissionId = controlElement.attributeValue("submission");
+                if (submissionId == null)
+                    throw new OXFException("xforms:submit requires a submission attribute.");
+
+                // Find submission object and dispatch submit event to it
+                final Object object = containingDocument.geObjectById(pipelineContext, submissionId);
+                if (object instanceof XFormsModelSubmission) {
+                    final XFormsModelSubmission submission = (XFormsModelSubmission) object;
+
+                    submission.dispatchEvent(pipelineContext, new XFormsSubmitEvent());
+                } else {
+                    throw new OXFException("xforms:submit submission attribute must point to an xforms:submission element.");
+                }
+
+            } else {
+                callEventHandlers(pipelineContext, xformsEvent, eventName, controlElement);
+            }
 
         } else if (XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)) {
             // 4.4.9 The DOMFocusOut Event
@@ -891,6 +903,9 @@ public class XFormsControls implements EventTarget {
     }
 
     private boolean callEventHandlers(PipelineContext pipelineContext, XFormsGenericEvent XFormsEvent, String eventName, Element controlElement) {
+
+        // TODO: capture / bubbling / cancel
+
         // Find event handler
         Element eventHandlerElement = getEventHandler(pipelineContext, controlElement, eventName);
         // If found, run actions
@@ -900,6 +915,20 @@ public class XFormsControls implements EventTarget {
         } else {
             return false;
         }
+    }
+
+    private Element getEventHandler(PipelineContext pipelineContext, Element controlElement, String eventName) {
+        // Create XPath variables
+        Map variables = new HashMap();
+        variables.put("event-name", eventName);
+
+        // Get event handler element
+        Element eventHandlerElement;
+        eventHandlerElement = (Element) documentXPathEvaluator.evaluateSingle(pipelineContext, controlElement,
+                "*[@ev:event = $event-name]", XFormsServer.XFORMS_NAMESPACES, variables, null, null);
+//            if (eventHandlerElement == null)
+//                throw new OXFException("Cannot find event handler with name '" + eventName + "'.");
+        return eventHandlerElement;
     }
 
     private void runAction(final PipelineContext pipelineContext, Element eventHandlerElement,

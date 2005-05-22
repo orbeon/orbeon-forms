@@ -58,6 +58,9 @@
     <!-- Standalone Employees example -->
     <page path-info="/employees*" model="/examples/employees/page-flow.xpl"/>
 
+    <!-- Standalone XForms Controls example -->
+    <page path-info="/xforms-controls*" model="/examples/xforms/xforms-controls/page-flow.xpl"/>
+
     <!-- Standalone XForms Upload example -->
     <page path-info="/xforms-upload*" model="/examples/xforms/xforms-upload/page-flow.xpl"/>
 

@@ -87,6 +87,7 @@
             <xforms:bind nodeset="instance('formatted')"
                 calculate="saxon:serialize(xxforms:call-xpl
                     ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
+            <xforms:submission ref="instance('instance')" id="default-submission" method="post" action="http://localhost:8888/oxf/xforms-controls/post" replace="instance"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -130,6 +131,11 @@
                                 long as they can be displayed on multiple lines.
                             </xforms:help>
                         </xforms:input>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:submit submission="default-submission">
+                            <xforms:label >Try Submit</xforms:label>
+                        </xforms:submit>
                     </xhtml:p>
                 </xforms:case>
                 <xforms:case id="selection-controls">

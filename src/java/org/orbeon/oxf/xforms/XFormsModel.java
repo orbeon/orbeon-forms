@@ -224,7 +224,7 @@ public class XFormsModel implements EventTarget, Cloneable {
     private InstanceConstructListener instanceConstructListener;
 
     // Submission information
-    private Map xformsModelSubmissions;
+    private Map submissions;
 
     // Binds
     private List binds;
@@ -271,9 +271,9 @@ public class XFormsModel implements EventTarget, Cloneable {
                 if (submissionId == null)
                     submissionId = "";
 
-                if (xformsModelSubmissions == null)
-                    xformsModelSubmissions = new HashMap();
-                xformsModelSubmissions.put(submissionId, new XFormsModelSubmission(submissionElement, this));
+                if (submissions == null)
+                    submissions = new HashMap();
+                submissions.put(submissionId, new XFormsModelSubmission(submissionElement, this));
             }
         }
     }
@@ -284,6 +284,27 @@ public class XFormsModel implements EventTarget, Cloneable {
 
     public XFormsControls getControls() {
         return xFormsControls;
+    }
+
+    /**
+     * Get object with the id specified.
+     */
+    public Object getObjectByid(PipelineContext pipelineContext, String id) {
+
+        // Check model itself
+        // NOTE: This is not needed for now
+
+        // Search instances
+        // NOTE: This is not needed for now
+
+        // Search submissions
+        {
+            final XFormsModelSubmission resultSubmission = (XFormsModelSubmission) submissions.get(id);
+            if (resultSubmission != null)
+                return resultSubmission;
+        }
+
+        return null;
     }
 
     private void resetBinds() {
@@ -485,7 +506,6 @@ public class XFormsModel implements EventTarget, Cloneable {
             instancesMap = new HashMap(instanceIds.size());
         }
         // Prepare and set instance
-        XFormsUtils.setInitialDecoration(instanceDocument);
         XFormsInstance newInstance = new XFormsInstance(pipelineContext, instanceDocument, this);
         instances.set(instancePosition, newInstance);
 

@@ -65,6 +65,7 @@ public class XFormsInstance implements EventTarget {
      * Set the instance document.
      */
     public void setInstanceDocument(Document instanceDocument) {
+        XFormsUtils.setInitialDecoration(instanceDocument);
         this.instanceDocument = instanceDocument;
         this.documentXPathEvaluator = new DocumentXPathEvaluator(instanceDocument);
     }

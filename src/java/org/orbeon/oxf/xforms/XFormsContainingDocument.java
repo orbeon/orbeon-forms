@@ -81,16 +81,33 @@ public class XFormsContainingDocument implements org.orbeon.oxf.xforms.event.Eve
     }
 
     /**
-     * Execute an event on control with id controlId and event eventName.
+     * Get object with the id specified.
      */
-    public void executeEvent(PipelineContext pipelineContext, String controlId, String eventName, String eventValue) {
+    public Object geObjectById(PipelineContext pipelineContext, String id) {
+
+        // Search in models
+        for (Iterator i = models.iterator(); i.hasNext();) {
+            XFormsModel model = (XFormsModel) i.next();
+            final Object resultObject = model.getObjectByid(pipelineContext, id);
+            if (resultObject != null)
+                return resultObject;
+        }
+
+        // Search in controls
+        return xFormsControls.getElementById(pipelineContext, id);
+    }
+
+    /**
+     * Execute an external event on control with id controlId and event eventName.
+     */
+    public void executeExternalEvent(PipelineContext pipelineContext, String controlId, String eventName, String eventValue) {
 
         // Get control element and event handler element
-        Element controlElement = xFormsControls.getControlElement(pipelineContext, controlId);
+        Element controlElement = xFormsControls.getElementById(pipelineContext, controlId);
 
         // Interpret event
-        XFormsGenericEvent XFormsEvent = new XFormsGenericEvent(controlElement, eventValue);
-        interpretEvent(pipelineContext, XFormsEvent, eventName);
+        XFormsGenericEvent xformsEvent = new XFormsGenericEvent(controlElement, eventValue);
+        interpretEvent(pipelineContext, xformsEvent, eventName);
     }
 
     private void interpretEvent(final PipelineContext pipelineContext, XFormsGenericEvent xformsEvent, String eventName) {

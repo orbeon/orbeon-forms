@@ -193,13 +193,13 @@ public class EmailProcessor extends ProcessorImpl {
             multipart = bodyElement.attributeValue("mime-multipart");
             if (multipart != null && !parts.hasNext())
                 throw new OXFException("mime-multipart attribute on body element requires part children elements");
-            String contentTypeFromAttribute = NetUtils.getContentTypeContentType(bodyElement.attributeValue("content-type"));
+            String contentTypeFromAttribute = NetUtils.getContentTypeMediaType(bodyElement.attributeValue("content-type"));
             if (contentTypeFromAttribute != null && contentTypeFromAttribute.startsWith("multipart/"))
                 contentTypeFromAttribute.substring("multipart/".length());
             if (parts.hasNext() && multipart == null)
                 multipart = DEFAULT_MULTIPART;
         } else {
-            String contentTypeAttribute = NetUtils.getContentTypeContentType(bodyElement.attributeValue("content-type"));
+            String contentTypeAttribute = NetUtils.getContentTypeMediaType(bodyElement.attributeValue("content-type"));
             multipart = (contentTypeAttribute != null && contentTypeAttribute.startsWith("multipart/")) ? contentTypeAttribute.substring("multipart/".length()) : null;
         }
 
@@ -227,7 +227,7 @@ public class EmailProcessor extends ProcessorImpl {
     private void handlePart(PipelineContext pipelineContext, String dataInputSystemId, Part parentPart, Element partOrBodyElement) throws Exception {
         final String name = partOrBodyElement.attributeValue("name");
         String contentTypeAttribute = partOrBodyElement.attributeValue("content-type");
-        final String contentType = NetUtils.getContentTypeContentType(contentTypeAttribute);
+        final String contentType = NetUtils.getContentTypeMediaType(contentTypeAttribute);
         final String charset;
         {
             String c = NetUtils.getContentTypeCharset(contentTypeAttribute);

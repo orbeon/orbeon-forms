@@ -170,7 +170,7 @@ public class NetUtils {
         return afterCharset.trim();
     }
 
-    public static String getContentTypeContentType(String contentType) {
+    public static String getContentTypeMediaType(String contentType) {
         if (contentType == null || contentType.equalsIgnoreCase("content/unknown"))
             return null;
         int semicolumnIndex = contentType.indexOf(";");
@@ -180,7 +180,7 @@ public class NetUtils {
     }
 
     /**
-     * Convert an Enumration of String into an array.
+     * Convert an Enumeration of String into an array.
      */
     public static String[] stringEnumerationToArray(Enumeration enumeration) {
         List values = new ArrayList();

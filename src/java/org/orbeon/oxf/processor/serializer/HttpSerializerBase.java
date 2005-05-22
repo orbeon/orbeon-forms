@@ -276,7 +276,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
         if (config.forceContentType)
             return config.contentType;
 
-        String documentContentType = NetUtils.getContentTypeContentType(contentTypeAttribute);
+        String documentContentType = NetUtils.getContentTypeMediaType(contentTypeAttribute);
         if (!config.ignoreDocumentContentType && documentContentType != null)
             return documentContentType;
 

@@ -102,7 +102,7 @@ public class TestExternalContext implements ExternalContext  {
                 Element bodyNode = (Element) XPathUtils.selectSingleNode(requestDocument, "/*/body");
                 if (bodyNode != null) {
                     String contentTypeAttribute = bodyNode.attributeValue("content-type");
-                    final String contentType = NetUtils.getContentTypeContentType(contentTypeAttribute);
+                    final String contentType = NetUtils.getContentTypeMediaType(contentTypeAttribute);
                     final String charset = NetUtils.getContentTypeCharset(contentTypeAttribute);
 
                     String hrefAttribute = bodyNode.attributeValue("href");

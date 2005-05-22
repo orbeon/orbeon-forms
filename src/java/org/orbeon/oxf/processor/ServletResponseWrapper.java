@@ -52,7 +52,7 @@ public class ServletResponseWrapper extends HttpServletResponseWrapper {
 
     public void setContentType(String contentType) {
         streamInterceptor.setEncoding(NetUtils.getContentTypeCharset(contentType));
-        streamInterceptor.setContentType(NetUtils.getContentTypeContentType(contentType));
+        streamInterceptor.setContentType(NetUtils.getContentTypeMediaType(contentType));
     }
 
     public void addCookie(Cookie cookie) {

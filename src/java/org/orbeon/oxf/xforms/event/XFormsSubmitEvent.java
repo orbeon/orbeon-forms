@@ -1,5 +1,5 @@
 /**
- *  Copyright (C) 2004 Orbeon, Inc.
+ *  Copyright (C) 2005 Orbeon, Inc.
  *
  *  This program is free software; you can redistribute it and/or modify it under the terms of the
  *  GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -11,16 +11,17 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xml.dom4j;
+package org.orbeon.oxf.xforms.event;
 
-import org.dom4j.io.SAXContentHandler;
+import org.orbeon.oxf.xforms.XFormsEvent;
+import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
- * @see NonLazyUserDataElement
+ * 4.3.9 The xforms-submit Event
  */
-public class NonLazySAXContentHandler extends SAXContentHandler {
+public class XFormsSubmitEvent extends XFormsEvent{
 
-    public NonLazySAXContentHandler() {
-        super(NonLazyUserDataDocumentFactory.getInstance(null));
+    public XFormsSubmitEvent() {
+        super(XFormsEvents.XFORMS_SUBMIT);
     }
 }

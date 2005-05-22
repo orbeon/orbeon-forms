@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.*;
-import org.dom4j.io.DocumentResult;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -25,6 +24,7 @@ import org.orbeon.oxf.xforms.event.EventTarget;
 import org.orbeon.oxf.xforms.event.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
@@ -63,6 +63,10 @@ public class XFormsModelSubmission implements EventTarget {
     public XFormsModelSubmission(Element submissionElement, XFormsModel model) {
         this.submissionElement = submissionElement;
         this.model = model;
+    }
+
+    public Element getSubmissionElement() {
+        return submissionElement;
     }
 
     private void extractSubmissionElement() {
@@ -138,7 +142,7 @@ public class XFormsModelSubmission implements EventTarget {
                     // Use entire instance document
                     documentToSubmit = currentInstance.getDocument();
                 }
-                // TODO: handle includenamespaceprefixes
+                // TODO: handle includenamespaceprefixes + handle non-relevant nodes
             }
 
             // Check that there are no validation errors
@@ -229,7 +233,7 @@ public class XFormsModelSubmission implements EventTarget {
                         urlConnection.setDoInput(true);
                         urlConnection.setDoOutput(true); // If POST / PUT
 
-                        urlConnection.setRequestMethod(method);
+                        urlConnection.setRequestMethod(method.toUpperCase());
                         urlConnection.setRequestProperty("content-type", (mediatype != null) ? mediatype : "application/xml");
 
                         urlConnection.connect();
@@ -240,7 +244,8 @@ public class XFormsModelSubmission implements EventTarget {
 
                         // Get response
                         responseCode = urlConnection.getResponseCode();
-                        responseMediaType = urlConnection.getContentType();
+                        final String contentType = urlConnection.getContentType();
+                        responseMediaType = NetUtils.getContentTypeMediaType(contentType);
 
                         final ByteArrayOutputStream resultByteArrayOutputStream = new ByteArrayOutputStream();
                         is = urlConnection.getInputStream();
@@ -299,7 +304,7 @@ public class XFormsModelSubmission implements EventTarget {
                                 // Handling of XML media type
                                 try {
                                     final Transformer identity = TransformerUtils.getIdentityTransformer();
-                                    final DocumentResult documentResult = new DocumentResult();
+                                    final LocationDocumentResult documentResult = new LocationDocumentResult();
                                     identity.transform(new StreamSource(new ByteArrayInputStream(submissionResponse)), documentResult);
                                     final Document resultingInstanceDocument = documentResult.getDocument();
 
@@ -332,7 +337,6 @@ public class XFormsModelSubmission implements EventTarget {
                     // Error code received
                     dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(action, null));
                 }
-                throw new OXFException("xforms:submission: submission URL scheme not yet implemented: " + scheme);
             } else if (scheme.equals("file")) {
                 // TODO
                 // SHOULD be supported

@@ -15,10 +15,10 @@ package org.orbeon.oxf.xml;
 
 import orbeon.apache.xalan.processor.StylesheetHandler;
 import org.dom4j.Document;
-import org.dom4j.io.DocumentResult;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -264,7 +264,7 @@ public class TransformerUtils {
      */
     public static Document domToDom4jDocument(org.w3c.dom.Node node) throws TransformerException {
         Transformer identity = getIdentityTransformer();
-        DocumentResult documentResult = new DocumentResult();
+        LocationDocumentResult documentResult = new LocationDocumentResult();
         identity.transform(new DOMSource(node), documentResult);
         return documentResult.getDocument();
     }

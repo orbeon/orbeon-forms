@@ -641,7 +641,7 @@ public class URLGenerator extends ProcessorImpl {
                 return null;
             // Otherwise, try URLConnection
             openConnection();
-            return NetUtils.getContentTypeContentType(urlConn.getContentType());
+            return NetUtils.getContentTypeMediaType(urlConn.getContentType());
         }
 
         public String getConnectionEncoding() throws IOException {

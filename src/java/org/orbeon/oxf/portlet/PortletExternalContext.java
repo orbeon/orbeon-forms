@@ -455,7 +455,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         }
 
         public void setContentType(String contentType) {
-            this.contentType = NetUtils.getContentTypeContentType(contentType);
+            this.contentType = NetUtils.getContentTypeMediaType(contentType);
         }
 
         /**
@@ -560,7 +560,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         }
 
         public void setContentType(String contentType) {
-            renderResponse.setContentType(NetUtils.getContentTypeContentType(contentType));
+            renderResponse.setContentType(NetUtils.getContentTypeMediaType(contentType));
         }
 
         public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) {

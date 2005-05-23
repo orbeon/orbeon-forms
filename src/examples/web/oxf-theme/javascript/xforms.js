@@ -124,9 +124,8 @@ function xformsFireEvent(target, eventName, value, incremental) {
     staticStateElement.appendChild(staticStateElement.ownerDocument.createTextNode(target.form.xformsStaticState.value));
     eventFiredElement.appendChild(staticStateElement);
     
-    // Add dynamic state
+    // Add dynamic state (element is just created and will be filled just before we send the request)
     var dynamicStateElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:dynamic-state");
-    dynamicStateElement.appendChild(dynamicStateElement.ownerDocument.createTextNode(target.form.xformsDynamicState.value));
     eventFiredElement.appendChild(dynamicStateElement);
 
     // Add action
@@ -329,8 +328,6 @@ function xformsPageLoaded() {
                 function rangeMouseMove(event) {
                     var control = document.xformsCurrentRangeControl;
                     if (control) {
-                        if (!control.slider) alert(control.tagName);
-                    
                         // Compute range boundaries
                         var rangeStart = xformsGetElementPosition(control.track).left
                         var rangeLength = control.track.clientWidth - control.slider.clientWidth;
@@ -357,7 +354,6 @@ function xformsPageLoaded() {
                 if (!control.listenersRegistered) {
                     control.listenersRegistered = true;
                     control.mouseDown = false;
-                    xformsAddEventListener(control, "mousedown", rangeMouseDown);
                     for (var childIndex = 0; childIndex < control.childNodes.length; childIndex++) {
                         var child = control.childNodes[childIndex];
                         if (child.className 
@@ -367,6 +363,7 @@ function xformsPageLoaded() {
                                 && xformsArrayContains(child.className.split(" "), "xforms-range-slider"))
                             control.slider = child;
                     }
+                    xformsAddEventListener(control.slider, "mousedown", rangeMouseDown);
 
                     // Find parent form and store this in span
                     var parent = control;
@@ -575,10 +572,19 @@ function xformsHandleResponse() {
 function xformsExecuteNextRequest() {
     if (! document.xformsRequestInProgress) {
         if (document.xformsNextRequests.length > 0) {
+            // Get next request
             var request = document.xformsNextRequests.shift();
             var target = document.xformsNextTargets.shift();
+            
+            // Mark this as loading
             document.xformsRequestInProgress = true;
             xformsDisplayLoading(target.form, "loading");
+            
+            // Set the value of the dynamic-state in the request
+            var dynamicStateElement = request.getElementsByTagName("xxforms:dynamic-state")[0];
+            dynamicStateElement.appendChild(dynamicStateElement.ownerDocument.createTextNode(target.form.xformsDynamicState.value));
+            
+            // Send request
             document.xformsTargetOfCurrentRequest = target;
             document.xformsXMLHttpRequest = new XMLHttpRequest();
             document.xformsXMLHttpRequest.open("POST", XFORMS_SERVER_URL, true);

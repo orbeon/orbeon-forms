@@ -655,6 +655,36 @@ ul {
     cursor: pointer;
 }
 
+.xforms-range-casing {
+    height: 30px;
+    overflow: hidden;
+    font-size: 1px;
+}
+    
+.xforms-range-track {
+    position: relative;
+    top: 12px;
+    border:1px solid &dark-color;;
+    background-color: &xxlight-color;;
+    width: 300px;
+    height: 6px;
+    z-index: 5;
+    overflow: hidden;
+}
+
+.xforms-range-slider {
+    position: relative;
+    z-index:6;
+    border:1px solid &dark-color;;
+    background-color:&light-color;;
+    top: 0px;
+    padding:0px;
+    width: 10px;     
+    height: 16px;        
+    cursor: pointer;
+    overflow: hidden;
+}
+
 <!-- Styles used by xforms-to-xhtml.xsl -->
 .xferrtable    { border: 0; margin: 0px; padding: 0px; }
 .xferrtable td { border: 0; margin: 0px; padding: 0px; }

@@ -31,6 +31,10 @@
                     <date/>
                     <flavor>v c</flavor>
                     <carrier>fedex</carrier>
+                    <range>
+                        <value>0</value>
+                        <letter>a</letter>
+                    </range>
                 </instance>
             </xforms:instance>
             <xforms:instance id="formatted">
@@ -38,6 +42,9 @@
                     &lt;span>
                     &lt;/span>
                 </formated-instance>
+            </xforms:instance>                
+            <xforms:instance id="countries">
+                <dummy/>
             </xforms:instance>                
             <xforms:instance id="ui">
                 <ui>
@@ -51,11 +58,20 @@
                 <xforms:bind nodeset="date" type="xs:date"/>
                 <xforms:bind nodeset="date2" type="xs:date"/>
                 <xforms:bind nodeset="time" type="xs:time"/>
+                <xforms:bind nodeset="range/letter" calculate="
+                    for $value in ../value return
+                    ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 
+                    'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z')
+                    [floor($value * 25) + 1]"/>
             </xforms:bind>
             <xforms:bind nodeset="instance('ui')/show-instance" relevant=". = 'true'"/>
             <xforms:bind nodeset="instance('formatted')" 
                 calculate="saxon:serialize(xxforms:call-xpl
                     ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
+            <xforms:bind nodeset="instance('countries')" 
+                calculate="saxon:serialize(xxforms:call-xpl
+                    ('oxf:/examples/xforms/xforms-controls/get-countries.xpl', 
+                    'letter', instance('instance')/range/letter, 'countries')/*, 'html')"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -165,9 +181,14 @@
                         </xforms:select1>
                     </xhtml:p>
                 </widget:tab>
-                <widget:tab id="slider">
-                    <widget:label>Slider</widget:label>
-                    <xhtml:p>Nothing yet here</xhtml:p>
+                <widget:tab id="slider" selected="true">
+                    <widget:label>Range</widget:label>
+                    <xforms:range ref="range/value"/>
+                    <xhtml:p>
+                        Countries starting with letter 
+                        <xhtml:b><xforms:output ref="range/letter"/></xhtml:b>:
+                    </xhtml:p>
+                    <xforms:output ref="instance('countries')" xhtml:class="xforms-xhtml"/>
                 </widget:tab>
             </widget:tabs>
             <xhtml:p style="margin-top: 2em">

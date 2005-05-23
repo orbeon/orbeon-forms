@@ -30,11 +30,14 @@
             <xhtml:tr>
                 <xhtml:td class="widget-tab-spacer-side"/>
                 <!-- Tabs at the top -->
+                <xsl:variable name="selected-tab" as="element()" 
+                    select="if (widget:tab[@selected = 'true']) then widget:tab[@selected = 'true']
+                    else widget:tab[1]"/>
                 <xsl:for-each select="widget:tab">
                     <xsl:if test="position() > 1">
                         <xhtml:td class="widget-tab-spacer-between"/>
                     </xsl:if>
-                    <xhtml:td class="{if (position() = 1) then 'widget-tab-active' else 'widget-tab-inactive'}">
+                    <xhtml:td class="{if (. = $selected-tab) then 'widget-tab-active' else 'widget-tab-inactive'}">
                         <xsl:value-of select="widget:label"/>
                         <xforms:trigger class="widget-tab-trigger">
                             <xforms:toggle ev:event="DOMActivate" case="{@id}"/>
@@ -48,7 +51,8 @@
                 <xhtml:td class="widget-tabs-panel" colspan="{count(widget:tab) * 2 + 1}">
                     <xforms:switch>
                         <xsl:for-each select="widget:tab">
-                            <xforms:case id="{@id}">
+                            <xforms:case>
+                                <xsl:copy-of select="@*"/>
                                 <xsl:apply-templates select="node() except widget:label"/>
                             </xforms:case>
                         </xsl:for-each>

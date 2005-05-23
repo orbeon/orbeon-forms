@@ -53,8 +53,9 @@
     
     <!-- - - - - - - XForms controls - - - - - - -->
     
-    <xsl:template match="xforms:output | xforms:trigger | xforms:submit | xforms:input
-            | xforms:secret | xforms:textarea | xforms:select | xforms:select1" priority="2">
+    <xsl:template match="xforms:output | xforms:trigger | xforms:input 
+            | xforms:secret | xforms:textarea | xforms:select | xforms:select1 
+            | xforms:range" priority="2">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xsl:if test="local-name() != 'trigger' and local-name() != 'submit'">
@@ -280,6 +281,16 @@
                 else $value-element/@help"/>
         </xhtml:label>
     </xsl:template>
+    
+    <xsl:template match="xforms:range">
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xhtml:div>
+            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-range-casing'), $id)"/>
+            <xhtml:div class="xforms-range-track"/>
+            <xhtml:div class="xforms-range-slider"/>
+        </xhtml:div>
+    </xsl:template>
 
     <!-- - - - - - - XForms repeat - - - - - - -->
 
@@ -312,7 +323,6 @@
     <xsl:template match="xforms:case">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <!-- FIXME: use reponse to figure out what case are displayed -->
         <xhtml:span>
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-case', $id)"/>
             <xsl:variable name="div-information" as="element()"

@@ -66,6 +66,23 @@ function xformsArrayContains(array, element) {
     return false;
 }
 
+function xformsGetElementPosition(element) {
+    var offsetTrail = element;
+    var offsetLeft = 0;
+    var offsetTop = 0;
+    while (offsetTrail) {
+        offsetLeft += offsetTrail.offsetLeft;
+        offsetTop += offsetTrail.offsetTop;
+        offsetTrail = offsetTrail.offsetParent;
+    }
+    if (navigator.userAgent.indexOf("Mac") != -1 && 
+        typeof document.body.leftMargin != "undefined") {
+        offsetLeft += document.body.leftMargin;
+        offsetTop += document.body.topMargin;
+    }
+    return {left:offsetLeft, top:offsetTop};
+}
+
 function log(text) {
     document.getElementById("debug").innerHTML += text + " | ";
 }
@@ -87,6 +104,13 @@ function xformsDisplayLoading(form, state) {
             form.xformsLoadingError.style.display = "none";
             form.xformsLoadingNone.style.display = "block";
             break;
+    }
+}
+
+function xformsValueChanged(target, incremental) {
+    if (target.value != target.previousValue) {
+        target.previousValue = target.value;
+        xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value, incremental);
     }
 }
 
@@ -175,24 +199,13 @@ function xformsPageLoaded() {
     }
     
     // Gather all potential form controls
-    document.xformsChangeEventElements = new Array();
-    var spans = document.getElementsByTagName("span");
-    var buttons = document.getElementsByTagName("button");
-    var inputs = document.getElementsByTagName("input");
-    var textareas = document.getElementsByTagName("textarea");
-    var labels = document.getElementsByTagName("label");
-    var selects = document.getElementsByTagName("select");
-    var tds = document.getElementsByTagName("td");
-    var tables = document.getElementsByTagName("table");
+    var interestingTagNames = new Array("span", "button", "textarea", "input", "label", "select", "td", "table", "div");
     var formsControls = new Array();
-    for (var i = 0; i < spans.length; i++) formsControls = formsControls.concat(spans[i]);
-    for (var i = 0; i < buttons.length; i++) formsControls = formsControls.concat(buttons[i]);
-    for (var i = 0; i < inputs.length; i++) formsControls = formsControls.concat(inputs[i]);
-    for (var i = 0; i < textareas.length; i++) formsControls = formsControls.concat(textareas[i]);
-    for (var i = 0; i < labels.length; i++) formsControls = formsControls.concat(labels[i]);
-    for (var i = 0; i < selects.length; i++) formsControls = formsControls.concat(selects[i]);
-    for (var i = 0; i < tds.length; i++) formsControls = formsControls.concat(tds[i]);
-    for (var i = 0; i < tables.length; i++) formsControls = formsControls.concat(tables[i]);
+    for (var tagIndex = 0; tagIndex < interestingTagNames.length; tagIndex++) {
+        var elements = document.getElementsByTagName(interestingTagNames[tagIndex]);
+        for (var elementIndex = 0; elementIndex < elements.length; elementIndex++)
+            formsControls = formsControls.concat(elements[elementIndex]);
+    }
 
     // Go through potential form controls, add style, and register listeners
     for (var controlIndex = 0; controlIndex < formsControls.length; controlIndex++) {
@@ -207,6 +220,7 @@ function xformsPageLoaded() {
         var isXFormsCheckboxRadio = false;
         var isXFormsComboboxList = false;
         var isWidget = false;
+        var isXFormsRange = false;
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
             var className = classes[classIndex];
             if (className.indexOf("xforms-") == 0)
@@ -215,6 +229,8 @@ function xformsPageLoaded() {
                 isXFormsAlert = true;
             if (className == "xforms-incremental")
                 isIncremental = true;
+            if (className == "xforms-range-casing")
+                isXFormsRange = true;
             if (className == "xforms-select-full" || className == "xforms-select1-full")
                 isXFormsCheckboxRadio = true;
             if (className == "xforms-select-compact" || className == "xforms-select1-minimal")
@@ -298,17 +314,70 @@ function xformsPageLoaded() {
                 // Compute the checkes value for the first time
                 computeSelectValue(control);
 
+            } else if (isXFormsRange) {
+            
+                function rangeMouseDown(event) {
+                    document.xformsCurrentRangeControl = getEventTarget(event).parentNode;
+                }
+                
+                function rangeMouseUp(event) {
+                    document.xformsCurrentRangeControl = null;
+                }
+                
+                function rangeMouseMove(event) {
+                    var control = document.xformsCurrentRangeControl;
+                    if (control) {
+                        // Compute value
+                        var value = (event.clientX - control.rangeStart) / control.rangeLength;
+                        if (value < 0) value = 0;
+                        if (value > 1) value = 1;
+                        
+                        // Compute slider position
+                        var sliderPosition = event.clientX - control.rangeStart;
+                        if (sliderPosition < 0) sliderPosition = 0;
+                        if (sliderPosition > control.rangeLength) sliderPosition = control.rangeLength;
+                        control.slider.style.left = sliderPosition;
+                        
+                        // Notify server that value changed
+                        control.value = value;
+                        xformsValueChanged(control, true);
+                    }
+                    
+                    return false;
+                }
+                
+                if (!control.listenersRegistered) {
+                    control.listenersRegistered = true;
+                    control.mouseDown = false;
+                    xformsAddEventListener(control, "mousedown", rangeMouseDown);
+                    xformsAddEventListener(control, "mouseup", rangeMouseUp);
+                    for (var childIndex = 0; childIndex < control.childNodes.length; childIndex++) {
+                        var child = control.childNodes[childIndex];
+                        if (child.className 
+                                && xformsArrayContains(child.className.split(" "), "xforms-range-track"))
+                            control.track = child;
+                        if (child.className 
+                                && xformsArrayContains(child.className.split(" "), "xforms-range-slider"))
+                            control.slider = child;
+                    }
+                    control.rangeStart = xformsGetElementPosition(control.track).left
+                    control.rangeLength = control.track.clientWidth - control.slider.clientWidth;
+
+                    // Find parent form and store this in span
+                    var parent = control;
+                    while (parent.tagName != "FORM")
+                       parent = parent.parentNode;
+                    control.form = parent;
+                }
+                
+                if (!document.xformsRangeListenerRegistered) {
+                    document.xformsRangeListenerRegistered = true;
+                    xformsAddEventListener(document, "mousemove", rangeMouseMove);
+                }
+            
             } else if (control.tagName == "SPAN") {
                 // Don't add listeners on spans
             } else {
-                // Regular listener for controls using a simple "value" attribute
-                function xformsValueChanged(target, incremental) {
-                    if (target.value != target.previousValue) {
-                        target.previousValue = target.value;
-                        xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value, incremental);
-                    }
-                }
-
                 // Handle value change and incremental modification
                 control.previousValue = null;
                 control.userModications = false;
@@ -434,7 +503,7 @@ function xformsHandleResponse() {
                                             documentElement.removeChild(documentElement.firstChild);
                                         documentElement.appendChild
                                             (documentElement.ownerDocument.createTextNode(controlValue));
-                                    } else if (xformsArrayContains(documentElementClasses, "xforms-output")
+                                    } else if (xformsArrayContains(documentElementClasses, "xforms-control")
                                             && typeof(documentElement.value) == "string") {
                                         // Other controls that have a value (textfield, etc)
                                         if (documentElement.value != controlValue) {

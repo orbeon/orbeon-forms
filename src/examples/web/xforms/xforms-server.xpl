@@ -29,7 +29,7 @@
     <!-- Dereference URI and return XML -->
     <p:processor name="oxf:url-generator">
         <p:input name="config" href="aggregate('config', aggregate('url', #request#xpointer(string(/request/body))))"/>
-        <p:output name="data" id="xml-request" debug="xxxrequest"/>
+        <p:output name="data" id="xml-request"/>
     </p:processor>
 
     <!-- Run XForms Server -->
@@ -40,7 +40,7 @@
 
     <!-- Generate response -->
     <p:processor name="oxf:xml-serializer">
-        <p:input name="data" href="#xml-response" debug="xxxresponse"/>
+        <p:input name="data" href="#xml-response"/>
         <p:input name="config">
             <config/>
         </p:input>

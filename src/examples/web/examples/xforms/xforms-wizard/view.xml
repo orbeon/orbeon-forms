@@ -51,12 +51,12 @@
                     <xforms:case id="firstname">
                         <xhtml:p>Step 1 of 3</xhtml:p>
                         <xhtml:p>
-                            <xforms:input ref="firstname">
+                            <xforms:input ref="firstname" tabindex="1">
                                 <xforms:label xhtml:class="fixed-width">First name:</xforms:label>
                             </xforms:input>
                         </xhtml:p>
                         <xhtml:p>
-                            <xforms:trigger>
+                            <xforms:trigger tabindex="2">
                                 <xforms:label>Next ></xforms:label>
                                 <xforms:toggle ev:event="DOMActivate" case="lastname"/>
                             </xforms:trigger>
@@ -65,12 +65,12 @@
                     <xforms:case id="lastname">
                         <xhtml:p>Step 2 of 3</xhtml:p>
                         <xhtml:p>
-                            <xforms:input ref="lastname">
+                            <xforms:input ref="lastname" tabindex="3">
                                 <xforms:label xhtml:class="fixed-width">Last name:</xforms:label>
                             </xforms:input>
                         </xhtml:p>
                         <xhtml:p>
-                            <xforms:trigger>
+                            <xforms:trigger tabindex="4">
                                 <xforms:label>&lt; Previous</xforms:label>
                                 <xforms:toggle ev:event="DOMActivate" case="firstname"/>
                             </xforms:trigger>
@@ -98,10 +98,10 @@
                                 <xforms:label>&lt; Previous</xforms:label>
                                 <xforms:toggle ev:event="DOMActivate" case="lastname"/>
                             </xforms:trigger>
-    <xforms:trigger ref="instance('buttons-state')/finish">
-        <xforms:label>Finish ></xforms:label>
-        <xforms:toggle ev:event="DOMActivate" case="showinstance"/>
-    </xforms:trigger>
+                            <xforms:trigger ref="instance('buttons-state')/finish">
+                                <xforms:label>Finish ></xforms:label>
+                                <xforms:toggle ev:event="DOMActivate" case="showinstance"/>
+                            </xforms:trigger>
                         </xhtml:p>
                     </xforms:case>
                     <xforms:case id="showinstance">

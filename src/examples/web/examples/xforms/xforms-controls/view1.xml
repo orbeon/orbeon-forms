@@ -87,7 +87,7 @@
             <xforms:bind nodeset="instance('formatted')"
                 calculate="saxon:serialize(xxforms:call-xpl
                     ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
-            <xforms:submission ref="instance('instance')" id="default-submission" method="post" action="http://localhost:8888/oxf/xforms-controls/post" replace="instance"/>
+            <xforms:submission ref="instance('instance')" id="default-submission" method="post" action="http://localhost:8888/ops/xforms-controls/post" replace="instance"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

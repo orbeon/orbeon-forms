@@ -22,7 +22,7 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.scope.ScopeStore;
-import org.orbeon.oxf.xforms.event.EventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * Represent an XForms instance.
  */
-public class XFormsInstance implements EventTarget {
+public class XFormsInstance implements XFormsEventTarget {
 
     public static final String REQUEST_INSTANCE_DOCUMENT = "org.orbeon.oxf.request.xforms-instance-document";
     public static final String DEFAULT_UPLOAD_TYPE = "xs:anyURI";
@@ -244,10 +244,7 @@ public class XFormsInstance implements EventTarget {
     }
 
     public void dispatchEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
-        dispatchEvent(pipelineContext, xformsEvent, xformsEvent.getEventName());
-    }
-
-    public void dispatchEvent(PipelineContext pipelineContext, XFormsGenericEvent xformsEvent, String eventName) {
+        final String eventName = xformsEvent.getEventName();
         if (XFormsEvents.XFORMS_INSERT.equals(eventName)) {
             // 4.4.5 The xforms-insert and xforms-delete Events
             // Bubbles: Yes / Cancelable: No / Context Info: Path expression used for insert/delete (xsd:string).

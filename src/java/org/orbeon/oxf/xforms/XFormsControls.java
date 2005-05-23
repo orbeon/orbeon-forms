@@ -33,7 +33,7 @@ import java.util.*;
 /**
  * Represents all this XForms containing document controls and the context in which they operate.
  */
-public class XFormsControls implements EventTarget {
+public class XFormsControls implements XFormsEventTarget {
 
     private Locator locator;
 
@@ -829,7 +829,8 @@ public class XFormsControls implements EventTarget {
                     result = XFormsUtils.retrieveSrcValue(srcAttributeValue);
                 } catch (IOException e) {
                     // Dispatch xforms-link-error to model
-                    getCurrentModel().dispatchEvent(pipelineContext, new XFormsLinkError(srcAttributeValue, childElement, e));
+                    final XFormsModel currentModel = getCurrentModel();
+                    currentModel.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(currentModel, srcAttributeValue, childElement, e));
                 }
             }
         }
@@ -843,36 +844,33 @@ public class XFormsControls implements EventTarget {
     }
 
     public void dispatchEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
-        dispatchEvent(pipelineContext, xformsEvent, xformsEvent.getEventName());
-    }
-
-    public void dispatchEvent(PipelineContext pipelineContext, XFormsGenericEvent xformsEvent, String eventName) {
+        final String eventName = xformsEvent.getEventName();
         if (XFormsEvents.XFORMS_DOM_ACTIVATE.equals(eventName)) {
             // 4.4.1 The DOMActivate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             // The default action for this event results in the following: None; notification event only.
 
-            final Element controlElement = xformsEvent.getControlElement();
-            if (controlElement.getName().equals("submit")) {
+            final Element targetElement = (Element) xformsEvent.getTargetObject();
+            if (targetElement.getName().equals("submit")) {
                 // xforms:submit reacts to DOMActivate in a special way
 
                 // Find submission id
-                final String submissionId = controlElement.attributeValue("submission");
+                final String submissionId = targetElement.attributeValue("submission");
                 if (submissionId == null)
                     throw new OXFException("xforms:submit requires a submission attribute.");
 
                 // Find submission object and dispatch submit event to it
-                final Object object = containingDocument.geObjectById(pipelineContext, submissionId);
+                final Object object = containingDocument.getObjectById(pipelineContext, submissionId);
                 if (object instanceof XFormsModelSubmission) {
                     final XFormsModelSubmission submission = (XFormsModelSubmission) object;
 
-                    submission.dispatchEvent(pipelineContext, new XFormsSubmitEvent());
+                    submission.dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));
                 } else {
                     throw new OXFException("xforms:submit submission attribute must point to an xforms:submission element.");
                 }
 
             } else {
-                callEventHandlers(pipelineContext, xformsEvent, eventName, controlElement);
+                callEventHandlers(pipelineContext, xformsEvent);
             }
 
         } else if (XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)) {
@@ -880,65 +878,71 @@ public class XFormsControls implements EventTarget {
             // Bubbles: Yes / Cancelable: No / Context Info: None
             // The default action for this event results in the following: None; notification event only.
 
-            callEventHandlers(pipelineContext, xformsEvent, eventName, xformsEvent.getControlElement());
+            callEventHandlers(pipelineContext, xformsEvent);
 
         } else if (XFormsEvents.XFORMS_VALUE_CHANGED.equals(eventName)) {
             // 4.4.2 The xforms-value-changed Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
             // The default action for this event results in the following: None; notification event only.
 
-            callEventHandlers(pipelineContext, xformsEvent, eventName, xformsEvent.getControlElement());
+            callEventHandlers(pipelineContext, xformsEvent);
 
-        } else if (XFormsEvents.XFORMS_SELECT.equals(eventName) || XFormsEvents.XFORMS_DESELECT.equals(eventName)) {
+        } else if (XFormsEvents.XFORMS_SELECT.equals(eventName)) {
             // 4.4.3 The xforms-select and xforms-deselect Events
             // Bubbles: Yes / Cancelable: No / Context Info: None
             // The default action for this event results in the following: None; notification event only.
 
-            callEventHandlers(pipelineContext, xformsEvent, eventName, xformsEvent.getControlElement());
+            callEventHandlers(pipelineContext, xformsEvent);
+
+        } else if (XFormsEvents.XFORMS_DESELECT.equals(eventName)) {
+            // 4.4.3 The xforms-select and xforms-deselect Events
+            // Bubbles: Yes / Cancelable: No / Context Info: None
+            // The default action for this event results in the following: None; notification event only.
+
+            callEventHandlers(pipelineContext, xformsEvent);
 
         } else {
             throw new OXFException("Invalid action requested: " + eventName);
         }
     }
 
-    private boolean callEventHandlers(PipelineContext pipelineContext, XFormsGenericEvent XFormsEvent, String eventName, Element controlElement) {
+    private boolean callEventHandlers(PipelineContext pipelineContext, XFormsEvent xformsEvent) {
 
         // TODO: capture / bubbling / cancel
 
         // Find event handler
-        Element eventHandlerElement = getEventHandler(pipelineContext, controlElement, eventName);
+        Element eventHandlerElement = getEventHandler(pipelineContext, (Element) xformsEvent.getTargetObject(), xformsEvent.getEventName());
         // If found, run actions
         if (eventHandlerElement != null) {
-            runAction(pipelineContext, eventHandlerElement, XFormsEvent);
+            runAction(pipelineContext, eventHandlerElement, xformsEvent);
             return true;
         } else {
             return false;
         }
     }
 
-    private Element getEventHandler(PipelineContext pipelineContext, Element controlElement, String eventName) {
+    private Element getEventHandler(PipelineContext pipelineContext, Element targetElement, String eventName) {
         // Create XPath variables
         Map variables = new HashMap();
         variables.put("event-name", eventName);
 
         // Get event handler element
         Element eventHandlerElement;
-        eventHandlerElement = (Element) documentXPathEvaluator.evaluateSingle(pipelineContext, controlElement,
+        eventHandlerElement = (Element) documentXPathEvaluator.evaluateSingle(pipelineContext, targetElement,
                 "*[@ev:event = $event-name]", XFormsServer.XFORMS_NAMESPACES, variables, null, null);
 //            if (eventHandlerElement == null)
 //                throw new OXFException("Cannot find event handler with name '" + eventName + "'.");
         return eventHandlerElement;
     }
 
-    private void runAction(final PipelineContext pipelineContext, Element eventHandlerElement,
-                           XFormsGenericEvent XFormsEvent) {
+    private void runAction(final PipelineContext pipelineContext, Element eventHandlerElement, XFormsEvent XFormsEvent) {
 
-        String actionNamespaceURI = eventHandlerElement.getNamespaceURI();
+        final String actionNamespaceURI = eventHandlerElement.getNamespaceURI();
         if (!XFormsConstants.XFORMS_NAMESPACE_URI.equals(actionNamespaceURI)) {
             throw new OXFException("Invalid action namespace: " + actionNamespaceURI);
         }
 
-        String actionEventName = eventHandlerElement.getName();
+        final String actionEventName = eventHandlerElement.getName();
 
         if (XFormsEvents.XFORMS_SETVALUE_ACTION.equals(actionEventName)) {
             // 10.1.9 The setvalue Element
@@ -1080,14 +1084,66 @@ public class XFormsControls implements EventTarget {
             }
 
             // "4. If the insert is successful, the event xforms-insert is dispatched."
-            currentInstance.dispatchEvent(pipelineContext, new XFormsInsertEvent(atAttribute));
+            currentInstance.dispatchEvent(pipelineContext, new XFormsInsertEvent(currentInstance, atAttribute));
 
         } else if (XFormsEvents.XFORMS_DELETE_ACTION.equals(actionEventName)) {
             // 9.3.6 The delete Element
 
+            // TODO
 
         } else if (XFormsEvents.XFORMS_SETINDEX_ACTION.equals(actionEventName)) {
             // 9.3.7 The setindex Element
+
+            // TODO
+
+        } else if (XFormsEvents.XFORMS_SEND_ACTION.equals(actionEventName)) {
+            // 10.1.10 The send Element
+
+            // Find submission object
+            final String submissionId = eventHandlerElement.attributeValue("submission");
+            if (submissionId == null)
+                throw new OXFException("Missing mandatory submission attribute on xforms:send element.");
+            final Object submission = containingDocument.getObjectById(pipelineContext, submissionId);
+            if (submission == null || !(submission instanceof XFormsModelSubmission))
+                throw new OXFException("submission attribute on xforms:send element does not refer to existing xforms:submission element.");
+
+            // Dispatch event to submission object
+            ((XFormsModelSubmission) submission).dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));
+
+        } else if (XFormsEvents.XFORMS_DISPATCH_ACTION.equals(actionEventName)) {
+            // 10.1.2 The dispatch Element
+
+            // Mandatory attributes
+            final String newEventName = eventHandlerElement.attributeValue("name");
+            if (newEventName == null)
+                throw new OXFException("Missing mandatory name attribute on xforms:dispatch element.");
+            final String newEventTargetId = eventHandlerElement.attributeValue("target");
+            if (newEventTargetId == null)
+                throw new OXFException("Missing mandatory target attribute on xforms:dispatch element.");
+
+            // Optional attributes
+            final boolean newEventBubbles; {
+                final String newEventBubblesString = eventHandlerElement.attributeValue("bubbles");
+                // FIXME: "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
+                newEventBubbles = Boolean.getBoolean((newEventBubblesString == null) ? "true" : newEventBubblesString);
+            }
+            final boolean newEventCancelable; {
+                // FIXME: "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
+                final String newEventCancelableString = eventHandlerElement.attributeValue("cancelable");
+                newEventCancelable = Boolean.getBoolean((newEventCancelableString == null) ? "true" : newEventCancelableString);
+            }
+
+            final Object newTargetObject = containingDocument.getObjectById(pipelineContext, newEventTargetId);
+
+            if (newTargetObject instanceof Element) {
+                // This must be a control
+
+            } else if (newTargetObject instanceof XFormsEventTarget) {
+                // This can be anything
+                ((XFormsEventTarget) newTargetObject).dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(newEventName, newTargetObject, newEventBubbles, newEventCancelable));
+            } else {
+                throw new OXFException("Invalid event target for id: " + newEventTargetId);
+            }
 
         } else {
             throw new OXFException("Invalid action requested: " + actionEventName);

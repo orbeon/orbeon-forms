@@ -19,6 +19,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.xforms.output.element.ViewContentHandler;
 import org.orbeon.oxf.xforms.*;
+import org.orbeon.oxf.xforms.event.XXFormsInitializeEvent;
 import org.xml.sax.ContentHandler;
 
 import java.util.Collections;
@@ -60,7 +61,7 @@ public class XFormsOutput extends ProcessorImpl {
                 // Create and initialize XForms Engine
                 XFormsContainingDocument containingDocument = new XFormsContainingDocument(Collections.singletonList(model), null);
                 containingDocument.initialize(pipelineContext);
-                containingDocument.dispatchEvent(pipelineContext, new XFormsEvent(XFormsEvents.XXFORMS_INITIALIZE));
+                containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
 
                 // Create evaluation context
                 XFormsElementContext elementContext =

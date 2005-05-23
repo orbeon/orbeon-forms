@@ -13,22 +13,23 @@
  */
 package org.orbeon.oxf.xforms.event;
 
+import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xforms.XFormsEvent;
 import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
- * 4.4.19 The xforms-submit-error Event
+ * 4.5.4 The xforms-compute-exception Event
  *
- * Target: model / Bubbles: Yes / Cancelable: No / Context Info: The submit method URI that failed (xsd:anyURI)
- * The default action for this event results in the following: None; notification event only.
+ * Target: model / Bubbles: Yes / Cancelable: No / Context Info: Implementation-specific error string.
+ * The default action for this event results in the following: Fatal error.
  */
-public class XFormsSubmitErrorEvent extends XFormsEvent {
+public class XFormsComputeExceptionEvent extends XFormsEvent {
+    private String errorString;
     private Throwable throwable;
-    private String urlString;
 
-    public XFormsSubmitErrorEvent(Object targetObject, String urlString, Throwable throwable) {
-        super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, true, false);
-        this.urlString = urlString;
+    public XFormsComputeExceptionEvent(Object targetObject, String errorString, Throwable throwable) {
+        super(XFormsEvents.XFORMS_COMPUTE_EXCEPTION, targetObject, true, false);
+        this.errorString = errorString;
         this.throwable = throwable;
     }
 
@@ -36,7 +37,16 @@ public class XFormsSubmitErrorEvent extends XFormsEvent {
         return throwable;
     }
 
-    public String getUrlString() {
-        return urlString;
+    public String getErrorString() {
+        return errorString;
+    }
+
+    public RuntimeException createException() {
+        String message = getEventName() + ": " + getErrorString();
+
+        if (getThrowable() != null)
+            return new OXFException(message, getThrowable());
+        else
+            return new OXFException(message);
     }
 }

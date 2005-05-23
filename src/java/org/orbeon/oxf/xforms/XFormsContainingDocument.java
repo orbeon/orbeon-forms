@@ -33,7 +33,7 @@ import java.util.Map;
  * o XForms controls
  * o Event handlers hierarchy
  */
-public class XFormsContainingDocument implements org.orbeon.oxf.xforms.event.EventTarget {
+public class XFormsContainingDocument implements XFormsEventTarget {
 
     private List models;
     private Map modelsMap = new HashMap();
@@ -83,7 +83,7 @@ public class XFormsContainingDocument implements org.orbeon.oxf.xforms.event.Eve
     /**
      * Get object with the id specified.
      */
-    public Object geObjectById(PipelineContext pipelineContext, String id) {
+    public Object getObjectById(PipelineContext pipelineContext, String id) {
 
         // Search in models
         for (Iterator i = models.iterator(); i.hasNext();) {
@@ -98,29 +98,33 @@ public class XFormsContainingDocument implements org.orbeon.oxf.xforms.event.Eve
     }
 
     /**
-     * Execute an external event on control with id controlId and event eventName.
+     * Execute an external event on element with id targetElementId and event eventName.
      */
-    public void executeExternalEvent(PipelineContext pipelineContext, String controlId, String eventName, String eventValue) {
+    public void executeExternalEvent(PipelineContext pipelineContext, String targetElementId, String eventName, String contextString) {
 
-        // Get control element and event handler element
-        Element controlElement = xFormsControls.getElementById(pipelineContext, controlId);
+        // Get target element (control element)
+        final Element targetElement = xFormsControls.getElementById(pipelineContext, targetElementId);
+
+        // Create event
+        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, targetElement, contextString, null, null);
 
         // Interpret event
-        XFormsGenericEvent xformsEvent = new XFormsGenericEvent(controlElement, eventValue);
-        interpretEvent(pipelineContext, xformsEvent, eventName);
+        interpretEvent(pipelineContext, xformsEvent);
     }
 
-    private void interpretEvent(final PipelineContext pipelineContext, XFormsGenericEvent xformsEvent, String eventName) {
-
+    private void interpretEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
+        final String eventName = xformsEvent.getEventName();
         if (XFormsEvents.XFORMS_DOM_ACTIVATE.equals(eventName)) {
             // 4.4.1 The DOMActivate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             // The default action for this event results in the following: None; notification event only.
 
-            xFormsControls.dispatchEvent(pipelineContext, xformsEvent, eventName);
+            xFormsControls.dispatchEvent(pipelineContext, xformsEvent);
 
         } else if (XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE.equals(eventName)) {
             // 4.6.7 Sequence: Value Change with Focus Change
+
+            final XXFormsValueChangeWithFocusChangeEvent concreteEvent = (XXFormsValueChangeWithFocusChangeEvent) xformsEvent;
 
             // 1. xforms-recalculate
             // 2. xforms-revalidate
@@ -132,23 +136,23 @@ public class XFormsContainingDocument implements org.orbeon.oxf.xforms.event.Eve
             // Reevaluation of binding expressions must occur before step 3 above.
 
             // Set current context to control
-            xFormsControls.setBinding(pipelineContext, xformsEvent.getControlElement());
+            xFormsControls.setBinding(pipelineContext, (Element) concreteEvent.getTargetObject());
 
             // Set value into the instance
-            XFormsInstance.setValueForNode(xFormsControls.getCurrentSingleNode(), xformsEvent.getValue());
+            XFormsInstance.setValueForNode(xFormsControls.getCurrentSingleNode(), concreteEvent.getNewValue());
 
             // Dispatch events
-            XFormsModel model = xFormsControls.getCurrentModel();
-            model.dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_RECALCULATE);
-            model.dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_REVALIDATE);
+            final XFormsModel model = xFormsControls.getCurrentModel();
+            model.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model));
+            model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model));
 
-            xFormsControls.dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_DOM_FOCUS_OUT);
-            xFormsControls.dispatchEvent(pipelineContext, xformsEvent, XFormsEvents.XFORMS_VALUE_CHANGED);
+            xFormsControls.dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(concreteEvent.getTargetObject()));
+            xFormsControls.dispatchEvent(pipelineContext, new XFormsValueChangeEvent(concreteEvent.getTargetObject()));
 
             // TODO (missing new control information!)
             //xFormsControls.dispatchEvent(pipelineContext, XFormsEvents.XFORMS_DOM_FOCUS_IN, newControlElement);
 
-            model.dispatchEvent(pipelineContext, new XFormsRefreshEvent());
+            model.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
 
         } else {
             throw new OXFException("Invalid event requested: " + eventName);
@@ -156,10 +160,7 @@ public class XFormsContainingDocument implements org.orbeon.oxf.xforms.event.Eve
     }
 
     public void dispatchEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
-        dispatchEvent(pipelineContext, xformsEvent, xformsEvent.getEventName());
-    }
-
-    public void dispatchEvent(PipelineContext pipelineContext, XFormsGenericEvent XFormsEvent, String eventName) {
+        final String eventName = xformsEvent.getEventName();
         if (XFormsEvents.XXFORMS_INITIALIZE.equals(eventName)) {
             // 4.2 Initialization Events
 
@@ -167,23 +168,23 @@ public class XFormsContainingDocument implements org.orbeon.oxf.xforms.event.Eve
             // 2. Dispatch xforms-model-construct-done to all models
             // 3. Dispatch xforms-ready to all models
 
-            final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_DONE, XFormsEvents.XFORMS_READY };
+            final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, XFormsEvents.XFORMS_READY };
             for (int i = 0; i < eventsToDispatch.length; i++) {
-                if (XFormsEvents.XFORMS_MODEL_DONE.equals(eventsToDispatch[i])) {
-                    dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XXFORMS_INITIALIZE_CONTROLS);
+                if (XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE.equals(eventsToDispatch[i])) {
+                    dispatchEvent(pipelineContext, new XXFormsInitializeControlsEvent(this));
                 }
                 for (Iterator j = getModels().iterator(); j.hasNext();) {
-                    XFormsModel model = (XFormsModel) j.next();
-                    model.dispatchEvent(pipelineContext, XFormsEvent, eventsToDispatch[i]);
+                    final XFormsModel currentModel = (XFormsModel) j.next();
+                    currentModel.dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
                 }
             }
         } else if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
             // Restore models state
             for (Iterator j = getModels().iterator(); j.hasNext();) {
-                XFormsModel model = (XFormsModel) j.next();
-                model.dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XXFORMS_INITIALIZE_STATE);
+                final XFormsModel currentModel = (XFormsModel) j.next();
+                currentModel.dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(currentModel));
             }
-            dispatchEvent(pipelineContext, XFormsEvent, XFormsEvents.XXFORMS_INITIALIZE_CONTROLS);
+            dispatchEvent(pipelineContext, new XXFormsInitializeControlsEvent(this));
         } else if (XFormsEvents.XXFORMS_INITIALIZE_CONTROLS.equals(eventName)) {
             // Make sure controls are initialized
             xFormsControls.initialize(pipelineContext);
@@ -191,5 +192,4 @@ public class XFormsContainingDocument implements org.orbeon.oxf.xforms.event.Eve
             throw new OXFException("Invalid event dispatched: " + eventName);
         }
     }
-
 }

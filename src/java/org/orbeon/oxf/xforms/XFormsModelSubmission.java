@@ -20,8 +20,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xforms.event.EventTarget;
-import org.orbeon.oxf.xforms.event.XFormsSubmitErrorEvent;
+import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
@@ -37,7 +36,7 @@ import java.net.URL;
 /**
  * Represents an XForms model submission instance.
  */
-public class XFormsModelSubmission implements EventTarget {
+public class XFormsModelSubmission implements XFormsEventTarget {
 
     private XFormsModel model;
     private Element submissionElement;
@@ -106,7 +105,7 @@ public class XFormsModelSubmission implements EventTarget {
         dispatchEvent(pipelineContext, xformsEvent, xformsEvent.getEventName());
     }
 
-    public void dispatchEvent(PipelineContext pipelineContext, XFormsGenericEvent event, String eventName) {
+    public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event, String eventName) {
         if (XFormsEvents.XFORMS_SUBMIT.equals(eventName)) {
             // 11.1 The xforms-submit Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
@@ -130,7 +129,7 @@ public class XFormsModelSubmission implements EventTarget {
             // Revalidate instance
             // TODO: we should only revalidate relevant parts
             // TODO: this should not send valid / invalid events (probably)
-            model.dispatchEvent(pipelineContext, new XFormsEvent(XFormsEvents.XFORMS_REVALIDATE));
+            model.dispatchEvent(pipelineContext,  new XFormsRevalidateEvent(model));
 
             final Document documentToSubmit;
             {
@@ -311,18 +310,18 @@ public class XFormsModelSubmission implements EventTarget {
                                     currentInstance.setInstanceDocument(resultingInstanceDocument);
 
                                     // Dispatch events
-                                    model.dispatchEvent(pipelineContext, new XFormsEvent(XFormsEvents.XFORMS_MODEL_CONSTRUCT));
-                                    dispatchEvent(pipelineContext, new XFormsEvent(XFormsEvents.XFORMS_SUBMIT_DONE));
+                                    model.dispatchEvent(pipelineContext, new XFormsModelConstructEvent(model));
+                                    dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                                 } catch (Exception e) {
                                     // TODO: dispatch xforms-submit-error and stop processing
                                     throw new OXFException("xforms:submission: exception while serializing XML to instance.", e);
                                 }
                             } else {
                                 // Other media type
-                                dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(action, null));
+                                dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(XFormsModelSubmission.this, action, null));
                             }
                         } else if (replace.equals("none")) {
-                            dispatchEvent(pipelineContext, new XFormsEvent(XFormsEvents.XFORMS_SUBMIT_DONE));
+                            dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                         } else {
                             // TODO: dispatch xforms-submit-error and stop processing
                             throw new OXFException("xforms:submission: invalid replace attribute: " + replace);
@@ -330,11 +329,11 @@ public class XFormsModelSubmission implements EventTarget {
 
                     } else {
                         // There is no body
-                        dispatchEvent(pipelineContext, new XFormsEvent(XFormsEvents.XFORMS_SUBMIT_DONE));
+                        dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                     }
                 } else {
                     // Error code received
-                    dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(action, null));
+                    dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(XFormsModelSubmission.this, action, null));
                 }
             } else if (scheme.equals("file")) {
                 // TODO

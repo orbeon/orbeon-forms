@@ -17,21 +17,13 @@ import org.orbeon.oxf.xforms.XFormsEvent;
 import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
- * 4.4.5 The xforms-insert and xforms-delete Events
+ * 4.2.2 The xforms-model-construct-done Event
  *
- * Target: instance / Bubbles: Yes / Cancelable: No / Context Info: Path expression used for insert/delete (xsd:string).
- * The default action for these events results in the following: None; notification event only.
+ * Target: model / Bubbles: Yes / Cancelable: No / Context Info: None
  */
-public class XFormsInsertEvent extends XFormsEvent {
+public class XFormsModelConstructDoneEvent extends XFormsEvent {
 
-    private String xpathExpression;
-
-    public XFormsInsertEvent(Object targetObject, String xpathExpression) {
-        super(XFormsEvents.XFORMS_INSERT, targetObject, true, false);
-        this.xpathExpression = xpathExpression;
-    }
-
-    public String getXpathExpression() {
-        return xpathExpression;
+    public XFormsModelConstructDoneEvent(Object targetObject) {
+        super(XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, targetObject, true, false);
     }
 }

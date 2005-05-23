@@ -13,23 +13,30 @@
  */
 package org.orbeon.oxf.xforms.event;
 
+import org.dom4j.Element;
 import org.orbeon.oxf.xforms.XFormsEvent;
 import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
- * 4.4.19 The xforms-submit-error Event
+ * 4.5.3 The xforms-link-error Event
  *
- * Target: model / Bubbles: Yes / Cancelable: No / Context Info: The submit method URI that failed (xsd:anyURI)
+ * Target: model / Bubbles: Yes / Cancelable: No / Context Info: The URI that failed to load (xsd:anyURI)
  * The default action for this event results in the following: None; notification event only.
  */
-public class XFormsSubmitErrorEvent extends XFormsEvent {
+public class XFormsLinkErrorEvent extends XFormsEvent {
     private Throwable throwable;
+    private Element controlElement;
     private String urlString;
 
-    public XFormsSubmitErrorEvent(Object targetObject, String urlString, Throwable throwable) {
-        super(XFormsEvents.XFORMS_SUBMIT_ERROR, targetObject, true, false);
+    public XFormsLinkErrorEvent(Object targetObject, String urlString, Element controlElement, Throwable throwable) {
+        super(XFormsEvents.XFORMS_LINK_ERROR, targetObject, true, false);
         this.urlString = urlString;
+        this.controlElement = controlElement;
         this.throwable = throwable;
+    }
+
+    public Element getControlElement() {
+        return controlElement;
     }
 
     public Throwable getThrowable() {

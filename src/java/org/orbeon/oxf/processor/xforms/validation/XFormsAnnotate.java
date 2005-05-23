@@ -18,9 +18,8 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.xforms.XFormsContainingDocument;
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.event.XXFormsInitializeEvent;
 import org.xml.sax.ContentHandler;
 
 import java.util.Collections;
@@ -61,7 +60,7 @@ public class XFormsAnnotate extends ProcessorImpl {
                 // Create and initialize XForms Engine
                 XFormsContainingDocument containingDocument = new XFormsContainingDocument(Collections.singletonList(model), null);
                 containingDocument.initialize(pipelineContext);
-                containingDocument.dispatchEvent(pipelineContext, new XFormsEvent(XFormsEvents.XXFORMS_INITIALIZE));
+                containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
 
                 // Output the instance to the specified content handler
                 model.getDefaultInstance().read(contentHandler);

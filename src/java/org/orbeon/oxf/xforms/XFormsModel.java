@@ -37,8 +37,11 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsRebuildEvent;
+import org.orbeon.oxf.xforms.event.XFormsRecalculateEvent;
+import org.orbeon.oxf.xforms.event.XFormsRevalidateEvent;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
-import org.orbeon.oxf.xforms.event.EventTarget;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -66,7 +69,7 @@ import java.util.*;
 /**
  * Represents an XForms model.
  */
-public class XFormsModel implements EventTarget, Cloneable {
+public class XFormsModel implements XFormsEventTarget, Cloneable {
 
     private static class MSVGrammarReaderController implements GrammarReaderController {
 
@@ -292,10 +295,13 @@ public class XFormsModel implements EventTarget, Cloneable {
     public Object getObjectByid(PipelineContext pipelineContext, String id) {
 
         // Check model itself
-        // NOTE: This is not needed for now
+        if (id.equals(modelId))
+            return this;
 
         // Search instances
-        // NOTE: This is not needed for now
+        final XFormsInstance instance = (XFormsInstance) instancesMap.get(id);
+        if (instance != null)
+            return instance;
 
         // Search submissions
         {
@@ -993,15 +999,12 @@ public class XFormsModel implements EventTarget, Cloneable {
     }
 
     public void dispatchEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
-        dispatchEvent(pipelineContext, xformsEvent, xformsEvent.getEventName());
-    }
-
-    public void dispatchEvent(final PipelineContext pipelineContext, XFormsGenericEvent genericXFormsEvent, String eventName) {
+        final String eventName = xformsEvent.getEventName();
         if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
             // Internal event to restore state
 
             applyRelevantReadonlyBinds(pipelineContext);
-            dispatchEvent(pipelineContext, genericXFormsEvent, XFormsEvents.XFORMS_REVALIDATE);
+            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this));
 
         } else if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
             // 4.2.1 The xforms-model-construct Event
@@ -1063,11 +1066,11 @@ public class XFormsModel implements EventTarget, Cloneable {
             // TODO: a, b, c xxx
 
             // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-            dispatchEvent(pipelineContext, genericXFormsEvent, XFormsEvents.XFORMS_REBUILD);
-            dispatchEvent(pipelineContext, genericXFormsEvent, XFormsEvents.XFORMS_RECALCULATE);
-            dispatchEvent(pipelineContext, genericXFormsEvent, XFormsEvents.XFORMS_REVALIDATE);
+            dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
+            dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this));
+            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this));
 
-        } else if (XFormsEvents.XFORMS_MODEL_DONE.equals(eventName)) {
+        } else if (XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE.equals(eventName)) {
             // 4.2.2 The xforms-model-construct-done Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
 

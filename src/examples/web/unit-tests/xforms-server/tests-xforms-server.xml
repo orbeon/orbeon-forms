@@ -761,7 +761,7 @@
                         </xxf:repeat>
                     </xxf:repeats>
                     <xxf:itemsets/>
-                    <xxforms:controls xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                    <xxforms:controls xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                         <table>
                             <tr>
                                 <td>
@@ -769,21 +769,17 @@
                                         <tr>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-1-1" class="xforms-control xforms-output">f11</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-1-1" id="id125-1-1" class="xforms-alert-inactive"/>
                                             </td>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-1-1" class="xforms-control xforms-output">l11</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-1-1" id="id126-1-1" class="xforms-alert-inactive"/>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-1-2" class="xforms-control xforms-output">f12</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-1-2" id="id125-1-2" class="xforms-alert-inactive"/>
                                             </td>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-1-2" class="xforms-control xforms-output">l12</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-1-2" id="id126-1-2" class="xforms-alert-inactive"/>
                                             </td>
                                         </tr>
                                     </table>
@@ -795,11 +791,9 @@
                                         <tr>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-2-1" class="xforms-control xforms-output">f21</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-2-1" id="id125-2-1" class="xforms-alert-inactive"/>
                                             </td>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-2-1" class="xforms-control xforms-output">l21</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-2-1" id="id126-2-1" class="xforms-alert-inactive"/>
                                             </td>
                                         </tr>
                                     </table>
@@ -811,41 +805,33 @@
                                         <tr>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-1" class="xforms-control xforms-output">f31</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-3-1" id="id125-3-1" class="xforms-alert-inactive"/>
                                             </td>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-1" class="xforms-control xforms-output">l31</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-3-1" id="id126-3-1" class="xforms-alert-inactive"/>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-2" class="xforms-control xforms-output">f32</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-3-2" id="id125-3-2" class="xforms-alert-inactive"/>
                                             </td>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-2" class="xforms-control xforms-output">l32</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-3-2" id="id126-3-2" class="xforms-alert-inactive"/>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-3" class="xforms-control xforms-output">f33</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-3-3" id="id125-3-3" class="xforms-alert-inactive"/>
                                             </td>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-3" class="xforms-control xforms-output">l33</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-3-3" id="id126-3-3" class="xforms-alert-inactive"/>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-4" class="xforms-control xforms-output">f34</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id125-3-4" id="id125-3-4" class="xforms-alert-inactive"/>
                                             </td>
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-4" class="xforms-control xforms-output">l34</xhtml:span>
-                                                <xhtml:label xmlns:xhtml="http://www.w3.org/1999/xhtml" for="id126-3-4" id="id126-3-4" class="xforms-alert-inactive"/>
                                             </td>
                                         </tr>
                                     </table>

@@ -21,6 +21,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.xforms.event.XXFormsInitializeEvent;
+import org.orbeon.oxf.xforms.event.XXFormsInitializeStateEvent;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.style.StandardNames;
@@ -468,9 +470,9 @@ public class XFormsServer extends ProcessorImpl {
         // Initialize XForms Engine
         containingDocument.initialize(pipelineContext);
         if (isInitializeEvent)
-            containingDocument.dispatchEvent(pipelineContext, new XFormsEvent(XFormsEvents.XXFORMS_INITIALIZE));
+            containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
         else
-            containingDocument.dispatchEvent(pipelineContext, new XFormsEvent(XFormsEvents.XXFORMS_INITIALIZE_STATE));
+            containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument));
 
         // Set switch state
         // TODO: send this info with XFormsEvents.XXFORMS_INITIALIZE_STATE event?

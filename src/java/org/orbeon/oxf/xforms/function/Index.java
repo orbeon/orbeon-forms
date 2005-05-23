@@ -13,17 +13,18 @@
  */
 package org.orbeon.oxf.xforms.function;
 
+import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.StaticExternalContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.XFormsElementContext;
+import org.orbeon.oxf.xforms.XFormsModel;
+import org.orbeon.oxf.xforms.event.XFormsComputeExceptionEvent;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.om.Item;
 import org.orbeon.saxon.value.IntegerValue;
 import org.orbeon.saxon.xpath.XPathException;
-import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xforms.event.XFormsComputeException;
-import org.orbeon.oxf.xforms.XFormsElementContext;
-import org.orbeon.oxf.pipeline.StaticExternalContext;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 /**
  * XForms index() function.
@@ -63,8 +64,9 @@ public class Index extends XFormsFunction {
                 final StaticExternalContext.StaticContext staticContext = StaticExternalContext.getStaticContext();
                 PipelineContext pipelineContext = (staticContext != null) ? staticContext.getPipelineContext() : null;
 
-                getXFormsControls().getCurrentModel().dispatchEvent(pipelineContext,
-                        new XFormsComputeException(message, exception));
+                final XFormsModel currentModel = getXFormsControls().getCurrentModel();
+                currentModel.dispatchEvent(pipelineContext,
+                        new XFormsComputeExceptionEvent(currentModel, message, exception));
 
                 // TODO: stop processing!
                 // How do we do this: throw special exception? Or should throw exception with

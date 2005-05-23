@@ -21,7 +21,10 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -944,7 +947,7 @@ public class XFormsControls implements XFormsEventTarget {
 
         final String actionEventName = eventHandlerElement.getName();
 
-        if (XFormsEvents.XFORMS_SETVALUE_ACTION.equals(actionEventName)) {
+        if (XFormsActions.XFORMS_SETVALUE_ACTION.equals(actionEventName)) {
             // 10.1.9 The setvalue Element
             // xforms:setvalue
 
@@ -969,7 +972,7 @@ public class XFormsControls implements XFormsEventTarget {
             Node currentNode = getCurrentSingleNode();
             XFormsInstance.setValueForNode(currentNode, valueToSet);
 
-        } else if (XFormsEvents.XFORMS_ACTION_ACTION.equals(actionEventName)) {
+        } else if (XFormsActions.XFORMS_ACTION_ACTION.equals(actionEventName)) {
             // 10.1.1 The action Element
             // xforms:action
 
@@ -978,7 +981,7 @@ public class XFormsControls implements XFormsEventTarget {
                 runAction(pipelineContext, embeddedActionElement, XFormsEvent);
             }
 
-        } else if (XFormsEvents.XFORMS_TOGGLE_ACTION.equals(actionEventName)) {
+        } else if (XFormsActions.XFORMS_TOGGLE_ACTION.equals(actionEventName)) {
             // 9.2.3 The toggle Element
             // xforms:toggle
 
@@ -987,7 +990,7 @@ public class XFormsControls implements XFormsEventTarget {
             // Update xforms:switch info and dispatch events
             updateSwitchInfo(pipelineContext, caseId);
 
-        } else if (XFormsEvents.XFORMS_INSERT_ACTION.equals(actionEventName)) {
+        } else if (XFormsActions.XFORMS_INSERT_ACTION.equals(actionEventName)) {
             // 9.3.5 The insert Element
             final String atAttribute = eventHandlerElement.attributeValue("at");
             final String positionAttribute = eventHandlerElement.attributeValue("position");
@@ -1086,17 +1089,17 @@ public class XFormsControls implements XFormsEventTarget {
             // "4. If the insert is successful, the event xforms-insert is dispatched."
             currentInstance.dispatchEvent(pipelineContext, new XFormsInsertEvent(currentInstance, atAttribute));
 
-        } else if (XFormsEvents.XFORMS_DELETE_ACTION.equals(actionEventName)) {
+        } else if (XFormsActions.XFORMS_DELETE_ACTION.equals(actionEventName)) {
             // 9.3.6 The delete Element
 
             // TODO
 
-        } else if (XFormsEvents.XFORMS_SETINDEX_ACTION.equals(actionEventName)) {
+        } else if (XFormsActions.XFORMS_SETINDEX_ACTION.equals(actionEventName)) {
             // 9.3.7 The setindex Element
 
             // TODO
 
-        } else if (XFormsEvents.XFORMS_SEND_ACTION.equals(actionEventName)) {
+        } else if (XFormsActions.XFORMS_SEND_ACTION.equals(actionEventName)) {
             // 10.1.10 The send Element
 
             // Find submission object
@@ -1110,7 +1113,7 @@ public class XFormsControls implements XFormsEventTarget {
             // Dispatch event to submission object
             ((XFormsModelSubmission) submission).dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));
 
-        } else if (XFormsEvents.XFORMS_DISPATCH_ACTION.equals(actionEventName)) {
+        } else if (XFormsActions.XFORMS_DISPATCH_ACTION.equals(actionEventName)) {
             // 10.1.2 The dispatch Element
 
             // Mandatory attributes

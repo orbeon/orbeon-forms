@@ -13,14 +13,12 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
  * Internal XXFORMS_INITIALIZE_CONTROLS event.
  */
-public class XXFormsInitializeControlsEvent extends XFormsEvent {
+public class XXFormsInitializeControlsEvent extends org.orbeon.oxf.xforms.event.XFormsEvent {
     public XXFormsInitializeControlsEvent(Object targetObject) {
-        super(XFormsEvents.XXFORMS_INITIALIZE_CONTROLS, targetObject, false, false);
+        super(org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_INITIALIZE_CONTROLS, targetObject, false, false);
     }
 }

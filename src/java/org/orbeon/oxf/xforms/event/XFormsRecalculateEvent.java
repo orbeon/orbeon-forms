@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
  * 4.3.6 The xforms-recalculate Event

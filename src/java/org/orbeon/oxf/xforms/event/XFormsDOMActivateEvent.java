@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
  * 4.4.1 The DOMActivate Event
@@ -25,6 +23,6 @@ import org.orbeon.oxf.xforms.XFormsEvents;
 public class XFormsDOMActivateEvent extends XFormsEvent {
 
     public XFormsDOMActivateEvent(Object targetObject) {
-        super(XFormsEvents.XFORMS_DOM_ACTIVATE, targetObject, true, true);
+        super(org.orbeon.oxf.xforms.event.XFormsEvents.XFORMS_DOM_ACTIVATE, targetObject, true, true);
     }
 }

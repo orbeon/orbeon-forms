@@ -37,10 +37,8 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsRebuildEvent;
-import org.orbeon.oxf.xforms.event.XFormsRecalculateEvent;
-import org.orbeon.oxf.xforms.event.XFormsRevalidateEvent;
+import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xforms.msv.IDConstraintChecker;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -998,7 +996,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
         return !schmVldatdObj.booleanValue();
     }
 
-    public void dispatchEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
+    public void dispatchEvent(final PipelineContext pipelineContext, org.orbeon.oxf.xforms.event.XFormsEvent xformsEvent) {
         final String eventName = xformsEvent.getEventName();
         if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
             // Internal event to restore state

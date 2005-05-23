@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
  * 4.4.18 The xforms-submit-done Event
@@ -22,9 +20,9 @@ import org.orbeon.oxf.xforms.XFormsEvents;
  * Target: submission / Bubbles: Yes / Cancelable: No / Context Info: None
  * The default action for this event results in the following: None; notification event only.
  */
-public class XFormsSubmitDoneEvent extends XFormsEvent{
+public class XFormsSubmitDoneEvent extends org.orbeon.oxf.xforms.event.XFormsEvent{
 
     public XFormsSubmitDoneEvent(Object targetObject) {
-        super(XFormsEvents.XFORMS_SUBMIT_DONE, targetObject, true, false);
+        super(org.orbeon.oxf.xforms.event.XFormsEvents.XFORMS_SUBMIT_DONE, targetObject, true, false);
     }
 }

@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
  * 4.4.3 The xforms-select and xforms-deselect Events
@@ -22,7 +20,7 @@ import org.orbeon.oxf.xforms.XFormsEvents;
  * Target: item or itemset or case / Bubbles: Yes / Cancelable: No / Context Info: None
  * The default action for this event results in the following: None; notification event only.
  */
-public class XFormsSelectEvent extends XFormsEvent {
+public class XFormsSelectEvent extends org.orbeon.oxf.xforms.event.XFormsEvent {
     public XFormsSelectEvent(Object targetObject) {
         super(XFormsEvents.XFORMS_SELECT, targetObject, true, false);
     }

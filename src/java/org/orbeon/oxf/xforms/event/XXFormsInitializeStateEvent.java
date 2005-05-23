@@ -13,14 +13,12 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
  * Internal XXFORMS_INITIALIZE_STATE event.
  */
 public class XXFormsInitializeStateEvent extends XFormsEvent {
     public XXFormsInitializeStateEvent(Object targetObject) {
-        super(XFormsEvents.XXFORMS_INITIALIZE_STATE, targetObject, false, false);
+        super(org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_INITIALIZE_STATE, targetObject, false, false);
     }
 }

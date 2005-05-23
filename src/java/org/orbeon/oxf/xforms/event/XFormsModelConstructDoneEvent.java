@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
  * 4.2.2 The xforms-model-construct-done Event
@@ -24,6 +22,6 @@ import org.orbeon.oxf.xforms.XFormsEvents;
 public class XFormsModelConstructDoneEvent extends XFormsEvent {
 
     public XFormsModelConstructDoneEvent(Object targetObject) {
-        super(XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, targetObject, true, false);
+        super(org.orbeon.oxf.xforms.event.XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, targetObject, true, false);
     }
 }

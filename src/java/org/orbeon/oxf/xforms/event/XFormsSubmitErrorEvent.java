@@ -13,8 +13,6 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
  * 4.4.19 The xforms-submit-error Event
@@ -22,7 +20,7 @@ import org.orbeon.oxf.xforms.XFormsEvents;
  * Target: model / Bubbles: Yes / Cancelable: No / Context Info: The submit method URI that failed (xsd:anyURI)
  * The default action for this event results in the following: None; notification event only.
  */
-public class XFormsSubmitErrorEvent extends XFormsEvent {
+public class XFormsSubmitErrorEvent extends org.orbeon.oxf.xforms.event.XFormsEvent {
     private Throwable throwable;
     private String urlString;
 

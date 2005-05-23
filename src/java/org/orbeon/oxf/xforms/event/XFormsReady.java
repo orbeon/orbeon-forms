@@ -13,17 +13,15 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
  * 4.2.3 The xforms-ready Event
  *
  * Target: model / Bubbles: Yes / Cancelable: No / Context Info: None
  */
-public class XFormsReady extends XFormsEvent {
+public class XFormsReady extends org.orbeon.oxf.xforms.event.XFormsEvent {
 
     public XFormsReady(Object targetObject) {
-        super(XFormsEvents.XFORMS_READY, targetObject, true, false);
+        super(org.orbeon.oxf.xforms.event.XFormsEvents.XFORMS_READY, targetObject, true, false);
     }
 }

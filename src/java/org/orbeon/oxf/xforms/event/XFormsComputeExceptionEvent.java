@@ -14,8 +14,6 @@
 package org.orbeon.oxf.xforms.event;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
  * 4.5.4 The xforms-compute-exception Event

@@ -15,8 +15,6 @@ package org.orbeon.oxf.xforms.event;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
  * 4.5.4 The xforms-compute-exception Event
@@ -24,7 +22,7 @@ import org.orbeon.oxf.xforms.XFormsEvents;
  * Target: model / Bubbles: Yes / Cancelable: No / Context Info: Implementation-specific error string.
  * The default action for this event results in the following: Fatal error.
  */
-public class XFormsLinkExceptionEvent extends XFormsEvent {
+public class XFormsLinkExceptionEvent extends org.orbeon.oxf.xforms.event.XFormsEvent {
     private Throwable throwable;
     private Element controlElement;
     private String urlString;

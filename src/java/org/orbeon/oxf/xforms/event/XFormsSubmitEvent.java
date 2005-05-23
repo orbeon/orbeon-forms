@@ -13,17 +13,15 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
  * 4.3.9 The xforms-submit Event
  *
  * Target: submission / Bubbles: Yes / Cancelable: Yes / Context Info: None
  */
-public class XFormsSubmitEvent extends XFormsEvent{
+public class XFormsSubmitEvent extends org.orbeon.oxf.xforms.event.XFormsEvent{
 
     public XFormsSubmitEvent(Object targetObject) {
-        super(XFormsEvents.XFORMS_SUBMIT, targetObject, true, true);
+        super(org.orbeon.oxf.xforms.event.XFormsEvents.XFORMS_SUBMIT, targetObject, true, true);
     }
 }

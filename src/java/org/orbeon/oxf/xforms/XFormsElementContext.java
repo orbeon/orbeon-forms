@@ -13,12 +13,12 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.dom4j.Attribute;
+import org.dom4j.Element;
+import org.dom4j.Node;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.xforms.output.element.XFormsElement;
 import org.xml.sax.ContentHandler;
-import org.dom4j.Node;
-import org.dom4j.Element;
-import org.dom4j.Attribute;
 
 import java.util.*;
 

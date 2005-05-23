@@ -13,15 +13,13 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.xforms.XFormsEvent;
-import org.orbeon.oxf.xforms.XFormsEvents;
 
 /**
  * 4.4.9 The DOMFocusOut Event
  *
  * Target: form control / Bubbles: Yes / Cancelable: No / Context Info: None
  */
-public class XFormsDOMFocusOutEvent extends XFormsEvent {
+public class XFormsDOMFocusOutEvent extends org.orbeon.oxf.xforms.event.XFormsEvent {
     public XFormsDOMFocusOutEvent(Object targetObject) {
         super(XFormsEvents.XFORMS_DOM_FOCUS_OUT, targetObject, true, false);
     }

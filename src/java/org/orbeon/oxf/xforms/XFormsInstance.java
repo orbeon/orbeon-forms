@@ -23,6 +23,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.scope.ScopeStore;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -243,7 +244,7 @@ public class XFormsInstance implements XFormsEventTarget {
         return request;
     }
 
-    public void dispatchEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
+    public void dispatchEvent(final PipelineContext pipelineContext, org.orbeon.oxf.xforms.event.XFormsEvent xformsEvent) {
         final String eventName = xformsEvent.getEventName();
         if (XFormsEvents.XFORMS_INSERT.equals(eventName)) {
             // 4.4.5 The xforms-insert and xforms-delete Events

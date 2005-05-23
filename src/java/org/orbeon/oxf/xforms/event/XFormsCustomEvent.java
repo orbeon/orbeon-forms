@@ -13,14 +13,11 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-
 /**
- * 4.3.5 The xforms-revalidate Event
- *
- * Target: model / Bubbles: Yes / Cancelable: Yes / Context Info: None
+ * Custom (i.e. non-XForms) event.
  */
-public class XFormsRevalidateEvent extends org.orbeon.oxf.xforms.event.XFormsEvent {
-    public XFormsRevalidateEvent(Object targetObject) {
-        super(XFormsEvents.XFORMS_REVALIDATE, targetObject, true, true);
+public class XFormsCustomEvent extends XFormsEvent {
+    public XFormsCustomEvent(String eventName, Object targetObject, boolean bubbles, boolean cancelable) {
+        super(eventName, targetObject, bubbles, cancelable);
     }
 }

@@ -219,7 +219,7 @@ public class XFormsControls implements XFormsEventTarget {
             }
             if (mandatoryNodesetControls.get(controlName) != null
                     && !(bindingElement.attribute("nodeset") != null)) {
-                throw new OXFException("Node-set binding is prohibited for element: " + bindingElement.getQualifiedName());
+                throw new OXFException("Missing mandatory nodeset binding for element: " + bindingElement.getQualifiedName());
             }
             if (noNodesetControls.get(controlName) != null
                     && bindingElement.attribute("nodeset") != null) {
@@ -932,7 +932,7 @@ public class XFormsControls implements XFormsEventTarget {
         // Get event handler element
         Element eventHandlerElement;
         eventHandlerElement = (Element) documentXPathEvaluator.evaluateSingle(pipelineContext, targetElement,
-                "(for $node in (ancestor-or-self::xf:*) return $node/xf:*[@ev:event = $event-name][1])[1]", XFormsServer.XFORMS_NAMESPACES, variables, null, null);
+                "(for $node in (reverse(ancestor-or-self::xf:*)) return $node/xf:*[@ev:event = $event-name][1])[1]", XFormsServer.XFORMS_NAMESPACES, variables, null, null);
 //            if (eventHandlerElement == null)
 //                throw new OXFException("Cannot find event handler with name '" + eventName + "'.");
         return eventHandlerElement;

@@ -120,7 +120,7 @@
             <xf:bind nodeset="/f1040ez/section02/line04"
                 calculate="/f1040ez/section02/line01 + /f1040ez/section02/line02 + /f1040ez/section02/line03"/>
             <xf:bind nodeset="/f1040ez/section02/line06"
-                calculate="if(/f1040ez/section02/line05 &gt; /f1040ez/section02/line04) then 0 else /f1040ez/section02/line04 - /f1040ez/section02/line05"/>
+                calculate="if(number(/f1040ez/section02/line05) &gt; number(/f1040ez/section02/line04)) then 0 else /f1040ez/section02/line04 - /f1040ez/section02/line05"/>
 
             <!-- Section 3 -->
             <xf:bind nodeset="/f1040ez/section03/line07" type="xsd:decimal"/>

@@ -5,7 +5,7 @@
 <!--    <table>-->
         <xforms:repeat nodeset="/form/departments/department" id="id123">
             <xforms:action ev:event="DOMActivate">
-                <xforms:insert at="1" position="after"/>
+                <xforms:insert nodeset="../department" at="1" position="after"/>
 <!--                <xforms:insert at="1" position="before"/>-->
             </xforms:action>
 <!--            <tr>-->

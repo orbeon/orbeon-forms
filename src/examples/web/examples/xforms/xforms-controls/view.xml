@@ -181,7 +181,7 @@
                         </xforms:select1>
                     </xhtml:p>
                 </widget:tab>
-                <widget:tab id="slider" selected="true">
+                <widget:tab id="slider">
                     <widget:label>Range</widget:label>
                     <xforms:range ref="range/value"/>
                     <xhtml:p>

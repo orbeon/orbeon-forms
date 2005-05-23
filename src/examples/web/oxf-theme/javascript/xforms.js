@@ -331,15 +331,19 @@ function xformsPageLoaded() {
                     if (control) {
                         if (!control.slider) alert(control.tagName);
                     
+                        // Compute range boundaries
+                        var rangeStart = xformsGetElementPosition(control.track).left
+                        var rangeLength = control.track.clientWidth - control.slider.clientWidth;
+
                         // Compute value
-                        var value = (event.clientX - control.rangeStart) / control.rangeLength;
+                        var value = (event.clientX - rangeStart) / rangeLength;
                         if (value < 0) value = 0;
                         if (value > 1) value = 1;
                         
                         // Compute slider position
-                        var sliderPosition = event.clientX - control.rangeStart;
+                        var sliderPosition = event.clientX - rangeStart;
                         if (sliderPosition < 0) sliderPosition = 0;
-                        if (sliderPosition > control.rangeLength) sliderPosition = control.rangeLength;
+                        if (sliderPosition > rangeLength) sliderPosition = rangeLength;
                         control.slider.style.left = sliderPosition;
                         
                         // Notify server that value changed
@@ -363,8 +367,6 @@ function xformsPageLoaded() {
                                 && xformsArrayContains(child.className.split(" "), "xforms-range-slider"))
                             control.slider = child;
                     }
-                    control.rangeStart = xformsGetElementPosition(control.track).left
-                    control.rangeLength = control.track.clientWidth - control.slider.clientWidth;
 
                     // Find parent form and store this in span
                     var parent = control;

@@ -14,7 +14,7 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <page path-info="/xforms-controls" view="view1.xml"/>
+    <page path-info="/xforms-controls" view="view.xml"/>
 
     <page path-info="/xforms-controls/post" model="post.xpl"/>
 

@@ -318,15 +318,19 @@ function xformsPageLoaded() {
             
                 function rangeMouseDown(event) {
                     document.xformsCurrentRangeControl = getEventTarget(event).parentNode;
+                    return false;
                 }
                 
                 function rangeMouseUp(event) {
                     document.xformsCurrentRangeControl = null;
+                    return false;
                 }
                 
                 function rangeMouseMove(event) {
                     var control = document.xformsCurrentRangeControl;
                     if (control) {
+                        if (!control.slider) alert(control.tagName);
+                    
                         // Compute value
                         var value = (event.clientX - control.rangeStart) / control.rangeLength;
                         if (value < 0) value = 0;
@@ -350,7 +354,6 @@ function xformsPageLoaded() {
                     control.listenersRegistered = true;
                     control.mouseDown = false;
                     xformsAddEventListener(control, "mousedown", rangeMouseDown);
-                    xformsAddEventListener(control, "mouseup", rangeMouseUp);
                     for (var childIndex = 0; childIndex < control.childNodes.length; childIndex++) {
                         var child = control.childNodes[childIndex];
                         if (child.className 
@@ -373,6 +376,7 @@ function xformsPageLoaded() {
                 if (!document.xformsRangeListenerRegistered) {
                     document.xformsRangeListenerRegistered = true;
                     xformsAddEventListener(document, "mousemove", rangeMouseMove);
+                    xformsAddEventListener(document, "mouseup", rangeMouseUp);
                 }
             
             } else if (control.tagName == "SPAN") {

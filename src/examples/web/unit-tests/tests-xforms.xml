@@ -783,31 +783,31 @@
         <output name="instance">
             <instance>
                 <boolean>
-                    <from-string-1>true</from-string-1>
-                    <from-string-2>true</from-string-2>
-                    <from-string-3>false</from-string-3>
-                    <from-string-4>false</from-string-4>
-                    <if-1>1</if-1>
-                    <if-2>2</if-2>
+                    <from-string-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">true</from-string-1>
+                    <from-string-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">true</from-string-2>
+                    <from-string-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">false</from-string-3>
+                    <from-string-4 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">false</from-string-4>
+                    <if-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1</if-1>
+                    <if-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2</if-2>
                 </boolean>
                 <number>
                     <avg>
                         <arg>2</arg>
                         <arg>4</arg>
                         <arg>6</arg>
-                        <result>4</result>
+                        <result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">4</result>
                     </avg>
                     <min>
                         <arg>2</arg>
                         <arg>4</arg>
                         <arg>6</arg>
-                        <result>2</result>
+                        <result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2</result>
                     </min>
                     <max>
                         <arg>2</arg>
                         <arg>4</arg>
                         <arg>6</arg>
-                        <result>6</result>
+                        <result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">6</result>
                     </max>
                     <count-non-empty>
                         <arg>2</arg>
@@ -815,29 +815,29 @@
                         <arg>4</arg>
                         <arg>6</arg>
                         <arg/>
-                        <result>3</result>
+                        <result xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">3</result>
                     </count-non-empty>
                 </number>
                 <string>
-                    <property-version>1.0</property-version>
-                    <property-conformance>full</property-conformance>
+                    <property-version xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1.0</property-version>
+                    <property-conformance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">full</property-conformance>
                 </string>
                 <date>
-                    <now>2004-12-31T12:00:00Z</now>
-                    <days-from-date-1>11688</days-from-date-1>
-                    <days-from-date-2>-1</days-from-date-2>
-                    <days-from-date-3>11687</days-from-date-3>
-                    <days-from-date-4>NaN</days-from-date-4>
-                    <seconds-from-date-1>1009809630</seconds-from-date-1>
-                    <seconds-from-date-2>NaN</seconds-from-date-2>
-                    <seconds-from-date-3>-3600</seconds-from-date-3>
-                    <seconds-1>0</seconds-1>
-                    <seconds-2>297001.5</seconds-2>
-                    <seconds-3>NaN</seconds-3>
-                    <seconds-4>-1</seconds-4>
-                    <months-1>14</months-1>
-                    <months-2>-19</months-2>
-                    <months-3>NaN</months-3>
+                    <now xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2004-12-31T12:00:00Z</now>
+                    <days-from-date-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">11688</days-from-date-1>
+                    <days-from-date-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-1</days-from-date-2>
+                    <days-from-date-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">11687</days-from-date-3>
+                    <days-from-date-4 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</days-from-date-4>
+                    <seconds-from-date-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1009809630</seconds-from-date-1>
+                    <seconds-from-date-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</seconds-from-date-2>
+                    <seconds-from-date-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-3600</seconds-from-date-3>
+                    <seconds-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">0</seconds-1>
+                    <seconds-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">297001.5</seconds-2>
+                    <seconds-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</seconds-3>
+                    <seconds-4 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-1</seconds-4>
+                    <months-1 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">14</months-1>
+                    <months-2 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">-19</months-2>
+                    <months-3 xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">NaN</months-3>
                 </date>
             </instance>
         </output>
@@ -888,18 +888,18 @@
             </xforms:group>
         </input>
         <output name="instance" >
-            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"  >
+            <instance>
                 <a>
-                    <b>1</b>
+                    <b xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">1</b>
                 </a>
                 <b>
                     <c>
-                        <d>2</d>
-                        <e>3</e>
+                        <d xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2</d>
+                        <e xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">3</e>
                     </c>
                     <c>
-                        <d>2</d>
-                        <e>3</e>
+                        <d xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">2</d>
+                        <e xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">3</e>
                     </c>
                 </b>
                 <c>
@@ -1016,7 +1016,7 @@
         </input>
         <output name="instance">
             <instance>
-                <a>Orbeon</a>
+                <a xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">Orbeon</a>
                 <b/>
                 <c xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:required="true" xxforms:valid="false"></c>
                 <d xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true"></d>
@@ -1207,7 +1207,7 @@
             </p:config>
         </input>
         <output name="instance">
-            <instance>Orbeon</instance>
+            <instance xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">Orbeon</instance>
         </output>
     </test>
     
@@ -1383,7 +1383,7 @@
         </input>
         <output name="instance">
             <instance>
-                <a>122</a>
+                <a xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">122</a>
                 <b>2</b>
             </instance>
         </output>

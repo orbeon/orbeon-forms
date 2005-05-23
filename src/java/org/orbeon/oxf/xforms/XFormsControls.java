@@ -932,7 +932,7 @@ public class XFormsControls implements XFormsEventTarget {
         // Get event handler element
         Element eventHandlerElement;
         eventHandlerElement = (Element) documentXPathEvaluator.evaluateSingle(pipelineContext, targetElement,
-                "*[@ev:event = $event-name]", XFormsServer.XFORMS_NAMESPACES, variables, null, null);
+                "(for $node in (ancestor-or-self::xf:*) return $node/xf:*[@ev:event = $event-name][1])[1]", XFormsServer.XFORMS_NAMESPACES, variables, null, null);
 //            if (eventHandlerElement == null)
 //                throw new OXFException("Cannot find event handler with name '" + eventName + "'.");
         return eventHandlerElement;

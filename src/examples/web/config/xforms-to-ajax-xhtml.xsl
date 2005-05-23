@@ -103,6 +103,9 @@
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:input type="text" name="{$id}" value="{xxforms:control($id)}">
+            <xsl:if test="xxforms:control($id)/@readonly = 'true'">
+                <xsl:attribute name="disabled">disabled</xsl:attribute>
+            </xsl:if>
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
         </xhtml:input>
     </xsl:template>

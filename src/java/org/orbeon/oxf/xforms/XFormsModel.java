@@ -660,8 +660,9 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             });
         }
 
-        // Handle read only
+        // Handle readonly
         if (modelBind.getReadonly() != null) {
+            // The bind has a readonly attribute
             iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
                 public void handleNode(Node node) {
                     // Evaluate "readonly" XPath expression on this node
@@ -682,6 +683,15 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                         if (expr != null)
                             expr.returnToPool();
                     }
+                }
+            });
+        } else if (modelBind.getCalculate() != null) {
+            // The bind doesn't have a readonly attribute, but has a calculate: set readonly to true()
+            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
+                public void handleNode(Node node) {
+                    // Mark node
+                    InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
+                    instanceData.getReadonly().set(true);
                 }
             });
         }

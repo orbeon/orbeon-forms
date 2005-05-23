@@ -15,6 +15,7 @@
         xmlns:xu="http://www.xmldb.org/xupdate">
 
     <page path-info="/xforms-translate" view="view.xml"/>
+    <page path-info="/direct/xforms-translate/post" model="post.xpl"/>
     
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

@@ -14,22 +14,21 @@
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <xhtml:head>
         <xhtml:title>Translate This</xhtml:title>
         <xforms:model>
-            <xforms:instance>
+            <xforms:instance id="instance">
                 <translation>
                     <language-pair>en|fr</language-pair>
                     <source/>
                     <target/>
                 </translation>
             </xforms:instance>
-            <xforms:bind nodeset="/translation/target" 
-                calculate="if (/translation/source = '') then '' else
-                xxforms:call-xpl('oxf:/examples/xforms/xforms-translate/translate.xpl', 
-                ('source', 'language-pair'), (/translation/source, /translation/language-pair), 'data')"/>
+            <xforms:submission ref="instance('instance')" id="default-submission" 
+                method="post" action="/direct/xforms-translate/post" replace="instance"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -113,11 +112,13 @@
                         <xforms:value>zh-CN|en</xforms:value>
                         <xforms:label>Chinese (Simplified) to English BETA</xforms:label>
                     </xforms:item>
+                    <xforms:send submission="default-submission" ev:event="xforms-value-changed"/>
                 </xforms:select1>
             </xhtml:p>
             <xhtml:p>
                 <xforms:textarea ref="source" class="wide-textarea" incremental="true">
                     <xforms:label class="bold">Translate text:</xforms:label>
+                    <xforms:send submission="default-submission" ev:event="xforms-value-changed"/>
                 </xforms:textarea>
             </xhtml:p>
             <xhtml:p>

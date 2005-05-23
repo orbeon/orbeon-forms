@@ -92,7 +92,7 @@
                         <p:output name="data" id="annotated-view"/>
                     </p:processor>
                     <!-- Extract models and controls -->
-                    <p:processor name="oxf:xslt">
+                    <p:processor name="oxf:unsafe-xslt">
                         <p:input name="data" href="#annotated-view"/>
                         <p:input name="config" href="xforms-extract-controls.xsl"/>
                         <p:output name="data" id="xforms-models-controls"/>

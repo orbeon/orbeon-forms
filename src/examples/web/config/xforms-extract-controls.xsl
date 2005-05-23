@@ -18,31 +18,43 @@
     xmlns:saxon="http://saxon.sf.net/"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext"
     exclude-result-prefixes="xforms xxforms xs saxon xhtml f">
+    
+    <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
 
     <xsl:template match="/">
         <static-state>
             <models>
-                <xsl:copy-of select="//xforms:model"/>
+                <xsl:apply-templates select="//xforms:model"/>
             </models>
             <controls>
-                <xsl:apply-templates select="//xforms:*[local-name() != 'model' and not(ancestor::xforms:*)]"/>
+                <xsl:apply-templates select="//xforms:*[local-name() != 'model' and not(ancestor::xforms:*)]" mode="controls"/>
             </controls>
         </static-state>
     </xsl:template>
     
-    <xsl:template match="xforms:*" priority="2">
+    <xsl:template match="xforms:submission">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
-            <xsl:apply-templates/>
+            <xsl:if test="@action">
+                <xsl:attribute name="action" select="context:rewriteResourceURL(@action, true())"/>
+            </xsl:if>
         </xsl:copy>
     </xsl:template>
     
-    <xsl:template match="*" priority="1">
-        <xsl:apply-templates select="*"/>
+    <xsl:template match="xforms:*" priority="2" mode="controls">
+        <xsl:copy>
+            <xsl:copy-of select="@*"/>
+            <xsl:apply-templates mode="#current"/>
+        </xsl:copy>
+    </xsl:template>
+    
+    <xsl:template match="*" priority="1" mode="controls">
+        <xsl:apply-templates select="*" mode="#current"/>
     </xsl:template>
 
-    <xsl:template match="text()" priority="1">
+    <xsl:template match="text()" priority="1" mode="controls">
         <xsl:if test="parent::xforms:alert | parent::xforms:hint | parent::xforms:help 
                 | parent::xforms:label | parent::xforms:value">
             <xsl:value-of select="."/>

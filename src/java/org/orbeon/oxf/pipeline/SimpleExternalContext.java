@@ -142,6 +142,10 @@ public class SimpleExternalContext implements ExternalContext {
             return "";
         }
 
+        public String getRequestURL() {
+            return "";
+        }
+
         public String getServletPath() {
             return "";
         }

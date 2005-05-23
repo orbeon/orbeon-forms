@@ -17,6 +17,7 @@ import org.dom4j.*;
 import org.dom4j.io.DocumentSource;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
@@ -30,6 +31,7 @@ import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -208,7 +210,18 @@ public class XFormsModelSubmission implements XFormsEventTarget {
             // Submit to URL
             final URL submissionURL;
             try {
-                submissionURL = URLFactory.createURL(action);
+                if (NetUtils.urlHasProtocol(action)) {
+                    submissionURL = URLFactory.createURL(action);
+                } else {
+                    final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                    final String requestURL = externalContext.getRequest().getRequestURL();
+
+                    if (requestURL != null) {
+                        submissionURL = URLFactory.createURL(requestURL, action);
+                    } else {
+                        throw new OXFException("xforms:submission: cannot resolve relative action: " + action);
+                    }
+                }
             } catch (MalformedURLException e) {
                 // TODO: dispatch xforms-submit-error and stop processing
                 throw new OXFException("xforms:submission: invalid action: " + action);

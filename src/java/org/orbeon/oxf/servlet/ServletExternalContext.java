@@ -257,6 +257,10 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             return nativeRequest.getRequestURI();
         }
 
+        public String getRequestURL() {
+            return nativeRequest.getRequestURL().toString();
+        }
+
         public String getServletPath() {
             return nativeRequest.getServletPath();
         }
@@ -580,7 +584,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             try {
                 ExternalContext.Request request = getRequest();
 
-                URL absoluteBaseURL = generateAbsoluteURL ? new URL(new URL(nativeRequest.getRequestURL().toString()), "/") : null;
+                URL absoluteBaseURL = generateAbsoluteURL ? new URL(new URL(request.getRequestURL()), "/") : null;
                 String baseURLString = generateAbsoluteURL ? absoluteBaseURL.toExternalForm() : "";
                 if (baseURLString.endsWith("/"))
                     baseURLString = baseURLString.substring(0, baseURLString.length() - 1);

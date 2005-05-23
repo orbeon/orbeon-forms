@@ -189,6 +189,11 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
             return null;
         }
 
+        public String getRequestURL() {
+            // NOTE: The portlet API does not provide for this value.
+            return null;
+        }
+
         public String getScheme() {
             return portletRequest.getScheme();
         }
@@ -392,7 +397,10 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
                 }
 
                 // Encode the URL a la WSRP
-                return WSRPUtils.encodeResourceURL(finalResult, false);
+                if (!generateAbsoluteURL)
+                    return WSRPUtils.encodeResourceURL(finalResult, false);
+                else
+                    return finalResult;
             } catch (Exception e) {
                 throw new OXFException(e);
             }

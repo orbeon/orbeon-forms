@@ -361,6 +361,8 @@ public class RequestGenerator extends ProcessorImpl {
             addTextElement(requestElement, "requested-session-id", request.getRequestedSessionId());
         if (all || XPathUtils.selectSingleNode(config, "/config/request-uri") != null)
             addTextElement(requestElement, "request-uri", request.getRequestURI());
+        if (all || XPathUtils.selectSingleNode(config, "/config/request-url") != null)
+            addTextElement(requestElement, "request-url", request.getRequestURL());
         if (all || XPathUtils.selectSingleNode(config, "/config/servlet-path") != null)
             addTextElement(requestElement, "servlet-path", request.getServletPath());
         if (all || XPathUtils.selectSingleNode(config, "/config/request-path") != null) {

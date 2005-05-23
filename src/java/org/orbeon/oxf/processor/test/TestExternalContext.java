@@ -280,6 +280,10 @@ public class TestExternalContext implements ExternalContext  {
             return XPathUtils.selectStringValueNormalize(requestDocument, "/*/request-uri");
         }
 
+        public String getRequestURL() {
+            return XPathUtils.selectStringValueNormalize(requestDocument, "/*/request-url");
+        }
+
         public String getScheme() {
             return XPathUtils.selectStringValueNormalize(requestDocument, "/*/scheme");
         }

@@ -76,6 +76,7 @@ public interface ExternalContext extends WebAppExternalContext {
         public String getPathTranslated();
         public String getQueryString();
         public String getRequestURI();
+        public String getRequestURL();
     }
 
     public interface Response {

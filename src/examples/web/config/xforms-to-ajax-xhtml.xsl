@@ -53,22 +53,22 @@
     
     <!-- - - - - - - XForms controls - - - - - - -->
     
-    <xsl:template match="xforms:output | xforms:trigger | xforms:input 
+    <xsl:template match="xforms:output | xforms:input 
             | xforms:secret | xforms:textarea | xforms:select | xforms:select1 
             | xforms:range" priority="2">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xsl:if test="local-name() != 'trigger' and local-name() != 'submit'">
-            <xsl:apply-templates select="xforms:label"/>
-        </xsl:if>
+        <xsl:apply-templates select="xforms:label"/>
         <xsl:next-match/>
         <xsl:apply-templates select="xforms:help"/>
-        <xhtml:label for="{$id}">
-            <xsl:variable name="alert-id" as="xs:string" select="concat(@id, $id-postfix)"/>
-            <xsl:copy-of select="xxforms:copy-attributes(xforms:alert, concat('xforms-alert-',
-                if (xxforms:control($id)/@valid = 'false') then 'active' else 'inactive'), $alert-id)"/>
-            <xsl:value-of select="xxforms:control($id)/@alert"/>
-        </xhtml:label>
+        <xsl:if test="local-name() != 'output'">
+            <xhtml:label for="{$id}">
+                <xsl:variable name="alert-id" as="xs:string" select="concat(@id, $id-postfix)"/>
+                <xsl:copy-of select="xxforms:copy-attributes(xforms:alert, concat('xforms-alert-',
+                    if (xxforms:control($id)/@valid = 'false') then 'active' else 'inactive'), $alert-id)"/>
+                <xsl:value-of select="xxforms:control($id)/@alert"/>
+            </xhtml:label>
+        </xsl:if>
         <xsl:apply-templates select="xforms:hint"/>
     </xsl:template>
     

@@ -186,7 +186,7 @@
                     <xforms:range ref="range/value"/>
                     <xhtml:p>
                         Countries starting with letter 
-                        <xhtml:b><xforms:output ref="range/letter"/></xhtml:b>:
+                        <xhtml:b><xforms:output ref="range/letter"/></xhtml:b>
                     </xhtml:p>
                     <xforms:output ref="instance('countries')" xhtml:class="xforms-xhtml"/>
                 </widget:tab>

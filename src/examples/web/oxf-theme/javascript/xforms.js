@@ -581,8 +581,14 @@ function xformsExecuteNextRequest() {
             xformsDisplayLoading(target.form, "loading");
             
             // Set the value of the dynamic-state in the request
-            var dynamicStateElement = request.getElementsByTagName("xxforms:dynamic-state")[0];
-            dynamicStateElement.appendChild(dynamicStateElement.ownerDocument.createTextNode(target.form.xformsDynamicState.value));
+            var requestElements = request.documentElement.childNodes;
+            for (var i = 0; i < requestElements.length; i++) {
+                if (requestElements[i].tagName.indexOf("dynamic-state") != -1) {
+                    var dynamicStateElement = requestElements[i];
+                    dynamicStateElement.appendChild(dynamicStateElement.ownerDocument.createTextNode
+                        (target.form.xformsDynamicState.value));
+                }
+            }
             
             // Send request
             document.xformsTargetOfCurrentRequest = target;

@@ -80,13 +80,13 @@
                 <widget:tab id="text-controls">
                     <widget:label>Text controls</widget:label>
                     <xhtml:p>
-                        <xforms:input ref="age">
+                        <xforms:input ref="age" incremental="true">
                             <xforms:label xhtml:class="fixed-width">Age:</xforms:label>
                             <xforms:hint>Positive number</xforms:hint>
                         </xforms:input>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:secret ref="secret">
+                        <xforms:secret ref="secret" incremental="true">
                             <xforms:label xhtml:class="fixed-width">Password:</xforms:label>
                             <xforms:hint>The password is 42 ;)</xforms:hint>
                             <xforms:alert>Invalid password</xforms:alert>

@@ -43,6 +43,16 @@ public class TomcatClasspathFix {
             }
         }
     }
+    
+    private static void silentClose( final JarFile jar ) {
+        if ( jar != null ) {
+            try {
+                jar.close();
+            } catch ( final java.io.IOException e ) {
+                // noop
+            }
+        }
+    }
     /*
      * Work around broken Tomcat loader if need be
      * According to servlet spec and j2ee spec the container should honor
@@ -97,10 +107,15 @@ public class TomcatClasspathFix {
                         final java.io.File file = files[ i ];
                         final String fnam = file.getName();
                         if ( !fnam.endsWith( ".jar" ) ) continue;
-                        final JarFile jar = new JarFile( file );
-                        final Manifest mf = jar.getManifest();
-                        if ( mf == null ) continue;
-                        processManifest( mf, baseURL );
+                        JarFile jar = null;
+                        try {
+                            jar = new JarFile( file );
+                            final Manifest mf = jar.getManifest();
+                            if ( mf == null ) continue;
+                            processManifest( mf, baseURL );
+                        } finally {
+                            silentClose( jar );
+                        }
                     }
                 }          
             }

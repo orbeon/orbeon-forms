@@ -29,26 +29,42 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
 
     private static Logger logger = LoggerFactory.createLogger(ClassLoaderResourceManagerImpl.class);
 
-    private Class clazz;
+    private final Class clazz;
+    private final boolean prependSlash;
     
     private java.net.URL getResource( final String key ) {
-        return (clazz == null ? getClass() : clazz).getResource(((clazz == null && !key.startsWith("/")) ? "/" : "") + key);
+        final String adjustedKey = prependSlash && !key.startsWith( "/" ) ? "/" + key : key;
+        final java.net.URL ret = clazz.getResource( adjustedKey ); 
+        if ( ret == null ) {
+            throw new ResourceNotFoundException( "Cannot read from file " + key );
+        }
+        return ret;
+    }
+
+    private java.net.URLConnection getConnection( final String key ) throws java.io.IOException { 
+        final java.net.URL u = getResource( key );
+        final java.net.URLConnection ret = u.openConnection();
+        // 5/24/2005 d : Put this in on off chance it would fix file locking pbm reported by 
+        //               Damon Rand on the mailing list.  It didn't so have removed it.
+        //ret.setUseCaches( false );
+        return ret;
     }
 
     /**
      * Initialize this resource manager.
      */
-    public ClassLoaderResourceManagerImpl(java.util.Map props) {
-        super(props);
+    public ClassLoaderResourceManagerImpl( final java.util.Map props ) {
+        this( props, null );
     }
 
     /**
      * Initialize this resource manager with rooted in the specified class
      * @param clazz a root class
      */
-    public ClassLoaderResourceManagerImpl(java.util.Map props, Class clazz) {
-        super(props);
-        this.clazz = clazz;
+    public ClassLoaderResourceManagerImpl( final java.util.Map props, final Class c ) {
+        super( props );
+        clazz = c == null ? getClass() : c;
+        prependSlash = c == null;
     }
 
     /**
@@ -67,15 +83,19 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
      * @param key A Resource Manager key
      * @return a input stream
      */
-    public java.io.InputStream getContentAsStream(String key) {
+    public java.io.InputStream getContentAsStream( String key ) {
         if (logger.isDebugEnabled())
             logger.debug("getContentAsStream(" + key + ")");
 
-        java.io.InputStream result = (clazz == null ? getClass() : clazz).getResourceAsStream
-                ((clazz == null && !key.startsWith("/") ? "/" : "") + key);
-        if (result == null)
-            throw new ResourceNotFoundException("Cannot load \"" + key + "\" with class loader");
-        return result;
+        final java.io.InputStream ret;
+        try {
+            final java.net.URLConnection uc = getConnection( key );
+            uc.setUseCaches( false );
+            ret = uc.getInputStream();
+        } catch ( final java.io.IOException e ) {
+            throw new OXFException( e );
+        }
+        return ret;
     }
 
     /**
@@ -93,17 +113,19 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
          */
         final long ret;
         done : try {
-            java.net.URL url = getResource( key );
-            if ( url == null ) {
-                throw new ResourceNotFoundException( "Cannot read from file " + key );
-            }
-            final java.net.URLConnection uc = url.openConnection();
+//            java.net.URL url = getResource( key );
+//            if ( url == null ) {
+//                throw new ResourceNotFoundException( "Cannot read from file " + key );
+//            }
+//            final java.net.URLConnection uc = url.openConnection();
+            final java.net.URLConnection uc = getConnection( key );
             if ( uc instanceof java.net.JarURLConnection ) {
                 final JarEntry je 
                     = ( ( java.net.JarURLConnection )uc ).getJarEntry();
                 ret = je.getTime();
                 break done;
             } 
+            final java.net.URL url = uc.getURL();
             final String prot = url.getProtocol();
             if ( "file".equalsIgnoreCase( prot ) ) {
                 final String fnam = url.getPath();
@@ -255,8 +277,7 @@ public class ClassLoaderResourceManagerImpl extends ResourceManagerBase {
      */
     public int length(String key) {
         try {
-            return (clazz == null ? getClass() : clazz).getResource
-                    (((clazz == null && !key.startsWith("/")) ? "/" : "") + key).openConnection().getContentLength();
+            return getConnection( key ).getContentLength();
         } catch (java.io.IOException e) {
             throw new OXFException(e);
         }

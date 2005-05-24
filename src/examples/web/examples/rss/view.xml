@@ -18,7 +18,7 @@
 
     <xhtml:head><xhtml:title>Create Your Own RSS Feeds</xhtml:title></xhtml:head>
     <xhtml:body>
-        <xforms:group ref="form/rss-feed-descriptor">
+        <xforms:group ref="rss-feed-descriptor">
             <p>
                 The form below is prefilled to generate an RSS feed with the news displayed on the
                 Yahoo! home page. These links point to RSS feeds generated with this page:

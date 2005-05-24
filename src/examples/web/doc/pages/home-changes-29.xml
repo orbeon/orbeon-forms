@@ -98,6 +98,16 @@
                         be able to read the HTTP request body.
                     </p>
                 </li>
+                <li>
+                    <p>
+                        Availability of XForms instance in actions, page models, and views: TODO
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Handling of <code>&lt;param></code> element: TODO
+                    </p>
+                </li>
             </ul>
         </section>
         <section>
@@ -138,9 +148,9 @@
                 </li>
             </ul>
             <p>
-                These changes should not affect applications that used <code>oxf:xslt</code> unless
-                stylesheets use external functions. In this case, you have to use
-                <code>oxf:unsafe-xslt</code> instead.
+                Compatibility note: These changes should not affect applications that used
+                <code>oxf:xslt</code> unless stylesheets use external functions. In this case, you
+                have to use <code>oxf:unsafe-xslt</code> instead.
             </p>
             <p>
                 If you were using <code>oxf:xslt-1.0</code> or were using XSLT 1.0 stylesheets

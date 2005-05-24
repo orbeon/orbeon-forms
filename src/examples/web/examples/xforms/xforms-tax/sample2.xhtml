@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!--<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"-->
+<!--    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">-->
+<!-- ***** BEGIN LICENSE BLOCK *****
+   - Version: MPL 1.1/GPL 2.0/LGPL 2.1
+   -
+   - The contents of this file are subject to the Mozilla Public License Version
+   - 1.1 (the "License"); you may not use this file except in compliance with
+   - the License. You may obtain a copy of the License at
+   - http://www.mozilla.org/MPL/
+   -
+   - Software distributed under the License is distributed on an "AS IS" basis,
+   - WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+   - for the specific language governing rights and limitations under the
+   - License.
+   -
+   - The Original Code is XForms Sample
+   -
+   - The Initial Developer of the Original Code is
+   -      IBM Corporation
+   -
+   - Portions created by the Initial Developer are Copyright (C) 2004
+   - the Initial Developer. All Rights Reserved.
+   -
+   - Contributor(s):
+   -
+   - Alternatively, the contents of this file may be used under the terms of
+   - either the GNU General Public License Version 2 or later (the "GPL"), or
+   - the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+   - in which case the provisions of the GPL or the LGPL are applicable instead
+   - of those above. If you wish to allow use of your version of this file only
+   - under the terms of either the GPL or the LGPL, and not to allow others to
+   - use your version of this file under the terms of the MPL, indicate your
+   - decision by deleting the provisions above and replace them with the notice
+   - and other provisions required by the LGPL or the GPL. If you do not delete
+   - the provisions above, a recipient may use your version of this file under
+   - the terms of any one of the MPL, the GPL or the LGPL.
+   -
+   - ***** END LICENSE BLOCK ***** -->
+
+<!-- ***** BEGIN DISCLAIMER BLOCK *****
+   - Disclaimer:
+   -
+   - Due to limitations that exist in the current Beta1 release of the XForms
+   - extension, it was necessary to code this sample form using a style that is
+   - deemed to be unproper XForms (e.g., CSS styling of some controls using
+   - attributes instead of pseudo classes and the use of labels outside of input
+   - controls to get a nice table layout).  This sample will be updated when
+   - the XForms extension handles CSS styling and control layout properly.
+   - ***** END DISCLAIMER BLOCK ***** -->
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <head>
+        <title>Sample Tax Form</title>
+
+        <xforms:model>
+            <xforms:instance>
+                <f1040ez xmlns="" cfund="no" scfund="no">
+                    <section01>
+                        <fname/>
+                        <lname/>
+                        <sfname/>
+                        <slname/>
+                        <address/>
+                        <apartment/>
+                        <cityStateZip/>
+                        <ssn1/>
+                        <ssn2/>
+                    </section01>
+                    <section02>
+                        <line01>0.00</line01>
+                        <line02>0.00</line02>
+                        <line03>0.00</line03>
+                        <line04>0.00</line04>
+                        <line05>0.00</line05>
+                        <line06>0.00</line06>
+                    </section02>
+                    <section03>
+                        <line07>0.00</line07>
+                        <line08a>0.00</line08a>
+                        <line08b>0.00</line08b>
+                        <line09>0.00</line09>
+                    </section03>
+                    <titles>
+                        <sec1f>Section 1: Label &gt;&gt;</sec1f>
+                        <sec1b>&lt;&lt; Section 1: Label</sec1b>
+                        <sec2f>Section 2: Income &gt;&gt;</sec2f>
+                        <sec2b>&lt;&lt; Section 2: Income</sec2b>
+                        <sec3f>Section 3: Payments and Taxes &gt;&gt;</sec3f>
+                        <sec3b>&lt;&lt; Section 3: Payments and Taxes</sec3b>
+                    </titles>
+                </f1040ez>
+            </xforms:instance>
+
+            <!-- Section 2 -->
+            <xforms:bind nodeset="/f1040ez/section02/line01" type="xsd:decimal"/>
+            <xforms:bind nodeset="/f1040ez/section02/line02" type="xsd:decimal"/>
+            <xforms:bind nodeset="/f1040ez/section02/line03" type="xsd:decimal"/>
+            <xforms:bind nodeset="/f1040ez/section02/line04" type="xsd:decimal"/>
+            <xforms:bind nodeset="/f1040ez/section02/line05" type="xsd:decimal"/>
+            <xforms:bind nodeset="/f1040ez/section02/line06" type="xsd:decimal"/>
+            <xforms:bind nodeset="/f1040ez/section02/line04"
+                calculate="/f1040ez/section02/line01 + /f1040ez/section02/line02 + /f1040ez/section02/line03"/>
+            <xforms:bind nodeset="/f1040ez/section02/line06"
+                calculate="if(number(/f1040ez/section02/line05) &gt; number(/f1040ez/section02/line04)) then 0 else /f1040ez/section02/line04 - /f1040ez/section02/line05"/>
+
+            <!-- Section 3 -->
+            <xforms:bind nodeset="/f1040ez/section03/line07" type="xsd:decimal"/>
+            <xforms:bind nodeset="/f1040ez/section03/line08a" type="xsd:decimal"/>
+            <xforms:bind nodeset="/f1040ez/section03/line08b" type="xsd:decimal"/>
+            <xforms:bind nodeset="/f1040ez/section03/line09"
+                calculate="/f1040ez/section03/line07 + /f1040ez/section03/line08a"/>
+        </xforms:model>
+
+    </head>
+
+    <body>
+
+        <xforms:switch>
+            <!-- Section 1 -->
+            <xforms:case id="sec1show">
+                <table border="0" cellpadding="3" cellspacing="3">
+                    <tr>
+                        <td bgcolor="#cceecc" valign="top" rowspan="11" width="85">Label</td>
+                        <td bgcolor="#eeeeee" valign="top" rowspan="3">Your information</td>
+                        <td bgcolor="#eeeeee" valign="top">First name</td>
+                        <td bgcolor="#eeeeee" valign="top"><xforms:input ref="/f1040ez/section01/fname"/></td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#eeeeee" valign="top">Last name</td>
+                        <td bgcolor="#eeeeee" valign="top"><xforms:input ref="/f1040ez/section01/lname"/></td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#eeeeee" valign="top">Social security number</td>
+                        <td bgcolor="#eeeeee" valign="top"><xforms:input ref="/f1040ez/section01/ssn1"/></td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#eeeeee" valign="top" rowspan="3">Spouse information</td>
+                        <td bgcolor="#eeeeee" valign="top">First name</td>
+                        <td bgcolor="#eeeeee" valign="top"><xforms:input ref="/f1040ez/section01/sfname"/></td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#eeeeee" valign="top">Last name</td>
+                        <td bgcolor="#eeeeee" valign="top"><xforms:input ref="/f1040ez/section01/slname"/></td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#eeeeee" valign="top">Social security number</td>
+                        <td bgcolor="#eeeeee" valign="top"><xforms:input ref="/f1040ez/section01/ssn2"/></td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#eeeeee" valign="top" rowspan="3">Address</td>
+                        <td bgcolor="#eeeeee" valign="top">Street</td>
+                        <td bgcolor="#eeeeee" valign="top"><xforms:input ref="/f1040ez/section01/address"/></td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#eeeeee" valign="top">Apt. No.</td>
+                        <td bgcolor="#eeeeee" valign="top"><xforms:input ref="/f1040ez/section01/apartment"/></td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#eeeeee" valign="top">City, state, and ZIP code</td>
+                        <td bgcolor="#eeeeee" valign="top"><xforms:input ref="/f1040ez/section01/cityStateZip"/></td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#eeeeee" valign="top" rowspan="2">Contribute $3 to fund</td>
+                        <td bgcolor="#eeeeee" valign="top">You</td>
+                        <td bgcolor="#eeeeee" valign="top">
+                            <xforms:select1 ref="@cfund" appearance="full">
+                                <xforms:item>
+                                    <xforms:label class="n8">Yes</xforms:label>
+                                    <xforms:value>yes</xforms:value>
+                                </xforms:item>
+                                <xforms:item>
+                                    <xforms:label class="n8">No</xforms:label>
+                                    <xforms:value>no</xforms:value>
+                                </xforms:item>
+                            </xforms:select1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td bgcolor="#eeeeee" valign="top">Your spouse</td>
+                        <td bgcolor="#eeeeee" valign="top">
+                            <xforms:select1 ref="@scfund" appearance="full">
+                                <xforms:item>
+                                    <xforms:label class="n8">Yes</xforms:label>
+                                    <xforms:value>yes</xforms:value>
+                                </xforms:item>
+                                <xforms:item>
+                                    <xforms:label class="n8">No</xforms:label>
+                                    <xforms:value>no</xforms:value>
+                                </xforms:item>
+                            </xforms:select1>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    <xforms:trigger>
+                        <xforms:label ref="/f1040ez/titles/sec2f" class="n10"/>
+                        <xforms:toggle ev:event="DOMActivate" case="sec2show"/>
+                    </xforms:trigger>
+                </p>
+            </xforms:case>
+
+            <!-- Section 2 -->
+            <xforms:case id="sec2show">
+                <table border="0" cellpadding="3" cellspacing="3">
+                    <tr>
+                        <td bgcolor="#cceecc" valign="top" rowspan="6" width="85">
+                            <span class="b10">Income</span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">1</span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="n8">
+                                Wages, salaries, and tips.  This should be shown in box 1 of your
+                                Form(s) W-2.
+                                <br/>Attach your Form(s) W-2.
+                            </span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">1 </span>
+                            <xforms:input ref="/f1040ez/section02/line01"/>
+                        </td>
+                    </tr>
+                    <tr bgcolor="#eeeeee">
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">2</span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="n8">
+            Taxable interest.  If the total is over $1,500, you cannot use Form
+            1040EZ.
+                            </span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">2 </span>
+                            <xforms:input ref="/f1040ez/section02/line02"/>
+                        </td>
+                    </tr>
+                    <tr bgcolor="#eeeeee">
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">3</span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="n8">
+            Unemployment compensation and Alaska Permanent Fund dividends.
+                            </span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">3 </span>
+                            <xforms:input ref="/f1040ez/section02/line03"/>
+                        </td>
+                    </tr>
+                    <tr bgcolor="#eeeeee">
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">4</span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="n8">
+            Add lines 1, 2, and 3.  This is your
+                                <b>adjusted gross income.</b>
+                            </span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">4 </span>
+                            <xforms:input ref="/f1040ez/section02/line04"/>
+                        </td>
+                    </tr>
+                    <tr bgcolor="#eeeeee">
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">5</span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="n8">
+            If
+                                <b>single</b>, enter $7,950.
+                                <br/>
+            If
+                                <b>married filing jointly</b>, enter $15,900.
+                            </span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">5 </span>
+                            <xforms:input ref="/f1040ez/section02/line05"/>
+                        </td>
+                    </tr>
+                    <tr bgcolor="#eeeeee">
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">6</span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="n8">
+            Subtract line 5 from line 4.  If line 5 is larger than line 4, enter -0-.
+                                <br/>
+            This is your
+                                <b>taxable income</b>.
+                            </span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">6 </span>
+                            <xforms:input ref="/f1040ez/section02/line06"/>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    <xforms:trigger>
+                        <xforms:label ref="/f1040ez/titles/sec1b" class="n10"/>
+                        <xforms:toggle ev:event="DOMActivate" case="sec1show"/>
+                    </xforms:trigger>
+                    <xforms:trigger>
+                        <xforms:label ref="/f1040ez/titles/sec3f" class="n10"/>
+                        <xforms:toggle ev:event="DOMActivate" case="sec3show"/>
+                    </xforms:trigger>
+                </p>
+            </xforms:case>
+
+            <!-- Section 3 -->
+            <xforms:case id="sec3show">
+                <table border="0" cellpadding="3" cellspacing="3">
+                    <tr>
+                        <td bgcolor="#cceecc" valign="top" rowspan="6" width="85">
+                            <span class="b10">Payments
+                                <br/>and taxes
+                            </span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">7</span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="n8">
+            Federal income tax withheld from box 2 of your Form(x) W-2.
+                            </span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <xforms:input ref="/f1040ez/section03/line07"/>
+                        </td>
+                    </tr>
+                    <tr bgcolor="#eeeeee">
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">8a</span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">Earned income credit (EIC)</span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <xforms:input ref="/f1040ez/section03/line08a"/>
+                        </td>
+                    </tr>
+                    <tr bgcolor="#eeeeee">
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">8b</span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="n8">Nontaxable combat pay election</span>
+                        </td>
+                        <td valign="top" colspan="2" bgcolor="#eeeeee">
+                            <xforms:input ref="/f1040ez/section03/line08b"/>
+                        </td>
+                    </tr>
+                    <tr bgcolor="#eeeeee">
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="b8">9</span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <span class="n8">
+                                Add lines 7 and 8a.  These are your
+                                <b>total payments.</b>
+                            </span>
+                        </td>
+                        <td valign="top" bgcolor="#eeeeee">
+                            <xforms:input ref="/f1040ez/section03/line09"/>
+                        </td>
+                    </tr>
+                </table>
+                <p>
+                    <xforms:trigger>
+                        <xforms:label ref="/f1040ez/titles/sec2b" class="n10"/>
+                        <xforms:toggle ev:event="DOMActivate" case="sec2show"/>
+                    </xforms:trigger>
+                </p>
+            </xforms:case>
+
+        </xforms:switch>
+    </body>
+
+</html>

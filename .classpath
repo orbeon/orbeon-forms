@@ -78,5 +78,6 @@
 	<classpathentry kind="lib" path="WEB-INF/cli-orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/commons-cli-1_0.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/saxon-8_1_1_orbeon.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/pdfbox-0_7_1.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>

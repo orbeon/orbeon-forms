@@ -19,7 +19,7 @@
         <xhtml:title>Anything Else</xhtml:title>
     </xhtml:head>
     <xhtml:body>
-        <xforms:group>
+        <xforms:group ref="/">
             <xhtml:p>
                 Would you like anything else?
             </xhtml:p>

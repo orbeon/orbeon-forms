@@ -22,6 +22,8 @@ import org.xml.sax.ContentHandler;
 
 import java.util.*;
 
+import orbeon.apache.xml.utils.NamespaceSupport2;
+
 /**
  * Context in which control elements are executed.
  */
@@ -32,6 +34,8 @@ public class XFormsElementContext extends XFormsControls {
 
     private Map repeatIdToIndex = new HashMap();
     private Stack elements = new Stack();
+
+    private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
 
     private String encryptionPassword;
 
@@ -96,6 +100,19 @@ public class XFormsElementContext extends XFormsControls {
 
     public Map getRepeatIdToIndex() {
         return repeatIdToIndex;
+    }
+
+    public Map getCurrentPrefixToURIMap() {
+        Map prefixToURI = new HashMap();
+        for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+            String prefix = (String) e.nextElement();
+            prefixToURI.put(prefix, namespaceSupport.getURI(prefix));
+        }
+        return prefixToURI;
+    }
+
+    public NamespaceSupport2 getNamespaceSupport() {
+        return namespaceSupport;
     }
 
     /**

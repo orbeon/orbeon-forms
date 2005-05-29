@@ -16,7 +16,7 @@
         <xhtml:title>See You Again</xhtml:title>
     </xhtml:head>
     <xhtml:body>
-        <xforms:group>
+        <xforms:group ref="/">
             <xhtml:p><img src="/examples/atm/apukwik.gif" width="314" height="232"/></xhtml:p>
         </xforms:group>
         <xhtml:p style="margin-top: 3em">

@@ -26,7 +26,7 @@
                 <xsl:value-of select="/balance"/>
             </xhtml:p>
             <xhtml:p>
-                <xforms:input ref="amount"/>
+                <xforms:input ref="/amount"/>
                 <xforms:submit>
                     <xforms:label>Withdraw</xforms:label>
                 </xforms:submit>

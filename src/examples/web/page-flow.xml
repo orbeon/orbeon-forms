@@ -49,6 +49,9 @@
     <!-- Standalone Counter example -->
     <page path-info="/counter*" model="/examples/counter/page-flow.xpl"/>
 
+    <!-- Standalone BizDoc 2 example -->
+    <page path-info="/bizdoc2*" model="/examples/bizdoc2/page-flow.xpl"/>
+
     <!-- Standalone BizDoc example -->
     <page path-info="/bizdoc*" model="/examples/bizdoc/page-flow.xpl"/>
 
@@ -76,7 +79,7 @@
     <page path-info="/examples/doc" view="/doc/stub-view.xml"/>
     <page path-info="/doc/book" model="/doc/book/model.xpl"/>
 
-    <page path-info="/doc/(.*)" matcher="oxf:perl5-matcher" 
+    <page path-info="/doc/(.*)" matcher="oxf:perl5-matcher"
             xforms="/doc/xforms.xml" model="/doc/model.xpl">
         <param ref="/form/page"/>
     </page>
@@ -98,6 +101,8 @@
         model="/oxfmark/machines.xpl"/>
     <page path-info="/examples/oxfmark-vms"
         model="/oxfmark/vms.xpl"/>
+
+    <page path-info="/dmv*" model="/examples/erik/dmv/page-flow.xpl"/>
 
     <!-- "Not Found" page displayed when no page matches the request URL -->
     <page id="not-found" path-info="/not-found" view="/config/not-found.xml"/>

@@ -339,18 +339,28 @@ public class Dom4jUtils {
         return ch.getDocument();
     }
 
+    /**
+     * Return a Map of namespaces in scope on the given element.
+     */
     public static Map getNamespaceContext(Element element) {
-        Map namespaces = new HashMap();
-        for (Element currentNode = element;
-             currentNode != null;
-             currentNode = currentNode.getParent()) {
-            List currentNamespaces = currentNode.declaredNamespaces();
+        final Map namespaces = new HashMap();
+        for (Element currentNode = element; currentNode != null; currentNode = currentNode.getParent()) {
+            final List currentNamespaces = currentNode.declaredNamespaces();
             for (Iterator j = currentNamespaces.iterator(); j.hasNext();) {
-                Namespace namespace = (Namespace) j.next();
+                final Namespace namespace = (Namespace) j.next();
                 if (!namespaces.containsKey(namespace.getPrefix()))
                     namespaces.put(namespace.getPrefix(), namespace.getURI());
             }
         }
+        return namespaces;
+    }
+
+    /**
+     * Return a Map of namespaces in scope on the given element, without the default namespace.
+     */
+    public static Map getNamespaceContextNoDefault(Element element) {
+        final Map namespaces = getNamespaceContext(element);
+        namespaces.remove("");
         return namespaces;
     }
 
@@ -467,19 +477,21 @@ public class Dom4jUtils {
 
     /**
      * Return a new document with a copy of newRoot as its root and all parent namespaces copied to
-     * the new root element.
+     * the new root element, assuming they are not already declared on the new root element.
      */
     public static Document createDocumentCopyParentNamespaces(final Element newRoot) {
 
-        Document document = Dom4jUtils.createDocument(newRoot);
+        final Document document = Dom4jUtils.createDocument(newRoot);
+        final Element rootElement = document.getRootElement();
 
         final Element parentElement = newRoot.getParent();
         final Map parentNamespaceContext = Dom4jUtils.getNamespaceContext(parentElement);
-        final Element rootElement = document.getRootElement();
+
         for (Iterator k = parentNamespaceContext.keySet().iterator(); k.hasNext();) {
-            String prefix = (String) k.next();
-            String uri = (String) parentNamespaceContext.get(prefix);
-            rootElement.addNamespace(prefix, uri);
+            final String prefix = (String) k.next();
+            final String uri = (String) parentNamespaceContext.get(prefix);
+            if (rootElement.getNamespaceForPrefix(prefix) == null)
+                rootElement.addNamespace(prefix, uri);
         }
 
         return document;

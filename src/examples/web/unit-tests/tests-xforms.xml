@@ -1103,7 +1103,7 @@
             </p:config>
         </input>
         <output name="data">
-            <instance>
+            <instance xmlns:a="a" xmlns:b="b">
                 <a:a xmlns:a="a">1</a:a>
                 <b:b xmlns:b="b">B</b:b>
             </instance>

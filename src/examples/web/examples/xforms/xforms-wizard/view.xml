@@ -46,7 +46,7 @@
     </xhtml:head>
     <xhtml:body>
         <xhtml:p>
-            <xforms:group ref="/user">
+            <xforms:group ref="instance('text')">
                 <xforms:switch>
                     <xforms:case id="firstname">
                         <xhtml:p>Step 1 of 3</xhtml:p>

@@ -13,7 +13,6 @@
  */
 package org.orbeon.oxf.xforms;
 
-import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -23,8 +22,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.XFormsEvent;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -40,7 +37,6 @@ public class XFormsControls implements XFormsEventTarget {
 
     private Locator locator;
 
-    private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
     private RepeatInfo repeatInfo;
     private Map switchIdToToSwitchInfoMap;
     private Map caseIdToSwitchInfoMap;
@@ -228,7 +224,7 @@ public class XFormsControls implements XFormsEventTarget {
         }
 
         // Determine current context
-        Context currentContext = getCurrentContext();
+        final Context currentContext = getCurrentContext();
 
         // Handle model
         final XFormsModel newModel;
@@ -247,7 +243,7 @@ public class XFormsControls implements XFormsEventTarget {
             } else if (ref != null || nodeset != null) {
                 // Evaluate new XPath in context of current node
                 newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, getCurrentSingleNode(newModel.getModelId()),
-                        ref != null ? ref : nodeset, getCurrentPrefixToURIMap(), null, functionLibrary, null);
+                        ref != null ? ref : nodeset, Dom4jUtils.getNamespaceContextNoDefault(bindingElement), null, functionLibrary, null);
 
                 if (ref != null && newNodeset.isEmpty())
                     throw new ValidationException("Single-node binding expression '"
@@ -313,15 +309,6 @@ public class XFormsControls implements XFormsEventTarget {
      */
     public List getCurrentNodeset() {
         return getCurrentContext().nodeset;
-    }
-
-    public Map getCurrentPrefixToURIMap() {
-        Map prefixToURI = new HashMap();
-        for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
-            String prefix = (String) e.nextElement();
-            prefixToURI.put(prefix, namespaceSupport.getURI(prefix));
-        }
-        return prefixToURI;
     }
 
     public void popBinding() {
@@ -589,10 +576,6 @@ public class XFormsControls implements XFormsEventTarget {
             }
         }
         return null;
-    }
-
-    public NamespaceSupport2 getNamespaceSupport() {
-        return namespaceSupport;
     }
 
     public Locator getLocator() {
@@ -961,7 +944,7 @@ public class XFormsControls implements XFormsEventTarget {
             final String valueToSet;
             if (value != null) {
                 // Value to set is computed with an XPath expression
-                Map namespaceContext = Dom4jUtils.getNamespaceContext(eventHandlerElement);
+                Map namespaceContext = Dom4jUtils.getNamespaceContextNoDefault(eventHandlerElement);
                 valueToSet = currentInstance.evaluateXPathAsString(pipelineContext, value, namespaceContext, null, functionLibrary, null);
             } else {
                 // Value to set is static content
@@ -1016,7 +999,7 @@ public class XFormsControls implements XFormsEventTarget {
             // specified by attributes position and at."
             final XFormsInstance currentInstance = getCurrentInstance();
             final String insersionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
-                    "round(" + atAttribute + ")", getCurrentPrefixToURIMap(), null, functionLibrary, null);
+                    "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(eventHandlerElement), null, functionLibrary, null);
 
             // Don't think we will get NaN with XPath 2.0...
             int insersionIndex = "NaN".equals(insersionIndexString) ? collectionToBeUpdated.size() : Integer.parseInt(insersionIndexString) ;

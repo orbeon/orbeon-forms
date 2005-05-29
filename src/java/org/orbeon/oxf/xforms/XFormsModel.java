@@ -325,7 +325,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             ModelBind modelBind = new ModelBind(bindElement.attributeValue("id"), bindElement.attributeValue("nodeset"),
                     bindElement.attributeValue("relevant"), bindElement.attributeValue("calculate"), bindElement.attributeValue("type"),
                     bindElement.attributeValue("constraint"), bindElement.attributeValue("required"), bindElement.attributeValue("readonly"),
-                    Dom4jUtils.getNamespaceContext(bindElement), (LocationData) bindElement.getData());
+                    Dom4jUtils.getNamespaceContextNoDefault(bindElement), (LocationData) bindElement.getData());
             if (parent != null) {
                 parent.addChild(modelBind);
                 modelBind.setParent(parent);
@@ -1052,7 +1052,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                     int instancePosition = 0;
                     for (Iterator i = instanceContainers.iterator(); i.hasNext(); instancePosition++) {
                         Element instanceContainer = (Element) i.next();
-                        Document instanceDocument = Dom4jUtils.createDocument((Element) instanceContainer.elements().get(0));
+                        Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) instanceContainer.elements().get(0));
                         setInstanceDocument(pipelineContext, instancePosition, instanceDocument);
                     }
                 }

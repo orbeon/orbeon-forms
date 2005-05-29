@@ -19,7 +19,7 @@
         <xhtml:title>Low Balance</xhtml:title>
     </xhtml:head>
     <xhtml:body>
-        <xforms:group>
+        <xforms:group ref="/">
             <xhtml:p>Your balance is insufficient. Please select another amount.</xhtml:p>
             <xhtml:p>
                 <xforms:submit>

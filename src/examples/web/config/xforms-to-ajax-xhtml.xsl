@@ -199,7 +199,7 @@
         <xsl:value-of select="$label"/>
     </xsl:template>
 
-    <xsl:template match="xforms:select1[@appearance = 'minimal'] | xforms:select[@appearance = 'compact']">
+    <xsl:template match="xforms:select1[@appearance = ('minimal', 'compact')] | xforms:select[@appearance = ('minimal', 'compact')]">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xsl:variable name="many" as="xs:boolean" select="local-name() = 'select'"/>

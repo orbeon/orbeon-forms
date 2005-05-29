@@ -597,6 +597,26 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
     }
 
     /**
+     * Load XForms model schemas.
+     */
+    private void loadSchemas(final PipelineContext pipelineContext, Element modelElement) {
+        if (!isSkipInstanceSchemaValidation()) {
+            String schemaURI = modelElement.attributeValue("schema");
+            if (schemaURI != null) {
+                // Resolve URI
+                String systemID = ((LocationData) modelElement.getData()).getSystemID();
+                try {
+                    schemaURI = URLFactory.createURL(systemID, schemaURI).toString();
+                } catch (MalformedURLException e) {
+                    throw new OXFException(e);
+                }
+                // Load associated grammar
+                schemaGrammar = loadGrammar(pipelineContext, schemaURI);
+            }
+        }
+    }
+
+    /**
      * Load and cache a Grammar for a given schema URI.
      */
     private Grammar loadGrammar(final PipelineContext pipelineContext, final String schemaURI) {
@@ -1011,6 +1031,9 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
         if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
             // Internal event to restore state
 
+            final Element modelElement = modelDocument.getRootElement();
+
+            loadSchemas(pipelineContext, modelElement);
             applyRelevantReadonlyBinds(pipelineContext);
             dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this));
 
@@ -1018,26 +1041,13 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // 4.2.1 The xforms-model-construct Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
 
-            Element modelElement = modelDocument.getRootElement();
+            final Element modelElement = modelDocument.getRootElement();
 
             // 1. All XML Schemas loaded (throws xforms-link-exception)
 
             // TODO: support multiple schemas
-            if (!isSkipInstanceSchemaValidation()) {
-                // Get schema URI
-                String schemaURI = modelElement.attributeValue("schema");
-                if (schemaURI != null) {
-                    // Resolve URI
-                    String systemID = ((LocationData) modelElement.getData()).getSystemID();
-                    try {
-                        schemaURI = URLFactory.createURL(systemID, schemaURI).toString();
-                    } catch (MalformedURLException e) {
-                        throw new OXFException(e);
-                    }
-                    // Load associated grammar
-                    schemaGrammar = loadGrammar(pipelineContext, schemaURI);
-                }
-            }
+            // Get schema URI
+            loadSchemas(pipelineContext, modelElement);
             // TODO: throw exception event
 
             // 2. Create XPath data model from instance (inline or external) (throws xforms-link-exception)

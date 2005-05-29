@@ -34,7 +34,7 @@
         </action>
         <!-- View a document -->
         <action when="/form/action = 'show-detail'" action="summary/find-document-action.xpl">
-            <result page="detail-1">
+            <result page="detail">
                 <xu:update select="/form/document-id">
                     <xu:value-of select="document('input:action')/document-info/document-id"/>
                 </xu:update>
@@ -45,7 +45,7 @@
         </action>
         <!-- Create a new document: just use the detail page's default XForms instance -->
         <action when="/form/action = 'new-document'" action="summary/new-document-action.xpl">
-            <result page="detail-1">
+            <result page="detail">
                 <xu:update select="/form/document-id">
                     <xu:value-of select="document('input:action')/document-info/document-id"/>
                 </xu:update>
@@ -71,10 +71,10 @@
     <!-- Show XML document -->
     <page id="xml-detail" path-info="/example-resources/bizdoc/xml-detail" xforms="detail/xml-detail-xforms-model.xml" model="detail/xml-detail-model.xpl"/>
 
-    <page id="detail-1" path-info="/bizdoc2/detail-1" view="detail/detail-view.xsl">
+    <page id="detail" path-info="/bizdoc2/detail" view="detail/detail-view.xsl">
         <!-- Save the current document and documemnt is valid -->
 <!--        <action when="/form/action = 'save' and not(/form/document//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="detail/save-document-action.xpl">-->
-<!--            <result page="detail-1">-->
+<!--            <result page="detail">-->
 <!--                <xu:remove select="/*"/>-->
 <!--                <xu:update select="/">-->
 <!--                    <xu:copy-of select="document('input:instance')/*"/>-->
@@ -105,41 +105,6 @@
 <!--                </xu:update>-->
 <!--            </result>-->
 <!--        </action>-->
-    </page>
-
-    <page id="detail-2" path-info="/bizdoc2/detail-2" xforms="detail/detail-xforms-model.xml" view="detail/detail-view-2.xsl">
-        <!-- Save the current document and documemnt is valid -->
-        <action when="/form/action = 'save' and not(/form/document//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="detail/save-document-action.xpl">
-            <result page="detail-2">
-                <xu:remove select="/*"/>
-                <xu:update select="/">
-                    <xu:copy-of select="document('input:instance')/*"/>
-                </xu:update>
-                <xu:update select="/form/action"/>
-                <xu:update select="/form/message">save-success</xu:update>
-            </result>
-        </action>
-        <!-- Save the current document and documemnt is invalid -->
-        <action when="/form/action = 'save' and /form/document//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])]">
-            <result>
-                <xu:message><xu:copy-of select="/*"/></xu:message>
-                <xu:update select="/form/message">save-failure</xu:update>
-                <xu:update select="/form/show-errors">true</xu:update>
-            </result>
-        </action>
-        <!-- Previous page -->
-        <action when="/form/action = 'back'">
-            <result page="detail-1">
-                <xu:update select="/form/document-id">
-                    <xu:value-of select="document('input:instance')/*/document-id"/>
-                </xu:update>
-                <xu:update select="/form/document">
-                    <xu:copy-of select="document('input:instance')/*/document/*"/>
-                </xu:update>
-            </result>
-        </action>
-        <!-- Next page -->
-        <!-- ... -->
     </page>
     
     <!-- Home (for standalone operation) -->

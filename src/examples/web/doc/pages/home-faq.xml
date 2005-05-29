@@ -17,7 +17,8 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:xu="http://www.xmldb.org/xupdate">
     <header>
         <title>PresentationServer and Studio FAQ</title>
     </header>
@@ -630,6 +631,26 @@
                     is free to use it or contribute to it. Like the rest of PresentationServer, it
                     is available under the LGPL license.
                 </p>
+            </section>
+            <a name="xupdate-debug"/>
+            <section>
+                <title>How can I debug the XUpdate code in my page flow?</title>
+                <p>
+                    Insert at the very beginning of the in the XUpdate code those 3 lines to log the
+                    instance being modified (instance of target page), the current instance, and
+                    the output of the action pipeline:
+                </p>
+                <xml-source>
+                    <xu:message>Instance of target page before XUpdate: <xu:copy-of select="/*"/></xu:message>
+                    <xu:message>Instance of this page: <xu:copy-of select="doc('oxf:instance')/*"/></xu:message>
+                    <xu:message>Action output: <xu:copy-of select="doc('oxf:action')/*"/></xu:message>
+                </xml-source>
+                <p>
+                    Then as the very last instruction in the XUpdate code, add:
+                </p>
+                <xml-source>
+                    <xu:message>Instance of target page after XUpdate: <xu:copy-of select="/*"/></xu:message>
+                </xml-source>
             </section>
             <a name="empty-local-name"/>
             <section>

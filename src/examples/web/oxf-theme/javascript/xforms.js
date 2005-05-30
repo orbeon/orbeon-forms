@@ -19,6 +19,9 @@ var XXFORMS_NAMESPACE_URI = "http://orbeon.org/oxf/xml/xforms";
 var BASE_URL = null;
 var XFORMS_SERVER_URL = null;
 var PATH_TO_JAVASCRIPT = "/oxf-theme/javascript/xforms.js";
+var ELEMENT_TYPE = document.createElement("dummy").nodeType;
+var ATTRIBUTE_TYPE = document.createAttribute("dummy").nodeType;
+var TEXT_TYPE = document.createTextNode("").nodeType;
 
 /* * * * * * Utility functions * * * * * */
 
@@ -81,6 +84,30 @@ function xformsGetElementPosition(element) {
         offsetTop += document.body.topMargin;
     }
     return {left:offsetLeft, top:offsetTop};
+}
+
+/**
+ * Replace in a tree a placeholder by some other string in text nodes and attribute values
+ */
+function xformsStringReplace(node, placeholder, replacement) {
+
+    function replace(text) {
+        var text = new String(node.value);
+        return text.replace(new RegExp("placeholder", "g"), replacement);
+    }
+
+    switch (node.nodeType) {
+        case ELEMENT_TYPE:
+            for (var i = 0; i < node.attributes.length; i++)
+                node.setAttribute(node.attributes[i].name, replace(node.attributes[i].value));
+            for (var i = 0; i < node.childNodes; i++)
+                xformsStringReplace(node.childNodes[i], placeholder, replacement);
+            break;
+        case TEXT_TYPE:
+            node.nodeValue = replace(node.nodeValue);
+            alert(node.nodeValue);
+            break;
+    }
 }
 
 function log(text) {
@@ -535,6 +562,80 @@ function xformsHandleResponse() {
                                     documentElement.style.display = visibile ? "block" : "none";
                                 }
                             }
+                        }
+                        
+                        // Change values in an itemset
+                        if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "itemsets") {
+                            var itemsetsElement = actionElement.childNodes[actionIndex];
+                            for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
+                                if (xformsGetLocalName(itemsetsElement.childNodes[j]) == "itemset") {
+                                    var itemsetElement = itemsetsElement.childNodes[j];
+                                    var controlId = itemsetElement.getAttribute("id");
+                                    var documentElement = document.getElementById(controlId);
+
+                                    if(documentElement.tagName == "SELECT") {
+
+                                        // Case of list / combobox
+                                        var options = documentElement.options;
+
+                                        // Update select per content of itemset
+                                        for (var k = 0; k < itemsetElement.childNodes.length; k++) {
+                                            var itemElement = itemsetElement.childNodes[k];
+                                            if (k >= options.length) {
+                                                // Add a new option
+                                                var newOption = document.createElement("OPTION");
+                                                documentElement.options.add(newOption);
+                                                newOption.text = itemElement.getAttribute("label");
+                                                newOption.value = itemElement.getAttribute("value");
+                                            } else {
+                                                // Replace current label/value if necessary
+                                                var option = options[k];
+                                                if (option.text != itemElement.getAttribute("label"))
+                                                    option.text = itemElement.getAttribute("label");
+                                                if (option.value != itemElement.getAttribute("value"))
+                                                    option.value = itemElement.getAttribute("value");
+                                            }
+                                        }
+
+                                        // Remove options in select if necessary
+                                        while (options.length > itemsetElement.childNodes.length)
+                                            options.remove(options.length - 1);
+                                    } else {
+                                    
+                                        // Case of checkboxes / radio bottons
+                                        
+                                        // Get element following control
+                                        var template = documentElement.nextSibling;
+                                        while (template.nodeType != ELEMENT_TYPE)
+                                            template = template.nextSibling;
+                                            
+                                        // Get its child element and clone
+                                        var template = template.firstChild;
+                                        while (template.nodeType != ELEMENT_TYPE)
+                                            template = template.nextSibling;
+                                            
+                                        // Remove content
+                                        while (documentElement.childNodes.length > 0)
+                                            documentElement.removeChild(documentElement.firstChild);
+                                            
+                                        // Recreate content based on template
+                                        for (var k = 0; k < itemsetElement.childNodes.length; k++) {
+                                            var itemElement = itemsetElement.childNodes[k];
+                                            var templateClone = template.cloneNode(true);
+                                            xformsStringReplace(templateClone, "$xforms-template-label$", 
+                                                itemElement.getAttribute("label"));
+                                            xformsStringReplace(templateClone, "$xforms-template-value$", 
+                                                itemElement.getAttribute("value"));
+                                            documentElement.appendChild(templateClone);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Submit form
+                        if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "submission") {
+                            form.submit();
                         }
                     }
                 }

@@ -849,7 +849,6 @@ public class XFormsControls implements XFormsEventTarget {
                 final Object object = containingDocument.getObjectById(pipelineContext, submissionId);
                 if (object instanceof XFormsModelSubmission) {
                     final XFormsModelSubmission submission = (XFormsModelSubmission) object;
-
                     submission.dispatchEvent(pipelineContext, new XFormsSubmitEvent(submission));
                 } else {
                     throw new OXFException("xforms:submit submission attribute must point to an xforms:submission element.");
@@ -900,7 +899,7 @@ public class XFormsControls implements XFormsEventTarget {
         Element eventHandlerElement = getEventHandler(pipelineContext, (Element) xformsEvent.getTargetObject(), xformsEvent.getEventName());
         // If found, run actions
         if (eventHandlerElement != null) {
-            runAction(pipelineContext, eventHandlerElement, xformsEvent);
+            runAction(pipelineContext, eventHandlerElement, xformsEvent, null);
             return true;
         } else {
             return false;
@@ -921,7 +920,7 @@ public class XFormsControls implements XFormsEventTarget {
         return eventHandlerElement;
     }
 
-    private void runAction(final PipelineContext pipelineContext, Element eventHandlerElement, XFormsEvent XFormsEvent) {
+    private void runAction(final PipelineContext pipelineContext, Element eventHandlerElement, XFormsEvent XFormsEvent, ActionContext actionContext) {
 
         final String actionNamespaceURI = eventHandlerElement.getNamespaceURI();
         if (!XFormsConstants.XFORMS_NAMESPACE_URI.equals(actionNamespaceURI)) {
@@ -955,18 +954,108 @@ public class XFormsControls implements XFormsEventTarget {
             Node currentNode = getCurrentSingleNode();
             XFormsInstance.setValueForNode(currentNode, valueToSet);
 
+            // "XForms Actions that change only the value of an instance node results in setting
+            // the flags for recalculate, revalidate, and refresh to true and making no change to
+            // the flag for rebuild".
+            if (actionContext != null) {
+                actionContext.recalculate = true;
+                actionContext.revalidate = true;
+                actionContext.refresh = true;
+            }
+
+        } else if (XFormsActions.XFORMS_RESET_ACTION.equals(actionEventName)) {
+            // 10.1.11 The reset Element
+
+            final String modelId = eventHandlerElement.attributeValue("model");
+
+            final Object modelObject = containingDocument.getObjectById(pipelineContext, modelId);
+            if (modelObject instanceof XFormsModel) {
+                final XFormsModel model = (XFormsModel) modelObject;
+                model.dispatchEvent(pipelineContext, new XFormsResetEvent(model));
+            } else {
+                throw new OXFException("xforms:reset model attribute must point to an xforms:model element.");
+            }
+
+            // "the reset action takes effect immediately and clears all of the flags."
+            if (actionContext != null)
+                actionContext.setAll(false);
+
         } else if (XFormsActions.XFORMS_ACTION_ACTION.equals(actionEventName)) {
             // 10.1.1 The action Element
-            // xforms:action
 
             for (Iterator i = eventHandlerElement.elementIterator(); i.hasNext();) {
-                Element embeddedActionElement = (Element) i.next();
-                runAction(pipelineContext, embeddedActionElement, XFormsEvent);
+                final Element embeddedActionElement = (Element) i.next();
+
+                final ActionContext newActionContext = (actionContext == null) ? new ActionContext() : null;
+                runAction(pipelineContext, embeddedActionElement, XFormsEvent, (newActionContext == null) ? actionContext : newActionContext );
+                if (newActionContext != null) {
+
+                    // Set binding for current action element
+                    setBinding(pipelineContext, eventHandlerElement);
+                    final XFormsModel model = getCurrentModel();
+
+                    // Process deferred behavior
+                    if (newActionContext.rebuild)
+                        model.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
+                    if (newActionContext.recalculate)
+                        model.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model));
+                    if (newActionContext.revalidate)
+                        model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model));
+                    if (newActionContext.refresh)
+                        model.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
+                }
             }
+
+        } else if (XFormsActions.XFORMS_REBUILD_ACTION.equals(actionEventName)) {
+            // 10.1.3 The rebuild Element
+
+            setBinding(pipelineContext, eventHandlerElement);
+            final XFormsModel model = getCurrentModel();
+            model.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
+
+            // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
+            // have an immediate effect, and clear the corresponding flag."
+            if (actionContext != null)
+                actionContext.rebuild = false;
+
+        } else if (XFormsActions.XFORMS_RECALCULATE_ACTION.equals(actionEventName)) {
+            // 10.1.4 The recalculate Element
+
+            setBinding(pipelineContext, eventHandlerElement);
+            final XFormsModel model = getCurrentModel();
+            model.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model));
+
+            // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
+            // have an immediate effect, and clear the corresponding flag."
+            if (actionContext != null)
+                actionContext.recalculate = false;
+
+        } else if (XFormsActions.XFORMS_REVALIDATE_ACTION.equals(actionEventName)) {
+            // 10.1.5 The revalidate Element
+
+            setBinding(pipelineContext, eventHandlerElement);
+            final XFormsModel model = getCurrentModel();
+            model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model));
+
+            // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
+            // have an immediate effect, and clear the corresponding flag."
+            if (actionContext != null)
+                actionContext.revalidate = false;
+
+        } else if (XFormsActions.XFORMS_REFRESH_ACTION.equals(actionEventName)) {
+            // 10.1.6 The refresh Element
+
+            setBinding(pipelineContext, eventHandlerElement);
+            final XFormsModel model = getCurrentModel();
+            model.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
+
+            // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
+            // have an immediate effect, and clear the corresponding flag."
+            if (actionContext != null)
+                actionContext.refresh = false;
 
         } else if (XFormsActions.XFORMS_TOGGLE_ACTION.equals(actionEventName)) {
             // 9.2.3 The toggle Element
-            // xforms:toggle
 
             String caseId = eventHandlerElement.attributeValue("case");
 
@@ -1072,10 +1161,18 @@ public class XFormsControls implements XFormsEventTarget {
             // "4. If the insert is successful, the event xforms-insert is dispatched."
             currentInstance.dispatchEvent(pipelineContext, new XFormsInsertEvent(currentInstance, atAttribute));
 
+            // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
+            if (actionContext != null)
+                actionContext.setAll(true);
+
         } else if (XFormsActions.XFORMS_DELETE_ACTION.equals(actionEventName)) {
             // 9.3.6 The delete Element
 
             // TODO
+
+            // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
+            if (actionContext != null)
+                actionContext.setAll(true);
 
         } else if (XFormsActions.XFORMS_SETINDEX_ACTION.equals(actionEventName)) {
             // 9.3.7 The setindex Element
@@ -1327,6 +1424,20 @@ public class XFormsControls implements XFormsEventTarget {
 
             final ItemsetInfo other = (ItemsetInfo) obj;
             return id.equals(other.id) && label.equals(other.label) && value.equals(other.value);
+        }
+    }
+
+    private static class ActionContext {
+        public boolean rebuild;
+        public boolean recalculate;
+        public boolean revalidate;
+        public boolean refresh;
+
+        public void setAll(boolean value) {
+            rebuild = value;
+            recalculate = value;
+            revalidate = value;
+            refresh = value;
         }
     }
 }

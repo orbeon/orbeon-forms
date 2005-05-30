@@ -41,6 +41,8 @@ public class XFormsContainingDocument implements XFormsEventTarget {
     private Map modelsMap = new HashMap();
     private XFormsControls xFormsControls;
 
+    private XFormsModelSubmission activeSubmission;
+
     public XFormsContainingDocument(List models, Document controlsDocument) {
         this.models = models;
         this.xFormsControls = new XFormsControls(this, controlsDocument);
@@ -49,7 +51,7 @@ public class XFormsContainingDocument implements XFormsEventTarget {
             XFormsModel model = (XFormsModel) i.next();
             if (model.getModelId() != null)
                 modelsMap.put(model.getModelId(), model);
-            model.setControls(xFormsControls);
+            model.setContainingDocument(this);
         }
     }
 
@@ -97,6 +99,24 @@ public class XFormsContainingDocument implements XFormsEventTarget {
 
         // Search in controls
         return xFormsControls.getElementById(pipelineContext, id);
+    }
+
+    /**
+     * Return the active submission if any or null.
+     */
+    public XFormsModelSubmission getActiveSubmission() {
+        return activeSubmission;
+    }
+
+    /**
+     * Set the active submission.
+     *
+     * This can be called with a non-null value at most once.
+     */
+    public void setActiveSubmission(XFormsModelSubmission activeSubmission) {
+        if (this.activeSubmission != null)
+            throw new OXFException("There is already an active submission.");
+        this.activeSubmission = activeSubmission;
     }
 
     /**

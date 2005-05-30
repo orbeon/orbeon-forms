@@ -231,8 +231,8 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
     private List binds;
     private FunctionLibrary xformsFunctionLibrary = new XFormsFunctionLibrary(this);
 
-    // Controls if available (mostly for event dispatching)
-    private XFormsControls xFormsControls;
+    // Containing document
+    private XFormsContainingDocument xFormsContainingDocument;
 
     public XFormsModel(Document modelDocument) {
         this.modelDocument = modelDocument;
@@ -279,12 +279,12 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
         }
     }
 
-    public void setControls(XFormsControls xFormsControls) {
-        this.xFormsControls = xFormsControls;
+    public void setContainingDocument(XFormsContainingDocument xFormsContainingDocument) {
+        this.xFormsContainingDocument = xFormsContainingDocument;
     }
 
-    public XFormsControls getControls() {
-        return xFormsControls;
+    public XFormsContainingDocument getContainingDocument() {
+        return xFormsContainingDocument;
     }
 
     /**
@@ -1151,8 +1151,8 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
             // Must ask controls to refresh for this model
-            if (xFormsControls != null) {
-                xFormsControls.refreshForModel(pipelineContext, this);
+            if (xFormsContainingDocument.getXFormsControls() != null) {
+                xFormsContainingDocument.getXFormsControls().refreshForModel(pipelineContext, this);
             }
 
         } else if (XFormsEvents.XFORMS_RESET.equals(eventName)) {
@@ -1160,6 +1160,16 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
             // TODO
+            // "The instance data is reset to the tree structure and values it had immediately
+            // after having processed the xforms-ready event."
+
+            // "Then, the events xforms-rebuild, xforms-recalculate, xforms-revalidate and
+            // xforms-refresh are dispatched to the model element in sequence."
+            dispatchEvent(pipelineContext, new XFormsRebuildEvent(XFormsModel.this));
+            dispatchEvent(pipelineContext, new XFormsRecalculateEvent(XFormsModel.this));
+            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this));
+            dispatchEvent(pipelineContext, new XFormsRefreshEvent(XFormsModel.this));
+
         } else if (XFormsEvents.XFORMS_LINK_ERROR.equals(eventName)) {
             // 4.5.2 The xforms-link-error Event
             // Bubbles: Yes / Cancelable: No / Context Info: The URI that failed to load (xsd:anyURI)

@@ -277,6 +277,11 @@ public class XFormsServer extends ProcessorImpl {
                             ch.endElement();
                         }
 
+                        // Output submit information
+                        {
+                            outputSubmissionInfo(ch, containingDocument.getActiveSubmission());
+                        }
+
                         ch.endElement();
                     }
 
@@ -290,6 +295,14 @@ public class XFormsServer extends ProcessorImpl {
         };
         addOutput(name, output);
         return output;
+    }
+
+    private void outputSubmissionInfo(ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
+        if (activeSubmission != null) {
+            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "submission");
+            // TODO
+            ch.endElement();
+        }
     }
 
     private void outputItemsets(ContentHandlerHelper ch, Map itemsetIdToItemsetInfoMap) {

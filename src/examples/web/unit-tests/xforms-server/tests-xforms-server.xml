@@ -503,7 +503,7 @@
                                     </other-instance>
                                 </xforms:instance>
                                 <xforms:bind nodeset="instance('instance2')/first" calculate="314"/>
-                                <xforms:bind nodeset="/*/first" calculate="1592"/>
+<!--                                <xforms:bind nodeset="/*/first" calculate="1592"/>-->
 <!--                                <xforms:bind nodeset="/*/first" type="xs:integer"/>-->
                             </xforms:model>
                         </models>
@@ -605,9 +605,9 @@
                                     </other-instance>
                                 </xforms:instance>
                                 <xforms:bind nodeset="instance('instance2')/first"
-                                    calculate="xxforms:call-xpl('oxf:/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/>
+                                    calculate="xxforms:call-xpl('oxf:/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/first"/><!-- FIXME: The '/' should evaluate to the root of instance2 -->
                                 <xforms:bind nodeset="instance('instance2')/second"
-                                    calculate="xxforms:call-xpl('oxf:/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/second"/>
+                                    calculate="xxforms:call-xpl('oxf:/unit-tests/xforms-server/xforms-call-xpl-pipeline.xpl', 'instance', /, 'result')/*/second"/><!-- FIXME: The '/' should evaluate to the root of instance2 -->
                                 <xforms:bind nodeset="/*/screen"
                                     constraint="false()"/>
                             </xforms:model>
@@ -635,10 +635,10 @@
                                 <result/>
                             </equation>
                             <other-instance>
-                                <first>123</first><!-- FIXME: the bind should pass data from the second instance, not the first one! -->
+                                <first>3.141592</first><!-- FIXME: the bind should pass data from the second instance, not the first one! -->
                                 <second>456</second><!-- FIXME: the bind should pass data from the second instance, not the first one! -->
-                                <third>123</third>
-                                <fourth>123</fourth>
+                                <third>3.141592</third>
+                                <fourth>3.141592</fourth>
                             </other-instance>
                         </instances>
                         <divs/>

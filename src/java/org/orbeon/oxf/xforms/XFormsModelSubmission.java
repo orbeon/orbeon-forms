@@ -118,7 +118,7 @@ public class XFormsModelSubmission implements XFormsEventTarget {
             extractSubmissionElement();
 
             // Select node based on ref or bind
-            final XFormsControls xformsControls = model.getControls();
+            final XFormsControls xformsControls = model.getContainingDocument().getXFormsControls();
             xformsControls.setBinding(pipelineContext, submissionElement);
 
             final Node currentNode = xformsControls.getCurrentSingleNode();
@@ -171,6 +171,14 @@ public class XFormsModelSubmission implements XFormsEventTarget {
             if (!instanceValid[0]) {
                 // TODO: dispatch xforms-submit-error and stop processing
                 throw new OXFException("xforms:submission: instance is not valid.");
+            }
+
+            // Deferred submission
+            // NOTE: When replace="all", we don't actually do the submission here when we are called from the XForms Server
+            boolean calledFromXFormsServer = true;// TODO
+            if (replace.equals("all") && calledFromXFormsServer) {
+                model.getContainingDocument().setActiveSubmission(this);
+                return;
             }
 
             // Serialize
@@ -310,8 +318,11 @@ public class XFormsModelSubmission implements XFormsEventTarget {
                         // There is a body
 
                         if (replace.equals("all")) {
-                            // TODO: dispatch xforms-submit-done
-                            // TODO: this will have to involve some more complex behavior, probably.
+                            // NOTE: We don't actually go through this for now because we tell the client to do a POST
+                            // "the event xforms-submit-done is dispatched"
+                            dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                            // NOTE: We would hook up here if we wanted to send the body back
+                            // through the XForms Server directly
                         } else if (replace.equals("instance")) {
                             if (ProcessorUtils.isXMLContentType(responseMediaType)) {
                                 // Handling of XML media type

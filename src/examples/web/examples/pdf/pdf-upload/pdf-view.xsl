@@ -13,7 +13,9 @@
 -->
 <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xf="http://www.w3.org/2002/xforms" xmlns:xxf="http://orbeon.org/oxf/xml/xforms" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" xsl:version="2.0">
 	<xhtml:head>
-		<xhtml:title>PDF Upload: <xsl:value-of select="/result/PDFDocument/@title"/>
+		<xhtml:title>
+            <xsl:text>PDF Upload</xsl:text>
+            <xsl:value-of select="if (normalize-space(/result/PDFDocument/@title) != '') then concat(' - ', /result/PDFDocument/@title) else ''"/>
 		</xhtml:title>
 	</xhtml:head>
 	<xhtml:body>
@@ -29,7 +31,7 @@
 				<xsl:value-of select="/result/message"/>
 			</p>
 		</xsl:if>
-		<xf:group ref="form">
+		<xf:group ref="/form">
 			<table>
 				<tr>
 					<td>

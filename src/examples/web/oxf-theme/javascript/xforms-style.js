@@ -91,6 +91,17 @@ function xformsUpdateStyle(element) {
                 }
             }
             
+            if (className == "xforms-select1-compact") {
+                // Prevent end-user from selecting multiple values
+                
+                function select1CompactChanged(event) {
+                    var target = getEventTarget(event);
+                    target.selectedIndex = target.selectedIndex;
+                } 
+                
+                xformsAddEventListener(element, "change", select1CompactChanged);
+            }
+            
             if (className == "wide-textarea") {
                 if (!element.changeHeightHandlerRegistered) {
                     function changeHeightHandler() {

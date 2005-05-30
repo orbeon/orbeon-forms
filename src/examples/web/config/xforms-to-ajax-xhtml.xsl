@@ -171,7 +171,7 @@
 
         <xsl:if test="xforms:itemset">
             <!-- Produce template -->
-            <xhtml:div id="ops-template-{$id}" style="display: none">
+            <xhtml:span id="ops-template-{$id}" style="display: none">
                 <xsl:call-template name="select-full-item">
                     <xsl:with-param name="type" select="$type"/>
                     <xsl:with-param name="id" select="$id"/>
@@ -179,7 +179,7 @@
                     <xsl:with-param name="label" select="'$ops-template-label$'"/>
                     <xsl:with-param name="value" select="'$ops-template-value$'"/>
                 </xsl:call-template>
-            </xhtml:div>
+            </xhtml:span>
         </xsl:if>
     </xsl:template>
     
@@ -199,15 +199,19 @@
         <xsl:value-of select="$label"/>
     </xsl:template>
 
-    <xsl:template match="xforms:select1[@appearance = ('minimal', 'compact')] | xforms:select[@appearance = ('minimal', 'compact')]">
+    <xsl:template match="xforms:select1[@appearance = ('minimal', 'compact')] 
+            | xforms:select[@appearance = 'compact']">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xsl:variable name="many" as="xs:boolean" select="local-name() = 'select'"/>
         <xsl:variable name="class" as="xs:string"
-            select="if ($many) then 'xforms-select-compact' else 'xforms-select1-minimal'"/>
+            select="if (local-name() = 'select1' and @appearance = 'minimal') then 'xforms-select1-minimal' 
+                else if (local-name() = 'select1' and @appearance = 'compact') then 'xforms-select1-compact'
+                else if (local-name() = 'select' and @appearance = 'compact') then 'xforms-select-compact'
+                else ()"/>
         
         <xhtml:select name="{$id}">
-            <xsl:if test="$many"><xsl:attribute name="multiple">multiple</xsl:attribute></xsl:if>
+            <xsl:if test="@appearance = 'compact'"><xsl:attribute name="multiple">multiple</xsl:attribute></xsl:if>
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', $class), $id)"/>
 
             <xsl:choose>
@@ -243,7 +247,7 @@
         
         <xsl:if test="xforms:itemset">
             <!-- Produce template -->
-            <xhtml:div id="ops-template-{$id}" style="display: none">
+            <xhtml:span id="ops-template-{$id}" style="display: none">
                 <xsl:call-template name="select-minimal-compact-item">
                     <xsl:with-param name="many" select="$many"/>
                     <xsl:with-param name="id" select="$id"/>
@@ -251,7 +255,7 @@
                     <xsl:with-param name="label" select="'$ops-template-label$'"/>
                     <xsl:with-param name="value" select="'$ops-template-value$'"/>
                 </xsl:call-template>
-            </xhtml:div>
+            </xhtml:span>
         </xsl:if>
         
     </xsl:template>

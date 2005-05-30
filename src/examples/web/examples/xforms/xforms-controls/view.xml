@@ -138,7 +138,7 @@
                         </xforms:input>
                     </xhtml:p>
                 </widget:tab>
-                <widget:tab id="selection-controls">
+                <widget:tab id="selection-controls" selected="true">
                     <widget:label>Selection controls</widget:label>
                     <xhtml:p>
                         <xforms:select ref="flavor" appearance="full">
@@ -168,6 +168,15 @@
                         </xforms:select1>
                     </xhtml:p>
                     <xhtml:p>
+                        <xforms:select1 ref="carrier" appearance="compact">
+                            <xforms:label xhtml:class="fixed-width"/>
+                            <xforms:itemset nodeset="instance('items')/carriers/carrier">
+                                <xforms:label ref="label"/>
+                                <xforms:value ref="@value"/>
+                            </xforms:itemset>
+                        </xforms:select1>
+                    </xhtml:p>
+                    <xhtml:p>
                         <xforms:select1 ref="carrier" appearance="minimal">
                             <xforms:label xhtml:class="fixed-width"/>
                             <xforms:itemset nodeset="instance('items')/carriers/carrier">
@@ -177,7 +186,7 @@
                         </xforms:select1>
                     </xhtml:p>
                 </widget:tab>
-                <widget:tab id="slider" selected="true">
+                <widget:tab id="slider">
                     <widget:label>Range</widget:label>
                     <xforms:range ref="range/value"/>
                     <xhtml:p>

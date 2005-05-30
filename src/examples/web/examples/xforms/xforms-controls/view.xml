@@ -35,7 +35,34 @@
                         <value>0</value>
                         <letter>a</letter>
                     </range>
+                    <country/>
                 </instance>
+            </xforms:instance>
+            <xforms:instance id="items">
+                <items>
+                    <flavors>
+                        <flavor value="v">
+                            <label>Vanilla</label>
+                        </flavor> 
+                        <flavor value="s">
+                            <label>Strawberry</label>
+                        </flavor> 
+                        <flavor value="c">
+                            <label>Chocolate</label>
+                        </flavor> 
+                    </flavors>
+                    <carriers>
+                        <carrier value="ups">
+                            <label>UPS</label>
+                        </carrier>
+                        <carrier value="fedex">
+                            <label>FedEx</label>
+                        </carrier>
+                        <carrier value="dhl">
+                            <label>DHL</label>
+                        </carrier>
+                    </carriers>
+                </items>
             </xforms:instance>
             <xforms:instance id="formatted">
                 <formated-instance>
@@ -44,7 +71,12 @@
                 </formated-instance>
             </xforms:instance>                
             <xforms:instance id="countries">
-                <dummy/>
+                <countries>
+                    <country>
+                        <name>1</name>
+                        <country-code>af</country-code>
+                    </country>
+                </countries>
             </xforms:instance>                
             <xforms:instance id="ui">
                 <ui>
@@ -67,11 +99,7 @@
             <xforms:bind nodeset="instance('ui')/show-instance" relevant=". = 'true'"/>
             <xforms:bind nodeset="instance('formatted')" 
                 calculate="saxon:serialize(xxforms:call-xpl
-                    ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
-            <xforms:bind nodeset="instance('countries')" 
-                calculate="saxon:serialize(xxforms:call-xpl
-                    ('oxf:/examples/xforms/xforms-controls/get-countries.xpl', 
-                    'letter', instance('instance')/range/letter, 'countries')/*, 'html')"/>
+                    ('oxf:/oxf-theme/format.xpl', 'data', instance('countries'), 'data')/*, 'html')"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -81,26 +109,26 @@
                     <widget:label>Text controls</widget:label>
                     <xhtml:p>
                         <xforms:input ref="age" incremental="true">
-                            <xforms:label xhtml:class="fixed-width">Age:</xforms:label>
+                            <xforms:label class="fixed-width">Age:</xforms:label>
                             <xforms:hint>Positive number</xforms:hint>
                         </xforms:input>
                     </xhtml:p>
                     <xhtml:p>
                         <xforms:secret ref="secret" incremental="true">
-                            <xforms:label xhtml:class="fixed-width">Password:</xforms:label>
+                            <xforms:label class="fixed-width">Password:</xforms:label>
                             <xforms:hint>The password is 42 ;)</xforms:hint>
                             <xforms:alert>Invalid password</xforms:alert>
                         </xforms:secret>
                     </xhtml:p>
                     <xhtml:p>
                         <xforms:textarea ref="textarea">
-                            <xforms:label xhtml:class="fixed-width">Text area:</xforms:label>
+                            <xforms:label class="fixed-width">Text area:</xforms:label>
                             <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
                         </xforms:textarea>
                     </xhtml:p>
                     <xhtml:p>
                         <xforms:input ref="date" class="xforms-date">
-                            <xforms:label xhtml:class="fixed-width">Birth date:</xforms:label>
+                            <xforms:label class="fixed-width">Birth date:</xforms:label>
                             <xforms:help>
                                 This is supposed to be a help message explaining what a birth date is. 
                                 But since you already know, it mostly serves the purpose of showing how 
@@ -114,81 +142,65 @@
                     <widget:label>Selection controls</widget:label>
                     <xhtml:p>
                         <xforms:select ref="flavor" appearance="full">
-                            <xforms:label xhtml:class="fixed-width">Flavors:</xforms:label>
-                            <xforms:item>
-                              <xforms:label>Vanilla</xforms:label>
-                              <xforms:value>v</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                              <xforms:label>Strawberry</xforms:label>
-                              <xforms:value>s</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                              <xforms:label>Chocolate</xforms:label>
-                              <xforms:value>c</xforms:value>
-                            </xforms:item>
+                            <xforms:label class="fixed-width">Flavors:</xforms:label>
+                            <xforms:itemset nodeset="instance('items')/flavors/flavor">
+                                <xforms:label ref="label"/>
+                                <xforms:value ref="@value"/>
+                            </xforms:itemset>
                         </xforms:select>
                     </xhtml:p>
                     <xhtml:p>
                         <xforms:select ref="flavor" appearance="compact">
                             <xforms:label xhtml:class="fixed-width"/>
-                            <xforms:item>
-                              <xforms:label>Vanilla</xforms:label>
-                              <xforms:value>v</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                              <xforms:label>Strawberry</xforms:label>
-                              <xforms:value>s</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                              <xforms:label>Chocolate</xforms:label>
-                              <xforms:value>c</xforms:value>
-                            </xforms:item>
+                            <xforms:itemset nodeset="instance('items')/flavors/flavor">
+                                <xforms:label ref="label"/>
+                                <xforms:value ref="@value"/>
+                            </xforms:itemset>
                         </xforms:select>
                     </xhtml:p>
                     <xhtml:p>
                         <xforms:select1 ref="carrier" appearance="full">
                             <xforms:label xhtml:class="fixed-width">Carrier:</xforms:label>
-                            <xforms:item>
-                              <xforms:label>UPS</xforms:label>
-                              <xforms:value>ups</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                              <xforms:label>FedEx</xforms:label>
-                              <xforms:value>fedex</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                              <xforms:label>DHL</xforms:label>
-                              <xforms:value>dhl</xforms:value>
-                            </xforms:item>
+                            <xforms:itemset nodeset="instance('items')/carriers/carrier">
+                                <xforms:label ref="label"/>
+                                <xforms:value ref="@value"/>
+                            </xforms:itemset>
                         </xforms:select1>
                     </xhtml:p>
                     <xhtml:p>
                         <xforms:select1 ref="carrier" appearance="minimal">
                             <xforms:label xhtml:class="fixed-width"/>
-                            <xforms:item>
-                              <xforms:label>UPS</xforms:label>
-                              <xforms:value>ups</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                              <xforms:label>FedEx</xforms:label>
-                              <xforms:value>fedex</xforms:value>
-                            </xforms:item>
-                            <xforms:item>
-                              <xforms:label>DHL</xforms:label>
-                              <xforms:value>dhl</xforms:value>
-                            </xforms:item>
+                            <xforms:itemset nodeset="instance('items')/carriers/carrier">
+                                <xforms:label ref="label"/>
+                                <xforms:value ref="@value"/>
+                            </xforms:itemset>
                         </xforms:select1>
                     </xhtml:p>
                 </widget:tab>
-                <widget:tab id="slider">
+                <widget:tab id="slider" selected="true">
                     <widget:label>Range</widget:label>
                     <xforms:range ref="range/value"/>
                     <xhtml:p>
                         Countries starting with letter 
                         <xhtml:b><xforms:output ref="range/letter"/></xhtml:b>
                     </xhtml:p>
-                    <xforms:output ref="instance('countries')" xhtml:class="xforms-xhtml"/>
+                    <xhtml:p>
+                        <xforms:select ref="country" appearance="compact">
+                            <xforms:itemset nodeset="instance('countries')/country">
+                                <xforms:label ref="name"/>
+                                <xforms:value ref="country-code"/>
+                            </xforms:itemset>
+                        </xforms:select>
+                    </xhtml:p>
+                    <xhtml:p>
+                        <xforms:trigger>
+                            <xforms:label>Add</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:insert nodeset="instance('countries')/country" at="last()" position="after"/>
+                                <xforms:setvalue ref="instance('countries')/country/name[1]" value="'x'"/>
+                            </xforms:action>
+                        </xforms:trigger>
+                    </xhtml:p>
                 </widget:tab>
             </widget:tabs>
             <xhtml:p style="margin-top: 2em">

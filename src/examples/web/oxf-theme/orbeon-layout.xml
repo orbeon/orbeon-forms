@@ -683,6 +683,10 @@ ul {
     cursor: pointer;
     overflow: hidden;
 }
+    
+.xforms-select-template {
+    display: none;
+}
 
 <!-- Styles used by xforms-to-xhtml.xsl -->
 .xferrtable    { border: 0; margin: 0px; padding: 0px; }

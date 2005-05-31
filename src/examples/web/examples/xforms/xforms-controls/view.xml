@@ -76,6 +76,10 @@
                         <name>1</name>
                         <country-code>af</country-code>
                     </country>
+                    <country>
+                        <name>2</name>
+                        <country-code>cd</country-code>
+                    </country>
                 </countries>
             </xforms:instance>                
             <xforms:instance id="ui">
@@ -99,7 +103,7 @@
             <xforms:bind nodeset="instance('ui')/show-instance" relevant=". = 'true'"/>
             <xforms:bind nodeset="instance('formatted')" 
                 calculate="saxon:serialize(xxforms:call-xpl
-                    ('oxf:/oxf-theme/format.xpl', 'data', instance('countries'), 'data')/*, 'html')"/>
+                    ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -138,7 +142,7 @@
                         </xforms:input>
                     </xhtml:p>
                 </widget:tab>
-                <widget:tab id="selection-controls" selected="true">
+                <widget:tab id="selection-controls">
                     <widget:label>Selection controls</widget:label>
                     <xhtml:p>
                         <xforms:select ref="flavor" appearance="full">
@@ -186,7 +190,7 @@
                         </xforms:select1>
                     </xhtml:p>
                 </widget:tab>
-                <widget:tab id="slider">
+                <widget:tab id="slider" selected="true">
                     <widget:label>Range</widget:label>
                     <xforms:range ref="range/value"/>
                     <xhtml:p>
@@ -194,7 +198,7 @@
                         <xhtml:b><xforms:output ref="range/letter"/></xhtml:b>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:select ref="country" appearance="compact">
+                        <xforms:select ref="country" appearance="full">
                             <xforms:itemset nodeset="instance('countries')/country">
                                 <xforms:label ref="name"/>
                                 <xforms:value ref="country-code"/>

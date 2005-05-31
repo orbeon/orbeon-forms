@@ -91,23 +91,34 @@ function xformsGetElementPosition(element) {
  */
 function xformsStringReplace(node, placeholder, replacement) {
 
-    function replace(text) {
-        var text = new String(node.value);
-        return text.replace(new RegExp("placeholder", "g"), replacement);
-    }
+    var placeholderRegExp = new RegExp(placeholder.replace(new RegExp("\\$", "g"), "\\$"), "g");
 
-    switch (node.nodeType) {
-        case ELEMENT_TYPE:
-            for (var i = 0; i < node.attributes.length; i++)
-                node.setAttribute(node.attributes[i].name, replace(node.attributes[i].value));
-            for (var i = 0; i < node.childNodes; i++)
-                xformsStringReplace(node.childNodes[i], placeholder, replacement);
-            break;
-        case TEXT_TYPE:
-            node.nodeValue = replace(node.nodeValue);
-            alert(node.nodeValue);
-            break;
+    function xformsStringReplaceWorker(node) {
+
+        function replace(text) {
+            var stringText = new String(text);
+            return stringText.replace(placeholderRegExp, replacement);
+        }
+
+        switch (node.nodeType) {
+            case ELEMENT_TYPE:
+                for (var i = 0; i < node.attributes.length; i++) {
+                    var newValue = replace(node.attributes[i].value);
+                    if (newValue != node.attributes[i].value)
+                        node.setAttribute(node.attributes[i].name, newValue);
+                }
+                for (var i = 0; i < node.childNodes.length; i++)
+                    xformsStringReplaceWorker(node.childNodes[i]);
+                break;
+            case TEXT_TYPE:
+                var newValue = replace(node.nodeValue);
+                if (newValue != node.nodeValue)
+                    node.nodeValue = newValue;
+                break;
+        }
     }
+    
+    xformsStringReplaceWorker(node);
 }
 
 function log(text) {
@@ -185,6 +196,44 @@ function xformsFireEvent(target, eventName, value, incremental) {
 function getEventTarget(event) {
     event = event ? event : window.event;
     return event.srcElement ? event.srcElement : event.target;
+}
+
+function xformsInitCheckesRadios(control) {
+    function computeSpanValue(span) {
+        var inputs = span.getElementsByTagName("input");
+        var spanValue = "";
+        for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
+            var input = inputs[inputIndex];
+            if (input.checked) {
+                if (spanValue != "") spanValue += " ";
+                spanValue += input.value;
+            }
+        }
+        span.value = spanValue;
+    }
+
+    function inputSelected(event) {
+        var checkbox = getEventTarget(event);
+        var span = checkbox;
+        while (! xformsArrayContains(span.className.split(" "), "xforms-select-full"))
+            span = span.parentNode;
+        computeSpanValue(span);
+        xformsFireEvent(span, "xxforms-value-change-with-focus-change", span.value, false);
+    }
+
+    // Register event listener on every checkbox
+    var inputs = control.getElementsByTagName("input");
+    for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++)
+        xformsAddEventListener(inputs[inputIndex], "click", inputSelected);
+
+    // Find parent form and store this in span
+    var parent = control;
+    while (parent.tagName != "FORM")
+       parent = parent.parentNode;
+    control.form = parent;
+
+    // Compute the checkes value for the first time
+    computeSpanValue(control);
 }
 
 /**
@@ -279,39 +328,7 @@ function xformsPageLoaded() {
                 });
             } else if (isXFormsCheckboxRadio) {
 
-                function computeSpanValue(span) {
-                    var inputs = span.getElementsByTagName("input");
-                    var spanValue = "";
-                    for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
-                        var input = inputs[inputIndex];
-                        if (input.checked) {
-                            if (spanValue != "") spanValue += " ";
-                            spanValue += input.value;
-                        }
-                    }
-                    span.value = spanValue;
-                }
-
-                function inputSelected(event) {
-                    var checkbox = getEventTarget(event);
-                    computeSpanValue(checkbox.parentNode);
-                    xformsFireEvent(checkbox.parentNode, "xxforms-value-change-with-focus-change",
-                        checkbox.parentNode.value, false);
-                }
-
-                // Register event listener on every checkbox
-                var inputs = control.getElementsByTagName("input");
-                for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++)
-                    xformsAddEventListener(inputs[inputIndex], "click", inputSelected);
-
-                // Find parent form and store this in span
-                var parent = control;
-                while (parent.tagName != "FORM")
-                   parent = parent.parentNode;
-                control.form = parent;
-
-                // Compute the checkes value for the first time
-                computeSpanValue(control);
+                xformsInitCheckesRadios(control);
 
             } else if (isXFormsComboboxList) {
 
@@ -485,9 +502,86 @@ function xformsHandleResponse() {
                 if (xformsGetLocalName(responseRoot.childNodes[i]) == "dynamic-state")
                     form.xformsDynamicState.value = responseRoot.childNodes[i].firstChild.data;
 
-                // Things to do are in the action element
+                // First handle the <xxforms:itemsets> actions
                 if (xformsGetLocalName(responseRoot.childNodes[i]) == "action") {
                     var actionElement = responseRoot.childNodes[i];
+                    for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
+                        // Change values in an itemset
+                        if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "itemsets") {
+                            var itemsetsElement = actionElement.childNodes[actionIndex];
+                            for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
+                                if (xformsGetLocalName(itemsetsElement.childNodes[j]) == "itemset") {
+                                    var itemsetElement = itemsetsElement.childNodes[j];
+                                    var controlId = itemsetElement.getAttribute("id");
+                                    var documentElement = document.getElementById(controlId);
+
+                                    if(documentElement.tagName == "SELECT") {
+
+                                        // Case of list / combobox
+                                        var options = documentElement.options;
+
+                                        // Update select per content of itemset
+                                        for (var k = 0; k < itemsetElement.childNodes.length; k++) {
+                                            var itemElement = itemsetElement.childNodes[k];
+                                            if (k >= options.length) {
+                                                // Add a new option
+                                                var newOption = document.createElement("OPTION");
+                                                documentElement.options.add(newOption);
+                                                newOption.text = itemElement.getAttribute("label");
+                                                newOption.value = itemElement.getAttribute("value");
+                                            } else {
+                                                // Replace current label/value if necessary
+                                                var option = options[k];
+                                                if (option.text != itemElement.getAttribute("label"))
+                                                    option.text = itemElement.getAttribute("label");
+                                                if (option.value != itemElement.getAttribute("value"))
+                                                    option.value = itemElement.getAttribute("value");
+                                            }
+                                        }
+
+                                        // Remove options in select if necessary
+                                        while (options.length > itemsetElement.childNodes.length)
+                                            options.remove(options.length - 1);
+                                    } else {
+                                    
+                                        // Case of checkboxes / radio bottons
+                                        
+                                        // Get element following control
+                                        var template = documentElement.nextSibling;
+                                        while (template.nodeType != ELEMENT_TYPE)
+                                            template = template.nextSibling;
+                                            
+                                        // Get its child element and clone
+                                        var template = template.firstChild;
+                                        while (template.nodeType != ELEMENT_TYPE)
+                                            template = template.nextSibling;
+                                            
+                                        // Remove content
+                                        while (documentElement.childNodes.length > 0)
+                                            documentElement.removeChild(documentElement.firstChild);
+                                            
+                                        // Recreate content based on template
+                                        for (var k = 0; k < itemsetElement.childNodes.length; k++) {
+                                            var itemElement = itemsetElement.childNodes[k];
+                                            if (itemElement.nodeType == ELEMENT_TYPE) {
+                                                var templateClone = template.cloneNode(true);
+                                                xformsStringReplace(templateClone, "$xforms-template-label$", 
+                                                    itemElement.getAttribute("label"));
+                                                xformsStringReplace(templateClone, "$xforms-template-value$", 
+                                                    itemElement.getAttribute("value"));
+                                                documentElement.appendChild(templateClone);
+                                            }
+                                        }
+                                        
+                                        // Compute value, of checkboxes/radio buttons and register listeners
+                                        xformsInitCheckesRadios(documentElement);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Handle other actions
                     for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
 
                         // Update controls
@@ -560,75 +654,6 @@ function xformsHandleResponse() {
                                     var visibile = divElement.getAttribute("visibility") == "visible";
                                     var documentElement = document.getElementById(controlId);
                                     documentElement.style.display = visibile ? "block" : "none";
-                                }
-                            }
-                        }
-                        
-                        // Change values in an itemset
-                        if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "itemsets") {
-                            var itemsetsElement = actionElement.childNodes[actionIndex];
-                            for (var j = 0; j < itemsetsElement.childNodes.length; j++) {
-                                if (xformsGetLocalName(itemsetsElement.childNodes[j]) == "itemset") {
-                                    var itemsetElement = itemsetsElement.childNodes[j];
-                                    var controlId = itemsetElement.getAttribute("id");
-                                    var documentElement = document.getElementById(controlId);
-
-                                    if(documentElement.tagName == "SELECT") {
-
-                                        // Case of list / combobox
-                                        var options = documentElement.options;
-
-                                        // Update select per content of itemset
-                                        for (var k = 0; k < itemsetElement.childNodes.length; k++) {
-                                            var itemElement = itemsetElement.childNodes[k];
-                                            if (k >= options.length) {
-                                                // Add a new option
-                                                var newOption = document.createElement("OPTION");
-                                                documentElement.options.add(newOption);
-                                                newOption.text = itemElement.getAttribute("label");
-                                                newOption.value = itemElement.getAttribute("value");
-                                            } else {
-                                                // Replace current label/value if necessary
-                                                var option = options[k];
-                                                if (option.text != itemElement.getAttribute("label"))
-                                                    option.text = itemElement.getAttribute("label");
-                                                if (option.value != itemElement.getAttribute("value"))
-                                                    option.value = itemElement.getAttribute("value");
-                                            }
-                                        }
-
-                                        // Remove options in select if necessary
-                                        while (options.length > itemsetElement.childNodes.length)
-                                            options.remove(options.length - 1);
-                                    } else {
-                                    
-                                        // Case of checkboxes / radio bottons
-                                        
-                                        // Get element following control
-                                        var template = documentElement.nextSibling;
-                                        while (template.nodeType != ELEMENT_TYPE)
-                                            template = template.nextSibling;
-                                            
-                                        // Get its child element and clone
-                                        var template = template.firstChild;
-                                        while (template.nodeType != ELEMENT_TYPE)
-                                            template = template.nextSibling;
-                                            
-                                        // Remove content
-                                        while (documentElement.childNodes.length > 0)
-                                            documentElement.removeChild(documentElement.firstChild);
-                                            
-                                        // Recreate content based on template
-                                        for (var k = 0; k < itemsetElement.childNodes.length; k++) {
-                                            var itemElement = itemsetElement.childNodes[k];
-                                            var templateClone = template.cloneNode(true);
-                                            xformsStringReplace(templateClone, "$xforms-template-label$", 
-                                                itemElement.getAttribute("label"));
-                                            xformsStringReplace(templateClone, "$xforms-template-value$", 
-                                                itemElement.getAttribute("value"));
-                                            documentElement.appendChild(templateClone);
-                                        }
-                                    }
                                 }
                             }
                         }

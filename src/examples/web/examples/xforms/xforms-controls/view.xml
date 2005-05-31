@@ -71,22 +71,19 @@
                 </formated-instance>
             </xforms:instance>                
             <xforms:instance id="countries">
-                <countries>
-                    <country>
-                        <name>1</name>
-                        <country-code>af</country-code>
-                    </country>
-                    <country>
-                        <name>2</name>
-                        <country-code>cd</country-code>
-                    </country>
-                </countries>
-            </xforms:instance>                
+                <countries letter=""/>
+            </xforms:instance>
+            <xforms:instance id="country-details">
+                <country us-code="">
+                    No country selected
+                </country>
+            </xforms:instance>
             <xforms:instance id="ui">
                 <ui>
                     <show-instance>false</show-instance>
                 </ui>
             </xforms:instance>                
+            
             <xforms:bind nodeset="instance('instance')">
                 <xforms:bind nodeset="age" constraint="number(.) >= 0"/>
                 <xforms:bind nodeset="secret" constraint="string(.) = '42'"/>
@@ -100,16 +97,25 @@
                     'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z')
                     [floor($value * 25) + 1]"/>
             </xforms:bind>
-            <xforms:bind nodeset="instance('ui')/show-instance" relevant=". = 'true'"/>
+            <xforms:bind nodeset="instance('countries')/@letter"
+                calculate="instance('instance')/range/letter"/>
+            <xforms:bind nodeset="instance('country-details')/@us-code"
+                calculate="instance('instance')/country"/>
             <xforms:bind nodeset="instance('formatted')" 
                 calculate="saxon:serialize(xxforms:call-xpl
-                    ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
+                    ('oxf:/oxf-theme/format.xpl', 'data', instance('country-details'), 'data')/*, 'html')"/>
+            <xforms:bind nodeset="instance('ui')/show-instance" relevant=". = 'true'"/>
+            
+            <xforms:submission ref="instance('countries')" id="countries-submission" 
+                method="post" action="/direct/xforms-controls/update-countries" replace="instance"/>
+            <xforms:submission ref="instance('country-details')" id="country-details-submission" 
+                method="post" action="/direct/xforms-controls/update-country-details" replace="instance"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
         <xforms:group ref="instance('instance')">
             <widget:tabs>
-                <widget:tab id="text-controls">
+                <widget:tab id="text-controls" selected="true">
                     <widget:label>Text controls</widget:label>
                     <xhtml:p>
                         <xforms:input ref="age" incremental="true">
@@ -190,29 +196,26 @@
                         </xforms:select1>
                     </xhtml:p>
                 </widget:tab>
-                <widget:tab id="slider" selected="true">
+                <widget:tab id="slider">
                     <widget:label>Range</widget:label>
-                    <xforms:range ref="range/value"/>
+                    <xforms:range ref="range/value">
+                        <xforms:send submission="countries-submission" ev:event="xforms-value-changed"/>
+                    </xforms:range>
                     <xhtml:p>
                         Countries starting with letter 
                         <xhtml:b><xforms:output ref="range/letter"/></xhtml:b>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:select ref="country" appearance="full">
+                        <xforms:select1 ref="country" appearance="compact" style="height: 8em">
                             <xforms:itemset nodeset="instance('countries')/country">
                                 <xforms:label ref="name"/>
-                                <xforms:value ref="country-code"/>
+                                <xforms:value ref="us-code"/>
                             </xforms:itemset>
-                        </xforms:select>
+                            <xforms:send submission="country-details-submission" ev:event="xforms-value-changed"/>
+                        </xforms:select1>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:trigger>
-                            <xforms:label>Add</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:insert nodeset="instance('countries')/country" at="last()" position="after"/>
-                                <xforms:setvalue ref="instance('countries')/country/name[1]" value="'x'"/>
-                            </xforms:action>
-                        </xforms:trigger>
+                        <xforms:output ref="instance('country-details')" class="xforms-xhtml"/>
                     </xhtml:p>
                 </widget:tab>
             </widget:tabs>

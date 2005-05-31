@@ -15,9 +15,8 @@
         xmlns:xu="http://www.xmldb.org/xupdate">
 
     <page path-info="/xforms-controls" view="view.xml"/>
-
-    <page path-info="/direct/xforms-controls/post" model="post.xpl"/>
-
+    <page path-info="/direct/xforms-controls/update-countries" model="update-countries.xpl"/>
+    <page path-info="/direct/xforms-controls/update-country-details" model="update-country-details.xpl"/>
     <epilogue url="oxf:/config/epilogue.xpl"/>
 
 </config>

@@ -521,27 +521,39 @@ function xformsHandleResponse() {
                                         var options = documentElement.options;
 
                                         // Update select per content of itemset
+                                        var itemCount = 0;
                                         for (var k = 0; k < itemsetElement.childNodes.length; k++) {
                                             var itemElement = itemsetElement.childNodes[k];
-                                            if (k >= options.length) {
-                                                // Add a new option
-                                                var newOption = document.createElement("OPTION");
-                                                documentElement.options.add(newOption);
-                                                newOption.text = itemElement.getAttribute("label");
-                                                newOption.value = itemElement.getAttribute("value");
-                                            } else {
-                                                // Replace current label/value if necessary
-                                                var option = options[k];
-                                                if (option.text != itemElement.getAttribute("label"))
-                                                    option.text = itemElement.getAttribute("label");
-                                                if (option.value != itemElement.getAttribute("value"))
-                                                    option.value = itemElement.getAttribute("value");
+                                            if (itemElement.nodeType == ELEMENT_TYPE) {
+                                                if (itemCount >= options.length) {
+                                                    // Add a new option
+                                                    var newOption = document.createElement("OPTION");
+                                                    documentElement.options.add(newOption);
+                                                    newOption.text = itemElement.getAttribute("label");
+                                                    newOption.value = itemElement.getAttribute("value");
+                                                } else {
+                                                    // Replace current label/value if necessary
+                                                    var option = options[itemCount];
+                                                    if (option.text != itemElement.getAttribute("label"))
+                                                        option.text = itemElement.getAttribute("label");
+                                                    if (option.value != itemElement.getAttribute("value"))
+                                                        option.value = itemElement.getAttribute("value");
+                                                }
+                                                itemCount++;
                                             }
                                         }
 
                                         // Remove options in select if necessary
-                                        while (options.length > itemsetElement.childNodes.length)
-                                            options.remove(options.length - 1);
+                                        while (options.length > itemCount) {
+                                            if (options.remove) {
+                                                // For IE
+                                                options.remove(options.length - 1);
+                                            } else {
+                                                // For Firefox
+                                                var toRemove = options.item(options.length - 1);
+                                                toRemove.parentNode.removeChild(toRemove);
+                                            }
+                                        }
                                     } else {
                                     
                                         // Case of checkboxes / radio bottons

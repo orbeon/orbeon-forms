@@ -26,7 +26,7 @@
 
     <p:choose href="#request-path">
         <p:when test="/*/request-path = '/xforms-server-submit'">
-            <!-- Hook-up XForms Server for this special path -->
+            <!-- Hook-up XForms Submission Server for this special path -->
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="oxf:/xforms/xforms-server-submit.xpl"/>
             </p:processor>

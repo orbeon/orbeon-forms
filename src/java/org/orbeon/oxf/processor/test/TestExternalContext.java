@@ -322,6 +322,10 @@ public class TestExternalContext implements ExternalContext  {
         public void sessionInvalidate() {
             // NIY
         }
+
+        public Object getNativeRequest() {
+            return TestExternalContext.this.getNativeRequest();
+        }
     }
 
     private class Response implements ExternalContext.Response {
@@ -389,6 +393,10 @@ public class TestExternalContext implements ExternalContext  {
         }
 
         public void setTitle(String title) {
+        }
+
+        public Object getNativeResponse() {
+            return TestExternalContext.this.getNativeResponse();
         }
     }
 

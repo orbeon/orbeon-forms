@@ -19,6 +19,8 @@ import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ForwardHttpServletRequestWrapper;
+import org.orbeon.oxf.externalcontext.ServletToExternalContextRequestDispatcherWrapper;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -36,7 +38,6 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.*;
 import java.net.URL;
 import java.security.Principal;
@@ -73,7 +74,8 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         public String getPathInfo() {
-            return NetUtils.getRequestPathInfo(nativeRequest);
+//            return NetUtils.getRequestPathInfo(nativeRequest);
+            return nativeRequest.getPathInfo();
         }
 
         public String getRemoteAddr() {
@@ -300,6 +302,10 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         public ServletExternalContext getServletExternalContext() {
             return ServletExternalContext.this;
         }
+
+        public Object getNativeRequest() {
+            return ServletExternalContext.this.getNativeRequest();
+        }
     }
 
     /**
@@ -466,10 +472,10 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 javax.servlet.RequestDispatcher requestDispatcher = nativeRequest.getRequestDispatcher(pathInfo);
                 try {
                     // Destroy the pipeline context before doing the forward. Nothing significant
-                    // should allowed on "this side" of the forward after the forward return.
+                    // should be allowed on "this side" of the forward after the forward return.
                     pipelineContext.destroy(true);
                     // Execute the forward
-                    RequestWrapper wrappedRequest = new RequestWrapper(nativeRequest, parameters);
+                    ForwardHttpServletRequestWrapper wrappedRequest = new ForwardHttpServletRequestWrapper(nativeRequest, parameters);
                     requestDispatcher.forward(wrappedRequest, nativeResponse);
                 } catch (ServletException e) {
                     throw new OXFException(e);
@@ -623,6 +629,10 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         public ServletExternalContext getServletExternalContext() {
             return ServletExternalContext.this;
         }
+
+        public Object getNativeResponse() {
+            return ServletExternalContext.this.getNativeResponse();
+        }
     }
 
     private class Session implements ExternalContext.Session {
@@ -734,155 +744,10 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     }
 
     public RequestDispatcher getNamedDispatcher(String name) {
-        return new RequestDispatcherWrapper(servletContext.getNamedDispatcher(name));
+        return new ServletToExternalContextRequestDispatcherWrapper(servletContext.getNamedDispatcher(name));
     }
 
     public RequestDispatcher getRequestDispatcher(String path) {
-        return new RequestDispatcherWrapper(servletContext.getRequestDispatcher(path));
-    }
-
-    /*
-     * Wrap a Servlet RequestDispatcher.
-     */
-    private static class RequestDispatcherWrapper implements ExternalContext.RequestDispatcher {
-
-        private javax.servlet.RequestDispatcher dispatcher;
-
-        public RequestDispatcherWrapper(javax.servlet.RequestDispatcher dispatcher) {
-            this.dispatcher = dispatcher;
-        }
-
-        public void forward(ExternalContext.Request request, ExternalContext.Response response) throws IOException {
-            try {
-                // FIXME: This is incorrect, must wrap request and responses
-                ServletExternalContext servletExternalContext = ((Request) request).getServletExternalContext();
-                dispatcher.forward(servletExternalContext.nativeRequest, servletExternalContext.nativeResponse);
-            } catch (ServletException e) {
-                throw new OXFException(e);
-            }
-        }
-
-        public void include(ExternalContext.Request request, ExternalContext.Response response) throws IOException {
-            try {
-                // FIXME: This is incorrect, must wrap request and responses
-                ServletExternalContext servletExternalContext = ((Request) request).getServletExternalContext();
-                dispatcher.include(servletExternalContext.nativeRequest, servletExternalContext.nativeResponse);
-            } catch (ServletException e) {
-                throw new OXFException(e);
-            }
-        }
-    }
-
-    private static class RequestWrapper extends HttpServletRequestWrapper {
-
-        private Map parameters;
-
-        public RequestWrapper(HttpServletRequest httpServletRequest, Map parameters) {
-            super(httpServletRequest);
-            this.parameters = parameters;
-        }
-
-        public Map getParameterMap() {
-            return parameters;
-        }
-
-        public Enumeration getParameterNames() {
-            return new Vector(parameters.keySet()).elements();
-        }
-
-        public String[] getParameterValues(String s) {
-            return (String[]) parameters.get(s);
-        }
-
-        public String getParameter(String s) {
-            return (String) parameters.get(s);
-        }
-
-        public String getContentType() {
-            // We never have a body on redirect
-            return null;
-        }
-
-        public int getContentLength() {
-            // We never have a body on redirect
-            return -1;
-        }
-
-        private ServletInputStream servletInputStream;
-        private BufferedReader bufferedReader;
-
-        public ServletInputStream getInputStream() throws IOException {
-            // We never have a body on redirect (returning something because the spec doesn't say the result can be null)
-            if (servletInputStream == null) {
-                final InputStream is = new ByteArrayInputStream(new byte[] {});
-                servletInputStream = new ServletInputStream() {
-                    public int read() throws IOException {
-                        return is.read();
-                    }
-                };
-            }
-            return servletInputStream;
-        }
-
-        public BufferedReader getReader() throws IOException {
-            // We never have a body on redirect (returning something because the spec doesn't say the result can be null)
-            if (bufferedReader == null) {
-                bufferedReader = new BufferedReader(new StringReader(""));
-            }
-            return bufferedReader;
-        }
-
-        public String getMethod() {
-            return "GET";
-        }
-
-        private Map filterHeaders = new HashMap();
-        {
-            filterHeaders.put("content-length", "");
-            filterHeaders.put("content-type", "");
-            //filterHeaders.put("referer", "");
-        }
-
-        private List headerNamesList;
-        private Enumeration headerNames;
-
-        public Enumeration getHeaderNames() {
-            if (headerNames == null) {
-                headerNamesList = Collections.list(super.getHeaderNames());
-
-                // Remove headers associated with body
-                for (Iterator i = filterHeaders.keySet().iterator(); i.hasNext();) {
-                    headerNamesList.remove(i.next());
-                }
-
-                headerNames = Collections.enumeration(headerNamesList);
-            }
-
-            return headerNames;
-        }
-
-        public String getHeader(String s) {
-            if (filterHeaders.get(s) != null)
-                return null;
-            return super.getHeader(s);
-        }
-
-        public Enumeration getHeaders(String s) {
-            if (filterHeaders.get(s) != null)
-                return null;
-            return super.getHeaders(s);
-        }
-
-        public long getDateHeader(String s) {
-            if (filterHeaders.get(s) != null)
-                return -1;
-            return super.getDateHeader(s);
-        }
-
-        public int getIntHeader(String s) {
-            if (filterHeaders.get(s) != null)
-                return -1;
-            return super.getIntHeader(s);
-        }
+        return new ServletToExternalContextRequestDispatcherWrapper(servletContext.getRequestDispatcher(path));
     }
 }

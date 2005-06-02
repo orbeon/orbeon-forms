@@ -16,46 +16,36 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-    <!-- Extract request body -->
+    <!-- Extract parameters -->
     <p:processor name="oxf:request">
         <p:input name="config">
             <config stream-type="xs:anyURI">
-                <include>/request/body</include>
+                <include>/request/parameters</include>
             </config>
         </p:input>
-        <p:output name="data" id="request"/>
+        <p:output name="data" id="request-params"/>
     </p:processor>
 
-    <!-- Dereference URI and return XML -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" href="aggregate('config', aggregate('url', #request#xpointer(string(/request/body))))"/>
+    <!-- Create XForms Server request -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#request-params"/>
+        <p:input name="config">
+            <xxforms:event-request xsl:version="2.0" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+                <xxforms:static-state>
+                    <xsl:value-of select="/*/parameters/parameter[name = '$static-state']/value"/>
+                </xxforms:static-state>
+                <xxforms:dynamic-state>
+                    <xsl:value-of select="/*/parameters/parameter[name = '$dynamic-state']/value"/>
+                </xxforms:dynamic-state>
+                <xxforms:action/>
+            </xxforms:event-request>
+        </p:input>
         <p:output name="data" id="xml-request"/>
     </p:processor>
-    
-    <!-- Transform document -->
-    <p:processor name="oxf:xslt">
-        <p:input name="data" href="#xml-request"/>
-        <p:input name="config">
-            <xsl:transform version="2.0">
-                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
-                <xsl:template match="age">
-                    <xsl:copy>
-                        <xsl:value-of select=". + 1"/>
-                    </xsl:copy>
-                </xsl:template>
-            </xsl:transform>
-        </p:input>
-        <p:output name="data" id="xml-response"/>
-    </p:processor>
 
-    <!-- Generate response -->
-    <p:processor name="oxf:xml-serializer">
-        <p:input name="data" href="#xml-response"/>
-        <p:input name="config">
-            <config>
-                <content-type>application/xml</content-type>
-            </config>
-        </p:input>
+    <!-- Run XForms Server -->
+    <p:processor name="oxf:xforms-server">
+        <p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng"/>
     </p:processor>
 
 </p:config>

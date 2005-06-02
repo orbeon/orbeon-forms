@@ -74,7 +74,7 @@ public class ImageServer extends ProcessorImpl {
 
     public void start(PipelineContext pipelineContext) {
 
-        ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.EXTERNAL_CONTEXT);
+        ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         ExternalContext.Response response = externalContext.getResponse();
         try {
             // Read configuration

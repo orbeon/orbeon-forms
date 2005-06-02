@@ -36,6 +36,7 @@ public class ProcessorUtils {
     public static final String XML_CONTENT_TYPE2 = "application/xml";
     public static final String XML_CONTENT_TYPE3_SUFFIX = "+xml";
 
+    public static final String XML_CONTENT_TYPE = XML_CONTENT_TYPE2;
     public static final String TEXT_CONTENT_TYPE_PREFIX = "text/";
     public static final String HTML_CONTENT_TYPE = "text/html";
     public static final String DEFAULT_CONTENT_TYPE = XML_CONTENT_TYPE2;

@@ -33,8 +33,8 @@ import java.util.Map;
  * OXFPortlet is the Portlet (JSR-168) entry point of OXF.
  *
  * Several OXFServlet and OXFPortlet instances can be used in the same Web or Portlet application.
- * They all share the same Servlet context initialization parameters, but each Servlet can be
- * configured with its own main processor and inputs.
+ * They all share the same Servlet context initialization parameters, but each Servlet or Portlet
+ * can be configured with its own main processor and inputs.
  *
  * All OXFServlet and OXFPortlet instances in a given Web application share the same resource
  * manager.
@@ -100,7 +100,6 @@ public class OXFPortletDelegate extends GenericPortlet {
             throw new PortletException(OXFException.getRootThrowable(e));
         }
     }
-
     public void processAction(ActionRequest actionRequest, ActionResponse response) throws PortletException, IOException {
         // If we get a request for an action, we run the service without a
         // response. The result, if any, is stored into a buffer. Otherwise it
@@ -112,9 +111,9 @@ public class OXFPortletDelegate extends GenericPortlet {
             actionRequest.getPortletSession().removeAttribute(OXF_PORTLET_OUTPUT_PARAMS);
 
             // Call service
-            PipelineContext pipelineContext = new PipelineContext();
+            final PipelineContext pipelineContext = new PipelineContext();
             pipelineContext.setAttribute(PipelineContext.PORTLET_CONFIG, getPortletConfig());
-            PortletExternalContext externalContext = new PortletExternalContext(pipelineContext, getPortletContext(), contextInitParameters, actionRequest);
+            final PortletExternalContext externalContext = new PortletExternalContext(processorService, pipelineContext, getPortletContext(), contextInitParameters, actionRequest);
             processorService.service(true, externalContext, pipelineContext);
 
             // Check whether a redirect was issued, or some output was generated
@@ -171,7 +170,7 @@ public class OXFPortletDelegate extends GenericPortlet {
                 // Call service
                 PipelineContext pipelineContext = new PipelineContext();
                 pipelineContext.setAttribute(PipelineContext.PORTLET_CONFIG, getPortletConfig());
-                ExternalContext externalContext = new PortletExternalContext(pipelineContext, getPortletContext(), contextInitParameters, request, response);
+                ExternalContext externalContext = new PortletExternalContext(processorService, pipelineContext, getPortletContext(), contextInitParameters, request, response);
                 processorService.service(true, externalContext, pipelineContext);
                 // TEMP: The response is also buffered, because our
                 // rewriting algorithm only operates on Strings for now.
@@ -184,6 +183,17 @@ public class OXFPortletDelegate extends GenericPortlet {
         } catch (Exception e) {
             throw new PortletException(OXFException.getRootThrowable(e));
         }
+    }
+
+    /**
+     * Forward a request.
+     */
+    public static void forward(ExternalContext.Request request, ExternalContext.Response response) {
+
+        // Create new external context and call service
+        final PipelineContext pipelineContext = new PipelineContext();
+        final PortletExternalContext externalContext = new PortletExternalContext(pipelineContext, request, response);
+        externalContext.getProcessorService().service(true, externalContext, externalContext.getPipelineContext());
     }
 
     public void destroy() {

@@ -87,7 +87,8 @@
             <xforms:bind nodeset="instance('formatted')"
                 calculate="saxon:serialize(xxforms:call-xpl
                     ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
-            <xforms:submission ref="instance('instance')" id="default-submission" method="post" action="/direct/xforms-controls/post" replace="instance"/>
+            <xforms:submission ref="instance('instance')" id="instance-submission" method="post" action="/direct/xforms-controls/post" replace="instance"/>
+            <xforms:submission ref="instance('instance')" id="all-submission" method="post" action="/direct/xforms-controls/post" replace="all"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -133,8 +134,11 @@
                         </xforms:input>
                     </xhtml:p>
                     <xhtml:p>
-                        <xforms:submit submission="default-submission">
-                            <xforms:label >Try Submit</xforms:label>
+                        <xforms:submit submission="instance-submission">
+                            <xforms:label >Try Submit (replace="instance")</xforms:label>
+                        </xforms:submit>
+                        <xforms:submit submission="all-submission">
+                            <xforms:label >Try Submit (replace="all")</xforms:label>
                         </xforms:submit>
                     </xhtml:p>
                 </xforms:case>

@@ -39,13 +39,13 @@ public class XFormsContainingDocument implements XFormsEventTarget {
 
     private List models;
     private Map modelsMap = new HashMap();
-    private XFormsControls xFormsControls;
+    private XFormsControls xformsControls;
 
     private XFormsModelSubmission activeSubmission;
 
     public XFormsContainingDocument(List models, Document controlsDocument) {
         this.models = models;
-        this.xFormsControls = new XFormsControls(this, controlsDocument);
+        this.xformsControls = new XFormsControls(this, controlsDocument);
 
         for (Iterator i = models.iterator(); i.hasNext();) {
             XFormsModel model = (XFormsModel) i.next();
@@ -74,7 +74,7 @@ public class XFormsContainingDocument implements XFormsEventTarget {
      * Return the XForms controls.
      */
     public XFormsControls getXFormsControls() {
-        return xFormsControls;
+        return xformsControls;
     }
 
     /**
@@ -98,7 +98,7 @@ public class XFormsContainingDocument implements XFormsEventTarget {
         }
 
         // Search in controls
-        return xFormsControls.getElementById(pipelineContext, id);
+        return xformsControls.getElementById(pipelineContext, id);
     }
 
     /**
@@ -124,11 +124,11 @@ public class XFormsContainingDocument implements XFormsEventTarget {
      */
     public void executeExternalEvent(PipelineContext pipelineContext, String targetElementId, String eventName, String contextString) {
 
-        // Get target element (control element)
-        final Element targetElement = xFormsControls.getElementById(pipelineContext, targetElementId);
+        // Get target object (right now control element or submission)
+        final Object targetObject = getObjectById(pipelineContext, targetElementId);
 
         // Create event
-        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, targetElement, contextString, null, null);
+        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, targetObject, contextString, null, null);
 
         // Interpret event
         interpretEvent(pipelineContext, xformsEvent);
@@ -141,7 +141,7 @@ public class XFormsContainingDocument implements XFormsEventTarget {
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             // The default action for this event results in the following: None; notification event only.
 
-            xFormsControls.dispatchEvent(pipelineContext, xformsEvent);
+            xformsControls.dispatchEvent(pipelineContext, xformsEvent);
 
         } else if (XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE.equals(eventName)) {
             // 4.6.7 Sequence: Value Change with Focus Change
@@ -158,23 +158,28 @@ public class XFormsContainingDocument implements XFormsEventTarget {
             // Reevaluation of binding expressions must occur before step 3 above.
 
             // Set current context to control
-            xFormsControls.setBinding(pipelineContext, (Element) concreteEvent.getTargetObject());
+            xformsControls.setBinding(pipelineContext, (Element) concreteEvent.getTargetObject());
 
             // Set value into the instance
-            XFormsInstance.setValueForNode(xFormsControls.getCurrentSingleNode(), concreteEvent.getNewValue());
+            XFormsInstance.setValueForNode(xformsControls.getCurrentSingleNode(), concreteEvent.getNewValue());
 
             // Dispatch events
-            final XFormsModel model = xFormsControls.getCurrentModel();
+            final XFormsModel model = xformsControls.getCurrentModel();
             model.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model));
             model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model));
 
-            xFormsControls.dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(concreteEvent.getTargetObject()));
-            xFormsControls.dispatchEvent(pipelineContext, new XFormsValueChangeEvent(concreteEvent.getTargetObject()));
+            xformsControls.dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(concreteEvent.getTargetObject()));
+            xformsControls.dispatchEvent(pipelineContext, new XFormsValueChangeEvent(concreteEvent.getTargetObject()));
 
             // TODO (missing new control information!)
             //xFormsControls.dispatchEvent(pipelineContext, XFormsEvents.XFORMS_DOM_FOCUS_IN, newControlElement);
 
             model.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
+
+        } else if (XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
+            // Internal submission event
+            final XFormsModelSubmission targetSubmission = (XFormsModelSubmission) xformsEvent.getTargetObject();
+            targetSubmission.dispatchEvent(pipelineContext, xformsEvent);
 
         } else {
             throw new OXFException("Invalid event requested: " + eventName);
@@ -209,7 +214,7 @@ public class XFormsContainingDocument implements XFormsEventTarget {
             dispatchEvent(pipelineContext, new XXFormsInitializeControlsEvent(this));
         } else if (XFormsEvents.XXFORMS_INITIALIZE_CONTROLS.equals(eventName)) {
             // Make sure controls are initialized
-            xFormsControls.initialize(pipelineContext);
+            xformsControls.initialize(pipelineContext);
         } else {
             throw new OXFException("Invalid event dispatched: " + eventName);
         }

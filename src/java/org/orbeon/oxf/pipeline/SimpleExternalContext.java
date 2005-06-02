@@ -173,6 +173,10 @@ public class SimpleExternalContext implements ExternalContext {
         public Principal getUserPrincipal() {
             return null;
         }
+
+        public Object getNativeRequest() {
+            return SimpleExternalContext.this.getNativeRequest();
+        }
     }
 
     protected class Response implements ExternalContext.Response {
@@ -259,6 +263,9 @@ public class SimpleExternalContext implements ExternalContext {
         public void setTitle(String title) {
         }
 
+        public Object getNativeResponse() {
+            return SimpleExternalContext.this.getNativeResponse();
+        }
     }
 
     protected class Session implements ExternalContext.Session {

@@ -34,8 +34,8 @@ import java.util.Enumeration;
  * OXFServlet is the Servlet entry point of OXF.
  *
  * Several OXFServlet and OXFPortlet instances can be used in the same Web or Portlet application.
- * They all share the same Servlet context initialization parameters, but each Servlet can be
- * configured with its own main processor and inputs.
+ * They all share the same Servlet context initialization parameters, but each Servlet or Portlet
+ * can be configured with its own main processor and inputs.
  *
  * At the moment, all OXFServlet and OXFPortlet instances in a given Web application share the same
  * resource manager.

@@ -13,11 +13,12 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 
 /**
- * XFormsEventTarget is implemented by classes that support dispatch of XForms events.
+ * Internal XXFORMS_SUBMIT event.
  */
-public interface XFormsEventTarget {
-    public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent xformsEvent);
+public class XXFormsSubmissionEvent extends XFormsEvent {
+    public XXFormsSubmissionEvent(Object targetObject) {
+        super(XFormsEvents.XXFORMS_SUBMIT, targetObject, false, false);
+    }
 }

@@ -23,6 +23,9 @@ public class XFormsEvents {
     public static final String XXFORMS_INITIALIZE_CONTROLS = "xxforms-initialize-controls";
     public static final String XXFORMS_INITIALIZE_STATE = "xxforms-initialize-state";
 
+    // Custom submit event
+    public static final String XXFORMS_SUBMIT = "xxforms-submit";
+
     // Standard sequences
     public static final String XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE = "xxforms-value-change-with-focus-change";
 

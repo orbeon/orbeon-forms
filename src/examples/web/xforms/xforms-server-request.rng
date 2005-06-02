@@ -27,19 +27,21 @@
                 <data type="string"/>
             </element>
             <element name="xxforms:action">
-                <element name="xxforms:event">
-                    <optional>
-                        <attribute name="name">
-                            <ref name="xformsActionName"/>
-                        </attribute>
-                        <attribute name="source-control-id">
-                            <data type="string"/>
-                        </attribute>
+                <optional>
+                    <element name="xxforms:event">
                         <optional>
-                            <data type="string"/>
+                            <attribute name="name">
+                                <ref name="xformsActionName"/>
+                            </attribute>
+                            <attribute name="source-control-id">
+                                <data type="string"/>
+                            </attribute>
+                            <optional>
+                                <data type="string"/>
+                            </optional>
                         </optional>
-                    </optional>
-                </element>
+                    </element>
+                </optional>
             </element>
         </element>
     </start>

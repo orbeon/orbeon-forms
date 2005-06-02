@@ -24,38 +24,50 @@
         <p:output name="data" id="request-path"/>
     </p:processor>
 
-    <!-- Extract example id (the first part of the path) -->
-    <p:processor name="oxf:perl5-matcher">
-        <p:input name="data" href="#request-path"/>
-        <p:input name="config"><regexp>/(example-resources/|examples-standalone/|direct/)?([^/]*).*</regexp></p:input>
-        <p:output name="data" id="regexp-result"/>
-    </p:processor>
+    <p:choose href="#request-path">
+        <p:when test="/*/request-path = '/xforms-server-submit'">
+            <!-- Hook-up XForms Server for this special path -->
+            <p:processor name="oxf:pipeline">
+                <p:input name="config" href="oxf:/xforms/xforms-server-submit.xpl"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <!-- Dispatch to examples -->
 
-    <p:processor name="oxf:xslt">
-        <p:input name="data" href="#regexp-result"/>
-        <p:input name="config">
-            <config xsl:version="2.0">
-                <xsl:variable name="examples-list" select="document('examples-list.xml')" as="document-node()"/>
-                <xsl:variable name="path-prefix" select="/*/group[1]" as="xs:string"/>
-                <xsl:variable name="example-id" select="/*/group[2]" as="xs:string"/>
-                <xsl:variable name="example" select="$examples-list//example[@id = $example-id]" as="element()"/>
-                <url><xsl:value-of select="concat('oxf:/',
-                        if ($path-prefix = 'examples-standalone/') then $path-prefix else 'examples/',
-                        if ($example/@path) then $example/@path else $example/@id, '/page-flow.xml')"/></url>
-            </config>
-        </p:input>
-        <p:output name="data" id="url-config"/>
-    </p:processor>
+            <!-- Extract example id (the first part of the path) -->
+            <p:processor name="oxf:perl5-matcher">
+                <p:input name="data" href="#request-path"/>
+                <p:input name="config"><regexp>/(example-resources/|examples-standalone/|direct/)?([^/]*).*</regexp></p:input>
+                <p:output name="data" id="regexp-result"/>
+            </p:processor>
 
-    <!-- Fetch page-flow.xml -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" href="#url-config"/>
-        <p:output name="data" id="page-flow"/>
-    </p:processor>
+            <p:processor name="oxf:xslt">
+                <p:input name="data" href="#regexp-result"/>
+                <p:input name="config">
+                    <config xsl:version="2.0">
+                        <xsl:variable name="examples-list" select="document('examples-list.xml')" as="document-node()"/>
+                        <xsl:variable name="path-prefix" select="/*/group[1]" as="xs:string"/>
+                        <xsl:variable name="example-id" select="/*/group[2]" as="xs:string"/>
+                        <xsl:variable name="example" select="$examples-list//example[@id = $example-id]" as="element()"/>
+                        <url><xsl:value-of select="concat('oxf:/',
+                                if ($path-prefix = 'examples-standalone/') then $path-prefix else 'examples/',
+                                if ($example/@path) then $example/@path else $example/@id, '/page-flow.xml')"/></url>
+                    </config>
+                </p:input>
+                <p:output name="data" id="url-config"/>
+            </p:processor>
 
-    <!-- Execute page flow -->
-    <p:processor name="oxf:page-flow">
-        <p:input name="controller" href="#page-flow"/>
-    </p:processor>
+            <!-- Fetch page-flow.xml -->
+            <p:processor name="oxf:url-generator">
+                <p:input name="config" href="#url-config"/>
+                <p:output name="data" id="page-flow"/>
+            </p:processor>
+
+            <!-- Execute page flow -->
+            <p:processor name="oxf:page-flow">
+                <p:input name="controller" href="#page-flow"/>
+            </p:processor>
+        </p:otherwise>
+    </p:choose>
 
 </p:config>

@@ -33,12 +33,13 @@
             </controls>
         </static-state>
     </xsl:template>
-    
+
     <xsl:template match="xforms:submission">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
             <xsl:if test="@action">
-                <xsl:attribute name="action" select="context:rewriteResourceURL(@action, true())"/>
+<!--                <xsl:attribute name="action" select="context:rewriteResourceURL(@action, false())"/>-->
+                <xsl:attribute name="action" select="@action"/>
             </xsl:if>
         </xsl:copy>
     </xsl:template>

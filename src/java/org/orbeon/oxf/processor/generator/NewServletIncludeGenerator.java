@@ -16,14 +16,19 @@ package org.orbeon.oxf.processor.generator;
 import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ResponseWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.xml.sax.ContentHandler;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.Map;
 
 public class NewServletIncludeGenerator extends ProcessorImpl {
 
@@ -60,7 +65,7 @@ public class NewServletIncludeGenerator extends ProcessorImpl {
                     throw new OXFException("Can't find external context in pipeline context");
 
                 // Include the result as XML
-                ResponseWrapper wrapper = new ResponseWrapper(externalContext.getResponse());
+                ServletIncludeResponseWrapper wrapper = new ServletIncludeResponseWrapper(externalContext.getResponse());
                 try {
                     getRequestDispatcher(externalContext, config).include(externalContext.getRequest(), wrapper);
                 } catch (IOException e) {
@@ -128,3 +133,69 @@ public class NewServletIncludeGenerator extends ProcessorImpl {
         }
     }
 }
+
+class ServletIncludeResponseWrapper extends ResponseWrapper {
+    private PrintWriter printWriter;
+    private StreamInterceptor streamInterceptor = new StreamInterceptor();
+
+    public ServletIncludeResponseWrapper(ExternalContext.Response response) {
+        super(response);
+    }
+
+    public OutputStream getOutputStream() {
+        return streamInterceptor.getOutputStream();
+    }
+
+    public PrintWriter getWriter() {
+        if (printWriter == null)
+            printWriter = new PrintWriter(streamInterceptor.getWriter());
+        return printWriter;
+    }
+
+    public boolean isCommitted() {
+        return false;
+    }
+
+    public void reset() {
+    }
+
+    public void sendError(int len) {
+        // NOTE: Should do something?
+    }
+
+    public void sendRedirect(String pathInfo, Map parameters, boolean isServerSide, boolean isExitPortal) throws IOException {
+    }
+
+    public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
+    }
+
+    public void setContentLength(int len) {
+    }
+
+    public void setContentType(String contentType) {
+        streamInterceptor.setEncoding(NetUtils.getContentTypeCharset(contentType));
+        streamInterceptor.setContentType(NetUtils.getContentTypeMediaType(contentType));
+    }
+
+    public void setHeader(String name, String value) {
+    }
+
+    public void addHeader(String name, String value) {
+    }
+
+    public void setStatus(int status) {
+    }
+
+    public void setTitle(String title) {
+    }
+
+    public void parse(ContentHandler contentHandler) {
+        parse(contentHandler, null);
+    }
+
+    public void parse(ContentHandler contentHandler, TidyConfig tidyConfig) {
+        streamInterceptor.parse(contentHandler, tidyConfig, false);
+    }
+}
+
+;

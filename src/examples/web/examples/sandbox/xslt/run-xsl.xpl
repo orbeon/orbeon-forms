@@ -50,7 +50,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="config" href="#xsl-parsed"/>
         <p:input name="data" href="#input-parsed"/>
-        <p:output name="data" id="output" debug="out"/>
+        <p:output name="data" id="output"/>
     </p:processor>
 
     <!-- Format output -->

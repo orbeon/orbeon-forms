@@ -36,7 +36,7 @@
     <!-- Parse input document -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#input-parsed"/>
-        <p:input name="xpath" href="#xpath" debug="xpath"/>
+        <p:input name="xpath" href="#xpath"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:template match="/">

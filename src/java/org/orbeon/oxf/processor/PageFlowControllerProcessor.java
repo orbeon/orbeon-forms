@@ -60,6 +60,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     private static final String INSTANCE_PASSING_PROPERTY_NAME = "instance-passing";
     private static final String EPILOGUE_PROPERTY_NAME = "epilogue";
     private static final String NOT_FOUND_PROPERTY_NAME = "not-found";
+    private static final String XFORMS_SUBMISSION_PATH_PROPERTY_NAME = "xforms-submission-path";
+    private static final String XFORMS_SUBMISSION_MODEL_PROPERTY_NAME = "xforms-submission-model";
 
     static {
         Element trueConfigElement = new NonLazyUserDataElement( "config");
@@ -111,12 +113,33 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 //                    errorPageId = errorHandlerElement != null ? errorHandlerElement.attributeValue("page") : null;
 //                }
 
+                // XForms Submission page
+                {
+                    final String xformsSubmissionPath = getPropertySet().getString(XFORMS_SUBMISSION_PATH_PROPERTY_NAME);
+                    final String xformsSubmissionModel = getPropertySet().getStringOrURIAsString(XFORMS_SUBMISSION_MODEL_PROPERTY_NAME);
+                    if ((xformsSubmissionPath == null && xformsSubmissionModel != null) || (xformsSubmissionPath != null && xformsSubmissionModel == null)) {
+                        throw new OXFException("Only one of properties " + XFORMS_SUBMISSION_PATH_PROPERTY_NAME + " and " + XFORMS_SUBMISSION_MODEL_PROPERTY_NAME + " is set.");
+                    }
+                    if (xformsSubmissionPath != null) {
+                        final Element firstPageElement = controllerDocument.getRootElement().element("page");
+                        if (firstPageElement != null) {
+                            final List allElements = controllerDocument.getRootElement().elements();
+                            final int firstPageElementIndex = allElements.indexOf(firstPageElement);
+                            final Element newElement = Dom4jUtils.createElement("page", CONTROLLER_NAMESPACE_URI);
+                            newElement.addAttribute("path-info", xformsSubmissionPath);
+                            newElement.addAttribute("model", xformsSubmissionModel);
+                            allElements.add(firstPageElementIndex, newElement);
+                        }
+                    }
+                }
+
                 // Go through all pages to get mapping
                 final Map pageIdToPageElement = new HashMap();
                 final Map pageIdToPathInfo = new HashMap();
                 final Map pageIdToXFormsModel = new HashMap();
                 final Map pageIdToParamsDocument = new HashMap();
                 final int pageCount = controllerDocument.getRootElement().elements("page").size();
+
                 for (Iterator i = controllerDocument.getRootElement().elements("page").iterator(); i.hasNext();) {
                     Element pageElement = (Element) i.next();
                     String pathInfo = pageElement.attributeValue("path-info");

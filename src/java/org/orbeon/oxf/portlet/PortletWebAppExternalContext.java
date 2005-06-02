@@ -61,6 +61,10 @@ public class PortletWebAppExternalContext implements WebAppExternalContext {
         return portletContext;
     }
 
+    protected PortletContext getPortletContext() {
+        return portletContext;
+    }
+
     /**
      * Present a view of the ServletContext properties as a Map.
      */

@@ -119,6 +119,12 @@
                         </element>
                     </zeroOrMore>
                 </element>
+                <optional>
+                    <element name="xxforms:submission">
+                        <attribute name="action"/>
+                        <attribute name="method"/>
+                    </element>
+                </optional>
             </element>
         </element>
     </start>

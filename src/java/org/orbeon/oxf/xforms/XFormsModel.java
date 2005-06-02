@@ -302,7 +302,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             return instance;
 
         // Search submissions
-        {
+        if (submissions != null) {
             final XFormsModelSubmission resultSubmission = (XFormsModelSubmission) submissions.get(id);
             if (resultSubmission != null)
                 return resultSubmission;

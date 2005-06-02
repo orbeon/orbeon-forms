@@ -21,6 +21,8 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.servlet.ServletExternalContext;
 import org.orbeon.oxf.util.AttributesToMap;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.externalcontext.PortletToExternalContextRequestDispatcherWrapper;
+import org.orbeon.oxf.webapp.ProcessorService;
 
 import javax.portlet.*;
 import java.io.*;
@@ -40,6 +42,10 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         private Map headerMap;
         private Map headerValuesMap;
         private Map parameterMap;
+
+        public PortletExternalContext getPortletExternalContext() {
+            return PortletExternalContext.this;
+        }
 
         public String getContainerType() {
             return "portlet";
@@ -230,6 +236,10 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         public PortletExternalContext getServletExternalContext() {
             return PortletExternalContext.this;
         }
+
+        public Object getNativeRequest() {
+            return PortletExternalContext.this.getNativeRequest();
+        }
     }
 
     private class Session implements ExternalContext.Session {
@@ -413,6 +423,10 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         public PortletExternalContext getServletExternalContext() {
             return PortletExternalContext.this;
         }
+
+        public Object getNativeResponse() {
+            return PortletExternalContext.this.getNativeResponse();
+        }
     }
 
     private static class LocalByteArrayOutputStream extends ByteArrayOutputStream {
@@ -592,31 +606,71 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
         }
     }
 
-    private Request request;
-    private Response response;
-    private Session session;
+    private ExternalContext.Request request;
+    private ExternalContext.Response response;
+    private ExternalContext.Session session;
 
+    private ProcessorService processorService;
     private PipelineContext pipelineContext;
     private PortletRequest portletRequest;
     private ActionRequest actionRequest;
     private RenderResponse renderResponse;
 
-    PortletExternalContext(PortletContext portletContext, Map initAttributesMap) {
+    PortletExternalContext(ProcessorService processorService, PortletContext portletContext, Map initAttributesMap) {
         super(portletContext, initAttributesMap);
+        this.processorService = processorService;
     }
 
-    PortletExternalContext(PipelineContext pipelineContext, PortletContext portletContext, Map initAttributesMap, PortletRequest portletRequest) {
-        this(portletContext, initAttributesMap);
+    PortletExternalContext(ProcessorService processorService, PipelineContext pipelineContext, PortletContext portletContext, Map initAttributesMap, PortletRequest portletRequest) {
+        this(processorService, portletContext, initAttributesMap);
         this.pipelineContext = pipelineContext;
         this.portletRequest = portletRequest;
         if (portletRequest instanceof ActionRequest)
             this.actionRequest = (ActionRequest) portletRequest;
     }
 
-    PortletExternalContext(PipelineContext pipelineContext, PortletContext portletContext, Map initAttributesMap, PortletRequest portletRequest, RenderResponse renderResponse) {
-        this(pipelineContext, portletContext, initAttributesMap, portletRequest);
+    PortletExternalContext(ProcessorService processorService, PipelineContext pipelineContext, PortletContext portletContext, Map initAttributesMap, PortletRequest portletRequest, RenderResponse renderResponse) {
+        this(processorService, pipelineContext, portletContext, initAttributesMap, portletRequest);
         this.renderResponse = renderResponse;
     }
+
+    private PortletExternalContext(PipelineContext pipelineContext, Request unwrappedRequest) {
+        this(unwrappedRequest.getPortletExternalContext().getProcessorService(),
+                pipelineContext,
+                unwrappedRequest.getPortletExternalContext().getPortletContext(),
+                unwrappedRequest.getPortletExternalContext().getInitAttributesMap(),
+                unwrappedRequest.getPortletExternalContext().getPortletRequest(),
+                unwrappedRequest.getPortletExternalContext().getRenderResponse());
+
+        // Forward portlet config to new pipeline context
+        pipelineContext.setAttribute(PipelineContext.PORTLET_CONFIG,
+                unwrappedRequest.getPortletExternalContext().getPipelineContext().getAttribute(PipelineContext.PORTLET_CONFIG));
+    }
+
+    PortletExternalContext(PipelineContext pipelineContext, ExternalContext.Request request, ExternalContext.Response response) {
+        this(pipelineContext, unwrapRequest(request));
+
+        this.request = request;
+        this.response = response;
+    }
+
+    private static Request unwrapRequest(ExternalContext.Request request) {
+        while (!(request instanceof Request)) {
+            if (!(request instanceof org.orbeon.oxf.externalcontext.RequestWrapper))
+                throw new OXFException("Request in forward must be original Request or instance of RequestWrapper.");
+            request = ((org.orbeon.oxf.externalcontext.RequestWrapper) request)._getRequest();
+        }
+        return (Request) request;
+    }
+
+//    private static Response unwrapResponse(ExternalContext.Response response) {
+//        while (!(response instanceof BaseResponse)) {
+//            if (!(response instanceof org.orbeon.oxf.externalcontext.ResponseWrapper))
+//                throw new OXFException("Response in forward must be original Response or instance of ResponseWrapper.");
+//            response = ((org.orbeon.oxf.externalcontext.ResponseWrapper) response)._getResponse();
+//        }
+//        return (Response) response;
+//    }
 
     public Object getNativeRequest() {
         return portletRequest;
@@ -664,36 +718,27 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
     }
 
     public RequestDispatcher getNamedDispatcher(String name) {
-        return new RequestDispatcherWrapper(portletContext.getNamedDispatcher(name));
+        return new PortletToExternalContextRequestDispatcherWrapper(portletContext.getNamedDispatcher(name));
     }
 
     public RequestDispatcher getRequestDispatcher(String path) {
-        return new RequestDispatcherWrapper(portletContext.getRequestDispatcher(path));
+        return new PortletToExternalContextRequestDispatcherWrapper(portletContext.getRequestDispatcher(path));
     }
 
-    /*
-     * Wrap a PortletRequestDispatcher.
-     */
-    private static class RequestDispatcherWrapper implements ExternalContext.RequestDispatcher {
-        private PortletRequestDispatcher _dispatcher;
+    public ProcessorService getProcessorService() {
+        return processorService;
+    }
 
-        public RequestDispatcherWrapper(PortletRequestDispatcher _dispatcher) {
-            this._dispatcher = _dispatcher;
-        }
+    public PipelineContext getPipelineContext() {
+        return pipelineContext;
+    }
 
-        public void forward(ExternalContext.Request request, ExternalContext.Response response) throws IOException {
-            throw new UnsupportedOperationException("RequestDispatcher.forward() is not supported within portlets.");
-        }
+    private PortletRequest getPortletRequest() {
+        return portletRequest;
+    }
 
-        public void include(ExternalContext.Request request, ExternalContext.Response response) throws IOException {
-            PortletExternalContext portletExternalContext = ((Request) request).getServletExternalContext();
-            try {
-                // FIXME: This is incorrect, must wrap request and responses
-                _dispatcher.include((RenderRequest) portletExternalContext.portletRequest, portletExternalContext.renderResponse);
-            } catch (PortletException e) {
-                throw new OXFException(e);
-            }
-        }
+    private RenderResponse getRenderResponse() {
+        return renderResponse;
     }
 
     /**

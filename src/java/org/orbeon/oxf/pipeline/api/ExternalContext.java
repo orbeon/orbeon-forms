@@ -77,6 +77,8 @@ public interface ExternalContext extends WebAppExternalContext {
         public String getQueryString();
         public String getRequestURI();
         public String getRequestURL();
+
+        public Object getNativeRequest();
     }
 
     public interface Response {
@@ -101,6 +103,8 @@ public interface ExternalContext extends WebAppExternalContext {
         public String rewriteResourceURL(String urlString, boolean absolute);
         public String getNamespacePrefix();
         public void setTitle(String title);
+
+        public Object getNativeResponse();
     }
 
     public interface Session {

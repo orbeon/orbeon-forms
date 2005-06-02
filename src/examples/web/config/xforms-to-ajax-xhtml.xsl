@@ -39,7 +39,7 @@
     <xsl:template match="xhtml:body">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <xhtml:form class="xforms-form">
+            <xhtml:form class="xforms-form" action="/xforms-server-submit" method="POST">
                 <!-- Store private information used by the client-side JavaScript -->
                 <xhtml:input type="hidden" name="$static-state" value="{$request/xxforms:static-state}"/>
                 <xhtml:input type="hidden" name="$dynamic-state" value="{$response/xxforms:dynamic-state}"/>

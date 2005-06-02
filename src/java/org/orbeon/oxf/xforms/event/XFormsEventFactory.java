@@ -75,6 +75,8 @@ public class XFormsEventFactory {
             return new XXFormsInitializeStateEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
             return new XXFormsValueChangeWithFocusChangeEvent(targetObject, contextString);
+        } else if (eventName.equals(XFormsEvents.XXFORMS_SUBMIT)) {
+            return new XXFormsSubmissionEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_CONSTRUCT)) {
             return new XFormsModelConstructEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE)) {

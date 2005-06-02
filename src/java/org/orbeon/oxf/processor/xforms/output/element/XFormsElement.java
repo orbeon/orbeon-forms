@@ -22,6 +22,7 @@ import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.style.StandardNames;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -82,9 +83,9 @@ public class XFormsElement {
 
         if (("if".equals(localname) || "when".equals(localname)) && XFormsConstants.XXFORMS_NAMESPACE_URI.equals(uri)) {
             String test = attributes.getValue("test");
-
+            final FunctionLibrary fncLib = context.getFunctionLibrary();
             Boolean value = (Boolean) context.getCurrentInstance().evaluateXPathSingle(context.getPipelineContext(), context.getCurrentSingleNode(),
-                    "boolean(" + test + ")", prefixToURI, context.getRepeatIdToIndex(), null, null);
+                    "boolean(" + test + ")", prefixToURI, context.getRepeatIdToIndex(), fncLib, null);
 
             addExtensionAttribute(newAttributes, "value", Boolean.toString(value.booleanValue()));
         } else if (context.getParentElement(0) instanceof Itemset

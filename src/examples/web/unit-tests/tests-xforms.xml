@@ -60,7 +60,7 @@
         </output>
     </test>
 
-    <test description="Conditionals: if" name="oxf:pipeline">
+    <test description="Conditionals: if" name="oxf:pipeline"  >
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xhtml="http://www.w3.org/1999/xhtml">
                 <p:param type="output" name="data"/>
@@ -74,6 +74,7 @@
                                     <a/>
                                     <b/>
                                     <c/>
+                                    <d/>
                                 </form>
                             </xforms:instance>
                         </xforms:model>
@@ -87,6 +88,7 @@
                             <a>1</a>
                             <b>2</b>
                             <c>3</c>
+                            <d>4</d>
                         </form>
                     </p:input>
                     <p:input name="data">
@@ -99,8 +101,11 @@
                                     <xxforms:if test="a = 1">
                                         <xforms:input ref="b" xhtml:id="b"/>
                                     </xxforms:if>
-                                    <xxforms:if test="count(/form/*) = 3">
+                                    <xxforms:if test="count(/form/*) = 4">
                                         <xforms:input ref="c" xhtml:id="c"/>
+                                    </xxforms:if>
+                                    <xxforms:if test="count-non-empty(/form/*)">
+                                        <xforms:input ref="d" xhtml:id="d"/>
                                     </xxforms:if>
                                 </xforms:group>
                             </body>
@@ -126,7 +131,7 @@
             </p:config>
         </input>
         <output name="data">
-            <result>b c</result>
+            <result>b c d</result>
         </output>
     </test>
 

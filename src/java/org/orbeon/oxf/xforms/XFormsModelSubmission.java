@@ -31,7 +31,6 @@ import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -86,13 +85,13 @@ public class XFormsModelSubmission implements XFormsEventTarget {
             mediatype = submissionElement.attributeValue("mediatype");
             encoding = submissionElement.attributeValue("encoding");
             if (submissionElement.attributeValue("omitxmldeclaration") != null) {
-                omitxmldeclaration = Boolean.getBoolean(submissionElement.attributeValue("omitxmldeclaration"));
+                omitxmldeclaration = Boolean.getBoolean(submissionElement.attributeValue("omit-xml-declaration"));
             }
             if (submissionElement.attributeValue("standalone") != null) {
                 standalone = new Boolean(submissionElement.attributeValue("standalone"));
             }
 
-            cdatasectionelements = submissionElement.attributeValue("cdatasectionelements");
+            cdatasectionelements = submissionElement.attributeValue("cdata-section-elements");
             if (submissionElement.attributeValue("replace") != null) {
                 replace = submissionElement.attributeValue("replace");
             }

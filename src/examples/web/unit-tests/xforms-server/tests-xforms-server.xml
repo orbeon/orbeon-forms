@@ -680,6 +680,7 @@
 
                 <p:processor name="oxf:unsafe-xslt">
                     <p:input name="data"><dummy/></p:input>
+                    <p:input name="request"><xxforms:event-request/></p:input>
                     <p:input name="response" href="#repeat-response"/>
                     <p:input name="controls" href="xforms-server/repeat-full-controls.xml"/>
                     <p:input name="config">

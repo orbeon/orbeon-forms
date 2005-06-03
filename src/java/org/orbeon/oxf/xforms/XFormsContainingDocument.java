@@ -166,7 +166,7 @@ public class XFormsContainingDocument implements XFormsEventTarget {
             // Dispatch events
             final XFormsModel model = xformsControls.getCurrentModel();
             model.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model));
-            model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model));
+            model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
 
             xformsControls.dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(concreteEvent.getTargetObject()));
             xformsControls.dispatchEvent(pipelineContext, new XFormsValueChangeEvent(concreteEvent.getTargetObject()));

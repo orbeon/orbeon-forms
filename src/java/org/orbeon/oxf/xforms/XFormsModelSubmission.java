@@ -58,7 +58,7 @@ public class XFormsModelSubmission implements XFormsEventTarget {
     private Boolean standalone;
     private String cdatasectionelements;
 
-    private String replace = "all";
+    private String replace = XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL;
     private String separator = ";";
     private String includenamespaceprefixes;
 
@@ -115,385 +115,379 @@ public class XFormsModelSubmission implements XFormsEventTarget {
             // 11.1 The xforms-submit Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
-            // Make sure submission element info is extracted
-            extractSubmissionElement();
+            try {
+                // Make sure submission element info is extracted
+                extractSubmissionElement();
 
-            // Select node based on ref or bind
-            final XFormsControls xformsControls = model.getContainingDocument().getXFormsControls();
-            xformsControls.setBinding(pipelineContext, submissionElement);
+                // Select node based on ref or bind
+                final XFormsControls xformsControls = model.getContainingDocument().getXFormsControls();
+                xformsControls.setBinding(pipelineContext, submissionElement);
 
-            final Node currentNode = xformsControls.getCurrentSingleNode();
+                final Node currentNode = xformsControls.getCurrentSingleNode();
 
-            if (!(currentNode instanceof Document || currentNode instanceof Element)) {
-                // TODO: dispatch xforms-submit-error
-                throw new OXFException("xforms:submission: single-node binding must refer to a document node or an element.");
-            }
-
-            final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
-
-            // Revalidate instance
-            // TODO: we should only revalidate relevant parts
-            // TODO: this should not send valid / invalid events (probably)
-            model.dispatchEvent(pipelineContext,  new XFormsRevalidateEvent(model));
-
-            final Document documentToSubmit;
-            {
-                if (currentNode instanceof Element) {
-                    // Create subset of document
-                    documentToSubmit = Dom4jUtils.createDocument((Element) currentNode);
-                } else {
-                    // Use entire instance document
-                    documentToSubmit = currentInstance.getDocument();
-                }
-                // TODO: handle includenamespaceprefixes + handle non-relevant nodes
-            }
-
-            // Check that there are no validation errors
-            final boolean[] instanceValid = new boolean[] { true } ;
-            documentToSubmit.accept(new VisitorSupport() {
-
-                public void visit(Element element) {
-                    final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
-                    checkInstanceData(instanceData);
+                if (!(currentNode instanceof Document || currentNode instanceof Element)) {
+                    throw new OXFException("xforms:submission: single-node binding must refer to a document node or an element.");
                 }
 
-                public void visit(Attribute attribute) {
-                    final InstanceData instanceData = XFormsUtils.getLocalInstanceData(attribute);
-                    checkInstanceData(instanceData);
+                final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
+
+                // Revalidate instance
+                // TODO: we should only revalidate relevant parts
+                model.dispatchEvent(pipelineContext,  new XFormsRevalidateEvent(model, false));
+
+                final Document documentToSubmit;
+                {
+                    if (currentNode instanceof Element) {
+                        // Create subset of document
+                        documentToSubmit = Dom4jUtils.createDocument((Element) currentNode);
+                    } else {
+                        // Use entire instance document
+                        documentToSubmit = currentInstance.getDocument();
+                    }
+                    // TODO: handle includenamespaceprefixes + handle non-relevant nodes
                 }
 
-                private void checkInstanceData(InstanceData instanceData) {
-                    final BooleanModelItemProperty validMIP = instanceData.getValid();
-                    if (validMIP != null)
-                        instanceValid[0] &= validMIP.get();
-                }
-            });
+                // Check that there are no validation errors
+                final boolean[] instanceValid = new boolean[] { true } ;
+                documentToSubmit.accept(new VisitorSupport() {
 
-            if (!instanceValid[0]) {
-                // TODO: dispatch xforms-submit-error and stop processing
-                throw new OXFException("xforms:submission: instance is not valid.");
-            }
-
-            // Deferred submission
-            // NOTE: When replace="all", we don't actually do the submission here when we are called from the XForms Server
-            if (replace.equals("all") && XFormsEvents.XFORMS_SUBMIT.equals(eventName)) {
-                model.getContainingDocument().setActiveSubmission(this);
-                return;
-            }
-
-            // Serialize
-            // To support: application/xml, application/x-www-form-urlencoded, multipart/related, multipart/form-data
-            final byte[] serializedInstance;
-            {
-                if (method.equals("post") || method.equals("put")) {
-                    try {
-                        final Transformer identity = TransformerUtils.getIdentityTransformer();
-                        TransformerUtils.applyOutputProperties(identity,
-                                "xml", version, null, null, encoding, omitxmldeclaration, standalone, indent, 4);
-
-                        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-                        identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
-                        serializedInstance = os.toByteArray();
-                    } catch (Exception e) {
-                        // TODO: dispatch xforms-submit-error and stop processing
-                        throw new OXFException("xforms:submission: exception while serializing instance to XML.", e);
+                    public void visit(Element element) {
+                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
+                        checkInstanceData(instanceData);
                     }
 
-                } else if (method.equals("get")) {
-                    // TODO
-                    throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-                } else if (method.equals("multipart-post")) {
-                    // TODO
-                    throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-                } else if (method.equals("form-data-post")) {
-                    // TODO
-                    throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-                } else if (method.equals("urlencoded-post")) {
-                    throw new OXFException("xforms:submission: deprecated submission method requested: " + method);
-                } else {
-                    throw new OXFException("xforms:submission: invalid submission method requested: " + method);
+                    public void visit(Attribute attribute) {
+                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(attribute);
+                        checkInstanceData(instanceData);
+                    }
+
+                    private void checkInstanceData(InstanceData instanceData) {
+                        final BooleanModelItemProperty validMIP = instanceData.getValid();
+                        if (validMIP != null)
+                            instanceValid[0] &= validMIP.get();
+                    }
+                });
+
+                if (!instanceValid[0]) {
+                    throw new OXFException("xforms:submission: instance is not valid.");
                 }
-            }
 
-            final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+                // Deferred submission
+                // NOTE: When replace="all", we don't actually do the submission here when we are called from the XForms Server
+                if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL) && XFormsEvents.XFORMS_SUBMIT.equals(eventName)) {
+                    model.getContainingDocument().setActiveSubmission(this);
+                    return;
+                }
 
-            // Result information
-            int resultCode = 0;
-            String resultMediaType = null;
-            Map resultHeaders = null;
-            InputStream resultInputStream = null;
+                // Serialize
+                // To support: application/xml, application/x-www-form-urlencoded, multipart/related, multipart/form-data
+                final byte[] serializedInstance;
+                {
+                    if (method.equals("post") || method.equals("put")) {
+                        try {
+                            final Transformer identity = TransformerUtils.getIdentityTransformer();
+                            TransformerUtils.applyOutputProperties(identity,
+                                    "xml", version, null, null, encoding, omitxmldeclaration, standalone, indent, 4);
 
-            HttpURLConnection urlConnection = null;
-            OutputStream os = null;
-            boolean forwarded = false;
+                            // TODO: use cdata-section-elements
 
-            try {
-                if (action.startsWith("/")) {
-                    // This is a "local" submission, i.e. in the same Servlet container
-                    // The submission can be optimized.
-                    // FIXME: How to deal with absolute paths on the same server, but not in the servlet container?
+                            final ByteArrayOutputStream os = new ByteArrayOutputStream();
+                            identity.transform(new DocumentSource(documentToSubmit), new StreamResult(os));
+                            serializedInstance = os.toByteArray();
+                        } catch (Exception e) {
+                            throw new OXFException("xforms:submission: exception while serializing instance to XML.", e);
+                        }
 
-                    ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action);
-                    try {
-                        if (method.equals("post") || method.equals("put")) {
+                    } else if (method.equals("get")) {
+                        // TODO
+                        throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+                    } else if (method.equals("multipart-post")) {
+                        // TODO
+                        throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+                    } else if (method.equals("form-data-post")) {
+                        // TODO
+                        throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+                    } else if (method.equals("urlencoded-post")) {
+                        throw new OXFException("xforms:submission: deprecated submission method requested: " + method);
+                    } else {
+                        throw new OXFException("xforms:submission: invalid submission method requested: " + method);
+                    }
+                }
 
-                            final ForwardExternalContextRequestWrapper requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
-                                    action, method.toUpperCase(), (mediatype != null) ? mediatype : "application/xml", serializedInstance);
+                final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
 
-                            if (replace.equals("all")) {
-                                // Just forward the reply
-                                requestDispatcher.forward(requestAdapter, externalContext.getResponse());
-                                // TODO: xforms-submit-done must be sent before the body is forwarded
-                                //dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
-                                forwarded = true;
+                // Result information
+                int resultCode = 0;
+                String resultMediaType = null;
+                Map resultHeaders = null;
+                InputStream resultInputStream = null;
+
+                HttpURLConnection urlConnection = null;
+                OutputStream os = null;
+                boolean forwarded = false;
+
+                try {
+                    if (action.startsWith("/")) {
+                        // This is a "local" submission, i.e. in the same Servlet container
+                        // The submission can be optimized.
+                        // FIXME: How to deal with absolute paths on the same server, but not in the servlet container?
+
+                        ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action);
+                        try {
+                            if (method.equals("post") || method.equals("put")) {
+
+                                final ForwardExternalContextRequestWrapper requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
+                                        action, method.toUpperCase(), (mediatype != null) ? mediatype : "application/xml", serializedInstance);
+
+                                if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL)) {
+                                    // Just forward the reply
+                                    // TODO: xforms-submit-done must be sent before the body is forwarded
+                                    dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                    requestDispatcher.forward(requestAdapter, externalContext.getResponse());
+                                    forwarded = true;
+                                } else {
+                                    // We must intercept the reply
+                                    final ResponseAdapter responseAdapter = new ResponseAdapter();
+                                    requestDispatcher.include(requestAdapter, responseAdapter);
+
+                                    // Get response information that needs to be forwarded
+                                    resultCode = responseAdapter.getResponseCode();
+    //                                resultMediaType = NetUtils.getContentTypeMediaType(responseAdapter.getContentType());
+    //                                resultHeaders = responseAdapter.getHeaders();
+                                    resultMediaType = ProcessorUtils.XML_CONTENT_TYPE;
+                                    resultInputStream = responseAdapter.getInputStream();
+                                }
+
+                            } else if (method.equals("get")) {
+                                // TODO
+                                throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+                            } else if (method.equals("multipart-post")) {
+                                // TODO
+                                throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+                            } else if (method.equals("form-data-post")) {
+                                // TODO
+                                throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+                            } else if (method.equals("urlencoded-post")) {
+                                throw new OXFException("xforms:submission: deprecated submission method requested: " + method);
                             } else {
-                                // We must intercept the reply
-                                final ResponseAdapter responseAdapter = new ResponseAdapter();
-                                requestDispatcher.include(requestAdapter, responseAdapter);
+                                throw new OXFException("xforms:submission: invalid submission method requested: " + method);
+                            }
+                        } catch (IOException e) {
+                            throw new OXFException(e);
+                        }
+
+                    } else {
+                        // This is a "remote" submission, i.e. using an absolute URL
+
+                        // Compute submission URL
+                        final URL submissionURL;
+                        try {
+                            if (NetUtils.urlHasProtocol(action)) {
+                                submissionURL = URLFactory.createURL(action);
+                            } else {
+                                final String requestURL = externalContext.getRequest().getRequestURL();
+
+                                if (requestURL != null) {
+                                    submissionURL = URLFactory.createURL(requestURL, action);
+                                } else {
+                                    throw new OXFException("xforms:submission: cannot resolve relative action: " + action);
+                                }
+                            }
+                        } catch (MalformedURLException e) {
+                            throw new OXFException("xforms:submission: invalid action: " + action, e);
+                        }
+
+                        // Perform submission
+                        final String scheme = submissionURL.getProtocol();
+                        if (scheme.equals("http") || scheme.equals("https")) {
+                            // http MUST be supported
+                            // https SHOULD be supported
+
+                            urlConnection = (HttpURLConnection) submissionURL.openConnection();
+
+                            if (method.equals("post") || method.equals("put")) {
+                                urlConnection.setDoInput(true);
+                                urlConnection.setDoOutput(true); // If POST / PUT
+
+                                urlConnection.setRequestMethod(method.toUpperCase());
+                                urlConnection.setRequestProperty("content-type", (mediatype != null) ? mediatype : "application/xml");
+
+                                urlConnection.connect();
+
+                                // Submit
+                                os = urlConnection.getOutputStream();
+                                os.write(serializedInstance);
 
                                 // Get response information that needs to be forwarded
-                                resultCode = responseAdapter.getResponseCode();
-//                                resultMediaType = NetUtils.getContentTypeMediaType(responseAdapter.getContentType());
-//                                resultHeaders = responseAdapter.getHeaders();
-                                resultMediaType = ProcessorUtils.XML_CONTENT_TYPE;
-                                resultInputStream = responseAdapter.getInputStream();
-                            }
+                                resultCode = urlConnection.getResponseCode();
+                                final String contentType = urlConnection.getContentType();
+                                resultMediaType = NetUtils.getContentTypeMediaType(contentType);
+                                resultHeaders = urlConnection.getHeaderFields();
+                                resultInputStream = urlConnection.getInputStream();
 
-                        } else if (method.equals("get")) {
-                            // TODO
-                            throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-                        } else if (method.equals("multipart-post")) {
-                            // TODO
-                            throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-                        } else if (method.equals("form-data-post")) {
-                            // TODO
-                            throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-                        } else if (method.equals("urlencoded-post")) {
-                            throw new OXFException("xforms:submission: deprecated submission method requested: " + method);
-                        } else {
-                            throw new OXFException("xforms:submission: invalid submission method requested: " + method);
-                        }
-                    } catch (IOException e) {
-                        throw new OXFException(e);
-                    }
-
-                } else {
-                    // This is a "remote" submission, i.e. using an absolute URL
-
-                    // Compute submission URL
-                    final URL submissionURL;
-                    try {
-                        if (NetUtils.urlHasProtocol(action)) {
-                            submissionURL = URLFactory.createURL(action);
-                        } else {
-                            final String requestURL = externalContext.getRequest().getRequestURL();
-
-                            if (requestURL != null) {
-                                submissionURL = URLFactory.createURL(requestURL, action);
+                            } else if (method.equals("get")) {
+                                // TODO
+                                throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+                            } else if (method.equals("multipart-post")) {
+                                // TODO
+                                throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+                            } else if (method.equals("form-data-post")) {
+                                // TODO
+                                throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+                            } else if (method.equals("urlencoded-post")) {
+                                throw new OXFException("xforms:submission: deprecated submission method requested: " + method);
                             } else {
-                                throw new OXFException("xforms:submission: cannot resolve relative action: " + action);
+                                throw new OXFException("xforms:submission: invalid submission method requested: " + method);
                             }
-                        }
-                    } catch (MalformedURLException e) {
-                        // TODO: dispatch xforms-submit-error and stop processing
-                        throw new OXFException("xforms:submission: invalid action: " + action);
-                    }
-
-                    // Perform submission
-                    final String scheme = submissionURL.getProtocol();
-                    if (scheme.equals("http") || scheme.equals("https")) {
-                        // http MUST be supported
-                        // https SHOULD be supported
-
-
-                        urlConnection = (HttpURLConnection) submissionURL.openConnection();
-
-                        if (method.equals("post") || method.equals("put")) {
-                            urlConnection.setDoInput(true);
-                            urlConnection.setDoOutput(true); // If POST / PUT
-
-                            urlConnection.setRequestMethod(method.toUpperCase());
-                            urlConnection.setRequestProperty("content-type", (mediatype != null) ? mediatype : "application/xml");
-
-                            urlConnection.connect();
-
-                            // Submit
-                            os = urlConnection.getOutputStream();
-                            os.write(serializedInstance);
-
-                            // Get response information that needs to be forwarded
-                            resultCode = urlConnection.getResponseCode();
-                            final String contentType = urlConnection.getContentType();
-                            resultMediaType = NetUtils.getContentTypeMediaType(contentType);
-                            resultHeaders = urlConnection.getHeaderFields();
-                            resultInputStream = urlConnection.getInputStream();
-
-                        } else if (method.equals("get")) {
+                        } else if (scheme.equals("file")) {
                             // TODO
-                            throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-                        } else if (method.equals("multipart-post")) {
+                            // SHOULD be supported
+                            // Question: should support oxf: as well?
+                            throw new OXFException("xforms:submission: submission URL scheme not yet implemented: " + scheme);
+                        } else if (scheme.equals("mailto")) {
                             // TODO
-                            throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-                        } else if (method.equals("form-data-post")) {
-                            // TODO
-                            throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
-                        } else if (method.equals("urlencoded-post")) {
-                            throw new OXFException("xforms:submission: deprecated submission method requested: " + method);
+                            // MAY be supported
+                            throw new OXFException("xforms:submission: submission URL scheme not yet implemented: " + scheme);
                         } else {
-                            throw new OXFException("xforms:submission: invalid submission method requested: " + method);
+                            throw new OXFException("xforms:submission: submission URL scheme not supported: " + scheme);
                         }
-                    } else if (scheme.equals("file")) {
-                        // TODO
-                        // SHOULD be supported
-                        // Question: should support oxf: as well?
-                        throw new OXFException("xforms:submission: submission URL scheme not yet implemented: " + scheme);
-                    } else if (scheme.equals("mailto")) {
-                        // TODO
-                        // MAY be supported
-                        throw new OXFException("xforms:submission: submission URL scheme not yet implemented: " + scheme);
-                    } else {
-                        throw new OXFException("xforms:submission: submission URL scheme not supported: " + scheme);
+
                     }
 
-                }
+                    if (!forwarded) {
+                        // Handle response
+                        if (resultCode == 200) {
+                            // Sucessful response
 
-                if (!forwarded) {
-                    // Handle response
-                    if (resultCode == 200) {
-                        // Sucessful response
+                            if (!resultInputStream.markSupported())
+                                resultInputStream = new BufferedInputStream(resultInputStream);
 
-                        if (!resultInputStream.markSupported())
-                            resultInputStream = new BufferedInputStream(resultInputStream);
+                            final boolean hasContent;
+                            {
+                                resultInputStream.mark(1);
+                                hasContent = resultInputStream.read() != -1;
+                                resultInputStream.reset();
+                            }
 
-                        final boolean hasContent;
-                        {
-                            resultInputStream.mark(1);
-                            hasContent = resultInputStream.read() != -1;
-                            resultInputStream.reset();
-                        }
+                            if (hasContent) {
+                                // There is a body
 
-                        if (hasContent) {
-                            // There is a body
+                                if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL)) {
+                                    // When we get here, we are in a mode where we need to send the reply
+                                    // directly to an external context, if any.
 
-                            if (replace.equals("all")) {
-                                // When we get here, we are in a mode where we need to send the reply
-                                // directly to an external context, if any.
+                                    // "the event xforms-submit-done is dispatched"
+                                    dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
 
-                                // "the event xforms-submit-done is dispatched"
-                                dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                    final ExternalContext.Response response = externalContext.getResponse();
 
-                                final ExternalContext.Response response = externalContext.getResponse();
+                                    // Forward headers to response
+                                    if (resultHeaders != null) {
+                                        for (Iterator i = resultHeaders.entrySet().iterator(); i.hasNext();) {
+                                            final Map.Entry currentEntry = (Map.Entry) i.next();
+                                            final String headerName = (String) currentEntry.getKey();
+                                            final List headerValues = (List) currentEntry.getValue();
 
-                                // Forward headers to response
-                                if (resultHeaders != null) {
-                                    for (Iterator i = resultHeaders.entrySet().iterator(); i.hasNext();) {
-                                        final Map.Entry currentEntry = (Map.Entry) i.next();
-                                        final String headerName = (String) currentEntry.getKey();
-                                        final List headerValues = (List) currentEntry.getValue();
-
-                                        if (headerName != null && headerValues != null) {
-                                            for (Iterator j = headerValues.iterator(); j.hasNext();) {
-                                                response.addHeader(headerName, (String) j.next());
+                                            if (headerName != null && headerValues != null) {
+                                                for (Iterator j = headerValues.iterator(); j.hasNext();) {
+                                                    response.addHeader(headerName, (String) j.next());
+                                                }
                                             }
                                         }
                                     }
-                                }
 
-                                // Forward content to response
-                                NetUtils.copyStream(resultInputStream, response.getOutputStream());
+                                    // Forward content to response
+                                    NetUtils.copyStream(resultInputStream, response.getOutputStream());
 
-                            } else if (replace.equals("instance")) {
+                                } else if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_INSTANCE)) {
 
-                                final ByteArrayOutputStream resultByteArrayOutputStream = new ByteArrayOutputStream();
-                                NetUtils.copyStream(resultInputStream, resultByteArrayOutputStream);
-                                byte[] submissionResponse = resultByteArrayOutputStream.toByteArray();
+                                    final ByteArrayOutputStream resultByteArrayOutputStream = new ByteArrayOutputStream();
+                                    NetUtils.copyStream(resultInputStream, resultByteArrayOutputStream);
+                                    byte[] submissionResponse = resultByteArrayOutputStream.toByteArray();
 
-                                if (ProcessorUtils.isXMLContentType(resultMediaType)) {
-                                    // Handling of XML media type
-                                    try {
-                                        final Transformer identity = TransformerUtils.getIdentityTransformer();
-                                        final LocationDocumentResult documentResult = new LocationDocumentResult();
-                                        identity.transform(new StreamSource(new ByteArrayInputStream(submissionResponse)), documentResult);
-                                        final Document resultingInstanceDocument = documentResult.getDocument();
+                                    if (ProcessorUtils.isXMLContentType(resultMediaType)) {
+                                        // Handling of XML media type
+                                        try {
+                                            final Transformer identity = TransformerUtils.getIdentityTransformer();
+                                            final LocationDocumentResult documentResult = new LocationDocumentResult();
+                                            identity.transform(new StreamSource(new ByteArrayInputStream(submissionResponse)), documentResult);
+                                            final Document resultingInstanceDocument = documentResult.getDocument();
 
-                                        // Set new instance document to replace the one submitted
-                                        currentInstance.setInstanceDocument(resultingInstanceDocument);
+                                            // Set new instance document to replace the one submitted
+                                            currentInstance.setInstanceDocument(resultingInstanceDocument);
 
-                                        // Dispatch events
-                                        model.dispatchEvent(pipelineContext, new XFormsModelConstructEvent(model));
-                                        dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
-                                    } catch (Exception e) {
-                                        // TODO: dispatch xforms-submit-error and stop processing
-                                        throw new OXFException("xforms:submission: exception while serializing XML to instance.", e);
+                                            // Dispatch events
+                                            model.dispatchEvent(pipelineContext, new XFormsModelConstructEvent(model));
+                                            dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                        } catch (Exception e) {
+                                            throw new OXFException("xforms:submission: exception while serializing XML to instance.", e);
+                                        }
+                                    } else {
+                                        // Other media type
+                                        throw new OXFException("Body received with non-XML media type for replace=\"instance\": " + resultMediaType);
                                     }
+                                } else if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE)) {
+                                    // Just notify that processing is terminated
+                                    dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                                 } else {
-                                    // Other media type
-                                    dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(XFormsModelSubmission.this, action, null));
+                                    throw new OXFException("xforms:submission: invalid replace attribute: " + replace);
                                 }
-                            } else if (replace.equals("none")) {
-                                dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+
                             } else {
-                                // TODO: dispatch xforms-submit-error and stop processing
-                                throw new OXFException("xforms:submission: invalid replace attribute: " + replace);
+                                // There is no body, notify that processing is terminated
+                                dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                             }
+                        } else if (resultCode == 302 || resultCode == 301) {
+                            // Got a redirect
+
+                            final ExternalContext.Response response = externalContext.getResponse();
+
+                            // Forward headers to response
+                            // TODO: this is duplicated from above
+                            if (resultHeaders != null) {
+                                for (Iterator i = resultHeaders.entrySet().iterator(); i.hasNext();) {
+                                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                                    final String headerName = (String) currentEntry.getKey();
+                                    final List headerValues = (List) currentEntry.getValue();
+
+                                    if (headerName != null && headerValues != null) {
+                                        for (Iterator j = headerValues.iterator(); j.hasNext();) {
+                                            response.addHeader(headerName, (String) j.next());
+                                        }
+                                    }
+                                }
+                            }
+
+                            // Forward redirect
+                            response.setStatus(resultCode);
 
                         } else {
-                            // There is no body
-                            dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                            // Error code received
+                            throw new OXFException("Error code received when submitting instance: " + resultCode);
                         }
-                    } else if (resultCode == 302 || resultCode == 301) {
-                        // Got a redirect
-
-                        final ExternalContext.Response response = externalContext.getResponse();
-
-                        // Forward headers to response
-                        // TODO: this is duplicated from above
-                        if (resultHeaders != null) {
-                            for (Iterator i = resultHeaders.entrySet().iterator(); i.hasNext();) {
-                                final Map.Entry currentEntry = (Map.Entry) i.next();
-                                final String headerName = (String) currentEntry.getKey();
-                                final List headerValues = (List) currentEntry.getValue();
-
-                                if (headerName != null && headerValues != null) {
-                                    for (Iterator j = headerValues.iterator(); j.hasNext();) {
-                                        response.addHeader(headerName, (String) j.next());
-                                    }
-                                }
-                            }
+                    }
+                } finally {
+                    // Clean-up
+                    if (os != null) {
+                        try {
+                            os.close();
+                        } catch (IOException e) {
+                            throw new OXFException("Exception while closing output stream for action: " + action);
                         }
-
-                        // Forward redirect
-                        response.setStatus(resultCode);
-
-                    } else {
-                        // Error code received
-                        dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(XFormsModelSubmission.this, action, null));
                     }
-                }
-
-            } catch (IOException e) {
-                // TODO: dispatch xforms-submit-error and stop processing
-                throw new OXFException(e);
-            } finally {
-                // Clean-up
-                if (os != null) {
-                    try {
-                        os.close();
-                    } catch (IOException e) {
-                        // TODO: dispatch xforms-submit-error and stop processing
-                        throw new OXFException("Exception while closing output stream for action: " + action);
+                    if (resultInputStream != null) {
+                        try {
+                            resultInputStream.close();
+                        } catch (IOException e) {
+                            throw new OXFException("Exception while closing input stream for action: " + action);
+                        }
                     }
+                    if (urlConnection != null)
+                        urlConnection.disconnect();
                 }
-                if (resultInputStream != null) {
-                    try {
-                        resultInputStream.close();
-                    } catch (IOException e) {
-                        // TODO: dispatch xforms-submit-error and stop processing
-                        throw new OXFException("Exception while closing input stream for action: " + action);
-                    }
-                }
-                if (urlConnection != null)
-                    urlConnection.disconnect();
+            } catch (Exception e) {
+                // Any exception will cause an error event to be dispatched
+                dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(XFormsModelSubmission.this, action, e));
             }
 
         } else if (XFormsEvents.XFORMS_SUBMIT_DONE.equals(eventName)) {

@@ -16,6 +16,9 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Namespace;
 import org.dom4j.QName;
 
+/**
+ * Constants useful for the XForms engine. 
+ */
 public class XFormsConstants {
 
     public static final String XFORMS_PREFIX = "xforms";
@@ -63,6 +66,10 @@ public class XFormsConstants {
     public static final QName XFORMS_VALUE_QNAME = new QName("value", XFormsConstants.XFORMS_NAMESPACE);
     public static final QName XFORMS_COPY_QNAME = new QName("copy", XFormsConstants.XFORMS_NAMESPACE);
     public static final QName XFORMS_ITEMSET_QNAME = new QName("itemset", XFormsConstants.XFORMS_NAMESPACE);
+
+    public static final String XFORMS_SUBMIT_REPLACE_ALL = "all";
+    public static final String XFORMS_SUBMIT_REPLACE_INSTANCE = "instance";
+    public static final String XFORMS_SUBMIT_REPLACE_NONE = "none";
 
     public static final String XFORMS_PASSWORD_PROPERTY = "oxf.xforms.password";
     public static final String XFORMS_ENCRYPT_NAMES_PROPERTY = "oxf.xforms.encrypt-names";

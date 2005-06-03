@@ -88,7 +88,7 @@ public class XFormsEventFactory {
         } else if (eventName.equals(XFormsEvents.XFORMS_RECALCULATE)) {
             return new XFormsRecalculateEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_REVALIDATE)) {
-            return new XFormsRevalidateEvent(targetObject);
+            return new XFormsRevalidateEvent(targetObject, Boolean.getBoolean(contextString));
         } else if (eventName.equals(XFormsEvents.XFORMS_VALUE_CHANGED)) {
             return new XFormsValueChangeEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_OUT)) {

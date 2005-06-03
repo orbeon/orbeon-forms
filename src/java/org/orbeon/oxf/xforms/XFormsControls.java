@@ -1000,7 +1000,7 @@ public class XFormsControls implements XFormsEventTarget {
                     if (newActionContext.recalculate)
                         model.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model));
                     if (newActionContext.revalidate)
-                        model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model));
+                        model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
                     if (newActionContext.refresh)
                         model.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
                 }
@@ -1035,7 +1035,7 @@ public class XFormsControls implements XFormsEventTarget {
 
             setBinding(pipelineContext, eventHandlerElement);
             final XFormsModel model = getCurrentModel();
-            model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model));
+            model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
 
             // "Actions that directly invoke rebuild, recalculate, revalidate, or refresh always
             // have an immediate effect, and clear the corresponding flag."

@@ -1035,7 +1035,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
 
             loadSchemas(pipelineContext, modelElement);
             applyRelevantReadonlyBinds(pipelineContext);
-            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this));
+            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
 
         } else if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
             // 4.2.1 The xforms-model-construct Event
@@ -1086,7 +1086,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
             dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
             dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this));
-            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this));
+            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
 
         } else if (XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE.equals(eventName)) {
             // 4.2.2 The xforms-model-construct-done Event
@@ -1126,6 +1126,8 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // 4.3.5 The xforms-revalidate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
+            XFormsRevalidateEvent xformsRevalidateEvent = (XFormsRevalidateEvent) xformsEvent;
+
             // Clear all existing errors on instance
             for (Iterator i = instances.iterator(); i.hasNext();) {
                 XFormsUtils.updateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
@@ -1144,7 +1146,10 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                 }
             });
 
-            // TODO: dispatch events
+            // Send events if needed
+            if (xformsRevalidateEvent.isSendEvents()) {
+                // TODO: dispatch events
+            }
 
         } else if (XFormsEvents.XFORMS_REFRESH.equals(eventName)) {
             // 4.3.4 The xforms-refresh Event
@@ -1167,7 +1172,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // xforms-refresh are dispatched to the model element in sequence."
             dispatchEvent(pipelineContext, new XFormsRebuildEvent(XFormsModel.this));
             dispatchEvent(pipelineContext, new XFormsRecalculateEvent(XFormsModel.this));
-            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this));
+            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this, true));
             dispatchEvent(pipelineContext, new XFormsRefreshEvent(XFormsModel.this));
 
         } else if (XFormsEvents.XFORMS_LINK_ERROR.equals(eventName)) {

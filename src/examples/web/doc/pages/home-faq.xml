@@ -166,35 +166,54 @@
                     </p>
 
             </section>
-            <a name="xforms-html"/>
+            <a name="xforms"/>
             <section>
-                <title>Do I need to use XForms to create my HTML forms?</title>
-
-                    <p>
-                        It is not a requirement to use XForms. It is possible to generate HTML form
-                        elements and to examine request parameters manually. We recommend however using
-                        XForms whenever possible, because it provides an elegant abstraction that
-                        simplifies form handling.
-                    </p>
-
+                <title>What is XForms?</title>
+                <p>
+                    XForms is W3C's next generation web forms. <a
+                    href="http://www.w3.org/TR/xforms/">XForms 1.0</a> is a W3C Recommendation
+                    since October 2003.
+                </p>
+                <p>
+                    XForms aims at replacing HTML forms, but it is not strictly tied to HTML. The
+                    main goal of XForms is to make web forms design easier, allowing the developer
+                    to write less client-side scripting (or none at all), and less server-side code
+                    thanks to a feature-rich declarative approach.
+                </p>
+                <p>
+                    Benefits of XForms include:
+                </p>
+                <ul>
+                    <li>Clear separation between data captured and presentation (separation of concerns)</li>
+                    <li>Flexible, structured XML-based data model: define your data model as an XML document, then create forms accessing the data</li>
+                    <li>Built-in facilities for validation and data integrity based on XML Schema and/or assertions</li>
+                    <li>Declarative approach requiring less / no scripting at all</li>
+                    <li>Ease of internationalization</li>
+                    <li>Support for a variety of devices</li>
+                    <li>W3C standard</li>
+                    <li>Not tied to a particular platform or language such as Java or .NET</li>
+                </ul>
+                <p>
+                    See also the OPS <a href="reference-xforms#introduction">XForms Introduction</a> section.
+                </p>
             </section>
-            <a name="xforms-support"/>
+
             <section>
                 <title>How much of the XForms specification does PresentationServer support?</title>
                 <p>
-                    The XForms specification assumes that XForms is implemented on the
-                    client-side. Ideally an XForms implementation would be implemented in a web
-                    browser, and until XForms becomes standard on mainstream browsers,
-                    XForms-based applications need to use server-side implementations, such as
-                    the one implemented by the PresentationServer. It is believed that using
-                    server-side implementation is a great migration path towards XForms.
+                    The XForms specification assumes that XForms is implemented on the client-side.
+                    Ideally an XForms implementation would be implemented in a web browser, and
+                    until XForms becomes standard on mainstream browsers, XForms-based applications
+                    need to use server-side implementations, such as the one implemented by the
+                    PresentationServer. It is believed that using server-side implementation is a
+                    great migration path towards XForms.
                 </p>
                 <p>
-                    A server-side implementation of XForms translates your forms described in
-                    terms of the XForms specification into HTML forms. It also creates one or
-                    more XML documents, the <i>XForms instances</i>, based on the data entered
-                    by the end-user with a browser. The following diagram shows a high-level
-                    overview of the architecture of a server-side XForms implementation:
+                    A server-side implementation of XForms translates your forms described in terms
+                    of the XForms specification into HTML forms. It also creates one or more XML
+                    documents, the <i>XForms instances</i>, based on the data entered by the
+                    end-user with a browser. The following diagram shows a high-level overview of
+                    the architecture of a server-side XForms implementation:
                 </p>
                 <div class="image">
                     <img width="600" height="380" src="pages/faq-xforms.png"/>
@@ -203,10 +222,20 @@
                 <p>
                     The PresentationServer implementation is based on the <a
                     href="http://www.w3.org/TR/xforms/">W3C XForms 1.0 Recommendation</a> (14
-                    October 2003). For more detailed information on what features are supported
-                    in the latest version of PresentationServer, see the <a
+                    October 2003). For more detailed information on what features are supported in
+                    the latest version of PresentationServer, see the <a
                     href="/ops/doc/reference-xforms-compliance">XForms conformance matrix</a>
                     section of the documentation.
+                </p>
+            </section>
+            <a name="xforms-html"/>
+            <section>
+                <title>Do I need to use XForms to create my HTML forms?</title>
+                <p>
+                    It is not a requirement to use XForms. It is possible to generate HTML form
+                    elements and to examine request parameters manually. We recommend however using
+                    XForms whenever possible, because it provides an elegant abstraction that
+                    simplifies form handling.
                 </p>
             </section>
             <a name="xpointer-support"/>

@@ -24,7 +24,7 @@ import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.serializer.legacy.HTMLSerializer;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.resources.URLFactory;
-import org.orbeon.oxf.transformer.xupdate.Constants;
+import org.orbeon.oxf.transformer.xupdate.XUpdateConstants;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
@@ -524,25 +524,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 addOutput(xformedInstance[0]);
             }});
         } else {
-            // Use XForms Submission processor
-            statementsList.add(new ASTProcessorCall(XMLConstants.XFORMS_SUBMISSION_PROCESSOR_QNAME) {{
-                if(!params.isEmpty()) {
-                    // Create document with params
-                    Document paramsDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("params"));
-                    for (Iterator j = params.iterator(); j.hasNext();) {
-                        Element paramElement = (Element) j.next();
-                        paramsDocument.getRootElement().add((Element) paramElement.clone());
-                    }
-                    addInput(new ASTInput("filter", paramsDocument));
-                    addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));
-                } else {
-                    addInput(new ASTInput("filter", Dom4jUtils.NULL_DOCUMENT));
-                    addInput(new ASTInput("matcher-result", Dom4jUtils.NULL_DOCUMENT));
-                }
-                addInput(new ASTInput("request", new ASTHrefId(requestWithParameters)));
+            // Use XForms XML Submission pipeline
+            statementsList.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
+                addInput(new ASTInput("config", new ASTHrefURL("oxf:/xforms/xforms-xml-submission.xpl")));
                 addOutput(xformedInstance[0]);
             }});
-            // Use XForms model for choose
+            // Use XForms model output for choose
             statementsList.add(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
                 addInput(new ASTInput("model", new ASTHrefId(xformsModel)));
             }});
@@ -664,7 +651,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         final Element resultElement = actionElement.element("result");
                         executeResult(stepProcessorContext, controllerContext, this, pageIdToXFormsModel,
                                 pageIdToPathInfo, pageIdToParamsDocument, xformedInstance, resultElement,
-                                internalActionData,isRedirect, xupdatedInstance, instancePassing);
+                                internalActionData, isRedirect, xupdatedInstance, instancePassing);
                     }
                 }});
             }
@@ -851,25 +838,33 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
             // Create XUpdate config
 
-            final NonLazyUserDataElement modificationsElement 
-                = new NonLazyUserDataElement( "modifications", Constants.XUPDATE_NAMESPACE );
-            final Map namespacesOnResult = Dom4jUtils.getNamespaceContext(resultElement);
-            for (Iterator i = namespacesOnResult.keySet().iterator(); i.hasNext();) {
-                String prefix = (String) i.next();
-                if (prefix.length() > 0)
-                    modificationsElement.add(new Namespace(prefix, (String) namespacesOnResult.get(prefix)));
-            }
-            final Document xuCfg = new NonLazyUserDataDocument( modificationsElement );
+            final Document xupdateConfig;
+            if (true) {
+                // The code in this branch should be equivalent to the one in the next branch,
+                // except it will add the default namespace as well. Try to switch at some point.
+                xupdateConfig = Dom4jUtils.createDocumentCopyParentNamespaces(resultElement);
+                xupdateConfig.getRootElement().setQName(new QName("modifications", XUpdateConstants.XUPDATE_NAMESPACE));
+            } else {
+                final NonLazyUserDataElement modificationsElement
+                    = new NonLazyUserDataElement( "modifications", XUpdateConstants.XUPDATE_NAMESPACE );
+                final Map namespacesOnResult = Dom4jUtils.getNamespaceContext(resultElement);
+                for (Iterator i = namespacesOnResult.keySet().iterator(); i.hasNext();) {
+                    String prefix = (String) i.next();
+                    if (prefix.length() > 0)
+                        modificationsElement.add(new Namespace(prefix, (String) namespacesOnResult.get(prefix)));
+                }
+                xupdateConfig = new NonLazyUserDataDocument( modificationsElement );
 
-            for (Iterator l = resultElement.elements().iterator(); l.hasNext();) {
-                Element xupdateElement = (Element) l.next();
-                modificationsElement.add(xupdateElement.createCopy());
+                for (Iterator l = resultElement.elements().iterator(); l.hasNext();) {
+                    Element xupdateElement = (Element) l.next();
+                    modificationsElement.add(xupdateElement.createCopy());
+                }
             }
 
             // Run XUpdate
             final String resultTraceAttribute = resultElement.attributeValue("trace");
             when.addStatement(new ASTProcessorCall(XMLConstants.XUPDATE_PROCESSOR_QNAME) {{
-                addInput(new ASTInput("config", xuCfg));
+                addInput(new ASTInput("config", xupdateConfig));
                 addInput(new ASTInput("data", new ASTHrefId(instanceToUpdate)));
                 addInput(new ASTInput("instance", new ASTHrefId(paramedInstance[0])));
                 if (actionData != null)
@@ -963,7 +958,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 }
                 // Execute the redirect
                 when.addStatement(new ASTProcessorCall(XMLConstants.REDIRECT_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", redirectURLData));// {{setDebug("redirect 2");}}
+                    addInput(new ASTInput("data", redirectURLData) {{setDebug("redirect 2");}});// {{setDebug("redirect 2");}}
                 }});
             }
         }

@@ -16,20 +16,28 @@ package org.orbeon.oxf.externalcontext;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 
 import javax.portlet.*;
+import java.security.Principal;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Collections;
-import java.security.Principal;
 
 /**
-* Wrap an ExternalContext.Request into a PortletRequest.
+ * Wrap an ExternalContext.Request into a PortletRequest.
+ *
+ * Methods with counterparts in ExternalContext.Request use the wrapped ExternalContext.Request
+ * object and can be overrided using RequestWrapper.. Other methods directly forward to the native
+ * request.
  */
 public class ExternalContextToPortletRenderRequestWrapper implements RenderRequest {
+
     private ExternalContext.Request request;
+    private PortletRequest nativeRequest;
 
     public ExternalContextToPortletRenderRequestWrapper(ExternalContext.Request request) {
         this.request = request;
+        if (request.getNativeRequest() instanceof PortletRequest)
+            this.nativeRequest = (PortletRequest) request.getNativeRequest();
     }
 
     public Object getAttribute(String clazz) {
@@ -74,23 +82,38 @@ public class ExternalContextToPortletRenderRequestWrapper implements RenderReque
     }
 
     public PortalContext getPortalContext() {
-        return null;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.getPortalContext();
+        else
+            return null;
     }
 
     public PortletMode getPortletMode() {
-        return null;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.getPortletMode();
+        else
+            return null;
     }
 
     public PortletSession getPortletSession() {
-        return null;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.getPortletSession();
+        else
+            return null;
     }
 
     public PortletSession getPortletSession(boolean b) {
-        return null;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.getPortletSession(b);
+        else
+            return null;
     }
 
     public PortletPreferences getPreferences() {
-        return null;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.getPreferences();
+        else
+            return null;
     }
 
     public Enumeration getProperties(String clazz) {
@@ -114,11 +137,17 @@ public class ExternalContextToPortletRenderRequestWrapper implements RenderReque
     }
 
     public String getResponseContentType() {
-        return null;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.getResponseContentType();
+        else
+            return null;
     }
 
     public Enumeration getResponseContentTypes() {
-        return null;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.getResponseContentTypes();
+        else
+            return null;
     }
 
     public String getScheme() {
@@ -138,11 +167,17 @@ public class ExternalContextToPortletRenderRequestWrapper implements RenderReque
     }
 
     public WindowState getWindowState() {
-        return null;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.getWindowState();
+        else
+            return null;
     }
 
     public boolean isPortletModeAllowed(PortletMode portletMode) {
-        return false;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.isPortletModeAllowed(portletMode);
+        else
+            return false;
     }
 
     public boolean isRequestedSessionIdValid() {
@@ -158,7 +193,10 @@ public class ExternalContextToPortletRenderRequestWrapper implements RenderReque
     }
 
     public boolean isWindowStateAllowed(WindowState windowState) {
-        return false;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.isWindowStateAllowed(windowState);
+        else
+            return false;
     }
 
     public void removeAttribute(String clazz) {

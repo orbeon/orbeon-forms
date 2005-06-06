@@ -294,7 +294,7 @@ public class RequestGenerator extends ProcessorImpl {
         // Get complete request document from pipeline context, or create it if not there
         Context context = getContext(pipelineContext);
         if (context.wholeRequest == null)
-            context.wholeRequest = readWholeRequestAsDOM4J(pipelineContext);
+            context.wholeRequest = readWholeRequestAsDOM4J(pipelineContext, null);
         Document result = (Document) context.wholeRequest.clone();
 
         // Filter the request based on the config input
@@ -303,69 +303,70 @@ public class RequestGenerator extends ProcessorImpl {
         return result;
     }
 
-    private Document readWholeRequestAsDOM4J(PipelineContext context) {
-        return readRequestAsDOM4J(context, null, true);
-    }
-
     private void addTextElement(Element element, String elementName, String text) {
         if (text != null)
             element.addElement(elementName).addText(text);
     }
 
-    private Document readRequestAsDOM4J(PipelineContext context, Node config, boolean all) {
-        ExternalContext.Request request = getRequest(context);
+    private Document readWholeRequestAsDOM4J(PipelineContext context, Node config) {
+        final ExternalContext.Request request = getRequest(context);
 
-        Document document = new NonLazyUserDataDocument();
-        Element requestElement = document.addElement("request");
-        if (all || XPathUtils.selectSingleNode(config, "/config/container-type") != null)
+        final Document document = new NonLazyUserDataDocument();
+        final Element requestElement = document.addElement("request");
+
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/container-type") != null)
             addTextElement(requestElement, "container-type", request.getContainerType());
-        if (all || XPathUtils.selectSingleNode(config, "/config/character-encoding") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/character-encoding") != null)
             addTextElement(requestElement, "character-encoding", request.getCharacterEncoding());
-        if (all || XPathUtils.selectSingleNode(config, "/config/content-length") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/content-length") != null)
             addTextElement(requestElement, "content-length", Integer.toString(request.getContentLength()));
-        if (all || XPathUtils.selectSingleNode(config, "/config/parameters") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/content-type") != null) {
+            final String contentType = request.getContentType();
+            addTextElement(requestElement, "content-type", (contentType == null) ? "" : contentType);
+        }
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/parameters") != null)
             addParameters(context, requestElement, request);
-        if (all || XPathUtils.selectSingleNode(config, "/config/body") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/body") != null)
             addBody(context, requestElement);
-        if (all || XPathUtils.selectSingleNode(config, "/config/protocol") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/protocol") != null)
             addTextElement(requestElement, "protocol", request.getProtocol());
-        if (all || XPathUtils.selectSingleNode(config, "/config/remote-addr") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/remote-addr") != null)
             addTextElement(requestElement, "remote-addr", request.getRemoteAddr());
-        if (all || XPathUtils.selectSingleNode(config, "/config/remote-host") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/remote-host") != null)
             addTextElement(requestElement, "remote-host", request.getRemoteHost());
-        if (all || XPathUtils.selectSingleNode(config, "/config/scheme") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/scheme") != null)
             addTextElement(requestElement, "scheme", request.getScheme());
-        if (all || XPathUtils.selectSingleNode(config, "/config/server-name") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/server-name") != null)
             addTextElement(requestElement, "server-name", request.getServerName());
-        if (all || XPathUtils.selectSingleNode(config, "/config/server-port") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/server-port") != null)
             addTextElement(requestElement, "server-port", Integer.toString(request.getServerPort()));
-        if (all || XPathUtils.selectSingleNode(config, "/config/is-secure") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/is-secure") != null)
             addTextElement(requestElement, "is-secure", new Boolean(request.isSecure()).toString());
-        if (all || XPathUtils.selectSingleNode(config, "/config/auth-type") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/auth-type") != null)
             addTextElement(requestElement, "auth-type", request.getAuthType());
-        if (all || XPathUtils.selectSingleNode(config, "/config/context-path") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/context-path") != null)
             addTextElement(requestElement, "context-path", request.getContextPath());
-        if (all || XPathUtils.selectSingleNode(config, "/config/headers") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/headers") != null)
             addHeaders(context, requestElement, request);
-        if (all || XPathUtils.selectSingleNode(config, "/config/method") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/method") != null)
             addTextElement(requestElement, "method", request.getMethod());
-        if (all || XPathUtils.selectSingleNode(config, "/config/path-info") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/path-info") != null)
             addTextElement(requestElement, "path-info", request.getPathInfo());
-        if (all || XPathUtils.selectSingleNode(config, "/config/path-translated") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/path-translated") != null)
             addTextElement(requestElement, "path-translated", request.getPathTranslated());
-        if (all || XPathUtils.selectSingleNode(config, "/config/query-string") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/query-string") != null)
             addTextElement(requestElement, "query-string", request.getQueryString());
-        if (all || XPathUtils.selectSingleNode(config, "/config/remote-user") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/remote-user") != null)
             addTextElement(requestElement, "remote-user", request.getRemoteUser());
-        if (all || XPathUtils.selectSingleNode(config, "/config/requested-session-id") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/requested-session-id") != null)
             addTextElement(requestElement, "requested-session-id", request.getRequestedSessionId());
-        if (all || XPathUtils.selectSingleNode(config, "/config/request-uri") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/request-uri") != null)
             addTextElement(requestElement, "request-uri", request.getRequestURI());
-        if (all || XPathUtils.selectSingleNode(config, "/config/request-url") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/request-url") != null)
             addTextElement(requestElement, "request-url", request.getRequestURL());
-        if (all || XPathUtils.selectSingleNode(config, "/config/servlet-path") != null)
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/servlet-path") != null)
             addTextElement(requestElement, "servlet-path", request.getServletPath());
-        if (all || XPathUtils.selectSingleNode(config, "/config/request-path") != null) {
+        if (config == null || XPathUtils.selectSingleNode(config, "/config/request-path") != null) {
             addTextElement(requestElement, "request-path", request.getRequestPath());
         }
         return document;

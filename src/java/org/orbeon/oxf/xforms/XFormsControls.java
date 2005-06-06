@@ -196,11 +196,17 @@ public class XFormsControls implements XFormsEventTarget {
      * Push an element containing either single-node or nodeset binding attributes.
      */
     public void pushBinding(PipelineContext pipelineContext, Element bindingElement) {
-        pushBinding(pipelineContext, bindingElement.attributeValue("ref"), bindingElement.attributeValue("nodeset"),
-                bindingElement.attributeValue("model"), bindingElement.attributeValue("bind"), bindingElement);
+        final String ref = bindingElement.attributeValue("ref");
+        final String nodeset = bindingElement.attributeValue("nodeset");
+        final String model = bindingElement.attributeValue("model");
+        final String bind = bindingElement.attributeValue("bind");
+
+        pushBinding(pipelineContext, ref, nodeset, model, bind, bindingElement,
+                (ref != null || nodeset != null) ? Dom4jUtils.getNamespaceContextNoDefault(bindingElement) : null);
     }
 
-    public void pushBinding(PipelineContext pipelineContext, String ref, String nodeset, String model, String bind, Element bindingElement) {
+    public void pushBinding(PipelineContext pipelineContext, String ref, String nodeset, String model, String bind,
+                            Element bindingElement, Map bindingElementNamespaceContext) {
 
         // Check for mandatory and optional bindings
         if (bindingElement != null && XFormsConstants.XFORMS_NAMESPACE_URI.equals(bindingElement.getNamespaceURI())) {
@@ -243,7 +249,7 @@ public class XFormsControls implements XFormsEventTarget {
             } else if (ref != null || nodeset != null) {
                 // Evaluate new XPath in context of current node
                 newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, getCurrentSingleNode(newModel.getModelId()),
-                        ref != null ? ref : nodeset, Dom4jUtils.getNamespaceContextNoDefault(bindingElement), null, functionLibrary, null);
+                        ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null);
 
                 if (ref != null && newNodeset.isEmpty())
                     throw new ValidationException("Single-node binding expression '"

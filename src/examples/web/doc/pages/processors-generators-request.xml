@@ -71,6 +71,7 @@
                 <request>
                     <container-type>servlet</container-type>
                     <content-length>-1</content-length>
+                    <content-type/>
                     <parameters>
                         <parameter>
                             <name>id</name>

@@ -57,7 +57,7 @@ public class TemplatesHandlerImpl extends LocationSAXContentHandler implements T
             } else if (node.getNodeType() == Node.ELEMENT_NODE) {
                 Element element = (Element) node;
                 NamespaceContext namespaceContext = new SimpleNamespaceContext(Dom4jUtils.getNamespaceContext(element));
-                if (Constants.XUPDATE_NAMESPACE_URI.equals(element.getNamespaceURI())) {
+                if (XUpdateConstants.XUPDATE_NAMESPACE_URI.equals(element.getNamespaceURI())) {
                     if (element.getName().equals("remove")) {
                         statements.add(new Remove((LocationData) element.getData(), element.attributeValue("select"), namespaceContext));
                     } else if (element.getName().equals("update")) {

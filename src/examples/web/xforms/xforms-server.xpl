@@ -23,13 +23,13 @@
                 <include>/request/body</include>
             </config>
         </p:input>
-        <p:output name="data" id="request"/>
+        <p:output name="data" id="request-body"/>
     </p:processor>
 
     <!-- Dereference URI and return XML -->
     <p:processor name="oxf:url-generator">
-        <p:input name="config" href="aggregate('config', aggregate('url', #request#xpointer(string(/request/body))))"/>
-        <p:output name="data" id="xml-request"/>
+        <p:input name="config" href="aggregate('config', aggregate('url', #request-body#xpointer(string(/request/body))))"/>
+        <p:output name="data" id="xml-request" debug="xxxrequest"/>
     </p:processor>
 
     <!-- Run XForms Server -->
@@ -40,9 +40,11 @@
 
     <!-- Generate response -->
     <p:processor name="oxf:xml-serializer">
-        <p:input name="data" href="#xml-response"/>
+        <p:input name="data" href="#xml-response" debug="xxxresponse"/>
         <p:input name="config">
-            <config/>
+            <config>
+                <content-type>application/xml</content-type>
+            </config>
         </p:input>
     </p:processor>
 

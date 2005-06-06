@@ -15,27 +15,35 @@ package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 
-import javax.servlet.ServletInputStream;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.security.Principal;
 import java.util.*;
 
 /**
  * Wrap an ExternalContext.Request into an HttpServletRequest.
+ *
+ * Methods with counterparts in ExternalContext.Request use the wrapped ExternalContext.Request
+ * object and can be overrided using RequestWrapper.. Other methods directly forward to the native
+ * request.
  */
 public class ExternalContextToHttpServletRequestWrapper extends HttpServletRequestWrapper {
+
     private ExternalContext.Request request;
+    private HttpServletRequest nativeRequest;
 
     private ServletInputStream servletInputStream;
 
     public ExternalContextToHttpServletRequestWrapper(ExternalContext.Request request) {
         super((HttpServletRequest) request.getNativeRequest());
         this.request = request;
+        if (request.getNativeRequest() instanceof HttpServletRequest)
+            this.nativeRequest = (HttpServletRequest) request.getNativeRequest();
     }
 
     public String getAuthType() {
@@ -47,7 +55,10 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
     }
 
     public Cookie[] getCookies() {
-        return new Cookie[0];// TODO
+        if (nativeRequest != null)
+            return nativeRequest.getCookies();
+        else
+            return null;
     }
 
     public long getDateHeader(String clazz) {
@@ -108,11 +119,17 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
     }
 
     public HttpSession getSession() {
-        return null;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.getSession();
+        else
+            return null;
     }
 
     public HttpSession getSession(boolean b) {
-        return null;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.getSession(b);
+        else
+            return null;
     }
 
     public Principal getUserPrincipal() {
@@ -120,11 +137,17 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
     }
 
     public boolean isRequestedSessionIdFromCookie() {
-        return false;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.isRequestedSessionIdFromCookie();
+        else
+            return false;
     }
 
     public boolean isRequestedSessionIdFromURL() {
-        return false;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.isRequestedSessionIdFromURL();
+        else
+            return false;
     }
 
     public boolean isRequestedSessionIdFromUrl() {
@@ -206,7 +229,10 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
     }
 
     public String getRealPath(String clazz) {
-        return null;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.getRealPath(clazz);
+        else
+            return null;
     }
 
     public String getRemoteAddr() {
@@ -218,7 +244,10 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
     }
 
     public javax.servlet.RequestDispatcher getRequestDispatcher(String clazz) {
-        return null;//TODO
+        if (nativeRequest != null)
+            return nativeRequest.getRequestDispatcher(clazz);
+        else
+            return null;
     }
 
     public String getScheme() {
@@ -246,7 +275,8 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
     }
 
     public void setCharacterEncoding(String clazz) throws UnsupportedEncodingException {
-        //TODO
+        if (nativeRequest != null)
+            nativeRequest.setCharacterEncoding(clazz);
     }
 }
 

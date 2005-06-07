@@ -108,6 +108,21 @@
                         Handling of <code>&lt;param></code> element: TODO
                     </p>
                 </li>
+                <li>
+                    <p>
+                        New XML submission mechanism: TODO
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        New generic XML instance transformation mechanism (XSLT, XQuery, XUpdate, ...): TODO
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Tracing: TODO
+                    </p>
+                </li>
             </ul>
         </section>
         <section>

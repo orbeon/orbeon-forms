@@ -13,11 +13,13 @@
  */
 package org.orbeon.oxf.externalcontext;
 
-import javax.servlet.http.HttpServletRequestWrapper;
-import javax.servlet.http.HttpServletRequest;
+import org.orbeon.oxf.util.NetUtils;
+
 import javax.servlet.ServletInputStream;
-import java.util.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.*;
+import java.util.*;
 
 /**
  * Create an HttpServletRequestWrapper useful for forwarding a request while simulating a
@@ -25,13 +27,17 @@ import java.io.*;
  */
 public class ForwardHttpServletRequestWrapper extends HttpServletRequestWrapper {
 
+    private String pathInfo;
     private Map parameters;
+
+    private String queryString;
 
     /**
      * This simulates a GET.
      */
-    public ForwardHttpServletRequestWrapper(HttpServletRequest httpServletRequest, Map parameters) {
+    public ForwardHttpServletRequestWrapper(HttpServletRequest httpServletRequest, String pathInfo, Map parameters) {
         super(httpServletRequest);
+        this.pathInfo = pathInfo;
         this.parameters = parameters;
     }
 
@@ -49,6 +55,22 @@ public class ForwardHttpServletRequestWrapper extends HttpServletRequestWrapper 
 
     public String getParameter(String s) {
         return (String) parameters.get(s);
+    }
+
+    public String getPathInfo() {
+        return pathInfo;
+    }
+
+    public String getQueryString() {
+        if (queryString == null) {
+            queryString = NetUtils.encodeQueryString(parameters);
+        }
+
+        return queryString;
+    }
+
+    public String getServletPath() {
+        return "";
     }
 
     public String getContentType() {

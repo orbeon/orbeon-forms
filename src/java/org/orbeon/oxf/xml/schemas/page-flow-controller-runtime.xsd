@@ -42,15 +42,25 @@
                                     <sequence>
                                         <element name="result" minOccurs="0" maxOccurs="unbounded">
                                             <complexType >
-                                                <complexContent>
-                                                    <extension base="xu:InstructionsContainer">
-                                                        <attribute name="page" type="string" use="optional"/>
-                                                        <attribute name="id" type="string" use="optional"/>
-                                                        <attribute name="when" type="string" use="optional" default="true()"/>
-                                                        <attribute name="trace" type="string" use="optional"/>
-                                                        <attribute name="instance-passing" type="string" use="optional"/>
-                                                     </extension>
-                                                 </complexContent>
+                                                <sequence>
+                                                    <any namespace="##any" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+                                                </sequence>
+                                                <attribute name="page" type="string" use="optional"/>
+                                                <attribute name="id" type="string" use="optional"/>
+                                                <attribute name="when" type="string" use="optional" default="true()"/>
+                                                <attribute name="trace" type="string" use="optional"/>
+                                                <attribute name="transform" type="QName" use="optional"/>
+                                                <attribute name="instance-passing" type="string" use="optional"/>
+<!--                                                <complexContent>-->
+<!--                                                    <extension base="xu:InstructionsContainer">-->
+<!--                                                        <attribute name="page" type="string" use="optional"/>-->
+<!--                                                        <attribute name="id" type="string" use="optional"/>-->
+<!--                                                        <attribute name="when" type="string" use="optional" default="true()"/>-->
+<!--                                                        <attribute name="trace" type="string" use="optional"/>-->
+<!--                                                        <attribute name="transform" type="QName" use="optional"/>-->
+<!--                                                        <attribute name="instance-passing" type="string" use="optional"/>-->
+<!--                                                     </extension>-->
+<!--                                                 </complexContent>-->
                                             </complexType>
                                             <!-- 2/27/2004 d: result-page-id-ref keyref below -->
                                         </element>

@@ -77,10 +77,6 @@
         <class name="org.orbeon.oxf.processor.transformer.XPathProcessor"/>
     </processor>
 
-    <processor name="oxf:page-flow" uri="oxf/processor/page-flow">
-        <class name="org.orbeon.oxf.processor.PageFlowControllerProcessor"/>
-    </processor>
-
     <processor name="oxf:perl5-matcher" uri="oxf/processor/perl5-matcher">
         <class name="org.orbeon.oxf.processor.Perl5MatchProcessor"/>
     </processor>
@@ -207,14 +203,6 @@
         <instantiation name="oxf:saxon8"/>
     </processor>
 
-    <processor name="oxf:pfc-xslt-1.0" uri="oxf/processor/xslt-1.0">
-        <instantiation name="oxf:saxon8"/>
-    </processor>
-
-    <processor name="oxf:pfc-xslt-2.0" uri="oxf/processor/xslt-2.0">
-        <instantiation name="oxf:saxon8"/>
-    </processor>
-
     <processor name="oxf:jdxsltc" uri="oxf/processor/jdxsltc">
         <instantiation name="oxf:generic-xslt-1.0">
             <input name="transformer">
@@ -259,6 +247,37 @@
 <!--            </input>-->
 <!--        </instantiation>-->
 <!--    </processor>-->
+
+    <!-- Page Flow processors -->
+    <processor name="oxf:page-flow" uri="oxf/processor/page-flow">
+        <class name="org.orbeon.oxf.processor.PageFlowControllerProcessor"/>
+    </processor>
+
+    <processor name="oxf:pfc-xslt">
+        <instantiation name="oxf:pipeline">
+            <input name="config" href="oxf:/xforms/pfc/xforms-transform-xslt.xpl"/>
+        </instantiation>
+    </processor>
+
+    <processor name="oxf:pfc-xquery">
+        <instantiation name="oxf:pipeline">
+            <input name="config" href="oxf:/xforms/pfc/xforms-transform-xquery.xpl"/>
+        </instantiation>
+    </processor>
+
+    <processor name="oxf:pfc-xupdate">
+        <instantiation name="oxf:pipeline">
+            <input name="config" href="oxf:/xforms/pfc/xforms-transform-xupdate.xpl"/>
+        </instantiation>
+    </processor>
+
+    <processor name="oxf:pfc-xslt-1.0">
+        <instantiation name="oxf:saxon8"/>
+    </processor>
+
+    <processor name="oxf:pfc-xslt-2.0">
+        <instantiation name="oxf:saxon8"/>
+    </processor>
 
     <!-- XQuery Processors-->
     <processor name="oxf:generic-saxon-xquery">

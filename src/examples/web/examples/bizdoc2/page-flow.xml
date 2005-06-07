@@ -12,6 +12,8 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xu="http://www.xmldb.org/xupdate"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         instance-passing="forward">
@@ -34,13 +36,11 @@
         </action>
         <!-- View a document -->
         <action when="/form/action = 'show-detail'" action="summary/find-document-action.xpl">
-            <result page="detail">
-                <xu:update select="/form/document-id">
-                    <xu:value-of select="document('input:action')/document-info/document-id"/>
-                </xu:update>
-                <xu:update select="/form/document">
-                    <xu:copy-of select="document('input:action')/document-info/document/*"/>
-                </xu:update>
+            <result page="detail" transform="oxf:pfc-xslt">
+                <form xsl:version="2.0" xmlns="">
+                    <document-id><xsl:value-of select="document('input:action')/document-info/document-id"/></document-id>
+                    <document><xsl:copy-of select="document('input:action')/document-info/document/*"/></document>
+                </form>
             </result>
         </action>
         <!-- Create a new document: just use the detail page's default XForms instance -->

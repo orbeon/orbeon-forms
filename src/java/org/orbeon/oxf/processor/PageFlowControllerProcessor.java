@@ -526,7 +526,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         } else {
             // Use XForms XML Submission pipeline
             statementsList.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
-                addInput(new ASTInput("config", new ASTHrefURL("oxf:/xforms/xforms-xml-submission.xpl")));
+                addInput(new ASTInput("config", new ASTHrefURL("oxf:/xforms/pfc/xforms-xml-submission.xpl")));
                 addOutput(xformedInstance[0]);
             }});
             // Use XForms model output for choose
@@ -831,35 +831,39 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             }});
         }
 
-        // XUpdate the instance
-        final ASTOutput internalXUpdatedInstance = resultElement == null || resultElement.elements().isEmpty()
-                ? instanceToUpdate : new ASTOutput("data", "internal-xupdated-instance");
-        if (resultElement != null && !resultElement.elements().isEmpty()) {
+        // Create resulting instance
+        final ASTOutput internalXUpdatedInstance;
+        if (resultElement != null && resultElement.attribute("transform") != null && !resultElement.elements().isEmpty()) {
+            // Generic transform mechanism
+            internalXUpdatedInstance = new ASTOutput("data", "internal-xupdated-instance");
+
+            final Document transformConfig = Dom4jUtils.createDocumentCopyParentNamespaces((Element) resultElement.elements().get(0));
+            final QName transformQName = Dom4jUtils.extractAttributeValueQName(resultElement, "transform");
+
+            // Run transform
+            final String resultTraceAttribute = resultElement.attributeValue("trace");
+            when.addStatement(new ASTProcessorCall(transformQName) {{
+                addInput(new ASTInput("transform", transformConfig));
+                addInput(new ASTInput("source-instance", new ASTHrefId(paramedInstance[0])));
+                addInput(new ASTInput("destination-instance", new ASTHrefId(instanceToUpdate)));
+//                addInput(new ASTInput("params-instance", );
+                if (actionData != null)
+                    addInput(new ASTInput("action", new ASTHrefId(actionData)));
+                else
+                    addInput(new ASTInput("action",  Dom4jUtils.NULL_DOCUMENT));
+                addOutput(new ASTOutput("updated-instance", internalXUpdatedInstance) {{ setDebug(resultTraceAttribute);}});
+            }});
+
+        } else if (resultElement != null && !resultElement.elements().isEmpty()) {
+
+            internalXUpdatedInstance = new ASTOutput("data", "internal-xupdated-instance");
 
             // Create XUpdate config
-
-            final Document xupdateConfig;
-            if (true) {
-                // The code in this branch should be equivalent to the one in the next branch,
-                // except it will add the default namespace as well. Try to switch at some point.
-                xupdateConfig = Dom4jUtils.createDocumentCopyParentNamespaces(resultElement);
-                xupdateConfig.getRootElement().setQName(new QName("modifications", XUpdateConstants.XUPDATE_NAMESPACE));
-            } else {
-                final NonLazyUserDataElement modificationsElement
-                    = new NonLazyUserDataElement( "modifications", XUpdateConstants.XUPDATE_NAMESPACE );
-                final Map namespacesOnResult = Dom4jUtils.getNamespaceContext(resultElement);
-                for (Iterator i = namespacesOnResult.keySet().iterator(); i.hasNext();) {
-                    String prefix = (String) i.next();
-                    if (prefix.length() > 0)
-                        modificationsElement.add(new Namespace(prefix, (String) namespacesOnResult.get(prefix)));
-                }
-                xupdateConfig = new NonLazyUserDataDocument( modificationsElement );
-
-                for (Iterator l = resultElement.elements().iterator(); l.hasNext();) {
-                    Element xupdateElement = (Element) l.next();
-                    modificationsElement.add(xupdateElement.createCopy());
-                }
-            }
+            // The code in this branch should be equivalent to the previous code doing the same
+            // thing, except it will add the default namespace as well. I think there should be
+            // the default namespace as well.
+            final Document xupdateConfig = Dom4jUtils.createDocumentCopyParentNamespaces(resultElement);
+            xupdateConfig.getRootElement().setQName(new QName("modifications", XUpdateConstants.XUPDATE_NAMESPACE));
 
             // Run XUpdate
             final String resultTraceAttribute = resultElement.attributeValue("trace");
@@ -871,6 +875,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addInput(new ASTInput("action", new ASTHrefId(actionData)));
                 addOutput(new ASTOutput("data", internalXUpdatedInstance) {{ setDebug(resultTraceAttribute);}});
             }});
+        } else {
+            internalXUpdatedInstance = instanceToUpdate;
         }
 
         // Do redirect

@@ -232,7 +232,7 @@
                 </init-param>
                 <init-param>
                     <param-name>oxf.error-processor.input.config</param-name>
-                    <param-value>oxf:/xforms/error.xpl</param-value>
+                    <param-value>oxf:/xforms/xforms-server-error.xpl</param-value>
                 </init-param>
                 <load-on-startup>1</load-on-startup>
             </servlet>

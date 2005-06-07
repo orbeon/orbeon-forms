@@ -24,20 +24,34 @@ import java.util.Locale;
 
 /**
  * Wrap an ExternalContext.Request into a RenderResponse.
+ *
+ * Methods with counterparts in ExternalContext.Response use the wrapped
+ * ExternalContext.Response object and can be overrided using ResponseWrapper. Other methods
+ * directly forward to the native response.
  */
 public class ExternalContextToPortletRenderResponseWrapper implements RenderResponse {
+
     private ExternalContext.Response response;
+    private RenderResponse nativeResponse;
 
     public ExternalContextToPortletRenderResponseWrapper(ExternalContext.Response response) {
         this.response = response;
+        if (response.getNativeResponse() instanceof RenderResponse)
+            this.nativeResponse = (RenderResponse) response.getNativeResponse();
     }
 
     public PortletURL createActionURL() {
-        return null;//TODO
+        if (nativeResponse != null)
+            return nativeResponse.createActionURL();
+        else
+            return null;
     }
 
     public PortletURL createRenderURL() {
-        return null;//TODO
+        if (nativeResponse != null)
+            return nativeResponse.createRenderURL();
+        else
+            return null;
     }
 
     public void flushBuffer() throws IOException {
@@ -53,15 +67,24 @@ public class ExternalContextToPortletRenderResponseWrapper implements RenderResp
     }
 
     public String getContentType() {
-        return null;//TODO
+        if (nativeResponse != null)
+            return nativeResponse.getContentType();
+        else
+            return null;
     }
 
     public Locale getLocale() {
-        return null;//TODO
+        if (nativeResponse != null)
+            return nativeResponse.getLocale();
+        else
+            return null;
     }
 
     public String getNamespace() {
-        return null;//TODO
+        if (nativeResponse != null)
+            return nativeResponse.getNamespace();
+        else
+            return null;
     }
 
     public OutputStream getPortletOutputStream() throws IOException {
@@ -93,14 +116,19 @@ public class ExternalContextToPortletRenderResponseWrapper implements RenderResp
     }
 
     public void setTitle(String clazz) {
-        //TODO
+        if (nativeResponse != null)
+            nativeResponse.setTitle(clazz);
     }
 
     public void addProperty(String clazz, String clazz1) {
+        //TODO
     }
 
     public String encodeURL(String clazz) {
-        return null;//TODO
+        if (nativeResponse != null)
+            return nativeResponse.encodeURL(clazz);
+        else
+            return null;
     }
 
     public void setProperty(String clazz, String clazz1) {

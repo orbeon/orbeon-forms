@@ -21,6 +21,7 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.externalcontext.ForwardHttpServletRequestWrapper;
 import org.orbeon.oxf.externalcontext.ServletToExternalContextRequestDispatcherWrapper;
+import org.orbeon.oxf.externalcontext.ExternalContextToHttpServletResponseWrapper;
 import org.orbeon.oxf.pipeline.InitUtils;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -475,7 +476,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                     // should be allowed on "this side" of the forward after the forward return.
                     pipelineContext.destroy(true);
                     // Execute the forward
-                    ForwardHttpServletRequestWrapper wrappedRequest = new ForwardHttpServletRequestWrapper(nativeRequest, parameters);
+                    ForwardHttpServletRequestWrapper wrappedRequest = new ForwardHttpServletRequestWrapper(nativeRequest, pathInfo, parameters);
                     requestDispatcher.forward(wrappedRequest, nativeResponse);
                 } catch (ServletException e) {
                     throw new OXFException(e);
@@ -483,7 +484,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
             } else {
                 // Client-side redirect: send the redirect to the client
                 String redirectURLString = NetUtils.pathInfoParametersToRelativeURL(pathInfo, parameters);
-                if (redirectURLString.startsWith("/"))
+                if (redirectURLString.startsWith("/") && !(nativeResponse instanceof ExternalContextToHttpServletResponseWrapper))
                     nativeResponse.sendRedirect(request.getContextPath() + redirectURLString);
                 else
                     nativeResponse.sendRedirect(redirectURLString);

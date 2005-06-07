@@ -37,7 +37,12 @@
                     <zeroOrMore>
                         <element name="input">
                             <attribute name="name"/><!-- Should be validated further -->
-                            <ref name="anyElement"/>
+                            <choice>
+                                <attribute name="href">
+                                    <data type="anyURI"/>
+                                </attribute>
+                                <ref name="anyElement"/>
+                            </choice>
                         </element>
                     </zeroOrMore>
                 </element>

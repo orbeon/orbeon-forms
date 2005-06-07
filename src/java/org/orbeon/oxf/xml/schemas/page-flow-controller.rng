@@ -154,6 +154,11 @@
                 </attribute>
             </optional>
         </optional>
+        <optional>
+            <attribute name="transform">
+                <data type="QName"/>
+            </attribute>
+        </optional>
         <zeroOrMore>
             <ref name="anyElement"/>
         </zeroOrMore>

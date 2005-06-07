@@ -118,24 +118,23 @@ public class XMLProcessorRegistry extends ProcessorImpl {
                                 baseProcessor.setName(defaultQName);
 
                                 for (Iterator j = XPathUtils.selectIterator(instantiationDef, "input"); j.hasNext();) {
-                                    Node config = (Node) j.next();
-                                    String name = XPathUtils.selectStringValueNormalize(config, "@name");
-                                    String src = XPathUtils.selectStringValueNormalize(config, "@src");
+                                    final Element inputElement = (Element) j.next();
+                                    final String name = XPathUtils.selectStringValueNormalize(inputElement, "@name");
+                                    final String href = XPathUtils.selectStringValueNormalize(inputElement, "@href");
 
-                                    if (src != null) {
+                                    if (href != null) {
                                         // Connect to resource generator
-                                        Processor resourceGenerator = PipelineUtils.createURLGenerator(src);
+                                        Processor resourceGenerator = PipelineUtils.createURLGenerator(href);
                                         PipelineUtils.connect(resourceGenerator, OUTPUT_DATA, baseProcessor, name);
                                     } else {
-                                        final ProcessorInput in = getInputByName( INPUT_CONFIG );
-                                        final Object cfgVldty = getInputValidity( ctxt, in );
+                                        final ProcessorInput processorConfigInput = getInputByName(INPUT_CONFIG);
+                                        final Object processorConfigValidity = getInputValidity(ctxt, processorConfigInput);
                                         // We must have some XML in the <input> tag
-                                        final org.dom4j.Element e = ( org.dom4j.Element )XPathUtils
-                                            .selectSingleNode( config, "*" );
-                                        final String sid = Dom4jUtils.makeSystemId( e );
-                                        final DOMGenerator dg = PipelineUtils.createDOMGenerator
-                                                ( e, "input from registry", cfgVldty, sid );
-                                        PipelineUtils.connect(dg, OUTPUT_DATA, baseProcessor, name);
+                                        final Element childElement = (Element) inputElement.elements().get(0);
+                                        final String sid = Dom4jUtils.makeSystemId(childElement);
+                                        final DOMGenerator domGenerator = PipelineUtils.createDOMGenerator
+                                                (childElement, "input from registry", processorConfigValidity, sid);
+                                        PipelineUtils.connect(domGenerator, OUTPUT_DATA, baseProcessor, name);
                                     }
                                 }
                                 return baseProcessor;

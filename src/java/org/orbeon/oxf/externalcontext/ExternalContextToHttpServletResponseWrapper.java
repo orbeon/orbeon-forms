@@ -14,53 +14,71 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.NetUtils;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Cookie;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Wrap an ExternalContext.Response into an HttpServletResponse.
+ *
+ * Methods with counterparts in ExternalContext.Response use the wrapped
+ * ExternalContext.Response object and can be overrided using ResponseWrapper. Other methods
+ * directly forward to the native response.
  */
 public class ExternalContextToHttpServletResponseWrapper implements HttpServletResponse {
 
     private ExternalContext.Response response;
+    private HttpServletResponse nativeResponse;
+
     private ServletOutputStream servletOutputStream;
 
     public ExternalContextToHttpServletResponseWrapper(ExternalContext.Response response) {
         this.response = response;
+        if (response.getNativeResponse() instanceof HttpServletResponse)
+            this.nativeResponse = (HttpServletResponse) response.getNativeResponse();
     }
 
     public void addCookie(Cookie cookie) {
-        //TODO
-        System.out.println();
+        if (nativeResponse != null)
+            nativeResponse.addCookie(cookie);
     }
 
     public void addDateHeader(String clazz, long l) {
         //TODO
-        System.out.println();
+        if (nativeResponse != null)
+            nativeResponse.addDateHeader(clazz, l);
     }
 
     public void addHeader(String clazz, String clazz1) {
-        //TODO
-        System.out.println();
+        response.addHeader(clazz, clazz1);
     }
 
     public void addIntHeader(String clazz, int i) {
         //TODO
-        System.out.println();
+        if (nativeResponse != null)
+            nativeResponse.addIntHeader(clazz, i);
     }
 
     public boolean containsHeader(String clazz) {
-        return false;//TODO
+        //TODO
+        if (nativeResponse != null)
+            return nativeResponse.containsHeader(clazz);
+        else
+            return false;
     }
 
     public String encodeRedirectURL(String clazz) {
-        return response.rewriteRenderURL(clazz);// CHECK
+        if (nativeResponse != null)
+            return nativeResponse.encodeRedirectURL(clazz);
+        else
+            return clazz;// CHECK
     }
 
     public String encodeRedirectUrl(String clazz) {
@@ -68,7 +86,10 @@ public class ExternalContextToHttpServletResponseWrapper implements HttpServletR
     }
 
     public String encodeURL(String clazz) {
-        return null;//TODO
+        if (nativeResponse != null)
+            return nativeResponse.encodeURL(clazz);
+        else
+            return clazz;//CHECK
     }
 
     public String encodeUrl(String clazz) {
@@ -80,18 +101,27 @@ public class ExternalContextToHttpServletResponseWrapper implements HttpServletR
     }
 
     public void sendError(int i, String clazz) throws IOException {
-        //TODO
-        System.out.println();
+        response.sendError(i);
     }
 
-    public void sendRedirect(String clazz) throws IOException {
-        //TODO
-        System.out.println();
+    public void sendRedirect(String path) throws IOException {
+        final String pathInfo;
+        final Map parameters;
+        final int qmIndex = path.indexOf('?');
+        if (qmIndex != -1) {
+            pathInfo = path.substring(0, qmIndex);
+            parameters = NetUtils.decodeQueryString(path.substring(qmIndex + 1), false);
+        } else {
+            pathInfo = path;
+            parameters = null;
+        }
+        response.sendRedirect(pathInfo, parameters, false, false);
     }
 
     public void setDateHeader(String clazz, long l) {
         //TODO
-        System.out.println();
+        if (nativeResponse != null)
+            nativeResponse.setDateHeader(clazz, l);
     }
 
     public void setHeader(String clazz, String clazz1) {
@@ -100,7 +130,8 @@ public class ExternalContextToHttpServletResponseWrapper implements HttpServletR
 
     public void setIntHeader(String clazz, int i) {
         //TODO
-        System.out.println();
+        if (nativeResponse != null)
+            nativeResponse.setIntHeader(clazz, i);
     }
 
     public void setStatus(int i) {
@@ -108,8 +139,7 @@ public class ExternalContextToHttpServletResponseWrapper implements HttpServletR
     }
 
     public void setStatus(int i, String clazz) {
-        //TODO
-        System.out.println();
+        response.setStatus(i);
     }
 
     public void flushBuffer() throws IOException {
@@ -125,7 +155,11 @@ public class ExternalContextToHttpServletResponseWrapper implements HttpServletR
     }
 
     public Locale getLocale() {
-        return null;//TODO
+        //TODO
+        if (nativeResponse != null)
+            return nativeResponse.getLocale();
+        else
+            return null;
     }
 
     public ServletOutputStream getOutputStream() throws IOException {
@@ -171,5 +205,7 @@ public class ExternalContextToHttpServletResponseWrapper implements HttpServletR
 
     public void setLocale(Locale locale) {
         //TODO
+        if (nativeResponse != null)
+            nativeResponse.setLocale(locale);
     }
 }

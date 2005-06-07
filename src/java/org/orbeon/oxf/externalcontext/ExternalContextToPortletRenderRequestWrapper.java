@@ -26,7 +26,7 @@ import java.util.Map;
  * Wrap an ExternalContext.Request into a PortletRequest.
  *
  * Methods with counterparts in ExternalContext.Request use the wrapped ExternalContext.Request
- * object and can be overrided using RequestWrapper.. Other methods directly forward to the native
+ * object and can be overrided using RequestWrapper. Other methods directly forward to the native
  * request.
  */
 public class ExternalContextToPortletRenderRequestWrapper implements RenderRequest {

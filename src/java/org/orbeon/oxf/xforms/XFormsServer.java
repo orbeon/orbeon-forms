@@ -224,7 +224,7 @@ public class XFormsServer extends ProcessorImpl {
                                 }
 
                                 // Get model item properties
-                                InstanceData instanceData = XFormsUtils.getLocalInstanceData(currentNode);
+                                InstanceData instanceData = XFormsUtils.getInheritedInstanceData(currentNode);
                                 if (instanceData != null) {
                                     BooleanModelItemProperty readonly = instanceData.getReadonly();
                                     if (readonly.isSet()) {

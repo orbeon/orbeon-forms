@@ -21,6 +21,7 @@ import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.style.StandardNames;
@@ -104,7 +105,7 @@ public class XFormsElement {
             boolean nodesetPresent = attributes.getIndex("", "nodeset") != -1;
             boolean positionPresent = attributes.getIndex(XFormsConstants.XXFORMS_NAMESPACE_URI, "position") != -1;
             if (refPresent || bindPresent || nodesetPresent || positionPresent) {
-                org.orbeon.oxf.xforms.InstanceData currentNodeInstanceData = XFormsUtils.getLocalInstanceData(context.getCurrentSingleNode());
+                InstanceData currentNodeInstanceData = XFormsUtils.getInheritedInstanceData(context.getCurrentSingleNode());
 
                 int typeCode = currentNodeInstanceData.getType().get();
                 if (typeCode != 0)
@@ -180,7 +181,7 @@ public class XFormsElement {
                     String src = attributes.getValue("src");
                     if ("orbeon:xforms:schema:errors".equals(src)) {
                         final org.dom4j.Node nd = context.getCurrentSingleNode();
-                        final org.orbeon.oxf.xforms.InstanceData instDat = XFormsUtils.getLocalInstanceData(nd);
+                        final InstanceData instDat = XFormsUtils.getLocalInstanceData(nd);
                         final java.util.Iterator itr = instDat.getSchemaErrorsMsgs();
                         val = StringUtils.join(itr, "\n");
                     } else {

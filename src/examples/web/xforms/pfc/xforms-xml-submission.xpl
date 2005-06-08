@@ -23,6 +23,7 @@
     <p:processor name="oxf:request">
         <p:input name="config">
             <config stream-type="xs:anyURI">
+                <include>/request/container-type</include>
                 <include>/request/content-type</include>
                 <include>/request/method</include>
                 <include>/request/parameters/parameter[name = '$instance']</include>
@@ -50,7 +51,7 @@
                 <p:output name="data" ref="instance" debug="xxxxmlsubmission1"/>
             </p:processor>
         </p:when>
-        <p:when test="lower-case(/*/method) = 'get' and /*/parameters/parameter">
+        <p:when test="(lower-case(/*/method) = 'get' or /*/container-type = 'portlet') and /*/parameters/parameter">
             <!-- Check for XML GET with $instance parameter -->
 
             <!-- Decode parameter -->

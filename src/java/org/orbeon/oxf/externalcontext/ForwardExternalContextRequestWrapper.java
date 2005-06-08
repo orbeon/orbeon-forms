@@ -107,24 +107,24 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         return null;//TODO?
     }
 
-//    public String getRequestPath() {
-//        // Get servlet path and path info
-//        String servletPath = getServletPath();
-//        if (servletPath == null) servletPath = "";
-//        String pathInfo = getPathInfo();
-//        if (pathInfo == null) pathInfo = "";
-//
-//        // Concatenate servlet path and path info, avoiding a double slash
-//        String requestPath = servletPath.endsWith("/") && pathInfo.startsWith("/")
-//                ? servletPath + pathInfo.substring(1)
-//                : servletPath + pathInfo;
-//
-//        // Add starting slash if missing
-//        if (!requestPath.startsWith("/"))
-//            requestPath = "/" + requestPath;
-//
-//        return requestPath;
-//    }
+    public String getRequestPath() {
+        // Get servlet path and path info
+        String servletPath = getServletPath();
+        if (servletPath == null) servletPath = "";
+        String pathInfo = getPathInfo();
+        if (pathInfo == null) pathInfo = "";
+
+        // Concatenate servlet path and path info, avoiding a double slash
+        String requestPath = servletPath.endsWith("/") && pathInfo.startsWith("/")
+                ? servletPath + pathInfo.substring(1)
+                : servletPath + pathInfo;
+
+        // Add starting slash if missing
+        if (!requestPath.startsWith("/"))
+            requestPath = "/" + requestPath;
+
+        return requestPath;
+    }
 //
 //    public String getRequestURI() {
 //        return getRequestPath();// FIXME

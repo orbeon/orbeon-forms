@@ -73,13 +73,37 @@ public class XFormsUtils {
     }
 
     /**
-     * Return local XForms instance data for the given node, null if not available.
+     * Return the local XForms instance data for the given node, null if not available.
      */
     public static InstanceData getLocalInstanceData(Node node) {
         return node instanceof Element
             ? (InstanceData) ((Element) node).getData()
             : node instanceof Attribute
             ? (InstanceData) ((Attribute) node).getData() : null;
+    }
+
+    /**
+     * Return the inherited XForms instance data for the given node, null if not available.
+     */
+    public static InstanceData getInheritedInstanceData(Node node) {
+        final InstanceData localInstanceData = getLocalInstanceData(node);
+        if (localInstanceData == null)
+            return null;
+
+        InstanceData resultInstanceData = new InstanceData(localInstanceData);
+
+        for (Element currentElement = node.getParent(); currentElement != null; currentElement = currentElement.getParent()) {
+            InstanceData currentInstanceData = getLocalInstanceData(currentElement);
+
+            // Handle readonly inheritance
+            if (currentInstanceData.getReadonly().get())
+                resultInstanceData.getReadonly().set(true);
+            // Handle relevant inheritance
+            if (!currentInstanceData.getRelevant().get())
+                resultInstanceData.getRelevant().set(false);
+        }
+
+        return resultInstanceData;
     }
 
     /**

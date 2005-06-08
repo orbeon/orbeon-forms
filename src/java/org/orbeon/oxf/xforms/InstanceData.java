@@ -44,6 +44,20 @@ public class InstanceData {
         this.id = id;
     }
 
+    public InstanceData(InstanceData other) {
+        this.locationData = other.locationData;
+        this.generated = other.generated;
+        this.relevant = new BooleanModelItemProperty(other.relevant);
+        this.required = new BooleanModelItemProperty(other.required);
+        this.readonly = new BooleanModelItemProperty(other.readonly);
+        this.valid = new BooleanModelItemProperty(other.valid);
+        this.type = new TypeModelItemProperty(other.type);
+        this.id = other.id;
+        this.invalidBindIds = other.invalidBindIds;
+        this.idToNodeMap = (other.idToNodeMap == null) ? null : new HashMap(other.idToNodeMap);
+        this.schemaErrors = (other.schemaErrors == null) ? null : new ArrayList(other.schemaErrors);
+    }
+
     public boolean isGenerated() {
         return generated;
     }

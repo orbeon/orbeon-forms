@@ -721,6 +721,34 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
 
     private void handleValidationBind(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
 
+        // Handle required
+        if (modelBind.getRequired() != null) {
+            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
+                public void handleNode(Node node) {
+                    // Evaluate "required" XPath expression on this node
+                    String xpath = "boolean(" + modelBind.getRequired() + ")";
+                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                            documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
+
+                    try {
+                        boolean required = ((Boolean) expr.evaluateSingle()).booleanValue();
+                        // Mark node
+                        InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
+                        instanceData.getRequired().set(required);
+
+                        // If required, check the string value is not empty
+                        markValidity(!required || node.getStringValue().trim().length() > 0, node, modelBind.getId());
+                    } catch (XPathException e) {
+                        throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
+                    } finally {
+                        if (expr != null)
+                            expr.returnToPool();
+                    }
+                }
+            });
+        }
+
         // Handle Type constraint
         if (modelBind.getType() != null) {
 
@@ -770,11 +798,12 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                         instanceData.getType().set(requiredType);
 
                         // Try to perform casting
-                        String nodeStringValue = node.getStringValue();
+                        String nodeStringValue = node.getStringValue().trim();
                         if (XFormsUtils.getLocalInstanceData(node).getRequired().get() || nodeStringValue.length() != 0) {
                             try {
                                 StringValue stringValue = new StringValue(nodeStringValue);
                                 XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration());
+                                // TODO: we don't do anything with the result value here?
                                 stringValue.convert(requiredType, xpContext);
                                 markValidity(true, node, modelBind.getId());
                             } catch (XPathException e) {
@@ -799,34 +828,6 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                     try {
                         Boolean valid = (Boolean) expr.evaluateSingle();
                         markValidity(valid.booleanValue(), node, modelBind.getId());
-                    } catch (XPathException e) {
-                        throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
-                    } finally {
-                        if (expr != null)
-                            expr.returnToPool();
-                    }
-                }
-            });
-        }
-
-        // Handle required
-        if (modelBind.getRequired() != null) {
-            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
-                public void handleNode(Node node) {
-                    // Evaluate "required" XPath expression on this node
-                    String xpath = "boolean(" + modelBind.getRequired() + ")";
-                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                            documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
-
-                    try {
-                        boolean required = ((Boolean) expr.evaluateSingle()).booleanValue();
-                        // Mark node
-                        InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
-                        instanceData.getRequired().set(required);
-
-                        // If required, check the string value is not empty
-                        markValidity(!required || node.getStringValue().length() > 0, node, modelBind.getId());
                     } catch (XPathException e) {
                         throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
                     } finally {
@@ -938,11 +939,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
     }
 
     /**
-     * Marks the given node as invalid by:
-     * <ul>
-     * <li>setting invalid flag on the node InstanceData</li>
-     * <li>adding an attribute xxforms:error="message"</li>
-     * </ul>
+     * Marks the given node as invalid by setting invalid flag on the node InstanceData.
      */
     private void markValidity(boolean valid, Node node, String id) {
         InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);

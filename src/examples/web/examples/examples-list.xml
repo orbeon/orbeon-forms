@@ -51,6 +51,7 @@
     </section>
     <section label="Document-Centric App">
         <example id="bizdoc" label="The &quot;BizDoc&quot; Example"/>
+        <example id="bizdoc2" label="The &quot;BizDoc&quot; Example" xforms-ng="true"/>
     </section>
     <section label="Database App">
         <example id="employees" label="The &quot;Employees&quot; Example"/>

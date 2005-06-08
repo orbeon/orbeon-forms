@@ -109,27 +109,34 @@ public class NetUtils {
 
         return requestPath;
     }
-    
-    public static long getLastModified( java.net.URL u ) throws java.io.IOException {
+
+    public static long getLastModified(java.net.URL u) throws java.io.IOException {
         final java.net.URLConnection uc = u.openConnection();
-        final long ret = getLastModified( uc );
+        final long ret = getLastModified(uc);
         return ret;
     }
-    public static Long getLastModified( java.net.URL u, Long notUsed ) throws java.io.IOException {
-        final long modTim = getLastModified( u );
-        final Long ret = new Long( modTim );
+
+    public static Long getLastModified(java.net.URL u, Long notUsed) throws java.io.IOException {
+        final long modTim = getLastModified(u);
+        final Long ret = new Long(modTim);
         return ret;
     }
+
     /**
      * Get the last modification date of an open URLConnection.
-     *
+     * <p/>
      * This handles the (broken at some point) case of the file: protocol.
      */
     public static long getLastModified(URLConnection urlConnection) {
-        long lastModified = urlConnection.getLastModified();
-        if (lastModified == 0 && "file".equals(urlConnection.getURL().getProtocol()))
-            lastModified = new File(URLDecoder.decode(urlConnection.getURL().getFile()), DEFAULT_URL_ENCODING).lastModified();
-        return lastModified;
+        try {
+            long lastModified = urlConnection.getLastModified();
+            if (lastModified == 0 && "file".equals(urlConnection.getURL().getProtocol()))
+                lastModified = new File(URLDecoder.decode(urlConnection.getURL().getFile(), DEFAULT_URL_ENCODING)).lastModified();
+            return lastModified;
+        } catch (UnsupportedEncodingException e) {
+            // Should not happen as we are using a required encoding
+            throw new OXFException(e);
+        }
     }
 
     /**
@@ -197,21 +204,26 @@ public class NetUtils {
      * @return a Map of String[] indexed by name, an empty Map if the query string was null
      */
     public static Map decodeQueryString(String query, boolean acceptAmp) {
-        Map parameters = new HashMap();
+        final Map parameters = new HashMap();
         if (query == null)
             return parameters;
-        StringTokenizer st = new StringTokenizer(query, "&");
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
-            // Check if &amp; is also supported as delimiter
-            if (acceptAmp && token.startsWith("amp;"))
-                token = token.substring(4);
-            int equalIndex = token.indexOf('=');
-            if (equalIndex == -1)
-                throw new OXFException("Malformed URL: " + query);
-            String name = token.substring(0, equalIndex);
-            String value = token.substring(equalIndex + 1);
-            NetUtils.addValueToStringArrayMap(parameters, name, value);
+        final StringTokenizer st = new StringTokenizer(query, "&");
+        try {
+            while (st.hasMoreTokens()) {
+                String token = st.nextToken();
+                // Check if &amp; is also supported as delimiter
+                if (acceptAmp && token.startsWith("amp;"))
+                    token = token.substring(4);
+                final int equalIndex = token.indexOf('=');
+                if (equalIndex == -1)
+                    throw new OXFException("Malformed URL: " + query);
+                final String name = URLDecoder.decode(token.substring(0, equalIndex), NetUtils.DEFAULT_URL_ENCODING);
+                final String value = URLDecoder.decode(token.substring(equalIndex + 1), NetUtils.DEFAULT_URL_ENCODING);
+                NetUtils.addValueToStringArrayMap(parameters, name, value);
+            }
+        } catch (UnsupportedEncodingException e) {
+            // Should not happen as we are using a required encoding
+            throw new OXFException(e);
         }
         return parameters;
     }
@@ -231,17 +243,24 @@ public class NetUtils {
     public static String encodeQueryString(Map parameters) {
         StringBuffer sb = new StringBuffer();
         boolean first = true;
-        for (Iterator i = parameters.keySet().iterator(); i.hasNext();) {
-            String name = (String) i.next();
-            String[] values = (String[]) parameters.get(name);
-            for (int j = 0; j < values.length; j++) {
-                if (!first)
-                    sb.append('&');
-                sb.append(name);
-                sb.append('=');
-                sb.append(values[j]);
-                first = false;
+        try {
+            for (Iterator i = parameters.keySet().iterator(); i.hasNext();) {
+                String name = (String) i.next();
+                String[] values = (String[]) parameters.get(name);
+                for (int j = 0; j < values.length; j++) {
+                    if (!first)
+                        sb.append('&');
+
+                    sb.append(URLEncoder.encode(name, NetUtils.DEFAULT_URL_ENCODING));
+                    sb.append('=');
+                    sb.append(URLEncoder.encode(values[j], NetUtils.DEFAULT_URL_ENCODING));
+
+                    first = false;
+                }
             }
+        } catch (UnsupportedEncodingException e) {
+            // Should not happen as we are using a required encoding
+            throw new OXFException(e);
         }
         return sb.toString();
     }
@@ -249,7 +268,7 @@ public class NetUtils {
     public static void addValueToStringArrayMap(Map map, String name, String value) {
         String[] currentValue = (String[]) map.get(name);
         if (currentValue == null) {
-            map.put(name, new String[] { value });
+            map.put(name, new String[]{value});
         } else {
             String[] newValue = new String[currentValue.length + 1];
             System.arraycopy(currentValue, 0, newValue, 0, currentValue.length);
@@ -301,6 +320,7 @@ public class NetUtils {
             sb.append("/");
         return sb.toString();
     }
+
     /**
      * Combine a path info and a parameters map to form a relative URL.
      */
@@ -325,7 +345,7 @@ public class NetUtils {
 
     /**
      * Check whether a URL starts with a protocol.
-     *
+     * <p/>
      * We consider that a protocol consists only of ASCII letters and must be at least two
      * characters long, to avoid confusion with Windows drive letters.
      */

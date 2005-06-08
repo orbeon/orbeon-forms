@@ -59,23 +59,25 @@
                                         </xforms:trigger>
                                     </td>
                                     <td>
-                                        <xforms:submit submission="main">
+                                        <xforms:trigger submission="main">
                                             <xforms:label>XML</xforms:label>
                                             <xforms:action ev:event="DOMActivate">
                                                 <xforms:setvalue ref="action">show-xml</xforms:setvalue>
                                                 <xforms:setvalue ref="document-id"><xsl:value-of select="."/></xforms:setvalue>
+                                                <xforms:send submission="main"/>
                                             </xforms:action>
-                                        </xforms:submit>
+                                        </xforms:trigger>
                                     </td>
                                     <td align="center">
-                                        <xforms:submit submission="main" xxforms:appearance="image">
-                                            <xxforms:img src="/images/remove.png"/>
-                                            <xforms:label/>
+                                        <xforms:trigger submission="main"><!--  xxforms:appearance="image" -->
+<!--                                            <xxforms:img src="/images/remove.png"/>-->
+                                            <xforms:label>Delete</xforms:label>
                                             <xforms:action ev:event="DOMActivate">
                                                 <xforms:setvalue ref="action">delete-documents</xforms:setvalue>
                                                 <xforms:setvalue ref="document-id"><xsl:value-of select="."/></xforms:setvalue>
+                                                <xforms:send submission="main"/>
                                             </xforms:action>
-                                        </xforms:submit>
+                                        </xforms:trigger>
                                     </td>
                                 </tr>
                             </xsl:for-each>
@@ -90,18 +92,23 @@
                 </table>
 
                 <hr/>
-
                 <table>
                     <tr>
                         <td align="left" valign="bottom">
-                            <xforms:submit>
+                            <xforms:trigger submission="main">
                                 <xforms:label>Import Documents</xforms:label>
-                                <xforms:setvalue ref="action">import-documents</xforms:setvalue>
-                            </xforms:submit>
-                            <xforms:submit>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue ref="action">import-documents</xforms:setvalue>
+                                    <xforms:send submission="main"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                            <xforms:trigger submission="main">
                                 <xforms:label>New Document</xforms:label>
-                                <xforms:setvalue ref="action">new-document</xforms:setvalue>
-                            </xforms:submit>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue ref="action">new-document</xforms:setvalue>
+                                    <xforms:send submission="main"/>
+                                </xforms:action>
+                            </xforms:trigger>
                         </td>
                     </tr>
                 </table>

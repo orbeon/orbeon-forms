@@ -27,22 +27,21 @@
         <xforms:model schema="oxf:/examples/bizdoc/detail/form-schema.xsd">
             <!-- The XForms instance with application data -->
             <xforms:instance id="main-instance">
+                <!-- Get submitted instance -->
                 <form xmlns="">
                     <action/>
                     <message/>
                     <show-errors/>
-                    <document-id/>
-                    <document>
-                        <!-- The document is included  -->
-                        <xi:include href="../../bizdoc/schema/empty-instance.xml"/>
-                    </document>
+                    <xsl:copy-of select="doc('input:instance')/*/(document-id | document)"/>
                 </form>
             </xforms:instance>
-            <xforms:submission method="post"/>
             <xforms:bind nodeset="/form/document/claim:claim">
                 <!-- This bind element handles the empty repeat entry necessary to add new entries with xforms:repeat -->
-                <xforms:bind nodeset="claim:insured-info/claim:family-info/claim:children/claim:child"
-                    relevant="count(following-sibling::claim:child) > 0"/>
+                <xforms:bind nodeset="claim:insured-info/claim:family-info/claim:children">
+                    <xforms:bind nodeset="claim:child" relevant="count(following-sibling::claim:child) > 0"/>
+                    <xforms:bind nodeset="claim:child[last()]/claim:birth-date" required="false()"/>
+                    <xforms:bind nodeset="claim:child[last()]/claim:first-name" required="false()"/>
+                </xforms:bind>
                 <!-- This bind element handles calculated values -->
                 <xforms:bind nodeset="claim:insured-info/claim:claim-info/claim:rate"
                              calculate="if (../claim:insured-info/claim:person-info/claim:birth-date castable as xs:date)
@@ -53,6 +52,7 @@
                 <!-- Date -->
                 <xforms:bind nodeset="claim:insured-info/claim:claim-info/claim:accident-date" type="xs:date"/>
             </xforms:bind>
+            <xforms:submission id="main" method="post" action="/bizdoc2/detail"/>
         </xforms:model>
     </head>
     <body>
@@ -193,14 +193,20 @@
                             <table>
                                 <tr>
                                     <td align="left" valign="bottom">
-                                        <xforms:submit>
+                                        <xforms:trigger submission="main">
                                             <xforms:label>Save</xforms:label>
-                                            <xforms:setvalue ref="/form/action">save</xforms:setvalue>
-                                        </xforms:submit>
-                                        <xforms:submit>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:setvalue ref="/form/action">save</xforms:setvalue>
+                                                <xforms:send submission="main"/>
+                                            </xforms:action>
+                                        </xforms:trigger>
+                                        <xforms:trigger submission="main">
                                             <xforms:label>Back</xforms:label>
-                                            <xforms:setvalue ref="/form/action">back</xforms:setvalue>
-                                        </xforms:submit>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:setvalue ref="/form/action">back</xforms:setvalue>
+                                                <xforms:send submission="main"/>
+                                            </xforms:action>
+                                        </xforms:trigger>
                                         <xforms:trigger>
                                             <xforms:label>Next</xforms:label>
                                             <xforms:toggle ev:event="DOMActivate" case="page-2"/>
@@ -250,7 +256,7 @@
                                         <tr>
                                             <th align="right" valign="middle">Marital Status</th>
                                             <td>
-                                                <xforms:select1 ref="claim:marital-status-code" appearance="compact" xhtml:style="width: 200px">
+                                                <xforms:select1 ref="claim:marital-status-code" appearance="minimal" xhtml:style="width: 200px">
                                                     <xforms:hint>Marital Status</xforms:hint>
                                                     <xforms:help>Please select a marital status here</xforms:help>
                                                     <xforms:item>
@@ -355,7 +361,7 @@
                                                     <tr>
                                                         <th>Accident Type</th>
                                                         <td colspan="4">
-                                                            <xforms:select1 ref="claim:accident-type" appearance="compact" xhtml:style="width: 200px">
+                                                            <xforms:select1 ref="claim:accident-type" appearance="minimal" xhtml:style="width: 200px">
                                                                 <xforms:hint>Accident Type</xforms:hint>
                                                                 <xforms:help>Please select an accident type here</xforms:help>
                                                                 <xforms:item>
@@ -407,10 +413,13 @@
                             <table>
                                 <tr>
                                     <td align="left" valign="bottom">
-                                        <xforms:submit>
+                                        <xforms:trigger submission="main">
                                             <xforms:label>Save</xforms:label>
-                                            <xforms:setvalue ref="/form/action">save</xforms:setvalue>
-                                        </xforms:submit>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:setvalue ref="/form/action">save</xforms:setvalue>
+                                                <xforms:send submission="main"/>
+                                            </xforms:action>
+                                        </xforms:trigger>
                                         <xforms:trigger>
                                             <xforms:label>Back</xforms:label>
                                             <xforms:toggle ev:event="DOMActivate" case="page-1"/>

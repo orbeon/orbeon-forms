@@ -5,7 +5,7 @@
 
     <!-- Call the data access layer -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="../data-access/delegate/read-document.xpl"/>
+        <p:input name="config" href="../../bizdoc/data-access/delegate/read-document.xpl"/>
         <p:input name="document-id" href="#instance#xpointer(/document-id)"/>
         <p:output name="document-info" id="document"/>
     </p:processor>

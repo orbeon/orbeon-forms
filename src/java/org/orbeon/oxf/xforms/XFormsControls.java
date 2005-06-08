@@ -989,27 +989,25 @@ public class XFormsControls implements XFormsEventTarget {
         } else if (XFormsActions.XFORMS_ACTION_ACTION.equals(actionEventName)) {
             // 10.1.1 The action Element
 
+            final ActionContext newActionContext = (actionContext == null) ? new ActionContext() : null;
             for (Iterator i = eventHandlerElement.elementIterator(); i.hasNext();) {
                 final Element embeddedActionElement = (Element) i.next();
-
-                final ActionContext newActionContext = (actionContext == null) ? new ActionContext() : null;
                 runAction(pipelineContext, embeddedActionElement, XFormsEvent, (newActionContext == null) ? actionContext : newActionContext );
-                if (newActionContext != null) {
+            }
+            if (newActionContext != null) {
+                // Set binding for current action element
+                setBinding(pipelineContext, eventHandlerElement);
+                final XFormsModel model = getCurrentModel();
 
-                    // Set binding for current action element
-                    setBinding(pipelineContext, eventHandlerElement);
-                    final XFormsModel model = getCurrentModel();
-
-                    // Process deferred behavior
-                    if (newActionContext.rebuild)
-                        model.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
-                    if (newActionContext.recalculate)
-                        model.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model));
-                    if (newActionContext.revalidate)
-                        model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
-                    if (newActionContext.refresh)
-                        model.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
-                }
+                // Process deferred behavior
+                if (newActionContext.rebuild)
+                    model.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
+                if (newActionContext.recalculate)
+                    model.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model));
+                if (newActionContext.revalidate)
+                    model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
+                if (newActionContext.refresh)
+                    model.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
             }
 
         } else if (XFormsActions.XFORMS_REBUILD_ACTION.equals(actionEventName)) {

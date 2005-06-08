@@ -107,6 +107,7 @@ public class ExternalContextToHttpServletResponseWrapper implements HttpServletR
     public void sendRedirect(String path) throws IOException {
         final String pathInfo;
         final Map parameters;
+
         final int qmIndex = path.indexOf('?');
         if (qmIndex != -1) {
             pathInfo = path.substring(0, qmIndex);

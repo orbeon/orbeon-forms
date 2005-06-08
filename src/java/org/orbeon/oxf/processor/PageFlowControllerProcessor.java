@@ -23,6 +23,7 @@ import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.processor.serializer.legacy.HTMLSerializer;
 import org.orbeon.oxf.xforms.XFormsConstants;
+import org.orbeon.oxf.xforms.XFormsInstance;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.transformer.xupdate.XUpdateConstants;
 import org.orbeon.oxf.util.LoggerFactory;
@@ -833,9 +834,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
         // Create resulting instance
         final ASTOutput internalXUpdatedInstance;
+        final boolean isTransformedInstance;
         if (resultElement != null && resultElement.attribute("transform") != null && !resultElement.elements().isEmpty()) {
             // Generic transform mechanism
             internalXUpdatedInstance = new ASTOutput("data", "internal-xupdated-instance");
+            isTransformedInstance = true;
 
             final Document transformConfig = Dom4jUtils.createDocumentCopyParentNamespaces((Element) resultElement.elements().get(0));
             final QName transformQName = Dom4jUtils.extractAttributeValueQName(resultElement, "transform");
@@ -843,20 +846,23 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             // Run transform
             final String resultTraceAttribute = resultElement.attributeValue("trace");
             when.addStatement(new ASTProcessorCall(transformQName) {{
-                addInput(new ASTInput("transform", transformConfig));
-                addInput(new ASTInput("source-instance", new ASTHrefId(paramedInstance[0])));
-                addInput(new ASTInput("destination-instance", new ASTHrefId(instanceToUpdate)));
-//                addInput(new ASTInput("params-instance", );
+                addInput(new ASTInput("config", transformConfig));// transform
+                addInput(new ASTInput("instance", new ASTHrefId(paramedInstance[0])));// source-instance
+                addInput(new ASTInput("data", new ASTHrefId(instanceToUpdate)));// destination-instance
+                // TODO: pass params instance
+//                addInput(new ASTInput("params", );
+                addInput(new ASTInput("params",  Dom4jUtils.NULL_DOCUMENT));// params-instance
                 if (actionData != null)
-                    addInput(new ASTInput("action", new ASTHrefId(actionData)));
+                    addInput(new ASTInput("action", new ASTHrefId(actionData)));// action
                 else
-                    addInput(new ASTInput("action",  Dom4jUtils.NULL_DOCUMENT));
-                addOutput(new ASTOutput("updated-instance", internalXUpdatedInstance) {{ setDebug(resultTraceAttribute);}});
+                    addInput(new ASTInput("action",  Dom4jUtils.NULL_DOCUMENT));// action
+                addOutput(new ASTOutput("data", internalXUpdatedInstance) {{ setDebug(resultTraceAttribute);}});// updated-instance
             }});
 
         } else if (resultElement != null && !resultElement.elements().isEmpty()) {
-
+            // Legacy transform mechanism (built-in XUpdate)
             internalXUpdatedInstance = new ASTOutput("data", "internal-xupdated-instance");
+            isTransformedInstance = true;
 
             // Create XUpdate config
             // The code in this branch should be equivalent to the previous code doing the same
@@ -877,9 +883,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             }});
         } else {
             internalXUpdatedInstance = instanceToUpdate;
+            isTransformedInstance = false;
         }
 
-        // Do redirect
+        // Do redirect if we are going to a new page (NOTE: even if the new page has the same id as the current page)
         if (resultPageId != null) {
             final String forwardPathInfo = (String) pageIdToPathInfo.get(resultPageId);
             if (forwardPathInfo == null)
@@ -891,14 +898,17 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
             {
                 // Do redirect passing parameters from internalXUpdatedInstance without modifying URL
-                final ASTOutput parametersOutput = (otherXForms != null) ? new ASTOutput(null, "parameters") : null;
-                if (otherXForms != null) {
+                final ASTOutput parametersOutput;
+                if (isTransformedInstance) {
+                    parametersOutput = new ASTOutput(null, "parameters");
                     // Pass parameters only if needed
                     when.addStatement(new ASTProcessorCall(XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
                         addInput(new ASTInput("filter", (paramsDocument != null) ? paramsDocument : Dom4jUtils.NULL_DOCUMENT));
                         addOutput(new ASTOutput("data", parametersOutput));
                     }});
+                } else {
+                    parametersOutput = null;
                 }
                 // Handle path info
                 final ASTOutput forwardPathInfoOutput = new ASTOutput(null, "forward-path-info");
@@ -926,7 +936,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         Document config = null;
                         try {
                             config = Dom4jUtils.parseText
-                                    ("<config><key>" + org.orbeon.oxf.xforms.XFormsInstance.REQUEST_INSTANCE_DOCUMENT + "</key><scope>request</scope></config>");
+                                    ("<config><key>" + XFormsInstance.REQUEST_INSTANCE_DOCUMENT + "</key><scope>request</scope></config>");
                         } catch (DocumentException e) {
                             throw new OXFException(e);
                         } catch ( final SAXException e ) {
@@ -958,7 +968,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // No params document, we can simply aggregate with XPL
                     final ASTHrefAggregate redirectDataAggregate = new ASTHrefAggregate("redirect-url", new ASTHrefId(forwardPathInfoOutput),
                             new ASTHrefId(isServerSideRedirectOutput), new ASTHrefId(isRedirectExitPortal));
-                    if (otherXForms != null) // Pass parameters only if needed
+                    if (isTransformedInstance) // Pass parameters only if needed
                         redirectDataAggregate.getHrefs().add(new ASTHrefId(parametersOutput));
                     redirectURLData = redirectDataAggregate;
                 }

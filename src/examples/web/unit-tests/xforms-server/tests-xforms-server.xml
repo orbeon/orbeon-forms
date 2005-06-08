@@ -637,8 +637,8 @@
                             <other-instance>
                                 <first>3.141592</first><!-- FIXME: the bind should pass data from the second instance, not the first one! -->
                                 <second>456</second><!-- FIXME: the bind should pass data from the second instance, not the first one! -->
-                                <third>3.141592</third>
-                                <fourth>3.141592</fourth>
+                                <third>123</third>
+                                <fourth>123</fourth>
                             </other-instance>
                         </instances>
                         <divs/>

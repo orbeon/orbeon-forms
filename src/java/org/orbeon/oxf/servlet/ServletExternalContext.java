@@ -75,7 +75,6 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
         }
 
         public String getPathInfo() {
-//            return NetUtils.getRequestPathInfo(nativeRequest);
             return nativeRequest.getPathInfo();
         }
 
@@ -737,11 +736,11 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
     }
 
     public String getStartLoggerString() {
-        return getRequest().getPathInfo() + " - Received request";
+        return getRequest().getRequestPath() + " - Received request";
     }
 
     public String getEndLoggerString() {
-        return getRequest().getPathInfo();
+        return getRequest().getRequestPath();
     }
 
     public RequestDispatcher getNamedDispatcher(String name) {

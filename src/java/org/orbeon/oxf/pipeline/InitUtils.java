@@ -60,10 +60,10 @@ public class InitUtils {
 
         // Record start time for this request
         long tsBegin = logger.isInfoEnabled() ? System.currentTimeMillis() : 0;
-        String pathInfo = null;
+        String requestPath = null;
         try {
             ExternalContext.Request request = externalContext.getRequest();
-            pathInfo = request.getPathInfo();
+            requestPath = request.getRequestPath();
         } catch (UnsupportedOperationException e) {
             // Don't do anything
         }
@@ -121,7 +121,7 @@ public class InitUtils {
                 else
                     successRate = "N/A";
                 long timing = System.currentTimeMillis() - tsBegin;
-                logger.info((pathInfo != null ? pathInfo : "Done running processor") + " - Timing: " + timing
+                logger.info((requestPath != null ? requestPath : "Done running processor") + " - Timing: " + timing
                         + " - Cache hits: " + hitCount
                         + ", fault: " + missCount
                         + ", adds: " + statistics.getAddCount()

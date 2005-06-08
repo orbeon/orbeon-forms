@@ -23,16 +23,15 @@
     <p:processor name="oxf:request">
         <p:input name="config">
             <config stream-type="xs:anyURI">
-<!--                <include>/request/content-type</include>-->
-<!--                <include>/request/method</include>-->
-                <include>/request/*</include>
-                <exclude>/request/body</exclude>
+                <include>/request/content-type</include>
+                <include>/request/method</include>
+                <include>/request/parameters/parameter[name = '$instance']</include>
             </config>
         </p:input>
-        <p:output name="data" id="request-content-type" debug="xxxrequest-content-type"/>
+        <p:output name="data" id="request-info" debug="xxxrequest-info"/>
     </p:processor>
 
-    <p:choose href="#request-content-type">
+    <p:choose href="#request-info">
         <!-- Check for XML post -->
         <p:when test="lower-case(/*/method) = 'post' and (/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
             <!-- Extract request body -->
@@ -48,8 +47,25 @@
             <!-- Dereference URI and return XML instance -->
             <p:processor name="oxf:url-generator">
                 <p:input name="config" href="aggregate('config', aggregate('url', #request-body#xpointer(string(/request/body))))"/>
-                <p:output name="data" ref="instance" debug="xxxxmlsubmission"/>
+                <p:output name="data" ref="instance" debug="xxxxmlsubmission1"/>
             </p:processor>
+        </p:when>
+        <p:when test="lower-case(/*/method) = 'get' and /*/parameters/parameter">
+            <!-- Check for XML GET with $instance parameter -->
+
+            <!-- Decode parameter -->
+            <p:processor name="oxf:unsafe-xslt">
+                <p:input name="data" href="#request-info"/>
+                <p:input name="config">
+                    <xsl:stylesheet version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
+                        <xsl:template match="/">
+                            <xsl:copy-of select="context:decodeXML(normalize-space(/*/parameters/parameter/value))"/>
+                        </xsl:template>
+                    </xsl:stylesheet>
+                </p:input>
+                <p:output name="data" ref="instance" debug="xxxxmlsubmission2"/>
+            </p:processor>
+
         </p:when>
         <p:otherwise>
             <!-- Return null document -->

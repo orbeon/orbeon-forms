@@ -253,24 +253,6 @@
         <class name="org.orbeon.oxf.processor.PageFlowControllerProcessor"/>
     </processor>
 
-    <processor name="oxf:pfc-xslt">
-        <instantiation name="oxf:pipeline">
-            <input name="config" href="oxf:/xforms/pfc/xforms-transform-xslt.xpl"/>
-        </instantiation>
-    </processor>
-
-    <processor name="oxf:pfc-xquery">
-        <instantiation name="oxf:pipeline">
-            <input name="config" href="oxf:/xforms/pfc/xforms-transform-xquery.xpl"/>
-        </instantiation>
-    </processor>
-
-    <processor name="oxf:pfc-xupdate">
-        <instantiation name="oxf:pipeline">
-            <input name="config" href="oxf:/xforms/pfc/xforms-transform-xupdate.xpl"/>
-        </instantiation>
-    </processor>
-
     <processor name="oxf:pfc-xslt-1.0">
         <instantiation name="oxf:saxon8"/>
     </processor>
@@ -434,10 +416,6 @@
 
     <processor name="oxf:xforms-server">
         <class name="org.orbeon.oxf.xforms.XFormsServer"/>
-    </processor>
-
-    <processor name="oxf:xforms-submission" uri="oxf/processor/xforms-input">
-        <class name="org.orbeon.oxf.xforms.XFormsSubmissionProcessor"/>
     </processor>
 
     <!-- Other processors -->

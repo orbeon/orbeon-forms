@@ -34,24 +34,22 @@
         <action when="/form/action = 'import-documents'" action="summary/import-documents-action.xpl">
             <result page="summary"/>
         </action>
-        <!-- View a document -->
+        <!-- View an existing document -->
         <action when="/form/action = 'show-detail'" action="summary/find-document-action.xpl">
-            <result page="detail" transform="oxf:pfc-xslt">
+            <result page="detail" transform="oxf:xslt">
                 <form xsl:version="2.0" xmlns="">
                     <document-id><xsl:value-of select="document('input:action')/document-info/document-id"/></document-id>
                     <document><xsl:copy-of select="document('input:action')/document-info/document/*"/></document>
                 </form>
             </result>
         </action>
-        <!-- Create a new document: just use the detail page's default XForms instance -->
+        <!-- Create a new document -->
         <action when="/form/action = 'new-document'" action="summary/new-document-action.xpl">
-            <result page="detail">
-                <xu:update select="/form/document-id">
-                    <xu:value-of select="document('input:action')/document-info/document-id"/>
-                </xu:update>
-                <xu:update select="/form/document">
-                    <xu:copy-of select="document('input:action')/document-info/document/*"/>
-                </xu:update>
+            <result page="detail" transform="oxf:xslt">
+                <form xsl:version="2.0" xmlns="">
+                    <document-id><xsl:value-of select="document('input:action')/document-info/document-id"/></document-id>
+                    <document><xsl:copy-of select="document('input:action')/document-info/document/*"/></document>
+                </form>
             </result>
         </action>
         <!-- Delete documents -->
@@ -60,16 +58,16 @@
         </action>
         <!-- View XML -->
         <action when="/form/action = 'show-xml'" action="summary/find-document-action.xpl">
-            <result page="xml-detail" instance-passing="redirect-exit-portal">
-                <xu:update select="/document-id">
-                    <xu:value-of select="document('input:action')/document-info/document-id"/>
-                </xu:update>
+            <result page="xml-detail" transform="oxf:xslt" instance-passing="redirect-exit-portal">
+                <document-id xsl:version="2.0" xmlns="">
+                    <xsl:value-of select="document('input:action')/document-info/document-id"/>
+                </document-id>
             </result>
         </action>
     </page>
 
     <!-- Show XML document -->
-    <page id="xml-detail" path-info="/example-resources/bizdoc/xml-detail" xforms="detail/xml-detail-xforms-model.xml" model="detail/xml-detail-model.xpl"/>
+    <page id="xml-detail" path-info="/direct/bizdoc2/xml-detail" model="detail/xml-detail-model.xpl"/>
 
     <page id="detail" path-info="/bizdoc2/detail" view="detail/detail-view.xsl">
         <!-- Save the current document and documemnt is valid -->
@@ -91,9 +89,9 @@
 <!--            </result>-->
 <!--        </action>-->
         <!-- Back: Return to the summary page -->
-<!--        <action when="/form/action = 'back'">-->
-<!--            <result page="summary"/>-->
-<!--        </action>-->
+        <action when="/form/action = 'back'">
+            <result page="summary"/>
+        </action>
         <!-- Next page -->
 <!--        <action when="/form/action = 'next'">-->
 <!--            <result page="detail-2">-->

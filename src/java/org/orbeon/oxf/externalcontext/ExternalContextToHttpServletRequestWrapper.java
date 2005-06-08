@@ -14,8 +14,8 @@
 package org.orbeon.oxf.externalcontext;
 
 import org.orbeon.oxf.pipeline.api.ExternalContext;
+import org.orbeon.oxf.util.NetUtils;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -95,7 +95,7 @@ public class ExternalContextToHttpServletRequestWrapper extends HttpServletReque
     }
 
     public String getQueryString() {
-        return null;//TODO
+        return NetUtils.encodeQueryString(request.getParameterMap());
     }
 
     public String getRemoteUser() {

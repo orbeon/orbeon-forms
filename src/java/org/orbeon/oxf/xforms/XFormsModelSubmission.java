@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
@@ -169,6 +170,9 @@ public class XFormsModelSubmission implements XFormsEventTarget {
                 });
 
                 if (!instanceValid[0]) {
+                    LocationSAXContentHandler ch = new LocationSAXContentHandler();
+                    currentInstance.read(ch);
+                    System.out.println(Dom4jUtils.domToString(ch.getDocument()));
                     throw new OXFException("xforms:submission: instance is not valid.");
                 }
 

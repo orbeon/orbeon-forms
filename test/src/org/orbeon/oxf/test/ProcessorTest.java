@@ -68,7 +68,7 @@ public class ProcessorTest extends TestCase {
     
     static {
         try {
-            // Initialize log4j
+        	// Initialize log4j
             LoggerFactory.initBasicLogger();
 
             jndiContext = new InitialContext();

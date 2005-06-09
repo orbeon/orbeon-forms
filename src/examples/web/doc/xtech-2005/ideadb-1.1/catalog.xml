@@ -1,0 +1,18 @@
+<?xml version='1.0'?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"
+         prefer="public">
+
+<!-- IDEAlliance Conference Paper DocBook XML Subset V1.1 -->
+
+  <public publicId="-//IDEAlliance//DTD Conference Paper DocBook XML Subset V1.1//EN"
+          uri="dtd/ideadb.dtd"/>
+
+<!-- DocBook V4.3 -->
+
+  <public publicId="-//OASIS//DTD DocBook XML V4.3//EN"
+          uri="dtd/docbook/docbookx.dtd"/>
+
+  <system systemId="http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd"
+          uri="dtd/docbook/docbookx.dtd"/>
+
+</catalog>

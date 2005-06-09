@@ -1,0 +1,1602 @@
+# *********************************************************************
+# *** THIS IS THE FLATTENED DTD. DO NOT EDIT THIS DTD BY HAND, EDIT ***
+# *** THE CUSTOMIZATION LAYER AND REGENERATE THE FLATTENED DTD! ********
+# *********************************************************************
+
+# ......................................................................
+
+# IDEAlliance XML Conference Paper DocBook XML Subset V1.1 .............
+
+# File sdocbook-custom.dtd .............................................
+
+# Copyright 2004 IDEAlliance. Based on DocBook XML V4.3,
+# Copyright 1992-2004 HaL Computer Systems, Inc.,
+# O'Reilly & Associates, Inc., ArborText, Inc., Fujitsu Software
+# Corporation, Norman Walsh, Sun Microsystems, Inc., and the
+# Organization for the Advancement of Structured Information
+# Standards (OASIS).
+# 
+# $Id: custom-ideadb.dtd,v 1.5 2004/08/24 21:04:30 ndw Exp $
+# 
+# Permission to use, copy, modify and distribute the DocBook XML DTD
+# and its accompanying documentation for any purpose and without fee
+# is hereby granted in perpetuity, provided that the above copyright
+# notice and this paragraph appear in all copies.  The copyright
+# holders make no representation about the suitability of the DTD for
+# any purpose.  It is provided "as is" without expressed or implied
+# warranty.
+# 
+# If you modify the XML Conference Paper DTD in any way, except for
+# declaring and referencing additional sets of general entities and
+# declaring additional notations, label your DTD as a variant of
+# the XML Conference Paper DTD. 
+
+# ......................................................................
+
+# This is the driver file for V1.1 of the IDEAlliance XML Conference
+# Paper DocBook XML Subset DTD.
+# Please use the following formal public identifier to identify it:
+# 
+# "-//IDEAlliance//DTD Conference Paper DocBook XML Subset V1.1//EN"
+# 
+# For example:
+# 
+# <!DOCTYPE article
+#   PUBLIC "-//IDEAlliance//DTD Conference Paper DocBook XML Subset V1.1//EN"
+#          "ideadb.dtd">
+
+# ......................................................................
+
+namespace a = "http://relaxng.org/ns/compatibility/annotations/1.0"
+
+linespecific.attrib =
+  [ a:defaultValue = "linespecific" ]
+  attribute format { "linespecific" }?,
+  attribute linenumbering { "numbered" | "unnumbered" }?,
+  attribute continuation { "continues" | "restarts" }?,
+  attribute startinglinenumber { text }?,
+  attribute language { text }?
+local.notation.class = notAllowed
+notation.class =
+  "BMP"
+  | "GIF"
+  | "GIF87a"
+  | "GIF89a"
+  | "JPG"
+  | "JPEG"
+  | "PNG"
+  | "SVG"
+  | "SVGZ"
+  | "linespecific"
+  | local.notation.class
+local.objectdata.attrib = empty
+objectdata.attrib =
+  attribute fileref { text }?,
+  attribute format { notation.class }?,
+  attribute srccredit { text }?,
+  local.objectdata.attrib
+local.list.class = notAllowed
+list.class =
+  itemizedlist | orderedlist | variablelist | local.list.class
+local.admon.class = notAllowed
+admon.class = note | local.admon.class
+local.linespecific.class = notAllowed
+linespecific.class =
+  literallayout | programlisting | local.linespecific.class
+local.para.class = notAllowed
+para.class = para | local.para.class
+local.informal.class = notAllowed
+informal.class =
+  blockquote | mediaobject | informaltable | local.informal.class
+local.formal.class = notAllowed
+formal.class = example | figure | table | local.formal.class
+local.compound.class = notAllowed
+compound.class = sidebar | local.compound.class
+local.genobj.class = notAllowed
+genobj.class = anchor | local.genobj.class
+local.descobj.class = notAllowed
+descobj.class = abstract | personblurb | epigraph | local.descobj.class
+local.xref.char.class = notAllowed
+xref.char.class = footnoteref | xref | local.xref.char.class
+local.gen.char.class = notAllowed
+gen.char.class =
+  abbrev
+  | acronym
+  | citetitle
+  | emphasis
+  | footnote
+  | phrase
+  | quote
+  | trademark
+  | local.gen.char.class
+local.link.char.class = notAllowed
+link.char.class = link | ulink | local.link.char.class
+local.tech.char.class = notAllowed
+tech.char.class =
+  command
+  | computeroutput
+  | email
+  | filename
+  | literal
+  | option
+  | replaceable
+  | systemitem
+  | userinput
+  | sgmltag
+  | code
+  | local.tech.char.class
+local.base.char.class = notAllowed
+base.char.class = anchor | local.base.char.class
+local.docinfo.char.class = notAllowed
+docinfo.char.class =
+  author
+  | corpauthor
+  | othercredit
+  | revhistory
+  | local.docinfo.char.class
+local.inlineobj.char.class = notAllowed
+inlineobj.char.class = inlinemediaobject | local.inlineobj.char.class
+local.effectivity.attrib = empty
+effectivity.attrib = local.effectivity.attrib
+local.common.attrib = empty
+common.attrib =
+  attribute id { xsd:ID }?,
+  attribute lang { text }?,
+  attribute remap { text }?,
+  attribute xreflabel { text }?,
+  attribute revisionflag { "changed" | "added" | "deleted" | "off" }?,
+  local.common.attrib
+local.person.ident.mix = notAllowed
+person.ident.mix =
+  honorific
+  | firstname
+  | surname
+  | lineage
+  | othername
+  | affiliation
+  | personblurb
+  | local.person.ident.mix
+local.bibliocomponent.mix = notAllowed
+bibliocomponent.mix =
+  abbrev
+  | abstract
+  | author
+  | authorgroup
+  | bibliomisc
+  | copyright
+  | corpauthor
+  | date
+  | edition
+  | editor
+  | issuenum
+  | othercredit
+  | pagenums
+  | pubdate
+  | publishername
+  | releaseinfo
+  | revhistory
+  | subtitle
+  | title
+  | titleabbrev
+  | volumenum
+  | citetitle
+  | person.ident.mix
+  | local.bibliocomponent.mix
+local.other.char.class = notAllowed
+other.char.class = subscript | superscript | local.other.char.class
+local.component.mix = notAllowed
+component.mix =
+  list.class
+  | admon.class
+  | linespecific.class
+  | para.class
+  | informal.class
+  | formal.class
+  | compound.class
+  | genobj.class
+  | descobj.class
+  | local.component.mix
+local.sidebar.mix = notAllowed
+sidebar.mix =
+  list.class
+  | admon.class
+  | linespecific.class
+  | para.class
+  | informal.class
+  | formal.class
+  | genobj.class
+  | local.sidebar.mix
+local.revdescription.mix = notAllowed
+revdescription.mix =
+  list.class
+  | admon.class
+  | linespecific.class
+  | para.class
+  | informal.class
+  | formal.class
+  | genobj.class
+  | local.revdescription.mix
+local.footnote.mix = notAllowed
+footnote.mix =
+  list.class
+  | linespecific.class
+  | para.class
+  | informal.class
+  | local.footnote.mix
+local.example.mix = notAllowed
+example.mix =
+  list.class
+  | linespecific.class
+  | para.class
+  | informal.class
+  | local.example.mix
+local.admon.mix = notAllowed
+admon.mix =
+  list.class
+  | linespecific.class
+  | para.class
+  | informal.class
+  | formal.class
+  | local.admon.mix
+local.figure.mix = notAllowed
+figure.mix = linespecific.class | informal.class | local.figure.mix
+local.tabentry.mix = notAllowed
+tabentry.mix =
+  list.class
+  | admon.class
+  | linespecific.class
+  | para.class
+  | mediaobject
+  | local.tabentry.mix
+local.legalnotice.mix = notAllowed
+legalnotice.mix =
+  list.class
+  | admon.class
+  | linespecific.class
+  | para.class
+  | blockquote
+  | local.legalnotice.mix
+local.textobject.mix = notAllowed
+textobject.mix =
+  list.class
+  | admon.class
+  | linespecific.class
+  | para.class
+  | blockquote
+  | local.textobject.mix
+local.listpreamble.mix = notAllowed
+listpreamble.mix =
+  admon.class
+  | linespecific.class
+  | para.class
+  | informal.class
+  | genobj.class
+  | descobj.class
+  | local.listpreamble.mix
+local.para.char.mix = notAllowed
+para.char.mix =
+  text
+  | xref.char.class
+  | gen.char.class
+  | link.char.class
+  | tech.char.class
+  | base.char.class
+  | other.char.class
+  | inlineobj.char.class
+  | local.para.char.mix
+local.title.char.mix = notAllowed
+title.char.mix =
+  text
+  | xref.char.class
+  | gen.char.class
+  | link.char.class
+  | tech.char.class
+  | base.char.class
+  | docinfo.char.class
+  | other.char.class
+  | inlineobj.char.class
+  | local.title.char.mix
+local.cptr.char.mix = notAllowed
+cptr.char.mix =
+  text
+  | link.char.class
+  | tech.char.class
+  | base.char.class
+  | other.char.class
+  | inlinemediaobject
+  | local.cptr.char.mix
+local.smallcptr.char.mix = notAllowed
+smallcptr.char.mix =
+  text | replaceable | inlinemediaobject | local.smallcptr.char.mix
+local.word.char.mix = notAllowed
+word.char.mix =
+  text
+  | acronym
+  | emphasis
+  | trademark
+  | link.char.class
+  | base.char.class
+  | other.char.class
+  | inlinemediaobject
+  | local.word.char.mix
+local.docinfo.char.mix = notAllowed
+docinfo.char.mix =
+  text
+  | link.char.class
+  | emphasis
+  | trademark
+  | replaceable
+  | other.char.class
+  | inlinemediaobject
+  | local.docinfo.char.mix
+tbl.table.mdl =
+  (title, (mediaobject+ | tgroup+))
+  | (caption, (col* | colgroup*), thead?, tfoot?, (tbody+ | tr+))
+local.divcomponent.mix = notAllowed
+divcomponent.mix =
+  list.class
+  | admon.class
+  | linespecific.class
+  | para.class
+  | informal.class
+  | formal.class
+  | compound.class
+  | descobj.class
+  | local.divcomponent.mix
+bookcomponent.content = (divcomponent.mix+, section*) | section+
+yesorno.attvals = string
+formalobject.title.content = title, titleabbrev?
+local.mediaobject.mix = notAllowed
+mediaobject.mix =
+  videoobject
+  | audioobject
+  | imageobject
+  | textobject
+  | local.mediaobject.mix
+idreq.attrib = attribute id { xsd:ID }
+lang.attrib = attribute lang { text }?
+remap.attrib = attribute remap { text }?
+role.attrib = attribute role { text }?
+xreflabel.attrib = attribute xreflabel { text }?
+revisionflag.attrib =
+  attribute revisionflag { "changed" | "added" | "deleted" | "off" }?
+dir.attrib = attribute dir { "ltr" | "rtl" | "lro" | "rlo" }?
+xml-base.attrib = attribute xml:base { text }?
+label.attrib = attribute label { text }?
+linkendreq.attrib = attribute linkend { xsd:IDREF }
+local.mark.attrib = empty
+mark.attrib =
+  attribute mark { text }?,
+  local.mark.attrib
+moreinfo.attrib =
+  [ a:defaultValue = "none" ]
+  attribute moreinfo { "refentry" | "none" }?
+pagenum.attrib = attribute pagenum { text }?
+local.status.attrib = empty
+status.attrib =
+  attribute status { text }?,
+  local.status.attrib
+width.attrib = attribute width { text }?
+local.title.attrib = empty
+title.role.attrib = role.attrib
+title = element title { title.attlist, title.char.mix* }
+title.attlist &=
+  pagenum.attrib, common.attrib, title.role.attrib, local.title.attrib
+local.titleabbrev.attrib = empty
+titleabbrev.role.attrib = role.attrib
+titleabbrev =
+  element titleabbrev { titleabbrev.attlist, title.char.mix* }
+titleabbrev.attlist &=
+  common.attrib, titleabbrev.role.attrib, local.titleabbrev.attrib
+local.subtitle.attrib = empty
+subtitle.role.attrib = role.attrib
+subtitle = element subtitle { subtitle.attlist, title.char.mix* }
+subtitle.attlist &=
+  common.attrib, subtitle.role.attrib, local.subtitle.attrib
+local.bibliomixed.attrib = empty
+bibliomixed.role.attrib = role.attrib
+bibliomixed.attlist &=
+  common.attrib, bibliomixed.role.attrib, local.bibliomixed.attrib
+local.articleinfo.attrib = empty
+articleinfo.role.attrib = role.attrib
+articleinfo.attlist &=
+  common.attrib, articleinfo.role.attrib, local.articleinfo.attrib
+bibliomset.role.attrib = role.attrib
+local.bibliomset.attrib = empty
+bibliomset =
+  element bibliomset {
+    bibliomset.attlist, (text | bibliocomponent.mix | bibliomset)*
+  }
+bibliomset.attlist &=
+  attribute relation { text }?,
+  common.attrib,
+  bibliomset.role.attrib,
+  local.bibliomset.attrib
+local.bibliomisc.attrib = empty
+bibliomisc.role.attrib = role.attrib
+bibliomisc = element bibliomisc { bibliomisc.attlist, para.char.mix* }
+bibliomisc.attlist &=
+  common.attrib, bibliomisc.role.attrib, local.bibliomisc.attrib
+local.subjectset.attrib = empty
+subjectset.role.attrib = role.attrib
+subjectset = element subjectset { subjectset.attlist, subject+ }
+subjectset.attlist &=
+  attribute scheme { xsd:NMTOKEN }?,
+  common.attrib,
+  subjectset.role.attrib,
+  local.subjectset.attrib
+local.subject.attrib = empty
+subject.role.attrib = role.attrib
+subject = element subject { subject.attlist, subjectterm+ }
+subject.attlist &=
+  attribute weight { text }?,
+  common.attrib,
+  subject.role.attrib,
+  local.subject.attrib
+local.subjectterm.attrib = empty
+subjectterm.role.attrib = role.attrib
+subjectterm = element subjectterm { subjectterm.attlist, text }
+subjectterm.attlist &=
+  common.attrib, subjectterm.role.attrib, local.subjectterm.attrib
+local.keywordset.attrib = empty
+keywordset.role.attrib = role.attrib
+keywordset = element keywordset { keywordset.attlist, keyword+ }
+keywordset.attlist &=
+  common.attrib, keywordset.role.attrib, local.keywordset.attrib
+local.keyword.attrib = empty
+keyword.role.attrib = role.attrib
+keyword = element keyword { keyword.attlist, text }
+keyword.attlist &=
+  common.attrib, keyword.role.attrib, local.keyword.attrib
+local.sidebar.attrib = empty
+sidebar.role.attrib = role.attrib
+sidebar.attlist &=
+  common.attrib, sidebar.role.attrib, local.sidebar.attrib
+local.abstract.attrib = empty
+abstract.role.attrib = role.attrib
+abstract = element abstract { abstract.attlist, title?, para.class+ }
+abstract.attlist &=
+  common.attrib, abstract.role.attrib, local.abstract.attrib
+local.personblurb.attrib = empty
+personblurb.role.attrib = role.attrib
+personblurb =
+  element personblurb { personblurb.attlist, title?, para.class+ }
+personblurb.attlist &=
+  common.attrib, personblurb.role.attrib, local.personblurb.attrib
+local.blockquote.attrib = empty
+blockquote.role.attrib = role.attrib
+blockquote.attlist &=
+  common.attrib, blockquote.role.attrib, local.blockquote.attrib
+local.attribution.attrib = empty
+attribution.role.attrib = role.attrib
+attribution =
+  element attribution { attribution.attlist, para.char.mix* }
+attribution.attlist &=
+  common.attrib, attribution.role.attrib, local.attribution.attrib
+local.epigraph.attrib = empty
+epigraph.role.attrib = role.attrib
+epigraph =
+  element epigraph {
+    epigraph.attlist, attribution?, (para.class | literallayout)+
+  }
+epigraph.attlist &=
+  common.attrib, epigraph.role.attrib, local.epigraph.attrib
+local.footnote.attrib = empty
+footnote.role.attrib = role.attrib
+footnote = element footnote { footnote.attlist, footnote.mix+ }
+footnote.attlist &=
+  label.attrib,
+  common.attrib,
+  footnote.role.attrib,
+  local.footnote.attrib
+local.para.attrib = empty
+para.role.attrib = role.attrib
+para.attlist &= common.attrib, para.role.attrib, local.para.attrib
+local.admon.attrib = empty
+admon.role.attrib = role.attrib
+note = element note { note.attlist, title?, admon.mix+ }
+note.attlist &= common.attrib, admon.role.attrib, local.admon.attrib
+local.itemizedlist.attrib = empty
+itemizedlist.role.attrib = role.attrib
+itemizedlist.attlist &=
+  attribute spacing { "normal" | "compact" }?,
+  mark.attrib,
+  common.attrib,
+  itemizedlist.role.attrib,
+  local.itemizedlist.attrib
+local.orderedlist.attrib = empty
+orderedlist.role.attrib = role.attrib
+orderedlist.attlist &=
+  attribute numeration {
+    "arabic" | "upperalpha" | "loweralpha" | "upperroman" | "lowerroman"
+  }?,
+  [ a:defaultValue = "ignore" ]
+  attribute inheritnum { "inherit" | "ignore" }?,
+  [ a:defaultValue = "restarts" ]
+  attribute continuation { "continues" | "restarts" }?,
+  attribute spacing { "normal" | "compact" }?,
+  common.attrib,
+  orderedlist.role.attrib,
+  local.orderedlist.attrib
+local.listitem.attrib = empty
+listitem.role.attrib = role.attrib
+listitem = element listitem { listitem.attlist, component.mix+ }
+listitem.attlist &=
+  attribute override { text }?,
+  common.attrib,
+  listitem.role.attrib,
+  local.listitem.attrib
+local.variablelist.attrib = empty
+variablelist.role.attrib = role.attrib
+variablelist.attlist &=
+  attribute termlength { text }?,
+  common.attrib,
+  variablelist.role.attrib,
+  local.variablelist.attrib
+local.varlistentry.attrib = empty
+varlistentry.role.attrib = role.attrib
+varlistentry =
+  element varlistentry { varlistentry.attlist, term+, listitem }
+varlistentry.attlist &=
+  common.attrib, varlistentry.role.attrib, local.varlistentry.attrib
+local.term.attrib = empty
+term.role.attrib = role.attrib
+term = element term { term.attlist, para.char.mix* }
+term.attlist &= common.attrib, term.role.attrib, local.term.attrib
+local.example.attrib = empty
+example.role.attrib = role.attrib
+example.attlist &=
+  attribute floatstyle { text }?,
+  label.attrib,
+  width.attrib,
+  common.attrib,
+  example.role.attrib,
+  local.example.attrib
+local.programlisting.attrib = empty
+programlisting.role.attrib = role.attrib
+programlisting.attlist &=
+  width.attrib,
+  linespecific.attrib,
+  common.attrib,
+  programlisting.role.attrib,
+  local.programlisting.attrib
+local.literallayout.attrib = empty
+literallayout.role.attrib = role.attrib
+literallayout.attlist &=
+  width.attrib,
+  linespecific.attrib,
+  [ a:defaultValue = "normal" ]
+  attribute class { "monospaced" | "normal" }?,
+  common.attrib,
+  literallayout.role.attrib,
+  local.literallayout.attrib
+local.figure.attrib = empty
+figure.role.attrib = role.attrib
+figure.attlist &=
+  [ a:defaultValue = "0" ] attribute float { yesorno.attvals }?,
+  attribute floatstyle { text }?,
+  attribute pgwide { yesorno.attvals }?,
+  label.attrib,
+  common.attrib,
+  figure.role.attrib,
+  local.figure.attrib
+local.mediaobject.attrib = empty
+mediaobject.role.attrib = role.attrib
+mediaobject =
+  element mediaobject {
+    mediaobject.attlist, objectinfo?, mediaobject.mix+, caption?
+  }
+mediaobject.attlist &=
+  common.attrib, mediaobject.role.attrib, local.mediaobject.attrib
+local.inlinemediaobject.attrib = empty
+inlinemediaobject.role.attrib = role.attrib
+inlinemediaobject =
+  element inlinemediaobject {
+    inlinemediaobject.attlist, objectinfo?, mediaobject.mix+
+  }
+inlinemediaobject.attlist &=
+  common.attrib,
+  inlinemediaobject.role.attrib,
+  local.inlinemediaobject.attrib
+local.videoobject.attrib = empty
+videoobject.role.attrib = role.attrib
+videoobject =
+  element videoobject { videoobject.attlist, objectinfo?, videodata }
+videoobject.attlist &=
+  common.attrib, videoobject.role.attrib, local.videoobject.attrib
+local.audioobject.attrib = empty
+audioobject.role.attrib = role.attrib
+audioobject =
+  element audioobject { audioobject.attlist, objectinfo?, audiodata }
+audioobject.attlist &=
+  common.attrib, audioobject.role.attrib, local.audioobject.attrib
+local.imageobject.attrib = empty
+imageobject.role.attrib = role.attrib
+imageobject =
+  element imageobject { imageobject.attlist, objectinfo?, imagedata }
+imageobject.attlist &=
+  common.attrib, imageobject.role.attrib, local.imageobject.attrib
+local.textobject.attrib = empty
+textobject.role.attrib = role.attrib
+textobject =
+  element textobject {
+    textobject.attlist,
+    objectinfo?,
+    (phrase | textdata | textobject.mix+)
+  }
+textobject.attlist &=
+  common.attrib, textobject.role.attrib, local.textobject.attrib
+local.objectinfo.attrib = empty
+objectinfo.role.attrib = role.attrib
+objectinfo.attlist &=
+  common.attrib, objectinfo.role.attrib, local.objectinfo.attrib
+local.videodata.attrib = empty
+videodata.role.attrib = role.attrib
+videodata = element videodata { videodata.attlist, empty }
+videodata.attlist &=
+  attribute width { text }?,
+  attribute contentwidth { text }?,
+  attribute depth { text }?,
+  attribute contentdepth { text }?,
+  attribute align { "left" | "right" | "center" }?,
+  attribute valign { "top" | "middle" | "bottom" }?,
+  attribute scale { text }?,
+  attribute scalefit { yesorno.attvals }?,
+  objectdata.attrib,
+  common.attrib,
+  videodata.role.attrib,
+  local.videodata.attrib
+local.audiodata.attrib = empty
+audiodata.role.attrib = role.attrib
+audiodata = element audiodata { audiodata.attlist, empty }
+audiodata.attlist &=
+  objectdata.attrib,
+  common.attrib,
+  audiodata.role.attrib,
+  local.audiodata.attrib
+local.imagedata.attrib = empty
+imagedata.role.attrib = role.attrib
+imagedata = element imagedata { imagedata.attlist, empty }
+imagedata.attlist &=
+  attribute width { text }?,
+  attribute contentwidth { text }?,
+  attribute depth { text }?,
+  attribute contentdepth { text }?,
+  attribute align { "left" | "right" | "center" }?,
+  attribute valign { "top" | "middle" | "bottom" }?,
+  attribute scale { text }?,
+  attribute scalefit { yesorno.attvals }?,
+  objectdata.attrib,
+  common.attrib,
+  imagedata.role.attrib,
+  local.imagedata.attrib
+local.textdata.attrib = empty
+textdata.role.attrib = role.attrib
+textdata = element textdata { textdata.attlist, empty }
+textdata.attlist &=
+  attribute encoding { text }?,
+  objectdata.attrib,
+  common.attrib,
+  textdata.role.attrib,
+  local.textdata.attrib
+html.coreattrs =
+  attribute id { xsd:ID }?,
+  attribute class { text }?,
+  attribute style { text }?,
+  attribute title { text }?
+i18n = attribute xml:lang { xsd:NMTOKEN }?
+events =
+  attribute onclick { text }?,
+  attribute ondblclick { text }?,
+  attribute onmousedown { text }?,
+  attribute onmouseup { text }?,
+  attribute onmouseover { text }?,
+  attribute onmousemove { text }?,
+  attribute onmouseout { text }?,
+  attribute onkeypress { text }?,
+  attribute onkeydown { text }?,
+  attribute onkeyup { text }?
+attrs = html.coreattrs, i18n, events
+cellhalign =
+  attribute align { "left" | "center" | "right" | "justify" | "char" }?,
+  attribute char { text }?,
+  attribute charoff { text }?
+cellvalign =
+  attribute valign { "top" | "middle" | "bottom" | "baseline" }?
+colgroup = element colgroup { colgroup.attlist, col* }
+col = element col { col.attlist, empty }
+tr = element tr { tr.attlist, (th | td)+ }
+th = element th { th.attlist, (para.char.mix | tabentry.mix)* }
+td = element td { td.attlist, (para.char.mix | tabentry.mix)* }
+colgroup.attlist &=
+  attrs,
+  [ a:defaultValue = "1" ] attribute span { text }?,
+  attribute width { text }?,
+  cellhalign,
+  cellvalign
+col.attlist &=
+  attrs,
+  [ a:defaultValue = "1" ] attribute span { text }?,
+  attribute width { text }?,
+  cellhalign,
+  cellvalign
+tr.attlist &=
+  attrs,
+  cellhalign,
+  cellvalign,
+  attribute bgcolor { text }?
+th.attlist &=
+  attrs,
+  attribute abbr { text }?,
+  attribute axis { text }?,
+  attribute headers { xsd:IDREFS }?,
+  attribute scope { "row" | "col" | "rowgroup" | "colgroup" }?,
+  [ a:defaultValue = "1" ] attribute rowspan { text }?,
+  [ a:defaultValue = "1" ] attribute colspan { text }?,
+  cellhalign,
+  cellvalign,
+  attribute nowrap { "nowrap" }?,
+  attribute bgcolor { text }?,
+  attribute width { text }?,
+  attribute height { text }?
+td.attlist &=
+  attrs,
+  attribute abbr { text }?,
+  attribute axis { text }?,
+  attribute headers { xsd:IDREFS }?,
+  attribute scope { "row" | "col" | "rowgroup" | "colgroup" }?,
+  [ a:defaultValue = "1" ] attribute rowspan { text }?,
+  [ a:defaultValue = "1" ] attribute colspan { text }?,
+  cellhalign,
+  cellvalign,
+  attribute nowrap { "nowrap" }?,
+  attribute bgcolor { text }?,
+  attribute width { text }?,
+  attribute height { text }?
+tables.role.attrib = role.attrib
+bodyatt =
+  attribute floatstyle { text }?,
+  label.attrib
+secur =
+  common.attrib,
+  attribute class { text }?,
+  attribute style { text }?,
+  attribute title { text }?,
+  i18n,
+  events,
+  tables.role.attrib
+common.table.attribs = bodyatt, secur
+tbl.table.att =
+  attribute tabstyle { text }?,
+  attribute tocentry { yesorno.attvals }?,
+  attribute shortentry { yesorno.attvals }?,
+  attribute orient { "port" | "land" }?,
+  attribute pgwide { yesorno.attvals }?,
+  attribute summary { text }?,
+  attribute width { text }?,
+  attribute border { text }?,
+  attribute rules { "none" | "groups" | "rows" | "cols" | "all" }?,
+  attribute cellspacing { text }?,
+  attribute cellpadding { text }?,
+  attribute align { "left" | "center" | "right" }?,
+  attribute bgcolor { text }?
+tbl.frame.attval =
+  "void"
+  | "above"
+  | "below"
+  | "hsides"
+  | "lhs"
+  | "rhs"
+  | "vsides"
+  | "box"
+  | "border"
+  | "top"
+  | "bottom"
+  | "topbot"
+  | "all"
+  | "sides"
+  | "none"
+tbl.entry.mdl = para.char.mix | tabentry.mix
+tbl.hdft.mdl = tr+ | (colspec*, row+)
+tbl.tbody.mdl = tr+ | row+
+yesorno = string
+tbl.tgroup.mdl = colspec*, spanspec*, thead?, tfoot?, tbody
+tbl.tgroup.att = attribute tgroupstyle { text }?
+tbl.row.mdl = (entry | entrytbl)+
+tbl.entrytbl.mdl = colspec*, spanspec*, thead?, tbody
+table = element table { table.attlist, tbl.table.mdl }
+table.attlist &=
+  attribute frame { tbl.frame.attval }?,
+  attribute colsep { yesorno }?,
+  attribute rowsep { yesorno }?,
+  tbl.table.att,
+  bodyatt,
+  secur
+tgroup = element tgroup { tgroup.attlist, tbl.tgroup.mdl }
+tgroup.attlist &=
+  attribute cols { text },
+  tbl.tgroup.att,
+  attribute colsep { yesorno }?,
+  attribute rowsep { yesorno }?,
+  attribute align { "left" | "right" | "center" | "justify" | "char" }?,
+  attribute char { text }?,
+  attribute charoff { text }?,
+  secur
+colspec = element colspec { colspec.attlist, empty }
+colspec.attlist &=
+  attribute colnum { text }?,
+  attribute colname { text }?,
+  attribute colwidth { text }?,
+  attribute colsep { yesorno }?,
+  attribute rowsep { yesorno }?,
+  attribute align { "left" | "right" | "center" | "justify" | "char" }?,
+  attribute char { text }?,
+  attribute charoff { text }?
+spanspec = element spanspec { spanspec.attlist, empty }
+spanspec.attlist &=
+  attribute namest { text },
+  attribute nameend { text },
+  attribute spanname { text },
+  attribute colsep { yesorno }?,
+  attribute rowsep { yesorno }?,
+  attribute align { "left" | "right" | "center" | "justify" | "char" }?,
+  attribute char { text }?,
+  attribute charoff { text }?
+thead = element thead { thead.attlist, tbl.hdft.mdl }
+thead.attlist &=
+  attribute valign { "top" | "middle" | "bottom" }?,
+  secur
+tfoot = element tfoot { tfoot.attlist, tbl.hdft.mdl }
+tfoot.attlist &=
+  attribute valign { "top" | "middle" | "bottom" }?,
+  secur
+tbody = element tbody { tbody.attlist, tbl.tbody.mdl }
+tbody.attlist &=
+  attribute valign { "top" | "middle" | "bottom" }?,
+  secur
+row = element row { row.attlist, tbl.row.mdl }
+row.attlist &=
+  attribute rowsep { yesorno }?,
+  attribute valign { "top" | "middle" | "bottom" }?,
+  secur
+entrytbl = element entrytbl { entrytbl.attlist, tbl.entrytbl.mdl }
+entrytbl.attlist &=
+  attribute cols { text },
+  tbl.tgroup.att,
+  attribute colname { text }?,
+  attribute spanname { text }?,
+  attribute namest { text }?,
+  attribute nameend { text }?,
+  attribute colsep { yesorno }?,
+  attribute rowsep { yesorno }?,
+  attribute align { "left" | "right" | "center" | "justify" | "char" }?,
+  attribute char { text }?,
+  attribute charoff { text }?,
+  secur
+entry = element entry { entry.attlist, tbl.entry.mdl* }
+entry.attlist &=
+  attribute colname { text }?,
+  attribute namest { text }?,
+  attribute nameend { text }?,
+  attribute spanname { text }?,
+  attribute morerows { text }?,
+  attribute colsep { yesorno }?,
+  attribute rowsep { yesorno }?,
+  attribute align { "left" | "right" | "center" | "justify" | "char" }?,
+  attribute char { text }?,
+  attribute charoff { text }?,
+  attribute rotate { yesorno }?,
+  attribute valign { "top" | "middle" | "bottom" }?,
+  secur
+local.informaltable.attrib = empty
+informaltable.attlist &=
+  attribute frame { tbl.frame.attval }?,
+  attribute colsep { yesorno.attvals }?,
+  attribute rowsep { yesorno.attvals }?,
+  common.table.attribs,
+  tbl.table.att,
+  local.informaltable.attrib
+local.caption.attrib = empty
+caption.role.attrib = role.attrib
+caption = element caption { caption.attlist, (text | textobject.mix)* }
+caption.attlist.content =
+  lang.attrib,
+  remap.attrib,
+  xreflabel.attrib,
+  revisionflag.attrib,
+  effectivity.attrib,
+  dir.attrib,
+  xml-base.attrib,
+  local.common.attrib,
+  caption.role.attrib,
+  attrs,
+  attribute align { "top" | "bottom" | "left" | "right" }?,
+  local.caption.attrib
+caption.attlist &= caption.attlist.content
+local.ackno.attrib = empty
+ackno.role.attrib = role.attrib
+ackno = element ackno { ackno.attlist, docinfo.char.mix* }
+ackno.attlist &= common.attrib, ackno.role.attrib, local.ackno.attrib
+local.address.attrib = empty
+address.role.attrib = role.attrib
+address.attlist &=
+  linespecific.attrib,
+  common.attrib,
+  address.role.attrib,
+  local.address.attrib
+local.city.attrib = empty
+city.role.attrib = role.attrib
+city = element city { city.attlist, docinfo.char.mix* }
+city.attlist &= common.attrib, city.role.attrib, local.city.attrib
+local.state.attrib = empty
+state.role.attrib = role.attrib
+state = element state { state.attlist, docinfo.char.mix* }
+state.attlist &= common.attrib, state.role.attrib, local.state.attrib
+local.country.attrib = empty
+country.role.attrib = role.attrib
+country = element country { country.attlist, docinfo.char.mix* }
+country.attlist &=
+  common.attrib, country.role.attrib, local.country.attrib
+local.affiliation.attrib = empty
+affiliation.role.attrib = role.attrib
+affiliation =
+  element affiliation {
+    affiliation.attlist,
+    shortaffil?,
+    jobtitle*,
+    orgname?,
+    orgdiv*,
+    address*
+  }
+affiliation.attlist &=
+  common.attrib, affiliation.role.attrib, local.affiliation.attrib
+local.shortaffil.attrib = empty
+shortaffil.role.attrib = role.attrib
+shortaffil =
+  element shortaffil { shortaffil.attlist, docinfo.char.mix* }
+shortaffil.attlist &=
+  common.attrib, shortaffil.role.attrib, local.shortaffil.attrib
+local.jobtitle.attrib = empty
+jobtitle.role.attrib = role.attrib
+jobtitle = element jobtitle { jobtitle.attlist, docinfo.char.mix* }
+jobtitle.attlist &=
+  common.attrib, jobtitle.role.attrib, local.jobtitle.attrib
+local.orgdiv.attrib = empty
+orgdiv.role.attrib = role.attrib
+orgdiv = element orgdiv { orgdiv.attlist, docinfo.char.mix* }
+orgdiv.attlist &= common.attrib, orgdiv.role.attrib, local.orgdiv.attrib
+local.author.attrib = empty
+author.role.attrib = role.attrib
+author.attlist &= common.attrib, author.role.attrib, local.author.attrib
+local.authorgroup.attrib = empty
+authorgroup.role.attrib = role.attrib
+authorgroup.attlist &=
+  common.attrib, authorgroup.role.attrib, local.authorgroup.attrib
+local.authorinitials.attrib = empty
+authorinitials.role.attrib = role.attrib
+authorinitials =
+  element authorinitials { authorinitials.attlist, docinfo.char.mix* }
+authorinitials.attlist &=
+  common.attrib, authorinitials.role.attrib, local.authorinitials.attrib
+local.copyright.attrib = empty
+copyright.role.attrib = role.attrib
+copyright = element copyright { copyright.attlist, year+, holder* }
+copyright.attlist &=
+  common.attrib, copyright.role.attrib, local.copyright.attrib
+local.year.attrib = empty
+year.role.attrib = role.attrib
+year = element year { year.attlist, docinfo.char.mix* }
+year.attlist &= common.attrib, year.role.attrib, local.year.attrib
+local.holder.attrib = empty
+holder.role.attrib = role.attrib
+holder = element holder { holder.attlist, docinfo.char.mix* }
+holder.attlist &= common.attrib, holder.role.attrib, local.holder.attrib
+local.corpauthor.attrib = empty
+corpauthor.role.attrib = role.attrib
+corpauthor =
+  element corpauthor { corpauthor.attlist, docinfo.char.mix* }
+corpauthor.attlist &=
+  common.attrib, corpauthor.role.attrib, local.corpauthor.attrib
+local.date.attrib = empty
+date.role.attrib = role.attrib
+date = element date { date.attlist, docinfo.char.mix* }
+date.attlist &= common.attrib, date.role.attrib, local.date.attrib
+local.edition.attrib = empty
+edition.role.attrib = role.attrib
+edition = element edition { edition.attlist, docinfo.char.mix* }
+edition.attlist &=
+  common.attrib, edition.role.attrib, local.edition.attrib
+local.editor.attrib = empty
+editor.role.attrib = role.attrib
+editor.attlist &= common.attrib, editor.role.attrib, local.editor.attrib
+local.issuenum.attrib = empty
+issuenum.role.attrib = role.attrib
+issuenum = element issuenum { issuenum.attlist, docinfo.char.mix* }
+issuenum.attlist &=
+  common.attrib, issuenum.role.attrib, local.issuenum.attrib
+local.legalnotice.attrib = empty
+legalnotice.role.attrib = role.attrib
+legalnotice.attlist &=
+  common.attrib, legalnotice.role.attrib, local.legalnotice.attrib
+local.orgname.attrib = empty
+orgname.role.attrib = role.attrib
+orgname = element orgname { orgname.attlist, docinfo.char.mix* }
+orgname.attlist &=
+  common.attrib,
+  attribute class {
+    "corporation" | "nonprofit" | "consortium" | "informal" | "other"
+  }?,
+  attribute otherclass { text }?,
+  orgname.role.attrib,
+  local.orgname.attrib
+local.othercredit.attrib = empty
+othercredit.role.attrib = role.attrib
+othercredit.attlist &=
+  attribute class {
+    "graphicdesigner"
+    | "productioneditor"
+    | "copyeditor"
+    | "technicaleditor"
+    | "translator"
+    | "other"
+  }?,
+  common.attrib,
+  othercredit.role.attrib,
+  local.othercredit.attrib
+local.pagenums.attrib = empty
+pagenums.role.attrib = role.attrib
+pagenums = element pagenums { pagenums.attlist, docinfo.char.mix* }
+pagenums.attlist &=
+  common.attrib, pagenums.role.attrib, local.pagenums.attrib
+local.firstname.attrib = empty
+firstname.role.attrib = role.attrib
+firstname = element firstname { firstname.attlist, docinfo.char.mix* }
+firstname.attlist &=
+  common.attrib, firstname.role.attrib, local.firstname.attrib
+local.honorific.attrib = empty
+honorific.role.attrib = role.attrib
+honorific = element honorific { honorific.attlist, docinfo.char.mix* }
+honorific.attlist &=
+  common.attrib, honorific.role.attrib, local.honorific.attrib
+local.lineage.attrib = empty
+lineage.role.attrib = role.attrib
+lineage = element lineage { lineage.attlist, docinfo.char.mix* }
+lineage.attlist &=
+  common.attrib, lineage.role.attrib, local.lineage.attrib
+local.othername.attrib = empty
+othername.role.attrib = role.attrib
+othername = element othername { othername.attlist, docinfo.char.mix* }
+othername.attlist &=
+  common.attrib, othername.role.attrib, local.othername.attrib
+local.surname.attrib = empty
+surname.role.attrib = role.attrib
+surname = element surname { surname.attlist, docinfo.char.mix* }
+surname.attlist &=
+  common.attrib, surname.role.attrib, local.surname.attrib
+local.pubdate.attrib = empty
+pubdate.role.attrib = role.attrib
+pubdate = element pubdate { pubdate.attlist, docinfo.char.mix* }
+pubdate.attlist &=
+  common.attrib, pubdate.role.attrib, local.pubdate.attrib
+local.publishername.attrib = empty
+publishername.role.attrib = role.attrib
+publishername =
+  element publishername { publishername.attlist, docinfo.char.mix* }
+publishername.attlist &=
+  common.attrib, publishername.role.attrib, local.publishername.attrib
+local.releaseinfo.attrib = empty
+releaseinfo.role.attrib = role.attrib
+releaseinfo =
+  element releaseinfo { releaseinfo.attlist, docinfo.char.mix* }
+releaseinfo.attlist &=
+  common.attrib, releaseinfo.role.attrib, local.releaseinfo.attrib
+local.revhistory.attrib = empty
+revhistory.role.attrib = role.attrib
+revhistory = element revhistory { revhistory.attlist, revision+ }
+revhistory.attlist &=
+  common.attrib, revhistory.role.attrib, local.revhistory.attrib
+local.revision.attrib = empty
+revision.role.attrib = role.attrib
+revision =
+  element revision {
+    revision.attlist,
+    revnumber,
+    date,
+    (author | authorinitials)*,
+    (revremark | revdescription)?
+  }
+revision.attlist &=
+  common.attrib, revision.role.attrib, local.revision.attrib
+local.revnumber.attrib = empty
+revnumber.role.attrib = role.attrib
+revnumber = element revnumber { revnumber.attlist, docinfo.char.mix* }
+revnumber.attlist &=
+  common.attrib, revnumber.role.attrib, local.revnumber.attrib
+local.revremark.attrib = empty
+revremark.role.attrib = role.attrib
+revremark = element revremark { revremark.attlist, docinfo.char.mix* }
+revremark.attlist &=
+  common.attrib, revremark.role.attrib, local.revremark.attrib
+local.revdescription.attrib = empty
+revdescription.role.attrib = role.attrib
+revdescription =
+  element revdescription { revdescription.attlist, revdescription.mix+ }
+revdescription.attlist &=
+  common.attrib, revdescription.role.attrib, local.revdescription.attrib
+local.volumenum.attrib = empty
+volumenum.role.attrib = role.attrib
+volumenum = element volumenum { volumenum.attlist, docinfo.char.mix* }
+volumenum.attlist &=
+  common.attrib, volumenum.role.attrib, local.volumenum.attrib
+local.command.attrib = empty
+command.role.attrib = role.attrib
+command = element command { command.attlist, cptr.char.mix* }
+command.attlist &=
+  moreinfo.attrib,
+  common.attrib,
+  command.role.attrib,
+  local.command.attrib
+local.computeroutput.attrib = empty
+computeroutput.role.attrib = role.attrib
+computeroutput.attlist &=
+  moreinfo.attrib,
+  common.attrib,
+  computeroutput.role.attrib,
+  local.computeroutput.attrib
+local.email.attrib = empty
+email.role.attrib = role.attrib
+email = element email { email.attlist, docinfo.char.mix* }
+email.attlist &= common.attrib, email.role.attrib, local.email.attrib
+local.filename.attrib = empty
+filename.role.attrib = role.attrib
+filename = element filename { filename.attlist, cptr.char.mix* }
+filename.attlist &=
+  attribute class {
+    "headerfile"
+    | "partition"
+    | "devicefile"
+    | "libraryfile"
+    | "directory"
+    | "extension"
+    | "symlink"
+  }?,
+  attribute path { text }?,
+  moreinfo.attrib,
+  common.attrib,
+  filename.role.attrib,
+  local.filename.attrib
+local.lineannotation.attrib = empty
+lineannotation.role.attrib = role.attrib
+lineannotation =
+  element lineannotation { lineannotation.attlist, para.char.mix* }
+lineannotation.attlist &=
+  common.attrib, lineannotation.role.attrib, local.lineannotation.attrib
+local.literal.attrib = empty
+literal.role.attrib = role.attrib
+literal = element literal { literal.attlist, cptr.char.mix* }
+literal.attlist &=
+  moreinfo.attrib,
+  common.attrib,
+  literal.role.attrib,
+  local.literal.attrib
+local.code.attrib = empty
+code.role.attrib = role.attrib
+code = element code { code.attlist, cptr.char.mix* }
+code.attlist &=
+  attribute language { text }?,
+  common.attrib,
+  code.role.attrib,
+  local.code.attrib
+local.option.attrib = empty
+option.role.attrib = role.attrib
+option = element option { option.attlist, cptr.char.mix* }
+option.attlist &= common.attrib, option.role.attrib, local.option.attrib
+local.replaceable.attrib = empty
+replaceable.role.attrib = role.attrib
+replaceable.attlist &=
+  attribute class { "command" | "function" | "option" | "parameter" }?,
+  common.attrib,
+  replaceable.role.attrib,
+  local.replaceable.attrib
+local.sgmltag.attrib = empty
+sgmltag.role.attrib = role.attrib
+sgmltag = element sgmltag { sgmltag.attlist, smallcptr.char.mix* }
+sgmltag.attlist &=
+  attribute class {
+    "attribute"
+    | "attvalue"
+    | "element"
+    | "endtag"
+    | "emptytag"
+    | "genentity"
+    | "numcharref"
+    | "paramentity"
+    | "pi"
+    | "xmlpi"
+    | "starttag"
+    | "sgmlcomment"
+    | "prefix"
+    | "namespace"
+    | "localname"
+  }?,
+  attribute namespace { text }?,
+  common.attrib,
+  sgmltag.role.attrib,
+  local.sgmltag.attrib
+local.systemitem.attrib = empty
+systemitem.role.attrib = role.attrib
+systemitem.attlist &=
+  attribute class {
+    "constant"
+    | "event"
+    | "eventhandler"
+    | "domainname"
+    | "fqdomainname"
+    | "ipaddress"
+    | "netmask"
+    | "etheraddress"
+    | "groupname"
+    | "library"
+    | "macro"
+    | "osname"
+    | "filesystem"
+    | "resource"
+    | "systemname"
+    | "username"
+    | "newsgroup"
+    | "process"
+    | "service"
+    | "server"
+    | "daemon"
+  }?,
+  moreinfo.attrib,
+  common.attrib,
+  systemitem.role.attrib,
+  local.systemitem.attrib
+local.userinput.attrib = empty
+userinput.role.attrib = role.attrib
+userinput.attlist &=
+  moreinfo.attrib,
+  common.attrib,
+  userinput.role.attrib,
+  local.userinput.attrib
+local.abbrev.attrib = empty
+abbrev.role.attrib = role.attrib
+abbrev = element abbrev { abbrev.attlist, word.char.mix* }
+abbrev.attlist &= common.attrib, abbrev.role.attrib, local.abbrev.attrib
+local.acronym.attrib = empty
+acronym.role.attrib = role.attrib
+acronym = element acronym { acronym.attlist, word.char.mix* }
+acronym.attlist &=
+  common.attrib, acronym.role.attrib, local.acronym.attrib
+local.citetitle.attrib = empty
+citetitle.role.attrib = role.attrib
+citetitle = element citetitle { citetitle.attlist, para.char.mix* }
+citetitle.attlist &=
+  attribute pubwork {
+    "article"
+    | "book"
+    | "chapter"
+    | "part"
+    | "refentry"
+    | "section"
+    | "journal"
+    | "series"
+    | "set"
+    | "manuscript"
+    | "cdrom"
+    | "dvd"
+    | "wiki"
+    | "gopher"
+    | "bbs"
+    | "emailmessage"
+    | "webpage"
+    | "newsposting"
+  }?,
+  common.attrib,
+  citetitle.role.attrib,
+  local.citetitle.attrib
+local.emphasis.attrib = empty
+emphasis.role.attrib = role.attrib
+emphasis = element emphasis { emphasis.attlist, para.char.mix* }
+emphasis.attlist &=
+  common.attrib, emphasis.role.attrib, local.emphasis.attrib
+local.phrase.attrib = empty
+phrase.role.attrib = role.attrib
+phrase = element phrase { phrase.attlist, para.char.mix* }
+phrase.attlist &= common.attrib, phrase.role.attrib, local.phrase.attrib
+local.quote.attrib = empty
+quote.role.attrib = role.attrib
+quote = element quote { quote.attlist, para.char.mix* }
+quote.attlist &= common.attrib, quote.role.attrib, local.quote.attrib
+local.ssscript.attrib = empty
+ssscript.role.attrib = role.attrib
+subscript.attlist &=
+  common.attrib, ssscript.role.attrib, local.ssscript.attrib
+superscript.attlist &=
+  common.attrib, ssscript.role.attrib, local.ssscript.attrib
+local.trademark.attrib = empty
+trademark.role.attrib = role.attrib
+trademark.attlist &=
+  [ a:defaultValue = "trade" ]
+  attribute class { "service" | "trade" | "registered" | "copyright" }?,
+  common.attrib,
+  trademark.role.attrib,
+  local.trademark.attrib
+local.link.attrib = empty
+link.role.attrib = role.attrib
+link = element link { link.attlist, para.char.mix* }
+link.attlist &=
+  attribute endterm { xsd:IDREF }?,
+  attribute xrefstyle { text }?,
+  attribute type { text }?,
+  linkendreq.attrib,
+  common.attrib,
+  link.role.attrib,
+  local.link.attrib
+local.ulink.attrib = empty
+ulink.role.attrib = role.attrib
+ulink = element ulink { ulink.attlist, para.char.mix* }
+ulink.attlist &=
+  attribute url { text },
+  attribute type { text }?,
+  attribute xrefstyle { text }?,
+  common.attrib,
+  ulink.role.attrib,
+  local.ulink.attrib
+local.footnoteref.attrib = empty
+footnoteref.role.attrib = role.attrib
+footnoteref = element footnoteref { footnoteref.attlist, empty }
+footnoteref.attlist &=
+  linkendreq.attrib,
+  label.attrib,
+  common.attrib,
+  footnoteref.role.attrib,
+  local.footnoteref.attrib
+local.xref.attrib = empty
+xref.role.attrib = role.attrib
+xref = element xref { xref.attlist, empty }
+xref.attlist &=
+  attribute endterm { xsd:IDREF }?,
+  attribute xrefstyle { text }?,
+  common.attrib,
+  linkendreq.attrib,
+  xref.role.attrib,
+  local.xref.attrib
+local.anchor.attrib = empty
+anchor.role.attrib = role.attrib
+anchor = element anchor { anchor.attlist, empty }
+anchor.attlist &=
+  idreq.attrib,
+  pagenum.attrib,
+  remap.attrib,
+  xreflabel.attrib,
+  revisionflag.attrib,
+  effectivity.attrib,
+  anchor.role.attrib,
+  local.anchor.attrib
+local.appendix.class = notAllowed
+appendix.class = appendix | local.appendix.class
+div.title.content = title, subtitle?, titleabbrev?
+bookcomponent.title.content = title, subtitle?, titleabbrev?
+sect.title.content = title, subtitle?, titleabbrev?
+local.appendix.attrib = empty
+appendix.role.attrib = role.attrib
+appendix.attlist &=
+  label.attrib,
+  status.attrib,
+  common.attrib,
+  appendix.role.attrib,
+  local.appendix.attrib
+local.section.attrib = empty
+section.role.attrib = role.attrib
+section.attlist &=
+  label.attrib,
+  status.attrib,
+  common.attrib,
+  section.role.attrib,
+  local.section.attrib
+local.bibliography.attrib = empty
+bibliography.role.attrib = role.attrib
+bibliography.attlist &=
+  status.attrib,
+  common.attrib,
+  bibliography.role.attrib,
+  local.bibliography.attrib
+local.bibliodiv.attrib = empty
+bibliodiv.role.attrib = role.attrib
+bibliodiv.attlist &=
+  status.attrib,
+  common.attrib,
+  bibliodiv.role.attrib,
+  local.bibliodiv.attrib
+local.article.attrib = empty
+article.role.attrib = role.attrib
+article.attlist &=
+  attribute class {
+    "journalarticle"
+    | "productsheet"
+    | "whitepaper"
+    | "techreport"
+    | "specification"
+    | "faq"
+  }?,
+  attribute parentbook { xsd:IDREF }?,
+  status.attrib,
+  common.attrib,
+  article.role.attrib,
+  local.article.attrib
+objectinfo =
+  element objectinfo {
+    objectinfo.attlist,
+    (mediaobject
+     | legalnotice
+     | keywordset
+     | subjectset
+     | bibliocomponent.mix)+
+  }
+section =
+  element section {
+    section.attlist,
+    sectioninfo?,
+    sect.title.content,
+    ((divcomponent.mix+, section*) | section+)
+  }
+sectioninfo =
+  element sectioninfo {
+    sectioninfo.attlist,
+    (mediaobject
+     | legalnotice
+     | keywordset
+     | subjectset
+     | bibliocomponent.mix)+
+  }
+sectioninfo.attlist &= empty
+authorgroup =
+  element authorgroup {
+    authorgroup.attlist, (author | editor | corpauthor | othercredit)+
+  }
+author = element author { author.attlist, person.ident.mix+ }
+editor = element editor { editor.attlist, person.ident.mix+ }
+othercredit =
+  element othercredit { othercredit.attlist, person.ident.mix+ }
+para = element para { para.attlist, para.char.mix* }
+informaltable.table.mdl =
+  (mediaobject+ | tgroup+)
+  | (caption, (col* | colgroup*), thead?, tfoot?, (tbody+ | tr+))
+informaltable =
+  element informaltable {
+    informaltable.attlist, informaltable.table.mdl
+  }
+replaceable =
+  element replaceable {
+    replaceable.attlist,
+    (text | link.char.class | base.char.class | inlinemediaobject)*
+  }
+trademark =
+  element trademark {
+    trademark.attlist,
+    (text
+     | link.char.class
+     | tech.char.class
+     | inlinemediaobject
+     | emphasis)*
+  }
+article =
+  element article {
+    article.attlist,
+    div.title.content?,
+    articleinfo?,
+    bookcomponent.content,
+    (appendix.class | bibliography | ackno)*
+  }
+articleinfo =
+  element articleinfo {
+    articleinfo.attlist,
+    (mediaobject
+     | legalnotice
+     | subjectset
+     | keywordset
+     | bibliocomponent.mix)+
+  }
+appendix =
+  element appendix {
+    appendix.attlist, bookcomponent.title.content, bookcomponent.content
+  }
+bibliography =
+  element bibliography {
+    bibliography.attlist,
+    bookcomponent.title.content?,
+    component.mix*,
+    (bibliodiv+ | bibliomixed+)
+  }
+bibliomixed =
+  element bibliomixed {
+    bibliomixed.attlist, (text | bibliocomponent.mix | bibliomset)*
+  }
+bibliodiv =
+  element bibliodiv {
+    bibliodiv.attlist, sect.title.content?, component.mix*, bibliomixed+
+  }
+sidebar =
+  element sidebar {
+    sidebar.attlist, formalobject.title.content?, sidebar.mix+
+  }
+programlisting =
+  element programlisting {
+    programlisting.attlist, (para.char.mix | lineannotation)*
+  }
+literallayout =
+  element literallayout {
+    literallayout.attlist, (para.char.mix | lineannotation)*
+  }
+itemizedlist =
+  element itemizedlist {
+    itemizedlist.attlist,
+    formalobject.title.content?,
+    listpreamble.mix*,
+    listitem+
+  }
+orderedlist =
+  element orderedlist {
+    orderedlist.attlist,
+    formalobject.title.content?,
+    listpreamble.mix*,
+    listitem+
+  }
+variablelist =
+  element variablelist {
+    variablelist.attlist,
+    formalobject.title.content?,
+    listpreamble.mix*,
+    varlistentry+
+  }
+example =
+  element example {
+    example.attlist, formalobject.title.content, example.mix+
+  }
+figure =
+  element figure {
+    figure.attlist,
+    formalobject.title.content,
+    (figure.mix | link.char.class)+
+  }
+legalnotice =
+  element legalnotice { legalnotice.attlist, title?, legalnotice.mix+ }
+systemitem =
+  element systemitem { systemitem.attlist, (cptr.char.mix | acronym)* }
+computeroutput =
+  element computeroutput { computeroutput.attlist, cptr.char.mix* }
+userinput = element userinput { userinput.attlist, cptr.char.mix* }
+blockquote =
+  element blockquote {
+    blockquote.attlist, title?, attribution?, component.mix+
+  }
+address =
+  element address {
+    address.attlist,
+    (text | person.ident.mix | city | state | country | email)*
+  }
+subscript =
+  element subscript {
+    subscript.attlist,
+    (text
+     | link.char.class
+     | emphasis
+     | replaceable
+     | inlinemediaobject
+     | base.char.class
+     | other.char.class)*
+  }
+superscript =
+  element superscript {
+    superscript.attlist,
+    (text
+     | link.char.class
+     | emphasis
+     | replaceable
+     | inlinemediaobject
+     | base.char.class
+     | other.char.class)*
+  }
+start = article

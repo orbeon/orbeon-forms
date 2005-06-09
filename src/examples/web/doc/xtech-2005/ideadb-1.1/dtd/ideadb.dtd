@@ -1,0 +1,1724 @@
+<!-- *********************************************************************
+     *** THIS IS THE FLATTENED DTD. DO NOT EDIT THIS DTD BY HAND, EDIT ***
+     *** THE CUSTOMIZATION LAYER AND REGENERATE THE FLATTENED DTD! ********
+     ********************************************************************* -->
+
+<!-- ...................................................................... -->
+<!-- IDEAlliance XML Conference Paper DocBook XML Subset V1.1 ............. -->
+<!-- File sdocbook-custom.dtd ............................................. -->
+
+
+<!-- Copyright 2004 IDEAlliance. Based on DocBook XML V4.3,
+     Copyright 1992-2004 HaL Computer Systems, Inc.,
+     O'Reilly & Associates, Inc., ArborText, Inc., Fujitsu Software
+     Corporation, Norman Walsh, Sun Microsystems, Inc., and the
+     Organization for the Advancement of Structured Information
+     Standards (OASIS).
+
+     $Id: ideadb.dtd,v 1.1 2005/06/09 22:02:43 ebruchez Exp $
+
+     Permission to use, copy, modify and distribute the DocBook XML DTD
+     and its accompanying documentation for any purpose and without fee
+     is hereby granted in perpetuity, provided that the above copyright
+     notice and this paragraph appear in all copies.  The copyright
+     holders make no representation about the suitability of the DTD for
+     any purpose.  It is provided "as is" without expressed or implied
+     warranty.
+
+     If you modify the XML Conference Paper DTD in any way, except for
+     declaring and referencing additional sets of general entities and
+     declaring additional notations, label your DTD as a variant of
+     the XML Conference Paper DTD. 
+-->
+
+<!-- ...................................................................... -->
+
+<!-- This is the driver file for V1.1 of the IDEAlliance XML Conference
+     Paper DocBook XML Subset DTD.
+     Please use the following formal public identifier to identify it:
+
+     "-//IDEAlliance//DTD Conference Paper DocBook XML Subset V1.1//EN"
+
+     For example:
+
+     <!DOCTYPE article
+       PUBLIC "-//IDEAlliance//DTD Conference Paper DocBook XML Subset V1.1//EN"
+              "ideadb.dtd">
+-->
+
+<!-- ...................................................................... -->
+
+
+<!ENTITY % linespecific.attrib
+	"format		(linespecific)	'linespecific'
+         linenumbering	(numbered|unnumbered) 	#IMPLIED
+         continuation	(continues|restarts)	#IMPLIED
+         startinglinenumber	CDATA		#IMPLIED
+         language	CDATA			#IMPLIED">
+<!ENTITY % local.notation.class "">
+<!ENTITY % notation.class
+		"BMP | GIF | GIF87a | GIF89a
+		| JPG | JPEG | PNG | SVG| SVGZ
+		| linespecific
+		%local.notation.class;">
+<!ENTITY % local.objectdata.attrib "">
+<!ENTITY % objectdata.attrib
+	"
+	fileref 	CDATA		#IMPLIED
+	format		(%notation.class;)
+					#IMPLIED
+	srccredit	CDATA		#IMPLIED
+	%local.objectdata.attrib;"
+>
+<!ENTITY % local.list.class "">
+<!ENTITY % list.class
+		"itemizedlist|orderedlist
+		|variablelist %local.list.class;">
+<!ENTITY % local.admon.class "">
+<!ENTITY % admon.class
+		"note %local.admon.class;">
+<!ENTITY % local.linespecific.class "">
+<!ENTITY % linespecific.class
+		"literallayout|programlisting %local.linespecific.class;">
+<!ENTITY % local.para.class "">
+<!ENTITY % para.class
+		"para %local.para.class;">
+<!ENTITY % local.informal.class "">
+<!ENTITY % informal.class
+		"blockquote
+		|mediaobject
+		|informaltable %local.informal.class;">
+<!ENTITY % local.formal.class "">
+<!ENTITY % formal.class
+		"example|figure|table %local.formal.class;">
+<!ENTITY % local.compound.class "">
+<!ENTITY % compound.class
+		"sidebar %local.compound.class;">
+<!ENTITY % local.genobj.class "">
+<!ENTITY % genobj.class "anchor %local.genobj.class;">
+<!ENTITY % local.descobj.class "">
+<!ENTITY % descobj.class
+		"abstract|personblurb|epigraph
+		%local.descobj.class;">
+<!ENTITY % local.xref.char.class "">
+<!ENTITY % xref.char.class "footnoteref|xref %local.xref.char.class;">
+<!ENTITY % local.gen.char.class "">
+<!ENTITY % gen.char.class
+		"abbrev|acronym|citetitle|emphasis|footnote|phrase
+		|quote|trademark %local.gen.char.class;">
+<!ENTITY % local.link.char.class "">
+<!ENTITY % link.char.class
+		"link|ulink %local.link.char.class;">
+<!ENTITY % local.tech.char.class "">
+<!ENTITY % tech.char.class
+		"command|computeroutput
+		|email|filename
+		|literal
+		|option
+		|replaceable
+		|systemitem|userinput|sgmltag|code
+		%local.tech.char.class;">
+<!ENTITY % local.base.char.class "">
+<!ENTITY % base.char.class "anchor %local.base.char.class;">
+<!ENTITY % local.docinfo.char.class "">
+<!ENTITY % docinfo.char.class
+		"author|corpauthor|othercredit
+		|revhistory
+		%local.docinfo.char.class;">
+<!ENTITY % local.inlineobj.char.class "">
+<!ENTITY % inlineobj.char.class
+		"inlinemediaobject %local.inlineobj.char.class;">
+<!ENTITY % local.effectivity.attrib "">
+<!ENTITY % effectivity.attrib 
+	"%local.effectivity.attrib;"
+>
+<!ENTITY % local.common.attrib "">
+<!ENTITY % common.attrib
+	"id		ID		#IMPLIED
+	lang		CDATA		#IMPLIED
+        remap           CDATA           #IMPLIED
+	xreflabel	CDATA		#IMPLIED
+	revisionflag	(changed
+			|added
+			|deleted
+			|off)		#IMPLIED
+	%local.common.attrib;"
+>
+<!ENTITY % local.person.ident.mix "">
+<!ENTITY % person.ident.mix
+		"honorific|firstname|surname|lineage|othername|affiliation
+		|personblurb
+		%local.person.ident.mix;">
+<!ENTITY % local.bibliocomponent.mix "">
+<!ENTITY % bibliocomponent.mix
+		"abbrev|abstract|author
+		|authorgroup|bibliomisc
+		|copyright|corpauthor|date|edition
+		|editor|issuenum
+		|othercredit|pagenums
+		|pubdate|publishername
+		|releaseinfo|revhistory
+		|subtitle|title|titleabbrev|volumenum|citetitle
+		|%person.ident.mix;
+		%local.bibliocomponent.mix;">
+<!ENTITY % local.other.char.class "">
+<!ENTITY % other.char.class
+		"subscript|superscript %local.other.char.class;">
+<!ENTITY % local.component.mix "">
+<!ENTITY % component.mix
+		"%list.class;		|%admon.class;
+		|%linespecific.class;
+		|%para.class;		|%informal.class;
+		|%formal.class;		|%compound.class;
+		|%genobj.class;		|%descobj.class;
+		%local.component.mix;">
+<!ENTITY % local.sidebar.mix "">
+<!ENTITY % sidebar.mix
+		"%list.class;		|%admon.class;
+		|%linespecific.class;
+		|%para.class;		|%informal.class;
+		|%formal.class;
+		|%genobj.class;
+		%local.sidebar.mix;">
+<!ENTITY % local.revdescription.mix "">
+<!ENTITY % revdescription.mix
+		"%list.class;		|%admon.class;
+		|%linespecific.class;
+		|%para.class;		|%informal.class;
+		|%formal.class;
+		|%genobj.class;
+		%local.revdescription.mix;">
+<!ENTITY % local.footnote.mix "">
+<!ENTITY % footnote.mix
+		"%list.class;
+		|%linespecific.class;
+		|%para.class;		|%informal.class;
+		%local.footnote.mix;">
+<!ENTITY % local.example.mix "">
+<!ENTITY % example.mix
+		"%list.class;
+		|%linespecific.class;
+		|%para.class;		|%informal.class;
+		%local.example.mix;">
+<!ENTITY % local.admon.mix "">
+<!ENTITY % admon.mix
+		"%list.class;
+		|%linespecific.class;
+		|%para.class;		|%informal.class;
+		|%formal.class;
+		%local.admon.mix;">
+<!ENTITY % local.figure.mix "">
+<!ENTITY % figure.mix
+		"%linespecific.class;
+					|%informal.class;
+		%local.figure.mix;">
+<!ENTITY % local.tabentry.mix "">
+<!ENTITY % tabentry.mix
+		"%list.class;		|%admon.class;
+		|%linespecific.class;
+		|%para.class;		|mediaobject
+		%local.tabentry.mix;">
+<!ENTITY % local.legalnotice.mix "">
+<!ENTITY % legalnotice.mix
+		"%list.class;		|%admon.class;
+		|%linespecific.class;
+		|%para.class;		|blockquote
+		%local.legalnotice.mix;">
+<!ENTITY % local.textobject.mix "">
+<!ENTITY % textobject.mix
+		"%list.class;		|%admon.class;
+		|%linespecific.class;
+		|%para.class;		|blockquote
+		%local.textobject.mix;">
+<!ENTITY % local.listpreamble.mix "">
+<!ENTITY % listpreamble.mix
+		"                  	 %admon.class;
+		|%linespecific.class;
+		|%para.class;		|%informal.class;
+		|%genobj.class;		|%descobj.class;
+		%local.listpreamble.mix;">
+<!ENTITY % local.para.char.mix "">
+<!ENTITY % para.char.mix
+		"#PCDATA
+		|%xref.char.class;	|%gen.char.class;
+		|%link.char.class;	|%tech.char.class;
+                |%base.char.class;
+		|%other.char.class;	|%inlineobj.char.class;
+		%local.para.char.mix;">
+<!ENTITY % local.title.char.mix "">
+<!ENTITY % title.char.mix
+		"#PCDATA
+		|%xref.char.class;	|%gen.char.class;
+		|%link.char.class;	|%tech.char.class;
+                |%base.char.class;
+					|%docinfo.char.class;
+		|%other.char.class;	|%inlineobj.char.class;
+		%local.title.char.mix;">
+<!ENTITY % local.cptr.char.mix "">
+<!ENTITY % cptr.char.mix
+		"#PCDATA
+		|%link.char.class;	|%tech.char.class;
+                |%base.char.class;
+		|%other.char.class;	|inlinemediaobject
+		%local.cptr.char.mix;">
+<!ENTITY % local.smallcptr.char.mix "">
+<!ENTITY % smallcptr.char.mix
+		"#PCDATA
+					|replaceable
+					|inlinemediaobject
+		%local.smallcptr.char.mix;">
+<!ENTITY % local.word.char.mix "">
+<!ENTITY % word.char.mix
+		"#PCDATA
+					|acronym|emphasis|trademark
+		|%link.char.class;
+                |%base.char.class;
+		|%other.char.class;	|inlinemediaobject
+		%local.word.char.mix;">
+<!ENTITY % local.docinfo.char.mix "">
+<!ENTITY % docinfo.char.mix
+		"#PCDATA
+		|%link.char.class;
+					|emphasis|trademark
+					|replaceable
+		|%other.char.class;	|inlinemediaobject
+		%local.docinfo.char.mix;">
+<!ENTITY % tbl.table.mdl
+	"((title, (mediaobject+|tgroup+))
+          |(caption, (col*|colgroup*), thead?, tfoot?, (tbody+|tr+)))">
+<!ENTITY % local.divcomponent.mix "">
+<!ENTITY % divcomponent.mix
+		"%list.class;		|%admon.class;
+		|%linespecific.class;
+		|%para.class;		|%informal.class;
+		|%formal.class;		|%compound.class;
+					|%descobj.class;
+		%local.divcomponent.mix;">
+<!ENTITY % bookcomponent.content
+	"((%divcomponent.mix;)+, section*)
+	| section+">
+<!ENTITY euro "&#x20AC;">
+<!ENTITY % yesorno.attvals	"CDATA">
+<!ENTITY % formalobject.title.content "title, titleabbrev?">
+<!ENTITY % local.mediaobject.mix "">
+<!ENTITY % mediaobject.mix
+		"videoobject|audioobject|imageobject|textobject %local.mediaobject.mix;">
+<!ENTITY % idreq.attrib
+	"id		ID		#REQUIRED">
+<!ENTITY % lang.attrib
+	"lang		CDATA		#IMPLIED">
+<!ENTITY % remap.attrib
+	"remap		CDATA		#IMPLIED">
+<!ENTITY % role.attrib
+	"role		CDATA		#IMPLIED">
+<!ENTITY % xreflabel.attrib
+	"xreflabel	CDATA		#IMPLIED">
+<!ENTITY % revisionflag.attrib
+	"revisionflag	(changed
+			|added
+			|deleted
+			|off)		#IMPLIED">
+<!ENTITY % dir.attrib
+	"dir		(ltr
+			|rtl
+			|lro
+			|rlo)		#IMPLIED">
+<!ENTITY % xml-base.attrib
+	"xml:base	CDATA		#IMPLIED">
+<!ENTITY % label.attrib
+	"label		CDATA		#IMPLIED">
+<!ENTITY % linkendreq.attrib
+	"linkend	IDREF		#REQUIRED">
+<!ENTITY % local.mark.attrib "">
+<!ENTITY % mark.attrib
+	"mark		CDATA		#IMPLIED
+	%local.mark.attrib;"
+>
+<!ENTITY % moreinfo.attrib
+	"moreinfo	(refentry|none)	'none'">
+<!ENTITY % pagenum.attrib
+	"pagenum	CDATA		#IMPLIED">
+<!ENTITY % local.status.attrib "">
+<!ENTITY % status.attrib
+	"status		CDATA		#IMPLIED
+	%local.status.attrib;"
+>
+<!ENTITY % width.attrib
+	"width		CDATA		#IMPLIED">
+<!ENTITY % local.title.attrib "">
+<!ENTITY % title.role.attrib "%role.attrib;">
+<!ELEMENT title  (%title.char.mix;)*>
+<!ATTLIST title
+		%pagenum.attrib;
+		%common.attrib;
+		%title.role.attrib;
+		%local.title.attrib;
+>
+<!ENTITY % local.titleabbrev.attrib "">
+<!ENTITY % titleabbrev.role.attrib "%role.attrib;">
+<!ELEMENT titleabbrev  (%title.char.mix;)*>
+<!ATTLIST titleabbrev
+		%common.attrib;
+		%titleabbrev.role.attrib;
+		%local.titleabbrev.attrib;
+>
+<!ENTITY % local.subtitle.attrib "">
+<!ENTITY % subtitle.role.attrib "%role.attrib;">
+<!ELEMENT subtitle  (%title.char.mix;)*>
+<!ATTLIST subtitle
+		%common.attrib;
+		%subtitle.role.attrib;
+		%local.subtitle.attrib;
+>
+<!ENTITY % local.bibliomixed.attrib "">
+<!ENTITY % bibliomixed.role.attrib "%role.attrib;">
+<!ATTLIST bibliomixed
+		%common.attrib;
+		%bibliomixed.role.attrib;
+		%local.bibliomixed.attrib;
+>
+<!ENTITY % local.articleinfo.attrib "">
+<!ENTITY % articleinfo.role.attrib "%role.attrib;">
+<!ATTLIST articleinfo
+		%common.attrib;
+		%articleinfo.role.attrib;
+		%local.articleinfo.attrib;
+>
+<!ENTITY % bibliomset.role.attrib "%role.attrib;">
+<!ENTITY % local.bibliomset.attrib "">
+<!ELEMENT bibliomset  (#PCDATA | %bibliocomponent.mix; | bibliomset)*
+                      >
+<!ATTLIST bibliomset
+		relation	CDATA		#IMPLIED
+		%common.attrib;
+		%bibliomset.role.attrib;
+		%local.bibliomset.attrib;
+>
+<!ENTITY % local.bibliomisc.attrib "">
+<!ENTITY % bibliomisc.role.attrib "%role.attrib;">
+<!ELEMENT bibliomisc  (%para.char.mix;)*>
+<!ATTLIST bibliomisc
+		%common.attrib;
+		%bibliomisc.role.attrib;
+		%local.bibliomisc.attrib;
+>
+<!ENTITY % local.subjectset.attrib "">
+<!ENTITY % subjectset.role.attrib "%role.attrib;">
+<!ELEMENT subjectset  (subject+)>
+<!ATTLIST subjectset
+		scheme		NMTOKEN		#IMPLIED
+		%common.attrib;
+		%subjectset.role.attrib;
+		%local.subjectset.attrib;
+>
+<!ENTITY % local.subject.attrib "">
+<!ENTITY % subject.role.attrib "%role.attrib;">
+<!ELEMENT subject  (subjectterm+)>
+<!ATTLIST subject
+		weight		CDATA		#IMPLIED
+		%common.attrib;
+		%subject.role.attrib;
+		%local.subject.attrib;
+>
+<!ENTITY % local.subjectterm.attrib "">
+<!ENTITY % subjectterm.role.attrib "%role.attrib;">
+<!ELEMENT subjectterm  (#PCDATA)>
+<!ATTLIST subjectterm
+		%common.attrib;
+		%subjectterm.role.attrib;
+		%local.subjectterm.attrib;
+>
+<!ENTITY % local.keywordset.attrib "">
+<!ENTITY % keywordset.role.attrib "%role.attrib;">
+<!ELEMENT keywordset  (keyword+)>
+<!ATTLIST keywordset
+		%common.attrib;
+		%keywordset.role.attrib;
+		%local.keywordset.attrib;
+>
+<!ENTITY % local.keyword.attrib "">
+<!ENTITY % keyword.role.attrib "%role.attrib;">
+<!ELEMENT keyword  (#PCDATA)>
+<!ATTLIST keyword
+		%common.attrib;
+		%keyword.role.attrib;
+		%local.keyword.attrib;
+>
+<!ENTITY % local.sidebar.attrib "">
+<!ENTITY % sidebar.role.attrib "%role.attrib;">
+<!ATTLIST sidebar
+		%common.attrib;
+		%sidebar.role.attrib;
+		%local.sidebar.attrib;
+>
+<!ENTITY % local.abstract.attrib "">
+<!ENTITY % abstract.role.attrib "%role.attrib;">
+<!ELEMENT abstract  (title?, (%para.class;)+)>
+<!ATTLIST abstract
+		%common.attrib;
+		%abstract.role.attrib;
+		%local.abstract.attrib;
+>
+<!ENTITY % local.personblurb.attrib "">
+<!ENTITY % personblurb.role.attrib "%role.attrib;">
+<!ELEMENT personblurb  (title?, (%para.class;)+)>
+<!ATTLIST personblurb
+		%common.attrib;
+		%personblurb.role.attrib;
+		%local.personblurb.attrib;
+>
+<!ENTITY % local.blockquote.attrib "">
+<!ENTITY % blockquote.role.attrib "%role.attrib;">
+<!ATTLIST blockquote
+		%common.attrib;
+		%blockquote.role.attrib;
+		%local.blockquote.attrib;
+>
+<!ENTITY % local.attribution.attrib "">
+<!ENTITY % attribution.role.attrib "%role.attrib;">
+<!ELEMENT attribution  (%para.char.mix;)*>
+<!ATTLIST attribution
+		%common.attrib;
+		%attribution.role.attrib;
+		%local.attribution.attrib;
+>
+<!ENTITY % local.epigraph.attrib "">
+<!ENTITY % epigraph.role.attrib "%role.attrib;">
+<!ELEMENT epigraph  (attribution?, ((%para.class;)|literallayout)+)>
+<!ATTLIST epigraph
+		%common.attrib;
+		%epigraph.role.attrib;
+		%local.epigraph.attrib;
+>
+<!ENTITY % local.footnote.attrib "">
+<!ENTITY % footnote.role.attrib "%role.attrib;">
+<!ELEMENT footnote  ((%footnote.mix;)+)
+                      >
+<!ATTLIST footnote
+		%label.attrib;
+		%common.attrib;
+		%footnote.role.attrib;
+		%local.footnote.attrib;
+>
+<!ENTITY % local.para.attrib "">
+<!ENTITY % para.role.attrib "%role.attrib;">
+<!ATTLIST para
+		%common.attrib;
+		%para.role.attrib;
+		%local.para.attrib;
+>
+<!ENTITY % local.admon.attrib "">
+<!ENTITY % admon.role.attrib "%role.attrib;">
+<!ELEMENT note  (title?, (%admon.mix;)+)
+                      >
+<!ATTLIST note
+		%common.attrib;
+		%admon.role.attrib;
+		%local.admon.attrib;
+>
+<!ENTITY % local.itemizedlist.attrib "">
+<!ENTITY % itemizedlist.role.attrib "%role.attrib;">
+<!ATTLIST itemizedlist		spacing		(normal
+				|compact)	#IMPLIED
+		%mark.attrib;
+		%common.attrib;
+		%itemizedlist.role.attrib;
+		%local.itemizedlist.attrib;
+>
+<!ENTITY % local.orderedlist.attrib "">
+<!ENTITY % orderedlist.role.attrib "%role.attrib;">
+<!ATTLIST orderedlist
+		numeration	(arabic
+				|upperalpha
+				|loweralpha
+				|upperroman
+				|lowerroman)	#IMPLIED
+		inheritnum	(inherit
+				|ignore)	"ignore"
+		continuation	(continues
+				|restarts)	"restarts"
+		spacing		(normal
+				|compact)	#IMPLIED
+		%common.attrib;
+		%orderedlist.role.attrib;
+		%local.orderedlist.attrib;
+>
+<!ENTITY % local.listitem.attrib "">
+<!ENTITY % listitem.role.attrib "%role.attrib;">
+<!ELEMENT listitem  ((%component.mix;)+)>
+<!ATTLIST listitem
+		override	CDATA		#IMPLIED
+		%common.attrib;
+		%listitem.role.attrib;
+		%local.listitem.attrib;
+>
+<!ENTITY % local.variablelist.attrib "">
+<!ENTITY % variablelist.role.attrib "%role.attrib;">
+<!ATTLIST variablelist
+		termlength	CDATA		#IMPLIED
+		%common.attrib;
+		%variablelist.role.attrib;
+		%local.variablelist.attrib;
+>
+<!ENTITY % local.varlistentry.attrib "">
+<!ENTITY % varlistentry.role.attrib "%role.attrib;">
+<!ELEMENT varlistentry  (term+, listitem)>
+<!ATTLIST varlistentry
+		%common.attrib;
+		%varlistentry.role.attrib;
+		%local.varlistentry.attrib;
+>
+<!ENTITY % local.term.attrib "">
+<!ENTITY % term.role.attrib "%role.attrib;">
+<!ELEMENT term  (%para.char.mix;)*>
+<!ATTLIST term
+		%common.attrib;
+		%term.role.attrib;
+		%local.term.attrib;
+>
+<!ENTITY % local.example.attrib "">
+<!ENTITY % example.role.attrib "%role.attrib;">
+<!ATTLIST example
+		floatstyle	CDATA			#IMPLIED
+		%label.attrib;
+		%width.attrib;
+		%common.attrib;
+		%example.role.attrib;
+		%local.example.attrib;
+>
+<!ENTITY % local.programlisting.attrib "">
+<!ENTITY % programlisting.role.attrib "%role.attrib;">
+<!ATTLIST programlisting
+		%width.attrib;
+		%linespecific.attrib;
+		%common.attrib;
+		%programlisting.role.attrib;
+		%local.programlisting.attrib;
+>
+<!ENTITY % local.literallayout.attrib "">
+<!ENTITY % literallayout.role.attrib "%role.attrib;">
+<!ATTLIST literallayout
+		%width.attrib;
+		%linespecific.attrib;
+		class	(monospaced|normal)	"normal"
+		%common.attrib;
+		%literallayout.role.attrib;
+		%local.literallayout.attrib;
+>
+<!ENTITY % local.figure.attrib "">
+<!ENTITY % figure.role.attrib "%role.attrib;">
+<!ATTLIST figure
+		float		%yesorno.attvals;	'0'
+		floatstyle	CDATA			#IMPLIED
+		pgwide      	%yesorno.attvals;       #IMPLIED
+		%label.attrib;
+		%common.attrib;
+		%figure.role.attrib;
+		%local.figure.attrib;
+>
+<!ENTITY % local.mediaobject.attrib "">
+<!ENTITY % mediaobject.role.attrib "%role.attrib;">
+<!ELEMENT mediaobject  (objectinfo?,
+                           (%mediaobject.mix;)+,
+			   caption?)>
+<!ATTLIST mediaobject
+		%common.attrib;
+		%mediaobject.role.attrib;
+		%local.mediaobject.attrib;
+>
+<!ENTITY % local.inlinemediaobject.attrib "">
+<!ENTITY % inlinemediaobject.role.attrib "%role.attrib;">
+<!ELEMENT inlinemediaobject  (objectinfo?,
+                	         (%mediaobject.mix;)+)>
+<!ATTLIST inlinemediaobject
+		%common.attrib;
+		%inlinemediaobject.role.attrib;
+		%local.inlinemediaobject.attrib;
+>
+<!ENTITY % local.videoobject.attrib "">
+<!ENTITY % videoobject.role.attrib "%role.attrib;">
+<!ELEMENT videoobject  (objectinfo?, videodata)>
+<!ATTLIST videoobject
+		%common.attrib;
+		%videoobject.role.attrib;
+		%local.videoobject.attrib;
+>
+<!ENTITY % local.audioobject.attrib "">
+<!ENTITY % audioobject.role.attrib "%role.attrib;">
+<!ELEMENT audioobject  (objectinfo?, audiodata)>
+<!ATTLIST audioobject
+		%common.attrib;
+		%audioobject.role.attrib;
+		%local.audioobject.attrib;
+>
+<!ENTITY % local.imageobject.attrib "">
+<!ENTITY % imageobject.role.attrib "%role.attrib;">
+<!ELEMENT imageobject  (objectinfo?, imagedata)>
+<!ATTLIST imageobject
+		%common.attrib;
+		%imageobject.role.attrib;
+		%local.imageobject.attrib;
+>
+<!ENTITY % local.textobject.attrib "">
+<!ENTITY % textobject.role.attrib "%role.attrib;">
+<!ELEMENT textobject  (objectinfo?, (phrase|textdata|(%textobject.mix;)+))>
+<!ATTLIST textobject
+		%common.attrib;
+		%textobject.role.attrib;
+		%local.textobject.attrib;
+>
+<!ENTITY % local.objectinfo.attrib "">
+<!ENTITY % objectinfo.role.attrib "%role.attrib;">
+<!ATTLIST objectinfo
+		%common.attrib;
+		%objectinfo.role.attrib;
+		%local.objectinfo.attrib;
+>
+<!ENTITY % local.videodata.attrib "">
+<!ENTITY % videodata.role.attrib "%role.attrib;">
+<!ELEMENT videodata  EMPTY>
+<!ATTLIST videodata
+	width		CDATA		#IMPLIED
+	contentwidth	CDATA		#IMPLIED
+	depth		CDATA		#IMPLIED
+	contentdepth	CDATA		#IMPLIED
+	align		(left
+			|right
+			|center)	#IMPLIED
+	valign		(top
+			|middle
+			|bottom)	#IMPLIED
+	scale		CDATA		#IMPLIED
+	scalefit	%yesorno.attvals;
+					#IMPLIED
+		%objectdata.attrib;
+		%common.attrib;
+		%videodata.role.attrib;
+		%local.videodata.attrib;
+>
+<!ENTITY % local.audiodata.attrib "">
+<!ENTITY % audiodata.role.attrib "%role.attrib;">
+<!ELEMENT audiodata  EMPTY>
+<!ATTLIST audiodata
+		%objectdata.attrib;
+		%common.attrib;
+		%audiodata.role.attrib;
+		%local.audiodata.attrib;
+>
+<!ENTITY % local.imagedata.attrib "">
+<!ENTITY % imagedata.role.attrib "%role.attrib;">
+<!ELEMENT imagedata  EMPTY>
+<!ATTLIST imagedata
+	width		CDATA		#IMPLIED
+	contentwidth	CDATA		#IMPLIED
+	depth		CDATA		#IMPLIED
+	contentdepth	CDATA		#IMPLIED
+	align		(left
+			|right
+			|center)	#IMPLIED
+	valign		(top
+			|middle
+			|bottom)	#IMPLIED
+	scale		CDATA		#IMPLIED
+	scalefit	%yesorno.attvals;
+					#IMPLIED
+		%objectdata.attrib;
+		%common.attrib;
+		%imagedata.role.attrib;
+		%local.imagedata.attrib;
+>
+<!ENTITY % local.textdata.attrib "">
+<!ENTITY % textdata.role.attrib "%role.attrib;">
+<!ELEMENT textdata  EMPTY>
+<!ATTLIST textdata
+		encoding	CDATA	#IMPLIED
+		%objectdata.attrib;
+		%common.attrib;
+		%textdata.role.attrib;
+		%local.textdata.attrib;
+>
+<!ENTITY % html.coreattrs
+ "id          ID             #IMPLIED
+  class       CDATA          #IMPLIED
+  style       CDATA          #IMPLIED
+  title       CDATA         #IMPLIED"
+  >
+<!ENTITY % i18n
+ "xml:lang    NMTOKEN        #IMPLIED"
+  >
+<!ENTITY % events
+ "onclick     CDATA       #IMPLIED
+  ondblclick  CDATA       #IMPLIED
+  onmousedown CDATA       #IMPLIED
+  onmouseup   CDATA       #IMPLIED
+  onmouseover CDATA       #IMPLIED
+  onmousemove CDATA       #IMPLIED
+  onmouseout  CDATA       #IMPLIED
+  onkeypress  CDATA       #IMPLIED
+  onkeydown   CDATA       #IMPLIED
+  onkeyup     CDATA       #IMPLIED"
+  >
+<!ENTITY % attrs "%html.coreattrs; %i18n; %events;">
+<!ENTITY % cellhalign
+  "align      (left|center|right|justify|char) #IMPLIED
+   char       CDATA    #IMPLIED
+   charoff    CDATA       #IMPLIED"
+  >
+<!ENTITY % cellvalign
+  "valign     (top|middle|bottom|baseline) #IMPLIED"
+  >
+<!ELEMENT colgroup (col)*>
+<!ELEMENT col      EMPTY>
+<!ELEMENT tr       (th|td)+>
+<!ELEMENT th       (%para.char.mix; | %tabentry.mix;)*>
+<!ELEMENT td       (%para.char.mix; | %tabentry.mix;)*>
+<!ATTLIST colgroup
+  %attrs;
+  span        CDATA       "1"
+  width       CDATA  #IMPLIED
+  %cellhalign;
+  %cellvalign;
+  >
+<!ATTLIST col
+  %attrs;
+  span        CDATA       "1"
+  width       CDATA  #IMPLIED
+  %cellhalign;
+  %cellvalign;
+  >
+<!ATTLIST tr
+  %attrs;
+  %cellhalign;
+  %cellvalign;
+  bgcolor     CDATA        #IMPLIED
+  >
+<!ATTLIST th
+  %attrs;
+  abbr        CDATA         #IMPLIED
+  axis        CDATA          #IMPLIED
+  headers     IDREFS         #IMPLIED
+  scope       (row|col|rowgroup|colgroup)   #IMPLIED
+  rowspan     CDATA       "1"
+  colspan     CDATA       "1"
+  %cellhalign;
+  %cellvalign;
+  nowrap      (nowrap)       #IMPLIED
+  bgcolor     CDATA         #IMPLIED
+  width       CDATA       #IMPLIED
+  height      CDATA       #IMPLIED
+  >
+<!ATTLIST td
+  %attrs;
+  abbr        CDATA         #IMPLIED
+  axis        CDATA          #IMPLIED
+  headers     IDREFS         #IMPLIED
+  scope       (row|col|rowgroup|colgroup)   #IMPLIED
+  rowspan     CDATA       "1"
+  colspan     CDATA       "1"
+  %cellhalign;
+  %cellvalign;
+  nowrap      (nowrap)       #IMPLIED
+  bgcolor     CDATA         #IMPLIED
+  width       CDATA       #IMPLIED
+  height      CDATA       #IMPLIED
+  >
+<!ENTITY % tables.role.attrib "%role.attrib;">
+<!ENTITY % bodyatt "
+		floatstyle	CDATA			#IMPLIED
+                %label.attrib;"
+>
+<!ENTITY % secur "
+	%common.attrib;
+	class       CDATA          #IMPLIED
+	style       CDATA          #IMPLIED
+	title       CDATA         #IMPLIED
+	%i18n;
+	%events;
+	%tables.role.attrib;">
+<!ENTITY % common.table.attribs
+	"%bodyatt;
+	%secur;">
+<!ENTITY % tbl.table.att        '
+    tabstyle    CDATA           #IMPLIED
+    tocentry    %yesorno.attvals;       #IMPLIED
+    shortentry  %yesorno.attvals;       #IMPLIED
+    orient      (port|land)     #IMPLIED
+    pgwide      %yesorno.attvals;       #IMPLIED 
+    summary     CDATA          #IMPLIED
+    width       CDATA        #IMPLIED
+    border      CDATA        #IMPLIED
+    rules       (none | groups | rows | cols | all)      #IMPLIED
+    cellspacing CDATA        #IMPLIED
+    cellpadding CDATA        #IMPLIED
+    align       (left|center|right)   #IMPLIED
+    bgcolor     CDATA         #IMPLIED
+'>
+<!ENTITY % tbl.frame.attval "void|above|below|hsides|lhs|rhs|vsides|box|border|
+top|bottom|topbot|all|sides|none">
+<!ENTITY % tbl.entry.mdl "%para.char.mix; | %tabentry.mix;">
+<!ENTITY % tbl.hdft.mdl        "(tr+|(colspec*,row+))">
+<!ENTITY % tbl.tbody.mdl       "(tr+|row+)">
+<!ENTITY % yesorno 'CDATA'>
+<!ENTITY % tbl.tgroup.mdl       "colspec*,spanspec*,thead?,tfoot?,tbody">
+<!ENTITY % tbl.tgroup.att       '
+    tgroupstyle CDATA           #IMPLIED '>
+<!ENTITY % tbl.row.mdl          "(entry|entrytbl)+">
+<!ENTITY % tbl.entrytbl.mdl     "colspec*,spanspec*,thead?,tbody">
+<!ELEMENT table  (%tbl.table.mdl;)>
+<!ATTLIST table
+        frame           (%tbl.frame.attval;)                    #IMPLIED
+        colsep          %yesorno;                               #IMPLIED
+        rowsep          %yesorno;                               #IMPLIED
+        %tbl.table.att;
+        %bodyatt;
+        %secur;
+>
+<!ELEMENT tgroup  (%tbl.tgroup.mdl;) >
+<!ATTLIST tgroup
+        cols            CDATA                                   #REQUIRED
+        %tbl.tgroup.att;
+        colsep          %yesorno;                               #IMPLIED
+        rowsep          %yesorno;                               #IMPLIED
+        align           (left|right|center|justify|char)        #IMPLIED
+        char            CDATA                                   #IMPLIED
+        charoff         CDATA                                   #IMPLIED
+        %secur;
+>
+<!ELEMENT colspec  EMPTY >
+<!ATTLIST colspec
+        colnum          CDATA                                   #IMPLIED
+        colname         CDATA                                   #IMPLIED
+        colwidth        CDATA                                   #IMPLIED
+        colsep          %yesorno;                               #IMPLIED
+        rowsep          %yesorno;                               #IMPLIED
+        align           (left|right|center|justify|char)        #IMPLIED
+        char            CDATA                                   #IMPLIED
+        charoff         CDATA                                   #IMPLIED
+>
+<!ELEMENT spanspec  EMPTY >
+<!ATTLIST spanspec
+        namest          CDATA                                   #REQUIRED
+        nameend         CDATA                                   #REQUIRED
+        spanname        CDATA                                   #REQUIRED
+        colsep          %yesorno;                               #IMPLIED
+        rowsep          %yesorno;                               #IMPLIED
+        align           (left|right|center|justify|char)        #IMPLIED
+        char            CDATA                                   #IMPLIED
+        charoff         CDATA                                   #IMPLIED
+>
+<!ELEMENT thead  (%tbl.hdft.mdl;)>
+<!ATTLIST thead
+        valign          (top|middle|bottom)                     #IMPLIED
+        %secur;
+>
+<!ELEMENT tfoot  (%tbl.hdft.mdl;)>
+<!ATTLIST tfoot
+        valign          (top|middle|bottom)                     #IMPLIED
+        %secur;
+>
+<!ELEMENT tbody  (%tbl.tbody.mdl;)>
+<!ATTLIST tbody
+        valign          (top|middle|bottom)                     #IMPLIED
+        %secur;
+>
+<!ELEMENT row  (%tbl.row.mdl;)>
+<!ATTLIST row
+        rowsep          %yesorno;                               #IMPLIED
+        valign          (top|middle|bottom)                     #IMPLIED
+        %secur;
+>
+<!ELEMENT entrytbl  (%tbl.entrytbl.mdl;)>
+<!ATTLIST entrytbl
+        cols            CDATA                                   #REQUIRED
+        %tbl.tgroup.att;
+        colname         CDATA                                   #IMPLIED
+        spanname        CDATA                                   #IMPLIED
+        namest          CDATA                                   #IMPLIED
+        nameend         CDATA                                   #IMPLIED
+        colsep          %yesorno;                               #IMPLIED
+        rowsep          %yesorno;                               #IMPLIED
+        align           (left|right|center|justify|char)        #IMPLIED
+        char            CDATA                                   #IMPLIED
+        charoff         CDATA                                   #IMPLIED
+        %secur;
+>
+<!ELEMENT entry  (%tbl.entry.mdl;)*>
+<!ATTLIST entry
+        colname         CDATA                                   #IMPLIED
+        namest          CDATA                                   #IMPLIED
+        nameend         CDATA                                   #IMPLIED
+        spanname        CDATA                                   #IMPLIED
+        morerows        CDATA                                   #IMPLIED
+        colsep          %yesorno;                               #IMPLIED
+        rowsep          %yesorno;                               #IMPLIED
+        align           (left|right|center|justify|char)        #IMPLIED
+        char            CDATA                                   #IMPLIED
+        charoff         CDATA                                   #IMPLIED
+        rotate          %yesorno;                               #IMPLIED
+        valign          (top|middle|bottom)                     #IMPLIED
+        %secur;
+>
+<!ENTITY % local.informaltable.attrib "">
+<!ATTLIST informaltable
+		frame		(%tbl.frame.attval;)	#IMPLIED
+		colsep		%yesorno.attvals;	#IMPLIED
+		rowsep		%yesorno.attvals;	#IMPLIED
+		%common.table.attribs;
+		%tbl.table.att;
+		%local.informaltable.attrib;
+>
+<!ENTITY % local.caption.attrib "">
+<!ENTITY % caption.role.attrib "%role.attrib;">
+<!ELEMENT caption  (#PCDATA | %textobject.mix;)*>
+<!ENTITY % caption.attlist.content "
+	%lang.attrib;
+	%remap.attrib;
+	%xreflabel.attrib;
+	%revisionflag.attrib;
+	%effectivity.attrib;
+	%dir.attrib;
+	%xml-base.attrib;
+	%local.common.attrib;
+		%caption.role.attrib;
+		%attrs;
+		align	(top|bottom|left|right)	#IMPLIED
+		%local.caption.attrib;
+">
+<!ATTLIST caption %caption.attlist.content;>
+<!ENTITY % local.ackno.attrib "">
+<!ENTITY % ackno.role.attrib "%role.attrib;">
+<!ELEMENT ackno  (%docinfo.char.mix;)*>
+<!ATTLIST ackno
+		%common.attrib;
+		%ackno.role.attrib;
+		%local.ackno.attrib;
+>
+<!ENTITY % local.address.attrib "">
+<!ENTITY % address.role.attrib "%role.attrib;">
+<!ATTLIST address
+		%linespecific.attrib;
+		%common.attrib;
+		%address.role.attrib;
+		%local.address.attrib;
+>
+<!ENTITY % local.city.attrib "">
+<!ENTITY % city.role.attrib "%role.attrib;">
+<!ELEMENT city  (%docinfo.char.mix;)*>
+<!ATTLIST city
+		%common.attrib;
+		%city.role.attrib;
+		%local.city.attrib;
+>
+<!ENTITY % local.state.attrib "">
+<!ENTITY % state.role.attrib "%role.attrib;">
+<!ELEMENT state  (%docinfo.char.mix;)*>
+<!ATTLIST state
+		%common.attrib;
+		%state.role.attrib;
+		%local.state.attrib;
+>
+<!ENTITY % local.country.attrib "">
+<!ENTITY % country.role.attrib "%role.attrib;">
+<!ELEMENT country  (%docinfo.char.mix;)*>
+<!ATTLIST country
+		%common.attrib;
+		%country.role.attrib;
+		%local.country.attrib;
+>
+<!ENTITY % local.affiliation.attrib "">
+<!ENTITY % affiliation.role.attrib "%role.attrib;">
+<!ELEMENT affiliation  (shortaffil?, jobtitle*, orgname?, orgdiv*,
+		address*)>
+<!ATTLIST affiliation
+		%common.attrib;
+		%affiliation.role.attrib;
+		%local.affiliation.attrib;
+>
+<!ENTITY % local.shortaffil.attrib "">
+<!ENTITY % shortaffil.role.attrib "%role.attrib;">
+<!ELEMENT shortaffil  (%docinfo.char.mix;)*>
+<!ATTLIST shortaffil
+		%common.attrib;
+		%shortaffil.role.attrib;
+		%local.shortaffil.attrib;
+>
+<!ENTITY % local.jobtitle.attrib "">
+<!ENTITY % jobtitle.role.attrib "%role.attrib;">
+<!ELEMENT jobtitle  (%docinfo.char.mix;)*>
+<!ATTLIST jobtitle
+		%common.attrib;
+		%jobtitle.role.attrib;
+		%local.jobtitle.attrib;
+>
+<!ENTITY % local.orgdiv.attrib "">
+<!ENTITY % orgdiv.role.attrib "%role.attrib;">
+<!ELEMENT orgdiv  (%docinfo.char.mix;)*>
+<!ATTLIST orgdiv
+		%common.attrib;
+		%orgdiv.role.attrib;
+		%local.orgdiv.attrib;
+>
+<!ENTITY % local.author.attrib "">
+<!ENTITY % author.role.attrib "%role.attrib;">
+<!ATTLIST author
+		%common.attrib;
+		%author.role.attrib;
+		%local.author.attrib;
+>
+<!ENTITY % local.authorgroup.attrib "">
+<!ENTITY % authorgroup.role.attrib "%role.attrib;">
+<!ATTLIST authorgroup
+		%common.attrib;
+		%authorgroup.role.attrib;
+		%local.authorgroup.attrib;
+>
+<!ENTITY % local.authorinitials.attrib "">
+<!ENTITY % authorinitials.role.attrib "%role.attrib;">
+<!ELEMENT authorinitials  (%docinfo.char.mix;)*>
+<!ATTLIST authorinitials
+		%common.attrib;
+		%authorinitials.role.attrib;
+		%local.authorinitials.attrib;
+>
+<!ENTITY % local.copyright.attrib "">
+<!ENTITY % copyright.role.attrib "%role.attrib;">
+<!ELEMENT copyright  (year+, holder*)>
+<!ATTLIST copyright
+		%common.attrib;
+		%copyright.role.attrib;
+		%local.copyright.attrib;
+>
+<!ENTITY % local.year.attrib "">
+<!ENTITY % year.role.attrib "%role.attrib;">
+<!ELEMENT year  (%docinfo.char.mix;)*>
+<!ATTLIST year
+		%common.attrib;
+		%year.role.attrib;
+		%local.year.attrib;
+>
+<!ENTITY % local.holder.attrib "">
+<!ENTITY % holder.role.attrib "%role.attrib;">
+<!ELEMENT holder  (%docinfo.char.mix;)*>
+<!ATTLIST holder
+		%common.attrib;
+		%holder.role.attrib;
+		%local.holder.attrib;
+>
+<!ENTITY % local.corpauthor.attrib "">
+<!ENTITY % corpauthor.role.attrib "%role.attrib;">
+<!ELEMENT corpauthor  (%docinfo.char.mix;)*>
+<!ATTLIST corpauthor
+		%common.attrib;
+		%corpauthor.role.attrib;
+		%local.corpauthor.attrib;
+>
+<!ENTITY % local.date.attrib "">
+<!ENTITY % date.role.attrib "%role.attrib;">
+<!ELEMENT date  (%docinfo.char.mix;)*>
+<!ATTLIST date
+		%common.attrib;
+		%date.role.attrib;
+		%local.date.attrib;
+>
+<!ENTITY % local.edition.attrib "">
+<!ENTITY % edition.role.attrib "%role.attrib;">
+<!ELEMENT edition  (%docinfo.char.mix;)*>
+<!ATTLIST edition
+		%common.attrib;
+		%edition.role.attrib;
+		%local.edition.attrib;
+>
+<!ENTITY % local.editor.attrib "">
+<!ENTITY % editor.role.attrib "%role.attrib;">
+<!ATTLIST editor
+		%common.attrib;
+		%editor.role.attrib;
+		%local.editor.attrib;
+>
+<!ENTITY % local.issuenum.attrib "">
+<!ENTITY % issuenum.role.attrib "%role.attrib;">
+<!ELEMENT issuenum  (%docinfo.char.mix;)*>
+<!ATTLIST issuenum
+		%common.attrib;
+		%issuenum.role.attrib;
+		%local.issuenum.attrib;
+>
+<!ENTITY % local.legalnotice.attrib "">
+<!ENTITY % legalnotice.role.attrib "%role.attrib;">
+<!ATTLIST legalnotice
+		%common.attrib;
+		%legalnotice.role.attrib;
+		%local.legalnotice.attrib;
+>
+<!ENTITY % local.orgname.attrib "">
+<!ENTITY % orgname.role.attrib "%role.attrib;">
+<!ELEMENT orgname  (%docinfo.char.mix;)*>
+<!ATTLIST orgname
+		%common.attrib;
+		class	(corporation|nonprofit|consortium|informal|other)	#IMPLIED
+		otherclass	CDATA			#IMPLIED
+		%orgname.role.attrib;
+		%local.orgname.attrib;
+>
+<!ENTITY % local.othercredit.attrib "">
+<!ENTITY % othercredit.role.attrib "%role.attrib;">
+<!ATTLIST othercredit
+		class	(graphicdesigner
+			|productioneditor
+			|copyeditor
+			|technicaleditor
+			|translator
+			|other)			#IMPLIED
+		%common.attrib;
+		%othercredit.role.attrib;
+		%local.othercredit.attrib;
+>
+<!ENTITY % local.pagenums.attrib "">
+<!ENTITY % pagenums.role.attrib "%role.attrib;">
+<!ELEMENT pagenums  (%docinfo.char.mix;)*>
+<!ATTLIST pagenums
+		%common.attrib;
+		%pagenums.role.attrib;
+		%local.pagenums.attrib;
+>
+<!ENTITY % local.firstname.attrib "">
+<!ENTITY % firstname.role.attrib "%role.attrib;">
+<!ELEMENT firstname  (%docinfo.char.mix;)*>
+<!ATTLIST firstname
+		%common.attrib;
+		%firstname.role.attrib;
+		%local.firstname.attrib;
+>
+<!ENTITY % local.honorific.attrib "">
+<!ENTITY % honorific.role.attrib "%role.attrib;">
+<!ELEMENT honorific  (%docinfo.char.mix;)*>
+<!ATTLIST honorific
+		%common.attrib;
+		%honorific.role.attrib;
+		%local.honorific.attrib;
+>
+<!ENTITY % local.lineage.attrib "">
+<!ENTITY % lineage.role.attrib "%role.attrib;">
+<!ELEMENT lineage  (%docinfo.char.mix;)*>
+<!ATTLIST lineage
+		%common.attrib;
+		%lineage.role.attrib;
+		%local.lineage.attrib;
+>
+<!ENTITY % local.othername.attrib "">
+<!ENTITY % othername.role.attrib "%role.attrib;">
+<!ELEMENT othername  (%docinfo.char.mix;)*>
+<!ATTLIST othername
+		%common.attrib;
+		%othername.role.attrib;
+		%local.othername.attrib;
+>
+<!ENTITY % local.surname.attrib "">
+<!ENTITY % surname.role.attrib "%role.attrib;">
+<!ELEMENT surname  (%docinfo.char.mix;)*>
+<!ATTLIST surname
+		%common.attrib;
+		%surname.role.attrib;
+		%local.surname.attrib;
+>
+<!ENTITY % local.pubdate.attrib "">
+<!ENTITY % pubdate.role.attrib "%role.attrib;">
+<!ELEMENT pubdate  (%docinfo.char.mix;)*>
+<!ATTLIST pubdate
+		%common.attrib;
+		%pubdate.role.attrib;
+		%local.pubdate.attrib;
+>
+<!ENTITY % local.publishername.attrib "">
+<!ENTITY % publishername.role.attrib "%role.attrib;">
+<!ELEMENT publishername  (%docinfo.char.mix;)*>
+<!ATTLIST publishername
+		%common.attrib;
+		%publishername.role.attrib;
+		%local.publishername.attrib;
+>
+<!ENTITY % local.releaseinfo.attrib "">
+<!ENTITY % releaseinfo.role.attrib "%role.attrib;">
+<!ELEMENT releaseinfo  (%docinfo.char.mix;)*>
+<!ATTLIST releaseinfo
+		%common.attrib;
+		%releaseinfo.role.attrib;
+		%local.releaseinfo.attrib;
+>
+<!ENTITY % local.revhistory.attrib "">
+<!ENTITY % revhistory.role.attrib "%role.attrib;">
+<!ELEMENT revhistory  (revision+)>
+<!ATTLIST revhistory
+		%common.attrib;
+		%revhistory.role.attrib;
+		%local.revhistory.attrib;
+>
+<!ENTITY % local.revision.attrib "">
+<!ENTITY % revision.role.attrib "%role.attrib;">
+<!ELEMENT revision  (revnumber, date, (author|authorinitials)*,
+                    (revremark|revdescription)?)>
+<!ATTLIST revision
+		%common.attrib;
+		%revision.role.attrib;
+		%local.revision.attrib;
+>
+<!ENTITY % local.revnumber.attrib "">
+<!ENTITY % revnumber.role.attrib "%role.attrib;">
+<!ELEMENT revnumber  (%docinfo.char.mix;)*>
+<!ATTLIST revnumber
+		%common.attrib;
+		%revnumber.role.attrib;
+		%local.revnumber.attrib;
+>
+<!ENTITY % local.revremark.attrib "">
+<!ENTITY % revremark.role.attrib "%role.attrib;">
+<!ELEMENT revremark  (%docinfo.char.mix;)*>
+<!ATTLIST revremark
+		%common.attrib;
+		%revremark.role.attrib;
+		%local.revremark.attrib;
+>
+<!ENTITY % local.revdescription.attrib "">
+<!ENTITY % revdescription.role.attrib "%role.attrib;">
+<!ELEMENT revdescription  ((%revdescription.mix;)+)>
+<!ATTLIST revdescription
+		%common.attrib;
+		%revdescription.role.attrib;
+		%local.revdescription.attrib;
+>
+<!ENTITY % local.volumenum.attrib "">
+<!ENTITY % volumenum.role.attrib "%role.attrib;">
+<!ELEMENT volumenum  (%docinfo.char.mix;)*>
+<!ATTLIST volumenum
+		%common.attrib;
+		%volumenum.role.attrib;
+		%local.volumenum.attrib;
+>
+<!ENTITY % local.command.attrib "">
+<!ENTITY % command.role.attrib "%role.attrib;">
+<!ELEMENT command  (%cptr.char.mix;)*>
+<!ATTLIST command
+		%moreinfo.attrib;
+		%common.attrib;
+		%command.role.attrib;
+		%local.command.attrib;
+>
+<!ENTITY % local.computeroutput.attrib "">
+<!ENTITY % computeroutput.role.attrib "%role.attrib;">
+<!ATTLIST computeroutput
+		%moreinfo.attrib;
+		%common.attrib;
+		%computeroutput.role.attrib;
+		%local.computeroutput.attrib;
+>
+<!ENTITY % local.email.attrib "">
+<!ENTITY % email.role.attrib "%role.attrib;">
+<!ELEMENT email  (%docinfo.char.mix;)*>
+<!ATTLIST email
+		%common.attrib;
+		%email.role.attrib;
+		%local.email.attrib;
+>
+<!ENTITY % local.filename.attrib "">
+<!ENTITY % filename.role.attrib "%role.attrib;">
+<!ELEMENT filename  (%cptr.char.mix;)*>
+<!ATTLIST filename
+		class		(headerfile
+                                |partition
+                                |devicefile
+                                |libraryfile
+                                |directory
+                                |extension
+				|symlink)       #IMPLIED
+		path		CDATA		#IMPLIED
+		%moreinfo.attrib;
+		%common.attrib;
+		%filename.role.attrib;
+		%local.filename.attrib;
+>
+<!ENTITY % local.lineannotation.attrib "">
+<!ENTITY % lineannotation.role.attrib "%role.attrib;">
+<!ELEMENT lineannotation  (%para.char.mix;)*>
+<!ATTLIST lineannotation
+		%common.attrib;
+		%lineannotation.role.attrib;
+		%local.lineannotation.attrib;
+>
+<!ENTITY % local.literal.attrib "">
+<!ENTITY % literal.role.attrib "%role.attrib;">
+<!ELEMENT literal  (%cptr.char.mix;)*>
+<!ATTLIST literal
+		%moreinfo.attrib;
+		%common.attrib;
+		%literal.role.attrib;
+		%local.literal.attrib;
+>
+<!ENTITY % local.code.attrib "">
+<!ENTITY % code.role.attrib "%role.attrib;">
+<!ELEMENT code  (%cptr.char.mix;)*>
+<!ATTLIST code
+		language	CDATA	#IMPLIED
+		%common.attrib;
+		%code.role.attrib;
+		%local.code.attrib;
+>
+<!ENTITY % local.option.attrib "">
+<!ENTITY % option.role.attrib "%role.attrib;">
+<!ELEMENT option  (%cptr.char.mix;)*>
+<!ATTLIST option
+		%common.attrib;
+		%option.role.attrib;
+		%local.option.attrib;
+>
+<!ENTITY % local.replaceable.attrib "">
+<!ENTITY % replaceable.role.attrib "%role.attrib;">
+<!ATTLIST replaceable
+		class		(command
+				|function
+				|option
+				|parameter)	#IMPLIED
+		%common.attrib;
+		%replaceable.role.attrib;
+		%local.replaceable.attrib;
+>
+<!ENTITY % local.sgmltag.attrib "">
+<!ENTITY % sgmltag.role.attrib "%role.attrib;">
+<!ELEMENT sgmltag  (%smallcptr.char.mix;)*>
+<!ATTLIST sgmltag
+		class 		(attribute
+				|attvalue
+				|element
+				|endtag
+                                |emptytag
+				|genentity
+				|numcharref
+				|paramentity
+				|pi
+                                |xmlpi
+				|starttag
+				|sgmlcomment
+                                |prefix
+                                |namespace
+                                |localname)	#IMPLIED
+		namespace	CDATA		#IMPLIED
+		%common.attrib;
+		%sgmltag.role.attrib;
+		%local.sgmltag.attrib;
+>
+<!ENTITY % local.systemitem.attrib "">
+<!ENTITY % systemitem.role.attrib "%role.attrib;">
+<!ATTLIST systemitem
+		class	(constant
+			|event
+			|eventhandler
+			|domainname
+			|fqdomainname
+			|ipaddress
+			|netmask
+			|etheraddress
+			|groupname
+			|library
+			|macro
+			|osname
+			|filesystem
+			|resource
+			|systemname
+			|username
+			|newsgroup
+                        |process
+                        |service
+                        |server
+                        |daemon)	#IMPLIED
+		%moreinfo.attrib;
+		%common.attrib;
+		%systemitem.role.attrib;
+		%local.systemitem.attrib;
+>
+<!ENTITY % local.userinput.attrib "">
+<!ENTITY % userinput.role.attrib "%role.attrib;">
+<!ATTLIST userinput
+		%moreinfo.attrib;
+		%common.attrib;
+		%userinput.role.attrib;
+		%local.userinput.attrib;
+>
+<!ENTITY % local.abbrev.attrib "">
+<!ENTITY % abbrev.role.attrib "%role.attrib;">
+<!ELEMENT abbrev  (%word.char.mix;)*>
+<!ATTLIST abbrev
+		%common.attrib;
+		%abbrev.role.attrib;
+		%local.abbrev.attrib;
+>
+<!ENTITY % local.acronym.attrib "">
+<!ENTITY % acronym.role.attrib "%role.attrib;">
+<!ELEMENT acronym  (%word.char.mix;)*
+		>
+<!ATTLIST acronym
+		%common.attrib;
+		%acronym.role.attrib;
+		%local.acronym.attrib;
+>
+<!ENTITY % local.citetitle.attrib "">
+<!ENTITY % citetitle.role.attrib "%role.attrib;">
+<!ELEMENT citetitle  (%para.char.mix;)*>
+<!ATTLIST citetitle
+		pubwork		(article
+				|book
+				|chapter
+				|part
+				|refentry
+				|section
+				|journal
+				|series
+				|set
+				|manuscript
+				|cdrom
+				|dvd
+				|wiki
+				|gopher
+				|bbs
+                                |emailmessage
+                                |webpage
+                                |newsposting)	#IMPLIED
+		%common.attrib;
+		%citetitle.role.attrib;
+		%local.citetitle.attrib;
+>
+<!ENTITY % local.emphasis.attrib "">
+<!ENTITY % emphasis.role.attrib "%role.attrib;">
+<!ELEMENT emphasis  (%para.char.mix;)*>
+<!ATTLIST emphasis
+		%common.attrib;
+		%emphasis.role.attrib;
+		%local.emphasis.attrib;
+>
+<!ENTITY % local.phrase.attrib "">
+<!ENTITY % phrase.role.attrib "%role.attrib;">
+<!ELEMENT phrase  (%para.char.mix;)*>
+<!ATTLIST phrase
+		%common.attrib;
+		%phrase.role.attrib;
+		%local.phrase.attrib;
+>
+<!ENTITY % local.quote.attrib "">
+<!ENTITY % quote.role.attrib "%role.attrib;">
+<!ELEMENT quote  (%para.char.mix;)*>
+<!ATTLIST quote
+		%common.attrib;
+		%quote.role.attrib;
+		%local.quote.attrib;
+>
+<!ENTITY % local.ssscript.attrib "">
+<!ENTITY % ssscript.role.attrib "%role.attrib;">
+<!ATTLIST subscript
+		%common.attrib;
+		%ssscript.role.attrib;
+		%local.ssscript.attrib;
+>
+<!ATTLIST superscript
+		%common.attrib;
+		%ssscript.role.attrib;
+		%local.ssscript.attrib;
+>
+<!ENTITY % local.trademark.attrib "">
+<!ENTITY % trademark.role.attrib "%role.attrib;">
+<!ATTLIST trademark
+		class		(service
+				|trade
+				|registered
+				|copyright)	'trade'
+		%common.attrib;
+		%trademark.role.attrib;
+		%local.trademark.attrib;
+>
+<!ENTITY % local.link.attrib "">
+<!ENTITY % link.role.attrib "%role.attrib;">
+<!ELEMENT link  (%para.char.mix;)*
+		>
+<!ATTLIST link
+		endterm		IDREF		#IMPLIED
+		xrefstyle	CDATA		#IMPLIED
+		type		CDATA		#IMPLIED
+		%linkendreq.attrib;
+		%common.attrib;
+		%link.role.attrib;
+		%local.link.attrib;
+>
+<!ENTITY % local.ulink.attrib "">
+<!ENTITY % ulink.role.attrib "%role.attrib;">
+<!ELEMENT ulink  (%para.char.mix;)*
+		>
+<!ATTLIST ulink
+		url		CDATA		#REQUIRED
+		type		CDATA		#IMPLIED
+		xrefstyle	CDATA		#IMPLIED
+		%common.attrib;
+		%ulink.role.attrib;
+		%local.ulink.attrib;
+>
+<!ENTITY % local.footnoteref.attrib "">
+<!ENTITY % footnoteref.role.attrib "%role.attrib;">
+<!ELEMENT footnoteref  EMPTY>
+<!ATTLIST footnoteref
+		%linkendreq.attrib;		%label.attrib;
+		%common.attrib;
+		%footnoteref.role.attrib;
+		%local.footnoteref.attrib;
+>
+<!ENTITY % local.xref.attrib "">
+<!ENTITY % xref.role.attrib "%role.attrib;">
+<!ELEMENT xref  EMPTY>
+<!ATTLIST xref
+		endterm		IDREF		#IMPLIED
+		xrefstyle	CDATA		#IMPLIED
+		%common.attrib;
+		%linkendreq.attrib;
+		%xref.role.attrib;
+		%local.xref.attrib;
+>
+<!ENTITY % local.anchor.attrib "">
+<!ENTITY % anchor.role.attrib "%role.attrib;">
+<!ELEMENT anchor  EMPTY>
+<!ATTLIST anchor
+		%idreq.attrib;		%pagenum.attrib;		%remap.attrib;
+		%xreflabel.attrib;
+		%revisionflag.attrib;
+		%effectivity.attrib;
+		%anchor.role.attrib;
+		%local.anchor.attrib;
+>
+<!ENTITY % local.appendix.class "">
+<!ENTITY % appendix.class	"appendix %local.appendix.class;">
+<!ENTITY % div.title.content
+	"title, subtitle?, titleabbrev?">
+<!ENTITY % bookcomponent.title.content
+	"title, subtitle?, titleabbrev?">
+<!ENTITY % sect.title.content
+	"title, subtitle?, titleabbrev?">
+<!ENTITY % local.appendix.attrib "">
+<!ENTITY % appendix.role.attrib "%role.attrib;">
+<!ATTLIST appendix
+		%label.attrib;
+		%status.attrib;
+		%common.attrib;
+		%appendix.role.attrib;
+		%local.appendix.attrib;
+>
+<!ENTITY % local.section.attrib "">
+<!ENTITY % section.role.attrib "%role.attrib;">
+<!ATTLIST section
+		%label.attrib;
+		%status.attrib;
+		%common.attrib;
+		%section.role.attrib;
+		%local.section.attrib;
+>
+<!ENTITY % local.bibliography.attrib "">
+<!ENTITY % bibliography.role.attrib "%role.attrib;">
+<!ATTLIST bibliography
+		%status.attrib;
+		%common.attrib;
+		%bibliography.role.attrib;
+		%local.bibliography.attrib;
+>
+<!ENTITY % local.bibliodiv.attrib "">
+<!ENTITY % bibliodiv.role.attrib "%role.attrib;">
+<!ATTLIST bibliodiv
+		%status.attrib;
+		%common.attrib;
+		%bibliodiv.role.attrib;
+		%local.bibliodiv.attrib;
+>
+<!ENTITY % local.article.attrib "">
+<!ENTITY % article.role.attrib "%role.attrib;">
+<!ATTLIST article
+		class		(journalarticle
+				|productsheet
+				|whitepaper
+				|techreport
+                                |specification
+				|faq)		#IMPLIED
+		parentbook	IDREF		#IMPLIED
+		%status.attrib;
+		%common.attrib;
+		%article.role.attrib;
+		%local.article.attrib;
+>
+<!ELEMENT objectinfo ((mediaobject | legalnotice
+	| keywordset | subjectset | %bibliocomponent.mix;)+)>
+<!ELEMENT section (sectioninfo?,
+			(%sect.title.content;),
+			(((%divcomponent.mix;)+, section*)
+			 | section+))>
+<!ELEMENT sectioninfo ((mediaobject | legalnotice
+	| keywordset | subjectset | %bibliocomponent.mix;)+)>
+<!ELEMENT authorgroup ((author|editor|corpauthor|othercredit)+)>
+<!ELEMENT author ((%person.ident.mix;)+)>
+<!ELEMENT editor ((%person.ident.mix;)+)>
+<!ELEMENT othercredit ((%person.ident.mix;)+)>
+<!ELEMENT para (%para.char.mix;)*>
+<!ENTITY % informaltable.table.mdl
+	"((mediaobject+|tgroup+)
+          |(caption, (col*|colgroup*), thead?, tfoot?, (tbody+|tr+)))">
+<!ELEMENT informaltable (%informaltable.table.mdl;) >
+<!ELEMENT replaceable (#PCDATA 
+		| %link.char.class;
+                | %base.char.class;
+		| inlinemediaobject)*>
+<!ELEMENT trademark (#PCDATA 
+		| %link.char.class; 
+		| %tech.char.class;
+		| inlinemediaobject
+		| emphasis)*>
+<!ELEMENT article ((%div.title.content;)?, articleinfo?,
+		       (%bookcomponent.content;),
+		       ((%appendix.class;)|bibliography|ackno)*)>
+<!ELEMENT articleinfo ((mediaobject | legalnotice
+	| subjectset | keywordset | %bibliocomponent.mix;)+)>
+<!ELEMENT appendix ((%bookcomponent.title.content;),
+		(%bookcomponent.content;))>
+<!ELEMENT bibliography ((%bookcomponent.title.content;)?,
+                        (%component.mix;)*,
+                        (bibliodiv+ | bibliomixed+))>
+<!ELEMENT bibliomixed (#PCDATA | %bibliocomponent.mix; | bibliomset)*>
+<!ELEMENT bibliodiv ((%sect.title.content;)?, (%component.mix;)*,
+		(bibliomixed)+)>
+<!ELEMENT sidebar ((%formalobject.title.content;)?,
+                   (%sidebar.mix;)+)>
+<!ELEMENT programlisting (%para.char.mix; | lineannotation)*>
+<!ELEMENT literallayout (%para.char.mix; | lineannotation)*>
+<!ELEMENT itemizedlist ((%formalobject.title.content;)?,
+ 			    (%listpreamble.mix;)*, listitem+)>
+<!ELEMENT orderedlist ((%formalobject.title.content;)?,
+ 			    (%listpreamble.mix;)*, listitem+)>
+<!ELEMENT variablelist ((%formalobject.title.content;)?,
+ 			    (%listpreamble.mix;)*, varlistentry+)>
+<!ELEMENT example ((%formalobject.title.content;), (%example.mix;)+)
+		>
+<!ELEMENT figure ((%formalobject.title.content;),
+                       (%figure.mix; | %link.char.class;)+)>
+<!ELEMENT legalnotice (title?, (%legalnotice.mix;)+)
+		>
+<!ELEMENT systemitem (%cptr.char.mix; | acronym)*>
+<!ELEMENT computeroutput  (%cptr.char.mix;)*>
+<!ELEMENT userinput  (%cptr.char.mix;)*>
+<!ELEMENT blockquote  (title?, attribution?, (%component.mix;)+)>
+<!ELEMENT address  (#PCDATA|%person.ident.mix;
+		|city|state|country|email)*>
+<!ELEMENT subscript  (#PCDATA
+		| %link.char.class;
+		| emphasis
+		| replaceable
+                | inlinemediaobject
+		| %base.char.class;
+		| %other.char.class;)*
+		>
+<!ELEMENT superscript  (#PCDATA
+		| %link.char.class;
+		| emphasis
+		| replaceable
+                | inlinemediaobject
+		| %base.char.class;
+		| %other.char.class;)*
+		>

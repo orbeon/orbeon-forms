@@ -1,0 +1,279 @@
+<HTML>
+<HEAD>
+<TITLE>IDEAlliance Conference Paper DocBook XML Subset V1.1: Element table</TITLE>
+</HEAD>
+<BODY>
+<TABLE BORDER='0' WIDTH='100%'>
+<TR>
+<TD ALIGN='left'>IDEAlliance Conference Paper DocBook XML Subset V1.1: User Element View</TD>
+<TD ALIGN='right'>&nbsp;</TD>
+</TR>
+<TR>
+<TD ALIGN='left'>
+[<A HREF="../index.html">Home</A>]
+[<A HREF="../elements.html">Elements</A>]
+</TD>
+<TD ALIGN='right'>
+[<A HREF="systemitem.html">Prev</A>]
+[<A HREF="tbody.html">Next</A>]
+</TD>
+</TR>
+</TABLE>
+<HR>
+<H1>Element table</h1>
+<H2>Synopsis</h2>
+<H3>Content Model</H3>
+<PRE>
+(((<A HREF="title.html">title</A>,
+   (<A HREF="mediaobject.html">mediaobject</A>+|<A HREF="tgroup.html">tgroup</A>+))|
+  (<A HREF="caption.html">caption</A>,
+   (<A HREF="col.html">col</A>*|<A HREF="colgroup.html">colgroup</A>*),
+   <A HREF="thead.html">thead</A>?,<A HREF="tfoot.html">tfoot</A>?,
+   (<A HREF="tbody.html">tbody</A>+|<A HREF="tr.html">tr</A>+))))</PRE>
+<H3>Attributes</H3>
+<TABLE BORDER='1'>
+<TR>
+<TH>Name</TH><TH>Type</TH><TH>Default Value</TH></TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">rowsep</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">ondblclick</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">floatstyle</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">onkeydown</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">onkeyup</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">onmouseup</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">id</TD>
+<TD ALIGN="left" VALIGN="top">ID</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">onmouseover</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">xreflabel</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">lang</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">align</TD>
+<TD ALIGN="left" VALIGN="top"><I>Enumeration:</I><BR>
+&nbsp;&nbsp;center<BR>
+&nbsp;&nbsp;left<BR>
+&nbsp;&nbsp;right</TD><TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">pgwide</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">orient</TD>
+<TD ALIGN="left" VALIGN="top"><I>Enumeration:</I><BR>
+&nbsp;&nbsp;land<BR>
+&nbsp;&nbsp;port</TD><TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">onkeypress</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">onmousedown</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">onclick</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">title</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">class</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">label</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">role</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">width</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">frame</TD>
+<TD ALIGN="left" VALIGN="top"><I>Enumeration:</I><BR>
+&nbsp;&nbsp;above<BR>
+&nbsp;&nbsp;all<BR>
+&nbsp;&nbsp;below<BR>
+&nbsp;&nbsp;border<BR>
+&nbsp;&nbsp;bottom<BR>
+&nbsp;&nbsp;box<BR>
+&nbsp;&nbsp;hsides<BR>
+&nbsp;&nbsp;lhs<BR>
+&nbsp;&nbsp;none<BR>
+&nbsp;&nbsp;rhs<BR>
+&nbsp;&nbsp;sides<BR>
+&nbsp;&nbsp;top<BR>
+&nbsp;&nbsp;topbot<BR>
+&nbsp;&nbsp;void<BR>
+&nbsp;&nbsp;vsides</TD><TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">rules</TD>
+<TD ALIGN="left" VALIGN="top"><I>Enumeration:</I><BR>
+&nbsp;&nbsp;all<BR>
+&nbsp;&nbsp;cols<BR>
+&nbsp;&nbsp;groups<BR>
+&nbsp;&nbsp;none<BR>
+&nbsp;&nbsp;rows</TD><TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">summary</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">bgcolor</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">tabstyle</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">cellspacing</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">colsep</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">shortentry</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">remap</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">onmouseout</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">onmousemove</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">style</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">xml:lang</TD>
+<TD ALIGN="left" VALIGN="top">NMTOKEN</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">border</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">revisionflag</TD>
+<TD ALIGN="left" VALIGN="top"><I>Enumeration:</I><BR>
+&nbsp;&nbsp;added<BR>
+&nbsp;&nbsp;changed<BR>
+&nbsp;&nbsp;deleted<BR>
+&nbsp;&nbsp;off</TD><TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">cellpadding</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+<TR>
+<TD ALIGN="left" VALIGN="top">tocentry</TD>
+<TD ALIGN="left" VALIGN="top">CDATA</TD>
+<TD ALIGN="left" VALIGN="top"><I>None</I></TD>
+</TR>
+</TABLE>
+<H2>Description</H2>
+<H3>Parents</H3>
+<P><A HREF="appendix.html">appendix</A>,
+<A HREF="article.html">article</A>,
+<A HREF="bibliodiv.html">bibliodiv</A>,
+<A HREF="bibliography.html">bibliography</A>,
+<A HREF="blockquote.html">blockquote</A>,
+<A HREF="listitem.html">listitem</A>,
+<A HREF="note.html">note</A>,
+<A HREF="revdescription.html">revdescription</A>,
+<A HREF="section.html">section</A>,
+<A HREF="sidebar.html">sidebar</A></P>
+<H3>Children</H3>
+<P><A HREF="caption.html">caption</A>,
+<A HREF="col.html">col</A>,
+<A HREF="colgroup.html">colgroup</A>,
+<A HREF="mediaobject.html">mediaobject</A>,
+<A HREF="tbody.html">tbody</A>,
+<A HREF="tfoot.html">tfoot</A>,
+<A HREF="tgroup.html">tgroup</A>,
+<A HREF="thead.html">thead</A>,
+<A HREF="title.html">title</A>,
+<A HREF="tr.html">tr</A></P>
+<P></P>
+<HR>
+HTML Presentation of IDEAlliance Conference Paper DocBook XML Subset V1.1 by <A HREF="http://sourceforge.net/projects/dtdparse/">DTDParse</A> (version 2.0beta6).
+</BODY>
+</HTML>

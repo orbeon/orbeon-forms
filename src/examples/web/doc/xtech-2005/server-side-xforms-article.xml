@@ -1,0 +1,1110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//IDEAlliance//DTD Conference Paper DocBook XML Subset V1.1//EN"
+"../dtd/ideadb.dtd">
+<article>
+    <title>Are Server-Side XForms Engines the Future of XForms?</title>
+    <articleinfo>
+        <author>
+            <firstname>Erik</firstname>
+            <surname>Bruchez</surname>
+            <affiliation>
+                <jobtitle>Software Architect, Orbeon, Inc.</jobtitle>
+                <orgname>Orbeon, Inc.
+                    <ulink url="http://www.orbeon.com/">http://www.orbeon.com/</ulink>
+                </orgname>
+                <address>
+                    <city>Mountain View</city>
+                    <state>CA</state>
+                    <country>USA</country>
+                    <email>ebruchez@orbeon.com</email>
+                </address>
+            </affiliation>
+            <personblurb>
+                <para>
+                    Erik has extensive experience in the software industry as an architect and
+                    consultant. He was involved with World Wide Web and Java technologies since
+                    their inception in 1992 and 1995 respectively. He has worked in all the areas of
+                    Java development, including constrained environments (J2ME), desktop
+                    applications (J2SE) and enterprise software (J2EE). A former employee of
+                    Symantec Corp. in Cupertino, he contributed to the VisualCafe for Java
+                    product line, before co-founding Orbeon, Inc., a company specialized in J2EE
+                    and XML consulting. He consulted and developed applications for companies such
+                    as WorldGate Communications (J2ME), Manugistics (supply-chain management), Sun
+                    (development tools), Volkswagen Financial Services (financial applications), and
+                    the City of San Diego (administrative applications). He is currently a
+                    specialist of web applications architecture and the architect of Orbeon
+                    PresentationServer (OPS), an open source J2EE-based platform for XML-centric
+                    web applications developed. Erik is the co-author of several articles on J2EE
+                    and web application development. Erik holds a MS/CS from the Swiss Institute
+                    of Technology (EPFL) in Lausanne, Switzerland.
+                </para>
+            </personblurb>
+        </author>
+        <keywordset>
+            <keyword>xml</keyword>
+            <keyword>xforms</keyword>
+        </keywordset>
+        <abstract>
+            <para>
+                XForms, the next generation web forms specification from the W3C, promises to make
+                the life of web developers easier by replacing HTML forms. But while some web
+                browser plugins are available, and while the Mozilla project has announced a project
+                to implement XForms, Microsoft Internet Explorer appears to shun the specification.
+                In such conditions, is there hope for XForms to ever take off outside the intranet?
+            </para>
+            <para>
+                In this paper, we present the result of two years of experience implementing a
+                server-side XForms engine now part of the open source Orbeon PresentationServer. The
+                benefit of such an approach is that it brings XForms transparently to currently
+                deployed web browsers, including Internet Explorer, without requiring the use of
+                plugins or other upgrades.
+            </para>
+            <para>
+                We consider the parts of the XForms specification that can be easily implemented
+                server-side, the challenges posed by implementing the remainder of the
+                specification, and the solutions brought by Ajax technologies. We also consider
+                promising perspectives such as the deployment of an XForms engine as a proxy.
+            </para>
+        </abstract>
+    </articleinfo>
+    <section>
+        <title>Quick Introduction to XForms</title>
+        <para>
+            XForms is the next generation web forms specification from the W3C. It is a
+            recommendation since October 2003. It aims at replacing HTML forms, as well as providing
+            other host languages such as SVG the ability to handle forms. There is no restriction on
+            what host language XForms is used with, but it is expected to be mostly used in
+            conjunction with XHTML, including the upcoming XHTML 2.0.
+        </para>
+        <para>
+            XForms provides many benefits over HTML forms, including:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Clear separation between the data captured and the presentation (separation of
+                    concerns).
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Flexible, structured XML-based data model. Define your data model as an XML
+                    document, then create forms accessing the data.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Built-in facilities for validation and data integrity based on XML Schema and/or
+                    assertions.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    XForms's approach is very declarative and therefore requires much less, or no
+                    scripting at all for many common scenarios that do require scripting with HTML
+                    forms.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Ease of internationalization.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Support for a variety of devices.
+                </para>
+            </listitem>
+        </itemizedlist>
+        <para>
+            Compared to most other forms technologies, XForms provides the following benefits:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    It is a standard.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    It is not tied to a particular platform or language such as Java or .NET.
+                </para>
+            </listitem>
+        </itemizedlist>
+        <para>
+            Some of XForms's most attractive features include:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Powerful declarative validation and calculation facilities.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    A declarative event model based on XML Events and DOM 2 Events.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Built-in declarative actions able to react to events.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    A versatile submission system.
+                </para>
+            </listitem>
+        </itemizedlist>
+        <para>
+            XForms was intended as a client-side technology. This means that an XForms engine, like
+            a Cascaded Style Sheets (CSS) engine, for example, was designed to be implemented
+            within a web browser. This was the idea of the specification all along, but if proof is
+            needed, consider for example that the specification has provisions for submitting an
+            XForms instance to a server.
+        </para>
+    </section>
+    <section>
+        <title>Spreading XForms</title>
+        <para>
+            After Netscape succumbed to Internet Explorer in the late 90s, the development of
+            client-side web browser technologies has largely stalled. With a market share of over
+            90% of the installed web browsers base, Microsoft has not seen any point in making any
+            improvement at all and after IE 5, Internet Explorer hasn't had any serious upgrade.
+            Following this trend, Microsoft has said it wouldn't support XForms. In fact, Microsoft
+            has its own competing proprietary technology to push forward: InfoPath.
+        </para>
+        <para>
+            On the bright side, the Mozilla project has produced an ever more solid browser,
+            culminating with the recent release of Firefox 1.0, and has announced that it was
+            working on an XForms 1.0 implementation. There are also commercial third-party plugins
+            available for Internet Explorer that provide XForms support.
+        </para>
+        <para>
+            XForms plugins and XForms support in Firefox and possibly other browsers will allow
+            XForms deployment for applications in controlled environments such as corporate intranet
+            applications. However the perspectives for mass-deployment of XForms outside the
+            intranet appear very dim:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Unless Microsoft changes its mind, Internet Explorer will not ship with XForms
+                    any time soon.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Assuming full XForms 1.0 support in Firefox in the near future, this browser
+                    still has a market share of under 10%. Even assuming the most optimistic growth
+                    strategy, it is unlikely to relegate Internet Explorer to a negligible market
+                    share.
+                </para>
+            </listitem>
+        </itemizedlist>
+        <para>
+            In other words, native XForms on over 75% of the clients is not a short-term
+            possibility. Does this mean that XForms is dead as the next generation of web forms?
+        </para>
+    </section>
+    <section>
+        <title>You Said Server-Side?</title>
+        <para>
+            If XForms on the client cannot be a reality tomorrow, is there a way around it? Can
+            XForms be more than a toy for technology enthusiasts? We believe that the answer is
+            yes.
+        </para>
+        <para>
+            One of the benefits of XForms is that it provides a high level of functionality to the
+            web application developer. What matters most is what the developers or its programming
+            tools see, not what the web browser sees. Following this logic, the solution consists
+            in building a server-side emulation layer for XForms. This is what is meant by
+            "server-side XForms".
+        </para>
+        <para>
+            In such an architecture, the developer writes XHTML and XForms code, as he would with an
+            XForms-aware web browser. A server-side piece of software, the server-side XForms
+            engine, translates this into languages understood by the web browser, namely (X)HTML,
+            CSS, and lightweight JavaScript. The following figures illustrate the overall
+            architecture of a server-side XForms implementation:
+        </para>
+        <figure id="server-side-xforms">
+            <title>Simple Server-Side XForms Architecture</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="xtech08.png"/>
+                </imageobject>
+            </mediaobject>
+        </figure>
+        <para>
+            The benefits of server-side XForms are clear:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    Currently deployed browsers, including Internet Explorer, can benefit from
+                    XForms technology without the installation of plugins or other upgrades.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Developers can use XForms without worrying more about differences between web
+                    browsers than they currently do.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    XForms has a chance to be used in a mainstream fashion and to grow as a
+                    specification.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Developing XForms extensions such as creating new components, compound
+                    components, supporting XPath 2.0, etc. does not require upgrading web browsers.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Optimizations such as keeping large XForms instances on the server are
+                    possible, potentially improving latency, saving bandwidth, and providing
+                    enhanced confidentiality.
+                </para>
+            </listitem>
+        </itemizedlist>
+    </section>
+    <section>
+        <title>A Simple Example</title>
+        <para>
+            Let's consider an example that illustrates how XForms emulation can be achieved. Let's
+            assume an XForms instance as follows:
+        </para>
+        <programlisting>
+&lt;credit-card>
+    &lt;type/>
+    &lt;number/>
+    &lt;expiration-month/>
+    &lt;expiration-year/>
+    &lt;verification-code/>
+    &lt;valid/>
+&lt;/credit-card></programlisting>
+        <para>
+            Associated XForms controls, embedded within XHTML, can look like this:
+        </para>
+        <programlisting>
+&lt;xhtml:body>
+    &lt;xforms:group ref="/credit-card">
+        ...
+         &lt;xforms:select1 ref="type" appearance="minimal">
+            &lt;xforms:item>
+                &lt;xforms:label>Visa&lt;/xforms:label>
+                &lt;xforms:value>visa&lt;/xforms:value>
+            &lt;/xforms:item>
+            &lt;xforms:item>
+                &lt;xforms:label>Mastercard&lt;/xforms:label>
+                &lt;xforms:value>mastercard&lt;/xforms:value>
+            &lt;/xforms:item>
+        &lt;/xforms:select1>
+        ...
+    &lt;/xf:group>
+&lt;/xhtml:body></programlisting>
+        <para>
+            An XForms engine may render those controls as follows:
+        </para>
+        <figure id="xforms-credit-card">
+            <title>Examples of Credit Card Selection Form</title>
+            <mediaobject>
+                <imageobject>
+                    <imagedata fileref="xtech07.png" />
+                </imageobject>
+            </mediaobject>
+        </figure>
+        <para>
+            An XForms input control, which is meant to display a text field that captures
+            information into the <code>number</code> element, is embedded within XHTML:
+        </para>
+        <programlisting>
+&lt;xforms:input ref="/credit-card/number"/></programlisting>
+        <para>
+            A simple approach consists in mapping the XForms control to an HTML form element, for
+            example as follows:
+        </para>
+        <programlisting>
+&lt;input name="%2fcredit-card%2fnumber"></programlisting>
+        <para>
+            When the HTML form is submitted back to the server, the server-side XForms engine
+            receives a parameter name (<code>%2fcredit-card%2fnumber</code>) and a value (the value
+            entered by the user in the text field). The XForms engine can then decode the parameter
+            name to <code>/credit-card/number</code>, associated it with an XForms instance XML
+            document, and store the associated value into the XForms instance.
+        </para>
+        <para>
+            In reality, the strategy is a little more complex, because features of XML such as
+            attributes and namespaces must be taken into account. The gist of it however is that
+            there must be a mapping between the name of an HTML form control and a certain element
+            or attribute of and XForms instance. How cleverly this mapping can be done is left as an
+            exercise for the reader.
+        </para>
+    </section>
+    <section>
+        <title>Techniques</title>
+        <para>
+            There are several techniques useful to emulate an XForms engine server-side:
+        </para>
+        <orderedlist>
+            <listitem>
+                <para>
+                    Markup rewriting
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Full client-server round-trips
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    "Ajax"
+                </para>
+            </listitem>
+        </orderedlist>
+        <para>
+            We explore these techniques in the following sections.
+        </para>
+        <section>
+            <title>Markup Rewriting</title>
+            <para>
+                This technique is mostly useful to render XForms controls. As the simple example
+                above illustrates, converting XForms controls to HTML controls is fairly simple. The
+                technique mainly consists in converting XHTML and XForms into (X)HTML and possibly
+                scripting. Most XForms controls have already an equivalent in HTML. There are
+                exceptions, for example:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        The XForms <code>range</code> control, which is missing from HTML.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Open list selection, which allows entering free text in addition to a list
+                        of choices such as a dropdown list.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Such controls can however be emulated in HTML:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        A <code>range</code> control can be composed of images and JavaScript code
+                        to increment and decrement values on a scale.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        An open list selection may be composed of a text field and a drop-down
+                        list, which the server-side XForms engine then combines together.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <figure id="xforms-open-selection">
+                <title>Examples of Controls with Open List Selection</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="xtech04.png" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+        </section>
+        <section>
+            <title>Differences in Processing Model</title>
+            <para>
+                HTML forms mandate a very simple processing model:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        The user fills-out data in a form.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        The user submits the form to the server.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                There is no level of interaction between the user and the form other than
+                filling-out data. Additional interactivity may be provided through scripting, but
+                that is above what simple HTML forms do in standard.
+            </para>
+            <para>
+                XForms on the other hand provides for much more advanced interaction. For example:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        The XForms <code>switch</code> module provides for a "construct that allows
+                        the creation of user interfaces where the user interface can be varied based
+                        on user actions and events".
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        XForms supports actions and events based on XML Events.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        XForms controls can be validated by XML Schema or by model item properties,
+                        and display adequate alert messages when controls fail validation.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        The XForms <code>repeat</code> construct allows insertion and deletion of
+                        rows within repeated structures, such as a list of line items in a purchase
+                        order.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <figure id="xforms-repeat-1">
+                <title>Example of XForms Repeat</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="xtech02.png" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            <para>
+                Such advanced features cannot be emulated directly by HTML forms. A little more
+                work must be performed, with the following aspects:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Processing: obtain the information necessary to realize the update
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Rendering: present the updated information to the user
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Consider the XForms repeat example: when a user presses an "Add" button, a new row
+                must be displayed. Following the distinction above, some code must:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Determine what new information must be presented, i.e. what fields and other
+                        HTML constructs must be repeated, and where.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Actually perform the update of the page based on such information, which
+                        will result in a new row being added.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                From the client's perspective, the information can be obtained in one of two ways:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Locally: using scripting, based on information present in the web page
+                        itself, whether as HTML markup or JavaScript variables.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Remotely: on the server, where information can be calculated based on state
+                        information provided by the client, or state kept on the server.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Still from the client's perspective, rendering can be done in one of two ways:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Regenerate the entire HTML page
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Modify locally the HTML page, using the DOM APIs and scripting, to reflect the change
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </section>
+        <section>
+            <title>Full Client-Server Round-Trips</title>
+            <para>
+                The full client-server round-trip strategy is a simple way of achieving complex
+                XForms behavior. Following-up on the XForms repeat example, let's assume the user
+                clicks on the "Add" button. The following sequence of events takes place:
+            </para>
+            <orderedlist>
+                <listitem>
+                    <para>
+                        The client submits the HTML form to the server.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        The server-side XForms engine detects, based on the fact that the "Add"
+                        button was pressed, that a new row must be inserted.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        The server-side XForms engine identifies the elements that must be
+                        duplicated in the XForms instance, and updates it on the server.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        The server-side XForms engine regenerates the page. The
+                        <code>xforms:repeat</code> control, based on the new elements in the XForms
+                        instance, generates one more row.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        The client renders a complete updated HTML page.
+                    </para>
+                </listitem>
+            </orderedlist>
+            <note>
+                <para>
+                    While the HTML form is submitted to the server, the form is not submitted to
+                    the application from the XForms programmer's point of view: the submission is
+                    intercepted by the XForms engine first.
+                </para>
+            </note>
+            <figure id="xforms-repeat-2">
+                <title>XForms Repeat with Newly Added Row</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="xtech03.png" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            <para>
+                This solution is straightforward and does not require large amount of client-side
+                scripting, if any. It can be used in such situations as:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        The client does not support scripting, or only limited scripting.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Calculations are complex, for example XML Schema validation must be
+                        performed, and it is easier to perform it on the server because all the
+                        validation tools are available there.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Calculations involve state information that is confidential and must not be tampered with.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                However, full round-trips imply increased latency, consume network and server
+                resources, cause web pages to refresh, and therefore provide a suboptimal user
+                experience.
+            </para>
+        </section>
+        <section>
+            <title>Ajax</title>
+            <para>
+                The latest trendy (albeit unofficially coined by Adaptive Path) acronym in the world
+                of web applications is "Ajax": Asynchronous JavaScript + XML. While the technology
+                is not new, it has been made popular by the use Google has recently made of it,
+                which has started a flurry of articles and blog entries. The technology does have
+                merits, and now has validation from a large community of developers. Most fairly
+                modern browsers, including IE, Firefox, and Safari, are able to provide this
+                capability.
+            </para>
+            <para>
+                The following figures illustrate the differences between the traditional mode of
+                interaction between a user agent and a server, and the Ajax mode of interaction:
+            </para>
+            <figure id="traditional-model">
+                <title>Traditional User Agent - Server Interaction Model</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="xtech10.png" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            <figure id="ajax-model">
+                <title>Ajax User Agent - Server Interaction Model</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="xtech11.png" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            <para>
+                Ajax provides benefits such as:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Enhanced user experience compared with full client-server round-trips,
+                        with shorter latency, smaller network usage, and faster page refreshes.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        No requirement that all the processing take place on the client: a large
+                        part of it is delegated to the server, which returns calculated information
+                        in the form of XML documents.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                The server-side XForms architecture illustrated before can be updated with Ajax as
+                follows:
+            </para>
+            <figure id="ajax-architecture">
+                <title>XForms + Ajax Architecture</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="xtech13.png" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+            <para>
+                Now considering the XForms repeat example, this is the sequence of events that takes
+                place:
+            </para>
+            <orderedlist>
+                <listitem>
+                    <para>
+                        The "Add" button executes a piece of JavaScript code that sends information
+                        to the server-side XForms engine.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        The server-side XForms engine identifies the elements that must be
+                        duplicated in the XForms instance, and updates it on the server.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        The server-side XForms engine constructs an XML document containing
+                        information about the HTML elements that must be added or duplicated on the
+                        client, as well as an updated version of the XForms instance to store on the
+                        client.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        The client, using JavaScript, interprets the result, updating form fields
+                        and the HTML DOM.
+                    </para>
+                </listitem>
+            </orderedlist>
+            <para>
+                From the end user's perspective, the page hasn't reloaded: it has just updated parts
+                of itself.
+            </para>
+            <para>
+                Ajax fits XForms extremely well:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        XForms can be heavy in events handling. Full client-side roundtrips become
+                        impractical when too many events are generated. With an Ajax-based XForms
+                        implementation however, the server can handle events much faster.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        XForms is not trivial to implement. A full XForms implementation requires
+                        XPath support, a W3C Schema validator, a repeat module, a switch module,
+                        and more. Delegating complex processing to the server allows implementing
+                        XForms and upgrading implementations faster. With a carefully designed
+                        Ajax-based system, data entered by the user in form fields can be validated
+                        as the user types it, for example.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Another interesting perspective on Ajax and XForms is that an Ajax-based XForms
+                implementation can well be considered a standard way of creating Ajax-based
+                applications! While there are today client-side libraries that implement Ajax
+                functionality in the user agent, their scope is usually quite limited: it does not
+                address how updates to the HTML page are performed, for example. With XForms,
+                writing Ajax-based applications implementing a number of Ajax scenarios can be done
+                by sticking to a well-established standard. Typical scenarios include:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Improved HTML widgets: XForms provides in standard open selection,
+                        dynamically updated selection lists, sliders, and more. In addition, XForms
+                        implementations can provide extensibility mechanisms allowing developers to
+                        create their own widgets.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Pre-submission validation: XForms provides support for instant feedback to
+                        the user of valid and invalid data. It is also possible to make validity
+                        depend on information dynamically returned by the server.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Dynamically showing or hiding parts of a page based on events or information
+                        returned by the server: XForms provides events, a switch module, as well as
+                        a powerful submission model allowing to exchange XML data between the client
+                        and the server and dynamically reflecting changes in the user interface
+                        without scripting.
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </section>
+    </section>
+    <section>
+        <title>Architecture Details</title>
+        <section>
+            <title>Keeping State</title>
+            <para>
+                An XForms engine works with one or more XForms models, which may each contain XForms
+                instances. Such instances are simply XML documents. The life cycle of XForms processing
+                operates on one or more XForms instances. In addition, XForms submission requires that a
+                complete XForms instance be submitted to a server.
+            </para>
+            <para>
+                This means that the server-side XForms engine must keep at least one entire XForms
+                instance as part of the state associated with a page containing XForms controls. As with
+                most web application frameworks, there are a few strategies to keep state, mainly:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Server-side, stored in association with a session. Note that programming tricks
+                        can be used to make sure that pages do not use the same state information, even
+                        if it is stored in association with the same session.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Client-side, stored  in a hidden HTML form element or in JavaScript variables.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Storing state client-side has the following advantages:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Less server resources are consumed.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Implementation can arguably be easier.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        State information does not expire with the server-side session.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Storing state client-side has some disadvantages:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Resulting HTML pages are larger, and more data is exchanged between the client
+                        and the server. In particular, the size of state data grows when XForms
+                        instances grow. This can be alleviated by compressing XForms instance data
+                        before storing it in HTML hidden fields.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        The integrity and confidentiality of XForms instance data has to be
+                        guaranteed. This can be solved by encrypting and signing XForms instance
+                        data before storing it on the client.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Whether state is stored client-side or server-side can be an option of the
+                server-side XForms engine.
+            </para>
+        </section>
+        <section>
+            <title>Client-Server Protocol</title>
+            <para>
+                A certain protocol must be devised to enable communication between user agent and
+                server. A request from the user agent can have the following structure:
+            </para>
+            <programlisting>
+    &lt;event-request>
+        &lt;static-state>
+            [models and controls]
+        &lt;/static-state>
+        &lt;dynamic-state>
+            [instances and other state]
+        &lt;/dynamic-state>
+        &lt;action>
+            &lt;event name="DOMActivate"
+                   source-control-id="42"/>
+        &lt;/action>
+    &lt;/event-request></programlisting>
+            <para>
+                And a reply from the server:
+            </para>
+            <programlisting>
+    &lt;event-response>
+        &lt;dynamic-state>
+            [instances and other state]
+        &lt;/dynamic-state>
+        &lt;action>
+            &lt;!-- Controls to update -->
+            &lt;control-values>
+                &lt;control id="42" value="John"/>
+                &lt;control id="43" value="Smith"/>
+            &lt;/control-values>
+            &lt;!-- Other actions -->
+            ...
+        &lt;/action>
+    &lt;/event-response></programlisting>
+            <para>
+                In these two simplified examples, state is kept on the client and exchanged in the
+                messages. In addition, the client can request the server to execute actions, and
+                conversely the server can request the client to do the same. Server-side actions
+                usually result in updating current state information, including instance data and
+                control values. Client-side actions usually result in visual updates within an HTML
+                page.
+            </para>
+        </section>
+        <section>
+            <title>Supporting Client-Side and Server-Side XForms</title>
+            <para>
+                A server-side XForms engine may also support user agents that implement XForms.
+                This requires that the server-side XForms engine be either configurable by the
+                developer, and/or that the XForms engine be able to detect user agents that support
+                XForms. A server-side XForms engine can this way make transparent to the developers
+                several types of user agents, including the following main categories:
+            </para>
+            <orderedlist>
+                <listitem>
+                    <para>
+                        User agents supporting client-side XForms: the engine forwards mostly
+                        unmodified XHTML + XForms to the user agent.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        User agents supporting limited scripting functionality: the engine rewrites
+                        XHTML + XForms to include limited client-side scripting, and is able to
+                        perform full client-server round-trips.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        User agents supporting enhanced scripting functionality, including Ajax:
+                        the engine rewrites XHTML + XForms to include more advanced scripting and
+                        Ajax support.
+                    </para>
+                </listitem>
+            </orderedlist>
+        </section>
+        <section>
+            <title>Deployment as Proxy</title>
+            <para>
+                A server-side XForms implementation can be deployed as a proxy. This allows the use of
+                different presentation frameworks and languages to benefit from XForms, such as Struts,
+                PHP, Perl, .NET, etc. In proxy mode, XForms processing works as follows:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        An existing application produces HTML or XHTML + XForms. The resulting page goes
+                        through the XForms proxy, which sends it to the user agent after transformation.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Conversely, the user agent sends events or HTML submissions to the XForms
+                        Server, which may end up submitting XML instances to the existing application.
+                        The application clearly must expect an XForms submission, but otherwise it does
+                        not need any particular XForms capabilities.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                The following figure illustrates this mode of operation:
+            </para>
+            <figure id="proxy-architecture">
+                <title>XForms Proxy Architecture</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata fileref="xtech14.png" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+        </section>
+        <section>
+            <title>100% Client-Side</title>
+            <para>
+                It wouldn't be fair not to consider the possiblity of implementing a portable
+                XForms engine entirely client-side. The main options are:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Javascript. It should be noted that Javascript is difficult to write
+                        compared to strongly-typed languages such as Java, and that incompabilities
+                        between clients may arise. Due to the complexity of XForms, building a full
+                        XForms implementation with Javascript is a daunting task, albeit not an
+                        impossible one. There are some important challenges to overcome, such as
+                        implementing XForms submission, which may require using browser-specific
+                        extensions or limited server-side code.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Flash shares some of the issues of Javascript. Using Flash also forgoes a
+                        tight integration with HTML, as Flash has its own rendering engine, unless
+                        either HTML is reimplemented within Flash, or the Flash engine acts as a
+                        faceless XForms engine.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Java in the web browser is no longer fashionable, and it is also more likely
+                        to be disabled than Javascript or Flash, or to have an out of date
+                        implementation. It is also heavier on the client than Javascript or Flash.
+                        Other than that, implementing a faceless XForms engine on the client can be
+                        an attractive solution to some developers.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                At this point, we believe that a hybrid solution using as little JavaScript as
+                possible on the client with an Ajax-based server-side XForms engine is the most
+                promising option.
+            </para>
+        </section>
+        <section>
+            <title>Impact of the Architecture on the Client - Server Relationship</title>
+            <para>
+                Server-side XForms splits the XForms engine into two parts: one part acts on the client,
+                and is composed of script and state information; the second part acts on the server.
+                Between the time an application produces XHTML + XForms, until the time the form is
+                submitted to the application zero or more interactions may occurs between the
+                client-side part of the XForms engine and the server-side part, whether producing full
+                client-server round-trips, or whether using Ajax techniques. This has an impact on
+                debugging. Documents that would be observable simply by viewing a page source within a
+                web browser must now be observed at the server-side XForms engine level.
+            </para>
+        </section>
+        <section>
+            <title>Relationship with Web Forms 2.0</title>
+            <para>
+                A recent W3C submission by Opera Software introduces Web Forms 2.0, an incremental
+                improvement over HTML forms. As mentioned in that submission, it does not compete
+                directly with XForms 1.0. Instead, it can be a facilitator for implementing server-side
+                XForms, by providing for example:
+            </para>
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Validation features such as a type attribute on inputs fields allowing user
+                        agents to present specialized controls and regular expression matching.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        A repetition model that can be helpful to implement the XForms repeat module.
+                    </para>
+                </listitem>
+            </itemizedlist>
+            <para>
+                Whether Web Forms 2.0 will be adopted and become a de facto standard remains to be
+                seen. At the moment, XForms 1.0 has the benefit of being an actual W3C recommendation.
+            </para>
+        </section>
+    </section>
+    <section>
+        <title>Current Implementations</title>
+        <para>
+            Orbeon PresentationServer (OPS) and Chiba are two open source server-side XForms
+            implementations available today. The OPS implementation started with using very simple
+            rewriting techniques, and then progressively included more advanced techniques to keep
+            state and exchange information between client and server. It is now well on its way to
+            support most of the XForms specification through Ajax in its next release.
+        </para>
+    </section>
+    <section>
+        <title>Conclusion</title>
+        <para>
+            We believe that server-side XForms is the most promising solution today to give XForms a
+            real chance on the web. From a technical standpoint, the technology to implement it is
+            adequate, and implementations are getting more mature as months pass.
+        </para>
+    </section>
+    <ackno>
+        Special thanks to Alessandro Vernet for his input.
+    </ackno>
+    <bibliography>
+        <bibliomixed id="XFORMS10">
+            <abbrev>XFORMS10</abbrev>
+            <citetitle>
+                <ulink url="http://www.w3.org/TR/2003/REC-xforms-20031014/">XForms 1.0 W3C Recommendation</ulink>.
+            </citetitle>
+        </bibliomixed>
+        <bibliomixed id="AJAX">
+            <abbrev>AJAX</abbrev>
+            <citetitle>
+                <ulink url="http://www.adaptivepath.com/publications/essays/archives/000385.php">Ajax: A New Approach to Web Applications</ulink>.
+            </citetitle>
+        </bibliomixed>
+        <bibliomixed id="WEBFORMS20">
+            <abbrev>WEBFORMS20</abbrev>
+            <citetitle>
+                <ulink url="http://www.w3.org/Submission/web-forms2/">Web Forms 2.0</ulink>.
+            </citetitle>
+        </bibliomixed>
+        <bibliomixed id="OPS">
+            <abbrev>OPS</abbrev>
+            <citetitle>
+                <ulink url="http://www.orbeon.com/software/">Orbeon PresentationServer</ulink>.
+            </citetitle>
+        </bibliomixed>
+        <bibliomixed id="CHIBA">
+            <abbrev>CHIBA</abbrev>
+            <citetitle>
+                <ulink url="http://chiba.sourceforge.net/">Chiba</ulink>.
+            </citetitle>
+        </bibliomixed>
+    </bibliography>
+</article>
+

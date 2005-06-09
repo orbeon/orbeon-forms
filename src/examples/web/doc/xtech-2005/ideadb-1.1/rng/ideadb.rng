@@ -1,0 +1,4450 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  *********************************************************************
+  *** THIS IS THE FLATTENED DTD. DO NOT EDIT THIS DTD BY HAND, EDIT ***
+  *** THE CUSTOMIZATION LAYER AND REGENERATE THE FLATTENED DTD! ********
+  *********************************************************************
+-->
+<!-- ...................................................................... -->
+<!-- IDEAlliance XML Conference Paper DocBook XML Subset V1.1 ............. -->
+<!-- File sdocbook-custom.dtd ............................................. -->
+<!--
+  Copyright 2004 IDEAlliance. Based on DocBook XML V4.3,
+  Copyright 1992-2004 HaL Computer Systems, Inc.,
+  O'Reilly & Associates, Inc., ArborText, Inc., Fujitsu Software
+  Corporation, Norman Walsh, Sun Microsystems, Inc., and the
+  Organization for the Advancement of Structured Information
+  Standards (OASIS).
+  
+  $Id: ideadb.rng,v 1.1 2005/06/09 22:02:43 ebruchez Exp $
+  
+  Permission to use, copy, modify and distribute the DocBook XML DTD
+  and its accompanying documentation for any purpose and without fee
+  is hereby granted in perpetuity, provided that the above copyright
+  notice and this paragraph appear in all copies.  The copyright
+  holders make no representation about the suitability of the DTD for
+  any purpose.  It is provided "as is" without expressed or implied
+  warranty.
+  
+  If you modify the XML Conference Paper DTD in any way, except for
+  declaring and referencing additional sets of general entities and
+  declaring additional notations, label your DTD as a variant of
+  the XML Conference Paper DTD. 
+-->
+<!-- ...................................................................... -->
+<!--
+  This is the driver file for V1.1 of the IDEAlliance XML Conference
+  Paper DocBook XML Subset DTD.
+  Please use the following formal public identifier to identify it:
+  
+  "-//IDEAlliance//DTD Conference Paper DocBook XML Subset V1.1//EN"
+  
+  For example:
+  
+  <!DOCTYPE article
+    PUBLIC "-//IDEAlliance//DTD Conference Paper DocBook XML Subset V1.1//EN"
+           "ideadb.dtd">
+-->
+<!-- ...................................................................... -->
+<grammar xmlns:a="http://relaxng.org/ns/compatibility/annotations/1.0" xmlns="http://relaxng.org/ns/structure/1.0" datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes">
+  <define name="linespecific.attrib">
+    <optional>
+      <attribute name="format" a:defaultValue="linespecific">
+        <choice>
+          <value>linespecific</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="linenumbering">
+        <choice>
+          <value>numbered</value>
+          <value>unnumbered</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="continuation">
+        <choice>
+          <value>continues</value>
+          <value>restarts</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="startinglinenumber"/>
+    </optional>
+    <optional>
+      <attribute name="language"/>
+    </optional>
+  </define>
+  <define name="local.notation.class">
+    <notAllowed/>
+  </define>
+  <define name="notation.class">
+    <choice>
+      <value>BMP</value>
+      <value>GIF</value>
+      <value>GIF87a</value>
+      <value>GIF89a</value>
+      <value>JPG</value>
+      <value>JPEG</value>
+      <value>PNG</value>
+      <value>SVG</value>
+      <value>SVGZ</value>
+      <value>linespecific</value>
+      <ref name="local.notation.class"/>
+    </choice>
+  </define>
+  <define name="local.objectdata.attrib">
+    <empty/>
+  </define>
+  <define name="objectdata.attrib">
+    <optional>
+      <attribute name="fileref"/>
+    </optional>
+    <optional>
+      <attribute name="format">
+        <choice>
+          <ref name="notation.class"/>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="srccredit"/>
+    </optional>
+    <ref name="local.objectdata.attrib"/>
+  </define>
+  <define name="local.list.class">
+    <notAllowed/>
+  </define>
+  <define name="list.class">
+    <choice>
+      <ref name="itemizedlist"/>
+      <ref name="orderedlist"/>
+      <ref name="variablelist"/>
+      <ref name="local.list.class"/>
+    </choice>
+  </define>
+  <define name="local.admon.class">
+    <notAllowed/>
+  </define>
+  <define name="admon.class">
+    <choice>
+      <ref name="note"/>
+      <ref name="local.admon.class"/>
+    </choice>
+  </define>
+  <define name="local.linespecific.class">
+    <notAllowed/>
+  </define>
+  <define name="linespecific.class">
+    <choice>
+      <ref name="literallayout"/>
+      <ref name="programlisting"/>
+      <ref name="local.linespecific.class"/>
+    </choice>
+  </define>
+  <define name="local.para.class">
+    <notAllowed/>
+  </define>
+  <define name="para.class">
+    <choice>
+      <ref name="para"/>
+      <ref name="local.para.class"/>
+    </choice>
+  </define>
+  <define name="local.informal.class">
+    <notAllowed/>
+  </define>
+  <define name="informal.class">
+    <choice>
+      <ref name="blockquote"/>
+      <ref name="mediaobject"/>
+      <ref name="informaltable"/>
+      <ref name="local.informal.class"/>
+    </choice>
+  </define>
+  <define name="local.formal.class">
+    <notAllowed/>
+  </define>
+  <define name="formal.class">
+    <choice>
+      <ref name="example"/>
+      <ref name="figure"/>
+      <ref name="table"/>
+      <ref name="local.formal.class"/>
+    </choice>
+  </define>
+  <define name="local.compound.class">
+    <notAllowed/>
+  </define>
+  <define name="compound.class">
+    <choice>
+      <ref name="sidebar"/>
+      <ref name="local.compound.class"/>
+    </choice>
+  </define>
+  <define name="local.genobj.class">
+    <notAllowed/>
+  </define>
+  <define name="genobj.class">
+    <choice>
+      <ref name="anchor"/>
+      <ref name="local.genobj.class"/>
+    </choice>
+  </define>
+  <define name="local.descobj.class">
+    <notAllowed/>
+  </define>
+  <define name="descobj.class">
+    <choice>
+      <ref name="abstract"/>
+      <ref name="personblurb"/>
+      <ref name="epigraph"/>
+      <ref name="local.descobj.class"/>
+    </choice>
+  </define>
+  <define name="local.xref.char.class">
+    <notAllowed/>
+  </define>
+  <define name="xref.char.class">
+    <choice>
+      <ref name="footnoteref"/>
+      <ref name="xref"/>
+      <ref name="local.xref.char.class"/>
+    </choice>
+  </define>
+  <define name="local.gen.char.class">
+    <notAllowed/>
+  </define>
+  <define name="gen.char.class">
+    <choice>
+      <ref name="abbrev"/>
+      <ref name="acronym"/>
+      <ref name="citetitle"/>
+      <ref name="emphasis"/>
+      <ref name="footnote"/>
+      <ref name="phrase"/>
+      <ref name="quote"/>
+      <ref name="trademark"/>
+      <ref name="local.gen.char.class"/>
+    </choice>
+  </define>
+  <define name="local.link.char.class">
+    <notAllowed/>
+  </define>
+  <define name="link.char.class">
+    <choice>
+      <ref name="link"/>
+      <ref name="ulink"/>
+      <ref name="local.link.char.class"/>
+    </choice>
+  </define>
+  <define name="local.tech.char.class">
+    <notAllowed/>
+  </define>
+  <define name="tech.char.class">
+    <choice>
+      <ref name="command"/>
+      <ref name="computeroutput"/>
+      <ref name="email"/>
+      <ref name="filename"/>
+      <ref name="literal"/>
+      <ref name="option"/>
+      <ref name="replaceable"/>
+      <ref name="systemitem"/>
+      <ref name="userinput"/>
+      <ref name="sgmltag"/>
+      <ref name="code"/>
+      <ref name="local.tech.char.class"/>
+    </choice>
+  </define>
+  <define name="local.base.char.class">
+    <notAllowed/>
+  </define>
+  <define name="base.char.class">
+    <choice>
+      <ref name="anchor"/>
+      <ref name="local.base.char.class"/>
+    </choice>
+  </define>
+  <define name="local.docinfo.char.class">
+    <notAllowed/>
+  </define>
+  <define name="docinfo.char.class">
+    <choice>
+      <ref name="author"/>
+      <ref name="corpauthor"/>
+      <ref name="othercredit"/>
+      <ref name="revhistory"/>
+      <ref name="local.docinfo.char.class"/>
+    </choice>
+  </define>
+  <define name="local.inlineobj.char.class">
+    <notAllowed/>
+  </define>
+  <define name="inlineobj.char.class">
+    <choice>
+      <ref name="inlinemediaobject"/>
+      <ref name="local.inlineobj.char.class"/>
+    </choice>
+  </define>
+  <define name="local.effectivity.attrib">
+    <empty/>
+  </define>
+  <define name="effectivity.attrib">
+    <ref name="local.effectivity.attrib"/>
+  </define>
+  <define name="local.common.attrib">
+    <empty/>
+  </define>
+  <define name="common.attrib">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="lang"/>
+    </optional>
+    <optional>
+      <attribute name="remap"/>
+    </optional>
+    <optional>
+      <attribute name="xreflabel"/>
+    </optional>
+    <optional>
+      <attribute name="revisionflag">
+        <choice>
+          <value>changed</value>
+          <value>added</value>
+          <value>deleted</value>
+          <value>off</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="local.common.attrib"/>
+  </define>
+  <define name="local.person.ident.mix">
+    <notAllowed/>
+  </define>
+  <define name="person.ident.mix">
+    <choice>
+      <ref name="honorific"/>
+      <ref name="firstname"/>
+      <ref name="surname"/>
+      <ref name="lineage"/>
+      <ref name="othername"/>
+      <ref name="affiliation"/>
+      <ref name="personblurb"/>
+      <ref name="local.person.ident.mix"/>
+    </choice>
+  </define>
+  <define name="local.bibliocomponent.mix">
+    <notAllowed/>
+  </define>
+  <define name="bibliocomponent.mix">
+    <choice>
+      <ref name="abbrev"/>
+      <ref name="abstract"/>
+      <ref name="author"/>
+      <ref name="authorgroup"/>
+      <ref name="bibliomisc"/>
+      <ref name="copyright"/>
+      <ref name="corpauthor"/>
+      <ref name="date"/>
+      <ref name="edition"/>
+      <ref name="editor"/>
+      <ref name="issuenum"/>
+      <ref name="othercredit"/>
+      <ref name="pagenums"/>
+      <ref name="pubdate"/>
+      <ref name="publishername"/>
+      <ref name="releaseinfo"/>
+      <ref name="revhistory"/>
+      <ref name="subtitle"/>
+      <ref name="title"/>
+      <ref name="titleabbrev"/>
+      <ref name="volumenum"/>
+      <ref name="citetitle"/>
+      <ref name="person.ident.mix"/>
+      <ref name="local.bibliocomponent.mix"/>
+    </choice>
+  </define>
+  <define name="local.other.char.class">
+    <notAllowed/>
+  </define>
+  <define name="other.char.class">
+    <choice>
+      <ref name="subscript"/>
+      <ref name="superscript"/>
+      <ref name="local.other.char.class"/>
+    </choice>
+  </define>
+  <define name="local.component.mix">
+    <notAllowed/>
+  </define>
+  <define name="component.mix">
+    <choice>
+      <ref name="list.class"/>
+      <ref name="admon.class"/>
+      <ref name="linespecific.class"/>
+      <ref name="para.class"/>
+      <ref name="informal.class"/>
+      <ref name="formal.class"/>
+      <ref name="compound.class"/>
+      <ref name="genobj.class"/>
+      <ref name="descobj.class"/>
+      <ref name="local.component.mix"/>
+    </choice>
+  </define>
+  <define name="local.sidebar.mix">
+    <notAllowed/>
+  </define>
+  <define name="sidebar.mix">
+    <choice>
+      <ref name="list.class"/>
+      <ref name="admon.class"/>
+      <ref name="linespecific.class"/>
+      <ref name="para.class"/>
+      <ref name="informal.class"/>
+      <ref name="formal.class"/>
+      <ref name="genobj.class"/>
+      <ref name="local.sidebar.mix"/>
+    </choice>
+  </define>
+  <define name="local.revdescription.mix">
+    <notAllowed/>
+  </define>
+  <define name="revdescription.mix">
+    <choice>
+      <ref name="list.class"/>
+      <ref name="admon.class"/>
+      <ref name="linespecific.class"/>
+      <ref name="para.class"/>
+      <ref name="informal.class"/>
+      <ref name="formal.class"/>
+      <ref name="genobj.class"/>
+      <ref name="local.revdescription.mix"/>
+    </choice>
+  </define>
+  <define name="local.footnote.mix">
+    <notAllowed/>
+  </define>
+  <define name="footnote.mix">
+    <choice>
+      <ref name="list.class"/>
+      <ref name="linespecific.class"/>
+      <ref name="para.class"/>
+      <ref name="informal.class"/>
+      <ref name="local.footnote.mix"/>
+    </choice>
+  </define>
+  <define name="local.example.mix">
+    <notAllowed/>
+  </define>
+  <define name="example.mix">
+    <choice>
+      <ref name="list.class"/>
+      <ref name="linespecific.class"/>
+      <ref name="para.class"/>
+      <ref name="informal.class"/>
+      <ref name="local.example.mix"/>
+    </choice>
+  </define>
+  <define name="local.admon.mix">
+    <notAllowed/>
+  </define>
+  <define name="admon.mix">
+    <choice>
+      <ref name="list.class"/>
+      <ref name="linespecific.class"/>
+      <ref name="para.class"/>
+      <ref name="informal.class"/>
+      <ref name="formal.class"/>
+      <ref name="local.admon.mix"/>
+    </choice>
+  </define>
+  <define name="local.figure.mix">
+    <notAllowed/>
+  </define>
+  <define name="figure.mix">
+    <choice>
+      <ref name="linespecific.class"/>
+      <ref name="informal.class"/>
+      <ref name="local.figure.mix"/>
+    </choice>
+  </define>
+  <define name="local.tabentry.mix">
+    <notAllowed/>
+  </define>
+  <define name="tabentry.mix">
+    <choice>
+      <ref name="list.class"/>
+      <ref name="admon.class"/>
+      <ref name="linespecific.class"/>
+      <ref name="para.class"/>
+      <ref name="mediaobject"/>
+      <ref name="local.tabentry.mix"/>
+    </choice>
+  </define>
+  <define name="local.legalnotice.mix">
+    <notAllowed/>
+  </define>
+  <define name="legalnotice.mix">
+    <choice>
+      <ref name="list.class"/>
+      <ref name="admon.class"/>
+      <ref name="linespecific.class"/>
+      <ref name="para.class"/>
+      <ref name="blockquote"/>
+      <ref name="local.legalnotice.mix"/>
+    </choice>
+  </define>
+  <define name="local.textobject.mix">
+    <notAllowed/>
+  </define>
+  <define name="textobject.mix">
+    <choice>
+      <ref name="list.class"/>
+      <ref name="admon.class"/>
+      <ref name="linespecific.class"/>
+      <ref name="para.class"/>
+      <ref name="blockquote"/>
+      <ref name="local.textobject.mix"/>
+    </choice>
+  </define>
+  <define name="local.listpreamble.mix">
+    <notAllowed/>
+  </define>
+  <define name="listpreamble.mix">
+    <choice>
+      <ref name="admon.class"/>
+      <ref name="linespecific.class"/>
+      <ref name="para.class"/>
+      <ref name="informal.class"/>
+      <ref name="genobj.class"/>
+      <ref name="descobj.class"/>
+      <ref name="local.listpreamble.mix"/>
+    </choice>
+  </define>
+  <define name="local.para.char.mix">
+    <notAllowed/>
+  </define>
+  <define name="para.char.mix">
+    <choice>
+      <text/>
+      <ref name="xref.char.class"/>
+      <ref name="gen.char.class"/>
+      <ref name="link.char.class"/>
+      <ref name="tech.char.class"/>
+      <ref name="base.char.class"/>
+      <ref name="other.char.class"/>
+      <ref name="inlineobj.char.class"/>
+      <ref name="local.para.char.mix"/>
+    </choice>
+  </define>
+  <define name="local.title.char.mix">
+    <notAllowed/>
+  </define>
+  <define name="title.char.mix">
+    <choice>
+      <text/>
+      <ref name="xref.char.class"/>
+      <ref name="gen.char.class"/>
+      <ref name="link.char.class"/>
+      <ref name="tech.char.class"/>
+      <ref name="base.char.class"/>
+      <ref name="docinfo.char.class"/>
+      <ref name="other.char.class"/>
+      <ref name="inlineobj.char.class"/>
+      <ref name="local.title.char.mix"/>
+    </choice>
+  </define>
+  <define name="local.cptr.char.mix">
+    <notAllowed/>
+  </define>
+  <define name="cptr.char.mix">
+    <choice>
+      <text/>
+      <ref name="link.char.class"/>
+      <ref name="tech.char.class"/>
+      <ref name="base.char.class"/>
+      <ref name="other.char.class"/>
+      <ref name="inlinemediaobject"/>
+      <ref name="local.cptr.char.mix"/>
+    </choice>
+  </define>
+  <define name="local.smallcptr.char.mix">
+    <notAllowed/>
+  </define>
+  <define name="smallcptr.char.mix">
+    <choice>
+      <text/>
+      <ref name="replaceable"/>
+      <ref name="inlinemediaobject"/>
+      <ref name="local.smallcptr.char.mix"/>
+    </choice>
+  </define>
+  <define name="local.word.char.mix">
+    <notAllowed/>
+  </define>
+  <define name="word.char.mix">
+    <choice>
+      <text/>
+      <ref name="acronym"/>
+      <ref name="emphasis"/>
+      <ref name="trademark"/>
+      <ref name="link.char.class"/>
+      <ref name="base.char.class"/>
+      <ref name="other.char.class"/>
+      <ref name="inlinemediaobject"/>
+      <ref name="local.word.char.mix"/>
+    </choice>
+  </define>
+  <define name="local.docinfo.char.mix">
+    <notAllowed/>
+  </define>
+  <define name="docinfo.char.mix">
+    <choice>
+      <text/>
+      <ref name="link.char.class"/>
+      <ref name="emphasis"/>
+      <ref name="trademark"/>
+      <ref name="replaceable"/>
+      <ref name="other.char.class"/>
+      <ref name="inlinemediaobject"/>
+      <ref name="local.docinfo.char.mix"/>
+    </choice>
+  </define>
+  <define name="tbl.table.mdl">
+    <choice>
+      <group>
+        <ref name="title"/>
+        <choice>
+          <oneOrMore>
+            <ref name="mediaobject"/>
+          </oneOrMore>
+          <oneOrMore>
+            <ref name="tgroup"/>
+          </oneOrMore>
+        </choice>
+      </group>
+      <group>
+        <ref name="caption"/>
+        <choice>
+          <zeroOrMore>
+            <ref name="col"/>
+          </zeroOrMore>
+          <zeroOrMore>
+            <ref name="colgroup"/>
+          </zeroOrMore>
+        </choice>
+        <optional>
+          <ref name="thead"/>
+        </optional>
+        <optional>
+          <ref name="tfoot"/>
+        </optional>
+        <choice>
+          <oneOrMore>
+            <ref name="tbody"/>
+          </oneOrMore>
+          <oneOrMore>
+            <ref name="tr"/>
+          </oneOrMore>
+        </choice>
+      </group>
+    </choice>
+  </define>
+  <define name="local.divcomponent.mix">
+    <notAllowed/>
+  </define>
+  <define name="divcomponent.mix">
+    <choice>
+      <ref name="list.class"/>
+      <ref name="admon.class"/>
+      <ref name="linespecific.class"/>
+      <ref name="para.class"/>
+      <ref name="informal.class"/>
+      <ref name="formal.class"/>
+      <ref name="compound.class"/>
+      <ref name="descobj.class"/>
+      <ref name="local.divcomponent.mix"/>
+    </choice>
+  </define>
+  <define name="bookcomponent.content">
+    <choice>
+      <group>
+        <oneOrMore>
+          <ref name="divcomponent.mix"/>
+        </oneOrMore>
+        <zeroOrMore>
+          <ref name="section"/>
+        </zeroOrMore>
+      </group>
+      <oneOrMore>
+        <ref name="section"/>
+      </oneOrMore>
+    </choice>
+  </define>
+  <define name="yesorno.attvals">
+    <data type="string" datatypeLibrary=""/>
+  </define>
+  <define name="formalobject.title.content">
+    <ref name="title"/>
+    <optional>
+      <ref name="titleabbrev"/>
+    </optional>
+  </define>
+  <define name="local.mediaobject.mix">
+    <notAllowed/>
+  </define>
+  <define name="mediaobject.mix">
+    <choice>
+      <ref name="videoobject"/>
+      <ref name="audioobject"/>
+      <ref name="imageobject"/>
+      <ref name="textobject"/>
+      <ref name="local.mediaobject.mix"/>
+    </choice>
+  </define>
+  <define name="idreq.attrib">
+    <attribute name="id">
+      <data type="ID"/>
+    </attribute>
+  </define>
+  <define name="lang.attrib">
+    <optional>
+      <attribute name="lang"/>
+    </optional>
+  </define>
+  <define name="remap.attrib">
+    <optional>
+      <attribute name="remap"/>
+    </optional>
+  </define>
+  <define name="role.attrib">
+    <optional>
+      <attribute name="role"/>
+    </optional>
+  </define>
+  <define name="xreflabel.attrib">
+    <optional>
+      <attribute name="xreflabel"/>
+    </optional>
+  </define>
+  <define name="revisionflag.attrib">
+    <optional>
+      <attribute name="revisionflag">
+        <choice>
+          <value>changed</value>
+          <value>added</value>
+          <value>deleted</value>
+          <value>off</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="dir.attrib">
+    <optional>
+      <attribute name="dir">
+        <choice>
+          <value>ltr</value>
+          <value>rtl</value>
+          <value>lro</value>
+          <value>rlo</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="xml-base.attrib">
+    <optional>
+      <attribute name="xml:base"/>
+    </optional>
+  </define>
+  <define name="label.attrib">
+    <optional>
+      <attribute name="label"/>
+    </optional>
+  </define>
+  <define name="linkendreq.attrib">
+    <attribute name="linkend">
+      <data type="IDREF"/>
+    </attribute>
+  </define>
+  <define name="local.mark.attrib">
+    <empty/>
+  </define>
+  <define name="mark.attrib">
+    <optional>
+      <attribute name="mark"/>
+    </optional>
+    <ref name="local.mark.attrib"/>
+  </define>
+  <define name="moreinfo.attrib">
+    <optional>
+      <attribute name="moreinfo" a:defaultValue="none">
+        <choice>
+          <value>refentry</value>
+          <value>none</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="pagenum.attrib">
+    <optional>
+      <attribute name="pagenum"/>
+    </optional>
+  </define>
+  <define name="local.status.attrib">
+    <empty/>
+  </define>
+  <define name="status.attrib">
+    <optional>
+      <attribute name="status"/>
+    </optional>
+    <ref name="local.status.attrib"/>
+  </define>
+  <define name="width.attrib">
+    <optional>
+      <attribute name="width"/>
+    </optional>
+  </define>
+  <define name="local.title.attrib">
+    <empty/>
+  </define>
+  <define name="title.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="title">
+    <element name="title">
+      <ref name="title.attlist"/>
+      <zeroOrMore>
+        <ref name="title.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="title.attlist" combine="interleave">
+    <ref name="pagenum.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="title.role.attrib"/>
+    <ref name="local.title.attrib"/>
+  </define>
+  <define name="local.titleabbrev.attrib">
+    <empty/>
+  </define>
+  <define name="titleabbrev.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="titleabbrev">
+    <element name="titleabbrev">
+      <ref name="titleabbrev.attlist"/>
+      <zeroOrMore>
+        <ref name="title.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="titleabbrev.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="titleabbrev.role.attrib"/>
+    <ref name="local.titleabbrev.attrib"/>
+  </define>
+  <define name="local.subtitle.attrib">
+    <empty/>
+  </define>
+  <define name="subtitle.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="subtitle">
+    <element name="subtitle">
+      <ref name="subtitle.attlist"/>
+      <zeroOrMore>
+        <ref name="title.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="subtitle.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="subtitle.role.attrib"/>
+    <ref name="local.subtitle.attrib"/>
+  </define>
+  <define name="local.bibliomixed.attrib">
+    <empty/>
+  </define>
+  <define name="bibliomixed.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="bibliomixed.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="bibliomixed.role.attrib"/>
+    <ref name="local.bibliomixed.attrib"/>
+  </define>
+  <define name="local.articleinfo.attrib">
+    <empty/>
+  </define>
+  <define name="articleinfo.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="articleinfo.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="articleinfo.role.attrib"/>
+    <ref name="local.articleinfo.attrib"/>
+  </define>
+  <define name="bibliomset.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="local.bibliomset.attrib">
+    <empty/>
+  </define>
+  <define name="bibliomset">
+    <element name="bibliomset">
+      <ref name="bibliomset.attlist"/>
+      <zeroOrMore>
+        <choice>
+          <text/>
+          <ref name="bibliocomponent.mix"/>
+          <ref name="bibliomset"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="bibliomset.attlist" combine="interleave">
+    <optional>
+      <attribute name="relation"/>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="bibliomset.role.attrib"/>
+    <ref name="local.bibliomset.attrib"/>
+  </define>
+  <define name="local.bibliomisc.attrib">
+    <empty/>
+  </define>
+  <define name="bibliomisc.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="bibliomisc">
+    <element name="bibliomisc">
+      <ref name="bibliomisc.attlist"/>
+      <zeroOrMore>
+        <ref name="para.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="bibliomisc.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="bibliomisc.role.attrib"/>
+    <ref name="local.bibliomisc.attrib"/>
+  </define>
+  <define name="local.subjectset.attrib">
+    <empty/>
+  </define>
+  <define name="subjectset.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="subjectset">
+    <element name="subjectset">
+      <ref name="subjectset.attlist"/>
+      <oneOrMore>
+        <ref name="subject"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="subjectset.attlist" combine="interleave">
+    <optional>
+      <attribute name="scheme">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="subjectset.role.attrib"/>
+    <ref name="local.subjectset.attrib"/>
+  </define>
+  <define name="local.subject.attrib">
+    <empty/>
+  </define>
+  <define name="subject.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="subject">
+    <element name="subject">
+      <ref name="subject.attlist"/>
+      <oneOrMore>
+        <ref name="subjectterm"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="subject.attlist" combine="interleave">
+    <optional>
+      <attribute name="weight"/>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="subject.role.attrib"/>
+    <ref name="local.subject.attrib"/>
+  </define>
+  <define name="local.subjectterm.attrib">
+    <empty/>
+  </define>
+  <define name="subjectterm.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="subjectterm">
+    <element name="subjectterm">
+      <ref name="subjectterm.attlist"/>
+      <text/>
+    </element>
+  </define>
+  <define name="subjectterm.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="subjectterm.role.attrib"/>
+    <ref name="local.subjectterm.attrib"/>
+  </define>
+  <define name="local.keywordset.attrib">
+    <empty/>
+  </define>
+  <define name="keywordset.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="keywordset">
+    <element name="keywordset">
+      <ref name="keywordset.attlist"/>
+      <oneOrMore>
+        <ref name="keyword"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="keywordset.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="keywordset.role.attrib"/>
+    <ref name="local.keywordset.attrib"/>
+  </define>
+  <define name="local.keyword.attrib">
+    <empty/>
+  </define>
+  <define name="keyword.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="keyword">
+    <element name="keyword">
+      <ref name="keyword.attlist"/>
+      <text/>
+    </element>
+  </define>
+  <define name="keyword.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="keyword.role.attrib"/>
+    <ref name="local.keyword.attrib"/>
+  </define>
+  <define name="local.sidebar.attrib">
+    <empty/>
+  </define>
+  <define name="sidebar.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="sidebar.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="sidebar.role.attrib"/>
+    <ref name="local.sidebar.attrib"/>
+  </define>
+  <define name="local.abstract.attrib">
+    <empty/>
+  </define>
+  <define name="abstract.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="abstract">
+    <element name="abstract">
+      <ref name="abstract.attlist"/>
+      <optional>
+        <ref name="title"/>
+      </optional>
+      <oneOrMore>
+        <ref name="para.class"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="abstract.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="abstract.role.attrib"/>
+    <ref name="local.abstract.attrib"/>
+  </define>
+  <define name="local.personblurb.attrib">
+    <empty/>
+  </define>
+  <define name="personblurb.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="personblurb">
+    <element name="personblurb">
+      <ref name="personblurb.attlist"/>
+      <optional>
+        <ref name="title"/>
+      </optional>
+      <oneOrMore>
+        <ref name="para.class"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="personblurb.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="personblurb.role.attrib"/>
+    <ref name="local.personblurb.attrib"/>
+  </define>
+  <define name="local.blockquote.attrib">
+    <empty/>
+  </define>
+  <define name="blockquote.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="blockquote.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="blockquote.role.attrib"/>
+    <ref name="local.blockquote.attrib"/>
+  </define>
+  <define name="local.attribution.attrib">
+    <empty/>
+  </define>
+  <define name="attribution.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="attribution">
+    <element name="attribution">
+      <ref name="attribution.attlist"/>
+      <zeroOrMore>
+        <ref name="para.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="attribution.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="attribution.role.attrib"/>
+    <ref name="local.attribution.attrib"/>
+  </define>
+  <define name="local.epigraph.attrib">
+    <empty/>
+  </define>
+  <define name="epigraph.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="epigraph">
+    <element name="epigraph">
+      <ref name="epigraph.attlist"/>
+      <optional>
+        <ref name="attribution"/>
+      </optional>
+      <oneOrMore>
+        <choice>
+          <ref name="para.class"/>
+          <ref name="literallayout"/>
+        </choice>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="epigraph.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="epigraph.role.attrib"/>
+    <ref name="local.epigraph.attrib"/>
+  </define>
+  <define name="local.footnote.attrib">
+    <empty/>
+  </define>
+  <define name="footnote.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="footnote">
+    <element name="footnote">
+      <ref name="footnote.attlist"/>
+      <oneOrMore>
+        <ref name="footnote.mix"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="footnote.attlist" combine="interleave">
+    <ref name="label.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="footnote.role.attrib"/>
+    <ref name="local.footnote.attrib"/>
+  </define>
+  <define name="local.para.attrib">
+    <empty/>
+  </define>
+  <define name="para.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="para.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="para.role.attrib"/>
+    <ref name="local.para.attrib"/>
+  </define>
+  <define name="local.admon.attrib">
+    <empty/>
+  </define>
+  <define name="admon.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="note">
+    <element name="note">
+      <ref name="note.attlist"/>
+      <optional>
+        <ref name="title"/>
+      </optional>
+      <oneOrMore>
+        <ref name="admon.mix"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="note.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="admon.role.attrib"/>
+    <ref name="local.admon.attrib"/>
+  </define>
+  <define name="local.itemizedlist.attrib">
+    <empty/>
+  </define>
+  <define name="itemizedlist.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="itemizedlist.attlist" combine="interleave">
+    <optional>
+      <attribute name="spacing">
+        <choice>
+          <value>normal</value>
+          <value>compact</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="mark.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="itemizedlist.role.attrib"/>
+    <ref name="local.itemizedlist.attrib"/>
+  </define>
+  <define name="local.orderedlist.attrib">
+    <empty/>
+  </define>
+  <define name="orderedlist.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="orderedlist.attlist" combine="interleave">
+    <optional>
+      <attribute name="numeration">
+        <choice>
+          <value>arabic</value>
+          <value>upperalpha</value>
+          <value>loweralpha</value>
+          <value>upperroman</value>
+          <value>lowerroman</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="inheritnum" a:defaultValue="ignore">
+        <choice>
+          <value>inherit</value>
+          <value>ignore</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="continuation" a:defaultValue="restarts">
+        <choice>
+          <value>continues</value>
+          <value>restarts</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="spacing">
+        <choice>
+          <value>normal</value>
+          <value>compact</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="orderedlist.role.attrib"/>
+    <ref name="local.orderedlist.attrib"/>
+  </define>
+  <define name="local.listitem.attrib">
+    <empty/>
+  </define>
+  <define name="listitem.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="listitem">
+    <element name="listitem">
+      <ref name="listitem.attlist"/>
+      <oneOrMore>
+        <ref name="component.mix"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="listitem.attlist" combine="interleave">
+    <optional>
+      <attribute name="override"/>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="listitem.role.attrib"/>
+    <ref name="local.listitem.attrib"/>
+  </define>
+  <define name="local.variablelist.attrib">
+    <empty/>
+  </define>
+  <define name="variablelist.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="variablelist.attlist" combine="interleave">
+    <optional>
+      <attribute name="termlength"/>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="variablelist.role.attrib"/>
+    <ref name="local.variablelist.attrib"/>
+  </define>
+  <define name="local.varlistentry.attrib">
+    <empty/>
+  </define>
+  <define name="varlistentry.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="varlistentry">
+    <element name="varlistentry">
+      <ref name="varlistentry.attlist"/>
+      <oneOrMore>
+        <ref name="term"/>
+      </oneOrMore>
+      <ref name="listitem"/>
+    </element>
+  </define>
+  <define name="varlistentry.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="varlistentry.role.attrib"/>
+    <ref name="local.varlistentry.attrib"/>
+  </define>
+  <define name="local.term.attrib">
+    <empty/>
+  </define>
+  <define name="term.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="term">
+    <element name="term">
+      <ref name="term.attlist"/>
+      <zeroOrMore>
+        <ref name="para.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="term.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="term.role.attrib"/>
+    <ref name="local.term.attrib"/>
+  </define>
+  <define name="local.example.attrib">
+    <empty/>
+  </define>
+  <define name="example.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="example.attlist" combine="interleave">
+    <optional>
+      <attribute name="floatstyle"/>
+    </optional>
+    <ref name="label.attrib"/>
+    <ref name="width.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="example.role.attrib"/>
+    <ref name="local.example.attrib"/>
+  </define>
+  <define name="local.programlisting.attrib">
+    <empty/>
+  </define>
+  <define name="programlisting.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="programlisting.attlist" combine="interleave">
+    <ref name="width.attrib"/>
+    <ref name="linespecific.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="programlisting.role.attrib"/>
+    <ref name="local.programlisting.attrib"/>
+  </define>
+  <define name="local.literallayout.attrib">
+    <empty/>
+  </define>
+  <define name="literallayout.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="literallayout.attlist" combine="interleave">
+    <ref name="width.attrib"/>
+    <ref name="linespecific.attrib"/>
+    <optional>
+      <attribute name="class" a:defaultValue="normal">
+        <choice>
+          <value>monospaced</value>
+          <value>normal</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="literallayout.role.attrib"/>
+    <ref name="local.literallayout.attrib"/>
+  </define>
+  <define name="local.figure.attrib">
+    <empty/>
+  </define>
+  <define name="figure.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="figure.attlist" combine="interleave">
+    <optional>
+      <attribute name="float" a:defaultValue="0">
+        <ref name="yesorno.attvals"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="floatstyle"/>
+    </optional>
+    <optional>
+      <attribute name="pgwide">
+        <ref name="yesorno.attvals"/>
+      </attribute>
+    </optional>
+    <ref name="label.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="figure.role.attrib"/>
+    <ref name="local.figure.attrib"/>
+  </define>
+  <define name="local.mediaobject.attrib">
+    <empty/>
+  </define>
+  <define name="mediaobject.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="mediaobject">
+    <element name="mediaobject">
+      <ref name="mediaobject.attlist"/>
+      <optional>
+        <ref name="objectinfo"/>
+      </optional>
+      <oneOrMore>
+        <ref name="mediaobject.mix"/>
+      </oneOrMore>
+      <optional>
+        <ref name="caption"/>
+      </optional>
+    </element>
+  </define>
+  <define name="mediaobject.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="mediaobject.role.attrib"/>
+    <ref name="local.mediaobject.attrib"/>
+  </define>
+  <define name="local.inlinemediaobject.attrib">
+    <empty/>
+  </define>
+  <define name="inlinemediaobject.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="inlinemediaobject">
+    <element name="inlinemediaobject">
+      <ref name="inlinemediaobject.attlist"/>
+      <optional>
+        <ref name="objectinfo"/>
+      </optional>
+      <oneOrMore>
+        <ref name="mediaobject.mix"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="inlinemediaobject.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="inlinemediaobject.role.attrib"/>
+    <ref name="local.inlinemediaobject.attrib"/>
+  </define>
+  <define name="local.videoobject.attrib">
+    <empty/>
+  </define>
+  <define name="videoobject.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="videoobject">
+    <element name="videoobject">
+      <ref name="videoobject.attlist"/>
+      <optional>
+        <ref name="objectinfo"/>
+      </optional>
+      <ref name="videodata"/>
+    </element>
+  </define>
+  <define name="videoobject.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="videoobject.role.attrib"/>
+    <ref name="local.videoobject.attrib"/>
+  </define>
+  <define name="local.audioobject.attrib">
+    <empty/>
+  </define>
+  <define name="audioobject.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="audioobject">
+    <element name="audioobject">
+      <ref name="audioobject.attlist"/>
+      <optional>
+        <ref name="objectinfo"/>
+      </optional>
+      <ref name="audiodata"/>
+    </element>
+  </define>
+  <define name="audioobject.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="audioobject.role.attrib"/>
+    <ref name="local.audioobject.attrib"/>
+  </define>
+  <define name="local.imageobject.attrib">
+    <empty/>
+  </define>
+  <define name="imageobject.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="imageobject">
+    <element name="imageobject">
+      <ref name="imageobject.attlist"/>
+      <optional>
+        <ref name="objectinfo"/>
+      </optional>
+      <ref name="imagedata"/>
+    </element>
+  </define>
+  <define name="imageobject.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="imageobject.role.attrib"/>
+    <ref name="local.imageobject.attrib"/>
+  </define>
+  <define name="local.textobject.attrib">
+    <empty/>
+  </define>
+  <define name="textobject.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="textobject">
+    <element name="textobject">
+      <ref name="textobject.attlist"/>
+      <optional>
+        <ref name="objectinfo"/>
+      </optional>
+      <choice>
+        <ref name="phrase"/>
+        <ref name="textdata"/>
+        <oneOrMore>
+          <ref name="textobject.mix"/>
+        </oneOrMore>
+      </choice>
+    </element>
+  </define>
+  <define name="textobject.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="textobject.role.attrib"/>
+    <ref name="local.textobject.attrib"/>
+  </define>
+  <define name="local.objectinfo.attrib">
+    <empty/>
+  </define>
+  <define name="objectinfo.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="objectinfo.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="objectinfo.role.attrib"/>
+    <ref name="local.objectinfo.attrib"/>
+  </define>
+  <define name="local.videodata.attrib">
+    <empty/>
+  </define>
+  <define name="videodata.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="videodata">
+    <element name="videodata">
+      <ref name="videodata.attlist"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="videodata.attlist" combine="interleave">
+    <optional>
+      <attribute name="width"/>
+    </optional>
+    <optional>
+      <attribute name="contentwidth"/>
+    </optional>
+    <optional>
+      <attribute name="depth"/>
+    </optional>
+    <optional>
+      <attribute name="contentdepth"/>
+    </optional>
+    <optional>
+      <attribute name="align">
+        <choice>
+          <value>left</value>
+          <value>right</value>
+          <value>center</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="valign">
+        <choice>
+          <value>top</value>
+          <value>middle</value>
+          <value>bottom</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="scale"/>
+    </optional>
+    <optional>
+      <attribute name="scalefit">
+        <ref name="yesorno.attvals"/>
+      </attribute>
+    </optional>
+    <ref name="objectdata.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="videodata.role.attrib"/>
+    <ref name="local.videodata.attrib"/>
+  </define>
+  <define name="local.audiodata.attrib">
+    <empty/>
+  </define>
+  <define name="audiodata.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="audiodata">
+    <element name="audiodata">
+      <ref name="audiodata.attlist"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="audiodata.attlist" combine="interleave">
+    <ref name="objectdata.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="audiodata.role.attrib"/>
+    <ref name="local.audiodata.attrib"/>
+  </define>
+  <define name="local.imagedata.attrib">
+    <empty/>
+  </define>
+  <define name="imagedata.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="imagedata">
+    <element name="imagedata">
+      <ref name="imagedata.attlist"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="imagedata.attlist" combine="interleave">
+    <optional>
+      <attribute name="width"/>
+    </optional>
+    <optional>
+      <attribute name="contentwidth"/>
+    </optional>
+    <optional>
+      <attribute name="depth"/>
+    </optional>
+    <optional>
+      <attribute name="contentdepth"/>
+    </optional>
+    <optional>
+      <attribute name="align">
+        <choice>
+          <value>left</value>
+          <value>right</value>
+          <value>center</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="valign">
+        <choice>
+          <value>top</value>
+          <value>middle</value>
+          <value>bottom</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="scale"/>
+    </optional>
+    <optional>
+      <attribute name="scalefit">
+        <ref name="yesorno.attvals"/>
+      </attribute>
+    </optional>
+    <ref name="objectdata.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="imagedata.role.attrib"/>
+    <ref name="local.imagedata.attrib"/>
+  </define>
+  <define name="local.textdata.attrib">
+    <empty/>
+  </define>
+  <define name="textdata.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="textdata">
+    <element name="textdata">
+      <ref name="textdata.attlist"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="textdata.attlist" combine="interleave">
+    <optional>
+      <attribute name="encoding"/>
+    </optional>
+    <ref name="objectdata.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="textdata.role.attrib"/>
+    <ref name="local.textdata.attrib"/>
+  </define>
+  <define name="html.coreattrs">
+    <optional>
+      <attribute name="id">
+        <data type="ID"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="class"/>
+    </optional>
+    <optional>
+      <attribute name="style"/>
+    </optional>
+    <optional>
+      <attribute name="title"/>
+    </optional>
+  </define>
+  <define name="i18n">
+    <optional>
+      <attribute name="xml:lang">
+        <data type="NMTOKEN"/>
+      </attribute>
+    </optional>
+  </define>
+  <define name="events">
+    <optional>
+      <attribute name="onclick"/>
+    </optional>
+    <optional>
+      <attribute name="ondblclick"/>
+    </optional>
+    <optional>
+      <attribute name="onmousedown"/>
+    </optional>
+    <optional>
+      <attribute name="onmouseup"/>
+    </optional>
+    <optional>
+      <attribute name="onmouseover"/>
+    </optional>
+    <optional>
+      <attribute name="onmousemove"/>
+    </optional>
+    <optional>
+      <attribute name="onmouseout"/>
+    </optional>
+    <optional>
+      <attribute name="onkeypress"/>
+    </optional>
+    <optional>
+      <attribute name="onkeydown"/>
+    </optional>
+    <optional>
+      <attribute name="onkeyup"/>
+    </optional>
+  </define>
+  <define name="attrs">
+    <ref name="html.coreattrs"/>
+    <ref name="i18n"/>
+    <ref name="events"/>
+  </define>
+  <define name="cellhalign">
+    <optional>
+      <attribute name="align">
+        <choice>
+          <value>left</value>
+          <value>center</value>
+          <value>right</value>
+          <value>justify</value>
+          <value>char</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="char"/>
+    </optional>
+    <optional>
+      <attribute name="charoff"/>
+    </optional>
+  </define>
+  <define name="cellvalign">
+    <optional>
+      <attribute name="valign">
+        <choice>
+          <value>top</value>
+          <value>middle</value>
+          <value>bottom</value>
+          <value>baseline</value>
+        </choice>
+      </attribute>
+    </optional>
+  </define>
+  <define name="colgroup">
+    <element name="colgroup">
+      <ref name="colgroup.attlist"/>
+      <zeroOrMore>
+        <ref name="col"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="col">
+    <element name="col">
+      <ref name="col.attlist"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="tr">
+    <element name="tr">
+      <ref name="tr.attlist"/>
+      <oneOrMore>
+        <choice>
+          <ref name="th"/>
+          <ref name="td"/>
+        </choice>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="th">
+    <element name="th">
+      <ref name="th.attlist"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="para.char.mix"/>
+          <ref name="tabentry.mix"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="td">
+    <element name="td">
+      <ref name="td.attlist"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="para.char.mix"/>
+          <ref name="tabentry.mix"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="colgroup.attlist" combine="interleave">
+    <ref name="attrs"/>
+    <optional>
+      <attribute name="span" a:defaultValue="1"/>
+    </optional>
+    <optional>
+      <attribute name="width"/>
+    </optional>
+    <ref name="cellhalign"/>
+    <ref name="cellvalign"/>
+  </define>
+  <define name="col.attlist" combine="interleave">
+    <ref name="attrs"/>
+    <optional>
+      <attribute name="span" a:defaultValue="1"/>
+    </optional>
+    <optional>
+      <attribute name="width"/>
+    </optional>
+    <ref name="cellhalign"/>
+    <ref name="cellvalign"/>
+  </define>
+  <define name="tr.attlist" combine="interleave">
+    <ref name="attrs"/>
+    <ref name="cellhalign"/>
+    <ref name="cellvalign"/>
+    <optional>
+      <attribute name="bgcolor"/>
+    </optional>
+  </define>
+  <define name="th.attlist" combine="interleave">
+    <ref name="attrs"/>
+    <optional>
+      <attribute name="abbr"/>
+    </optional>
+    <optional>
+      <attribute name="axis"/>
+    </optional>
+    <optional>
+      <attribute name="headers">
+        <data type="IDREFS"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="scope">
+        <choice>
+          <value>row</value>
+          <value>col</value>
+          <value>rowgroup</value>
+          <value>colgroup</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowspan" a:defaultValue="1"/>
+    </optional>
+    <optional>
+      <attribute name="colspan" a:defaultValue="1"/>
+    </optional>
+    <ref name="cellhalign"/>
+    <ref name="cellvalign"/>
+    <optional>
+      <attribute name="nowrap">
+        <choice>
+          <value>nowrap</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="bgcolor"/>
+    </optional>
+    <optional>
+      <attribute name="width"/>
+    </optional>
+    <optional>
+      <attribute name="height"/>
+    </optional>
+  </define>
+  <define name="td.attlist" combine="interleave">
+    <ref name="attrs"/>
+    <optional>
+      <attribute name="abbr"/>
+    </optional>
+    <optional>
+      <attribute name="axis"/>
+    </optional>
+    <optional>
+      <attribute name="headers">
+        <data type="IDREFS"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="scope">
+        <choice>
+          <value>row</value>
+          <value>col</value>
+          <value>rowgroup</value>
+          <value>colgroup</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowspan" a:defaultValue="1"/>
+    </optional>
+    <optional>
+      <attribute name="colspan" a:defaultValue="1"/>
+    </optional>
+    <ref name="cellhalign"/>
+    <ref name="cellvalign"/>
+    <optional>
+      <attribute name="nowrap">
+        <choice>
+          <value>nowrap</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="bgcolor"/>
+    </optional>
+    <optional>
+      <attribute name="width"/>
+    </optional>
+    <optional>
+      <attribute name="height"/>
+    </optional>
+  </define>
+  <define name="tables.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="bodyatt">
+    <optional>
+      <attribute name="floatstyle"/>
+    </optional>
+    <ref name="label.attrib"/>
+  </define>
+  <define name="secur">
+    <ref name="common.attrib"/>
+    <optional>
+      <attribute name="class"/>
+    </optional>
+    <optional>
+      <attribute name="style"/>
+    </optional>
+    <optional>
+      <attribute name="title"/>
+    </optional>
+    <ref name="i18n"/>
+    <ref name="events"/>
+    <ref name="tables.role.attrib"/>
+  </define>
+  <define name="common.table.attribs">
+    <ref name="bodyatt"/>
+    <ref name="secur"/>
+  </define>
+  <define name="tbl.table.att">
+    <optional>
+      <attribute name="tabstyle"/>
+    </optional>
+    <optional>
+      <attribute name="tocentry">
+        <ref name="yesorno.attvals"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="shortentry">
+        <ref name="yesorno.attvals"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="orient">
+        <choice>
+          <value>port</value>
+          <value>land</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="pgwide">
+        <ref name="yesorno.attvals"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="summary"/>
+    </optional>
+    <optional>
+      <attribute name="width"/>
+    </optional>
+    <optional>
+      <attribute name="border"/>
+    </optional>
+    <optional>
+      <attribute name="rules">
+        <choice>
+          <value>none</value>
+          <value>groups</value>
+          <value>rows</value>
+          <value>cols</value>
+          <value>all</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="cellspacing"/>
+    </optional>
+    <optional>
+      <attribute name="cellpadding"/>
+    </optional>
+    <optional>
+      <attribute name="align">
+        <choice>
+          <value>left</value>
+          <value>center</value>
+          <value>right</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="bgcolor"/>
+    </optional>
+  </define>
+  <define name="tbl.frame.attval">
+    <choice>
+      <value>void</value>
+      <value>above</value>
+      <value>below</value>
+      <value>hsides</value>
+      <value>lhs</value>
+      <value>rhs</value>
+      <value>vsides</value>
+      <value>box</value>
+      <value>border</value>
+      <value>top</value>
+      <value>bottom</value>
+      <value>topbot</value>
+      <value>all</value>
+      <value>sides</value>
+      <value>none</value>
+    </choice>
+  </define>
+  <define name="tbl.entry.mdl">
+    <choice>
+      <ref name="para.char.mix"/>
+      <ref name="tabentry.mix"/>
+    </choice>
+  </define>
+  <define name="tbl.hdft.mdl">
+    <choice>
+      <oneOrMore>
+        <ref name="tr"/>
+      </oneOrMore>
+      <group>
+        <zeroOrMore>
+          <ref name="colspec"/>
+        </zeroOrMore>
+        <oneOrMore>
+          <ref name="row"/>
+        </oneOrMore>
+      </group>
+    </choice>
+  </define>
+  <define name="tbl.tbody.mdl">
+    <choice>
+      <oneOrMore>
+        <ref name="tr"/>
+      </oneOrMore>
+      <oneOrMore>
+        <ref name="row"/>
+      </oneOrMore>
+    </choice>
+  </define>
+  <define name="yesorno">
+    <data type="string" datatypeLibrary=""/>
+  </define>
+  <define name="tbl.tgroup.mdl">
+    <zeroOrMore>
+      <ref name="colspec"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="spanspec"/>
+    </zeroOrMore>
+    <optional>
+      <ref name="thead"/>
+    </optional>
+    <optional>
+      <ref name="tfoot"/>
+    </optional>
+    <ref name="tbody"/>
+  </define>
+  <define name="tbl.tgroup.att">
+    <optional>
+      <attribute name="tgroupstyle"/>
+    </optional>
+  </define>
+  <define name="tbl.row.mdl">
+    <oneOrMore>
+      <choice>
+        <ref name="entry"/>
+        <ref name="entrytbl"/>
+      </choice>
+    </oneOrMore>
+  </define>
+  <define name="tbl.entrytbl.mdl">
+    <zeroOrMore>
+      <ref name="colspec"/>
+    </zeroOrMore>
+    <zeroOrMore>
+      <ref name="spanspec"/>
+    </zeroOrMore>
+    <optional>
+      <ref name="thead"/>
+    </optional>
+    <ref name="tbody"/>
+  </define>
+  <define name="table">
+    <element name="table">
+      <ref name="table.attlist"/>
+      <ref name="tbl.table.mdl"/>
+    </element>
+  </define>
+  <define name="table.attlist" combine="interleave">
+    <optional>
+      <attribute name="frame">
+        <choice>
+          <ref name="tbl.frame.attval"/>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="colsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <ref name="tbl.table.att"/>
+    <ref name="bodyatt"/>
+    <ref name="secur"/>
+  </define>
+  <define name="tgroup">
+    <element name="tgroup">
+      <ref name="tgroup.attlist"/>
+      <ref name="tbl.tgroup.mdl"/>
+    </element>
+  </define>
+  <define name="tgroup.attlist" combine="interleave">
+    <attribute name="cols"/>
+    <ref name="tbl.tgroup.att"/>
+    <optional>
+      <attribute name="colsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="align">
+        <choice>
+          <value>left</value>
+          <value>right</value>
+          <value>center</value>
+          <value>justify</value>
+          <value>char</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="char"/>
+    </optional>
+    <optional>
+      <attribute name="charoff"/>
+    </optional>
+    <ref name="secur"/>
+  </define>
+  <define name="colspec">
+    <element name="colspec">
+      <ref name="colspec.attlist"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="colspec.attlist" combine="interleave">
+    <optional>
+      <attribute name="colnum"/>
+    </optional>
+    <optional>
+      <attribute name="colname"/>
+    </optional>
+    <optional>
+      <attribute name="colwidth"/>
+    </optional>
+    <optional>
+      <attribute name="colsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="align">
+        <choice>
+          <value>left</value>
+          <value>right</value>
+          <value>center</value>
+          <value>justify</value>
+          <value>char</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="char"/>
+    </optional>
+    <optional>
+      <attribute name="charoff"/>
+    </optional>
+  </define>
+  <define name="spanspec">
+    <element name="spanspec">
+      <ref name="spanspec.attlist"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="spanspec.attlist" combine="interleave">
+    <attribute name="namest"/>
+    <attribute name="nameend"/>
+    <attribute name="spanname"/>
+    <optional>
+      <attribute name="colsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="align">
+        <choice>
+          <value>left</value>
+          <value>right</value>
+          <value>center</value>
+          <value>justify</value>
+          <value>char</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="char"/>
+    </optional>
+    <optional>
+      <attribute name="charoff"/>
+    </optional>
+  </define>
+  <define name="thead">
+    <element name="thead">
+      <ref name="thead.attlist"/>
+      <ref name="tbl.hdft.mdl"/>
+    </element>
+  </define>
+  <define name="thead.attlist" combine="interleave">
+    <optional>
+      <attribute name="valign">
+        <choice>
+          <value>top</value>
+          <value>middle</value>
+          <value>bottom</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="secur"/>
+  </define>
+  <define name="tfoot">
+    <element name="tfoot">
+      <ref name="tfoot.attlist"/>
+      <ref name="tbl.hdft.mdl"/>
+    </element>
+  </define>
+  <define name="tfoot.attlist" combine="interleave">
+    <optional>
+      <attribute name="valign">
+        <choice>
+          <value>top</value>
+          <value>middle</value>
+          <value>bottom</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="secur"/>
+  </define>
+  <define name="tbody">
+    <element name="tbody">
+      <ref name="tbody.attlist"/>
+      <ref name="tbl.tbody.mdl"/>
+    </element>
+  </define>
+  <define name="tbody.attlist" combine="interleave">
+    <optional>
+      <attribute name="valign">
+        <choice>
+          <value>top</value>
+          <value>middle</value>
+          <value>bottom</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="secur"/>
+  </define>
+  <define name="row">
+    <element name="row">
+      <ref name="row.attlist"/>
+      <ref name="tbl.row.mdl"/>
+    </element>
+  </define>
+  <define name="row.attlist" combine="interleave">
+    <optional>
+      <attribute name="rowsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="valign">
+        <choice>
+          <value>top</value>
+          <value>middle</value>
+          <value>bottom</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="secur"/>
+  </define>
+  <define name="entrytbl">
+    <element name="entrytbl">
+      <ref name="entrytbl.attlist"/>
+      <ref name="tbl.entrytbl.mdl"/>
+    </element>
+  </define>
+  <define name="entrytbl.attlist" combine="interleave">
+    <attribute name="cols"/>
+    <ref name="tbl.tgroup.att"/>
+    <optional>
+      <attribute name="colname"/>
+    </optional>
+    <optional>
+      <attribute name="spanname"/>
+    </optional>
+    <optional>
+      <attribute name="namest"/>
+    </optional>
+    <optional>
+      <attribute name="nameend"/>
+    </optional>
+    <optional>
+      <attribute name="colsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="align">
+        <choice>
+          <value>left</value>
+          <value>right</value>
+          <value>center</value>
+          <value>justify</value>
+          <value>char</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="char"/>
+    </optional>
+    <optional>
+      <attribute name="charoff"/>
+    </optional>
+    <ref name="secur"/>
+  </define>
+  <define name="entry">
+    <element name="entry">
+      <ref name="entry.attlist"/>
+      <zeroOrMore>
+        <ref name="tbl.entry.mdl"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="entry.attlist" combine="interleave">
+    <optional>
+      <attribute name="colname"/>
+    </optional>
+    <optional>
+      <attribute name="namest"/>
+    </optional>
+    <optional>
+      <attribute name="nameend"/>
+    </optional>
+    <optional>
+      <attribute name="spanname"/>
+    </optional>
+    <optional>
+      <attribute name="morerows"/>
+    </optional>
+    <optional>
+      <attribute name="colsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowsep">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="align">
+        <choice>
+          <value>left</value>
+          <value>right</value>
+          <value>center</value>
+          <value>justify</value>
+          <value>char</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="char"/>
+    </optional>
+    <optional>
+      <attribute name="charoff"/>
+    </optional>
+    <optional>
+      <attribute name="rotate">
+        <ref name="yesorno"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="valign">
+        <choice>
+          <value>top</value>
+          <value>middle</value>
+          <value>bottom</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="secur"/>
+  </define>
+  <define name="local.informaltable.attrib">
+    <empty/>
+  </define>
+  <define name="informaltable.attlist" combine="interleave">
+    <optional>
+      <attribute name="frame">
+        <choice>
+          <ref name="tbl.frame.attval"/>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="colsep">
+        <ref name="yesorno.attvals"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="rowsep">
+        <ref name="yesorno.attvals"/>
+      </attribute>
+    </optional>
+    <ref name="common.table.attribs"/>
+    <ref name="tbl.table.att"/>
+    <ref name="local.informaltable.attrib"/>
+  </define>
+  <define name="local.caption.attrib">
+    <empty/>
+  </define>
+  <define name="caption.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="caption">
+    <element name="caption">
+      <ref name="caption.attlist"/>
+      <zeroOrMore>
+        <choice>
+          <text/>
+          <ref name="textobject.mix"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="caption.attlist.content">
+    <ref name="lang.attrib"/>
+    <ref name="remap.attrib"/>
+    <ref name="xreflabel.attrib"/>
+    <ref name="revisionflag.attrib"/>
+    <ref name="effectivity.attrib"/>
+    <ref name="dir.attrib"/>
+    <ref name="xml-base.attrib"/>
+    <ref name="local.common.attrib"/>
+    <ref name="caption.role.attrib"/>
+    <ref name="attrs"/>
+    <optional>
+      <attribute name="align">
+        <choice>
+          <value>top</value>
+          <value>bottom</value>
+          <value>left</value>
+          <value>right</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="local.caption.attrib"/>
+  </define>
+  <define name="caption.attlist" combine="interleave">
+    <ref name="caption.attlist.content"/>
+  </define>
+  <define name="local.ackno.attrib">
+    <empty/>
+  </define>
+  <define name="ackno.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="ackno">
+    <element name="ackno">
+      <ref name="ackno.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="ackno.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="ackno.role.attrib"/>
+    <ref name="local.ackno.attrib"/>
+  </define>
+  <define name="local.address.attrib">
+    <empty/>
+  </define>
+  <define name="address.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="address.attlist" combine="interleave">
+    <ref name="linespecific.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="address.role.attrib"/>
+    <ref name="local.address.attrib"/>
+  </define>
+  <define name="local.city.attrib">
+    <empty/>
+  </define>
+  <define name="city.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="city">
+    <element name="city">
+      <ref name="city.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="city.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="city.role.attrib"/>
+    <ref name="local.city.attrib"/>
+  </define>
+  <define name="local.state.attrib">
+    <empty/>
+  </define>
+  <define name="state.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="state">
+    <element name="state">
+      <ref name="state.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="state.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="state.role.attrib"/>
+    <ref name="local.state.attrib"/>
+  </define>
+  <define name="local.country.attrib">
+    <empty/>
+  </define>
+  <define name="country.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="country">
+    <element name="country">
+      <ref name="country.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="country.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="country.role.attrib"/>
+    <ref name="local.country.attrib"/>
+  </define>
+  <define name="local.affiliation.attrib">
+    <empty/>
+  </define>
+  <define name="affiliation.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="affiliation">
+    <element name="affiliation">
+      <ref name="affiliation.attlist"/>
+      <optional>
+        <ref name="shortaffil"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="jobtitle"/>
+      </zeroOrMore>
+      <optional>
+        <ref name="orgname"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="orgdiv"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="address"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="affiliation.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="affiliation.role.attrib"/>
+    <ref name="local.affiliation.attrib"/>
+  </define>
+  <define name="local.shortaffil.attrib">
+    <empty/>
+  </define>
+  <define name="shortaffil.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="shortaffil">
+    <element name="shortaffil">
+      <ref name="shortaffil.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="shortaffil.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="shortaffil.role.attrib"/>
+    <ref name="local.shortaffil.attrib"/>
+  </define>
+  <define name="local.jobtitle.attrib">
+    <empty/>
+  </define>
+  <define name="jobtitle.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="jobtitle">
+    <element name="jobtitle">
+      <ref name="jobtitle.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="jobtitle.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="jobtitle.role.attrib"/>
+    <ref name="local.jobtitle.attrib"/>
+  </define>
+  <define name="local.orgdiv.attrib">
+    <empty/>
+  </define>
+  <define name="orgdiv.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="orgdiv">
+    <element name="orgdiv">
+      <ref name="orgdiv.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="orgdiv.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="orgdiv.role.attrib"/>
+    <ref name="local.orgdiv.attrib"/>
+  </define>
+  <define name="local.author.attrib">
+    <empty/>
+  </define>
+  <define name="author.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="author.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="author.role.attrib"/>
+    <ref name="local.author.attrib"/>
+  </define>
+  <define name="local.authorgroup.attrib">
+    <empty/>
+  </define>
+  <define name="authorgroup.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="authorgroup.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="authorgroup.role.attrib"/>
+    <ref name="local.authorgroup.attrib"/>
+  </define>
+  <define name="local.authorinitials.attrib">
+    <empty/>
+  </define>
+  <define name="authorinitials.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="authorinitials">
+    <element name="authorinitials">
+      <ref name="authorinitials.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="authorinitials.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="authorinitials.role.attrib"/>
+    <ref name="local.authorinitials.attrib"/>
+  </define>
+  <define name="local.copyright.attrib">
+    <empty/>
+  </define>
+  <define name="copyright.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="copyright">
+    <element name="copyright">
+      <ref name="copyright.attlist"/>
+      <oneOrMore>
+        <ref name="year"/>
+      </oneOrMore>
+      <zeroOrMore>
+        <ref name="holder"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="copyright.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="copyright.role.attrib"/>
+    <ref name="local.copyright.attrib"/>
+  </define>
+  <define name="local.year.attrib">
+    <empty/>
+  </define>
+  <define name="year.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="year">
+    <element name="year">
+      <ref name="year.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="year.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="year.role.attrib"/>
+    <ref name="local.year.attrib"/>
+  </define>
+  <define name="local.holder.attrib">
+    <empty/>
+  </define>
+  <define name="holder.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="holder">
+    <element name="holder">
+      <ref name="holder.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="holder.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="holder.role.attrib"/>
+    <ref name="local.holder.attrib"/>
+  </define>
+  <define name="local.corpauthor.attrib">
+    <empty/>
+  </define>
+  <define name="corpauthor.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="corpauthor">
+    <element name="corpauthor">
+      <ref name="corpauthor.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="corpauthor.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="corpauthor.role.attrib"/>
+    <ref name="local.corpauthor.attrib"/>
+  </define>
+  <define name="local.date.attrib">
+    <empty/>
+  </define>
+  <define name="date.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="date">
+    <element name="date">
+      <ref name="date.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="date.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="date.role.attrib"/>
+    <ref name="local.date.attrib"/>
+  </define>
+  <define name="local.edition.attrib">
+    <empty/>
+  </define>
+  <define name="edition.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="edition">
+    <element name="edition">
+      <ref name="edition.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="edition.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="edition.role.attrib"/>
+    <ref name="local.edition.attrib"/>
+  </define>
+  <define name="local.editor.attrib">
+    <empty/>
+  </define>
+  <define name="editor.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="editor.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="editor.role.attrib"/>
+    <ref name="local.editor.attrib"/>
+  </define>
+  <define name="local.issuenum.attrib">
+    <empty/>
+  </define>
+  <define name="issuenum.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="issuenum">
+    <element name="issuenum">
+      <ref name="issuenum.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="issuenum.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="issuenum.role.attrib"/>
+    <ref name="local.issuenum.attrib"/>
+  </define>
+  <define name="local.legalnotice.attrib">
+    <empty/>
+  </define>
+  <define name="legalnotice.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="legalnotice.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="legalnotice.role.attrib"/>
+    <ref name="local.legalnotice.attrib"/>
+  </define>
+  <define name="local.orgname.attrib">
+    <empty/>
+  </define>
+  <define name="orgname.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="orgname">
+    <element name="orgname">
+      <ref name="orgname.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="orgname.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <optional>
+      <attribute name="class">
+        <choice>
+          <value>corporation</value>
+          <value>nonprofit</value>
+          <value>consortium</value>
+          <value>informal</value>
+          <value>other</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="otherclass"/>
+    </optional>
+    <ref name="orgname.role.attrib"/>
+    <ref name="local.orgname.attrib"/>
+  </define>
+  <define name="local.othercredit.attrib">
+    <empty/>
+  </define>
+  <define name="othercredit.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="othercredit.attlist" combine="interleave">
+    <optional>
+      <attribute name="class">
+        <choice>
+          <value>graphicdesigner</value>
+          <value>productioneditor</value>
+          <value>copyeditor</value>
+          <value>technicaleditor</value>
+          <value>translator</value>
+          <value>other</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="othercredit.role.attrib"/>
+    <ref name="local.othercredit.attrib"/>
+  </define>
+  <define name="local.pagenums.attrib">
+    <empty/>
+  </define>
+  <define name="pagenums.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="pagenums">
+    <element name="pagenums">
+      <ref name="pagenums.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="pagenums.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="pagenums.role.attrib"/>
+    <ref name="local.pagenums.attrib"/>
+  </define>
+  <define name="local.firstname.attrib">
+    <empty/>
+  </define>
+  <define name="firstname.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="firstname">
+    <element name="firstname">
+      <ref name="firstname.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="firstname.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="firstname.role.attrib"/>
+    <ref name="local.firstname.attrib"/>
+  </define>
+  <define name="local.honorific.attrib">
+    <empty/>
+  </define>
+  <define name="honorific.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="honorific">
+    <element name="honorific">
+      <ref name="honorific.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="honorific.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="honorific.role.attrib"/>
+    <ref name="local.honorific.attrib"/>
+  </define>
+  <define name="local.lineage.attrib">
+    <empty/>
+  </define>
+  <define name="lineage.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="lineage">
+    <element name="lineage">
+      <ref name="lineage.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="lineage.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="lineage.role.attrib"/>
+    <ref name="local.lineage.attrib"/>
+  </define>
+  <define name="local.othername.attrib">
+    <empty/>
+  </define>
+  <define name="othername.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="othername">
+    <element name="othername">
+      <ref name="othername.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="othername.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="othername.role.attrib"/>
+    <ref name="local.othername.attrib"/>
+  </define>
+  <define name="local.surname.attrib">
+    <empty/>
+  </define>
+  <define name="surname.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="surname">
+    <element name="surname">
+      <ref name="surname.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="surname.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="surname.role.attrib"/>
+    <ref name="local.surname.attrib"/>
+  </define>
+  <define name="local.pubdate.attrib">
+    <empty/>
+  </define>
+  <define name="pubdate.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="pubdate">
+    <element name="pubdate">
+      <ref name="pubdate.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="pubdate.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="pubdate.role.attrib"/>
+    <ref name="local.pubdate.attrib"/>
+  </define>
+  <define name="local.publishername.attrib">
+    <empty/>
+  </define>
+  <define name="publishername.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="publishername">
+    <element name="publishername">
+      <ref name="publishername.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="publishername.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="publishername.role.attrib"/>
+    <ref name="local.publishername.attrib"/>
+  </define>
+  <define name="local.releaseinfo.attrib">
+    <empty/>
+  </define>
+  <define name="releaseinfo.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="releaseinfo">
+    <element name="releaseinfo">
+      <ref name="releaseinfo.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="releaseinfo.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="releaseinfo.role.attrib"/>
+    <ref name="local.releaseinfo.attrib"/>
+  </define>
+  <define name="local.revhistory.attrib">
+    <empty/>
+  </define>
+  <define name="revhistory.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="revhistory">
+    <element name="revhistory">
+      <ref name="revhistory.attlist"/>
+      <oneOrMore>
+        <ref name="revision"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="revhistory.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="revhistory.role.attrib"/>
+    <ref name="local.revhistory.attrib"/>
+  </define>
+  <define name="local.revision.attrib">
+    <empty/>
+  </define>
+  <define name="revision.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="revision">
+    <element name="revision">
+      <ref name="revision.attlist"/>
+      <ref name="revnumber"/>
+      <ref name="date"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="author"/>
+          <ref name="authorinitials"/>
+        </choice>
+      </zeroOrMore>
+      <optional>
+        <choice>
+          <ref name="revremark"/>
+          <ref name="revdescription"/>
+        </choice>
+      </optional>
+    </element>
+  </define>
+  <define name="revision.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="revision.role.attrib"/>
+    <ref name="local.revision.attrib"/>
+  </define>
+  <define name="local.revnumber.attrib">
+    <empty/>
+  </define>
+  <define name="revnumber.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="revnumber">
+    <element name="revnumber">
+      <ref name="revnumber.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="revnumber.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="revnumber.role.attrib"/>
+    <ref name="local.revnumber.attrib"/>
+  </define>
+  <define name="local.revremark.attrib">
+    <empty/>
+  </define>
+  <define name="revremark.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="revremark">
+    <element name="revremark">
+      <ref name="revremark.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="revremark.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="revremark.role.attrib"/>
+    <ref name="local.revremark.attrib"/>
+  </define>
+  <define name="local.revdescription.attrib">
+    <empty/>
+  </define>
+  <define name="revdescription.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="revdescription">
+    <element name="revdescription">
+      <ref name="revdescription.attlist"/>
+      <oneOrMore>
+        <ref name="revdescription.mix"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="revdescription.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="revdescription.role.attrib"/>
+    <ref name="local.revdescription.attrib"/>
+  </define>
+  <define name="local.volumenum.attrib">
+    <empty/>
+  </define>
+  <define name="volumenum.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="volumenum">
+    <element name="volumenum">
+      <ref name="volumenum.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="volumenum.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="volumenum.role.attrib"/>
+    <ref name="local.volumenum.attrib"/>
+  </define>
+  <define name="local.command.attrib">
+    <empty/>
+  </define>
+  <define name="command.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="command">
+    <element name="command">
+      <ref name="command.attlist"/>
+      <zeroOrMore>
+        <ref name="cptr.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="command.attlist" combine="interleave">
+    <ref name="moreinfo.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="command.role.attrib"/>
+    <ref name="local.command.attrib"/>
+  </define>
+  <define name="local.computeroutput.attrib">
+    <empty/>
+  </define>
+  <define name="computeroutput.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="computeroutput.attlist" combine="interleave">
+    <ref name="moreinfo.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="computeroutput.role.attrib"/>
+    <ref name="local.computeroutput.attrib"/>
+  </define>
+  <define name="local.email.attrib">
+    <empty/>
+  </define>
+  <define name="email.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="email">
+    <element name="email">
+      <ref name="email.attlist"/>
+      <zeroOrMore>
+        <ref name="docinfo.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="email.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="email.role.attrib"/>
+    <ref name="local.email.attrib"/>
+  </define>
+  <define name="local.filename.attrib">
+    <empty/>
+  </define>
+  <define name="filename.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="filename">
+    <element name="filename">
+      <ref name="filename.attlist"/>
+      <zeroOrMore>
+        <ref name="cptr.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="filename.attlist" combine="interleave">
+    <optional>
+      <attribute name="class">
+        <choice>
+          <value>headerfile</value>
+          <value>partition</value>
+          <value>devicefile</value>
+          <value>libraryfile</value>
+          <value>directory</value>
+          <value>extension</value>
+          <value>symlink</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="path"/>
+    </optional>
+    <ref name="moreinfo.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="filename.role.attrib"/>
+    <ref name="local.filename.attrib"/>
+  </define>
+  <define name="local.lineannotation.attrib">
+    <empty/>
+  </define>
+  <define name="lineannotation.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="lineannotation">
+    <element name="lineannotation">
+      <ref name="lineannotation.attlist"/>
+      <zeroOrMore>
+        <ref name="para.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="lineannotation.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="lineannotation.role.attrib"/>
+    <ref name="local.lineannotation.attrib"/>
+  </define>
+  <define name="local.literal.attrib">
+    <empty/>
+  </define>
+  <define name="literal.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="literal">
+    <element name="literal">
+      <ref name="literal.attlist"/>
+      <zeroOrMore>
+        <ref name="cptr.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="literal.attlist" combine="interleave">
+    <ref name="moreinfo.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="literal.role.attrib"/>
+    <ref name="local.literal.attrib"/>
+  </define>
+  <define name="local.code.attrib">
+    <empty/>
+  </define>
+  <define name="code.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="code">
+    <element name="code">
+      <ref name="code.attlist"/>
+      <zeroOrMore>
+        <ref name="cptr.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="code.attlist" combine="interleave">
+    <optional>
+      <attribute name="language"/>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="code.role.attrib"/>
+    <ref name="local.code.attrib"/>
+  </define>
+  <define name="local.option.attrib">
+    <empty/>
+  </define>
+  <define name="option.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="option">
+    <element name="option">
+      <ref name="option.attlist"/>
+      <zeroOrMore>
+        <ref name="cptr.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="option.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="option.role.attrib"/>
+    <ref name="local.option.attrib"/>
+  </define>
+  <define name="local.replaceable.attrib">
+    <empty/>
+  </define>
+  <define name="replaceable.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="replaceable.attlist" combine="interleave">
+    <optional>
+      <attribute name="class">
+        <choice>
+          <value>command</value>
+          <value>function</value>
+          <value>option</value>
+          <value>parameter</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="replaceable.role.attrib"/>
+    <ref name="local.replaceable.attrib"/>
+  </define>
+  <define name="local.sgmltag.attrib">
+    <empty/>
+  </define>
+  <define name="sgmltag.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="sgmltag">
+    <element name="sgmltag">
+      <ref name="sgmltag.attlist"/>
+      <zeroOrMore>
+        <ref name="smallcptr.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="sgmltag.attlist" combine="interleave">
+    <optional>
+      <attribute name="class">
+        <choice>
+          <value>attribute</value>
+          <value>attvalue</value>
+          <value>element</value>
+          <value>endtag</value>
+          <value>emptytag</value>
+          <value>genentity</value>
+          <value>numcharref</value>
+          <value>paramentity</value>
+          <value>pi</value>
+          <value>xmlpi</value>
+          <value>starttag</value>
+          <value>sgmlcomment</value>
+          <value>prefix</value>
+          <value>namespace</value>
+          <value>localname</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="namespace"/>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="sgmltag.role.attrib"/>
+    <ref name="local.sgmltag.attrib"/>
+  </define>
+  <define name="local.systemitem.attrib">
+    <empty/>
+  </define>
+  <define name="systemitem.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="systemitem.attlist" combine="interleave">
+    <optional>
+      <attribute name="class">
+        <choice>
+          <value>constant</value>
+          <value>event</value>
+          <value>eventhandler</value>
+          <value>domainname</value>
+          <value>fqdomainname</value>
+          <value>ipaddress</value>
+          <value>netmask</value>
+          <value>etheraddress</value>
+          <value>groupname</value>
+          <value>library</value>
+          <value>macro</value>
+          <value>osname</value>
+          <value>filesystem</value>
+          <value>resource</value>
+          <value>systemname</value>
+          <value>username</value>
+          <value>newsgroup</value>
+          <value>process</value>
+          <value>service</value>
+          <value>server</value>
+          <value>daemon</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="moreinfo.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="systemitem.role.attrib"/>
+    <ref name="local.systemitem.attrib"/>
+  </define>
+  <define name="local.userinput.attrib">
+    <empty/>
+  </define>
+  <define name="userinput.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="userinput.attlist" combine="interleave">
+    <ref name="moreinfo.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="userinput.role.attrib"/>
+    <ref name="local.userinput.attrib"/>
+  </define>
+  <define name="local.abbrev.attrib">
+    <empty/>
+  </define>
+  <define name="abbrev.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="abbrev">
+    <element name="abbrev">
+      <ref name="abbrev.attlist"/>
+      <zeroOrMore>
+        <ref name="word.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="abbrev.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="abbrev.role.attrib"/>
+    <ref name="local.abbrev.attrib"/>
+  </define>
+  <define name="local.acronym.attrib">
+    <empty/>
+  </define>
+  <define name="acronym.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="acronym">
+    <element name="acronym">
+      <ref name="acronym.attlist"/>
+      <zeroOrMore>
+        <ref name="word.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="acronym.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="acronym.role.attrib"/>
+    <ref name="local.acronym.attrib"/>
+  </define>
+  <define name="local.citetitle.attrib">
+    <empty/>
+  </define>
+  <define name="citetitle.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="citetitle">
+    <element name="citetitle">
+      <ref name="citetitle.attlist"/>
+      <zeroOrMore>
+        <ref name="para.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="citetitle.attlist" combine="interleave">
+    <optional>
+      <attribute name="pubwork">
+        <choice>
+          <value>article</value>
+          <value>book</value>
+          <value>chapter</value>
+          <value>part</value>
+          <value>refentry</value>
+          <value>section</value>
+          <value>journal</value>
+          <value>series</value>
+          <value>set</value>
+          <value>manuscript</value>
+          <value>cdrom</value>
+          <value>dvd</value>
+          <value>wiki</value>
+          <value>gopher</value>
+          <value>bbs</value>
+          <value>emailmessage</value>
+          <value>webpage</value>
+          <value>newsposting</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="citetitle.role.attrib"/>
+    <ref name="local.citetitle.attrib"/>
+  </define>
+  <define name="local.emphasis.attrib">
+    <empty/>
+  </define>
+  <define name="emphasis.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="emphasis">
+    <element name="emphasis">
+      <ref name="emphasis.attlist"/>
+      <zeroOrMore>
+        <ref name="para.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="emphasis.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="emphasis.role.attrib"/>
+    <ref name="local.emphasis.attrib"/>
+  </define>
+  <define name="local.phrase.attrib">
+    <empty/>
+  </define>
+  <define name="phrase.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="phrase">
+    <element name="phrase">
+      <ref name="phrase.attlist"/>
+      <zeroOrMore>
+        <ref name="para.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="phrase.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="phrase.role.attrib"/>
+    <ref name="local.phrase.attrib"/>
+  </define>
+  <define name="local.quote.attrib">
+    <empty/>
+  </define>
+  <define name="quote.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="quote">
+    <element name="quote">
+      <ref name="quote.attlist"/>
+      <zeroOrMore>
+        <ref name="para.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="quote.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="quote.role.attrib"/>
+    <ref name="local.quote.attrib"/>
+  </define>
+  <define name="local.ssscript.attrib">
+    <empty/>
+  </define>
+  <define name="ssscript.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="subscript.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="ssscript.role.attrib"/>
+    <ref name="local.ssscript.attrib"/>
+  </define>
+  <define name="superscript.attlist" combine="interleave">
+    <ref name="common.attrib"/>
+    <ref name="ssscript.role.attrib"/>
+    <ref name="local.ssscript.attrib"/>
+  </define>
+  <define name="local.trademark.attrib">
+    <empty/>
+  </define>
+  <define name="trademark.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="trademark.attlist" combine="interleave">
+    <optional>
+      <attribute name="class" a:defaultValue="trade">
+        <choice>
+          <value>service</value>
+          <value>trade</value>
+          <value>registered</value>
+          <value>copyright</value>
+        </choice>
+      </attribute>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="trademark.role.attrib"/>
+    <ref name="local.trademark.attrib"/>
+  </define>
+  <define name="local.link.attrib">
+    <empty/>
+  </define>
+  <define name="link.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="link">
+    <element name="link">
+      <ref name="link.attlist"/>
+      <zeroOrMore>
+        <ref name="para.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="link.attlist" combine="interleave">
+    <optional>
+      <attribute name="endterm">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="xrefstyle"/>
+    </optional>
+    <optional>
+      <attribute name="type"/>
+    </optional>
+    <ref name="linkendreq.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="link.role.attrib"/>
+    <ref name="local.link.attrib"/>
+  </define>
+  <define name="local.ulink.attrib">
+    <empty/>
+  </define>
+  <define name="ulink.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="ulink">
+    <element name="ulink">
+      <ref name="ulink.attlist"/>
+      <zeroOrMore>
+        <ref name="para.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="ulink.attlist" combine="interleave">
+    <attribute name="url"/>
+    <optional>
+      <attribute name="type"/>
+    </optional>
+    <optional>
+      <attribute name="xrefstyle"/>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="ulink.role.attrib"/>
+    <ref name="local.ulink.attrib"/>
+  </define>
+  <define name="local.footnoteref.attrib">
+    <empty/>
+  </define>
+  <define name="footnoteref.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="footnoteref">
+    <element name="footnoteref">
+      <ref name="footnoteref.attlist"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="footnoteref.attlist" combine="interleave">
+    <ref name="linkendreq.attrib"/>
+    <ref name="label.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="footnoteref.role.attrib"/>
+    <ref name="local.footnoteref.attrib"/>
+  </define>
+  <define name="local.xref.attrib">
+    <empty/>
+  </define>
+  <define name="xref.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="xref">
+    <element name="xref">
+      <ref name="xref.attlist"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="xref.attlist" combine="interleave">
+    <optional>
+      <attribute name="endterm">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="xrefstyle"/>
+    </optional>
+    <ref name="common.attrib"/>
+    <ref name="linkendreq.attrib"/>
+    <ref name="xref.role.attrib"/>
+    <ref name="local.xref.attrib"/>
+  </define>
+  <define name="local.anchor.attrib">
+    <empty/>
+  </define>
+  <define name="anchor.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="anchor">
+    <element name="anchor">
+      <ref name="anchor.attlist"/>
+      <empty/>
+    </element>
+  </define>
+  <define name="anchor.attlist" combine="interleave">
+    <ref name="idreq.attrib"/>
+    <ref name="pagenum.attrib"/>
+    <ref name="remap.attrib"/>
+    <ref name="xreflabel.attrib"/>
+    <ref name="revisionflag.attrib"/>
+    <ref name="effectivity.attrib"/>
+    <ref name="anchor.role.attrib"/>
+    <ref name="local.anchor.attrib"/>
+  </define>
+  <define name="local.appendix.class">
+    <notAllowed/>
+  </define>
+  <define name="appendix.class">
+    <choice>
+      <ref name="appendix"/>
+      <ref name="local.appendix.class"/>
+    </choice>
+  </define>
+  <define name="div.title.content">
+    <ref name="title"/>
+    <optional>
+      <ref name="subtitle"/>
+    </optional>
+    <optional>
+      <ref name="titleabbrev"/>
+    </optional>
+  </define>
+  <define name="bookcomponent.title.content">
+    <ref name="title"/>
+    <optional>
+      <ref name="subtitle"/>
+    </optional>
+    <optional>
+      <ref name="titleabbrev"/>
+    </optional>
+  </define>
+  <define name="sect.title.content">
+    <ref name="title"/>
+    <optional>
+      <ref name="subtitle"/>
+    </optional>
+    <optional>
+      <ref name="titleabbrev"/>
+    </optional>
+  </define>
+  <define name="local.appendix.attrib">
+    <empty/>
+  </define>
+  <define name="appendix.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="appendix.attlist" combine="interleave">
+    <ref name="label.attrib"/>
+    <ref name="status.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="appendix.role.attrib"/>
+    <ref name="local.appendix.attrib"/>
+  </define>
+  <define name="local.section.attrib">
+    <empty/>
+  </define>
+  <define name="section.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="section.attlist" combine="interleave">
+    <ref name="label.attrib"/>
+    <ref name="status.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="section.role.attrib"/>
+    <ref name="local.section.attrib"/>
+  </define>
+  <define name="local.bibliography.attrib">
+    <empty/>
+  </define>
+  <define name="bibliography.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="bibliography.attlist" combine="interleave">
+    <ref name="status.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="bibliography.role.attrib"/>
+    <ref name="local.bibliography.attrib"/>
+  </define>
+  <define name="local.bibliodiv.attrib">
+    <empty/>
+  </define>
+  <define name="bibliodiv.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="bibliodiv.attlist" combine="interleave">
+    <ref name="status.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="bibliodiv.role.attrib"/>
+    <ref name="local.bibliodiv.attrib"/>
+  </define>
+  <define name="local.article.attrib">
+    <empty/>
+  </define>
+  <define name="article.role.attrib">
+    <ref name="role.attrib"/>
+  </define>
+  <define name="article.attlist" combine="interleave">
+    <optional>
+      <attribute name="class">
+        <choice>
+          <value>journalarticle</value>
+          <value>productsheet</value>
+          <value>whitepaper</value>
+          <value>techreport</value>
+          <value>specification</value>
+          <value>faq</value>
+        </choice>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="parentbook">
+        <data type="IDREF"/>
+      </attribute>
+    </optional>
+    <ref name="status.attrib"/>
+    <ref name="common.attrib"/>
+    <ref name="article.role.attrib"/>
+    <ref name="local.article.attrib"/>
+  </define>
+  <define name="objectinfo">
+    <element name="objectinfo">
+      <ref name="objectinfo.attlist"/>
+      <oneOrMore>
+        <choice>
+          <ref name="mediaobject"/>
+          <ref name="legalnotice"/>
+          <ref name="keywordset"/>
+          <ref name="subjectset"/>
+          <ref name="bibliocomponent.mix"/>
+        </choice>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="section">
+    <element name="section">
+      <ref name="section.attlist"/>
+      <optional>
+        <ref name="sectioninfo"/>
+      </optional>
+      <ref name="sect.title.content"/>
+      <choice>
+        <group>
+          <oneOrMore>
+            <ref name="divcomponent.mix"/>
+          </oneOrMore>
+          <zeroOrMore>
+            <ref name="section"/>
+          </zeroOrMore>
+        </group>
+        <oneOrMore>
+          <ref name="section"/>
+        </oneOrMore>
+      </choice>
+    </element>
+  </define>
+  <define name="sectioninfo">
+    <element name="sectioninfo">
+      <ref name="sectioninfo.attlist"/>
+      <oneOrMore>
+        <choice>
+          <ref name="mediaobject"/>
+          <ref name="legalnotice"/>
+          <ref name="keywordset"/>
+          <ref name="subjectset"/>
+          <ref name="bibliocomponent.mix"/>
+        </choice>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="sectioninfo.attlist" combine="interleave">
+    <empty/>
+  </define>
+  <define name="authorgroup">
+    <element name="authorgroup">
+      <ref name="authorgroup.attlist"/>
+      <oneOrMore>
+        <choice>
+          <ref name="author"/>
+          <ref name="editor"/>
+          <ref name="corpauthor"/>
+          <ref name="othercredit"/>
+        </choice>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="author">
+    <element name="author">
+      <ref name="author.attlist"/>
+      <oneOrMore>
+        <ref name="person.ident.mix"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="editor">
+    <element name="editor">
+      <ref name="editor.attlist"/>
+      <oneOrMore>
+        <ref name="person.ident.mix"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="othercredit">
+    <element name="othercredit">
+      <ref name="othercredit.attlist"/>
+      <oneOrMore>
+        <ref name="person.ident.mix"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="para">
+    <element name="para">
+      <ref name="para.attlist"/>
+      <zeroOrMore>
+        <ref name="para.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="informaltable.table.mdl">
+    <choice>
+      <choice>
+        <oneOrMore>
+          <ref name="mediaobject"/>
+        </oneOrMore>
+        <oneOrMore>
+          <ref name="tgroup"/>
+        </oneOrMore>
+      </choice>
+      <group>
+        <ref name="caption"/>
+        <choice>
+          <zeroOrMore>
+            <ref name="col"/>
+          </zeroOrMore>
+          <zeroOrMore>
+            <ref name="colgroup"/>
+          </zeroOrMore>
+        </choice>
+        <optional>
+          <ref name="thead"/>
+        </optional>
+        <optional>
+          <ref name="tfoot"/>
+        </optional>
+        <choice>
+          <oneOrMore>
+            <ref name="tbody"/>
+          </oneOrMore>
+          <oneOrMore>
+            <ref name="tr"/>
+          </oneOrMore>
+        </choice>
+      </group>
+    </choice>
+  </define>
+  <define name="informaltable">
+    <element name="informaltable">
+      <ref name="informaltable.attlist"/>
+      <ref name="informaltable.table.mdl"/>
+    </element>
+  </define>
+  <define name="replaceable">
+    <element name="replaceable">
+      <ref name="replaceable.attlist"/>
+      <zeroOrMore>
+        <choice>
+          <text/>
+          <ref name="link.char.class"/>
+          <ref name="base.char.class"/>
+          <ref name="inlinemediaobject"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="trademark">
+    <element name="trademark">
+      <ref name="trademark.attlist"/>
+      <zeroOrMore>
+        <choice>
+          <text/>
+          <ref name="link.char.class"/>
+          <ref name="tech.char.class"/>
+          <ref name="inlinemediaobject"/>
+          <ref name="emphasis"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="article">
+    <element name="article">
+      <ref name="article.attlist"/>
+      <optional>
+        <ref name="div.title.content"/>
+      </optional>
+      <optional>
+        <ref name="articleinfo"/>
+      </optional>
+      <ref name="bookcomponent.content"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="appendix.class"/>
+          <ref name="bibliography"/>
+          <ref name="ackno"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="articleinfo">
+    <element name="articleinfo">
+      <ref name="articleinfo.attlist"/>
+      <oneOrMore>
+        <choice>
+          <ref name="mediaobject"/>
+          <ref name="legalnotice"/>
+          <ref name="subjectset"/>
+          <ref name="keywordset"/>
+          <ref name="bibliocomponent.mix"/>
+        </choice>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="appendix">
+    <element name="appendix">
+      <ref name="appendix.attlist"/>
+      <ref name="bookcomponent.title.content"/>
+      <ref name="bookcomponent.content"/>
+    </element>
+  </define>
+  <define name="bibliography">
+    <element name="bibliography">
+      <ref name="bibliography.attlist"/>
+      <optional>
+        <ref name="bookcomponent.title.content"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="component.mix"/>
+      </zeroOrMore>
+      <choice>
+        <oneOrMore>
+          <ref name="bibliodiv"/>
+        </oneOrMore>
+        <oneOrMore>
+          <ref name="bibliomixed"/>
+        </oneOrMore>
+      </choice>
+    </element>
+  </define>
+  <define name="bibliomixed">
+    <element name="bibliomixed">
+      <ref name="bibliomixed.attlist"/>
+      <zeroOrMore>
+        <choice>
+          <text/>
+          <ref name="bibliocomponent.mix"/>
+          <ref name="bibliomset"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="bibliodiv">
+    <element name="bibliodiv">
+      <ref name="bibliodiv.attlist"/>
+      <optional>
+        <ref name="sect.title.content"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="component.mix"/>
+      </zeroOrMore>
+      <oneOrMore>
+        <ref name="bibliomixed"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="sidebar">
+    <element name="sidebar">
+      <ref name="sidebar.attlist"/>
+      <optional>
+        <ref name="formalobject.title.content"/>
+      </optional>
+      <oneOrMore>
+        <ref name="sidebar.mix"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="programlisting">
+    <element name="programlisting">
+      <ref name="programlisting.attlist"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="para.char.mix"/>
+          <ref name="lineannotation"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="literallayout">
+    <element name="literallayout">
+      <ref name="literallayout.attlist"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="para.char.mix"/>
+          <ref name="lineannotation"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="itemizedlist">
+    <element name="itemizedlist">
+      <ref name="itemizedlist.attlist"/>
+      <optional>
+        <ref name="formalobject.title.content"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="listpreamble.mix"/>
+      </zeroOrMore>
+      <oneOrMore>
+        <ref name="listitem"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="orderedlist">
+    <element name="orderedlist">
+      <ref name="orderedlist.attlist"/>
+      <optional>
+        <ref name="formalobject.title.content"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="listpreamble.mix"/>
+      </zeroOrMore>
+      <oneOrMore>
+        <ref name="listitem"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="variablelist">
+    <element name="variablelist">
+      <ref name="variablelist.attlist"/>
+      <optional>
+        <ref name="formalobject.title.content"/>
+      </optional>
+      <zeroOrMore>
+        <ref name="listpreamble.mix"/>
+      </zeroOrMore>
+      <oneOrMore>
+        <ref name="varlistentry"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="example">
+    <element name="example">
+      <ref name="example.attlist"/>
+      <ref name="formalobject.title.content"/>
+      <oneOrMore>
+        <ref name="example.mix"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="figure">
+    <element name="figure">
+      <ref name="figure.attlist"/>
+      <ref name="formalobject.title.content"/>
+      <oneOrMore>
+        <choice>
+          <ref name="figure.mix"/>
+          <ref name="link.char.class"/>
+        </choice>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="legalnotice">
+    <element name="legalnotice">
+      <ref name="legalnotice.attlist"/>
+      <optional>
+        <ref name="title"/>
+      </optional>
+      <oneOrMore>
+        <ref name="legalnotice.mix"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="systemitem">
+    <element name="systemitem">
+      <ref name="systemitem.attlist"/>
+      <zeroOrMore>
+        <choice>
+          <ref name="cptr.char.mix"/>
+          <ref name="acronym"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="computeroutput">
+    <element name="computeroutput">
+      <ref name="computeroutput.attlist"/>
+      <zeroOrMore>
+        <ref name="cptr.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="userinput">
+    <element name="userinput">
+      <ref name="userinput.attlist"/>
+      <zeroOrMore>
+        <ref name="cptr.char.mix"/>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="blockquote">
+    <element name="blockquote">
+      <ref name="blockquote.attlist"/>
+      <optional>
+        <ref name="title"/>
+      </optional>
+      <optional>
+        <ref name="attribution"/>
+      </optional>
+      <oneOrMore>
+        <ref name="component.mix"/>
+      </oneOrMore>
+    </element>
+  </define>
+  <define name="address">
+    <element name="address">
+      <ref name="address.attlist"/>
+      <zeroOrMore>
+        <choice>
+          <text/>
+          <ref name="person.ident.mix"/>
+          <ref name="city"/>
+          <ref name="state"/>
+          <ref name="country"/>
+          <ref name="email"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="subscript">
+    <element name="subscript">
+      <ref name="subscript.attlist"/>
+      <zeroOrMore>
+        <choice>
+          <text/>
+          <ref name="link.char.class"/>
+          <ref name="emphasis"/>
+          <ref name="replaceable"/>
+          <ref name="inlinemediaobject"/>
+          <ref name="base.char.class"/>
+          <ref name="other.char.class"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <define name="superscript">
+    <element name="superscript">
+      <ref name="superscript.attlist"/>
+      <zeroOrMore>
+        <choice>
+          <text/>
+          <ref name="link.char.class"/>
+          <ref name="emphasis"/>
+          <ref name="replaceable"/>
+          <ref name="inlinemediaobject"/>
+          <ref name="base.char.class"/>
+          <ref name="other.char.class"/>
+        </choice>
+      </zeroOrMore>
+    </element>
+  </define>
+  <start>
+    <choice>
+      <ref name="article"/>
+    </choice>
+  </start>
+</grammar>

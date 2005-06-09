@@ -1,0 +1,3061 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  *********************************************************************
+  *** THIS IS THE FLATTENED DTD. DO NOT EDIT THIS DTD BY HAND, EDIT ***
+  *** THE CUSTOMIZATION LAYER AND REGENERATE THE FLATTENED DTD! ********
+  *********************************************************************
+-->
+<!-- ...................................................................... -->
+<!-- IDEAlliance XML Conference Paper DocBook XML Subset V1.1 ............. -->
+<!-- File sdocbook-custom.dtd ............................................. -->
+<!--
+  Copyright 2004 IDEAlliance. Based on DocBook XML V4.3,
+  Copyright 1992-2004 HaL Computer Systems, Inc.,
+  O'Reilly & Associates, Inc., ArborText, Inc., Fujitsu Software
+  Corporation, Norman Walsh, Sun Microsystems, Inc., and the
+  Organization for the Advancement of Structured Information
+  Standards (OASIS).
+  
+  $Id: ideadb.xsd,v 1.1 2005/06/09 22:02:43 ebruchez Exp $
+  
+  Permission to use, copy, modify and distribute the DocBook XML DTD
+  and its accompanying documentation for any purpose and without fee
+  is hereby granted in perpetuity, provided that the above copyright
+  notice and this paragraph appear in all copies.  The copyright
+  holders make no representation about the suitability of the DTD for
+  any purpose.  It is provided "as is" without expressed or implied
+  warranty.
+  
+  If you modify the XML Conference Paper DTD in any way, except for
+  declaring and referencing additional sets of general entities and
+  declaring additional notations, label your DTD as a variant of
+  the XML Conference Paper DTD. 
+-->
+<!-- ...................................................................... -->
+<!--
+  This is the driver file for V1.1 of the IDEAlliance XML Conference
+  Paper DocBook XML Subset DTD.
+  Please use the following formal public identifier to identify it:
+  
+  "-//IDEAlliance//DTD Conference Paper DocBook XML Subset V1.1//EN"
+  
+  For example:
+  
+  <!DOCTYPE article
+    PUBLIC "-//IDEAlliance//DTD Conference Paper DocBook XML Subset V1.1//EN"
+           "ideadb.dtd">
+-->
+<!-- ...................................................................... -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml.xsd"/>
+  <xs:attributeGroup name="linespecific.attrib">
+    <xs:attribute name="format" default="linespecific">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="linespecific"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="linenumbering">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="numbered"/>
+          <xs:enumeration value="unnumbered"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="continuation">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="continues"/>
+          <xs:enumeration value="restarts"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="startinglinenumber"/>
+    <xs:attribute name="language"/>
+  </xs:attributeGroup>
+  <xs:simpleType name="notation.class">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="BMP"/>
+      <xs:enumeration value="GIF"/>
+      <xs:enumeration value="GIF87a"/>
+      <xs:enumeration value="GIF89a"/>
+      <xs:enumeration value="JPG"/>
+      <xs:enumeration value="JPEG"/>
+      <xs:enumeration value="PNG"/>
+      <xs:enumeration value="SVG"/>
+      <xs:enumeration value="SVGZ"/>
+      <xs:enumeration value="linespecific"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:attributeGroup name="objectdata.attrib">
+    <xs:attribute name="fileref"/>
+    <xs:attribute name="format" type="notation.class"/>
+    <xs:attribute name="srccredit"/>
+  </xs:attributeGroup>
+  <xs:element name="list.class" abstract="true"/>
+  <xs:element name="admon.class" abstract="true">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="title"/>
+        <xs:group maxOccurs="unbounded" ref="admon.mix"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="note.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="linespecific.class" abstract="true"/>
+  <xs:element name="para.class" abstract="true">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="para.char.mix"/>
+      <xs:attributeGroup ref="para.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="informal.class" abstract="true"/>
+  <xs:element name="formal.class" abstract="true"/>
+  <xs:element name="compound.class" abstract="true">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group minOccurs="0" ref="formalobject.title.content"/>
+        <xs:group maxOccurs="unbounded" ref="sidebar.mix"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="sidebar.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="genobj.class">
+    <xs:sequence>
+      <xs:element ref="anchor"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="descobj.class">
+    <xs:choice>
+      <xs:element ref="abstract"/>
+      <xs:element ref="personblurb"/>
+      <xs:element ref="epigraph"/>
+    </xs:choice>
+  </xs:group>
+  <xs:element name="xref.char.class" abstract="true"/>
+  <xs:element name="gen.char.class" abstract="true"/>
+  <xs:element name="link.char.class" abstract="true"/>
+  <xs:element name="tech.char.class" abstract="true"/>
+  <xs:group name="base.char.class">
+    <xs:sequence>
+      <xs:element ref="anchor"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="docinfo.char.class" abstract="true"/>
+  <xs:element name="inlineobj.char.class" abstract="true">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="objectinfo"/>
+        <xs:element maxOccurs="unbounded" ref="mediaobject.mix"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="inlinemediaobject.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="common.attrib">
+    <xs:attribute name="id" type="xs:ID"/>
+    <xs:attribute name="lang"/>
+    <xs:attribute name="remap"/>
+    <xs:attribute name="xreflabel"/>
+    <xs:attribute name="revisionflag">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="changed"/>
+          <xs:enumeration value="added"/>
+          <xs:enumeration value="deleted"/>
+          <xs:enumeration value="off"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:group name="person.ident.mix">
+    <xs:choice>
+      <xs:element ref="honorific"/>
+      <xs:element ref="firstname"/>
+      <xs:element ref="surname"/>
+      <xs:element ref="lineage"/>
+      <xs:element ref="othername"/>
+      <xs:element ref="affiliation"/>
+      <xs:element ref="personblurb"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="bibliocomponent.mix">
+    <xs:choice>
+      <xs:element ref="abbrev"/>
+      <xs:element ref="abstract"/>
+      <xs:element ref="author"/>
+      <xs:element ref="authorgroup"/>
+      <xs:element ref="bibliomisc"/>
+      <xs:element ref="copyright"/>
+      <xs:element ref="corpauthor"/>
+      <xs:element ref="date"/>
+      <xs:element ref="edition"/>
+      <xs:element ref="editor"/>
+      <xs:element ref="issuenum"/>
+      <xs:element ref="othercredit"/>
+      <xs:element ref="pagenums"/>
+      <xs:element ref="pubdate"/>
+      <xs:element ref="publishername"/>
+      <xs:element ref="releaseinfo"/>
+      <xs:element ref="revhistory"/>
+      <xs:element ref="subtitle"/>
+      <xs:element ref="title"/>
+      <xs:element ref="titleabbrev"/>
+      <xs:element ref="volumenum"/>
+      <xs:element ref="citetitle"/>
+      <xs:group ref="person.ident.mix"/>
+    </xs:choice>
+  </xs:group>
+  <xs:element name="other.char.class" abstract="true"/>
+  <xs:group name="component.mix">
+    <xs:choice>
+      <xs:element ref="list.class"/>
+      <xs:element ref="admon.class"/>
+      <xs:element ref="linespecific.class"/>
+      <xs:element ref="para.class"/>
+      <xs:element ref="informal.class"/>
+      <xs:element ref="formal.class"/>
+      <xs:element ref="compound.class"/>
+      <xs:group ref="genobj.class"/>
+      <xs:group ref="descobj.class"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="sidebar.mix">
+    <xs:choice>
+      <xs:element ref="list.class"/>
+      <xs:element ref="admon.class"/>
+      <xs:element ref="linespecific.class"/>
+      <xs:element ref="para.class"/>
+      <xs:element ref="informal.class"/>
+      <xs:element ref="formal.class"/>
+      <xs:group ref="genobj.class"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="revdescription.mix">
+    <xs:choice>
+      <xs:element ref="list.class"/>
+      <xs:element ref="admon.class"/>
+      <xs:element ref="linespecific.class"/>
+      <xs:element ref="para.class"/>
+      <xs:element ref="informal.class"/>
+      <xs:element ref="formal.class"/>
+      <xs:group ref="genobj.class"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="footnote.mix">
+    <xs:choice>
+      <xs:element ref="list.class"/>
+      <xs:element ref="linespecific.class"/>
+      <xs:element ref="para.class"/>
+      <xs:element ref="informal.class"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="example.mix">
+    <xs:choice>
+      <xs:element ref="list.class"/>
+      <xs:element ref="linespecific.class"/>
+      <xs:element ref="para.class"/>
+      <xs:element ref="informal.class"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="admon.mix">
+    <xs:choice>
+      <xs:element ref="list.class"/>
+      <xs:element ref="linespecific.class"/>
+      <xs:element ref="para.class"/>
+      <xs:element ref="informal.class"/>
+      <xs:element ref="formal.class"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="figure.mix">
+    <xs:choice>
+      <xs:element ref="linespecific.class"/>
+      <xs:element ref="informal.class"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="tabentry.mix">
+    <xs:choice>
+      <xs:element ref="list.class"/>
+      <xs:element ref="admon.class"/>
+      <xs:element ref="linespecific.class"/>
+      <xs:element ref="para.class"/>
+      <xs:element ref="mediaobject"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="legalnotice.mix">
+    <xs:choice>
+      <xs:element ref="list.class"/>
+      <xs:element ref="admon.class"/>
+      <xs:element ref="linespecific.class"/>
+      <xs:element ref="para.class"/>
+      <xs:element ref="blockquote"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="textobject.mix">
+    <xs:choice>
+      <xs:element ref="list.class"/>
+      <xs:element ref="admon.class"/>
+      <xs:element ref="linespecific.class"/>
+      <xs:element ref="para.class"/>
+      <xs:element ref="blockquote"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="listpreamble.mix">
+    <xs:choice>
+      <xs:element ref="admon.class"/>
+      <xs:element ref="linespecific.class"/>
+      <xs:element ref="para.class"/>
+      <xs:element ref="informal.class"/>
+      <xs:group ref="genobj.class"/>
+      <xs:group ref="descobj.class"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="para.char.mix">
+    <xs:sequence>
+      <xs:choice minOccurs="0">
+        <xs:element ref="xref.char.class"/>
+        <xs:element ref="gen.char.class"/>
+        <xs:element ref="link.char.class"/>
+        <xs:element ref="tech.char.class"/>
+        <xs:group ref="base.char.class"/>
+        <xs:element ref="other.char.class"/>
+        <xs:element ref="inlineobj.char.class"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="title.char.mix">
+    <xs:sequence>
+      <xs:choice minOccurs="0">
+        <xs:element ref="xref.char.class"/>
+        <xs:element ref="gen.char.class"/>
+        <xs:element ref="link.char.class"/>
+        <xs:element ref="tech.char.class"/>
+        <xs:group ref="base.char.class"/>
+        <xs:element ref="docinfo.char.class"/>
+        <xs:element ref="other.char.class"/>
+        <xs:element ref="inlineobj.char.class"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="cptr.char.mix">
+    <xs:sequence>
+      <xs:choice minOccurs="0">
+        <xs:element ref="link.char.class"/>
+        <xs:element ref="tech.char.class"/>
+        <xs:group ref="base.char.class"/>
+        <xs:element ref="other.char.class"/>
+        <xs:element ref="inlinemediaobject"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="smallcptr.char.mix">
+    <xs:sequence>
+      <xs:choice minOccurs="0">
+        <xs:element ref="replaceable"/>
+        <xs:element ref="inlinemediaobject"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="word.char.mix">
+    <xs:sequence>
+      <xs:choice minOccurs="0">
+        <xs:element ref="acronym"/>
+        <xs:element ref="emphasis"/>
+        <xs:element ref="trademark"/>
+        <xs:element ref="link.char.class"/>
+        <xs:group ref="base.char.class"/>
+        <xs:element ref="other.char.class"/>
+        <xs:element ref="inlinemediaobject"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="docinfo.char.mix">
+    <xs:sequence>
+      <xs:choice minOccurs="0">
+        <xs:element ref="link.char.class"/>
+        <xs:element ref="emphasis"/>
+        <xs:element ref="trademark"/>
+        <xs:element ref="replaceable"/>
+        <xs:element ref="other.char.class"/>
+        <xs:element ref="inlinemediaobject"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:group>
+  <xs:complexType name="tbl.table.mdl">
+    <xs:choice>
+      <xs:sequence>
+        <xs:element ref="title"/>
+        <xs:choice>
+          <xs:element maxOccurs="unbounded" ref="mediaobject"/>
+          <xs:element maxOccurs="unbounded" ref="tgroup"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:sequence>
+        <xs:element ref="caption"/>
+        <xs:choice>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="col"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="colgroup"/>
+        </xs:choice>
+        <xs:element minOccurs="0" ref="thead"/>
+        <xs:element minOccurs="0" ref="tfoot"/>
+        <xs:choice>
+          <xs:element maxOccurs="unbounded" ref="tbody"/>
+          <xs:element maxOccurs="unbounded" ref="tr"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:choice>
+  </xs:complexType>
+  <xs:group name="divcomponent.mix">
+    <xs:choice>
+      <xs:element ref="list.class"/>
+      <xs:element ref="admon.class"/>
+      <xs:element ref="linespecific.class"/>
+      <xs:element ref="para.class"/>
+      <xs:element ref="informal.class"/>
+      <xs:element ref="formal.class"/>
+      <xs:element ref="compound.class"/>
+      <xs:group ref="descobj.class"/>
+    </xs:choice>
+  </xs:group>
+  <xs:group name="bookcomponent.content">
+    <xs:choice>
+      <xs:sequence>
+        <xs:group maxOccurs="unbounded" ref="divcomponent.mix"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="section"/>
+      </xs:sequence>
+      <xs:element maxOccurs="unbounded" ref="section"/>
+    </xs:choice>
+  </xs:group>
+  <xs:simpleType name="yesorno.attvals">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:group name="formalobject.title.content">
+    <xs:sequence>
+      <xs:element ref="title"/>
+      <xs:element minOccurs="0" ref="titleabbrev"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="mediaobject.mix" abstract="true"/>
+  <xs:attributeGroup name="idreq.attrib">
+    <xs:attribute name="id" use="required" type="xs:ID"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="lang.attrib">
+    <xs:attribute name="lang"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="remap.attrib">
+    <xs:attribute name="remap"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="role.attrib">
+    <xs:attribute name="role"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="xreflabel.attrib">
+    <xs:attribute name="xreflabel"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="revisionflag.attrib">
+    <xs:attribute name="revisionflag">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="changed"/>
+          <xs:enumeration value="added"/>
+          <xs:enumeration value="deleted"/>
+          <xs:enumeration value="off"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="dir.attrib">
+    <xs:attribute name="dir">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="ltr"/>
+          <xs:enumeration value="rtl"/>
+          <xs:enumeration value="lro"/>
+          <xs:enumeration value="rlo"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="xml-base.attrib">
+    <xs:attribute ref="xml:base"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="label.attrib">
+    <xs:attribute name="label"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="linkendreq.attrib">
+    <xs:attribute name="linkend" use="required" type="xs:IDREF"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="mark.attrib">
+    <xs:attribute name="mark"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="moreinfo.attrib">
+    <xs:attribute name="moreinfo" default="none">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="refentry"/>
+          <xs:enumeration value="none"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="pagenum.attrib">
+    <xs:attribute name="pagenum"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="status.attrib">
+    <xs:attribute name="status"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="width.attrib">
+    <xs:attribute name="width"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="title.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="title">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="title.char.mix"/>
+      <xs:attributeGroup ref="title.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="title.attlist">
+    <xs:attributeGroup ref="pagenum.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="title.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="titleabbrev.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="titleabbrev">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="title.char.mix"/>
+      <xs:attributeGroup ref="titleabbrev.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="titleabbrev.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="titleabbrev.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="subtitle.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="subtitle">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="title.char.mix"/>
+      <xs:attributeGroup ref="subtitle.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="subtitle.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="subtitle.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="bibliomixed.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="bibliomixed.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="bibliomixed.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="articleinfo.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="articleinfo.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="articleinfo.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="bibliomset.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="bibliomset">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="bibliocomponent.mix"/>
+        <xs:element ref="bibliomset"/>
+      </xs:choice>
+      <xs:attributeGroup ref="bibliomset.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="bibliomset.attlist">
+    <xs:attribute name="relation"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="bibliomset.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="bibliomisc.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="bibliomisc">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="para.char.mix"/>
+      <xs:attributeGroup ref="bibliomisc.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="bibliomisc.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="bibliomisc.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="subjectset.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="subjectset">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="subject"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="subjectset.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="subjectset.attlist">
+    <xs:attribute name="scheme" type="xs:NMTOKEN"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="subjectset.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="subject.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="subject">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="subjectterm"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="subject.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="subject.attlist">
+    <xs:attribute name="weight"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="subject.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="subjectterm.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="subjectterm">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="subjectterm.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="subjectterm.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="subjectterm.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="keywordset.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="keywordset">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="keyword"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="keywordset.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="keywordset.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="keywordset.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="keyword.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="keyword">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="keyword.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="keyword.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="keyword.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="sidebar.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="sidebar.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="sidebar.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="abstract.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="abstract">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="title"/>
+        <xs:element maxOccurs="unbounded" ref="para.class"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="abstract.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="abstract.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="abstract.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="personblurb.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="personblurb">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="title"/>
+        <xs:element maxOccurs="unbounded" ref="para.class"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="personblurb.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="personblurb.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="personblurb.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="blockquote.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="blockquote.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="blockquote.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="attribution.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="attribution">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="para.char.mix"/>
+      <xs:attributeGroup ref="attribution.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attribution.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="attribution.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="epigraph.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="epigraph">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="attribution"/>
+        <xs:choice maxOccurs="unbounded">
+          <xs:element ref="para.class"/>
+          <xs:element ref="literallayout"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="epigraph.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="epigraph.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="epigraph.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="footnote.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="footnote" substitutionGroup="gen.char.class">
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="footnote.mix"/>
+      <xs:attributeGroup ref="footnote.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="footnote.attlist">
+    <xs:attributeGroup ref="label.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="footnote.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="para.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="para.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="para.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="admon.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="note" substitutionGroup="admon.class"/>
+  <xs:attributeGroup name="note.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="admon.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="itemizedlist.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="itemizedlist.attlist">
+    <xs:attribute name="spacing">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="normal"/>
+          <xs:enumeration value="compact"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attributeGroup ref="mark.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="itemizedlist.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="orderedlist.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="orderedlist.attlist">
+    <xs:attribute name="numeration">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="arabic"/>
+          <xs:enumeration value="upperalpha"/>
+          <xs:enumeration value="loweralpha"/>
+          <xs:enumeration value="upperroman"/>
+          <xs:enumeration value="lowerroman"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="inheritnum" default="ignore">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="inherit"/>
+          <xs:enumeration value="ignore"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="continuation" default="restarts">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="continues"/>
+          <xs:enumeration value="restarts"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="spacing">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="normal"/>
+          <xs:enumeration value="compact"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="orderedlist.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="listitem.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="listitem">
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="component.mix"/>
+      <xs:attributeGroup ref="listitem.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="listitem.attlist">
+    <xs:attribute name="override"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="listitem.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="variablelist.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="variablelist.attlist">
+    <xs:attribute name="termlength"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="variablelist.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="varlistentry.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="varlistentry">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="term"/>
+        <xs:element ref="listitem"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="varlistentry.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="varlistentry.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="varlistentry.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="term.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="term">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="para.char.mix"/>
+      <xs:attributeGroup ref="term.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="term.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="term.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="example.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="example.attlist">
+    <xs:attribute name="floatstyle"/>
+    <xs:attributeGroup ref="label.attrib"/>
+    <xs:attributeGroup ref="width.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="example.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="programlisting.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="programlisting.attlist">
+    <xs:attributeGroup ref="width.attrib"/>
+    <xs:attributeGroup ref="linespecific.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="programlisting.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="literallayout.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="literallayout.attlist">
+    <xs:attributeGroup ref="width.attrib"/>
+    <xs:attributeGroup ref="linespecific.attrib"/>
+    <xs:attribute name="class" default="normal">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="monospaced"/>
+          <xs:enumeration value="normal"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="literallayout.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="figure.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="figure.attlist">
+    <xs:attribute name="float" default="0" type="yesorno.attvals"/>
+    <xs:attribute name="floatstyle"/>
+    <xs:attribute name="pgwide" type="yesorno.attvals"/>
+    <xs:attributeGroup ref="label.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="figure.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="mediaobject.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="mediaobject" substitutionGroup="informal.class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="objectinfo"/>
+        <xs:element maxOccurs="unbounded" ref="mediaobject.mix"/>
+        <xs:element minOccurs="0" ref="caption"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="mediaobject.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="mediaobject.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="mediaobject.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="inlinemediaobject.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="inlinemediaobject" substitutionGroup="inlineobj.char.class"/>
+  <xs:attributeGroup name="inlinemediaobject.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="inlinemediaobject.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="videoobject.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="videoobject" substitutionGroup="mediaobject.mix">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="objectinfo"/>
+        <xs:element ref="videodata"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="videoobject.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="videoobject.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="videoobject.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="audioobject.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="audioobject" substitutionGroup="mediaobject.mix">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="objectinfo"/>
+        <xs:element ref="audiodata"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="audioobject.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="audioobject.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="audioobject.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="imageobject.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="imageobject" substitutionGroup="mediaobject.mix">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="objectinfo"/>
+        <xs:element ref="imagedata"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="imageobject.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="imageobject.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="imageobject.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="textobject.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="textobject" substitutionGroup="mediaobject.mix">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="objectinfo"/>
+        <xs:choice>
+          <xs:element ref="phrase"/>
+          <xs:element ref="textdata"/>
+          <xs:group maxOccurs="unbounded" ref="textobject.mix"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="textobject.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="textobject.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="textobject.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="objectinfo.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="objectinfo.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="objectinfo.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="videodata.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="videodata">
+    <xs:complexType>
+      <xs:attributeGroup ref="videodata.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="videodata.attlist">
+    <xs:attribute name="width"/>
+    <xs:attribute name="contentwidth"/>
+    <xs:attribute name="depth"/>
+    <xs:attribute name="contentdepth"/>
+    <xs:attribute name="align">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="left"/>
+          <xs:enumeration value="right"/>
+          <xs:enumeration value="center"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="valign">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="top"/>
+          <xs:enumeration value="middle"/>
+          <xs:enumeration value="bottom"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="scale"/>
+    <xs:attribute name="scalefit" type="yesorno.attvals"/>
+    <xs:attributeGroup ref="objectdata.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="videodata.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="audiodata.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="audiodata">
+    <xs:complexType>
+      <xs:attributeGroup ref="audiodata.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="audiodata.attlist">
+    <xs:attributeGroup ref="objectdata.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="audiodata.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="imagedata.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="imagedata">
+    <xs:complexType>
+      <xs:attributeGroup ref="imagedata.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="imagedata.attlist">
+    <xs:attribute name="width"/>
+    <xs:attribute name="contentwidth"/>
+    <xs:attribute name="depth"/>
+    <xs:attribute name="contentdepth"/>
+    <xs:attribute name="align">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="left"/>
+          <xs:enumeration value="right"/>
+          <xs:enumeration value="center"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="valign">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="top"/>
+          <xs:enumeration value="middle"/>
+          <xs:enumeration value="bottom"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="scale"/>
+    <xs:attribute name="scalefit" type="yesorno.attvals"/>
+    <xs:attributeGroup ref="objectdata.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="imagedata.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="textdata.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="textdata">
+    <xs:complexType>
+      <xs:attributeGroup ref="textdata.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="textdata.attlist">
+    <xs:attribute name="encoding"/>
+    <xs:attributeGroup ref="objectdata.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="textdata.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="html.coreattrs">
+    <xs:attribute name="id" type="xs:ID"/>
+    <xs:attribute name="class"/>
+    <xs:attribute name="style"/>
+    <xs:attribute name="title"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="i18n">
+    <xs:attribute ref="xml:lang"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="events">
+    <xs:attribute name="onclick"/>
+    <xs:attribute name="ondblclick"/>
+    <xs:attribute name="onmousedown"/>
+    <xs:attribute name="onmouseup"/>
+    <xs:attribute name="onmouseover"/>
+    <xs:attribute name="onmousemove"/>
+    <xs:attribute name="onmouseout"/>
+    <xs:attribute name="onkeypress"/>
+    <xs:attribute name="onkeydown"/>
+    <xs:attribute name="onkeyup"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="attrs">
+    <xs:attributeGroup ref="html.coreattrs"/>
+    <xs:attributeGroup ref="i18n"/>
+    <xs:attributeGroup ref="events"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="cellhalign">
+    <xs:attribute name="align">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="left"/>
+          <xs:enumeration value="center"/>
+          <xs:enumeration value="right"/>
+          <xs:enumeration value="justify"/>
+          <xs:enumeration value="char"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="char"/>
+    <xs:attribute name="charoff"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="cellvalign">
+    <xs:attribute name="valign">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="top"/>
+          <xs:enumeration value="middle"/>
+          <xs:enumeration value="bottom"/>
+          <xs:enumeration value="baseline"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:element name="colgroup">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="col"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="colgroup.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="col">
+    <xs:complexType>
+      <xs:attributeGroup ref="col.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="tr">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="th"/>
+        <xs:element ref="td"/>
+      </xs:choice>
+      <xs:attributeGroup ref="tr.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="th">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="para.char.mix"/>
+        <xs:group ref="tabentry.mix"/>
+      </xs:choice>
+      <xs:attributeGroup ref="th.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="td">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="para.char.mix"/>
+        <xs:group ref="tabentry.mix"/>
+      </xs:choice>
+      <xs:attributeGroup ref="td.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="colgroup.attlist">
+    <xs:attributeGroup ref="attrs"/>
+    <xs:attribute name="span" default="1"/>
+    <xs:attribute name="width"/>
+    <xs:attributeGroup ref="cellhalign"/>
+    <xs:attributeGroup ref="cellvalign"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="col.attlist">
+    <xs:attributeGroup ref="attrs"/>
+    <xs:attribute name="span" default="1"/>
+    <xs:attribute name="width"/>
+    <xs:attributeGroup ref="cellhalign"/>
+    <xs:attributeGroup ref="cellvalign"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tr.attlist">
+    <xs:attributeGroup ref="attrs"/>
+    <xs:attributeGroup ref="cellhalign"/>
+    <xs:attributeGroup ref="cellvalign"/>
+    <xs:attribute name="bgcolor"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="th.attlist">
+    <xs:attributeGroup ref="attrs"/>
+    <xs:attribute name="abbr"/>
+    <xs:attribute name="axis"/>
+    <xs:attribute name="headers" type="xs:IDREFS"/>
+    <xs:attribute name="scope">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="row"/>
+          <xs:enumeration value="col"/>
+          <xs:enumeration value="rowgroup"/>
+          <xs:enumeration value="colgroup"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="rowspan" default="1"/>
+    <xs:attribute name="colspan" default="1"/>
+    <xs:attributeGroup ref="cellhalign"/>
+    <xs:attributeGroup ref="cellvalign"/>
+    <xs:attribute name="nowrap">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="nowrap"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bgcolor"/>
+    <xs:attribute name="width"/>
+    <xs:attribute name="height"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="td.attlist">
+    <xs:attributeGroup ref="attrs"/>
+    <xs:attribute name="abbr"/>
+    <xs:attribute name="axis"/>
+    <xs:attribute name="headers" type="xs:IDREFS"/>
+    <xs:attribute name="scope">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="row"/>
+          <xs:enumeration value="col"/>
+          <xs:enumeration value="rowgroup"/>
+          <xs:enumeration value="colgroup"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="rowspan" default="1"/>
+    <xs:attribute name="colspan" default="1"/>
+    <xs:attributeGroup ref="cellhalign"/>
+    <xs:attributeGroup ref="cellvalign"/>
+    <xs:attribute name="nowrap">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="nowrap"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bgcolor"/>
+    <xs:attribute name="width"/>
+    <xs:attribute name="height"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tables.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="bodyatt">
+    <xs:attribute name="floatstyle"/>
+    <xs:attributeGroup ref="label.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="secur">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attribute name="class"/>
+    <xs:attribute name="style"/>
+    <xs:attribute name="title"/>
+    <xs:attributeGroup ref="i18n"/>
+    <xs:attributeGroup ref="events"/>
+    <xs:attributeGroup ref="tables.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="common.table.attribs">
+    <xs:attributeGroup ref="bodyatt"/>
+    <xs:attributeGroup ref="secur"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="tbl.table.att">
+    <xs:attribute name="tabstyle"/>
+    <xs:attribute name="tocentry" type="yesorno.attvals"/>
+    <xs:attribute name="shortentry" type="yesorno.attvals"/>
+    <xs:attribute name="orient">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="port"/>
+          <xs:enumeration value="land"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="pgwide" type="yesorno.attvals"/>
+    <xs:attribute name="summary"/>
+    <xs:attribute name="width"/>
+    <xs:attribute name="border"/>
+    <xs:attribute name="rules">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="none"/>
+          <xs:enumeration value="groups"/>
+          <xs:enumeration value="rows"/>
+          <xs:enumeration value="cols"/>
+          <xs:enumeration value="all"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="cellspacing"/>
+    <xs:attribute name="cellpadding"/>
+    <xs:attribute name="align">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="left"/>
+          <xs:enumeration value="center"/>
+          <xs:enumeration value="right"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="bgcolor"/>
+  </xs:attributeGroup>
+  <xs:simpleType name="tbl.frame.attval">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="void"/>
+      <xs:enumeration value="above"/>
+      <xs:enumeration value="below"/>
+      <xs:enumeration value="hsides"/>
+      <xs:enumeration value="lhs"/>
+      <xs:enumeration value="rhs"/>
+      <xs:enumeration value="vsides"/>
+      <xs:enumeration value="box"/>
+      <xs:enumeration value="border"/>
+      <xs:enumeration value="top"/>
+      <xs:enumeration value="bottom"/>
+      <xs:enumeration value="topbot"/>
+      <xs:enumeration value="all"/>
+      <xs:enumeration value="sides"/>
+      <xs:enumeration value="none"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:group name="tbl.entry.mdl">
+    <xs:choice>
+      <xs:group ref="para.char.mix"/>
+      <xs:group ref="tabentry.mix"/>
+    </xs:choice>
+  </xs:group>
+  <xs:complexType name="tbl.hdft.mdl">
+    <xs:choice>
+      <xs:element maxOccurs="unbounded" ref="tr"/>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="colspec"/>
+        <xs:element maxOccurs="unbounded" ref="row"/>
+      </xs:sequence>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="tbl.tbody.mdl">
+    <xs:choice>
+      <xs:element maxOccurs="unbounded" ref="tr"/>
+      <xs:element maxOccurs="unbounded" ref="row"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:simpleType name="yesorno">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+  <xs:complexType name="tbl.tgroup.mdl">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="colspec"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="spanspec"/>
+      <xs:element minOccurs="0" ref="thead"/>
+      <xs:element minOccurs="0" ref="tfoot"/>
+      <xs:element ref="tbody"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:attributeGroup name="tbl.tgroup.att">
+    <xs:attribute name="tgroupstyle"/>
+  </xs:attributeGroup>
+  <xs:complexType name="tbl.row.mdl">
+    <xs:choice maxOccurs="unbounded">
+      <xs:element ref="entry"/>
+      <xs:element ref="entrytbl"/>
+    </xs:choice>
+  </xs:complexType>
+  <xs:complexType name="tbl.entrytbl.mdl">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="colspec"/>
+      <xs:element minOccurs="0" maxOccurs="unbounded" ref="spanspec"/>
+      <xs:element minOccurs="0" ref="thead"/>
+      <xs:element ref="tbody"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="table" substitutionGroup="formal.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbl.table.mdl">
+          <xs:attributeGroup ref="table.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="table.attlist">
+    <xs:attribute name="frame" type="tbl.frame.attval"/>
+    <xs:attribute name="colsep" type="yesorno"/>
+    <xs:attribute name="rowsep" type="yesorno"/>
+    <xs:attributeGroup ref="tbl.table.att"/>
+    <xs:attributeGroup ref="bodyatt"/>
+    <xs:attributeGroup ref="secur"/>
+  </xs:attributeGroup>
+  <xs:element name="tgroup">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbl.tgroup.mdl">
+          <xs:attributeGroup ref="tgroup.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tgroup.attlist">
+    <xs:attribute name="cols" use="required"/>
+    <xs:attributeGroup ref="tbl.tgroup.att"/>
+    <xs:attribute name="colsep" type="yesorno"/>
+    <xs:attribute name="rowsep" type="yesorno"/>
+    <xs:attribute name="align">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="left"/>
+          <xs:enumeration value="right"/>
+          <xs:enumeration value="center"/>
+          <xs:enumeration value="justify"/>
+          <xs:enumeration value="char"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="char"/>
+    <xs:attribute name="charoff"/>
+    <xs:attributeGroup ref="secur"/>
+  </xs:attributeGroup>
+  <xs:element name="colspec">
+    <xs:complexType>
+      <xs:attributeGroup ref="colspec.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="colspec.attlist">
+    <xs:attribute name="colnum"/>
+    <xs:attribute name="colname"/>
+    <xs:attribute name="colwidth"/>
+    <xs:attribute name="colsep" type="yesorno"/>
+    <xs:attribute name="rowsep" type="yesorno"/>
+    <xs:attribute name="align">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="left"/>
+          <xs:enumeration value="right"/>
+          <xs:enumeration value="center"/>
+          <xs:enumeration value="justify"/>
+          <xs:enumeration value="char"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="char"/>
+    <xs:attribute name="charoff"/>
+  </xs:attributeGroup>
+  <xs:element name="spanspec">
+    <xs:complexType>
+      <xs:attributeGroup ref="spanspec.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="spanspec.attlist">
+    <xs:attribute name="namest" use="required"/>
+    <xs:attribute name="nameend" use="required"/>
+    <xs:attribute name="spanname" use="required"/>
+    <xs:attribute name="colsep" type="yesorno"/>
+    <xs:attribute name="rowsep" type="yesorno"/>
+    <xs:attribute name="align">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="left"/>
+          <xs:enumeration value="right"/>
+          <xs:enumeration value="center"/>
+          <xs:enumeration value="justify"/>
+          <xs:enumeration value="char"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="char"/>
+    <xs:attribute name="charoff"/>
+  </xs:attributeGroup>
+  <xs:element name="thead">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbl.hdft.mdl">
+          <xs:attributeGroup ref="thead.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="thead.attlist">
+    <xs:attribute name="valign">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="top"/>
+          <xs:enumeration value="middle"/>
+          <xs:enumeration value="bottom"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attributeGroup ref="secur"/>
+  </xs:attributeGroup>
+  <xs:element name="tfoot">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbl.hdft.mdl">
+          <xs:attributeGroup ref="tfoot.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tfoot.attlist">
+    <xs:attribute name="valign">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="top"/>
+          <xs:enumeration value="middle"/>
+          <xs:enumeration value="bottom"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attributeGroup ref="secur"/>
+  </xs:attributeGroup>
+  <xs:element name="tbody">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbl.tbody.mdl">
+          <xs:attributeGroup ref="tbody.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="tbody.attlist">
+    <xs:attribute name="valign">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="top"/>
+          <xs:enumeration value="middle"/>
+          <xs:enumeration value="bottom"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attributeGroup ref="secur"/>
+  </xs:attributeGroup>
+  <xs:element name="row">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbl.row.mdl">
+          <xs:attributeGroup ref="row.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="row.attlist">
+    <xs:attribute name="rowsep" type="yesorno"/>
+    <xs:attribute name="valign">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="top"/>
+          <xs:enumeration value="middle"/>
+          <xs:enumeration value="bottom"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attributeGroup ref="secur"/>
+  </xs:attributeGroup>
+  <xs:element name="entrytbl">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="tbl.entrytbl.mdl">
+          <xs:attributeGroup ref="entrytbl.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="entrytbl.attlist">
+    <xs:attribute name="cols" use="required"/>
+    <xs:attributeGroup ref="tbl.tgroup.att"/>
+    <xs:attribute name="colname"/>
+    <xs:attribute name="spanname"/>
+    <xs:attribute name="namest"/>
+    <xs:attribute name="nameend"/>
+    <xs:attribute name="colsep" type="yesorno"/>
+    <xs:attribute name="rowsep" type="yesorno"/>
+    <xs:attribute name="align">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="left"/>
+          <xs:enumeration value="right"/>
+          <xs:enumeration value="center"/>
+          <xs:enumeration value="justify"/>
+          <xs:enumeration value="char"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="char"/>
+    <xs:attribute name="charoff"/>
+    <xs:attributeGroup ref="secur"/>
+  </xs:attributeGroup>
+  <xs:element name="entry">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="tbl.entry.mdl"/>
+      <xs:attributeGroup ref="entry.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="entry.attlist">
+    <xs:attribute name="colname"/>
+    <xs:attribute name="namest"/>
+    <xs:attribute name="nameend"/>
+    <xs:attribute name="spanname"/>
+    <xs:attribute name="morerows"/>
+    <xs:attribute name="colsep" type="yesorno"/>
+    <xs:attribute name="rowsep" type="yesorno"/>
+    <xs:attribute name="align">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="left"/>
+          <xs:enumeration value="right"/>
+          <xs:enumeration value="center"/>
+          <xs:enumeration value="justify"/>
+          <xs:enumeration value="char"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="char"/>
+    <xs:attribute name="charoff"/>
+    <xs:attribute name="rotate" type="yesorno"/>
+    <xs:attribute name="valign">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="top"/>
+          <xs:enumeration value="middle"/>
+          <xs:enumeration value="bottom"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attributeGroup ref="secur"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="informaltable.attlist">
+    <xs:attribute name="frame" type="tbl.frame.attval"/>
+    <xs:attribute name="colsep" type="yesorno.attvals"/>
+    <xs:attribute name="rowsep" type="yesorno.attvals"/>
+    <xs:attributeGroup ref="common.table.attribs"/>
+    <xs:attributeGroup ref="tbl.table.att"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="caption.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="caption">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="textobject.mix"/>
+      <xs:attributeGroup ref="caption.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="caption.attlist.content">
+    <xs:attributeGroup ref="lang.attrib"/>
+    <xs:attributeGroup ref="remap.attrib"/>
+    <xs:attributeGroup ref="xreflabel.attrib"/>
+    <xs:attributeGroup ref="revisionflag.attrib"/>
+    <xs:attributeGroup ref="dir.attrib"/>
+    <xs:attributeGroup ref="xml-base.attrib"/>
+    <xs:attributeGroup ref="caption.role.attrib"/>
+    <xs:attributeGroup ref="attrs"/>
+    <xs:attribute name="align">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="top"/>
+          <xs:enumeration value="bottom"/>
+          <xs:enumeration value="left"/>
+          <xs:enumeration value="right"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="caption.attlist">
+    <xs:attributeGroup ref="caption.attlist.content"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="ackno.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="ackno">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="ackno.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="ackno.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="ackno.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="address.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="address.attlist">
+    <xs:attributeGroup ref="linespecific.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="address.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="city.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="city">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="city.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="city.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="city.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="state.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="state">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="state.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="state.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="state.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="country.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="country">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="country.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="country.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="country.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="affiliation.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="affiliation">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="shortaffil"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="jobtitle"/>
+        <xs:element minOccurs="0" ref="orgname"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="orgdiv"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="address"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="affiliation.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="affiliation.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="affiliation.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="shortaffil.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="shortaffil">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="shortaffil.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="shortaffil.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="shortaffil.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="jobtitle.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="jobtitle">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="jobtitle.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="jobtitle.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="jobtitle.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="orgdiv.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="orgdiv">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="orgdiv.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="orgdiv.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="orgdiv.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="author.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="author.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="author.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="authorgroup.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="authorgroup.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="authorgroup.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="authorinitials.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="authorinitials">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="authorinitials.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="authorinitials.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="authorinitials.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="copyright.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="copyright">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="year"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="holder"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="copyright.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="copyright.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="copyright.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="year.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="year">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="year.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="year.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="year.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="holder.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="holder">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="holder.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="holder.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="holder.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="corpauthor.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="corpauthor" substitutionGroup="docinfo.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="corpauthor.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="corpauthor.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="corpauthor.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="date.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="date">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="date.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="date.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="date.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="edition.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="edition">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="edition.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="edition.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="edition.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="editor.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="editor.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="editor.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="issuenum.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="issuenum">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="issuenum.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="issuenum.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="issuenum.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="legalnotice.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="legalnotice.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="legalnotice.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="orgname.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="orgname">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="orgname.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="orgname.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attribute name="class">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="corporation"/>
+          <xs:enumeration value="nonprofit"/>
+          <xs:enumeration value="consortium"/>
+          <xs:enumeration value="informal"/>
+          <xs:enumeration value="other"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="otherclass"/>
+    <xs:attributeGroup ref="orgname.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="othercredit.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="othercredit.attlist">
+    <xs:attribute name="class">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="graphicdesigner"/>
+          <xs:enumeration value="productioneditor"/>
+          <xs:enumeration value="copyeditor"/>
+          <xs:enumeration value="technicaleditor"/>
+          <xs:enumeration value="translator"/>
+          <xs:enumeration value="other"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="othercredit.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="pagenums.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="pagenums">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="pagenums.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="pagenums.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="pagenums.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="firstname.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="firstname">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="firstname.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="firstname.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="firstname.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="honorific.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="honorific">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="honorific.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="honorific.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="honorific.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="lineage.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="lineage">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="lineage.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="lineage.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="lineage.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="othername.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="othername">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="othername.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="othername.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="othername.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="surname.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="surname">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="surname.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="surname.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="surname.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="pubdate.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="pubdate">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="pubdate.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="pubdate.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="pubdate.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="publishername.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="publishername">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="publishername.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="publishername.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="publishername.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="releaseinfo.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="releaseinfo">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="releaseinfo.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="releaseinfo.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="releaseinfo.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="revhistory.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="revhistory" substitutionGroup="docinfo.char.class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="revision"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="revhistory.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="revhistory.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="revhistory.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="revision.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="revision">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="revnumber"/>
+        <xs:element ref="date"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="author"/>
+          <xs:element ref="authorinitials"/>
+        </xs:choice>
+        <xs:choice minOccurs="0">
+          <xs:element ref="revremark"/>
+          <xs:element ref="revdescription"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="revision.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="revision.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="revision.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="revnumber.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="revnumber">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="revnumber.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="revnumber.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="revnumber.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="revremark.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="revremark">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="revremark.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="revremark.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="revremark.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="revdescription.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="revdescription">
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="revdescription.mix"/>
+      <xs:attributeGroup ref="revdescription.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="revdescription.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="revdescription.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="volumenum.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="volumenum">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="volumenum.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="volumenum.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="volumenum.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="command.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="command" substitutionGroup="tech.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="cptr.char.mix"/>
+      <xs:attributeGroup ref="command.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="command.attlist">
+    <xs:attributeGroup ref="moreinfo.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="command.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="computeroutput.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="computeroutput.attlist">
+    <xs:attributeGroup ref="moreinfo.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="computeroutput.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="email.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="email" substitutionGroup="tech.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="docinfo.char.mix"/>
+      <xs:attributeGroup ref="email.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="email.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="email.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="filename.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="filename" substitutionGroup="tech.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="cptr.char.mix"/>
+      <xs:attributeGroup ref="filename.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="filename.attlist">
+    <xs:attribute name="class">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="headerfile"/>
+          <xs:enumeration value="partition"/>
+          <xs:enumeration value="devicefile"/>
+          <xs:enumeration value="libraryfile"/>
+          <xs:enumeration value="directory"/>
+          <xs:enumeration value="extension"/>
+          <xs:enumeration value="symlink"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="path"/>
+    <xs:attributeGroup ref="moreinfo.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="filename.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="lineannotation.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="lineannotation">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="para.char.mix"/>
+      <xs:attributeGroup ref="lineannotation.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="lineannotation.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="lineannotation.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="literal.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="literal" substitutionGroup="tech.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="cptr.char.mix"/>
+      <xs:attributeGroup ref="literal.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="literal.attlist">
+    <xs:attributeGroup ref="moreinfo.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="literal.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="code.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="code" substitutionGroup="tech.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="cptr.char.mix"/>
+      <xs:attributeGroup ref="code.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="code.attlist">
+    <xs:attribute name="language"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="code.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="option.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="option" substitutionGroup="tech.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="cptr.char.mix"/>
+      <xs:attributeGroup ref="option.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="option.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="option.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="replaceable.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="replaceable.attlist">
+    <xs:attribute name="class">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="command"/>
+          <xs:enumeration value="function"/>
+          <xs:enumeration value="option"/>
+          <xs:enumeration value="parameter"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="replaceable.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="sgmltag.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="sgmltag" substitutionGroup="tech.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="smallcptr.char.mix"/>
+      <xs:attributeGroup ref="sgmltag.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="sgmltag.attlist">
+    <xs:attribute name="class">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="attribute"/>
+          <xs:enumeration value="attvalue"/>
+          <xs:enumeration value="element"/>
+          <xs:enumeration value="endtag"/>
+          <xs:enumeration value="emptytag"/>
+          <xs:enumeration value="genentity"/>
+          <xs:enumeration value="numcharref"/>
+          <xs:enumeration value="paramentity"/>
+          <xs:enumeration value="pi"/>
+          <xs:enumeration value="xmlpi"/>
+          <xs:enumeration value="starttag"/>
+          <xs:enumeration value="sgmlcomment"/>
+          <xs:enumeration value="prefix"/>
+          <xs:enumeration value="namespace"/>
+          <xs:enumeration value="localname"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="namespace"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="sgmltag.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="systemitem.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="systemitem.attlist">
+    <xs:attribute name="class">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="constant"/>
+          <xs:enumeration value="event"/>
+          <xs:enumeration value="eventhandler"/>
+          <xs:enumeration value="domainname"/>
+          <xs:enumeration value="fqdomainname"/>
+          <xs:enumeration value="ipaddress"/>
+          <xs:enumeration value="netmask"/>
+          <xs:enumeration value="etheraddress"/>
+          <xs:enumeration value="groupname"/>
+          <xs:enumeration value="library"/>
+          <xs:enumeration value="macro"/>
+          <xs:enumeration value="osname"/>
+          <xs:enumeration value="filesystem"/>
+          <xs:enumeration value="resource"/>
+          <xs:enumeration value="systemname"/>
+          <xs:enumeration value="username"/>
+          <xs:enumeration value="newsgroup"/>
+          <xs:enumeration value="process"/>
+          <xs:enumeration value="service"/>
+          <xs:enumeration value="server"/>
+          <xs:enumeration value="daemon"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attributeGroup ref="moreinfo.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="systemitem.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="userinput.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="userinput.attlist">
+    <xs:attributeGroup ref="moreinfo.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="userinput.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="abbrev.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="abbrev" substitutionGroup="gen.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="word.char.mix"/>
+      <xs:attributeGroup ref="abbrev.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="abbrev.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="abbrev.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="acronym.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="acronym" substitutionGroup="gen.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="word.char.mix"/>
+      <xs:attributeGroup ref="acronym.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="acronym.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="acronym.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="citetitle.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="citetitle" substitutionGroup="gen.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="para.char.mix"/>
+      <xs:attributeGroup ref="citetitle.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="citetitle.attlist">
+    <xs:attribute name="pubwork">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="article"/>
+          <xs:enumeration value="book"/>
+          <xs:enumeration value="chapter"/>
+          <xs:enumeration value="part"/>
+          <xs:enumeration value="refentry"/>
+          <xs:enumeration value="section"/>
+          <xs:enumeration value="journal"/>
+          <xs:enumeration value="series"/>
+          <xs:enumeration value="set"/>
+          <xs:enumeration value="manuscript"/>
+          <xs:enumeration value="cdrom"/>
+          <xs:enumeration value="dvd"/>
+          <xs:enumeration value="wiki"/>
+          <xs:enumeration value="gopher"/>
+          <xs:enumeration value="bbs"/>
+          <xs:enumeration value="emailmessage"/>
+          <xs:enumeration value="webpage"/>
+          <xs:enumeration value="newsposting"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="citetitle.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="emphasis.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="emphasis" substitutionGroup="gen.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="para.char.mix"/>
+      <xs:attributeGroup ref="emphasis.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="emphasis.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="emphasis.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="phrase.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="phrase" substitutionGroup="gen.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="para.char.mix"/>
+      <xs:attributeGroup ref="phrase.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="phrase.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="phrase.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="quote.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="quote" substitutionGroup="gen.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="para.char.mix"/>
+      <xs:attributeGroup ref="quote.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="quote.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="quote.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="ssscript.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="subscript.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="ssscript.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="superscript.attlist">
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="ssscript.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="trademark.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="trademark.attlist">
+    <xs:attribute name="class" default="trade">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="service"/>
+          <xs:enumeration value="trade"/>
+          <xs:enumeration value="registered"/>
+          <xs:enumeration value="copyright"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="trademark.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="link.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="link" substitutionGroup="link.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="para.char.mix"/>
+      <xs:attributeGroup ref="link.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="link.attlist">
+    <xs:attribute name="endterm" type="xs:IDREF"/>
+    <xs:attribute name="xrefstyle"/>
+    <xs:attribute name="type"/>
+    <xs:attributeGroup ref="linkendreq.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="link.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="ulink.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="ulink" substitutionGroup="link.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="para.char.mix"/>
+      <xs:attributeGroup ref="ulink.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="ulink.attlist">
+    <xs:attribute name="url" use="required"/>
+    <xs:attribute name="type"/>
+    <xs:attribute name="xrefstyle"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="ulink.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="footnoteref.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="footnoteref" substitutionGroup="xref.char.class">
+    <xs:complexType>
+      <xs:attributeGroup ref="footnoteref.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="footnoteref.attlist">
+    <xs:attributeGroup ref="linkendreq.attrib"/>
+    <xs:attributeGroup ref="label.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="footnoteref.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="xref.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="xref" substitutionGroup="xref.char.class">
+    <xs:complexType>
+      <xs:attributeGroup ref="xref.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="xref.attlist">
+    <xs:attribute name="endterm" type="xs:IDREF"/>
+    <xs:attribute name="xrefstyle"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="linkendreq.attrib"/>
+    <xs:attributeGroup ref="xref.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="anchor.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="anchor">
+    <xs:complexType>
+      <xs:attributeGroup ref="anchor.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="anchor.attlist">
+    <xs:attributeGroup ref="idreq.attrib"/>
+    <xs:attributeGroup ref="pagenum.attrib"/>
+    <xs:attributeGroup ref="remap.attrib"/>
+    <xs:attributeGroup ref="xreflabel.attrib"/>
+    <xs:attributeGroup ref="revisionflag.attrib"/>
+    <xs:attributeGroup ref="anchor.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="appendix.class" abstract="true">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="bookcomponent.title.content"/>
+        <xs:group ref="bookcomponent.content"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="appendix.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:group name="div.title.content">
+    <xs:sequence>
+      <xs:element ref="title"/>
+      <xs:element minOccurs="0" ref="subtitle"/>
+      <xs:element minOccurs="0" ref="titleabbrev"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="bookcomponent.title.content">
+    <xs:sequence>
+      <xs:element ref="title"/>
+      <xs:element minOccurs="0" ref="subtitle"/>
+      <xs:element minOccurs="0" ref="titleabbrev"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:group name="sect.title.content">
+    <xs:sequence>
+      <xs:element ref="title"/>
+      <xs:element minOccurs="0" ref="subtitle"/>
+      <xs:element minOccurs="0" ref="titleabbrev"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:attributeGroup name="appendix.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="appendix.attlist">
+    <xs:attributeGroup ref="label.attrib"/>
+    <xs:attributeGroup ref="status.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="appendix.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="section.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="section.attlist">
+    <xs:attributeGroup ref="label.attrib"/>
+    <xs:attributeGroup ref="status.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="section.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="bibliography.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="bibliography.attlist">
+    <xs:attributeGroup ref="status.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="bibliography.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="bibliodiv.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="bibliodiv.attlist">
+    <xs:attributeGroup ref="status.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="bibliodiv.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="article.role.attrib">
+    <xs:attributeGroup ref="role.attrib"/>
+  </xs:attributeGroup>
+  <xs:attributeGroup name="article.attlist">
+    <xs:attribute name="class">
+      <xs:simpleType>
+        <xs:restriction base="xs:token">
+          <xs:enumeration value="journalarticle"/>
+          <xs:enumeration value="productsheet"/>
+          <xs:enumeration value="whitepaper"/>
+          <xs:enumeration value="techreport"/>
+          <xs:enumeration value="specification"/>
+          <xs:enumeration value="faq"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="parentbook" type="xs:IDREF"/>
+    <xs:attributeGroup ref="status.attrib"/>
+    <xs:attributeGroup ref="common.attrib"/>
+    <xs:attributeGroup ref="article.role.attrib"/>
+  </xs:attributeGroup>
+  <xs:element name="objectinfo">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="mediaobject"/>
+        <xs:element ref="legalnotice"/>
+        <xs:element ref="keywordset"/>
+        <xs:element ref="subjectset"/>
+        <xs:group ref="bibliocomponent.mix"/>
+      </xs:choice>
+      <xs:attributeGroup ref="objectinfo.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="section">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="sectioninfo"/>
+        <xs:group ref="sect.title.content"/>
+        <xs:choice>
+          <xs:sequence>
+            <xs:group maxOccurs="unbounded" ref="divcomponent.mix"/>
+            <xs:element minOccurs="0" maxOccurs="unbounded" ref="section"/>
+          </xs:sequence>
+          <xs:element maxOccurs="unbounded" ref="section"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="section.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sectioninfo">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="mediaobject"/>
+        <xs:element ref="legalnotice"/>
+        <xs:element ref="keywordset"/>
+        <xs:element ref="subjectset"/>
+        <xs:group ref="bibliocomponent.mix"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="authorgroup">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="author"/>
+        <xs:element ref="editor"/>
+        <xs:element ref="corpauthor"/>
+        <xs:element ref="othercredit"/>
+      </xs:choice>
+      <xs:attributeGroup ref="authorgroup.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="author" substitutionGroup="docinfo.char.class">
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="person.ident.mix"/>
+      <xs:attributeGroup ref="author.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="editor">
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="person.ident.mix"/>
+      <xs:attributeGroup ref="editor.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="othercredit" substitutionGroup="docinfo.char.class">
+    <xs:complexType>
+      <xs:group maxOccurs="unbounded" ref="person.ident.mix"/>
+      <xs:attributeGroup ref="othercredit.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="para" substitutionGroup="para.class"/>
+  <xs:complexType name="informaltable.table.mdl">
+    <xs:choice>
+      <xs:choice>
+        <xs:element maxOccurs="unbounded" ref="mediaobject"/>
+        <xs:element maxOccurs="unbounded" ref="tgroup"/>
+      </xs:choice>
+      <xs:sequence>
+        <xs:element ref="caption"/>
+        <xs:choice>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="col"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="colgroup"/>
+        </xs:choice>
+        <xs:element minOccurs="0" ref="thead"/>
+        <xs:element minOccurs="0" ref="tfoot"/>
+        <xs:choice>
+          <xs:element maxOccurs="unbounded" ref="tbody"/>
+          <xs:element maxOccurs="unbounded" ref="tr"/>
+        </xs:choice>
+      </xs:sequence>
+    </xs:choice>
+  </xs:complexType>
+  <xs:element name="informaltable" substitutionGroup="informal.class">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="informaltable.table.mdl">
+          <xs:attributeGroup ref="informaltable.attlist"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="replaceable" substitutionGroup="tech.char.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="link.char.class"/>
+        <xs:group ref="base.char.class"/>
+        <xs:element ref="inlinemediaobject"/>
+      </xs:choice>
+      <xs:attributeGroup ref="replaceable.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="trademark" substitutionGroup="gen.char.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="link.char.class"/>
+        <xs:element ref="tech.char.class"/>
+        <xs:element ref="inlinemediaobject"/>
+        <xs:element ref="emphasis"/>
+      </xs:choice>
+      <xs:attributeGroup ref="trademark.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="article">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group minOccurs="0" ref="div.title.content"/>
+        <xs:element minOccurs="0" ref="articleinfo"/>
+        <xs:group ref="bookcomponent.content"/>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element ref="appendix.class"/>
+          <xs:element ref="bibliography"/>
+          <xs:element ref="ackno"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="article.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="articleinfo">
+    <xs:complexType>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element ref="mediaobject"/>
+        <xs:element ref="legalnotice"/>
+        <xs:element ref="subjectset"/>
+        <xs:element ref="keywordset"/>
+        <xs:group ref="bibliocomponent.mix"/>
+      </xs:choice>
+      <xs:attributeGroup ref="articleinfo.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="appendix" substitutionGroup="appendix.class"/>
+  <xs:element name="bibliography">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group minOccurs="0" ref="bookcomponent.title.content"/>
+        <xs:group minOccurs="0" maxOccurs="unbounded" ref="component.mix"/>
+        <xs:choice>
+          <xs:element maxOccurs="unbounded" ref="bibliodiv"/>
+          <xs:element maxOccurs="unbounded" ref="bibliomixed"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="bibliography.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="bibliomixed">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="bibliocomponent.mix"/>
+        <xs:element ref="bibliomset"/>
+      </xs:choice>
+      <xs:attributeGroup ref="bibliomixed.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="bibliodiv">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group minOccurs="0" ref="sect.title.content"/>
+        <xs:group minOccurs="0" maxOccurs="unbounded" ref="component.mix"/>
+        <xs:element maxOccurs="unbounded" ref="bibliomixed"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="bibliodiv.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sidebar" substitutionGroup="compound.class"/>
+  <xs:element name="programlisting" substitutionGroup="linespecific.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="para.char.mix"/>
+        <xs:element ref="lineannotation"/>
+      </xs:choice>
+      <xs:attributeGroup ref="programlisting.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="literallayout" substitutionGroup="linespecific.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="para.char.mix"/>
+        <xs:element ref="lineannotation"/>
+      </xs:choice>
+      <xs:attributeGroup ref="literallayout.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="itemizedlist" substitutionGroup="list.class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group minOccurs="0" ref="formalobject.title.content"/>
+        <xs:group minOccurs="0" maxOccurs="unbounded" ref="listpreamble.mix"/>
+        <xs:element maxOccurs="unbounded" ref="listitem"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="itemizedlist.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="orderedlist" substitutionGroup="list.class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group minOccurs="0" ref="formalobject.title.content"/>
+        <xs:group minOccurs="0" maxOccurs="unbounded" ref="listpreamble.mix"/>
+        <xs:element maxOccurs="unbounded" ref="listitem"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="orderedlist.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="variablelist" substitutionGroup="list.class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group minOccurs="0" ref="formalobject.title.content"/>
+        <xs:group minOccurs="0" maxOccurs="unbounded" ref="listpreamble.mix"/>
+        <xs:element maxOccurs="unbounded" ref="varlistentry"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="variablelist.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="example" substitutionGroup="formal.class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="formalobject.title.content"/>
+        <xs:group maxOccurs="unbounded" ref="example.mix"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="example.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="figure" substitutionGroup="formal.class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:group ref="formalobject.title.content"/>
+        <xs:choice maxOccurs="unbounded">
+          <xs:group ref="figure.mix"/>
+          <xs:element ref="link.char.class"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="figure.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="legalnotice">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="title"/>
+        <xs:group maxOccurs="unbounded" ref="legalnotice.mix"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="legalnotice.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="systemitem" substitutionGroup="tech.char.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="cptr.char.mix"/>
+        <xs:element ref="acronym"/>
+      </xs:choice>
+      <xs:attributeGroup ref="systemitem.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="computeroutput" substitutionGroup="tech.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="cptr.char.mix"/>
+      <xs:attributeGroup ref="computeroutput.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="userinput" substitutionGroup="tech.char.class">
+    <xs:complexType mixed="true">
+      <xs:group minOccurs="0" maxOccurs="unbounded" ref="cptr.char.mix"/>
+      <xs:attributeGroup ref="userinput.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="blockquote" substitutionGroup="informal.class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="title"/>
+        <xs:element minOccurs="0" ref="attribution"/>
+        <xs:group maxOccurs="unbounded" ref="component.mix"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="blockquote.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="address">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:group ref="person.ident.mix"/>
+        <xs:element ref="city"/>
+        <xs:element ref="state"/>
+        <xs:element ref="country"/>
+        <xs:element ref="email"/>
+      </xs:choice>
+      <xs:attributeGroup ref="address.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="subscript" substitutionGroup="other.char.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="link.char.class"/>
+        <xs:element ref="emphasis"/>
+        <xs:element ref="replaceable"/>
+        <xs:element ref="inlinemediaobject"/>
+        <xs:group ref="base.char.class"/>
+        <xs:element ref="other.char.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="subscript.attlist"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="superscript" substitutionGroup="other.char.class">
+    <xs:complexType mixed="true">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="link.char.class"/>
+        <xs:element ref="emphasis"/>
+        <xs:element ref="replaceable"/>
+        <xs:element ref="inlinemediaobject"/>
+        <xs:group ref="base.char.class"/>
+        <xs:element ref="other.char.class"/>
+      </xs:choice>
+      <xs:attributeGroup ref="superscript.attlist"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

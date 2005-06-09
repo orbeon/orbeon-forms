@@ -66,7 +66,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
     private XFormsModelSchemaValidator schemaValidator;
 
     // Containing document
-    private XFormsContainingDocument xFormsContainingDocument;
+    private XFormsContainingDocument xformsContainingDocument;
 
     public XFormsModel(Document modelDocument) {
         this.modelDocument = modelDocument;
@@ -114,11 +114,11 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
     }
 
     public void setContainingDocument(XFormsContainingDocument xFormsContainingDocument) {
-        this.xFormsContainingDocument = xFormsContainingDocument;
+        this.xformsContainingDocument = xFormsContainingDocument;
     }
 
     public XFormsContainingDocument getContainingDocument() {
-        return xFormsContainingDocument;
+        return xformsContainingDocument;
     }
 
     /**
@@ -736,7 +736,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                 XFormsUtils.updateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
                     public void walk(Node node, InstanceData instanceData) {
                         if (instanceData != null)
-                            instanceData.clearSchemaErrors();
+                            instanceData.clearValidationErrors();
                     }
                 });
             }
@@ -750,8 +750,34 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             });
 
             // Send events if needed
-            if (xformsRevalidateEvent.isSendEvents()) {
-                // TODO: dispatch events
+            if (xformsRevalidateEvent.isSendEvents() && xformsContainingDocument.getXFormsControls() != null) {
+                final XFormsControls xformsControls = xformsContainingDocument.getXFormsControls();
+                for (Iterator i = instances.iterator(); i.hasNext();) {
+                    XFormsUtils.updateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
+                        public void walk(Node node, InstanceData instanceData) {
+                            // Dispatch xforms-valid/xforms-invalid
+                            {
+                                final boolean previousValidState = instanceData.getPreviousValidState();
+                                final boolean newValidState = instanceData.getValid().get();
+                                if (previousValidState && !newValidState) {
+                                    xformsControls.dispatchEvent(pipelineContext, new XFormsInvalidEvent(node));
+                                } else if (!previousValidState && newValidState) {
+                                    xformsControls.dispatchEvent(pipelineContext, new XFormsValidEvent(node));
+                                }
+                            }
+                            // Dispatch xforms-optional/xforms-required
+                            {
+                                final boolean previousRequiredState = instanceData.getPreviousRequiredState();
+                                final boolean newRequiredState = instanceData.getRequired().get();
+                                if (previousRequiredState && !newRequiredState) {
+                                    xformsControls.dispatchEvent(pipelineContext, new XFormsOptionalEvent(node));
+                                } else if (!previousRequiredState && newRequiredState) {
+                                    xformsControls.dispatchEvent(pipelineContext, new XFormsRequiredEvent(node));
+                                }
+                            }
+                        }
+                    });
+                }
             }
 
         } else if (XFormsEvents.XFORMS_REFRESH.equals(eventName)) {
@@ -759,8 +785,8 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
             // Must ask controls to refresh for this model
-            if (xFormsContainingDocument.getXFormsControls() != null) {
-                xFormsContainingDocument.getXFormsControls().refreshForModel(pipelineContext, this);
+            if (xformsContainingDocument.getXFormsControls() != null) {
+                xformsContainingDocument.getXFormsControls().refreshForModel(pipelineContext, this);
             }
 
         } else if (XFormsEvents.XFORMS_RESET.equals(eventName)) {

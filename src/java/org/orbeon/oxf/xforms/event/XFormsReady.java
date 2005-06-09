@@ -19,9 +19,9 @@ package org.orbeon.oxf.xforms.event;
  *
  * Target: model / Bubbles: Yes / Cancelable: No / Context Info: None
  */
-public class XFormsReady extends org.orbeon.oxf.xforms.event.XFormsEvent {
+public class XFormsReady extends XFormsEvent {
 
     public XFormsReady(Object targetObject) {
-        super(org.orbeon.oxf.xforms.event.XFormsEvents.XFORMS_READY, targetObject, true, false);
+        super(XFormsEvents.XFORMS_READY, targetObject, true, false);
     }
 }

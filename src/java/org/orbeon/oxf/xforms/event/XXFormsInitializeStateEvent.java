@@ -19,6 +19,6 @@ package org.orbeon.oxf.xforms.event;
  */
 public class XXFormsInitializeStateEvent extends XFormsEvent {
     public XXFormsInitializeStateEvent(Object targetObject) {
-        super(org.orbeon.oxf.xforms.event.XFormsEvents.XXFORMS_INITIALIZE_STATE, targetObject, false, false);
+        super(XFormsEvents.XXFORMS_INITIALIZE_STATE, targetObject, false, false);
     }
 }

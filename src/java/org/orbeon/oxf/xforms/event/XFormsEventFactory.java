@@ -93,6 +93,14 @@ public class XFormsEventFactory {
             return new XFormsValueChangeEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_OUT)) {
             return new XFormsDOMFocusOutEvent(targetObject);
+        } else if (eventName.equals(XFormsEvents.XFORMS_VALID)) {
+            return new XFormsValidEvent(targetObject);
+        } else if (eventName.equals(XFormsEvents.XFORMS_INVALID)) {
+            return new XFormsInvalidEvent(targetObject);
+            } else if (eventName.equals(XFormsEvents.XFORMS_REQUIRED)) {
+            return new XFormsRequiredEvent(targetObject);
+        } else if (eventName.equals(XFormsEvents.XFORMS_OPTIONAL)) {
+            return new XFormsOptionalEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_LINK_EXCEPTION)) {
             return new XFormsLinkExceptionEvent(targetObject, contextString, contextElement, contextThrowable);
         } else if (eventName.equals(XFormsEvents.XFORMS_LINK_ERROR)) {

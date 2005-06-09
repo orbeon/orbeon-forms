@@ -19,9 +19,9 @@ package org.orbeon.oxf.xforms.event;
  *
  * Target: submission / Bubbles: Yes / Cancelable: Yes / Context Info: None
  */
-public class XFormsSubmitEvent extends org.orbeon.oxf.xforms.event.XFormsEvent{
+public class XFormsSubmitEvent extends XFormsEvent{
 
     public XFormsSubmitEvent(Object targetObject) {
-        super(org.orbeon.oxf.xforms.event.XFormsEvents.XFORMS_SUBMIT, targetObject, true, true);
+        super(XFormsEvents.XFORMS_SUBMIT, targetObject, true, true);
     }
 }

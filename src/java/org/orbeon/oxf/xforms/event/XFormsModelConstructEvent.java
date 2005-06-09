@@ -22,6 +22,6 @@ package org.orbeon.oxf.xforms.event;
 public class XFormsModelConstructEvent extends XFormsEvent {
 
     public XFormsModelConstructEvent(Object targetObject) {
-        super(org.orbeon.oxf.xforms.event.XFormsEvents.XFORMS_MODEL_CONSTRUCT, targetObject, true, false);
+        super(XFormsEvents.XFORMS_MODEL_CONSTRUCT, targetObject, true, false);
     }
 }

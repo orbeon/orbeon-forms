@@ -23,6 +23,6 @@ package org.orbeon.oxf.xforms.event;
 public class XFormsDOMActivateEvent extends XFormsEvent {
 
     public XFormsDOMActivateEvent(Object targetObject) {
-        super(org.orbeon.oxf.xforms.event.XFormsEvents.XFORMS_DOM_ACTIVATE, targetObject, true, true);
+        super(XFormsEvents.XFORMS_DOM_ACTIVATE, targetObject, true, true);
     }
 }

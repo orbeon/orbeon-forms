@@ -19,7 +19,7 @@ package org.orbeon.oxf.xforms.event;
  *
  * Target: model / Bubbles: Yes / Cancelable: Yes / Context Info: None
  */
-public class XFormsRefreshEvent extends org.orbeon.oxf.xforms.event.XFormsEvent {
+public class XFormsRefreshEvent extends XFormsEvent {
 
     public XFormsRefreshEvent(Object targetObject) {
         super(XFormsEvents.XFORMS_REFRESH, targetObject, true, true);

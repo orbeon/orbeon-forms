@@ -19,7 +19,7 @@ package org.orbeon.oxf.xforms.event;
  *
  * Target: model / Bubbles: Yes / Cancelable: Yes / Context Info: None
  */
-public class XFormsRevalidateEvent extends org.orbeon.oxf.xforms.event.XFormsEvent {
+public class XFormsRevalidateEvent extends XFormsEvent {
 
     private boolean sendEvents;
 

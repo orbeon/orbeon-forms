@@ -17,7 +17,7 @@ package org.orbeon.oxf.xforms.event;
 /**
  * Internal XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE event.
  */
-public class XXFormsValueChangeWithFocusChangeEvent extends org.orbeon.oxf.xforms.event.XFormsEvent {
+public class XXFormsValueChangeWithFocusChangeEvent extends XFormsEvent {
     private String newValue;
     public XXFormsValueChangeWithFocusChangeEvent(Object targetObject, String newValue) {
         super(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, targetObject, false, false);

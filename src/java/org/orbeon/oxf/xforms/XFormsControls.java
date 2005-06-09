@@ -892,6 +892,34 @@ public class XFormsControls implements XFormsEventTarget {
 
             callEventHandlers(pipelineContext, xformsEvent);
 
+        } else if (XFormsEvents.XFORMS_VALID.equals(eventName)) {
+            // 4.4.6 The xforms-valid Event
+            // Bubbles: Yes / Cancelable: No / Context Info: None
+            // The default action for this event results in the following: None; notification event only.
+
+            callEventHandlers(pipelineContext, xformsEvent);
+
+        } else if (XFormsEvents.XFORMS_INVALID.equals(eventName)) {
+            // 4.4.7 The xforms-invalid Event
+            // Bubbles: Yes / Cancelable: No / Context Info: None
+            // The default action for this event results in the following: None; notification event only.
+
+            callEventHandlers(pipelineContext, xformsEvent);
+
+        } else if (XFormsEvents.XFORMS_REQUIRED.equals(eventName)) {
+            // 4.4.12 The xforms-required Event
+            // Bubbles: Yes / Cancelable: No / Context Info: None
+            // The default action for this event results in the following: None; notification event only.
+
+            callEventHandlers(pipelineContext, xformsEvent);
+
+        } else if (XFormsEvents.XFORMS_OPTIONAL.equals(eventName)) {
+            // 4.4.13 The xforms-optional Event
+            // Bubbles: Yes / Cancelable: No / Context Info: None
+            // The default action for this event results in the following: None; notification event only.
+
+            callEventHandlers(pipelineContext, xformsEvent);
+
         } else {
             throw new OXFException("Invalid action requested: " + eventName);
         }

@@ -20,7 +20,7 @@ package org.orbeon.oxf.xforms.event;
  * Target: instance / Bubbles: Yes / Cancelable: No / Context Info: Path expression used for insert/delete (xsd:string).
  * The default action for these events results in the following: None; notification event only.
  */
-public class XFormsInsertEvent extends org.orbeon.oxf.xforms.event.XFormsEvent {
+public class XFormsInsertEvent extends XFormsEvent {
 
     private String xpathExpression;
 

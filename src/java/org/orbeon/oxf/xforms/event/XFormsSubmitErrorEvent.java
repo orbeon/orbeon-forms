@@ -20,7 +20,7 @@ package org.orbeon.oxf.xforms.event;
  * Target: model / Bubbles: Yes / Cancelable: No / Context Info: The submit method URI that failed (xsd:anyURI)
  * The default action for this event results in the following: None; notification event only.
  */
-public class XFormsSubmitErrorEvent extends org.orbeon.oxf.xforms.event.XFormsEvent {
+public class XFormsSubmitErrorEvent extends XFormsEvent {
     private Throwable throwable;
     private String urlString;
 

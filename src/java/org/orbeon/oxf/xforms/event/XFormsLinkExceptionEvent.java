@@ -22,7 +22,7 @@ import org.orbeon.oxf.common.OXFException;
  * Target: model / Bubbles: Yes / Cancelable: No / Context Info: Implementation-specific error string.
  * The default action for this event results in the following: Fatal error.
  */
-public class XFormsLinkExceptionEvent extends org.orbeon.oxf.xforms.event.XFormsEvent {
+public class XFormsLinkExceptionEvent extends XFormsEvent {
     private Throwable throwable;
     private Element controlElement;
     private String urlString;

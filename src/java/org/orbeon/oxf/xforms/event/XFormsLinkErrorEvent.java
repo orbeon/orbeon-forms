@@ -21,13 +21,13 @@ import org.dom4j.Element;
  * Target: model / Bubbles: Yes / Cancelable: No / Context Info: The URI that failed to load (xsd:anyURI)
  * The default action for this event results in the following: None; notification event only.
  */
-public class XFormsLinkErrorEvent extends org.orbeon.oxf.xforms.event.XFormsEvent {
+public class XFormsLinkErrorEvent extends XFormsEvent {
     private Throwable throwable;
     private Element controlElement;
     private String urlString;
 
     public XFormsLinkErrorEvent(Object targetObject, String urlString, Element controlElement, Throwable throwable) {
-        super(org.orbeon.oxf.xforms.event.XFormsEvents.XFORMS_LINK_ERROR, targetObject, true, false);
+        super(XFormsEvents.XFORMS_LINK_ERROR, targetObject, true, false);
         this.urlString = urlString;
         this.controlElement = controlElement;
         this.throwable = throwable;

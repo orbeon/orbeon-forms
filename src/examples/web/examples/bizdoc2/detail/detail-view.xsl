@@ -52,6 +52,7 @@
                 <xforms:bind nodeset="claim:insured-info/claim:claim-info/claim:accident-date" type="xs:date"/>
             </xforms:bind>
             <xforms:submission id="main" method="post" action="/bizdoc2/detail"/>
+            <xforms:submission id="save" method="post" replace="none" action="/bizdoc2/save"/>
         </xforms:model>
     </head>
     <body>
@@ -192,14 +193,13 @@
                             <table>
                                 <tr>
                                     <td align="left" valign="bottom">
-                                        <xforms:trigger submission="main">
+                                        <xforms:trigger>
                                             <xforms:label>Save</xforms:label>
                                             <xforms:action ev:event="DOMActivate">
-                                                <xforms:setvalue ref="/form/action">save</xforms:setvalue>
-                                                <xforms:send submission="main"/>
+                                                <xforms:send submission="save"/>
                                             </xforms:action>
                                         </xforms:trigger>
-                                        <xforms:trigger submission="main">
+                                        <xforms:trigger>
                                             <xforms:label>Back</xforms:label>
                                             <xforms:action ev:event="DOMActivate">
                                                 <xforms:setvalue ref="/form/action">back</xforms:setvalue>
@@ -412,11 +412,10 @@
                             <table>
                                 <tr>
                                     <td align="left" valign="bottom">
-                                        <xforms:trigger submission="main">
+                                        <xforms:trigger>
                                             <xforms:label>Save</xforms:label>
                                             <xforms:action ev:event="DOMActivate">
-                                                <xforms:setvalue ref="/form/action">save</xforms:setvalue>
-                                                <xforms:send submission="main"/>
+                                                <xforms:send submission="save"/>
                                             </xforms:action>
                                         </xforms:trigger>
                                         <xforms:trigger>

@@ -29,13 +29,13 @@
     <files path-info="*.java" mime-type="text/plain"/>
     <files path-info="*.txt" mime-type="text/plain"/>
 
-    <page id="summary" path-info="/bizdoc2" model="summary/summary-model.xpl" view="summary/summary-view.xsl">
+    <page id="summary" path-info="/bizdoc2" model="../bizdoc/summary/summary-model.xpl" view="summary/summary-view.xsl">
         <!-- Import documents -->
-        <action when="/form/action = 'import-documents'" action="summary/import-documents-action.xpl">
+        <action when="/form/action = 'import-documents'" action="../bizdoc/summary/import-documents-action.xpl">
             <result page="summary"/>
         </action>
         <!-- View an existing document -->
-        <action when="/form/action = 'show-detail'" action="summary/find-document-action.xpl">
+        <action when="/form/action = 'show-detail'" action="../bizdoc/summary/find-document-action.xpl">
             <result page="detail" transform="oxf:xslt">
                 <form xsl:version="2.0" xmlns="">
                     <document-id><xsl:value-of select="document('input:action')/document-info/document-id"/></document-id>
@@ -44,7 +44,7 @@
             </result>
         </action>
         <!-- Create a new document -->
-        <action when="/form/action = 'new-document'" action="summary/new-document-action.xpl">
+        <action when="/form/action = 'new-document'" action="../bizdoc/summary/new-document-action.xpl">
             <result page="detail" transform="oxf:xslt">
                 <form xsl:version="2.0" xmlns="">
                     <document-id><xsl:value-of select="document('input:action')/document-info/document-id"/></document-id>
@@ -53,11 +53,11 @@
             </result>
         </action>
         <!-- Delete documents -->
-        <action when="/form/action = 'delete-documents'" action="summary/delete-documents-action.xpl">
+        <action when="/form/action = 'delete-documents'" action="../bizdoc/summary/delete-documents-action.xpl">
             <result page="summary"/>
         </action>
         <!-- View XML -->
-        <action when="/form/action = 'show-xml'" action="summary/find-document-action.xpl">
+        <action when="/form/action = 'show-xml'" action="../bizdoc/summary/find-document-action.xpl">
             <result page="xml-detail" transform="oxf:xslt" instance-passing="redirect-exit-portal">
                 <document-id xsl:version="2.0" xmlns="">
                     <xsl:value-of select="document('input:action')/document-info/document-id"/>
@@ -70,39 +70,14 @@
     <page id="xml-detail" path-info="/direct/bizdoc2/xml-detail" model="detail/xml-detail-model.xpl"/>
 
     <page id="detail" path-info="/bizdoc2/detail" view="detail/detail-view.xsl">
-        <!-- Save the current document and documemnt is valid -->
-<!--        <action when="/form/action = 'save' and not(/form/document//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="detail/save-document-action.xpl">-->
-<!--            <result page="detail">-->
-<!--                <xu:remove select="/*"/>-->
-<!--                <xu:update select="/">-->
-<!--                    <xu:copy-of select="document('input:instance')/*"/>-->
-<!--                </xu:update>-->
-<!--                <xu:update select="/form/action"/>-->
-<!--                <xu:update select="/form/message">save-success</xu:update>-->
-<!--            </result>-->
-<!--        </action>-->
-        <!-- Save the current document and documemnt is invalid -->
-<!--        <action when="/form/action = 'save' and /form/document//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])]">-->
-<!--            <result>-->
-<!--                <xu:update select="/form/message">save-failure</xu:update>-->
-<!--                <xu:update select="/form/show-errors">true</xu:update>-->
-<!--            </result>-->
-<!--        </action>-->
         <!-- Back: Return to the summary page -->
         <action when="/form/action = 'back'">
             <result page="summary"/>
         </action>
-        <!-- Next page -->
-<!--        <action when="/form/action = 'next'">-->
-<!--            <result page="detail-2">-->
-<!--                <xu:update select="/form/document-id">-->
-<!--                    <xu:value-of select="document('input:instance')/*/document-id"/>-->
-<!--                </xu:update>-->
-<!--                <xu:update select="/form/document">-->
-<!--                    <xu:copy-of select="document('input:instance')/*/document/*"/>-->
-<!--                </xu:update>-->
-<!--            </result>-->
-<!--        </action>-->
+    </page>
+    
+    <page path-info="/bizdoc2/save">
+        <action action="../bizdoc/detail/save-document-action.xpl"/>
     </page>
     
     <!-- Home (for standalone operation) -->

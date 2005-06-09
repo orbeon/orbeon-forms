@@ -22,6 +22,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.transformer.xupdate.Closure;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
@@ -74,8 +75,8 @@ public class Utils {
      * Evaluates an XPath expression
      */
     public static Object evaluate(final URIResolver uriResolver, Object context,
-                                  final VariableContextImpl variableContext, final LocationData locationData,
-                                  String select, NamespaceContext namespaceContext) {
+                                  final VariableContextImpl variableContext, final DocumentContext documentContext,
+                                  final LocationData locationData, String select, NamespaceContext namespaceContext) {
         FunctionContext functionContext = new FunctionContext() {
             public org.jaxen.Function getFunction(final String namespaceURI,
                                         final String prefix,
@@ -87,14 +88,19 @@ public class Utils {
                         public Object call(Context jaxenContext, List args) {
                             try {
                                 String url = (String) Dom4jUtils.createXPath("string(.)").evaluate(args.get(0));
-                                Source source = uriResolver.resolve(url, locationData.getSystemID());
-                                if (! (source instanceof SAXSource))
-                                    throw new ValidationException("Unsupported source type", locationData);
-                                XMLReader xmlReader = ((SAXSource) source).getXMLReader();
-                                LocationSAXContentHandler contentHandler = new LocationSAXContentHandler();
-                                xmlReader.setContentHandler(contentHandler);
-                                xmlReader.parse(new InputSource());
-                                return contentHandler.getDocument();
+                                Document result = documentContext.getDocument(url);
+                                if (result == null) {
+                                    Source source = uriResolver.resolve(url, locationData.getSystemID());
+                                    if (! (source instanceof SAXSource))
+                                        throw new ValidationException("Unsupported source type", locationData);
+                                    XMLReader xmlReader = ((SAXSource) source).getXMLReader();
+                                    LocationSAXContentHandler contentHandler = new LocationSAXContentHandler();
+                                    xmlReader.setContentHandler(contentHandler);
+                                    xmlReader.parse(new InputSource());
+                                    result = contentHandler.getDocument();
+                                    documentContext.addDocument(url, result);
+                                }
+                                return result;
                             } catch (Exception e) {
                                 throw new ValidationException(e, locationData);
                             }
@@ -285,8 +291,8 @@ public class Utils {
 
     public static List evaluateToList(URIResolver uriResolver, Object context,
                                       VariableContextImpl variableContext, LocationData locationData,
-                                      String select, NamespaceContext namespaceContext) {
-        Object selected = Utils.evaluate(uriResolver, context, variableContext, locationData, select, namespaceContext);
+                                      String select, NamespaceContext namespaceContext, DocumentContext documentContext) {
+        Object selected = Utils.evaluate(uriResolver, context, variableContext, documentContext, locationData, select, namespaceContext);
         return xpathObjectToDOM4JList(locationData, selected);
     }
 
@@ -308,21 +314,21 @@ public class Utils {
     }
 
     public static Object execute(URIResolver uriResolver, Object context,
-                                 VariableContextImpl variableContext, Statement[] statements) {
+                                 VariableContextImpl variableContext, DocumentContext documentContext, Statement[] statements) {
         List result = new ArrayList();
         VariableContextImpl currentVariableContext = variableContext;
         for (int i = 0; i < statements.length; i++) {
             if (statements[i] instanceof Variable) {
                 Variable variable = (Variable) statements[i];
                 currentVariableContext = new VariableContextImpl(currentVariableContext,
-                        variable.getName(), variable.execute(uriResolver, context, currentVariableContext));
+                        variable.getName(), variable.execute(uriResolver, context, currentVariableContext, documentContext));
             } else if (statements[i] instanceof Function) {
                 Function function = (Function) statements[i];
                 Closure closure = function.getClosure(uriResolver, context);
                 currentVariableContext = new VariableContextImpl(currentVariableContext, function.getName(), closure);
                 closure.setVariableContext(currentVariableContext);
             } else {
-                Object statementResult = statements[i].execute(uriResolver, context, currentVariableContext);
+                Object statementResult = statements[i].execute(uriResolver, context, currentVariableContext, documentContext);
                 if (statementResult instanceof List) {
                     result.addAll((List) statementResult);
                 } else {
@@ -352,9 +358,8 @@ public class Utils {
     public static Element getInsertPivot(LocationData locationData, String select,
                                          NamespaceContext namespaceContext,
                                          URIResolver uriResolver, Object context,
-                                         VariableContextImpl variableContext) {
-        Object insertPivotObject = Utils.evaluate(uriResolver, context, variableContext,
-                locationData, select, namespaceContext);
+                                         VariableContextImpl variableContext, DocumentContext documentContext) {
+        Object insertPivotObject = Utils.evaluate(uriResolver, context, variableContext, documentContext, locationData, select, namespaceContext);
         if (!(insertPivotObject instanceof Element))
             throw new ValidationException("Select expression must return an element", locationData);
         return (Element) insertPivotObject;

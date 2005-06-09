@@ -16,6 +16,7 @@ package org.orbeon.oxf.transformer.xupdate.statement;
 import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.URIResolver;
@@ -35,13 +36,13 @@ public class While extends Statement {
         this.statements = statements;
     }
 
-    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
+    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
         List result = new ArrayList();
         while (true) {
             Boolean success = (Boolean) Utils.evaluate
-                    (uriResolver, context, variableContext, getLocationData(), "boolean(" + select + ")", namespaceContext);
+                    (uriResolver, context, variableContext, documentContext, getLocationData(), "boolean(" + select + ")", namespaceContext);
             if (!success.booleanValue()) break;
-            Object statementsResult = Utils.execute(uriResolver, context, variableContext, statements);
+            Object statementsResult = Utils.execute(uriResolver, context, variableContext, documentContext, statements);
             if (statementsResult instanceof List) {
                 result.addAll((List) statementsResult);
             } else {

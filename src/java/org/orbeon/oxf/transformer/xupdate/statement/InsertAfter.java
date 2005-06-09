@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.URIResolver;
@@ -34,11 +35,11 @@ public class InsertAfter extends Statement {
         this.statements = statements;
     }
 
-    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
+    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
         Element insertPivot = Utils.getInsertPivot(getLocationData(), select, namespaceContext,
-                uriResolver, context, variableContext);
+                uriResolver, context, variableContext, documentContext);
         Utils.insert(getLocationData(), insertPivot.getParent(), insertPivot.getParent().indexOf(insertPivot) + 1,
-                Utils.execute(uriResolver, insertPivot, variableContext, statements));
+                Utils.execute(uriResolver, insertPivot, variableContext, documentContext, statements));
         return Collections.EMPTY_LIST;
     }
 }

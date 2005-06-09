@@ -41,8 +41,7 @@ public class XUpdateDriver {
             "org.orbeon.oxf.transformer.xupdate.TransformerFactoryImpl";
 
     public static void main(String[] args) 
-    throws TransformerException, IOException, ParserConfigurationException
-    , SAXException {
+            throws TransformerException, IOException, ParserConfigurationException, SAXException {
 
         // Check arguments
         if (args.length != 2) {
@@ -65,7 +64,7 @@ public class XUpdateDriver {
     }
 
     private static XMLReader newXMLReader() 
-    throws ParserConfigurationException, SAXException {
+            throws ParserConfigurationException, SAXException {
         final SAXParserFactory pf = SAXParserFactory.newInstance();
         final SAXParser p = pf.newSAXParser();
         final XMLReader ret = p.getXMLReader();

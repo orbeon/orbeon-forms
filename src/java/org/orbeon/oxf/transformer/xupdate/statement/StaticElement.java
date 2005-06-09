@@ -16,6 +16,7 @@ package org.orbeon.oxf.transformer.xupdate.statement;
 import org.dom4j.Element;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.URIResolver;
@@ -31,9 +32,9 @@ public class StaticElement extends Statement {
         this.statements = statements;
     }
 
-    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
+    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
         Element resultElement = (Element) element.clone();
-        Utils.insert(getLocationData(), resultElement, 0, Utils.execute(uriResolver, context, variableContext, statements));
+        Utils.insert(getLocationData(), resultElement, 0, Utils.execute(uriResolver, context, variableContext, documentContext, statements));
         return Arrays.asList(new Object[] {resultElement});
     }
 }

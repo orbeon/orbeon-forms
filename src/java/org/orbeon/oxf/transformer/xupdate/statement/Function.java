@@ -17,6 +17,7 @@ import org.dom4j.QName;
 import org.orbeon.oxf.transformer.xupdate.Closure;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.URIResolver;
@@ -32,7 +33,7 @@ public class Function extends Statement {
         this.statements = statements;
     }
 
-    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
+    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
         throw new IllegalStateException("Function statement for '" + qname.toString() + "' cannot be executed");
     }
 

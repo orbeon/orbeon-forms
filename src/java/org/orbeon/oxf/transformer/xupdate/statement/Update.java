@@ -20,6 +20,7 @@ import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
@@ -39,10 +40,10 @@ public class Update extends Statement {
         this.statements = statements;
     }
 
-    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
-        for (Iterator i = Utils.evaluateToList(uriResolver, context, variableContext, getLocationData(), select, namespaceContext).iterator(); i.hasNext();) {
+    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
+        for (Iterator i = Utils.evaluateToList(uriResolver, context, variableContext, getLocationData(), select, namespaceContext, documentContext).iterator(); i.hasNext();) {
             Object node = i.next();
-            Object toInsert = Utils.execute(uriResolver, node, variableContext, statements);
+            Object toInsert = Utils.execute(uriResolver, node, variableContext, documentContext, statements);
             if (node instanceof Element) {
                 Element parent = (Element) node;
                 Dom4jUtils.clearElementContent(parent);

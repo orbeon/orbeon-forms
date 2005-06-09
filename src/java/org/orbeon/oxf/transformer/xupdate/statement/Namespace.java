@@ -16,6 +16,7 @@ package org.orbeon.oxf.transformer.xupdate.statement;
 import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -36,17 +37,15 @@ public class Namespace extends Statement {
         this.statements = statements;
     }
 
-    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
+    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
         name = name.trim();
         String prefix = name.startsWith("{")
-                ? (String) Utils.evaluate(uriResolver, context, variableContext,
-                    getLocationData(), "string(" + name.substring(1, name.length() - 1) + ")", namespaceContext)
+                ? (String) Utils.evaluate(uriResolver, context, variableContext, documentContext, getLocationData(), "string(" + name.substring(1, name.length() - 1) + ")", namespaceContext)
                 : name;
         String uri = select != null
-                ? (String) Utils.evaluate(uriResolver, context, variableContext,
-                    getLocationData(), "string(" + select + ")", namespaceContext)
+                ? (String) Utils.evaluate(uriResolver, context, variableContext, documentContext, getLocationData(), "string(" + select + ")", namespaceContext)
                 : (String) Dom4jUtils.createXPath("string()").evaluate
-                    (Utils.execute(uriResolver, context, variableContext, statements));
+                    (Utils.execute(uriResolver, context, variableContext, documentContext, statements));
         return Arrays.asList(new Object[] {Dom4jUtils.createNamespace(prefix, uri)});
     }
 }

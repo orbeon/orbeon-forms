@@ -29,5 +29,5 @@ public abstract class Statement {
         return locationData;
     }
 
-    public abstract Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext);
+    public abstract Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext);
 }

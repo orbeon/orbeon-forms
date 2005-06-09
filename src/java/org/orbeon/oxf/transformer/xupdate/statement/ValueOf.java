@@ -16,6 +16,7 @@ package org.orbeon.oxf.transformer.xupdate.statement;
 import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -31,8 +32,8 @@ public class ValueOf extends Statement {
         this.namespaceContext = namespaceContext;
     }
 
-    public Object execute(final URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
-        Object selectedObject = Utils.evaluate(uriResolver, context, variableContext, getLocationData(), select, namespaceContext);
+    public Object execute(final URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
+        Object selectedObject = Utils.evaluate(uriResolver, context, variableContext, documentContext, getLocationData(), select, namespaceContext);
         return Dom4jUtils.createXPath("string()").evaluate(selectedObject);
     }
 }

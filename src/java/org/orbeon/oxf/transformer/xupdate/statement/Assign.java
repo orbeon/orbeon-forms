@@ -19,6 +19,7 @@ import org.jaxen.UnresolvableException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.URIResolver;
@@ -39,11 +40,11 @@ public class Assign extends Statement {
         this.statements = statements;
     }
 
-    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
+    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
         try {
             Object newValue = select != null
-                ? Utils.evaluate(uriResolver, context, variableContext, getLocationData(), select, namespaceContext)
-                : Utils.execute(uriResolver, context, variableContext, statements);
+                ? Utils.evaluate(uriResolver, context, variableContext, documentContext, getLocationData(), select, namespaceContext)
+                : Utils.execute(uriResolver, context, variableContext, documentContext, statements);
             variableContext.assign(qname, newValue);
             return Collections.EMPTY_LIST;
         } catch (UnresolvableException e) {

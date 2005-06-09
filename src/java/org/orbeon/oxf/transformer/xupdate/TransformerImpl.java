@@ -85,7 +85,7 @@ public class TransformerImpl extends Transformer {
             Document document = documentContentHandler.getDocument();
 
             // Execute operations
-            Utils.execute(uriResolver, document, new VariableContextImpl(), templates.getStatements());
+            Utils.execute(uriResolver, document, new VariableContextImpl(), new DocumentContext(), templates.getStatements());
 
             // Send document to output
             LocationSAXWriter locationSAXWriter = new LocationSAXWriter();

@@ -17,6 +17,7 @@ import org.dom4j.Node;
 import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.URIResolver;
@@ -33,8 +34,8 @@ public class Remove extends Statement {
         this.namespaceContext = namespaceContext;
     }
 
-    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
-        for (Iterator i = Utils.evaluateToList(uriResolver, context, variableContext, getLocationData(), select, namespaceContext)
+    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
+        for (Iterator i = Utils.evaluateToList(uriResolver, context, variableContext, getLocationData(), select, namespaceContext, documentContext)
                 .iterator(); i.hasNext();) {
             Node node = (Node) i.next();
             node.detach();

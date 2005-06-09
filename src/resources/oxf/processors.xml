@@ -559,6 +559,10 @@
         <class name="org.orbeon.oxf.processor.SAXDebuggerProcessor"/>
     </processor>
 
+    <processor name="oxf:counter">
+        <class name="org.orbeon.oxf.processor.test.CounterProcessor"/>
+    </processor>
+
     <!-- This is kept only for backward compatibility -->
     <processor name="oxf:webapp-controller" uri="oxf/processor/webapp-controller">
         <class name="org.orbeon.oxf.processor.PageFlowControllerProcessor"/>

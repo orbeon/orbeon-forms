@@ -17,6 +17,7 @@ import org.jaxen.Context;
 import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.URIResolver;
@@ -37,15 +38,15 @@ public class ForEach extends Statement {
         this.statements = statements;
     }
 
-    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
+    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
         List result = new ArrayList();
-        List selected = Utils.evaluateToList(uriResolver, context, variableContext, getLocationData(), select, namespaceContext);
+        List selected = Utils.evaluateToList(uriResolver, context, variableContext, getLocationData(), select, namespaceContext, documentContext);
         Context jaxenContext = new Context(null);
         jaxenContext.setSize(selected.size());
         for (int i = 0; i < selected.size(); i++) {
             jaxenContext.setPosition(i + 1);
             jaxenContext.setNodeSet(Arrays.asList(new Object[]{selected.get(i)}));
-            Object statementsResult = Utils.execute(uriResolver, jaxenContext, variableContext, statements);
+            Object statementsResult = Utils.execute(uriResolver, jaxenContext, variableContext, documentContext, statements);
             if (statementsResult instanceof List) {
                 result.addAll((List) statementsResult);
             } else {

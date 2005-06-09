@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.transformer.xupdate.Closure;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -35,8 +36,8 @@ public class CopyOf extends Statement {
         this.namespaceContext = namespaceContext;
     }
 
-    public Object execute(final URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
-        Object selected = Utils.evaluate(uriResolver, context, variableContext, getLocationData(), select, namespaceContext);
+    public Object execute(final URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
+        Object selected = Utils.evaluate(uriResolver, context, variableContext, documentContext, getLocationData(), select, namespaceContext);
         if (selected == null) {
             return Collections.EMPTY_LIST;
         } else if (selected instanceof String || selected instanceof Number) {

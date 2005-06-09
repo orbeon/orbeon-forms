@@ -81,7 +81,7 @@ public class TransformerURIResolver implements URIResolver {
                 };
             }
 
-            // Return SAX Source based on XML Reader
+            // Create SAX Source based on XML Reader
             SAXSource saxSource = new SAXSource(xmlReader, new InputSource());
             saxSource.setSystemId(href);
             return saxSource;
@@ -90,5 +90,4 @@ public class TransformerURIResolver implements URIResolver {
             throw new OXFException(e);
         }
     }
-
 }

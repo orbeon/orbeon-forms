@@ -16,6 +16,7 @@ package org.orbeon.oxf.transformer.xupdate.statement;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -32,8 +33,8 @@ public class Message extends Statement {
         this.statements = statements;
     }
 
-    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
-        Object statementsResult = Utils.execute(uriResolver, context, variableContext, statements);
+    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
+        Object statementsResult = Utils.execute(uriResolver, context, variableContext, documentContext, statements);
         if (logger.isInfoEnabled()) {
             logger.info(Utils.xpathObjectToString(statementsResult));
         }

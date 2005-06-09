@@ -25,6 +25,7 @@ public class Closure {
     private URIResolver uriResolver;
     private Object context;
     private VariableContextImpl variableContext;
+    private DocumentContext documentContext;
     private Statement[] statements;
 
     public Closure(URIResolver uriRes, Object ctxt, Statement[] stmnts) {
@@ -47,14 +48,13 @@ public class Closure {
                 Param param = (Param) statement;
                 Object value = paramCount < args.size()
                         ? args.get(paramCount)
-                        : param.execute(uriResolver, context, currentVariableContext);
+                        : param.execute(uriResolver, context, currentVariableContext, documentContext);
                 currentVariableContext = new VariableContextImpl(currentVariableContext, param.getName(), value);
                 paramCount++;
             } else {
                 statementsToExecute.add(statement);
             }
         }
-        return Utils.execute(uriResolver, context, currentVariableContext, 
-                (Statement[]) statementsToExecute.toArray(new Statement[statementsToExecute.size()]));
+        return Utils.execute(uriResolver, context, currentVariableContext, documentContext, (Statement[]) statementsToExecute.toArray(new Statement[statementsToExecute.size()]));
     }
 }

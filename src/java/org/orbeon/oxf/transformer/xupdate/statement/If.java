@@ -16,6 +16,7 @@ package org.orbeon.oxf.transformer.xupdate.statement;
 import org.jaxen.NamespaceContext;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.URIResolver;
@@ -34,11 +35,10 @@ public class If extends Statement {
         this.statements = statements;
     }
 
-    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
-        Boolean success = (Boolean) Utils.evaluate(uriResolver, context, variableContext,
-                getLocationData(), "boolean(" + test + ")", namespaceContext);
+    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
+        Boolean success = (Boolean) Utils.evaluate(uriResolver, context, variableContext, documentContext, getLocationData(), "boolean(" + test + ")", namespaceContext);
         if (success.booleanValue()) {
-            return Utils.execute(uriResolver, context, variableContext, statements);
+            return Utils.execute(uriResolver, context, variableContext, documentContext, statements);
         } else {
             return Collections.EMPTY_LIST;
         }

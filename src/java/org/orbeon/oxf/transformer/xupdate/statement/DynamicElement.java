@@ -17,6 +17,7 @@ import org.dom4j.Element;
 import org.dom4j.QName;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 
@@ -34,9 +35,9 @@ public class DynamicElement extends Statement {
         this.statements = statements;
     }
 
-    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
+    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
         Element element = new NonLazyUserDataElement(qname);
-        Utils.insert(getLocationData(), element, 0, Utils.execute(uriResolver, context, variableContext, statements));
+        Utils.insert(getLocationData(), element, 0, Utils.execute(uriResolver, context, variableContext, documentContext, statements));
         return Arrays.asList(new Object[] {element});
     }
 }

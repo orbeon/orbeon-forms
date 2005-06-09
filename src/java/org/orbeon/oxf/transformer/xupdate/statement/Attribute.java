@@ -16,6 +16,7 @@ package org.orbeon.oxf.transformer.xupdate.statement;
 import org.dom4j.QName;
 import org.orbeon.oxf.transformer.xupdate.Statement;
 import org.orbeon.oxf.transformer.xupdate.VariableContextImpl;
+import org.orbeon.oxf.transformer.xupdate.DocumentContext;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
@@ -32,10 +33,10 @@ public class Attribute extends Statement {
         this.statements = statements;
     }
 
-    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext) {
+    public Object execute(URIResolver uriResolver, Object context, VariableContextImpl variableContext, DocumentContext documentContext) {
         org.dom4j.Attribute attribute = Dom4jUtils.createAttribute(null, qname, "");
         Utils.insert(getLocationData(), attribute, 0,
-                Utils.execute(uriResolver, context, variableContext, statements));
+                Utils.execute(uriResolver, context, variableContext, documentContext, statements));
         return Arrays.asList(new Object[] {attribute});
     }
 }

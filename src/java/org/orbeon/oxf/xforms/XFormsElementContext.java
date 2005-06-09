@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
+import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.dom4j.Attribute;
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -21,8 +22,6 @@ import org.orbeon.oxf.processor.xforms.output.element.XFormsElement;
 import org.xml.sax.ContentHandler;
 
 import java.util.*;
-
-import orbeon.apache.xml.utils.NamespaceSupport2;
 
 /**
  * Context in which control elements are executed.

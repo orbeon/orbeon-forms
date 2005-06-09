@@ -24,7 +24,6 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xforms.event.XXFormsInitializeEvent;
 import org.orbeon.oxf.xforms.event.XXFormsInitializeStateEvent;
-import org.orbeon.oxf.xforms.mip.*;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;

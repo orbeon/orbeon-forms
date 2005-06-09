@@ -13,12 +13,10 @@
  */
 package org.orbeon.oxf.xforms;
 
-import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xforms.mip.*;
-import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
-import org.orbeon.oxf.xforms.mip.TypeModelItemProperty;
 import org.dom4j.Node;
+import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xforms.mip.*;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.util.*;
 

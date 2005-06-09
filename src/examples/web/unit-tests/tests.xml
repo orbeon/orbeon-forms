@@ -86,7 +86,7 @@
         </output>
     </test>
 
-    <test description="Delegation Processor" name="oxf:delegation">
+    <test description="Delegation Processor" name="oxf:delegation" ignore="true">
         <input name="interface">
             <config>
                 <service id="ca-traffic" type="webservice"

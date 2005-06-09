@@ -29,6 +29,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.StringTokenizer;
 
 /**
  * OXFServlet is the Servlet entry point of OXF.
@@ -42,10 +45,15 @@ import java.util.Enumeration;
  */
 public class OXFServletDelegate extends HttpServlet {
 
+    private static final String HTTP_DEFAULT_ACCEPT_METHODS = "get,post,head";
+
     private ProcessorService processorService;
 
     // Web application context instance shared between all components of a Web of Portlet application
     private WebAppContext webAppContext;
+
+    // Accepted methods for this servlet
+    private Map acceptedMethods = new HashMap();
 
     public void init() throws ServletException {
         try {
@@ -70,11 +78,12 @@ public class OXFServletDelegate extends HttpServlet {
                         ProcessorService.MAIN_PROCESSOR_INPUT_PROPERTY_PREFIX);
             }
             // Get error processor definition
+            final Map servletInitMap =  new ServletInitMap(this);
             ProcessorDefinition errorProcessorDefinition;
             {
                 // Try to obtain a local processor definition
                 errorProcessorDefinition
-                        = InitUtils.getDefinitionFromMap(new ServletInitMap(this), ProcessorService.ERROR_PROCESSOR_PROPERTY_PREFIX,
+                        = InitUtils.getDefinitionFromMap(servletInitMap, ProcessorService.ERROR_PROCESSOR_PROPERTY_PREFIX,
                                 ProcessorService.ERROR_PROCESSOR_INPUT_PROPERTY_PREFIX);
                 // Try to obtain a processor definition from the properties
                 if (errorProcessorDefinition == null)
@@ -86,9 +95,22 @@ public class OXFServletDelegate extends HttpServlet {
                         ProcessorService.ERROR_PROCESSOR_INPUT_PROPERTY_PREFIX);
             }
 
+            // Initialize accepted methods
+            {
+                String acceptMethods = (String) servletInitMap.get(ProcessorService.HTTP_ACCEPT_METHODS_PROPERTY);
+                if (acceptMethods == null)
+                    acceptMethods = HTTP_DEFAULT_ACCEPT_METHODS;
+                final StringTokenizer st = new StringTokenizer(acceptMethods, ",");
+                while (st.hasMoreTokens()) {
+                    final String method = st.nextToken().trim().toLowerCase();
+                    acceptedMethods.put(method, method);
+                }
+            }
+
             // Create and initialize service
             processorService = new ProcessorService();
             processorService.init(mainProcessorDefinition, errorProcessorDefinition);
+
         } catch (Exception e) {
             throw new ServletException(OXFException.getRootThrowable(e));
         }
@@ -98,7 +120,7 @@ public class OXFServletDelegate extends HttpServlet {
         try {
             // Filter on supported methods
             String httpMethod = request.getMethod();
-            if (!("post".equalsIgnoreCase(httpMethod) || "get".equalsIgnoreCase(httpMethod)))
+            if (acceptedMethods.get(httpMethod.toLowerCase()) == null)
                 throw new OXFException("Unsupported HTTP method: " + httpMethod);
 
             // Run service

@@ -15,21 +15,29 @@ package org.orbeon.oxf.xforms;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xforms.mip.*;
+import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
+import org.orbeon.oxf.xforms.mip.TypeModelItemProperty;
+import org.dom4j.Node;
 
 import java.util.*;
 
 /**
  * Instance of this class are used to decorate the XForms instance.
  */
-public class InstanceData {
+public class InstanceData implements Cloneable {
 
     private LocationData locationData;
     private boolean generated = false;
-    private BooleanModelItemProperty relevant = new BooleanModelItemProperty(true);
-    private BooleanModelItemProperty required = new BooleanModelItemProperty(false);
-    private BooleanModelItemProperty readonly = new BooleanModelItemProperty(false);
-    private BooleanModelItemProperty valid = new BooleanModelItemProperty(true);
+    private RelevantModelItemProperty relevant = new RelevantModelItemProperty();
+    private RequiredModelItemProperty required = new RequiredModelItemProperty();
+    private ReadonlyModelItemProperty readonly = new ReadonlyModelItemProperty();
+    private ValidModelItemProperty valid;
     private TypeModelItemProperty type = new TypeModelItemProperty();
+
+    private ValidModelItemProperty valueValid = new ValidModelItemProperty();
+    private ValidModelItemProperty constraint = new ValidModelItemProperty();
+
     private int id = -1;
     private String invalidBindIds = null;
     private Map idToNodeMap;
@@ -44,20 +52,6 @@ public class InstanceData {
         this.id = id;
     }
 
-    public InstanceData(InstanceData other) {
-        this.locationData = other.locationData;
-        this.generated = other.generated;
-        this.relevant = new BooleanModelItemProperty(other.relevant);
-        this.required = new BooleanModelItemProperty(other.required);
-        this.readonly = new BooleanModelItemProperty(other.readonly);
-        this.valid = new BooleanModelItemProperty(other.valid);
-        this.type = new TypeModelItemProperty(other.type);
-        this.id = other.id;
-        this.invalidBindIds = other.invalidBindIds;
-        this.idToNodeMap = (other.idToNodeMap == null) ? null : new HashMap(other.idToNodeMap);
-        this.schemaErrors = (other.schemaErrors == null) ? null : new ArrayList(other.schemaErrors);
-    }
-
     public boolean isGenerated() {
         return generated;
     }
@@ -66,12 +60,11 @@ public class InstanceData {
         this.generated = generated;
     }
 
-
     public BooleanModelItemProperty getRelevant() {
         return relevant;
     }
 
-    public BooleanModelItemProperty getRequired() {
+    public RequiredModelItemProperty getRequired() {
         return required;
     }
 
@@ -80,6 +73,36 @@ public class InstanceData {
     }
 
     public BooleanModelItemProperty getValid() {
+        if (valid == null) {
+            valid = new ValidModelItemProperty() {
+
+                public boolean get() {
+                    // If the constraint make the node invalid, the node is really invalid!
+                    if (!constraint.get())
+                        return false;
+
+                    // Handle type and required constraints
+                    if (valueValid.get() && getRequired().get()) {
+                        // Valid and required, check that the value is actually non-empty
+                        return !(getRequired().getStringValue().length() == 0);
+                    } else if (!valueValid.get() && !getRequired().get()) {
+                        // Not valid and not required, checked that the value is actually empty
+                        return valueValid.getStringValue().length() == 0;
+                    } else {
+                        return valueValid.get();
+                    }
+                }
+
+                public void set(boolean value) {
+                    throw new UnsupportedOperationException();
+                }
+
+                public void unSet() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        }
+
         return valid;
     }
 
@@ -128,8 +151,8 @@ public class InstanceData {
         return ret;
     }
 
-    public void addSchemaError(final String msg) {
-        valid.set(false);
+    public void addSchemaError(final String msg, final String stringValue) {
+        valueValid.set(false, stringValue);
         if (schemaErrors == null) {
             schemaErrors = new ArrayList(1);
         }
@@ -137,9 +160,46 @@ public class InstanceData {
     }
 
     public void clearSchemaErrors() {
-        valid.set(true);
-        valid.unSet();
+        valueValid = new ValidModelItemProperty();
         if (schemaErrors != null)
             schemaErrors.clear();
+    }
+
+    public void updateRequired(boolean value, Node node, String modelBindId) {
+        required.set(value, node.getStringValue());
+    }
+
+    public void updateConstraint(boolean value, Node node, String modelBindId) {
+        constraint.set(value, node.getStringValue());
+    }
+
+    public void updateValueValid(boolean value, Node node, String modelBindId) {
+        if (!value) {
+            valueValid.set(value, node.getStringValue());
+
+            if (modelBindId != null)
+                setInvalidBindIds(getInvalidBindIds() == null ? modelBindId : getInvalidBindIds() + " " + modelBindId);
+        }
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+        final InstanceData result = (InstanceData) super.clone();
+
+        try {
+            result.relevant = (RelevantModelItemProperty) this.relevant.clone();
+            result.required = (RequiredModelItemProperty) this.required.clone();
+            result.readonly = (ReadonlyModelItemProperty) this.readonly.clone();
+            result.valueValid = (ValidModelItemProperty) this.valueValid.clone();
+            result.constraint = (ValidModelItemProperty) this.constraint.clone();
+            result.type = (TypeModelItemProperty) this.type.clone();
+        } catch (CloneNotSupportedException e) {
+            // This should not happen because the classes cloned are Cloneable
+            throw new OXFException(e);
+        }
+
+        result.idToNodeMap = (this.idToNodeMap == null) ? null : new HashMap(this.idToNodeMap);
+        result.schemaErrors = (this.schemaErrors == null) ? null : new ArrayList(this.schemaErrors);
+
+        return result;
     }
 }

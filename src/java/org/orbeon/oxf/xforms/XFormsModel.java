@@ -62,6 +62,7 @@ import org.xml.sax.helpers.AttributesImpl;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -335,8 +336,8 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
         }
     }
 
-    private void addSchemaError(final Element elt, final String errMsg) {
-        final InstanceData instDat = XFormsUtils.getLocalInstanceData(elt);
+    private void addSchemaError(final Element element, final String errMsg) {
+        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
         final String em;
         if (errMsg == null) {
             // Looks like if n is an element and errMsg == null then the problem is missing 
@@ -345,14 +346,14 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
         } else {
             em = errMsg;
         }
-        instDat.addSchemaError(em);
+        instanceData.addSchemaError(em, element.getStringValue());
     }
 
-    private void addSchemaError(final Attribute att, final String errMsg) {
+    private void addSchemaError(final Attribute attribute, final String errMsg) {
         // Looks like if n is an element and errMsg == null then the problem is missing character
         // data.
-        final InstanceData instDat = XFormsUtils.getLocalInstanceData(att);
-        instDat.addSchemaError(errMsg);
+        final InstanceData instDat = XFormsUtils.getLocalInstanceData(attribute);
+        instDat.addSchemaError(errMsg, attribute.getStringValue());
         // FIXME: The code below does nothing. Why is it here at all?
 //        final Element elt = att.getParent();
 //        final InstanceData eltInstDat = XFormsUtils.getLocalInstanceData(elt);
@@ -621,7 +622,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
      */
     private Grammar loadGrammar(final PipelineContext pipelineContext, final String schemaURI) {
         try {
-            final java.net.URL url = URLFactory.createURL(schemaURI);
+            final URL url = URLFactory.createURL(schemaURI);
             final Long modTim = NetUtils.getLastModified(url, (Long) null);
 
             final Cache cache = ObjectCache.instance();
@@ -656,7 +657,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
     }
 
     private void handleRelevantReadonlyBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
-        // Handle relevant
+        // Handle relevant MIP
         if (modelBind.getRelevant() != null) {
             iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
                 public void handleNode(Node node) {
@@ -680,7 +681,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             });
         }
 
-        // Handle readonly
+        // Handle readonly MIP
         if (modelBind.getReadonly() != null) {
             // The bind has a readonly attribute
             iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
@@ -721,7 +722,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
 
     private void handleValidationBind(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
 
-        // Handle required
+        // Handle required MIP
         if (modelBind.getRequired() != null) {
             iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
                 public void handleNode(Node node) {
@@ -732,13 +733,10 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                             xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
 
                     try {
-                        boolean required = ((Boolean) expr.evaluateSingle()).booleanValue();
                         // Mark node
-                        InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
-                        instanceData.getRequired().set(required);
-
-                        // If required, check the string value is not empty
-                        markValidity(!required || node.getStringValue().trim().length() > 0, node, modelBind.getId());
+                        final boolean required = ((Boolean) expr.evaluateSingle()).booleanValue();
+                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
+                        instanceData.updateRequired(required, node, modelBind.getId());
                     } catch (XPathException e) {
                         throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
                     } finally {
@@ -749,7 +747,31 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             });
         }
 
-        // Handle Type constraint
+        // Handle XPath constraint MIP
+        if (modelBind.getConstraint() != null) {
+            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
+                public void handleNode(Node node) {
+                    // Evaluate constraint
+                    String xpath = "boolean(" + modelBind.getConstraint() + ")";
+                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                            documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
+
+                    try {
+                        final Boolean valid = (Boolean) expr.evaluateSingle();
+                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
+                        instanceData.updateConstraint(valid.booleanValue(), node, modelBind.getId());
+                    } catch (XPathException e) {
+                        throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
+                    } finally {
+                        if (expr != null)
+                            expr.returnToPool();
+                    }
+                }
+            });
+        }
+
+        // Handle type MIP
         if (modelBind.getType() != null) {
 
             // Need an evaluator to check and convert type below
@@ -767,72 +789,47 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
 
             iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
                 public void handleNode(Node node) {
-                    if (XFormsUtils.getLocalInstanceData(node).getValid().get()) {
 
-                        // Get type information
-                        int requiredType = -1;
-                        boolean foundType = false;
-                        {
-                            String type = modelBind.getType();
-                            int prefixPosition = type.indexOf(':');
-                            if (prefixPosition > 0) {
-                                String prefix = type.substring(0, prefixPosition);
-                                String namespace = (String) modelBind.getNamespaceMap().get(prefix);
-                                if (namespace == null)
-                                    throw new ValidationException("Namespace not declared for prefix '" + prefix + "'",
-                                            modelBind.getLocationData());
-                                ItemType itemType = Type.getBuiltInItemType((String) modelBind.getNamespaceMap().get(prefix),
-                                        type.substring(prefixPosition + 1));
-                                if (itemType != null) {
-                                    requiredType = itemType.getPrimitiveType();
-                                    foundType = true;
-                                }
-                            }
-                        }
-                        if (!foundType)
-                            throw new ValidationException("Invalid type '" + modelBind.getType() + "'",
-                                    modelBind.getLocationData());
-
-                        // Pass-through the type value
-                        InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
-                        instanceData.getType().set(requiredType);
-
-                        // Try to perform casting
-                        String nodeStringValue = node.getStringValue().trim();
-                        if (XFormsUtils.getLocalInstanceData(node).getRequired().get() || nodeStringValue.length() != 0) {
-                            try {
-                                StringValue stringValue = new StringValue(nodeStringValue);
-                                XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration());
-                                // TODO: we don't do anything with the result value here?
-                                stringValue.convert(requiredType, xpContext);
-                                markValidity(true, node, modelBind.getId());
-                            } catch (XPathException e) {
-                                markValidity(false, node, modelBind.getId());
+                    // Get type information
+                    int requiredType = -1;
+                    boolean foundType = false;
+                    {
+                        String type = modelBind.getType();
+                        int prefixPosition = type.indexOf(':');
+                        if (prefixPosition > 0) {
+                            String prefix = type.substring(0, prefixPosition);
+                            String namespace = (String) modelBind.getNamespaceMap().get(prefix);
+                            if (namespace == null)
+                                throw new ValidationException("Namespace not declared for prefix '" + prefix + "'",
+                                        modelBind.getLocationData());
+                            ItemType itemType = Type.getBuiltInItemType((String) modelBind.getNamespaceMap().get(prefix),
+                                    type.substring(prefixPosition + 1));
+                            if (itemType != null) {
+                                requiredType = itemType.getPrimitiveType();
+                                foundType = true;
                             }
                         }
                     }
-                }
-            });
-        }
+                    if (!foundType)
+                        throw new ValidationException("Invalid type '" + modelBind.getType() + "'",
+                                modelBind.getLocationData());
 
-        // Handle XPath constraint
-        if (modelBind.getConstraint() != null) {
-            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
-                public void handleNode(Node node) {
-                    // Evaluate constraint
-                    String xpath = "boolean(" + modelBind.getConstraint() + ")";
-                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                            documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
+                    // Pass-through the type value
+                    InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
+                    instanceData.getType().set(requiredType);
 
-                    try {
-                        Boolean valid = (Boolean) expr.evaluateSingle();
-                        markValidity(valid.booleanValue(), node, modelBind.getId());
-                    } catch (XPathException e) {
-                        throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
-                    } finally {
-                        if (expr != null)
-                            expr.returnToPool();
+                    // Try to perform casting
+                    final String nodeStringValue = node.getStringValue().trim();
+                    if (XFormsUtils.getLocalInstanceData(node).getRequired().get() || nodeStringValue.length() != 0) {
+                        try {
+                            StringValue stringValue = new StringValue(nodeStringValue);
+                            XPathContext xpContext = new XPathContextMajor(stringValue, xpathEvaluator.getStaticContext().getConfiguration());
+                            // TODO: we don't do anything with the result value here?
+                            stringValue.convert(requiredType, xpContext);
+                            instanceData.updateValueValid(true, node, modelBind.getId());
+                        } catch (XPathException e) {
+                            instanceData.updateValueValid(false, node, modelBind.getId());
+                        }
                     }
                 }
             });
@@ -842,6 +839,8 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
     }
 
     private void handleCalculateBind(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
+
+        // Handle calculate MIP
         if (modelBind.getCalculate() != null) {
             iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
                 public void handleNode(Node node) {
@@ -936,19 +935,6 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
 
     private interface NodeHandler {
         void handleNode(Node node);
-    }
-
-    /**
-     * Marks the given node as invalid by setting invalid flag on the node InstanceData.
-     */
-    private void markValidity(boolean valid, Node node, String id) {
-        InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
-        if (instanceData.getValid().get() || !valid) {
-            instanceData.getValid().set(valid);
-        }
-        if (id != null && !valid)
-            instanceData.setInvalidBindIds(instanceData.getInvalidBindIds() == null
-                    ? id : instanceData.getInvalidBindIds() + " " + id);
     }
 
     public String getModelId() {

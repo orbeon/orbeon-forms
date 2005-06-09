@@ -38,7 +38,6 @@
             <xforms:bind nodeset="/form/document/claim:claim">
                 <!-- This bind element handles the empty repeat entry necessary to add new entries with xforms:repeat -->
                 <xforms:bind nodeset="claim:insured-info/claim:family-info/claim:children">
-                    <xforms:bind nodeset="claim:child" relevant="count(following-sibling::claim:child) > 0"/>
                     <xforms:bind nodeset="claim:child[last()]/claim:birth-date" required="false()"/>
                     <xforms:bind nodeset="claim:child[last()]/claim:first-name" required="false()"/>
                 </xforms:bind>

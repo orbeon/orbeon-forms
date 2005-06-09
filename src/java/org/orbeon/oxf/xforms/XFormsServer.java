@@ -24,6 +24,8 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xforms.event.XXFormsInitializeEvent;
 import org.orbeon.oxf.xforms.event.XXFormsInitializeStateEvent;
+import org.orbeon.oxf.xforms.mip.*;
+import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.saxon.style.StandardNames;
@@ -227,25 +229,25 @@ public class XFormsServer extends ProcessorImpl {
                                 InstanceData instanceData = XFormsUtils.getInheritedInstanceData(currentNode);
                                 if (instanceData != null) {
                                     BooleanModelItemProperty readonly = instanceData.getReadonly();
-                                    if (readonly.isSet()) {
+                                    if (readonly.hasChangedFromDefault()) {
                                         attributesImpl.addAttribute("", XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
                                                 XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
                                                 ContentHandlerHelper.CDATA, Boolean.toString(readonly.get()));
                                     }
                                     BooleanModelItemProperty required = instanceData.getRequired();
-                                    if (required.isSet()) {
+                                    if (required.hasChangedFromDefault()) {
                                         attributesImpl.addAttribute("", XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
                                                 XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
                                                 ContentHandlerHelper.CDATA, Boolean.toString(required.get()));
                                     }
                                     BooleanModelItemProperty relevant = instanceData.getRelevant();
-                                    if (relevant.isSet()) {
+                                    if (relevant.hasChangedFromDefault()) {
                                         attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
                                                 XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
                                                 ContentHandlerHelper.CDATA, Boolean.toString(relevant.get()));
                                     }
                                     BooleanModelItemProperty valid = instanceData.getValid();
-                                    if (valid.isSet()) {
+                                    if (valid.hasChangedFromDefault()) {
                                         attributesImpl.addAttribute("", XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
                                                 XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
                                                 ContentHandlerHelper.CDATA, Boolean.toString(valid.get()));

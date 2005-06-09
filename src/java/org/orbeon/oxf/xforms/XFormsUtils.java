@@ -27,6 +27,7 @@ import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -90,7 +91,13 @@ public class XFormsUtils {
         if (localInstanceData == null)
             return null;
 
-        InstanceData resultInstanceData = new InstanceData(localInstanceData);
+        InstanceData resultInstanceData;
+        try {
+            resultInstanceData = (InstanceData) localInstanceData.clone();
+        } catch (CloneNotSupportedException e) {
+            // This should not happen because the classes cloned are Cloneable
+            throw new OXFException(e);
+        }
 
         for (Element currentElement = node.getParent(); currentElement != null; currentElement = currentElement.getParent()) {
             InstanceData currentInstanceData = getLocalInstanceData(currentElement);
@@ -186,7 +193,7 @@ public class XFormsUtils {
 
     private static void reconcileBoolean(final BooleanModelItemProperty prp, final Element elt, final QName qnm, final boolean defaultValue) {
         final String currentBooleanValue;
-        if (prp.isSet()) {
+        if (prp.hasChangedFromDefault()) {
             final boolean b = prp.get();
             currentBooleanValue = Boolean.toString(b);
         } else {

@@ -23,6 +23,7 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.mip.*;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
@@ -163,7 +164,7 @@ public class XFormsModelSubmission implements XFormsEventTarget {
                     }
 
                     private void checkInstanceData(InstanceData instanceData) {
-                        final BooleanModelItemProperty validMIP = instanceData.getValid();
+                        final org.orbeon.oxf.xforms.mip.BooleanModelItemProperty validMIP = instanceData.getValid();
                         if (validMIP != null)
                             instanceValid[0] &= validMIP.get();
                     }

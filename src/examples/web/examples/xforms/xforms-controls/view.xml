@@ -31,11 +31,10 @@
                     <date/>
                     <flavor>v c</flavor>
                     <carrier>fedex</carrier>
-                    <new-flavor>
-                        <flavor value="lime">
-                            <label>Key Lime</label>
-                        </flavor>
-                    </new-flavor>
+                    <new-item>
+                        <label>Key lime</label>
+                        <value>lime</value>
+                    </new-item>
                     <range>
                         <value>0</value>
                         <letter>a</letter>
@@ -209,12 +208,12 @@
                     <xforms:group>
                         <xforms:label>Add</xforms:label>
                         <xhtml:p>
-                            <xforms:input ref="new-flavor/flavor/label">
+                            <xforms:input ref="new-item/label">
                                 <xforms:label class="fixed-width">Label:</xforms:label>
                             </xforms:input>
                         </xhtml:p>
                         <xhtml:p>
-                            <xforms:input ref="new-flavor/flavor/@value">
+                            <xforms:input ref="new-item/value">
                                 <xforms:label class="fixed-width">Value:</xforms:label>
                             </xforms:input>
                         </xhtml:p>
@@ -222,13 +221,25 @@
                             <xhtml:span class="fixed-width"/>
                             <xforms:trigger>
                                 <xforms:label>Add carrier</xforms:label>
-                                <xforms:insert nodeset="/instance/*" 
-                                    at="1" position="after" ev:event="DOMActivate"/>
+                                <xforms:action  ev:event="DOMActivate">
+                                    <xforms:insert nodeset="instance('items')/carriers/carrier" 
+                                        at="1" position="after"/>
+                                    <xforms:setvalue ref="instance('items')/carriers/carrier[last()]/@value"
+                                        value="instance('instance')/new-item/value"/>
+                                    <xforms:setvalue ref="instance('items')/carriers/carrier[last()]/label"
+                                        value="instance('instance')/new-item/label"/>
+                                </xforms:action>
                             </xforms:trigger>
                             <xforms:trigger>
                                 <xforms:label>Add flavor</xforms:label>
-                                <xforms:insert nodeset="instance('items')/carriers/carrier" 
-                                    at="last()" position="after" ev:event="DOMActivate"/>
+                                <xforms:action  ev:event="DOMActivate">
+                                    <xforms:insert nodeset="instance('items')/flavors/flavor" 
+                                        at="1" position="after"/>
+                                    <xforms:setvalue ref="instance('items')/flavors/flavor[last()]/@value"
+                                        value="instance('instance')/new-item/value"/>
+                                    <xforms:setvalue ref="instance('items')/flavors/flavor[last()]/label"
+                                        value="instance('instance')/new-item/label"/>
+                                </xforms:action>
                             </xforms:trigger>
                         </xhtml:p>
                     </xforms:group>

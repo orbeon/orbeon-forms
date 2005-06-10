@@ -47,6 +47,10 @@ public class XFormsEvents {
     public static final String XFORMS_INVALID = "xforms-invalid";
     public static final String XFORMS_REQUIRED = "xforms-required";
     public static final String XFORMS_OPTIONAL = "xforms-optional";
+    public static final String XFORMS_READWRITE = "xforms-readwrite";
+    public static final String XFORMS_READONLY = "xforms-readonly";
+    public static final String XFORMS_ENABLED = "xforms-enabled";
+    public static final String XFORMS_DISABLED = "xforms-disabled";
 
     public static final String XFORMS_DESELECT = "xforms-deselect";
     public static final String XFORMS_SELECT = "xforms-select";

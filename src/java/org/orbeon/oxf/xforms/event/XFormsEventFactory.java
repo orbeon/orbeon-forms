@@ -86,7 +86,7 @@ public class XFormsEventFactory {
         } else if (eventName.equals(XFormsEvents.XFORMS_REBUILD)) {
             return new XFormsRebuildEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_RECALCULATE)) {
-            return new XFormsRecalculateEvent(targetObject);
+            return new XFormsRecalculateEvent(targetObject, Boolean.getBoolean(contextString));
         } else if (eventName.equals(XFormsEvents.XFORMS_REVALIDATE)) {
             return new XFormsRevalidateEvent(targetObject, Boolean.getBoolean(contextString));
         } else if (eventName.equals(XFormsEvents.XFORMS_VALUE_CHANGED)) {
@@ -97,10 +97,18 @@ public class XFormsEventFactory {
             return new XFormsValidEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_INVALID)) {
             return new XFormsInvalidEvent(targetObject);
-            } else if (eventName.equals(XFormsEvents.XFORMS_REQUIRED)) {
+        } else if (eventName.equals(XFormsEvents.XFORMS_REQUIRED)) {
             return new XFormsRequiredEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_OPTIONAL)) {
             return new XFormsOptionalEvent(targetObject);
+        } else if (eventName.equals(XFormsEvents.XFORMS_READWRITE)) {
+            return new XFormsReadwriteEvent(targetObject);
+        } else if (eventName.equals(XFormsEvents.XFORMS_READONLY)) {
+            return new XFormsReadonlyEvent(targetObject);
+        } else if (eventName.equals(XFormsEvents.XFORMS_ENABLED)) {
+            return new XFormsEnabledEvent(targetObject);
+        } else if (eventName.equals(XFormsEvents.XFORMS_DISABLED)) {
+            return new XFormsDisabledEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_LINK_EXCEPTION)) {
             return new XFormsLinkExceptionEvent(targetObject, contextString, contextElement, contextThrowable);
         } else if (eventName.equals(XFormsEvents.XFORMS_LINK_ERROR)) {

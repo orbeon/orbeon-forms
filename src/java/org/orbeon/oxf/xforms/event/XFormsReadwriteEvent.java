@@ -13,22 +13,13 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-
 /**
- * 4.3.6 The xforms-recalculate Event
+ * .4.11 The xforms-readwrite Event
  *
- * Target: model / Bubbles: Yes / Cancelable: Yes / Context Info: None
+ * Target: form control / Bubbles: Yes / Cancelable: No / Context Info: None
  */
-public class XFormsRecalculateEvent extends XFormsEvent {
-
-    private boolean sendEvents;
-
-    public XFormsRecalculateEvent(Object targetObject, boolean sendEvents) {
-        super(XFormsEvents.XFORMS_RECALCULATE, targetObject, true, true);
-        this.sendEvents = sendEvents;
-    }
-
-    public boolean isSendEvents() {
-        return sendEvents;
+public class XFormsReadwriteEvent extends XFormsEvent {
+    public XFormsReadwriteEvent(Object targetObject) {
+        super(XFormsEvents.XFORMS_READWRITE, targetObject, true, false);
     }
 }

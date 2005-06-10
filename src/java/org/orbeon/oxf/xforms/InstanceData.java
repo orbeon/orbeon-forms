@@ -39,6 +39,8 @@ public class InstanceData implements Cloneable {
 
     private boolean previousRequiredState;
     private boolean previousValidState;
+    private boolean previousRelevantState;
+    private boolean previousReadonlyState;
 
     private int id = -1;
     private String invalidBindIds = null;
@@ -161,14 +163,25 @@ public class InstanceData implements Cloneable {
         schemaErrors.add(msg);
     }
 
-    public void clearValidationErrors() {
+    public void clearComputedExpressionBinds() {
+
+        // Save required state
+        previousRequiredState = getRequired().get();
+        previousRelevantState = getRelevant().get();
+        previousReadonlyState = getReadonly().get();
+
+        // clear required MIPs
+        required = new RequiredModelItemProperty();
+        relevant = new RelevantModelItemProperty();
+        readonly = new ReadonlyModelItemProperty();
+    }
+
+    public void clearValidationBinds() {
 
         // Save valid state
-        previousRequiredState = getRequired().get();
         previousValidState = getValid().get();
 
-        // Clear everything related to validity
-        required = new RequiredModelItemProperty();
+        // Clear everything related to validity (except required)
         valueValid = new ValidModelItemProperty();
         constraint = new ValidModelItemProperty();
         type = new TypeModelItemProperty();
@@ -182,6 +195,14 @@ public class InstanceData implements Cloneable {
 
     public boolean getPreviousValidState() {
         return previousValidState;
+    }
+
+    public boolean getPreviousRelevantState() {
+        return previousRelevantState;
+    }
+
+    public boolean getPreviousReadonlyState() {
+        return previousReadonlyState;
     }
 
     public void updateRequired(boolean value, Node node, String modelBindId) {

@@ -236,10 +236,10 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
     /**
      * Apply relevant and readonly binds only.
      */
-    public void applyRelevantReadonlyBinds(final PipelineContext pipelineContext) {
+    public void applyComputedExpressionBinds(final PipelineContext pipelineContext) {
         applyBinds(new BindRunner() {
             public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
-                handleRelevantReadonlyBinds(pipelineContext, modelBind, documentWrapper, this);
+                handleComputedExpressionBinds(pipelineContext, modelBind, documentWrapper, this);
             }
         });
     }
@@ -268,7 +268,33 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
         }
     }
 
-    private void handleRelevantReadonlyBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
+    private void handleComputedExpressionBinds(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
+
+        // Handle required MIP
+        if (modelBind.getRequired() != null) {
+            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
+                public void handleNode(Node node) {
+                    // Evaluate "required" XPath expression on this node
+                    String xpath = "boolean(" + modelBind.getRequired() + ")";
+                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                            documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
+
+                    try {
+                        // Mark node
+                        final boolean required = ((Boolean) expr.evaluateSingle()).booleanValue();
+                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
+                        instanceData.updateRequired(required, node, modelBind.getId());
+                    } catch (XPathException e) {
+                        throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
+                    } finally {
+                        if (expr != null)
+                            expr.returnToPool();
+                    }
+                }
+            });
+        }
+
         // Handle relevant MIP
         if (modelBind.getRelevant() != null) {
             iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
@@ -334,31 +360,6 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
 
     private void handleValidationBind(final PipelineContext pipelineContext, final ModelBind modelBind, final DocumentWrapper documentWrapper, BindRunner bindRunner) {
 
-        // Handle required MIP
-        if (modelBind.getRequired() != null) {
-            iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
-                public void handleNode(Node node) {
-                    // Evaluate "required" XPath expression on this node
-                    String xpath = "boolean(" + modelBind.getRequired() + ")";
-                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                            documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
-                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
-
-                    try {
-                        // Mark node
-                        final boolean required = ((Boolean) expr.evaluateSingle()).booleanValue();
-                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData((Node) node);
-                        instanceData.updateRequired(required, node, modelBind.getId());
-                    } catch (XPathException e) {
-                        throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
-                    } finally {
-                        if (expr != null)
-                            expr.returnToPool();
-                    }
-                }
-            });
-        }
-
         // Handle XPath constraint MIP
         if (modelBind.getConstraint() != null) {
             iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
@@ -382,7 +383,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                 }
             });
         }
-
+        
         // Handle type MIP
         if (modelBind.getType() != null) {
 
@@ -637,7 +638,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // Internal event to restore state
 
             loadSchemasIfNeeded(pipelineContext);
-            applyRelevantReadonlyBinds(pipelineContext);
+            applyComputedExpressionBinds(pipelineContext);
             dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
 
         } else if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
@@ -688,7 +689,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
 
             // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
             dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
-            dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this));
+            dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this, false));
             dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
 
         } else if (XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE.equals(eventName)) {
@@ -715,6 +716,18 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // 4.3.6 The xforms-recalculate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
+            final XFormsRecalculateEvent xformsRecalculateEvent = (XFormsRecalculateEvent) xformsEvent;
+
+            // Clear all existing computed expression binds
+            for (Iterator i = instances.iterator(); i.hasNext();) {
+                XFormsUtils.updateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
+                    public void walk(Node node, InstanceData instanceData) {
+                        if (instanceData != null)
+                            instanceData.clearComputedExpressionBinds();
+                    }
+                });
+            }
+
             applyBinds(new BindRunner() {
                 public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
                     handleCalculateBind(pipelineContext, modelBind, documentWrapper, this);
@@ -723,20 +736,61 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
 
             // Here we assume that we update those after recaculate, because recalculate is always
             // called after values are changed in the instance - may have to be changed...
-            applyRelevantReadonlyBinds(pipelineContext);
+            applyComputedExpressionBinds(pipelineContext);
+
+            // Send events if needed
+            if (xformsRecalculateEvent.isSendEvents() && xformsContainingDocument.getXFormsControls() != null) {
+                final XFormsControls xformsControls = xformsContainingDocument.getXFormsControls();
+                for (Iterator i = instances.iterator(); i.hasNext();) {
+                    XFormsUtils.updateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
+                        public void walk(Node node, InstanceData instanceData) {
+                            // Dispatch xforms-optional/xforms-required
+                            {
+                                final boolean previousRequiredState = instanceData.getPreviousRequiredState();
+                                final boolean newRequiredState = instanceData.getRequired().get();
+                                if (previousRequiredState && !newRequiredState) {
+                                    xformsControls.dispatchEvent(pipelineContext, new XFormsOptionalEvent(node));
+                                } else if (!previousRequiredState && newRequiredState) {
+                                    xformsControls.dispatchEvent(pipelineContext, new XFormsRequiredEvent(node));
+                                }
+                            }
+                            // Dispatch xforms-enabled/xforms-disabled
+                            {
+                                final boolean previousRelevantState = instanceData.getPreviousRelevantState();
+                                final boolean newRelevantState = instanceData.getRelevant().get();
+                                if (previousRelevantState && !newRelevantState) {
+                                    xformsControls.dispatchEvent(pipelineContext, new XFormsDisabledEvent(node));
+                                } else if (!previousRelevantState && newRelevantState) {
+                                    xformsControls.dispatchEvent(pipelineContext, new XFormsEnabledEvent(node));
+                                }
+                            }
+                            // Dispatch xforms-readonly/xforms-readwrite
+                            {
+                                final boolean previousReadonlyState = instanceData.getPreviousReadonlyState();
+                                final boolean newReadonlyState = instanceData.getReadonly().get();
+                                if (previousReadonlyState && !newReadonlyState) {
+                                    xformsControls.dispatchEvent(pipelineContext, new XFormsReadwriteEvent(node));
+                                } else if (!previousReadonlyState && newReadonlyState) {
+                                    xformsControls.dispatchEvent(pipelineContext, new XFormsReadonlyEvent(node));
+                                }
+                            }
+                        }
+                    });
+                }
+            }
 
         } else if (XFormsEvents.XFORMS_REVALIDATE.equals(eventName)) {
             // 4.3.5 The xforms-revalidate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
-            XFormsRevalidateEvent xformsRevalidateEvent = (XFormsRevalidateEvent) xformsEvent;
+            final XFormsRevalidateEvent xformsRevalidateEvent = (XFormsRevalidateEvent) xformsEvent;
 
-            // Clear all existing errors on instance
+            // Clear all existing validation binds
             for (Iterator i = instances.iterator(); i.hasNext();) {
                 XFormsUtils.updateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
                     public void walk(Node node, InstanceData instanceData) {
                         if (instanceData != null)
-                            instanceData.clearValidationErrors();
+                            instanceData.clearValidationBinds();
                     }
                 });
             }
@@ -765,16 +819,6 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                                     xformsControls.dispatchEvent(pipelineContext, new XFormsValidEvent(node));
                                 }
                             }
-                            // Dispatch xforms-optional/xforms-required
-                            {
-                                final boolean previousRequiredState = instanceData.getPreviousRequiredState();
-                                final boolean newRequiredState = instanceData.getRequired().get();
-                                if (previousRequiredState && !newRequiredState) {
-                                    xformsControls.dispatchEvent(pipelineContext, new XFormsOptionalEvent(node));
-                                } else if (!previousRequiredState && newRequiredState) {
-                                    xformsControls.dispatchEvent(pipelineContext, new XFormsRequiredEvent(node));
-                                }
-                            }
                         }
                     });
                 }
@@ -800,7 +844,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // "Then, the events xforms-rebuild, xforms-recalculate, xforms-revalidate and
             // xforms-refresh are dispatched to the model element in sequence."
             dispatchEvent(pipelineContext, new XFormsRebuildEvent(XFormsModel.this));
-            dispatchEvent(pipelineContext, new XFormsRecalculateEvent(XFormsModel.this));
+            dispatchEvent(pipelineContext, new XFormsRecalculateEvent(XFormsModel.this, true));
             dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this, true));
             dispatchEvent(pipelineContext, new XFormsRefreshEvent(XFormsModel.this));
 

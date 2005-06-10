@@ -988,13 +988,20 @@ public class XFormsControls implements XFormsEventTarget {
             Node currentNode = getCurrentSingleNode();
             XFormsInstance.setValueForNode(currentNode, valueToSet);
 
-            // "XForms Actions that change only the value of an instance node results in setting
-            // the flags for recalculate, revalidate, and refresh to true and making no change to
-            // the flag for rebuild".
             if (actionContext != null) {
+                // "XForms Actions that change only the value of an instance node results in setting
+                // the flags for recalculate, revalidate, and refresh to true and making no change to
+                // the flag for rebuild".
                 actionContext.recalculate = true;
                 actionContext.revalidate = true;
                 actionContext.refresh = true;
+            } else {
+                // Send events directly
+                setBinding(pipelineContext, eventHandlerElement);
+                final XFormsModel model = getCurrentModel();
+                model.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
+                model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
+                model.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
             }
 
         } else if (XFormsActions.XFORMS_RESET_ACTION.equals(actionEventName)) {
@@ -1193,18 +1200,36 @@ public class XFormsControls implements XFormsEventTarget {
             // "4. If the insert is successful, the event xforms-insert is dispatched."
             currentInstance.dispatchEvent(pipelineContext, new XFormsInsertEvent(currentInstance, atAttribute));
 
-            // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-            if (actionContext != null)
+            if (actionContext != null) {
+                // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
                 actionContext.setAll(true);
+            } else {
+                // Send events directly
+                setBinding(pipelineContext, eventHandlerElement);
+                final XFormsModel model = getCurrentModel();
+                model.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
+                model.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
+                model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
+                model.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
+            }
 
         } else if (XFormsActions.XFORMS_DELETE_ACTION.equals(actionEventName)) {
             // 9.3.6 The delete Element
 
             // TODO
 
-            // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
-            if (actionContext != null)
+            if (actionContext != null) {
+                // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
                 actionContext.setAll(true);
+            } else {
+                // Send events directly
+                setBinding(pipelineContext, eventHandlerElement);
+                final XFormsModel model = getCurrentModel();
+                model.dispatchEvent(pipelineContext, new XFormsRebuildEvent(model));
+                model.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
+                model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
+                model.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
+            }
 
         } else if (XFormsActions.XFORMS_SETINDEX_ACTION.equals(actionEventName)) {
             // 9.3.7 The setindex Element

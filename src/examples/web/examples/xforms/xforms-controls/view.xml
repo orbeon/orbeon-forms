@@ -31,6 +31,11 @@
                     <date/>
                     <flavor>v c</flavor>
                     <carrier>fedex</carrier>
+                    <new-flavor>
+                        <flavor value="lime">
+                            <label>Key Lime</label>
+                        </flavor>
+                    </new-flavor>
                     <range>
                         <value>0</value>
                         <letter>a</letter>
@@ -103,7 +108,7 @@
                 calculate="instance('instance')/country"/>
             <xforms:bind nodeset="instance('formatted')" 
                 calculate="saxon:serialize(xxforms:call-xpl
-                    ('oxf:/oxf-theme/format.xpl', 'data', instance('country-details'), 'data')/*, 'html')"/>
+                    ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
             <xforms:bind nodeset="instance('ui')/show-instance" relevant=". = 'true'"/>
             
             <xforms:submission ref="instance('countries')" id="countries-submission" 
@@ -115,7 +120,7 @@
     <xhtml:body>
         <xforms:group ref="instance('instance')">
             <widget:tabs>
-                <widget:tab id="text-controls" selected="true">
+                <widget:tab id="text-controls">
                     <widget:label>Text controls</widget:label>
                     <xhtml:p>
                         <xforms:input ref="age" incremental="true">
@@ -148,53 +153,85 @@
                         </xforms:input>
                     </xhtml:p>
                 </widget:tab>
-                <widget:tab id="selection-controls">
+                <widget:tab id="selection-controls" selected="true">
                     <widget:label>Selection controls</widget:label>
-                    <xhtml:p>
-                        <xforms:select ref="flavor" appearance="full">
-                            <xforms:label class="fixed-width">Flavors:</xforms:label>
-                            <xforms:itemset nodeset="instance('items')/flavors/flavor">
-                                <xforms:label ref="label"/>
-                                <xforms:value ref="@value"/>
-                            </xforms:itemset>
-                        </xforms:select>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xforms:select ref="flavor" appearance="compact">
-                            <xforms:label xhtml:class="fixed-width"/>
-                            <xforms:itemset nodeset="instance('items')/flavors/flavor">
-                                <xforms:label ref="label"/>
-                                <xforms:value ref="@value"/>
-                            </xforms:itemset>
-                        </xforms:select>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xforms:select1 ref="carrier" appearance="full">
-                            <xforms:label xhtml:class="fixed-width">Carrier:</xforms:label>
-                            <xforms:itemset nodeset="instance('items')/carriers/carrier">
-                                <xforms:label ref="label"/>
-                                <xforms:value ref="@value"/>
-                            </xforms:itemset>
-                        </xforms:select1>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xforms:select1 ref="carrier" appearance="compact">
-                            <xforms:label xhtml:class="fixed-width"/>
-                            <xforms:itemset nodeset="instance('items')/carriers/carrier">
-                                <xforms:label ref="label"/>
-                                <xforms:value ref="@value"/>
-                            </xforms:itemset>
-                        </xforms:select1>
-                    </xhtml:p>
-                    <xhtml:p>
-                        <xforms:select1 ref="carrier" appearance="minimal">
-                            <xforms:label xhtml:class="fixed-width"/>
-                            <xforms:itemset nodeset="instance('items')/carriers/carrier">
-                                <xforms:label ref="label"/>
-                                <xforms:value ref="@value"/>
-                            </xforms:itemset>
-                        </xforms:select1>
-                    </xhtml:p>
+                    <xforms:group>
+                        <xforms:label>Single Value Selection</xforms:label>
+                        <xhtml:p>
+                            <xforms:select1 ref="carrier" appearance="full">
+                                <xforms:label class="fixed-width">Carrier:</xforms:label>
+                                <xforms:itemset nodeset="instance('items')/carriers/carrier">
+                                    <xforms:label ref="label"/>
+                                    <xforms:value ref="@value"/>
+                                </xforms:itemset>
+                            </xforms:select1>
+                        </xhtml:p>
+                        <xhtml:p>
+                            <xforms:select1 ref="carrier" appearance="compact">
+                                <xforms:label class="fixed-width"/>
+                                <xforms:itemset nodeset="instance('items')/carriers/carrier">
+                                    <xforms:label ref="label"/>
+                                    <xforms:value ref="@value"/>
+                                </xforms:itemset>
+                            </xforms:select1>
+                        </xhtml:p>
+                        <xhtml:p>
+                            <xforms:select1 ref="carrier" appearance="minimal">
+                                <xforms:label class="fixed-width"/>
+                                <xforms:itemset nodeset="instance('items')/carriers/carrier">
+                                    <xforms:label ref="label"/>
+                                    <xforms:value ref="@value"/>
+                                </xforms:itemset>
+                            </xforms:select1>
+                        </xhtml:p>
+                    </xforms:group>
+                    <xforms:group>
+                        <xforms:label>Multiple Value Selection</xforms:label>
+                        <xhtml:p>
+                            <xforms:select ref="flavor" appearance="full">
+                                <xforms:label class="fixed-width">Flavor:</xforms:label>
+                                <xforms:itemset nodeset="instance('items')/flavors/flavor">
+                                    <xforms:label ref="label"/>
+                                    <xforms:value ref="@value"/>
+                                </xforms:itemset>
+                            </xforms:select>
+                        </xhtml:p>
+                        <xhtml:p>
+                            <xforms:select ref="flavor" appearance="compact">
+                                <xforms:label class="fixed-width"/>
+                                <xforms:itemset nodeset="instance('items')/flavors/flavor">
+                                    <xforms:label ref="label"/>
+                                    <xforms:value ref="@value"/>
+                                </xforms:itemset>
+                            </xforms:select>
+                        </xhtml:p>
+                    </xforms:group>
+                    <xforms:group>
+                        <xforms:label>Add</xforms:label>
+                        <xhtml:p>
+                            <xforms:input ref="new-flavor/flavor/label">
+                                <xforms:label class="fixed-width">Label:</xforms:label>
+                            </xforms:input>
+                        </xhtml:p>
+                        <xhtml:p>
+                            <xforms:input ref="new-flavor/flavor/@value">
+                                <xforms:label class="fixed-width">Value:</xforms:label>
+                            </xforms:input>
+                        </xhtml:p>
+                        <xhtml:p>
+                            <xhtml:span class="fixed-width"/>
+                            <xforms:trigger>
+                                <xforms:label>Add carrier</xforms:label>
+                                <xforms:insert nodeset="/instance/*" 
+                                    at="1" position="after" ev:event="DOMActivate"/>
+                            </xforms:trigger>
+                            <xforms:trigger>
+                                <xforms:label>Add flavor</xforms:label>
+                                <xforms:insert nodeset="instance('items')/carriers/carrier" 
+                                    at="last()" position="after" ev:event="DOMActivate"/>
+                            </xforms:trigger>
+                        </xhtml:p>
+                    </xforms:group>
                 </widget:tab>
                 <widget:tab id="slider">
                     <widget:label>Range</widget:label>

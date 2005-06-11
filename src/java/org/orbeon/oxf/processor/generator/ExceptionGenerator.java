@@ -56,7 +56,7 @@ public class ExceptionGenerator extends ProcessorImpl {
         return output;
     }
 
-    protected void addThrowable(ContentHandlerHelper helper, Throwable throwable, LocationData locationData) throws Exception {
+    public static void addThrowable(ContentHandlerHelper helper, Throwable throwable, LocationData locationData) {
         String exceptionElementName = "exception";
         helper.startElement(exceptionElementName);
 

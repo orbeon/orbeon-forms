@@ -50,7 +50,11 @@ public class TransformerURIResolver implements URIResolver {
             XMLReader xmlReader;
             {
                 String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
-                if (inputName != null) {
+                if (ProcessorImpl.INPUT_DATA.equals(inputName)) {
+                    // Don't allow the "data" input to be read this way. We do this to prevent that input to read twice.
+                    throw new OXFException("Can't read '" + ProcessorImpl.INPUT_DATA
+                            + "' input. Use a '/' expression in XPath instead.");
+                } else  if (inputName != null) {
                     // Resolve to input of current processor
                     xmlReader = new ProcessorOutputXMLReader
                             (pipelineContext, processor.getInputByName(inputName).getOutput());

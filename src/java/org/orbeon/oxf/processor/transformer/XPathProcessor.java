@@ -110,6 +110,8 @@ public class XPathProcessor extends ProcessorImpl {
                         } else if ( result instanceof Double ) {
                             final double d = ( ( Double )result ).doubleValue();
                             strVal = XMLUtils.removeScientificNotation( d );
+                        } else if ( result instanceof Boolean ) {
+                            strVal = ((Boolean) result).toString();
                         } else {
                             String message = "Unsupported type returned by XPath expression: "
                                     + (result == null ? "null" : result.getClass().getName());

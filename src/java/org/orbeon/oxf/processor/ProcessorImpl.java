@@ -533,6 +533,14 @@ public abstract class ProcessorImpl implements Processor {
         return result[0];
     }
 
+    /**
+     * This method is used to retrieve the state information set with setState().
+     *
+     * This method may be called from start() and ProcessorOutput.readImpl().
+     *
+     * @param context current PipelineContext object
+     * @return        state object set by the caller of setState()
+     */
     protected Object getState(PipelineContext context) {
         Object state = context.getAttribute(getProcessorKey(context));
         if (state == null) {
@@ -541,6 +549,16 @@ public abstract class ProcessorImpl implements Processor {
         return state;
     }
 
+    /**
+     * This method is used by processor implementations to store state information tied to the
+     * current execution of the current processor, across processor initialization as well as reads
+     * of all the processor's outputs.
+     *
+     * This method should be called from the reset() method.
+     *
+     * @param context current PipelineContext object
+     * @param state   user-defined object containing state information
+     */
     protected void setState(PipelineContext context, Object state) {
         context.setAttribute(getProcessorKey(context), state);
     }

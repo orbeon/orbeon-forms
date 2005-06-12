@@ -18,13 +18,22 @@ import org.orbeon.oxf.cache.Cacheable;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorInput;
+import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-public class TeeProcessor extends org.orbeon.oxf.processor.ProcessorImpl {
+/**
+ * This internal processor handles the tee-ing functionality of XPL, i.e. sending an XML infoset to
+ * multiple readers.
+ */
+public class TeeProcessor extends ProcessorImpl {
 
     static private Logger logger = LoggerFactory.createLogger(TeeProcessor.class);
     private Exception creationException;
@@ -33,17 +42,17 @@ public class TeeProcessor extends org.orbeon.oxf.processor.ProcessorImpl {
 
     public TeeProcessor(LocationData locationData) {
         creationException = new ValidationException("", locationData);
-        addInputInfo(new org.orbeon.oxf.processor.ProcessorInputOutputInfo(INPUT_DATA));
-        addOutputInfo(new org.orbeon.oxf.processor.ProcessorInputOutputInfo(OUTPUT_DATA));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
+        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
-    public org.orbeon.oxf.processor.ProcessorOutput createOutput(String name) {
-        org.orbeon.oxf.processor.ProcessorOutput output = new org.orbeon.oxf.processor.ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-            public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, ContentHandler contentHandler) {
+    public ProcessorOutput createOutput(String name) {
+        ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
+            public void readImpl(PipelineContext context, ContentHandler contentHandler) {
                 try {
                     State state = (State) getState(context);
                     if (state.store == null) {
-                        org.orbeon.oxf.processor.ProcessorInput input = getInputByName(INPUT_DATA);
+                        ProcessorInput input = getInputByName(INPUT_DATA);
                         state.store = new SAXStore(contentHandler);
                         readInputAsSAX(context, input, state.store);
                     } else {
@@ -54,7 +63,7 @@ public class TeeProcessor extends org.orbeon.oxf.processor.ProcessorImpl {
                 }
             }
 
-            public OutputCacheKey getKeyImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {
+            public OutputCacheKey getKeyImpl(PipelineContext context) {
                 State state = null;
                 try {
                     state = (State) getState(context);
@@ -66,16 +75,16 @@ public class TeeProcessor extends org.orbeon.oxf.processor.ProcessorImpl {
                     throw e;
                 }
                 if (state.outputCacheKey == null) {
-                    org.orbeon.oxf.processor.ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
+                    ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
                     state.outputCacheKey = (output instanceof Cacheable) ? ((Cacheable) output).getKey(context) : null;
                 }
                 return state.outputCacheKey;
             }
 
-            public Object getValidityImpl(org.orbeon.oxf.pipeline.api.PipelineContext context) {
+            public Object getValidityImpl(PipelineContext context) {
                 State state = (State) getState(context);
                 if (state.validity == null) {
-                    org.orbeon.oxf.processor.ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
+                    ProcessorOutput output = getInputByName(INPUT_DATA).getOutput();
                     state.validity = (output instanceof Cacheable) ? ((Cacheable) output).getValidity(context) : null;
                 }
                 return state.validity;
@@ -85,7 +94,7 @@ public class TeeProcessor extends org.orbeon.oxf.processor.ProcessorImpl {
         return output;
     }
 
-    public void reset(org.orbeon.oxf.pipeline.api.PipelineContext context) {
+    public void reset(PipelineContext context) {
         resetException = new Exception(Integer.toString(hashCode()));
         resetProcessorKey = getProcessorKey(context);
         setState(context, new State());

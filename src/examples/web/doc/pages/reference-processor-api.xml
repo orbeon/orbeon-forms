@@ -359,6 +359,62 @@ public Object getAttribute(Object key);
 ]]></source>
             </section>
             <section>
+                <title>XPL Program Cleanup</title>
+                <p>
+                    You can register a listener on the <code>PipelineContext</code> object to
+                    perform clean-up upon the termination of the XML program, using the following
+                    API:
+                </p>
+                <source><![CDATA[
+/**
+ * Add a new listener to the context.
+ *
+ * @param listener
+ */
+public synchronized void addContextListener(ContextListener listener);
+]]></source>
+            <source><![CDATA[
+/**
+ * ContextListener interface to listen on PipelineContext events.
+ */
+public interface ContextListener {
+    /**
+     * Called when the context is destroyed.
+     *
+     * @param success true if the pipeline execution was successful, false otherwise
+     */
+    public void contextDestroyed(boolean success);
+}
+]]></source>
+            <source><![CDATA[
+/**
+ * ContextListener adapter class to faciliate implementations of the ContextListener
+ * interface.
+ */
+public static class ContextListenerAdapter implements ContextListener {
+    public void contextDestroyed(boolean success) {
+    }
+}
+]]></source>
+                <p>
+                    You can register a listener as follows:
+                </p>
+                            <source><![CDATA[
+pipelineContext.addContextListener(new ContextListenerAdapter() {
+    public void contextDestroyed(boolean success) {
+        // Implement your clean-up code here
+    }
+);
+]]></source>
+                <p>
+                    Examples of clean-up operations include:
+                </p>
+                <ul>
+                    <li>Performing commits or rollbacks on external resources</li>
+                    <li>Freeing-up external resources allocated for the execution of the XPL program only</li>
+                </ul>
+            </section>
+            <section>
                 <title>Processor Instance State</title>
                 <p>
                     Processors with multiple outputs often have to perform some task when the first

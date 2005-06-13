@@ -86,6 +86,20 @@ function xformsGetElementPosition(element) {
     return {left:offsetLeft, top:offsetTop};
 }
 
+
+/**
+ * Retuns a string with contains all the concatenation of the child text node under the element.
+ */
+function xformsStringValue(element) {
+    var result = "";
+    for (var i = 0; i < element.childNodes.length; i++) {
+        var child = element.childNodes[i];
+        if (child.nodeType == TEXT_TYPE)
+            result += child.nodeValue;
+    }
+    return result;
+}
+
 /**
  * Replace in a tree a placeholder by some other string in text nodes and attribute values
  */
@@ -607,8 +621,7 @@ function xformsHandleResponse() {
                             for (var j = 0; j < controlValuesElement.childNodes.length; j++) {
                                 if (xformsGetLocalName(controlValuesElement.childNodes[j]) == "control") {
                                     var controlElement = controlValuesElement.childNodes[j];
-                                    var controlValue = controlElement.firstChild ?
-                                        controlElement.firstChild.data : "";
+                                    var controlValue = xformsStringValue(controlElement);
                                     var controlId = controlElement.getAttribute("id");
                                     var documentElement = document.getElementById(controlId);
                                     var documentElementClasses = documentElement.className.split(" ");

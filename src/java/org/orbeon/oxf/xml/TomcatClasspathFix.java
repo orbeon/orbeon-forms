@@ -53,6 +53,9 @@ public class TomcatClasspathFix {
             }
         }
     }
+    
+    
+    
     /*
      * Work around broken Tomcat loader if need be
      * According to servlet spec and j2ee spec the container should honor
@@ -72,9 +75,14 @@ public class TomcatClasspathFix {
     static {
         try {
             final ClassLoader ldr = InitUtils.class.getClassLoader();
-            final Class ldrCls = ldr.getClass();
-            final String ldrClsName = ldrCls.getName();
-            if ( "org.apache.catalina.loader.WebappClassLoader".equals( ldrClsName ) ) {
+            boolean isTCLdr = false;
+            for ( Class ldrCls = ldr.getClass(); 
+                  ldrCls != null && !isTCLdr; 
+                  ldrCls = ldrCls.getSuperclass() ) {
+                final String ldrClsName = ldrCls.getName();
+                isTCLdr = "org.apache.catalina.loader.WebappClassLoader".equals( ldrClsName );
+            }
+            if ( isTCLdr ) {
                 final java.net.URL url = InitUtils.class.getResource
                         ( "/org/orbeon/oxf/pipeline/InitUtils.class" );
                 final String proto = url.getProtocol();

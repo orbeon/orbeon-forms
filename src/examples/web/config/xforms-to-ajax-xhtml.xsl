@@ -57,6 +57,8 @@
             | xforms:secret | xforms:textarea | xforms:select | xforms:select1 
             | xforms:range" priority="2">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
+
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xsl:apply-templates select="xforms:label"/>
         <xsl:next-match/>
@@ -64,9 +66,19 @@
         <xsl:if test="local-name() != 'output'">
             <xhtml:label for="{$id}">
                 <xsl:variable name="alert-id" as="xs:string" select="concat(@id, $id-postfix)"/>
-                <xsl:copy-of select="xxforms:copy-attributes(xforms:alert, concat('xforms-alert-',
-                    if (xxforms:control($id)/@valid = 'false') then 'active' else 'inactive'), $alert-id)"/>
-                <xsl:value-of select="xxforms:control($id)/@alert"/>
+                <xsl:choose>
+                    <xsl:when test="$generate-template">
+                        <xsl:copy-of select="xxforms:copy-attributes(xforms:alert, '$xforms-alert-valid$', $alert-id)"/>
+                        <xsl:value-of select="'$xforms-alert-value$'"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:copy-of select="xxforms:copy-attributes(xforms:alert,
+                                            concat('xforms-alert-',
+                                                if (xxforms:control($id)/@valid = 'false') then 'active' else 'inactive'),
+                                            $alert-id)"/>
+                        <xsl:value-of select="xxforms:control($id)/@alert"/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xhtml:label>
         </xsl:if>
         <xsl:apply-templates select="xforms:hint"/>
@@ -74,10 +86,19 @@
     
     <xsl:template match="xforms:output">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
+
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:span>
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output'), $id)"/>
-            <xsl:value-of select="xxforms:control($id)"/>
+            <xsl:choose>
+                <xsl:when test="$generate-template">
+                    <xsl:value-of select="'$xforms-alert-value$'"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="xxforms:control($id)"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xhtml:span>
     </xsl:template>
     
@@ -92,22 +113,43 @@
 
     <xsl:template match="xforms:submit">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
+
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xhtml:button type="button" class="trigger">
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
-            <xsl:value-of select="xxforms:control($id)/@label"/>
+
+            <xsl:choose>
+                <xsl:when test="$generate-template">
+                    <xsl:value-of select="'$xforms-label-value$'"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="xxforms:control($id)/@label"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xhtml:button>
     </xsl:template>
 
     <xsl:template match="xforms:input">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
+
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xhtml:input type="text" name="{$id}" value="{xxforms:control($id)}">
-            <xsl:if test="xxforms:control($id)/@readonly = 'true'">
-                <xsl:attribute name="disabled">disabled</xsl:attribute>
-            </xsl:if>
-            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
-        </xhtml:input>
+        <xsl:choose>
+            <xsl:when test="$generate-template">
+                <xhtml:input type="text" name="{$id}" value="{'$xforms-input-value$'}" disabled="{'$xforms-input-disabled$'}">
+                    <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
+                </xhtml:input>
+            </xsl:when>
+            <xsl:otherwise>
+                <xhtml:input type="text" name="{$id}" value="{xxforms:control($id)}">
+                    <xsl:if test="xxforms:control($id)/@readonly = 'true'">
+                        <xsl:attribute name="disabled">disabled</xsl:attribute>
+                    </xsl:if>
+                    <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
+                </xhtml:input>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="xforms:secret">
@@ -271,14 +313,26 @@
 
     <xsl:template match="xforms:label | xforms:hint | xforms:help">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
+
         <xsl:variable name="parent-id" as="xs:string" select="concat(../@id, $id-postfix)"/>
         <xsl:variable name="current-id" as="xs:string" select="concat(@id, $id-postfix)"/>
         <xhtml:label for="{$parent-id}">
             <xsl:copy-of select="xxforms:copy-attributes(., concat('xforms-', local-name()), $current-id)"/>
-            <xsl:variable name="value-element" as="element()" select="xxforms:control($parent-id)"/>
-            <xsl:value-of select="if (local-name() = 'label') then $value-element/@label
-                else if (local-name() = 'hint') then $value-element/@hint
-                else $value-element/@help"/>
+
+            <xsl:choose>
+                <xsl:when test="$generate-template">
+                    <xsl:value-of select="if (local-name() = 'label') then '$xforms-label-value$'
+                        else if (local-name() = 'hint') then '$xforms-hint-value$'
+                        else '$xforms-help-value$'"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:variable name="value-element" as="element()" select="xxforms:control($parent-id)"/>
+                    <xsl:value-of select="if (local-name() = 'label') then $value-element/@label
+                        else if (local-name() = 'hint') then $value-element/@hint
+                        else $value-element/@help"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xhtml:label>
     </xsl:template>
     
@@ -297,16 +351,58 @@
     <xsl:template match="xforms:repeat">
         <xsl:param name="current-repeats" select="$repeats" tunnel="yes"/>
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:param name="top-level-repeat" select="true()" as="xs:boolean" tunnel="yes"/>
+        <xsl:param name="generate-template" select="true()" as="xs:boolean" tunnel="yes"/>
 
         <xsl:variable name="xforms-repeat" select="." as="element()"/>
-        <xsl:variable name="current-repeat" select="$current-repeats[@id = $xforms-repeat/@id]" as="element()"/>
+        <xsl:variable name="xforms-repeat-id" select="$xforms-repeat/@id" as="xs:string"/>
+        <xsl:variable name="current-repeat" select="$current-repeats[@id = $xforms-repeat-id]" as="element()?"/>
 
-        <xsl:for-each select="(1 to $current-repeat/@occurs)">
-            <xsl:apply-templates select="$xforms-repeat/*">
-                <xsl:with-param name="current-repeats" select="$current-repeat/xxforms:repeat[current()]" tunnel="yes"/>
-                <xsl:with-param name="id-postfix" select="concat($id-postfix, '-', current())" tunnel="yes"/>
-            </xsl:apply-templates>
-        </xsl:for-each>
+        <xsl:if test="$top-level-repeat or not($generate-template)">
+            <!-- Repeat content for the number of occurrences the XForms Server gives us -->
+            <xsl:for-each select="(1 to $current-repeat/@occurs)">
+                <xsl:apply-templates select="$xforms-repeat/*">
+                    <xsl:with-param name="current-repeats" select="$current-repeat/xxforms:repeat[current()]" tunnel="yes"/>
+                    <xsl:with-param name="id-postfix" select="concat($id-postfix, '-', current())" tunnel="yes"/>
+                    <xsl:with-param name="top-level-repeat" select="false()" tunnel="yes"/>
+                    <xsl:with-param name="generate-template" select="false()" tunnel="yes"/>
+                </xsl:apply-templates>
+            </xsl:for-each>
+        </xsl:if>
+
+        <xsl:if test="$generate-template">
+            <!-- Produce templates -->
+            <xsl:choose>
+                <xsl:when test="xhtml:tr|tr">
+                    <xsl:for-each select="$xforms-repeat/*">
+                        <xhtml:span id="repeat-template-{$xforms-repeat-id}" class="xforms-repeat-template">
+                            <xsl:copy>
+                                <xsl:copy-of select="@*"/>
+                                <!-- Copy class attribute, both in xhtml namespace and no namespace -->
+                                <xsl:attribute name="class" select="string-join
+                                    ((@xhtml:class, @class, 'xforms-repeat-template'), ' ')"/> 
+                                <xsl:apply-templates select="*">
+                                    <xsl:with-param name="current-repeats" select="()" tunnel="yes"/>
+                                    <xsl:with-param name="id-postfix" select="$id-postfix" tunnel="yes"/>
+                                    <xsl:with-param name="top-level-repeat" select="false()" tunnel="yes"/>
+                                    <xsl:with-param name="generate-template" select="true()" tunnel="yes"/>
+                                </xsl:apply-templates>
+                            </xsl:copy>
+                        </xhtml:span>
+                    </xsl:for-each>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xhtml:span id="repeat-template-{$xforms-repeat-id}" class="xforms-repeat-template">
+                        <xsl:apply-templates select="$xforms-repeat/*">
+                            <xsl:with-param name="current-repeats" select="()" tunnel="yes"/>
+                            <xsl:with-param name="id-postfix" select="$id-postfix" tunnel="yes"/>
+                            <xsl:with-param name="top-level-repeat" select="false()" tunnel="yes"/>
+                            <xsl:with-param name="generate-template" select="true()" tunnel="yes"/>
+                        </xsl:apply-templates>
+                    </xhtml:span>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:if>
     </xsl:template>
 
     <!-- - - - - - - XForms containers - - - - - - -->

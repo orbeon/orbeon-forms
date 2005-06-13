@@ -838,6 +838,24 @@
                                     </table>
                                 </td>
                             </tr>
+                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="repeat-template-id123" class="xforms-repeat-template">
+                                <tr class="xforms-repeat-template">
+                                    <td>
+                                        <table>
+                                            <xhtml:span id="repeat-template-id124" class="xforms-repeat-template">
+                                                <tr class="xforms-repeat-template">
+                                                    <td>
+                                                        <xhtml:span id="id125" class="xforms-control xforms-output">$xforms-alert-value$</xhtml:span>
+                                                    </td>
+                                                    <td>
+                                                        <xhtml:span id="id126" class="xforms-control xforms-output">$xforms-alert-value$</xhtml:span>
+                                                    </td>
+                                                </tr>
+                                            </xhtml:span>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </xhtml:span>
                         </table>
                     </xxforms:controls>
                 </xxf:action>

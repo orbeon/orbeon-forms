@@ -215,8 +215,13 @@ function xformsInitCheckesRadios(control) {
     function inputSelected(event) {
         var checkbox = getEventTarget(event);
         var span = checkbox;
-        while (! xformsArrayContains(span.className.split(" "), "xforms-select-full"))
+        while (true) {
+            var spanClasses = span.className.split(" ");
+            if (xformsArrayContains(spanClasses, "xforms-select-full")
+                    || xformsArrayContains(spanClasses, "xforms-select1-full"))
+                break;
             span = span.parentNode;
+        }
         computeSpanValue(span);
         xformsFireEvent(span, "xxforms-value-change-with-focus-change", span.value, false);
     }

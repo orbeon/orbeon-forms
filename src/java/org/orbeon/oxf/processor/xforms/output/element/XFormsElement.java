@@ -18,10 +18,10 @@ import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.util.SecureUtils;
+import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsConstants;
 import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xforms.XFormsUtils;
-import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.orbeon.saxon.style.StandardNames;
@@ -105,31 +105,34 @@ public class XFormsElement {
             boolean nodesetPresent = attributes.getIndex("", "nodeset") != -1;
             boolean positionPresent = attributes.getIndex(XFormsConstants.XXFORMS_NAMESPACE_URI, "position") != -1;
             if (refPresent || bindPresent || nodesetPresent || positionPresent) {
-                InstanceData currentNodeInstanceData = XFormsUtils.getInheritedInstanceData(context.getCurrentSingleNode());
-
-                int typeCode = currentNodeInstanceData.getType().get();
-                if (typeCode != 0)
-                    addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME,
-                            StandardNames.getPrefix(typeCode) + ":" + StandardNames.getLocalName(typeCode));
-                addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
-                        Boolean.toString(currentNodeInstanceData.getReadonly().get()));
-                addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
-                        Boolean.toString(currentNodeInstanceData.getRelevant().get()));
-                addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
-                        Boolean.toString(currentNodeInstanceData.getRequired().get()));
-                addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
-                        Boolean.toString(currentNodeInstanceData.getValid().get()));
-                if (currentNodeInstanceData.getInvalidBindIds() != null)
-                    addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME, currentNodeInstanceData.getInvalidBindIds());
-                if (DATA_CONTROLS.containsKey(localname)) {
-                    currentNodeInstanceData.setGenerated(true);
-                    String id = Integer.toString(currentNodeInstanceData.getId());
-                    if (XFormsUtils.isNameEncryptionEnabled())
-                        id = SecureUtils.encrypt(context.getPipelineContext(), context.getEncryptionPassword(), id);
-                    addExtensionAttribute(newAttributes, "name", "$node^" + id);
-                    addExtensionAttribute(newAttributes, "value", context.getRefValue());
-                } else if (ACTION_CONTROLS.containsKey(localname)) {
-                    addExtensionAttribute(newAttributes, "value", context.getRefValue());
+                {
+                    final InstanceData currentNodeInstanceData = XFormsUtils.getInheritedInstanceData(context.getCurrentSingleNode());
+                    if (currentNodeInstanceData != null) { // will be null for /
+                        final int typeCode = currentNodeInstanceData.getType().get();
+                        if (typeCode != 0)
+                            addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME,
+                                    StandardNames.getPrefix(typeCode) + ":" + StandardNames.getLocalName(typeCode));
+                        addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
+                                Boolean.toString(currentNodeInstanceData.getReadonly().get()));
+                        addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
+                                Boolean.toString(currentNodeInstanceData.getRelevant().get()));
+                        addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
+                                Boolean.toString(currentNodeInstanceData.getRequired().get()));
+                        addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
+                                Boolean.toString(currentNodeInstanceData.getValid().get()));
+                        if (currentNodeInstanceData.getInvalidBindIds() != null)
+                            addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME, currentNodeInstanceData.getInvalidBindIds());
+                        if (DATA_CONTROLS.containsKey(localname)) {
+                            currentNodeInstanceData.setGenerated(true);
+                            String id = Integer.toString(currentNodeInstanceData.getId());
+                            if (XFormsUtils.isNameEncryptionEnabled())
+                                id = SecureUtils.encrypt(context.getPipelineContext(), context.getEncryptionPassword(), id);
+                            addExtensionAttribute(newAttributes, "name", "$node^" + id);
+                            addExtensionAttribute(newAttributes, "value", context.getRefValue());
+                        } else if (ACTION_CONTROLS.containsKey(localname)) {
+                            addExtensionAttribute(newAttributes, "value", context.getRefValue());
+                        }
+                    }
                 }
 
                 if (!positionPresent) {
@@ -137,15 +140,17 @@ public class XFormsElement {
                     StringBuffer ids = new StringBuffer();
                     boolean first = true;
                     for (Iterator i = context.getCurrentNodeset().iterator(); i.hasNext();) {
-                        Node node = (Node) i.next();
+                        final Node node = (Node) i.next();
                         if (!first) ids.append(' '); else first = false;
-                        String id = Integer.toString(XFormsUtils.getLocalInstanceData(node).getId());
-                        if (XFormsUtils.isNameEncryptionEnabled())
-                            id = SecureUtils.encrypt(context.getPipelineContext(), context.getEncryptionPassword(), id);
-                        ids.append(id);
+                        final InstanceData currentNodeInstanceData = XFormsUtils.getLocalInstanceData(node);
+                        if (currentNodeInstanceData != null) {
+                            String id = Integer.toString(currentNodeInstanceData.getId());
+                            if (XFormsUtils.isNameEncryptionEnabled())
+                                id = SecureUtils.encrypt(context.getPipelineContext(), context.getEncryptionPassword(), id);
+                            ids.append(id);
+                        }
                     }
                     addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_NODE_IDS_ATTRIBUTE_NAME, ids.toString());
-
                 }
             }
 

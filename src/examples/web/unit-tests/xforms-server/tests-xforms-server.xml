@@ -103,37 +103,6 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="1">7</xxf:control>
-                        <xxf:control id="2" label="M:">0</xxf:control>
-                        <xxf:control id="3" label="Clear"/>
-                        <xxf:control id="4" label="MC"/>
-                        <xxf:control id="5" label="7"/>
-                        <xxf:control id="6" label="8"/>
-                        <xxf:control id="7" label="9"/>
-                        <xxf:control id="8" label="/"/>
-                        <xxf:control id="9" label="MR"/>
-                        <xxf:control id="10" label="4"/>
-                        <xxf:control id="11" label="5"/>
-                        <xxf:control id="12" label="6"/>
-                        <xxf:control id="13" label="*"/>
-                        <xxf:control id="14" label="MS"/>
-                        <xxf:control id="15" label="1"/>
-                        <xxf:control id="16" label="2"/>
-                        <xxf:control id="17" label="3"/>
-                        <xxf:control id="18" label="-"/>
-                        <xxf:control id="19" label="1/x"/>
-                        <xxf:control id="20" label="M+"/>
-                        <xxf:control id="21" label="0"/>
-                        <xxf:control id="22" label="+/-"/>
-                        <xxf:control id="23" label="+"/>
-                        <xxf:control id="23a"/>
-                        <xxf:control id="add"/>
-                        <xxf:control id="24" label="="/>
-                        <xxf:control id="subtract"/>
-                        <xxf:control id="25" label="="/>
-                        <xxf:control id="multiply"/>
-                        <xxf:control id="26" label="="/>
-                        <xxf:control id="divide" label="Hello Divide!!!"/>
-                        <xxf:control id="27" label="="/>
                     </xxf:control-values>
                     <xxf:divs>
                         <xxf:div id="add" visibility="visible"/>
@@ -208,37 +177,6 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="1">7</xxf:control>
-                        <xxf:control id="2" label="M:">12</xxf:control>
-                        <xxf:control id="3" label="Clear"/>
-                        <xxf:control id="4" label="MC"/>
-                        <xxf:control id="5" label="7"/>
-                        <xxf:control id="6" label="8"/>
-                        <xxf:control id="7" label="9"/>
-                        <xxf:control id="8" label="/"/>
-                        <xxf:control id="9" label="MR"/>
-                        <xxf:control id="10" label="4"/>
-                        <xxf:control id="11" label="5"/>
-                        <xxf:control id="12" label="6"/>
-                        <xxf:control id="13" label="*"/>
-                        <xxf:control id="14" label="MS"/>
-                        <xxf:control id="15" label="1"/>
-                        <xxf:control id="16" label="2"/>
-                        <xxf:control id="17" label="3"/>
-                        <xxf:control id="18" label="-"/>
-                        <xxf:control id="19" label="1/x"/>
-                        <xxf:control id="20" label="M+"/>
-                        <xxf:control id="21" label="0"/>
-                        <xxf:control id="22" label="+/-"/>
-                        <xxf:control id="23" label="+"/>
-                        <xxf:control id="23a"/>
-                        <xxf:control id="add"/>
-                        <xxf:control id="24" label="="/>
-                        <xxf:control id="subtract"/>
-                        <xxf:control id="25" label="="/>
-                        <xxf:control id="multiply"/>
-                        <xxf:control id="26" label="="/>
-                        <xxf:control id="divide" label="Hello Divide!!!"/>
-                        <xxf:control id="27" label="="/>
                     </xxf:control-values>
                     <xxf:divs>
                         <xxf:div id="add" visibility="visible"/>
@@ -413,38 +351,38 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="group111"/>
-                        <xxf:control id="group112"/>
-                        <xxf:control id="group113"/>
-                        <xxf:control id="id111">111</xxf:control>
-                        <xxf:control id="id112">112</xxf:control>
-                        <xxf:control id="id113">113</xxf:control>
-                        <xxf:control id="id114">114</xxf:control>
-                        <xxf:control id="group121"/>
-                        <xxf:control id="group122"/>
-                        <xxf:control id="id121">121</xxf:control>
-                        <xxf:control id="id122">122</xxf:control>
-                        <xxf:control id="id123">123</xxf:control>
-                        <xxf:control id="id124">124</xxf:control>
-                        <xxf:control id="group211"/>
-                        <xxf:control id="group212"/>
-                        <xxf:control id="group213"/>
-                        <xxf:control id="id211">211</xxf:control>
-                        <xxf:control id="id212">212</xxf:control>
-                        <xxf:control id="id213">213</xxf:control>
-                        <xxf:control id="id214">214</xxf:control>
-                        <xxf:control id="group214"/>
-                        <xxf:control id="group8"/>
-                        <xxf:control id="id221">221</xxf:control>
-                        <xxf:control id="id222">222</xxf:control>
-                        <xxf:control id="id223">223</xxf:control>
-                        <xxf:control id="id224">224</xxf:control>
-                        <xxf:control id="group214"/>
-                        <xxf:control id="group10"/>
-                        <xxf:control id="id211b">211</xxf:control>
-                        <xxf:control id="id212b">212</xxf:control>
-                        <xxf:control id="id213b">213</xxf:control>
-                        <xxf:control id="id214b">214</xxf:control>
+                        <xxf:control id="group111" readonly="false" required="false" relevant="false" valid="false"/>
+                        <xxf:control id="group112" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="group113" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="id111" readonly="false" required="false" relevant="true" valid="true">111</xxf:control>
+                        <xxf:control id="id112" readonly="false" required="false" relevant="true" valid="true">112</xxf:control>
+                        <xxf:control id="id113" readonly="false" required="false" relevant="true" valid="true">113</xxf:control>
+                        <xxf:control id="id114" readonly="false" required="false" relevant="true" valid="true">114</xxf:control>
+                        <xxf:control id="group121" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="group122" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="id121" readonly="false" required="false" relevant="true" valid="true">121</xxf:control>
+                        <xxf:control id="id122" readonly="false" required="false" relevant="true" valid="true">122</xxf:control>
+                        <xxf:control id="id123" readonly="false" required="false" relevant="true" valid="true">123</xxf:control>
+                        <xxf:control id="id124" readonly="false" required="false" relevant="true" valid="true">124</xxf:control>
+                        <xxf:control id="group211" readonly="false" required="false" relevant="false" valid="false"/>
+                        <xxf:control id="group212" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="group213" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="id211" readonly="false" required="false" relevant="true" valid="true">211</xxf:control>
+                        <xxf:control id="id212" readonly="false" required="false" relevant="true" valid="true">212</xxf:control>
+                        <xxf:control id="id213" readonly="false" required="false" relevant="true" valid="true">213</xxf:control>
+                        <xxf:control id="id214" readonly="false" required="false" relevant="true" valid="true">214</xxf:control>
+                        <xxf:control id="group214" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="group8" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="id221" readonly="false" required="false" relevant="true" valid="true">221</xxf:control>
+                        <xxf:control id="id222" readonly="false" required="false" relevant="true" valid="true">222</xxf:control>
+                        <xxf:control id="id223" readonly="false" required="false" relevant="true" valid="true">223</xxf:control>
+                        <xxf:control id="id224" readonly="false" required="false" relevant="true" valid="true">224</xxf:control>
+                        <xxf:control id="group214" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="group10" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="id211b" readonly="false" required="false" relevant="true" valid="true">211</xxf:control>
+                        <xxf:control id="id212b" readonly="false" required="false" relevant="true" valid="true">212</xxf:control>
+                        <xxf:control id="id213b" readonly="false" required="false" relevant="true" valid="true">213</xxf:control>
+                        <xxf:control id="id214b" readonly="false" required="false" relevant="true" valid="true">214</xxf:control>
                     </xxf:control-values>
                     <xxf:divs/>
                     <xxf:repeats/>
@@ -538,13 +476,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="group1"/>
-                        <xxf:control id="group2"/>
-                        <xxf:control id="1">0</xxf:control>
-                        <xxf:control id="2" label="M:">12</xxf:control>
-                        <xxf:control id="3" label="Clear"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                     <xxf:divs/>
                     <xxf:repeats/>
                     <xxf:itemsets/>
@@ -645,13 +577,7 @@
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
-                    <xxf:control-values>
-                        <xxf:control id="group1"/>
-                        <xxf:control id="group2" valid="false"/>
-                        <xxf:control id="1" valid="false">0</xxf:control>
-                        <xxf:control id="2" label="M:">12</xxf:control>
-                        <xxf:control id="3" label="Clear"/>
-                    </xxf:control-values>
+                    <xxf:control-values/>
                     <xxf:divs/>
                     <xxf:repeats/>
                     <xxf:itemsets/>
@@ -734,24 +660,24 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id123"/>
-                        <xxf:control id="id124-1"/>
-                        <xxf:control id="id125-1-1">f11</xxf:control>
-                        <xxf:control id="id126-1-1">l11</xxf:control>
-                        <xxf:control id="id125-1-2">f12</xxf:control>
-                        <xxf:control id="id126-1-2">l12</xxf:control>
-                        <xxf:control id="id124-2"/>
-                        <xxf:control id="id125-2-1">f21</xxf:control>
-                        <xxf:control id="id126-2-1">l21</xxf:control>
-                        <xxf:control id="id124-3"/>
-                        <xxf:control id="id125-3-1">f31</xxf:control>
-                        <xxf:control id="id126-3-1">l31</xxf:control>
-                        <xxf:control id="id125-3-2">f32</xxf:control>
-                        <xxf:control id="id126-3-2">l32</xxf:control>
-                        <xxf:control id="id125-3-3">f33</xxf:control>
-                        <xxf:control id="id126-3-3">l33</xxf:control>
-                        <xxf:control id="id125-3-4">f34</xxf:control>
-                        <xxf:control id="id126-3-4">l34</xxf:control>
+                        <xxf:control id="id123" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="id124-1" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="id125-1-1" readonly="false" required="false" relevant="true" valid="true">f11</xxf:control>
+                        <xxf:control id="id126-1-1" readonly="false" required="false" relevant="true" valid="true">l11</xxf:control>
+                        <xxf:control id="id125-1-2" readonly="false" required="false" relevant="true" valid="true">f12</xxf:control>
+                        <xxf:control id="id126-1-2" readonly="false" required="false" relevant="true" valid="true">l12</xxf:control>
+                        <xxf:control id="id124-2" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="id125-2-1" readonly="false" required="false" relevant="true" valid="true">f21</xxf:control>
+                        <xxf:control id="id126-2-1" readonly="false" required="false" relevant="true" valid="true">l21</xxf:control>
+                        <xxf:control id="id124-3" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="id125-3-1" readonly="false" required="false" relevant="true" valid="true">f31</xxf:control>
+                        <xxf:control id="id126-3-1" readonly="false" required="false" relevant="true" valid="true">l31</xxf:control>
+                        <xxf:control id="id125-3-2" readonly="false" required="false" relevant="true" valid="true">f32</xxf:control>
+                        <xxf:control id="id126-3-2" readonly="false" required="false" relevant="true" valid="true">l32</xxf:control>
+                        <xxf:control id="id125-3-3" readonly="false" required="false" relevant="true" valid="true">f33</xxf:control>
+                        <xxf:control id="id126-3-3" readonly="false" required="false" relevant="true" valid="true">l33</xxf:control>
+                        <xxf:control id="id125-3-4" readonly="false" required="false" relevant="true" valid="true">f34</xxf:control>
+                        <xxf:control id="id126-3-4" readonly="false" required="false" relevant="true" valid="true">l34</xxf:control>
                     </xxf:control-values>
                     <xxf:divs/>
                     <xxf:repeats>
@@ -764,97 +690,127 @@
                     <xxf:itemsets/>
                     <xxforms:controls xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                         <table>
-                            <tr>
-                                <td>
-                                    <table>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-1-1" class="xforms-control xforms-output">f11</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-1-1" class="xforms-control xforms-output">l11</xhtml:span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-1-2" class="xforms-control xforms-output">f12</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-1-2" class="xforms-control xforms-output">l12</xhtml:span>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <table>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-2-1" class="xforms-control xforms-output">f21</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-2-1" class="xforms-control xforms-output">l21</xhtml:span>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <table>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-1" class="xforms-control xforms-output">f31</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-1" class="xforms-control xforms-output">l31</xhtml:span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-2" class="xforms-control xforms-output">f32</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-2" class="xforms-control xforms-output">l32</xhtml:span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-3" class="xforms-control xforms-output">f33</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-3" class="xforms-control xforms-output">l33</xhtml:span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-4" class="xforms-control xforms-output">f34</xhtml:span>
-                                            </td>
-                                            <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-4" class="xforms-control xforms-output">l34</xhtml:span>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="repeat-template-id123" class="xforms-repeat-template">
-                                <tr class="xforms-repeat-template">
-                                    <td>
-                                        <table>
-                                            <xhtml:span id="repeat-template-id124" class="xforms-repeat-template">
-                                                <tr class="xforms-repeat-template">
-                                                    <td>
-                                                        <xhtml:span id="id125" class="xforms-control xforms-output">$xforms-alert-value$</xhtml:span>
-                                                    </td>
-                                                    <td>
-                                                        <xhtml:span id="id126" class="xforms-control xforms-output">$xforms-alert-value$</xhtml:span>
-                                                    </td>
-                                                </tr>
-                                            </xhtml:span>
-                                        </table>
-                                    </td>
-                                </tr>
+                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id123">
+                                <xhtml:span id="id123-1">
+                                    <tr>
+                                        <td>
+                                            <table>
+                                                <xhtml:span id="id124-1">
+                                                    <xhtml:span id="id124-1-1">
+                                                        <tr>
+                                                            <td>
+                                                                <xhtml:span id="id125-1-1" class="xforms-control xforms-output">f11</xhtml:span>
+                                                            </td>
+                                                            <td>
+                                                                <xhtml:span id="id126-1-1" class="xforms-control xforms-output">l11</xhtml:span>
+                                                            </td>
+                                                        </tr>
+                                                    </xhtml:span>
+                                                    <xhtml:span id="id124-1-2">
+                                                        <tr>
+                                                            <td>
+                                                                <xhtml:span id="id125-1-2" class="xforms-control xforms-output">f12</xhtml:span>
+                                                            </td>
+                                                            <td>
+                                                                <xhtml:span id="id126-1-2" class="xforms-control xforms-output">l12</xhtml:span>
+                                                            </td>
+                                                        </tr>
+                                                    </xhtml:span>
+                                                </xhtml:span>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </xhtml:span>
+                                <xhtml:span id="id123-2">
+                                    <tr>
+                                        <td>
+                                            <table>
+                                                <xhtml:span id="id124-2">
+                                                    <xhtml:span id="id124-2-1">
+                                                        <tr>
+                                                            <td>
+                                                                <xhtml:span id="id125-2-1" class="xforms-control xforms-output">f21</xhtml:span>
+                                                            </td>
+                                                            <td>
+                                                                <xhtml:span id="id126-2-1" class="xforms-control xforms-output">l21</xhtml:span>
+                                                            </td>
+                                                        </tr>
+                                                    </xhtml:span>
+                                                </xhtml:span>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </xhtml:span>
+                                <xhtml:span id="id123-3">
+                                    <tr>
+                                        <td>
+                                            <table>
+                                                <xhtml:span id="id124-3">
+                                                    <xhtml:span id="id124-3-1">
+                                                        <tr>
+                                                            <td>
+                                                                <xhtml:span id="id125-3-1" class="xforms-control xforms-output">f31</xhtml:span>
+                                                            </td>
+                                                            <td>
+                                                                <xhtml:span id="id126-3-1" class="xforms-control xforms-output">l31</xhtml:span>
+                                                            </td>
+                                                        </tr>
+                                                    </xhtml:span>
+                                                    <xhtml:span id="id124-3-2">
+                                                        <tr>
+                                                            <td>
+                                                                <xhtml:span id="id125-3-2" class="xforms-control xforms-output">f32</xhtml:span>
+                                                            </td>
+                                                            <td>
+                                                                <xhtml:span id="id126-3-2" class="xforms-control xforms-output">l32</xhtml:span>
+                                                            </td>
+                                                        </tr>
+                                                    </xhtml:span>
+                                                    <xhtml:span id="id124-3-3">
+                                                        <tr>
+                                                            <td>
+                                                                <xhtml:span id="id125-3-3" class="xforms-control xforms-output">f33</xhtml:span>
+                                                            </td>
+                                                            <td>
+                                                                <xhtml:span id="id126-3-3" class="xforms-control xforms-output">l33</xhtml:span>
+                                                            </td>
+                                                        </tr>
+                                                    </xhtml:span>
+                                                    <xhtml:span id="id124-3-4">
+                                                        <tr>
+                                                            <td>
+                                                                <xhtml:span id="id125-3-4" class="xforms-control xforms-output">f34</xhtml:span>
+                                                            </td>
+                                                            <td>
+                                                                <xhtml:span id="id126-3-4" class="xforms-control xforms-output">l34</xhtml:span>
+                                                            </td>
+                                                        </tr>
+                                                    </xhtml:span>
+                                                </xhtml:span>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </xhtml:span>
+                                <xhtml:span id="repeat-template-id123" class="xforms-repeat-template">
+                                    <tr class="xforms-repeat-template">
+                                        <td>
+                                            <table>
+                                                <xhtml:span id="id124">
+                                                    <xhtml:span id="repeat-template-id124" class="xforms-repeat-template">
+                                                        <tr class="xforms-repeat-template">
+                                                            <td>
+                                                                <xhtml:span id="id125" class="xforms-control xforms-output">$xforms-output-value$</xhtml:span>
+                                                            </td>
+                                                            <td>
+                                                                <xhtml:span id="id126" class="xforms-control xforms-output">$xforms-output-value$</xhtml:span>
+                                                            </td>
+                                                        </tr>
+                                                    </xhtml:span>
+                                                </xhtml:span>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </xhtml:span>
                             </xhtml:span>
                         </table>
                     </xxforms:controls>
@@ -911,26 +867,9 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:control id="id123"/>
-                        <xxf:control id="id124-1"/>
-                        <xxf:control id="id125-1-1">f11</xxf:control>
-                        <xxf:control id="id126-1-1">l11</xxf:control>
-                        <xxf:control id="id125-1-2">f12</xxf:control>
-                        <xxf:control id="id126-1-2">l12</xxf:control>
-                        <xxf:control id="id125-1-3">f12</xxf:control>
-                        <xxf:control id="id126-1-3">l12</xxf:control>
-                        <xxf:control id="id124-2"/>
-                        <xxf:control id="id125-2-1">f21</xxf:control>
-                        <xxf:control id="id126-2-1">l21</xxf:control>
-                        <xxf:control id="id124-3"/>
-                        <xxf:control id="id125-3-1">f31</xxf:control>
-                        <xxf:control id="id126-3-1">l31</xxf:control>
-                        <xxf:control id="id125-3-2">f32</xxf:control>
-                        <xxf:control id="id126-3-2">l32</xxf:control>
-                        <xxf:control id="id125-3-3">f33</xxf:control>
-                        <xxf:control id="id126-3-3">l33</xxf:control>
-                        <xxf:control id="id125-3-4">f34</xxf:control>
-                        <xxf:control id="id126-3-4">l34</xxf:control>
+                        <xxf:copy-repeat-template id="id124" id-suffix="-3"/>
+                        <xxf:control id="id125-1-3" readonly="false" required="false" relevant="true" valid="true">f12</xxf:control>
+                        <xxf:control id="id126-1-3" readonly="false" required="false" relevant="true" valid="true">l12</xxf:control>
                     </xxf:control-values>
                     <xxf:divs/>
                     <xxf:repeats>

@@ -31,61 +31,76 @@
             <element name="xxforms:action">
                 <element name="xxforms:control-values">
                     <zeroOrMore>
-                        <element name="xxforms:control">
-                            <attribute name="id">
-                                <data type="string"/>
-                            </attribute>
-                            <optional>
-                                <attribute name="hint"/>
-                            </optional>
-                            <optional>
-                                <attribute name="alert"/>
-                            </optional>
-                            <optional>
-                                <attribute name="label"/>
-                            </optional>
-                            <optional>
-                                <attribute name="help"/>
-                            </optional>
-                            <optional>
-                                <attribute name="readonly">
-                                    <choice>
-                                        <value>true</value>
-                                        <value>false</value>
-                                    </choice>
+                        <choice>
+                            <element name="xxforms:control">
+                                <attribute name="id">
+                                    <data type="string"/>
                                 </attribute>
-                            </optional>
-                            <optional>
-                                <attribute name="required">
-                                    <choice>
-                                        <value>true</value>
-                                        <value>false</value>
-                                    </choice>
+                                <optional>
+                                    <attribute name="hint"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="alert"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="label"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="help"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="readonly">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="required">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="relevant">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="valid">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="type"/>
+                                </optional>
+                                <optional>
+                                    <data type="string"/>
+                                </optional>
+                            </element>
+                            <element name="xxforms:copy-repeat-template">
+                                <attribute name="id">
+                                    <data type="string"/>
                                 </attribute>
-                            </optional>
-                            <optional>
-                                <attribute name="relevant">
-                                    <choice>
-                                        <value>true</value>
-                                        <value>false</value>
-                                    </choice>
+                                <attribute name="id-suffix">
+                                    <data type="string"/>
                                 </attribute>
-                            </optional>
-                            <optional>
-                                <attribute name="valid">
-                                    <choice>
-                                        <value>true</value>
-                                        <value>false</value>
-                                    </choice>
+                            </element>
+                            <element name="xxforms:delete-element">
+                                <attribute name="id">
+                                    <data type="string"/>
                                 </attribute>
-                            </optional>
-                            <optional>
-                                <attribute name="type"/>
-                            </optional>
-                            <optional>
-                                <data type="string"/>
-                            </optional>
-                        </element>
+                            </element>
+                        </choice>
                     </zeroOrMore>
                 </element>
                 <element name="xxforms:divs">

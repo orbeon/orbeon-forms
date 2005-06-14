@@ -395,6 +395,7 @@
                                     <!-- Copy class attribute, both in xhtml namespace and no namespace -->
                                     <xsl:attribute name="class" select="string-join
                                         ((@xhtml:class, @class, 'xforms-repeat-template'), ' ')"/>
+                                    <xsl:attribute name="id" select="concat('repeat-template-', $xforms-repeat-id)"/><!-- FIXME: what if <tr? already has id? should use that -->
                                     <xsl:apply-templates select="*">
                                         <xsl:with-param name="current-repeats" select="()" tunnel="yes"/>
                                         <xsl:with-param name="id-postfix" select="$id-postfix" tunnel="yes"/>

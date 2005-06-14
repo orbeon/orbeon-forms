@@ -792,12 +792,12 @@
                                     </tr>
                                 </xhtml:span>
                                 <xhtml:span id="repeat-template-id123" class="xforms-repeat-template">
-                                    <tr class="xforms-repeat-template">
+                                    <tr class="xforms-repeat-template" id="repeat-template-id123">
                                         <td>
                                             <table>
                                                 <xhtml:span id="id124">
                                                     <xhtml:span id="repeat-template-id124" class="xforms-repeat-template">
-                                                        <tr class="xforms-repeat-template">
+                                                        <tr class="xforms-repeat-template" id="repeat-template-id124">
                                                             <td>
                                                                 <xhtml:span id="id125" class="xforms-control xforms-output">$xforms-output-value$</xhtml:span>
                                                             </td>

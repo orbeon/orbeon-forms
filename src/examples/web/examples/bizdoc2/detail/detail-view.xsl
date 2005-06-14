@@ -214,7 +214,7 @@
                                 </tr>
                             </table>
                         </xforms:case>
-                        <xforms:case id="page-2">
+                        <xforms:case id="page-2" selected="true">
 
                             <xforms:group ref="claim:claim/claim:insured-info">
                                 <h2 style="margin-top: 0">Additonal Claimant Information</h2>
@@ -318,34 +318,40 @@
                                             <th align="left">Birth Date</th>
                                             <th align="left">Name</th>
                                         </tr>
-<!--                                        <xforms:repeat nodeset="claim:children/claim:child" id="childSet">-->
-<!--                                            <tr>-->
+                                        <xforms:repeat nodeset="claim:children/claim:child" id="childSet">
+                                            <tr>
+                                                <td>
+                                                    <xforms:input ref="claim:birth-date">
+                                                        <xforms:hint>Birth Date</xforms:hint>
+                                                        <xforms:help>Please enter a birth date here (e.g. 1970-02-25)</xforms:help>
+                                                    </xforms:input>
+                                                </td>
+                                                <td>
+                                                    <xforms:input ref="claim:first-name">
+                                                        <xforms:hint>First Name</xforms:hint>
+                                                        <xforms:help>Please enter a first name here</xforms:help>
+                                                    </xforms:input>
+                                                </td>
 <!--                                                <td>-->
-<!--                                                    <xforms:input ref="claim:birth-date">-->
-<!--                                                        <xforms:hint>Birth Date</xforms:hint>-->
-<!--                                                        <xforms:help>Please enter a birth date here (e.g. 1970-02-25)</xforms:help>-->
-<!--                                                    </xforms:input>-->
-<!--                                                </td>-->
-<!--                                                <td>-->
-<!--                                                    <xforms:input ref="claim:first-name">-->
-<!--                                                        <xforms:hint>First Name</xforms:hint>-->
-<!--                                                        <xforms:help>Please enter a first name here</xforms:help>-->
-<!--                                                    </xforms:input>-->
-<!--                                                </td>-->
-<!--                                                <td>-->
-<!--                                                    <xforms:submit>-->
+<!--                                                    <xforms:trigger>-->
 <!--                                                        <xforms:label>X</xforms:label>-->
-<!--                                                        <xforms:delete nodeset="/form/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child" at="index('childSet')"/>-->
-<!--                                                    </xforms:submit>-->
+<!--                                                        <xforms:delete ev:event="DOMActivate" nodeset="../claim:child" at="last()"/>-->
+<!--                                                    </xforms:trigger>-->
 <!--                                                </td>-->
-<!--                                            </tr>-->
-<!--                                        </xforms:repeat>-->
+                                            </tr>
+                                        </xforms:repeat>
                                         <tr>
                                             <td colspan="2">
-                                                <xforms:submit>
+                                                <xforms:trigger>
                                                     <xforms:label>Add Child</xforms:label>
-                                                    <xforms:insert nodeset="claim:children/claim:child" at="last()" position="after"/>
-                                                </xforms:submit>
+                                                    <xforms:insert ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()" position="after"/>
+                                                </xforms:trigger>
+                                            </td>
+                                            <td>
+                                                <xforms:trigger>
+                                                    <xforms:label>X</xforms:label>
+                                                    <xforms:delete ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()"/>
+                                                </xforms:trigger>
                                             </td>
                                         </tr>
                                     </table>

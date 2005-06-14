@@ -198,11 +198,11 @@ public class XFormsServer extends ProcessorImpl {
 
                     // Output repeats information
                     {
+                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeats");
                         if (isInitializationRun) {
-                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeats");
                             outputInitialRepeats(ch, xFormsControls.getRepeatInfo());
-                            ch.endElement();
                         }
+                        ch.endElement();
                     }
 
                     // Output itemset information
@@ -384,8 +384,8 @@ public class XFormsServer extends ProcessorImpl {
                         // Size has shrunk
 
                         // Delete element and hierarchy underneath it
-                        for (int k = size2; k < size1; k++) {
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-element", new String[]{"id", ((XFormsControls.ControlInfo) children1.get(k)).getId()});
+                        for (int k = size2 + 1; k <= size1; k++) {
+                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-element", new String[]{"id", controlInfo2.getId() + "-" + k});
                         }
 
                         // Diff the remaining subset

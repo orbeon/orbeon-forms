@@ -15,7 +15,6 @@ package org.orbeon.oxf.xforms;
 
 import org.dom4j.Document;
 import org.dom4j.Element;
-import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
@@ -24,10 +23,8 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xforms.event.XXFormsInitializeEvent;
 import org.orbeon.oxf.xforms.event.XXFormsInitializeStateEvent;
-import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.saxon.style.StandardNames;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
@@ -201,13 +198,11 @@ public class XFormsServer extends ProcessorImpl {
 
                     // Output repeats information
                     {
-                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeats");
                         if (isInitializationRun) {
+                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeats");
                             outputInitialRepeats(ch, xFormsControls.getRepeatInfo());
-                        } else {
-                            outputRepeatsUpdates(ch, xFormsControls.getRepeatInfo());
+                            ch.endElement();
                         }
-                        ch.endElement();
                     }
 
                     // Output itemset information
@@ -337,9 +332,6 @@ public class XFormsServer extends ProcessorImpl {
                         }
                     }
 
-//                    for (int a = 0; a < attributesImpl.getLength(); a++) {
-//                        System.out.println("" + attributesImpl.getQName(a) + ", " + attributesImpl.getValue(a));
-//                    }
                     ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
 
                     // Get current value if possible for this control
@@ -393,7 +385,7 @@ public class XFormsServer extends ProcessorImpl {
 
                         // Delete element and hierarchy underneath it
                         for (int k = size2; k < size1; k++) {
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-element", new String[]{"id", controlInfo2.getId()});
+                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-element", new String[]{"id", ((XFormsControls.ControlInfo) children1.get(k)).getId()});
                         }
 
                         // Diff the remaining subset
@@ -503,10 +495,6 @@ public class XFormsServer extends ProcessorImpl {
             }
             ch.endElement();
         }
-    }
-
-    private void outputRepeatsUpdates(ContentHandlerHelper ch, XFormsControls.RepeatInfo repeatInfo) {
-        outputInitialRepeats(ch, repeatInfo);
     }
 
     public static XFormsContainingDocument createXFormsEngine(PipelineContext pipelineContext, String staticStateString,
@@ -626,99 +614,5 @@ public class XFormsServer extends ProcessorImpl {
         }
 
         return containingDocument;
-    }
-
-    private void oldStuff(final PipelineContext pipelineContext, final XFormsControls xFormsControls, final ContentHandlerHelper ch) {
-
-        final AttributesImpl attributesImpl = new AttributesImpl();
-        xFormsControls.visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlVisitorListener() {
-            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
-
-                if (effectiveControlId == null)
-                    throw new OXFException("Control element doesn't have an id: " + controlElement.getQualifiedName());
-
-                // Set current binding for control element
-                final Node currentNode = xFormsControls.getCurrentSingleNode();
-
-                attributesImpl.clear();
-
-                // Control id
-                attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, effectiveControlId);
-
-                // Get control children values
-                String labelValue = xFormsControls.getLabelValue(pipelineContext);
-                String helpValue = xFormsControls.getHelpValue(pipelineContext);
-                String hintValue = xFormsControls.getHintValue(pipelineContext);
-                String alertValue = xFormsControls.getAlertValue(pipelineContext);
-
-                if (labelValue != null) {
-                    attributesImpl.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, labelValue);
-                }
-
-                if (helpValue != null) {
-                    attributesImpl.addAttribute("", "help", "help", ContentHandlerHelper.CDATA, helpValue);
-                }
-
-                if (hintValue != null) {
-                    attributesImpl.addAttribute("", "hint", "hint", ContentHandlerHelper.CDATA, hintValue);
-                }
-
-                if (alertValue != null) {
-                    attributesImpl.addAttribute("", "alert", "alert", ContentHandlerHelper.CDATA, alertValue);
-                }
-
-                // Get model item properties
-                InstanceData instanceData = XFormsUtils.getInheritedInstanceData(currentNode);
-                if (instanceData != null) {
-                    BooleanModelItemProperty readonly = instanceData.getReadonly();
-                    if (readonly.hasChangedFromDefault()) {
-                        attributesImpl.addAttribute("", XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
-                                XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
-                                ContentHandlerHelper.CDATA, Boolean.toString(readonly.get()));
-                    }
-                    BooleanModelItemProperty required = instanceData.getRequired();
-                    if (required.hasChangedFromDefault()) {
-                        attributesImpl.addAttribute("", XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
-                                XFormsConstants.XXFORMS_REQUIRED_ATTRIBUTE_NAME,
-                                ContentHandlerHelper.CDATA, Boolean.toString(required.get()));
-                    }
-                    BooleanModelItemProperty relevant = instanceData.getRelevant();
-                    if (relevant.hasChangedFromDefault()) {
-                        attributesImpl.addAttribute("", XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
-                                XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,
-                                ContentHandlerHelper.CDATA, Boolean.toString(relevant.get()));
-                    }
-                    BooleanModelItemProperty valid = instanceData.getValid();
-                    if (valid.hasChangedFromDefault()) {
-                        attributesImpl.addAttribute("", XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
-                                XFormsConstants.XXFORMS_VALID_ATTRIBUTE_NAME,
-                                ContentHandlerHelper.CDATA, Boolean.toString(valid.get()));
-                    }
-                    int typeCode = instanceData.getType().get();
-                    if (typeCode != 0) {
-                        attributesImpl.addAttribute("", XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME,
-                                XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME, ContentHandlerHelper.CDATA,
-                                StandardNames.getPrefix(typeCode) + ":" + StandardNames.getLocalName(typeCode));
-                    }
-                }
-
-                ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
-
-                // Get current value if possible for this control
-                if (XFormsControls.isValueControl(controlElement.getName())) {
-                    String controlValue = XFormsInstance.getValueForNode(currentNode);
-                    ch.text(controlValue);
-                }
-
-                ch.endElement();
-
-
-                return true;
-            }
-
-            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
-                return true;
-            }
-        });
     }
 }

@@ -251,6 +251,11 @@ public class XFormsInstance implements XFormsEventTarget {
             // Bubbles: Yes / Cancelable: No / Context Info: Path expression used for insert/delete (xsd:string).
             // The default action for this event results in the following: None; notification event only.
 
+        } else if (XFormsEvents.XFORMS_DELETE.equals(eventName)) {
+            // 4.4.5 The xforms-insert and xforms-delete Events
+            // Bubbles: Yes / Cancelable: No / Context Info: Path expression used for insert/delete (xsd:string).
+            // The default action for this event results in the following: None; notification event only.
+
         } else {
             throw new OXFException("Invalid action requested: " + eventName);
         }

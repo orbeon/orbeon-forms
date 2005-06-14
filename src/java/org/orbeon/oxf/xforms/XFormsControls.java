@@ -1226,6 +1226,7 @@ public class XFormsControls implements XFormsEventTarget {
 
                 // "Finally, this newly created node is inserted into the instance data at the location
                 // specified by attributes position and at."
+
                 final XFormsInstance currentInstance = getCurrentInstance();
                 final String insersionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
                         "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(eventHandlerElement), null, functionLibrary, null);
@@ -1329,7 +1330,38 @@ public class XFormsControls implements XFormsEventTarget {
             if (collectionToBeUpdated.size() > 0) {
                 // "If the collection is empty, the insert action has no effect."
 
-                // TODO
+                final XFormsInstance currentInstance = getCurrentInstance();
+                {
+                    final String insersionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
+                            "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(eventHandlerElement), null, functionLibrary, null);
+
+                    // Don't think we will get NaN with XPath 2.0...
+                    int insersionIndex = "NaN".equals(insersionIndexString) ? collectionToBeUpdated.size() : Integer.parseInt(insersionIndexString) ;
+
+                    // Adjust index to be in range
+                    if (insersionIndex > collectionToBeUpdated.size())
+                        insersionIndex = collectionToBeUpdated.size();
+
+                    if (insersionIndex < 1)
+                        insersionIndex = 1;
+
+                    // Find actual insersion point
+                    final Element indexElement = (Element) collectionToBeUpdated.get(insersionIndex - 1);
+
+                    final Element parentElement = indexElement.getParent();
+                    final List siblingElements = parentElement.elements();
+                    final int actualIndex = siblingElements.indexOf(indexElement);
+
+                    // Delete node
+                    siblingElements.remove(actualIndex);
+                }
+
+                // Update repeat information for the ids found
+                initializeRepeatInfo(pipelineContext);
+                // TODO: index update
+
+                // "4. If the insert is successful, the event xforms-insert is dispatched."
+                currentInstance.dispatchEvent(pipelineContext, new XFormsDeleteEvent(currentInstance, atAttribute));
 
                 if (actionContext != null) {
                     // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"

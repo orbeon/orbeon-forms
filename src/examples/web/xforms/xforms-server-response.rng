@@ -116,24 +116,28 @@
                         </element>
                     </zeroOrMore>
                 </element>
-                <element name="xxforms:repeats">
-                    <zeroOrMore>
-                        <ref name="repeatInfo"/>
-                    </zeroOrMore>
-                </element>
-                <element name="xxforms:itemsets">
-                    <zeroOrMore>
-                        <element name="xxforms:itemset">
-                            <attribute name="id"/>
-                            <zeroOrMore>
-                                <element name="xxforms:item">
-                                    <attribute name="label"/>
-                                    <attribute name="value"/>
-                                </element>
-                            </zeroOrMore>
-                        </element>
-                    </zeroOrMore>
-                </element>
+                <optional>
+                    <element name="xxforms:repeats">
+                        <zeroOrMore>
+                            <ref name="repeatInfo"/>
+                        </zeroOrMore>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="xxforms:itemsets">
+                        <zeroOrMore>
+                            <element name="xxforms:itemset">
+                                <attribute name="id"/>
+                                <zeroOrMore>
+                                    <element name="xxforms:item">
+                                        <attribute name="label"/>
+                                        <attribute name="value"/>
+                                    </element>
+                                </zeroOrMore>
+                            </element>
+                        </zeroOrMore>
+                    </element>
+                </optional>
                 <optional>
                     <element name="xxforms:submission">
                         <attribute name="action"/>

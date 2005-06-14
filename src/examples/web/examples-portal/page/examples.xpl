@@ -21,14 +21,91 @@
           xmlns:portlet="http://orbeon.org/oxf/xml/portlet"
           xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-    <p:param name="data" type="input"/>
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
+    
+    <!-- Create the portal configuration -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#instance"/>
+        <p:input name="config">
+            <portal-config xsl:version="2.0">
+                <xsl:variable name="instance" select="/*" as="element()"/>
+                <!-- We configure the portal with an embedded portlet.xml -->
+                <xsl:copy-of select="document('../config/portlet.xml')/*"/>
+                <!-- Give the portal an id -->
+                <portal-id>examples</portal-id>
+                <!-- Configure what instances of portlets are present -->
+                <xsl:for-each select="('OXFExamplesPortlet', 'OXFExamplesDocumentationPortlet', 'OXFExamplesSourceCodePortlet')">
+                    <portlet-instance>
+                        <portlet-name><xsl:value-of select="."/></portlet-name>
+<!--                        <window-state>-->
+<!--                            <xsl:value-of select="if ($instance/visible-portlet = .) then 'normal' else 'minimized'"/>-->
+<!--                        </window-state>-->
+                    </portlet-instance>
+                </xsl:for-each>
+            </portal-config>
+        </p:input>
+        <p:output name="data" id="portal-config"/>
+    </p:processor>
+
+    <!-- Configure the portal and read the portal status -->
+    <p:processor name="oxf:portlet-container">
+        <p:input name="portal-config" href="#portal-config"/>
+        <p:output name="portal-status" id="portal-status"/>
+    </p:processor>
+
+    <!-- Render portlets and aggregate their outputs -->
+    <p:for-each href="#portal-status" select="/portal-status/portlet-instance" root="aggregated-portlets" id="aggregated-portlets">
+
+        <p:processor name="oxf:xslt">
+            <p:input name="data" href="current()"/>
+            <p:input name="instance" href="#instance"/>
+            <p:input name="config">
+                <config xsl:version="2.0">
+                    <xsl:variable name="instance" select="doc('input:instance')/*" as="element()"/>
+                    <xsl:variable name="portlet-instance" select="/*" as="element()"/>
+
+                    <portal-id>examples</portal-id>
+
+                    <xsl:copy-of select="$portlet-instance/portlet-id"/>
+
+                    <xsl:choose>
+                        <xsl:when test="$instance/render = 'show-example'">
+                            <render-parameters>
+                                <param>
+                                    <name>oxf.path</name>
+                                    <value><xsl:value-of select="concat('/', $instance/example-id)"/></value>
+                                </param>
+                            </render-parameters>
+                        </xsl:when>
+                        <xsl:when test="$instance/render = 'show-source' and $portlet-instance/portlet-name = 'OXFExamplesSourceCodePortlet'">
+                            <render-parameters>
+                                <param>
+                                    <name>oxf.path</name>
+                                    <value><xsl:value-of select="concat('/', $instance/example-id, '/', $instance/source-url)"/></value>
+                                </param>
+                            </render-parameters>
+                        </xsl:when>
+                    </xsl:choose>
+                    <window-state>
+                        <xsl:value-of select="if ($portlet-instance/portlet-name = $instance/visible-portlet) then 'normal' else 'minimized'"/>
+                    </window-state>
+                </config>
+            </p:input>
+            <p:output name="data" id="portlet-include-config"/>
+        </p:processor>
+
+        <p:processor name="oxf:portlet-include">
+            <p:input name="config" href="#portlet-include-config"/>
+            <p:output name="data" ref="aggregated-portlets"/>
+        </p:processor>
+
+    </p:for-each>
 
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#instance"/>
-        <p:input name="portal-status" href="#data#xpointer(/*/*[1])"/>
-        <p:input name="aggregated-portlets" href="#data#xpointer(/*/*[2])"/>
+        <p:input name="portal-status" href="#portal-status"/>
+        <p:input name="aggregated-portlets" href="#aggregated-portlets"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0">
 

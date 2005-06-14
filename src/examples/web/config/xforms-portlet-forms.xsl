@@ -13,12 +13,9 @@
 -->
 <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:portlet="http://orbeon.org/oxf/xml/portlet"
-    xmlns:f="http://orbeon.org/oxf/xml/formatting"
-    xmlns:xforms-utils="java:org.orbeon.oxf.processor.xforms.XFormsUtils">
+    xmlns:f="http://orbeon.org/oxf/xml/formatting">
 
     <xsl:import href="oxf:/oxf/xslt/utils/copy-modes.xsl"/>
 

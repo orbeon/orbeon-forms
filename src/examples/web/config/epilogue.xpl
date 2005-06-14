@@ -63,7 +63,6 @@
                     <p:processor name="oxf:xslt">
                         <p:input name="config" href="xforms-portlet-forms.xsl"/>
                         <p:input name="data" href="#xhtml-data"/>
-                        <p:input name="annotated-data" href="#annotated-data"/>
                         <p:output name="data" id="xformed-data"/>
                     </p:processor>
                 </p:when>

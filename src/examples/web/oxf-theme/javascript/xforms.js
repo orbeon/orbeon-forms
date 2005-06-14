@@ -32,7 +32,7 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 function xformsCreateElementNS(namespaceURI, qname) {
     var localName = qname.indexOf(":") == -1 ? "" : ":" + qname.substr(0, qname.indexOf(":"));
     var request = Sarissa.getDomDocument();
-    request.loadXML("<" + qname + " xmlns" + localName + "='" + namespaceURI + "'/>")
+    request.loadXML("<" + qname + " xmlns" + localName + "='" + namespaceURI + "'/>");
     return request.documentElement;
 }
 
@@ -303,7 +303,7 @@ function xformsPageLoaded() {
 
     // Go through potential form controls, add style, and register listeners
     for (var controlIndex = 0; controlIndex < formsControls.length; controlIndex++) {
-    
+
         var control = formsControls[controlIndex];
 
         // Check that this is an XForms control. Otherwise continue.
@@ -351,7 +351,7 @@ function xformsPageLoaded() {
 
             } else if (isXFormsComboboxList) {
 
-                function computeSelectValue(select) {
+                var computeSelectValue = function (select) {
                     var options = select.options;
                     var selectValue = "";
                     for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
@@ -362,14 +362,14 @@ function xformsPageLoaded() {
                         }
                     }
                     select.selectValue = selectValue;
-                }
+                };
 
-                function selectChanged(event) {
+                var selectChanged = function (event) {
                     var select = getEventTarget(event);
                     computeSelectValue(select);
                     xformsFireEvent(select, "xxforms-value-change-with-focus-change",
                         select.selectValue, false);
-                }
+                };
 
                 // Register event listener on select
                 xformsAddEventListener(control, "change", selectChanged);
@@ -378,22 +378,22 @@ function xformsPageLoaded() {
 
             } else if (isXFormsRange) {
             
-                function rangeMouseDown(event) {
+                var rangeMouseDown = function (event) {
                     document.xformsCurrentRangeControl = getEventTarget(event).parentNode;
                     return false;
-                }
+                };
                 
-                function rangeMouseUp(event) {
+                var rangeMouseUp = function (event) {
                     document.xformsCurrentRangeControl = null;
                     return false;
-                }
+                };
                 
-                function rangeMouseMove(event) {
-                    var control = document.xformsCurrentRangeControl;
-                    if (control) {
+                var rangeMouseMove = function (event) {
+                    var rangeControl = document.xformsCurrentRangeControl;
+                    if (rangeControl) {
                         // Compute range boundaries
-                        var rangeStart = xformsGetElementPosition(control.track).left
-                        var rangeLength = control.track.clientWidth - control.slider.clientWidth;
+                        var rangeStart = xformsGetElementPosition(rangeControl.track).left;
+                        var rangeLength = rangeControl.track.clientWidth - rangeControl.slider.clientWidth;
 
                         // Compute value
                         var value = (event.clientX - rangeStart) / rangeLength;
@@ -404,15 +404,15 @@ function xformsPageLoaded() {
                         var sliderPosition = event.clientX - rangeStart;
                         if (sliderPosition < 0) sliderPosition = 0;
                         if (sliderPosition > rangeLength) sliderPosition = rangeLength;
-                        control.slider.style.left = sliderPosition;
+                        rangeControl.slider.style.left = sliderPosition;
                         
                         // Notify server that value changed
-                        control.value = value;
-                        xformsValueChanged(control, true);
+                        rangeControl.value = value;
+                        xformsValueChanged(rangeControl, true);
                     }
                     
                     return false;
-                }
+                };
                 
                 if (!control.listenersRegistered) {
                     control.listenersRegistered = true;
@@ -482,8 +482,14 @@ function xformsPageLoaded() {
             if (element.name) {
                 if (element.name.indexOf("$static-state") != -1)
                     form.xformsStaticState = element;
-                if (element.name.indexOf("$dynamic-state") != -1)
+                if (element.name.indexOf("$dynamic-state") != -1) {
                     form.xformsDynamicState = element;
+                }
+                if (element.name.indexOf("$temp-dynamic-state") != -1) {
+                    form.xformsTempDynamicState = element;
+                    if (element.value == "")
+                        element.value = form.xformsDynamicState.value;
+                }
             }
         }
     }
@@ -510,16 +516,18 @@ function xformsHandleResponse() {
     if (document.xformsXMLHttpRequest.readyState == 4) {
         var form = document.xformsTargetOfCurrentRequest.form;
         var responseXML = document.xformsXMLHttpRequest.responseXML;
-        if (responseXML && responseXML.documentElement 
+        if (responseXML && responseXML.documentElement
                 && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
                 
             // Good: we received an XML document from the server
             var responseRoot = responseXML.documentElement;
+            var newDynamicState = null;
+            var newDynamicStateTriggersPost = false;
             for (var i = 0; i < responseRoot.childNodes.length; i++) {
 
                 // Update instances
                 if (xformsGetLocalName(responseRoot.childNodes[i]) == "dynamic-state")
-                    form.xformsDynamicState.value = responseRoot.childNodes[i].firstChild.data;
+                    newDynamicState = xformsStringValue(responseRoot.childNodes[i]);
 
                 // First handle the <xxforms:itemsets> actions
                 if (xformsGetLocalName(responseRoot.childNodes[i]) == "action") {
@@ -534,7 +542,7 @@ function xformsHandleResponse() {
                                     var controlId = itemsetElement.getAttribute("id");
                                     var documentElement = document.getElementById(controlId);
 
-                                    if(documentElement.tagName == "SELECT") {
+                                    if (documentElement.tagName == "SELECT") {
 
                                         // Case of list / combobox
                                         var options = documentElement.options;
@@ -583,7 +591,7 @@ function xformsHandleResponse() {
                                             template = template.nextSibling;
                                             
                                         // Get its child element and clone
-                                        var template = template.firstChild;
+                                        template = template.firstChild;
                                         while (template.nodeType != ELEMENT_TYPE)
                                             template = template.nextSibling;
                                             
@@ -690,11 +698,19 @@ function xformsHandleResponse() {
                         
                         // Submit form
                         if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "submission") {
+                            newDynamicStateTriggersPost = true;
+                            form.xformsDynamicState.value = newDynamicState;
                             form.submit();
                         }
                     }
                 }
             }
+
+            // Store new dynamic state if that state did not trigger a post
+            if (!newDynamicStateTriggersPost) {
+                form.xformsDynamicState.value = newDynamicState;
+            }
+
             xformsDisplayLoading(form, "none");
             
         } else if (responseXML && responseXML.documentElement 
@@ -710,7 +726,7 @@ function xformsHandleResponse() {
             xformsDisplayLoading(form, "error");
             
         } else {
-        
+
             // The server didn't send valid XML
             form.xformsLoadingError.innerHTML = "Unexpected response received from server";
             xformsDisplayLoading(form, "error");
@@ -742,7 +758,7 @@ function xformsExecuteNextRequest() {
                 if (requestElements[i].tagName.indexOf("dynamic-state") != -1) {
                     var dynamicStateElement = requestElements[i];
                     dynamicStateElement.appendChild(dynamicStateElement.ownerDocument.createTextNode
-                        (target.form.xformsDynamicState.value));
+                        (target.form.xformsTempDynamicState.value));
                 }
             }
             

@@ -43,6 +43,7 @@
                 <!-- Store private information used by the client-side JavaScript -->
                 <xhtml:input type="hidden" name="$static-state" value="{$request/xxforms:static-state}"/>
                 <xhtml:input type="hidden" name="$dynamic-state" value="{$response/xxforms:dynamic-state}"/>
+                <xhtml:input type="hidden" name="$temp-dynamic-state" value=""/>
                 <xhtml:span class="xforms-loading-loading"/>
                 <xhtml:span class="xforms-loading-error"/>
                 <xhtml:span class="xforms-loading-none"/>

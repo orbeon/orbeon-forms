@@ -263,14 +263,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 // Compute test
                                 String test;
                                 if (pathInfo.startsWith("*")) {
-                                    test = "(string-length(/request/request-path) >= " + (pathInfo.length() - 1)
-                                            + " and substring(/request/request-path, string-length(/request/request-path) - "
-                                            + (pathInfo.length() - 2) + ", " + (pathInfo.length() - 1) + ") = '"
-                                            + pathInfo.substring(1) + "')";
+                                    test = "ends-with( /request/request-path, '" 
+                                           + pathInfo.substring( 1 ) 
+                                           + "' )";
                                 } else if (pathInfo.endsWith("*")) {
-                                    test = "(string-length(/request/request-path) >= " + (pathInfo.length() - 1)
-                                            + "and substring(/request/request-path, 1, " + (pathInfo.length() - 1)
-                                            + ") = '" + pathInfo.substring(0, pathInfo.length() - 1) + "')";
+                                    final int len = pathInfo.length() - 1;
+                                    test = "starts-with( /request/request-path, " 
+                                           + pathInfo.substring( 0,  len )
+                                           + "' )";
                                 } else {
                                     test = "(/request/request-path = '" + pathInfo + "')";
                                 }

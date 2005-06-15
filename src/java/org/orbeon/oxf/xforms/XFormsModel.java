@@ -749,9 +749,9 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                                 final boolean previousRequiredState = instanceData.getPreviousRequiredState();
                                 final boolean newRequiredState = instanceData.getRequired().get();
                                 if (previousRequiredState && !newRequiredState) {
-                                    xformsControls.dispatchEvent(pipelineContext, new XFormsOptionalEvent(node));
+//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsOptionalEvent(null));// TODO: find bound control
                                 } else if (!previousRequiredState && newRequiredState) {
-                                    xformsControls.dispatchEvent(pipelineContext, new XFormsRequiredEvent(node));
+//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsRequiredEvent(null));// TODO: find bound control
                                 }
                             }
                             // Dispatch xforms-enabled/xforms-disabled
@@ -759,9 +759,9 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                                 final boolean previousRelevantState = instanceData.getPreviousRelevantState();
                                 final boolean newRelevantState = instanceData.getRelevant().get();
                                 if (previousRelevantState && !newRelevantState) {
-                                    xformsControls.dispatchEvent(pipelineContext, new XFormsDisabledEvent(node));
+//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsDisabledEvent(null));// TODO: find bound control
                                 } else if (!previousRelevantState && newRelevantState) {
-                                    xformsControls.dispatchEvent(pipelineContext, new XFormsEnabledEvent(node));
+//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsEnabledEvent(null));// TODO: find bound control
                                 }
                             }
                             // Dispatch xforms-readonly/xforms-readwrite
@@ -769,9 +769,9 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                                 final boolean previousReadonlyState = instanceData.getPreviousReadonlyState();
                                 final boolean newReadonlyState = instanceData.getReadonly().get();
                                 if (previousReadonlyState && !newReadonlyState) {
-                                    xformsControls.dispatchEvent(pipelineContext, new XFormsReadwriteEvent(node));
+//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsReadwriteEvent(null));// TODO: find bound control
                                 } else if (!previousReadonlyState && newReadonlyState) {
-                                    xformsControls.dispatchEvent(pipelineContext, new XFormsReadonlyEvent(node));
+//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsReadonlyEvent(null));// TODO: find bound control
                                 }
                             }
                         }
@@ -814,9 +814,9 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                                 final boolean previousValidState = instanceData.getPreviousValidState();
                                 final boolean newValidState = instanceData.getValid().get();
                                 if (previousValidState && !newValidState) {
-                                    xformsControls.dispatchEvent(pipelineContext, new XFormsInvalidEvent(node));
+//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsInvalidEvent(null));// TODO: find bound control
                                 } else if (!previousValidState && newValidState) {
-                                    xformsControls.dispatchEvent(pipelineContext, new XFormsValidEvent(node));
+//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsValidEvent(null));// TODO: find bound control
                                 }
                             }
                         }

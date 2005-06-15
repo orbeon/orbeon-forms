@@ -50,7 +50,7 @@
         <example id="authentication" label="J2EE Authentication" standalone="true"/>
     </section>
     <section label="Document-Centric App">
-        <example id="bizdoc" label="The &quot;BizDoc&quot; Example"/>
+        <example id="bizdoc" label="&quot;BizDoc&quot; Classic"/>
         <example id="bizdoc2" label="&quot;BizDoc&quot; NG" xforms-ng="true"/>
     </section>
     <section label="Database App">

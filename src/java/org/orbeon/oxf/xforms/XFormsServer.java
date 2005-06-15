@@ -183,8 +183,8 @@ public class XFormsServer extends ProcessorImpl {
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
-                        diffControlsState(ch, isInitializationRun ? null : xFormsControls.getInitialControlsState(),
-                                xFormsControls.getControlsState(pipelineContext));
+                        diffControlsState(ch, isInitializationRun ? null : xFormsControls.getInitialControlsState().getChildren(),
+                                xFormsControls.getControlsState(pipelineContext).getChildren());
 
                         ch.endElement();
                     }

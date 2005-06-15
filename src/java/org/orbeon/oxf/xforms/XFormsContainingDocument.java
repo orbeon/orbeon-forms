@@ -96,7 +96,7 @@ public class XFormsContainingDocument implements XFormsEventTarget {
         }
 
         // Search in controls
-        return xformsControls.getElementById(pipelineContext, id);
+        return xformsControls.getObjectById(id);
     }
 
     /**
@@ -156,7 +156,7 @@ public class XFormsContainingDocument implements XFormsEventTarget {
             // Reevaluation of binding expressions must occur before step 3 above.
 
             // Set current context to control
-            xformsControls.setBinding(pipelineContext, (Element) concreteEvent.getTargetObject());
+            xformsControls.setBinding(pipelineContext, (XFormsControls.ControlInfo) concreteEvent.getTargetObject());
 
             // Set value into the instance
             XFormsInstance.setValueForNode(xformsControls.getCurrentSingleNode(), concreteEvent.getNewValue());

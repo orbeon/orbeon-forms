@@ -827,7 +827,7 @@
                 <p:processor name="oxf:pipeline">
                     <p:input name="config" href="xforms-server/wrap-server.xpl"/>
                     <p:input name="event">
-                        <xxforms:event name="DOMActivate" source-control-id="id124"/>
+                        <xxforms:event name="DOMActivate" source-control-id="id124-1"/>
                     </p:input>
                     <p:input name="controls" href="xforms-server/repeat-controls.xml"/>
                     <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>

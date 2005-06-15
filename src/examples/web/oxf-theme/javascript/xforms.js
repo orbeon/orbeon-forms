@@ -623,84 +623,129 @@ function xformsHandleResponse() {
                     // Handle other actions
                     for (var actionIndex = 0; actionIndex < actionElement.childNodes.length; actionIndex++) {
 
-                        // Update controls
-                        if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "control-values") {
-                            var controlValuesElement = actionElement.childNodes[actionIndex];
-                            for (var j = 0; j < controlValuesElement.childNodes.length; j++) {
-                                if (xformsGetLocalName(controlValuesElement.childNodes[j]) == "control") {
-                                    var controlElement = controlValuesElement.childNodes[j];
-                                    var controlValue = xformsStringValue(controlElement);
-                                    var controlId = controlElement.getAttribute("id");
-                                    var documentElement = document.getElementById(controlId);
-                                    var documentElementClasses = documentElement.className.split(" ");
+                        var actionName = xformsGetLocalName(actionElement.childNodes[actionIndex]);
+                        switch (actionName) {
 
-                                    // Update value
-                                    if (document.xformsTargetOfCurrentRequest.id == controlId) {
-                                        // Don't update the control that we just modified
-                                    } else if (xformsArrayContains(documentElementClasses, "xforms-trigger")) {
-                                        // Triggers don't have a value: don't update them
-                                    } else if (xformsArrayContains(documentElementClasses, "xforms-select-full")
-                                            || xformsArrayContains(documentElementClasses, "xforms-select1-full")) {
-                                        // Handle checkboxes and radio buttons
-                                        var selectedValues = xformsArrayContains(documentElementClasses, "xforms-select-full")
-                                            ? controlValue.split(" ") : new Array(controlValue);
-                                        var checkboxInputs = documentElement.getElementsByTagName("input");
-                                        for (var checkboxInputIndex = 0; checkboxInputIndex < checkboxInputs.length; checkboxInputIndex++) {
-                                            var checkboxInput = checkboxInputs[checkboxInputIndex];
-                                            checkboxInput.checked = xformsArrayContains(selectedValues, checkboxInput.value);
+                            // Update controls
+                            case "control-values": {
+                                var controlValuesElement = actionElement.childNodes[actionIndex];
+                                for (var j = 0; j < controlValuesElement.childNodes.length; j++) {
+                                    var controlValueAction = xformsGetLocalName(controlValuesElement.childNodes[j]);
+                                    switch (controlValueAction) {
+
+                                        // Update control value
+                                        case "XXXcontrol": {
+                                            var controlElement = controlValuesElement.childNodes[j];
+                                            var controlValue = xformsStringValue(controlElement);
+                                            var controlId = controlElement.getAttribute("id");
+                                            var documentElement = document.getElementById(controlId);
+                                            if (!documentElement) alert(controlId);
+                                            var documentElementClasses = documentElement.className.split(" ");
+
+                                            // Update value
+                                            if (document.xformsTargetOfCurrentRequest.id == controlId) {
+                                                // Don't update the control that we just modified
+                                            } else if (xformsArrayContains(documentElementClasses, "xforms-trigger")) {
+                                                // Triggers don't have a value: don't update them
+                                            } else if (xformsArrayContains(documentElementClasses, "xforms-select-full")
+                                                    || xformsArrayContains(documentElementClasses, "xforms-select1-full")) {
+                                                // Handle checkboxes and radio buttons
+                                                var selectedValues = xformsArrayContains(documentElementClasses, "xforms-select-full")
+                                                    ? controlValue.split(" ") : new Array(controlValue);
+                                                var checkboxInputs = documentElement.getElementsByTagName("input");
+                                                for (var checkboxInputIndex = 0; checkboxInputIndex < checkboxInputs.length; checkboxInputIndex++) {
+                                                    var checkboxInput = checkboxInputs[checkboxInputIndex];
+                                                    checkboxInput.checked = xformsArrayContains(selectedValues, checkboxInput.value);
+                                                }
+                                            } else if (xformsArrayContains(documentElementClasses, "xforms-select-compact")
+                                                    || xformsArrayContains(documentElementClasses, "xforms-select1-minimal")) {
+                                                // Handle lists and comboboxes
+                                                var selectedValues = xformsArrayContains(documentElementClasses, "xforms-select-compact")
+                                                    ? controlValue.split(" ") : new Array(controlValue);
+                                                var options = documentElement.options;
+                                                for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
+                                                    var option = options[optionIndex];
+                                                    option.selected = xformsArrayContains(selectedValues, option.value);
+                                                }
+                                            } else if (xformsArrayContains(documentElementClasses, "xforms-output")) {
+                                                // XForms output
+                                                while(documentElement.childNodes.length > 0)
+                                                    documentElement.removeChild(documentElement.firstChild);
+                                                documentElement.appendChild
+                                                    (documentElement.ownerDocument.createTextNode(controlValue));
+                                            } else if (xformsArrayContains(documentElementClasses, "xforms-control")
+                                                    && typeof(documentElement.value) == "string") {
+                                                // Other controls that have a value (textfield, etc)
+                                                if (documentElement.value != controlValue) {
+                                                    documentElement.value = controlValue;
+                                                }
+                                            }
+
+                                            // Update validity
+                                            documentElement.isValid = controlElement.getAttribute("valid") != "false";
+
+                                            // Update style
+                                            xformsUpdateStyle(documentElement);
+                                            break;
                                         }
-                                    } else if (xformsArrayContains(documentElementClasses, "xforms-select-compact")
-                                            || xformsArrayContains(documentElementClasses, "xforms-select1-minimal")) {
-                                        // Handle lists and comboboxes
-                                        var selectedValues = xformsArrayContains(documentElementClasses, "xforms-select-compact")
-                                            ? controlValue.split(" ") : new Array(controlValue);
-                                        var options = documentElement.options;
-                                        for (var optionIndex = 0; optionIndex < options.length; optionIndex++) {
-                                            var option = options[optionIndex];
-                                            option.selected = xformsArrayContains(selectedValues, option.value);
-                                        }
-                                    } else if (xformsArrayContains(documentElementClasses, "xforms-output")) {
-                                        // XForms output
-                                        while(documentElement.childNodes.length > 0)
-                                            documentElement.removeChild(documentElement.firstChild);
-                                        documentElement.appendChild
-                                            (documentElement.ownerDocument.createTextNode(controlValue));
-                                    } else if (xformsArrayContains(documentElementClasses, "xforms-control")
-                                            && typeof(documentElement.value) == "string") {
-                                        // Other controls that have a value (textfield, etc)
-                                        if (documentElement.value != controlValue) {
-                                            documentElement.value = controlValue;
+
+                                        // Copy repeat template
+                                        case "copy-repeat-template": {
+                                            var copyRepeatTemplateElement = controlValuesElement.childNodes[j];
+                                            var repeatId = copyRepeatTemplateElement.getAttribute("id");
+                                            // Locate template to copy
+                                            var repeatSpan = document.getElementById(repeatId);
+                                            var template = repeatSpan.lastChild;
+                                            while (template.nodeType != ELEMENT_TYPE)
+                                                template = template.previousSibling;
+                                            // Duplicate the template
+                                            var templateCopy = template.cloneNode(true);
+                                            repeatSpan.appendChild(templateCopy);
+                                            // Add suffix to all the ids
+                                            var idSuffix = copyRepeatTemplateElement.getAttribute("id-suffix");
+                                            var addSuffixToIds = function(element, idSuffix) {
+                                                if (element.id) element.id += idSuffix;
+                                                for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
+                                                    var childNode = element.childNodes[childIndex];
+                                                    if (childNode.nodeType == ELEMENT_TYPE)
+                                                        addSuffixToIds(element, idSuffix);
+                                                }
+                                            };
+                                            addSuffixToIds(template, idSuffix);
+                                            // Remove class on template
+                                            template.className = "";
+
+                                            break;
                                         }
                                     }
-
-                                    // Update validity
-                                    documentElement.isValid = controlElement.getAttribute("valid") != "false";
-
-                                    // Update style
-                                    xformsUpdateStyle(documentElement);
                                 }
+                                break;
                             }
-                        }
 
-                        // Display or hide divs
-                        if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "divs") {
-                            var divsElement = actionElement.childNodes[actionIndex];
-                            for (var j = 0; j < divsElement.childNodes.length; j++) {
-                                if (xformsGetLocalName(divsElement.childNodes[j]) == "div") {
-                                    var divElement = divsElement.childNodes[j];
-                                    var controlId = divElement.getAttribute("id");
-                                    var visibile = divElement.getAttribute("visibility") == "visible";
-                                    var documentElement = document.getElementById(controlId);
-                                    documentElement.style.display = visibile ? "block" : "none";
+                            // Display or hide divs
+                            case "divs": {
+                                var divsElement = actionElement.childNodes[actionIndex];
+                                for (var j = 0; j < divsElement.childNodes.length; j++) {
+                                    if (xformsGetLocalName(divsElement.childNodes[j]) == "div") {
+                                        var divElement = divsElement.childNodes[j];
+                                        var controlId = divElement.getAttribute("id");
+                                        var visibile = divElement.getAttribute("visibility") == "visible";
+                                        var documentElement = document.getElementById(controlId);
+                                        documentElement.style.display = visibile ? "block" : "none";
+                                    }
                                 }
+                                break;
                             }
-                        }
-                        
-                        // Submit form
-                        if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "submission") {
-                            newDynamicStateTriggersPost = true;
-                            form.xformsDynamicState.value = newDynamicState;
-                            form.submit();
+
+                            // Submit form
+                            case "submission": {
+                                if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "submission") {
+                                    newDynamicStateTriggersPost = true;
+                                    form.xformsDynamicState.value = newDynamicState;
+                                    form.submit();
+                                }
+                                break;
+                            }
                         }
                     }
                 }
@@ -708,7 +753,7 @@ function xformsHandleResponse() {
 
             // Store new dynamic state if that state did not trigger a post
             if (!newDynamicStateTriggersPost) {
-                form.xformsDynamicState.value = newDynamicState;
+                form.xformsTempDynamicState.value = newDynamicState;
             }
 
             xformsDisplayLoading(form, "none");

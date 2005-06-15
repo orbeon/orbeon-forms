@@ -29,7 +29,7 @@
                 <include>/request/parameters/parameter[name = '$instance']</include>
             </config>
         </p:input>
-        <p:output name="data" id="request-info" debug="xxxrequest-info"/>
+        <p:output name="data" id="request-info"/>
     </p:processor>
 
     <p:choose href="#request-info">
@@ -48,7 +48,7 @@
             <!-- Dereference URI and return XML instance -->
             <p:processor name="oxf:url-generator">
                 <p:input name="config" href="aggregate('config', aggregate('url', #request-body#xpointer(string(/request/body))))"/>
-                <p:output name="data" ref="instance" debug="xxxxmlsubmission1"/>
+                <p:output name="data" ref="instance"/>
             </p:processor>
         </p:when>
         <p:when test="(lower-case(/*/method) = 'get' or /*/container-type = 'portlet') and /*/parameters/parameter">
@@ -64,7 +64,7 @@
                         </xsl:template>
                     </xsl:stylesheet>
                 </p:input>
-                <p:output name="data" ref="instance" debug="xxxxmlsubmission2"/>
+                <p:output name="data" ref="instance"/>
             </p:processor>
 
         </p:when>

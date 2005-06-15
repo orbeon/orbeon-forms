@@ -634,7 +634,7 @@ function xformsHandleResponse() {
                                     switch (controlValueAction) {
 
                                         // Update control value
-                                        case "XXXcontrol": {
+                                        case "control": {
                                             var controlElement = controlValuesElement.childNodes[j];
                                             var controlValue = xformsStringValue(controlElement);
                                             var controlId = controlElement.getAttribute("id");

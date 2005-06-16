@@ -268,7 +268,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                            + "' )";
                                 } else if (pathInfo.endsWith("*")) {
                                     final int len = pathInfo.length() - 1;
-                                    test = "starts-with( /request/request-path, " 
+                                    test = "starts-with( /request/request-path, '" 
                                            + pathInfo.substring( 0,  len )
                                            + "' )";
                                 } else {

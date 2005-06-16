@@ -21,21 +21,20 @@ import org.orbeon.saxon.xpath.Variable;
 import org.orbeon.saxon.xpath.XPathException;
 import org.orbeon.saxon.xpath.XPathExpression;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class PooledXPathExpression {
     private XPathExpression expression;
     private ObjectPool pool;
     private StandaloneContext context;
-    private Map variables = new HashMap();
+    private java.util.Map variables;
 
-    public PooledXPathExpression(XPathExpression exp, ObjectPool pool, StandaloneContext context, Map variables) {
+    public PooledXPathExpression
+    ( XPathExpression exp, ObjectPool pool, StandaloneContext context, final java.util.Map vars ) {
         this.expression = exp;
         this.pool = pool;
         this.context = context;
-        this.variables = variables;
+        variables = vars;
     }
 
     public void returnToPool() {
@@ -75,8 +74,9 @@ public class PooledXPathExpression {
     }
 
     public void destroy() {
-        this.context = null;
-        this.expression = null;
-        this.pool = null;
+        context = null;
+        expression = null;
+        pool = null;
+        variables = null;
     }
 }

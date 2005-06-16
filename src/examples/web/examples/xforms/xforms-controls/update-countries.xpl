@@ -34,7 +34,7 @@
     </p:processor>
 
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#xml-request" debug="data"/>
+        <p:input name="data" href="#xml-request"/>
         <p:input name="countries" href="/init-database/countries.xml"/>
         <p:input name="config">
             <xsl:stylesheet version="2.0" exclude-result-prefixes="xhtml oxf xs p">

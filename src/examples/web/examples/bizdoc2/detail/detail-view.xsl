@@ -346,10 +346,8 @@
                                                     <xforms:label>Add Child</xforms:label>
                                                     <xforms:insert ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()" position="after"/>
                                                 </xforms:trigger>
-                                            </td>
-                                            <td>
                                                 <xforms:trigger>
-                                                    <xforms:label>X</xforms:label>
+                                                    <xforms:label>Remove Child</xforms:label>
                                                     <xforms:delete ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()"/>
                                                 </xforms:trigger>
                                             </td>

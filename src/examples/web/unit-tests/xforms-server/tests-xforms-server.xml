@@ -690,128 +690,115 @@
                     <xxf:itemsets/>
                     <xxforms:controls xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                         <table>
-                            <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id123">
-                                <xhtml:span id="id123-1">
-                                    <tr>
-                                        <td>
-                                            <table>
-                                                <xhtml:span id="id124-1">
-                                                    <xhtml:span id="id124-1-1">
-                                                        <tr>
-                                                            <td>
-                                                                <xhtml:span id="id125-1-1" class="xforms-control xforms-output">f11</xhtml:span>
-                                                            </td>
-                                                            <td>
-                                                                <xhtml:span id="id126-1-1" class="xforms-control xforms-output">l11</xhtml:span>
-                                                            </td>
-                                                        </tr>
-                                                    </xhtml:span>
-                                                    <xhtml:span id="id124-1-2">
-                                                        <tr>
-                                                            <td>
-                                                                <xhtml:span id="id125-1-2" class="xforms-control xforms-output">f12</xhtml:span>
-                                                            </td>
-                                                            <td>
-                                                                <xhtml:span id="id126-1-2" class="xforms-control xforms-output">l12</xhtml:span>
-                                                            </td>
-                                                        </tr>
-                                                    </xhtml:span>
-                                                </xhtml:span>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </xhtml:span>
-                                <xhtml:span id="id123-2">
-                                    <tr>
-                                        <td>
-                                            <table>
-                                                <xhtml:span id="id124-2">
-                                                    <xhtml:span id="id124-2-1">
-                                                        <tr>
-                                                            <td>
-                                                                <xhtml:span id="id125-2-1" class="xforms-control xforms-output">f21</xhtml:span>
-                                                            </td>
-                                                            <td>
-                                                                <xhtml:span id="id126-2-1" class="xforms-control xforms-output">l21</xhtml:span>
-                                                            </td>
-                                                        </tr>
-                                                    </xhtml:span>
-                                                </xhtml:span>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </xhtml:span>
-                                <xhtml:span id="id123-3">
-                                    <tr>
-                                        <td>
-                                            <table>
-                                                <xhtml:span id="id124-3">
-                                                    <xhtml:span id="id124-3-1">
-                                                        <tr>
-                                                            <td>
-                                                                <xhtml:span id="id125-3-1" class="xforms-control xforms-output">f31</xhtml:span>
-                                                            </td>
-                                                            <td>
-                                                                <xhtml:span id="id126-3-1" class="xforms-control xforms-output">l31</xhtml:span>
-                                                            </td>
-                                                        </tr>
-                                                    </xhtml:span>
-                                                    <xhtml:span id="id124-3-2">
-                                                        <tr>
-                                                            <td>
-                                                                <xhtml:span id="id125-3-2" class="xforms-control xforms-output">f32</xhtml:span>
-                                                            </td>
-                                                            <td>
-                                                                <xhtml:span id="id126-3-2" class="xforms-control xforms-output">l32</xhtml:span>
-                                                            </td>
-                                                        </tr>
-                                                    </xhtml:span>
-                                                    <xhtml:span id="id124-3-3">
-                                                        <tr>
-                                                            <td>
-                                                                <xhtml:span id="id125-3-3" class="xforms-control xforms-output">f33</xhtml:span>
-                                                            </td>
-                                                            <td>
-                                                                <xhtml:span id="id126-3-3" class="xforms-control xforms-output">l33</xhtml:span>
-                                                            </td>
-                                                        </tr>
-                                                    </xhtml:span>
-                                                    <xhtml:span id="id124-3-4">
-                                                        <tr>
-                                                            <td>
-                                                                <xhtml:span id="id125-3-4" class="xforms-control xforms-output">f34</xhtml:span>
-                                                            </td>
-                                                            <td>
-                                                                <xhtml:span id="id126-3-4" class="xforms-control xforms-output">l34</xhtml:span>
-                                                            </td>
-                                                        </tr>
-                                                    </xhtml:span>
-                                                </xhtml:span>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </xhtml:span>
-                                <xhtml:span id="repeat-template-id123" class="xforms-repeat-template">
-                                    <tr class="xforms-repeat-template" id="repeat-template-id123">
-                                        <td>
-                                            <table>
-                                                <xhtml:span id="id124">
-                                                    <xhtml:span id="repeat-template-id124" class="xforms-repeat-template">
-                                                        <tr class="xforms-repeat-template" id="repeat-template-id124">
-                                                            <td>
-                                                                <xhtml:span id="id125" class="xforms-control xforms-output">$xforms-output-value$</xhtml:span>
-                                                            </td>
-                                                            <td>
-                                                                <xhtml:span id="id126" class="xforms-control xforms-output">$xforms-output-value$</xhtml:span>
-                                                            </td>
-                                                        </tr>
-                                                    </xhtml:span>
-                                                </xhtml:span>
-                                            </table>
-                                        </td>
-                                    </tr>
-                                </xhtml:span>
-                            </xhtml:span>
+                            <tr id="id123-repeat-begin" class="xforms-repeat-begin-end"/>
+                            <tr class="xforms-repeat-delimiter"/>
+                            <tr>
+                                <td>
+                                    <table>
+                                        <tr id="id124-1-repeat-begin" class="xforms-repeat-begin-end"/>
+                                        <tr class="xforms-repeat-delimiter"/>
+                                        <tr>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-1-1" class="xforms-control xforms-output">f11</xhtml:span>
+                                            </td>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-1-1" class="xforms-control xforms-output">l11</xhtml:span>
+                                            </td>
+                                        </tr>
+                                        <tr class="xforms-repeat-delimiter"/>
+                                        <tr>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-1-2" class="xforms-control xforms-output">f12</xhtml:span>
+                                            </td>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-1-2" class="xforms-control xforms-output">l12</xhtml:span>
+                                            </td>
+                                        </tr>
+                                        <tr id="id124-1-repeat-end" class="xforms-repeat-begin-end"/>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr class="xforms-repeat-delimiter"/>
+                            <tr>
+                                <td>
+                                    <table>
+                                        <tr id="id124-2-repeat-begin" class="xforms-repeat-begin-end"/>
+                                        <tr class="xforms-repeat-delimiter"/>
+                                        <tr>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-2-1" class="xforms-control xforms-output">f21</xhtml:span>
+                                            </td>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-2-1" class="xforms-control xforms-output">l21</xhtml:span>
+                                            </td>
+                                        </tr>
+                                        <tr id="id124-2-repeat-end" class="xforms-repeat-begin-end"/>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr class="xforms-repeat-delimiter"/>
+                            <tr>
+                                <td>
+                                    <table>
+                                        <tr id="id124-3-repeat-begin" class="xforms-repeat-begin-end"/>
+                                        <tr class="xforms-repeat-delimiter"/>
+                                        <tr>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-1" class="xforms-control xforms-output">f31</xhtml:span>
+                                            </td>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-1" class="xforms-control xforms-output">l31</xhtml:span>
+                                            </td>
+                                        </tr>
+                                        <tr class="xforms-repeat-delimiter"/>
+                                        <tr>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-2" class="xforms-control xforms-output">f32</xhtml:span>
+                                            </td>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-2" class="xforms-control xforms-output">l32</xhtml:span>
+                                            </td>
+                                        </tr>
+                                        <tr class="xforms-repeat-delimiter"/>
+                                        <tr>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-3" class="xforms-control xforms-output">f33</xhtml:span>
+                                            </td>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-3" class="xforms-control xforms-output">l33</xhtml:span>
+                                            </td>
+                                        </tr>
+                                        <tr class="xforms-repeat-delimiter"/>
+                                        <tr>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-3-4" class="xforms-control xforms-output">f34</xhtml:span>
+                                            </td>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-4" class="xforms-control xforms-output">l34</xhtml:span>
+                                            </td>
+                                        </tr>
+                                        <tr id="id124-3-repeat-end" class="xforms-repeat-begin-end"/>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr class="xforms-repeat-delimiter"/>
+                            <tr class="xforms-repeat-template">
+                                <td>
+                                    <table>
+                                        <tr id="id124-repeat-begin" class="xforms-repeat-begin-end"/>
+                                        <tr class="xforms-repeat-template">
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125" class="xforms-control xforms-output">$xforms-output-value$</xhtml:span>
+                                            </td>
+                                            <td>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126" class="xforms-control xforms-output">$xforms-output-value$</xhtml:span>
+                                            </td>
+                                        </tr>
+                                        <tr id="id124-repeat-end" class="xforms-repeat-begin-end"/>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr id="id123-repeat-end" class="xforms-repeat-begin-end"/>
                         </table>
                     </xxforms:controls>
                 </xxf:action>

@@ -16,7 +16,7 @@
 
     <xhtml:head><xhtml:title>Counter</xhtml:title></xhtml:head>
     <xhtml:body>
-        <xforms:group ref="instance">
+        <xforms:group ref="/instance">
             <xhtml:p>The current value is: <xforms:output ref="counter"/>.</xhtml:p>
             <xhtml:p>
                 <xforms:submit>

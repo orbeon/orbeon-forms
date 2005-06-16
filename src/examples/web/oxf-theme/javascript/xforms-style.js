@@ -53,7 +53,7 @@ function xformsUpdateStyle(element) {
             if (className == "xforms-help") {
                 if (!element.divId) {
                     element.divId = element.id + "-div";
-                    var divHTML = tt_Htm(this, element.divId, element.firstChild.data);
+                    var divHTML = tt_Htm(this, element.divId, xformsStringValue(element));
                     var container = element.cloneNode(true);
                     container.innerHTML = divHTML;
                     document.body.appendChild(container.firstChild);

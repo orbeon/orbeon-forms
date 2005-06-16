@@ -693,27 +693,67 @@ function xformsHandleResponse() {
                                         case "copy-repeat-template": {
                                             var copyRepeatTemplateElement = controlValuesElement.childNodes[j];
                                             var repeatId = copyRepeatTemplateElement.getAttribute("id");
-                                            // Locate template to copy
-                                            var repeatSpan = document.getElementById(repeatId);
-                                            var template = repeatSpan.lastChild;
-                                            while (template.nodeType != ELEMENT_TYPE)
-                                                template = template.previousSibling;
-                                            // Duplicate the template
-                                            var templateCopy = template.cloneNode(true);
-                                            repeatSpan.appendChild(templateCopy);
-                                            // Add suffix to all the ids
                                             var idSuffix = copyRepeatTemplateElement.getAttribute("id-suffix");
-                                            var addSuffixToIds = function(element, idSuffix) {
-                                                if (element.id) element.id += idSuffix;
-                                                for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
-                                                    var childNode = element.childNodes[childIndex];
-                                                    if (childNode.nodeType == ELEMENT_TYPE)
-                                                        addSuffixToIds(element, idSuffix);
+                                            // Locate end of the repeat
+                                            var repeatEnd = document.getElementById(repeatId + "-repeat-end");
+                                            // Put nodes of the template in an array in reverse order
+                                            var templateNodes = new Array();
+                                            var templateNode = repeatEnd.previousSibling;
+                                            while (templateNode.className != "xforms-repeat-delimiter") {
+                                                if (templateNode.nodeType == ELEMENT_TYPE) {
+                                                    var nodeCopy = templateNode.cloneNode(true);
+                                                    // Add suffix to all the ids
+                                                    var addSuffixToIds = function(element, idSuffix) {
+                                                        if (element.id) element.id += idSuffix;
+                                                        for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
+                                                            var childNode = element.childNodes[childIndex];
+                                                            if (childNode.nodeType == ELEMENT_TYPE)
+                                                                addSuffixToIds(childNode, idSuffix);
+                                                        }
+                                                    };
+                                                    addSuffixToIds(nodeCopy, idSuffix);
+                                                    // Remove "xforms-repeat-template" from classes on copy of element
+                                                    var nodeCopyClasses = nodeCopy.className.split(" ");
+                                                    var nodeCopyNewClasses = new Array();
+                                                    for (var nodeCopyClassIndex = 0; nodeCopyClassIndex < nodeCopyClasses.length; nodeCopyClassIndex++) {
+                                                        var currentClass = nodeCopyClasses[nodeCopyClassIndex];
+                                                        if (currentClass != "xforms-repeat-template")
+                                                            nodeCopyNewClasses.push(currentClass);
+                                                    }
+                                                    nodeCopy.className = nodeCopyNewClasses.join(" ");
+                                                    templateNodes.push(nodeCopy);
                                                 }
-                                            };
-                                            addSuffixToIds(template, idSuffix);
-                                            // Remove class on template
-                                            template.className = "";
+                                                templateNode = templateNode.previousSibling;
+                                            }
+                                            // Figure out tag name for delimiter element
+                                            var tagName = templateNodes[0].tagName;
+                                            // Insert copy of template nodes
+                                            var afterTemplateCopy = templateNode.nextSibling;
+                                            for (var templateNodeIndex = 0; templateNodeIndex < templateNodes.length; templateNodeIndex++)
+                                                 afterTemplateCopy.parentNode.insertBefore(templateNodes[templateNodeIndex], afterTemplateCopy);
+                                            // Insert delimiter
+                                            var newDelimiter = document.createElement(templateNodes[0].tagName);
+                                            newDelimiter.className = "xforms-repeat-delimiter";
+                                            afterTemplateCopy.parentNode.insertBefore(newDelimiter, afterTemplateCopy);
+                                            break;
+                                        }
+
+                                        // Copy repeat template
+                                        case "delete-element": {
+                                            var deleteElementElement = controlValuesElement.childNodes[j];
+                                            var deleteId = deleteElementElement.getAttribute("id");
+                                            var repeatId = deleteId.substring(0, deleteId.lastIndexOf("-"));
+                                            // Locate end of repeat
+                                            var cursor = document.getElementById(repeatId + "-repeat-end");
+                                            // Move to last delimiter
+                                            while (cursor.className != "xforms-repeat-delimiter")
+                                                cursor = cursor.previousSibling;
+                                            // Eat everything until next delimiter
+                                            do {
+                                                var nextCursor = cursor.previousSibling;
+                                                cursor.parentNode.removeChild(cursor);
+                                                cursor = nextCursor;
+                                            } while (cursor.className != "xforms-repeat-delimiter");
 
                                             break;
                                         }

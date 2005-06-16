@@ -13,6 +13,20 @@
  */
 
 function xformsUpdateStyle(element) {
+
+    /**
+     * Updates an HTML label with a new message (used for XForms label, hint, and help).
+     */
+    function updateLabel(label, message) {
+        if (xformsStringValue(label) != message) {
+            // Remove content of label
+            while (label.firstChild != null)
+                label.removeChild(label.firstChild);
+            // Add new message
+            label.appendChild(document.createTextNode(message));
+        }
+    }
+
     if (element.className) {
         var classes = element.className.split(" ");
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
@@ -116,9 +130,25 @@ function xformsUpdateStyle(element) {
                 
             }
 
+            // Update validity
             if (element.alertElement && typeof(element.isValid) != "undefined") {
                 element.alertElement.className = element.isValid ? "xforms-alert-inactive" 
                     : "xforms-alert-active";
+            }
+
+            // Update label
+            if (element.labelElement && typeof(element.labelMessage) != "undefined") {
+                updateLabel(element.labelElement, element.labelMessage);
+            }
+
+            // Update hint
+            if (element.hintElement && typeof(element.hintMessage) != "undefined") {
+                updateLabel(element.hintElement, element.hintMessage);
+            }
+
+            // Update help
+            if (element.helpElement && typeof(element.helpMessage) != "undefined") {
+                updateLabel(element.helpElement, element.helpMessage);
             }
 
             // This is for widgets. Code for widgets should be modularized and moved out of this file

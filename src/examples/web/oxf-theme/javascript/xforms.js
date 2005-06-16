@@ -639,7 +639,6 @@ function xformsHandleResponse() {
                                             var controlValue = xformsStringValue(controlElement);
                                             var controlId = controlElement.getAttribute("id");
                                             var documentElement = document.getElementById(controlId);
-                                            if (!documentElement) alert(controlId);
                                             var documentElementClasses = documentElement.className.split(" ");
 
                                             // Update value
@@ -681,8 +680,15 @@ function xformsHandleResponse() {
                                                 }
                                             }
 
-                                            // Update validity
-                                            documentElement.isValid = controlElement.getAttribute("valid") != "false";
+                                            // Store validity, label, hint, help in element
+                                            var newValid = controlElement.getAttribute("valid");
+                                            if (newValid != null) documentElement.isValid = newValid != "false";
+                                            var newLabel = controlElement.getAttribute("label");
+                                            if (newLabel != null) documentElement.labelMessage = newLabel;
+                                            var newHint = controlElement.getAttribute("hint");
+                                            if (newHint != null) documentElement.hintMessage = newHint;
+                                            var newHelp = controlElement.getAttribute("help");
+                                            if (newHelp) documentElement.helpMessage = newHelp;
 
                                             // Update style
                                             xformsUpdateStyle(documentElement);
@@ -705,6 +711,7 @@ function xformsHandleResponse() {
                                                     // Add suffix to all the ids
                                                     var addSuffixToIds = function(element, idSuffix) {
                                                         if (element.id) element.id += idSuffix;
+                                                        if (element.htmlFor) element.htmlFor += idSuffix;
                                                         for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
                                                             var childNode = element.childNodes[childIndex];
                                                             if (childNode.nodeType == ELEMENT_TYPE)
@@ -729,8 +736,32 @@ function xformsHandleResponse() {
                                             var tagName = templateNodes[0].tagName;
                                             // Insert copy of template nodes
                                             var afterTemplateCopy = templateNode.nextSibling;
-                                            for (var templateNodeIndex = 0; templateNodeIndex < templateNodes.length; templateNodeIndex++)
-                                                 afterTemplateCopy.parentNode.insertBefore(templateNodes[templateNodeIndex], afterTemplateCopy);
+                                            for (var templateNodeIndex = 0; templateNodeIndex < templateNodes.length; templateNodeIndex++) {
+                                                templateNode = templateNodes[templateNodeIndex];
+                                                afterTemplateCopy.parentNode.insertBefore(templateNode, afterTemplateCopy);
+                                                // Look for help, alert, hint labels in template
+                                                var updateControlToLabels = function(element) {
+                                                    if (typeof element.htmlFor != "undefined") {
+                                                        var control = document.getElementById(element.htmlFor);
+                                                        switch (element.className) {
+                                                            case "xforms-help":
+                                                                control.helpElement = element; break;
+                                                            case "xforms-alert-valid":
+                                                                control.alertElement = element; break;
+                                                            case "xforms-hint":
+                                                                control.hintElement = element; break;
+                                                            case "xforms-label":
+                                                                control.labelElement = element; break;
+                                                        }
+                                                    }
+                                                    for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
+                                                        var childNode = element.childNodes[childIndex];
+                                                        if (childNode.nodeType == ELEMENT_TYPE)
+                                                            updateControlToLabels(childNode);
+                                                    }
+                                                };
+                                                updateControlToLabels(templateNode);
+                                            }
                                             // Insert delimiter
                                             var newDelimiter = document.createElement(templateNodes[0].tagName);
                                             newDelimiter.className = "xforms-repeat-delimiter";

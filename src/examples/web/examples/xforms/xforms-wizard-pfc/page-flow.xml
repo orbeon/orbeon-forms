@@ -1,0 +1,63 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<config xmlns="http://www.orbeon.com/oxf/controller"
+        xmlns:xu="http://www.xmldb.org/xupdate">
+
+    <page id="xforms-wizard-pfc-firstname" path-info="/xforms-wizard-pfc"
+          xforms="form.xml"
+          view="step1-firstname.xml">
+        <action when="/form/action = 'next'">
+            <result page="xforms-wizard-pfc-lastname">
+                <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
+            </result>
+        </action>
+    </page>
+
+    <page id="xforms-wizard-pfc-lastname" path-info="/xforms-wizard-pfc/lastname"
+          xforms="form.xml"
+          view="step2-lastname.xml">
+        <action when="/form/action = 'previous'">
+            <result page="xforms-wizard-pfc-firstname">
+                <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
+            </result>
+        </action>
+        <action when="/form/action = 'next'">
+            <result page="xforms-wizard-pfc-ssn">
+                <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
+            </result>
+        </action>
+    </page>
+
+    <page id="xforms-wizard-pfc-ssn" path-info="/xforms-wizard-pfc/ssn"
+          xforms="form.xml"
+          view="step3-ssn.xml">
+        <action when="/form/action = 'previous'">
+            <result page="xforms-wizard-pfc-lastname">
+                <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
+            </result>
+        </action>
+        <action when="/form/action = 'finish'">
+            <result page="xforms-wizard-pfc-summary">
+                <xu:update select="/form/user"><xu:copy-of select="document('input:instance')/form/user/*"/></xu:update>
+            </result>
+        </action>
+    </page>
+
+    <page id="xforms-wizard-pfc-summary" path-info="/xforms-wizard-pfc/summary"
+          xforms="form.xml"
+          view="step4-summary.xsl"/>
+
+    <epilogue url="oxf:/config/epilogue.xpl"/>
+
+</config>

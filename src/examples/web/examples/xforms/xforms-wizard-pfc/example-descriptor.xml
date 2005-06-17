@@ -1,0 +1,36 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<example-descriptor>
+    <title>XForms Multi-Screen Wizard</title>
+    <source>form.xml</source>
+    <source>step1-firstname.xml</source>
+    <source>step2-lastname.xml</source>
+    <source>step3-ssn.xml</source>
+    <source>step4-summary.xsl</source>
+    <description>
+         <p>
+            In some cases, it makes sense to create a multiple-pages interface to fill out a single
+            logical form. Such wizard-like user interfaces are typically used to make the user
+            experience more intuitive, or when different sections in the form need to be filled out
+            based on previous answers.
+        </p>
+        <p>
+            The example below is an example of a simple wizard: the first 3 steps ask questions to
+            the end-user and the last step displays the information entered in the previous steps.
+            There only one XForms model for the whole wizard, and the navigation logic is defined in
+            the Page Flow Controller configuration file, as illustrated by the diagram below.
+        </p>
+        <p><img src="/examples/xforms/xforms-wizard/xforms-wizard.png"/></p>
+    </description>
+</example-descriptor>

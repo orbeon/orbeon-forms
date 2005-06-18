@@ -442,9 +442,10 @@ pipelineContext.addContextListener(new ContextListenerAdapter() {
                 </p>
                 <source><![CDATA[
 /**
- * This method is used by processor implementations to store state information tied to the
- * current execution of the current processor, across processor initialization as well as reads
- * of all the processor's outputs.
+ * This method is used by processor implementations to store state
+ * information tied to the current execution of the current processor,
+ * across processor initialization as well as reads of all the
+ * processor's outputs.
  *
  * This method should be called from the reset() method.
  *

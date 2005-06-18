@@ -28,12 +28,14 @@
                 <table cellpadding="0" cellspacing="0" border="0" id="main">
                     <!-- Banner (with search) -->
                     <tr><td colspan="2" id="banner">
-                        <div style="float: left">
+                        <div id="orbeon-logo" style="float: left">
                             <a href="/" f:url-norewrite="true">
-                                <img f:url-norewrite="false" width="199" height="42" style="border: 0 white; margin-left: 1em; margin-top: 0.2em; margin-bottom: 0.4em" src="/oxf-theme/images/orbeon-small-blueorange.gif"/>
+                                <img f:url-norewrite="false" width="199" height="42"
+                                     style="border: 0 white; margin-top: 0.2em; margin-bottom: 0.4em"
+                                     src="/oxf-theme/images/orbeon-small-blueorange.gif"/>
                             </a>
                         </div>
-                        <span style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
+                        <span id="navigation" style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">
                             <form method="GET" class="blue" style="margin:0.2em; margin-bottom:0em" action="http://www.google.com/custom">
                                 <a href="http://www.orbeon.com/" f:url-norewrite="true">Orbeon.com</a> |
                                 <a href="../" f:url-norewrite="true">Examples</a> | 

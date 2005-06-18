@@ -110,6 +110,10 @@ fieldset {
     font-size: 12px;
 }
 
+#orbeon-logo {
+    margin-left: 1em;
+}
+
 #main {
     border-bottom:1px solid &dark-color;;
     min-width: 650px;
@@ -712,9 +716,10 @@ ul {
     .tabs { display: none }
     .tab { display: none }
     #cleaner { display: none }
-    #banner { display: none}
+    #orbeon-logo { margin-left: 0em; margin-bottom: 2em; }
+    #navigation { display: none}
     #xmaincontent { position: relative; top: -2cm; left: -3.5cm; width: 15cm;}
-    #main .maincontent { margin: 0; }
+    #main .maincontent { margin: 0; border: none; }
 }
 
 </root>

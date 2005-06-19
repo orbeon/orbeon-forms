@@ -176,75 +176,106 @@
                         <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>
                         <p:output name="data" id="rewritten-data"/>
                     </p:processor>
-                    <p:choose href="#request">
-                        <!-- Remove the 'false() and ' below to allow browsers supporting XHTML to receive XHTML -->
-                        <p:when test="false() and contains(/request/headers/header[name = 'accept'], 'application/xhtml+xml')">
-                            <!-- Browser says it supports XHTML -->
-                            <!-- Make sure XHTML elements are output without prefix to increase compatibility -->
-                            <p:processor name="oxf:qname-converter">
-                                <p:input name="config">
-                                    <config>
-                                        <match>
-                                            <uri>http://www.w3.org/1999/xhtml</uri>
-                                        </match>
-                                        <replace>
-                                            <prefix></prefix>
-                                        </replace>
-                                    </config>
-                                </p:input>
-                                <p:input name="data" href="#rewritten-data"/>
-                                <p:output name="data" id="xhtml-data"/>
-                            </p:processor>
-                            <!--  Serialize to XHTML -->
-                            <p:processor name="oxf:xml-converter">
-                                <p:input name="config">
-                                    <config>
-                                        <method>xhtml</method>
-                                        <public-doctype>-//W3C//DTD XHTML 1.0 Transitional//EN</public-doctype>
-<!--                                        <public-doctype>-//W3C//DTD xhtml 1.1//EN</public-doctype>-->
-                                        <system-doctype>http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</system-doctype>
-<!--                                        <system-doctype>http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd</system-doctype>-->
-                                        <encoding>utf-8</encoding>
-                                        <content-type>application/xhtml+xml</content-type>
-<!--                                        <content-type>text/html</content-type>-->
-                                    </config>
-                                </p:input>
-                                <p:input name="data" href="#xhtml-data"/>
-                                <p:output name="data" id="converted"/>
-                            </p:processor>
-                        </p:when>
-                        <p:otherwise>
-                            <!-- Just send plain HTML -->
-                            <!-- Move from XHTML namespace to no namespace -->
-                            <p:processor name="oxf:qname-converter">
-                                <p:input name="config">
-                                    <config>
-                                        <match>
-                                            <uri>http://www.w3.org/1999/xhtml</uri>
-                                        </match>
-                                        <replace>
-                                            <uri></uri>
-                                            <prefix></prefix>
-                                        </replace>
-                                    </config>
-                                </p:input>
-                                <p:input name="data" href="#rewritten-data"/>
-                                <p:output name="data" id="html-data"/>
-                            </p:processor>
-                            <!-- Output regular HTML -->
-                            <p:processor name="oxf:html-converter">
-                                <p:input name="config">
-                                    <config>
-                                        <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
-                                        <version>4.01</version>
-                                        <encoding>utf-8</encoding>
-                                    </config>
-                                </p:input>
-                                <p:input name="data" href="#html-data"/>
-                                <p:output name="data" id="converted"/>
-                            </p:processor>
-                        </p:otherwise>
-                    </p:choose>
+
+                    <!-- Use this choose block if you want to send XHTML to those browser to  -->
+                    <!-- support it. -->
+                    <!-- BEGIN ASSUME SOME XHTML CLIENTS -->
+<!--                    <p:choose href="#request">-->
+<!--                        <p:when test="false() and contains(/request/headers/header[name = 'accept'], 'application/xhtml+xml')">-->
+<!--                            <p:processor name="oxf:qname-converter">-->
+<!--                                <p:input name="config">-->
+<!--                                    <config>-->
+<!--                                        <match>-->
+<!--                                            <uri>http://www.w3.org/1999/xhtml</uri>-->
+<!--                                        </match>-->
+<!--                                        <replace>-->
+<!--                                            <prefix></prefix>-->
+<!--                                        </replace>-->
+<!--                                    </config>-->
+<!--                                </p:input>-->
+<!--                                <p:input name="data" href="#rewritten-data"/>-->
+<!--                                <p:output name="data" id="xhtml-data"/>-->
+<!--                            </p:processor>-->
+<!--                            <p:processor name="oxf:xml-converter">-->
+<!--                                <p:input name="config">-->
+<!--                                    <config>-->
+<!--                                        <method>xhtml</method>-->
+<!--                                        <public-doctype>-//W3C//DTD XHTML 1.0 Transitional//EN</public-doctype>-->
+<!--                                        <system-doctype>http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</system-doctype>-->
+<!--                                        <encoding>utf-8</encoding>-->
+<!--                                        <content-type>application/xhtml+xml</content-type>-->
+<!--                                    </config>-->
+<!--                                </p:input>-->
+<!--                                <p:input name="data" href="#xhtml-data"/>-->
+<!--                                <p:output name="data" id="converted"/>-->
+<!--                            </p:processor>-->
+<!--                        </p:when>-->
+<!--                        <p:otherwise>-->
+<!--                            <p:processor name="oxf:qname-converter">-->
+<!--                                <p:input name="config">-->
+<!--                                    <config>-->
+<!--                                        <match>-->
+<!--                                            <uri>http://www.w3.org/1999/xhtml</uri>-->
+<!--                                        </match>-->
+<!--                                        <replace>-->
+<!--                                            <uri></uri>-->
+<!--                                            <prefix></prefix>-->
+<!--                                        </replace>-->
+<!--                                    </config>-->
+<!--                                </p:input>-->
+<!--                                <p:input name="data" href="#rewritten-data"/>-->
+<!--                                <p:output name="data" id="html-data"/>-->
+<!--                            </p:processor>-->
+<!--                            <p:processor name="oxf:html-converter">-->
+<!--                                <p:input name="config">-->
+<!--                                    <config>-->
+<!--                                        <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>-->
+<!--                                        <version>4.01</version>-->
+<!--                                        <encoding>utf-8</encoding>-->
+<!--                                    </config>-->
+<!--                                </p:input>-->
+<!--                                <p:input name="data" href="#html-data"/>-->
+<!--                                <p:output name="data" id="converted"/>-->
+<!--                            </p:processor>-->
+<!--                        </p:otherwise>-->
+<!--                    </p:choose>-->
+                    <!-- END ASSUME SOME XHTML CLIENTS -->
+
+                    <!-- BEGIN NO ASSUME XHTML CLIENTS -->
+                    <!-- Just send plain HTML -->
+                    <!-- Move from XHTML namespace to no namespace -->
+                    <p:processor name="oxf:qname-converter">
+                        <p:input name="config">
+                            <config>
+                                <match>
+                                    <uri>http://www.w3.org/1999/xhtml</uri>
+                                </match>
+                                <replace>
+                                    <uri></uri>
+                                    <prefix></prefix>
+                                </replace>
+                            </config>
+                        </p:input>
+                        <p:input name="data" href="#rewritten-data"/>
+                        <p:output name="data" id="html-data"/>
+                    </p:processor>
+                    <!-- Output regular HTML -->
+                    <p:processor name="oxf:html-converter">
+                        <p:input name="config">
+                            <config>
+                                <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
+                                <version>4.01</version>
+                                <encoding>utf-8</encoding>
+                            </config>
+                        </p:input>
+                        <p:input name="data" href="#html-data"/>
+                        <p:output name="data" id="converted"/>
+                    </p:processor>
+                    <!-- END ASSUME NO XHTML CLIENTS -->
+                    
+
+                    
+                    
                     <!-- Serialize to HTTP -->
                     <p:processor name="oxf:http-serializer">
                         <p:input name="config">

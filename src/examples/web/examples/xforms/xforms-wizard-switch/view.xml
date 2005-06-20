@@ -94,6 +94,9 @@
                             </xforms:input>
                         </xhtml:p>
                         <xhtml:p>
+                            Finish enabled: <xforms:output ref="instance('buttons-state')/finish/@relevant"/>
+                        </xhtml:p>
+                        <xhtml:p>
                             <xforms:trigger>
                                 <xforms:label>&lt; Previous</xforms:label>
                                 <xforms:toggle ev:event="DOMActivate" case="lastname"/>

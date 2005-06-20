@@ -65,7 +65,6 @@ public class XFormsControls implements XFormsEventTarget {
     private static final Map noSingleNodeControls = new HashMap();
     private static final Map mandatoryNodesetControls = new HashMap();
     private static final Map noNodesetControls = new HashMap();
-    //private static final Map someBindingControls = new HashMap();
 
     static {
         groupingControls.put("group", "");
@@ -123,10 +122,6 @@ public class XFormsControls implements XFormsEventTarget {
         noNodesetControls.putAll(mandatorySingleNodeControls);
         noNodesetControls.putAll(optionalSingleNodeControls);
         noNodesetControls.putAll(noSingleNodeControls);
-
-//        someBindingControls.putAll(mandatorySingleNodeControls);
-//        someBindingControls.putAll(optionalSingleNodeControls);
-//        someBindingControls.putAll(mandatoryNodesetControls);
     }
 
     public XFormsControls(XFormsContainingDocument containingDocument, Document controlsDocument) {
@@ -186,10 +181,6 @@ public class XFormsControls implements XFormsEventTarget {
     public static boolean isActualControl(String controlName) {
         return actualControls.get(controlName) != null;
     }
-
-//    public static boolean isSomeBindingControl(String controlName) {
-//        return someBindingControls.get(controlName) != null;
-//    }
 
     public void setBinding(PipelineContext pipelineContext, ControlInfo controlInfo) {
 

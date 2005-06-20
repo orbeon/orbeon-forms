@@ -15,7 +15,9 @@ package org.orbeon.oxf.util;
 
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xml.XMLConstants;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -25,6 +27,9 @@ import java.io.OutputStream;
  * a ContentHandler.
  */
 public class ContentHandlerOutputStream extends OutputStream {
+
+    private static final String DEFAULT_BINARY_DOCUMENT_ELEMENT = "document";
+
     private ContentHandler contentHandler;
 
     private byte[] byteBuffer = new byte[76 * 3 / 4]; // maximum bytes that, once decoded, can fit in a line of 76 characters
@@ -35,6 +40,25 @@ public class ContentHandlerOutputStream extends OutputStream {
 
     public ContentHandlerOutputStream(ContentHandler contentHandler) {
         this.contentHandler = contentHandler;
+    }
+
+    public void startDocument(String contentType) throws SAXException {
+        // Start document
+        AttributesImpl attributes = new AttributesImpl();
+        contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+        contentHandler.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+        attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
+        if (contentType != null)
+            attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
+
+        contentHandler.startDocument();
+        contentHandler.startElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
+    }
+
+    public void endDocument() throws SAXException {
+        // End document
+        contentHandler.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
+        contentHandler.endDocument();
     }
 
     public void close() throws IOException {

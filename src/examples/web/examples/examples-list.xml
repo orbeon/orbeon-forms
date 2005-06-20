@@ -85,6 +85,7 @@
     </section>
     <section label="PDF Processing">
         <example id="pdf-upload" path="pdf/pdf-upload" label="Extract PDF Info"/>
+        <example id="pdf-template" path="pdf/pdf-template" label="PDF Templates"/>
     </section>
     <section label="Query &amp; Transformation">
         <example id="xquery" path="sandbox/xquery" label="XQuery Sandbox" xforms-ng="true"/>

@@ -799,30 +799,6 @@ public class XMLUtils {
             OutputStream os = new ContentHandlerOutputStream(contentHandler);
             NetUtils.copyStream(new BufferedInputStream(is), os);
             os.close(); // necessary with ContentHandlerOutputStream to make sure all extra characters are written
-
-
-//            // Work with buffered stream
-//            is = new BufferedInputStream(is);
-//            // Read and write in chunks
-//            // Check http://www.ietf.org/rfc/rfc2045.txt for Base64
-//            byte[] buf = new byte[76 * 3 / 4]; // maximum bytes that, once decoded, can fit in a line of 76 characters
-//            char[] result = new char[76 + 1];
-//            int count;
-//            while ((count = is.read(buf, 0, buf.length)) != -1) {
-//                String encoded;
-//                if (count == buf.length) {
-//                    encoded = Base64.encode(buf);
-//                } else {
-//                    // This can only be the last chunk
-//                    byte[] tempBuf = new byte[count];
-//                    System.arraycopy(buf, 0, tempBuf, 0, count);
-//                    encoded = Base64.encode(tempBuf);
-//                }
-//                // The terminating LF is already added by encode()
-//                encoded.getChars(0, encoded.length(), result, 0);
-//                // Output characters
-//                contentHandler.characters(result, 0, encoded.length());
-//            }
         } catch (Exception e) {
             throw new OXFException(e);
         }

@@ -1208,15 +1208,15 @@ public abstract class ProcessorImpl implements Processor {
             return false;
         }
 
-        protected CacheKey getLocalKey(PipelineContext context) {
+        protected CacheKey getLocalKey(PipelineContext pipelineContext) {
             throw new UnsupportedOperationException();
         }
 
-        protected Object getLocalValidity(PipelineContext context) {
+        protected Object getLocalValidity(PipelineContext pipelineContext) {
             throw new UnsupportedOperationException();
         }
 
-        public OutputCacheKey getKeyImpl(PipelineContext context) {
+        public OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
 
             // Create input information
             List keys = new ArrayList();
@@ -1224,7 +1224,7 @@ public abstract class ProcessorImpl implements Processor {
             for (Iterator i = inputsMap.keySet().iterator(); i.hasNext();) {
                 List currentInputs = (List) inputsMap.get(i.next());
                 for (Iterator j = currentInputs.iterator(); j.hasNext();) {
-                    OutputCacheKey outputKey = getInputKey(context, (ProcessorInput) j.next());
+                    OutputCacheKey outputKey = getInputKey(pipelineContext, (ProcessorInput) j.next());
                     if (outputKey == null) return null;
                     keys.add(outputKey);
                 }
@@ -1232,7 +1232,7 @@ public abstract class ProcessorImpl implements Processor {
 
             // Add local key if needed
             if (supportsLocalKeyValidity()) {
-                CacheKey localKey = getLocalKey(context);
+                CacheKey localKey = getLocalKey(pipelineContext);
                 if (localKey == null) return null;
                 keys.add(localKey);
             }
@@ -1245,14 +1245,14 @@ public abstract class ProcessorImpl implements Processor {
             return new CompoundOutputCacheKey( c, nm, outKys );
         }
 
-        public Object getValidityImpl(PipelineContext context) {
+        public Object getValidityImpl(PipelineContext pipelineContext) {
             List validityObjects = new ArrayList();
 
             Map inputsMap = getConnectedInputs();
             for (Iterator i = inputsMap.keySet().iterator(); i.hasNext();) {
                 List currentInputs = (List) inputsMap.get(i.next());
                 for (Iterator j = currentInputs.iterator(); j.hasNext();) {
-                    Object validity = getInputValidity(context, (ProcessorInput) j.next());
+                    Object validity = getInputValidity(pipelineContext, (ProcessorInput) j.next());
                     if (validity == null)
                         return null;
                     validityObjects.add(validity);
@@ -1261,7 +1261,7 @@ public abstract class ProcessorImpl implements Processor {
 
             // Add local validity if needed
             if (supportsLocalKeyValidity()) {
-                Object localValidity = getLocalValidity(context);
+                Object localValidity = getLocalValidity(pipelineContext);
                 if (localValidity == null) return null;
                 validityObjects.add(localValidity);
             }

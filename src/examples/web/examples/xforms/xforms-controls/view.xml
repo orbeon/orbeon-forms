@@ -89,7 +89,7 @@
             </xforms:instance>                
             
             <xforms:bind nodeset="instance('instance')">
-                <xforms:bind nodeset="age" constraint="number(.) >= 0"/>
+                <xforms:bind nodeset="age" constraint="number(.) >= 0 and number(.) le 150"/>
                 <xforms:bind nodeset="secret" constraint="string(.) = '42'"/>
                 <xforms:bind nodeset="textarea" constraint="string-length(.) > 10"/>
                 <xforms:bind nodeset="date" type="xs:date"/>
@@ -137,6 +137,7 @@
                     <xhtml:p>
                         <xforms:textarea ref="textarea">
                             <xforms:label class="fixed-width">Text area:</xforms:label>
+                            <xforms:hint>Enter at least 11 characters</xforms:hint>
                             <xforms:alert>Content of text area has less than 10 characters</xforms:alert>
                         </xforms:textarea>
                     </xhtml:p>

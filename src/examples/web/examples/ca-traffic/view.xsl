@@ -23,7 +23,7 @@
         <xforms:group>
             <xhtml:p>
                 Enter an highway number (e.g. 101):
-                <xforms:input ref="highway"/>
+                <xforms:input ref="/highway"/>
                 <xsl:text>&#160;</xsl:text>
                 <xforms:submit>
                     <xforms:label>Get Traffic</xforms:label>

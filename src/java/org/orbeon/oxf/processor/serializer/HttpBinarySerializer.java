@@ -20,9 +20,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.util.ContentHandlerOutputStream;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.OutputStream;
 
@@ -30,8 +28,6 @@ import java.io.OutputStream;
  * Legacy HTTP binary serializer. This is deprecated by HttpSerializer.
  */
 public abstract class HttpBinarySerializer extends HttpSerializerBase {
-
-    private static final String DEFAULT_BINARY_DOCUMENT_ELEMENT = "document";
 
     protected final void readInput(PipelineContext pipelineContext, ExternalContext.Response response, ProcessorInput input, Object _config, OutputStream outputStream) {
 
@@ -64,7 +60,7 @@ public abstract class HttpBinarySerializer extends HttpSerializerBase {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
                 // Create OutputStream that converts to Base64
-                OutputStream outputStream = new ContentHandlerOutputStream(contentHandler);
+                ContentHandlerOutputStream outputStream = new ContentHandlerOutputStream(contentHandler);
 
                 // Read configuration input
                 Config config = readConfig(pipelineContext);
@@ -72,24 +68,14 @@ public abstract class HttpBinarySerializer extends HttpSerializerBase {
 
                 try {
                     // Start document
-                    AttributesImpl attributes = new AttributesImpl();
-                    contentHandler.startPrefixMapping(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
-                    contentHandler.startPrefixMapping(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-                    attributes.addAttribute(XMLConstants.XSI_URI, "type", "xsi:type", "CDATA", XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName());
-                    if (contentType != null)
-                        attributes.addAttribute("", "content-type", "content-type", "CDATA", contentType);
-
-                    // Start document
-                    contentHandler.startDocument();
-                    contentHandler.startElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT, attributes);
+                    outputStream.startDocument(contentType);
 
                     // Write content
                     readInput(pipelineContext, null, config, outputStream);
                     outputStream.close();
 
                     // End document
-                    contentHandler.endElement("", DEFAULT_BINARY_DOCUMENT_ELEMENT, DEFAULT_BINARY_DOCUMENT_ELEMENT);
-                    contentHandler.endDocument();
+                    outputStream.endDocument();
 
                 } catch (Exception e) {
                     throw new OXFException(e);

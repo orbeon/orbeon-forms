@@ -21,22 +21,29 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
+import org.orbeon.oxf.cache.CacheKey;
+import org.orbeon.oxf.cache.InternalCacheKey;
+import org.orbeon.oxf.cache.ObjectCache;
 import org.orbeon.oxf.cache.SoftCacheImpl;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.ContentHandlerOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.util.NumberUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
+import org.xml.sax.ContentHandler;
+import org.xml.sax.SAXException;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.*;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -44,12 +51,12 @@ import java.util.*;
 import java.util.List;
 
 /**
- * ImageServer serves images from URLs while performing various operations on
- * them such as scaling or cropping. It also handles a disk cache of
+ * ImageServer directly serves or converts to its "data" output images from URLs while performing
+ * various operations on them such as scaling or cropping. It also handles a disk cache of
  * transformed images.
  *
- * NOTE: The JPEG quality parameter only applies when a transformation is
- * done. There is no provision to do a quality conversion only.
+ * NOTE: The JPEG quality parameter only applies when a transformation is done. There is no
+ * provision to do a quality conversion only.
  */
 public class ImageServer extends ProcessorImpl {
 
@@ -70,53 +77,98 @@ public class ImageServer extends ProcessorImpl {
     public ImageServer() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, IMAGE_SERVER_CONFIG_NAMESPACE_URI));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_IMAGE, IMAGE_SERVER_IMAGE_NAMESPACE_URI));
+        //addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA)); // optional
     }
 
-    public void start(PipelineContext pipelineContext) {
+    private static class Config {
+        public URL imageDirectoryURL;
+        public File cacheDir;
+        public float defaultQuality;
+        public boolean useSandbox;
+        public String cachePathEncoding;
+    }
 
-        ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
-        ExternalContext.Response response = externalContext.getResponse();
+    private static class ImageConfig {
+        public String urlString;
+        public Float quality;
+        public Boolean useCache;
+        public Object transforms;
+        public int transformCount;
+        public Iterator transformIterator;
+    }
+
+    public void processImage(PipelineContext pipelineContext, ImageResponse imageResponse) {
+
         try {
-            // Read configuration
-            Node config = readCacheInputAsDOM4J(pipelineContext, INPUT_CONFIG);
+            // Read global configuration
+            final Config config = (ImageServer.Config) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+                public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
 
-            String imageDirectoryString = XPathUtils.selectStringValueNormalize(config, "/config/image-directory");
-            imageDirectoryString = imageDirectoryString.replace('\\', '/');
-            // Make sure this ends with a '/' so that it is considered a directory
-            if (!imageDirectoryString.endsWith("/"))
-                imageDirectoryString = imageDirectoryString + '/';
-            URL imageDirectoryURL = URLFactory.createURL(imageDirectoryString);
+                    final Document configDocument = readInputAsDOM4J(pipelineContext, processorInput);
+                    final Config result = new Config();
 
-            String cacheDirectoryString = XPathUtils.selectStringValueNormalize(config, "/config/cache/directory");
-            File cacheDir = (cacheDirectoryString == null) ? null : new File(cacheDirectoryString);
-            if (cacheDir != null && !cacheDir.isDirectory())
-                throw new IllegalArgumentException("Invalid cache directory: " + cacheDirectoryString);
+                    String imageDirectoryString = XPathUtils.selectStringValueNormalize(configDocument, "/config/image-directory");
+                    imageDirectoryString = imageDirectoryString.replace('\\', '/');
 
-            float defaultQuality = selectFloatValue(config, "/config/default-quality", DEFAULT_QUALITY);
-            if (defaultQuality < 0.0f || defaultQuality > 1.0f)
-                throw new IllegalArgumentException("default-quality must be comprised between 0.0 and 1.0");
+                    // Make sure this ends with a '/' so that it is considered a directory
+                    if (!imageDirectoryString.endsWith("/"))
+                        imageDirectoryString = imageDirectoryString + '/';
 
-            boolean useSandbox = selectBooleanValue(config, "/config/use-sandbox", DEFAULT_USE_SANDBOX);
-            String cachePathEncoding = XPathUtils.selectStringValueNormalize(config, "/config/cache/path-encoding");
+                    try {
+                        result.imageDirectoryURL = URLFactory.createURL(imageDirectoryString);
+                    } catch (MalformedURLException e) {
+                        throw new OXFException(e);
+                    }
 
-            // Read request info
-            Node imageConfig = readCacheInputAsDOM4J(pipelineContext, INPUT_IMAGE);
+                    final String cacheDirectoryString = XPathUtils.selectStringValueNormalize(configDocument, "/config/cache/directory");
+                    result.cacheDir = (cacheDirectoryString == null) ? null : new File(cacheDirectoryString);
+                    if (result.cacheDir != null && !result.cacheDir.isDirectory())
+                        throw new IllegalArgumentException("Invalid cache directory: " + cacheDirectoryString);
 
-            // Read URL
-            String urlString = XPathUtils.selectStringValueNormalize(imageConfig, "/image/url");
+                    result.defaultQuality = selectFloatValue(configDocument, "/config/default-quality", DEFAULT_QUALITY);
+                    if (result.defaultQuality < 0.0f || result.defaultQuality > 1.0f)
+                        throw new IllegalArgumentException("default-quality must be comprised between 0.0 and 1.0");
 
-            // For backward compatibility, try to get path element (which also contained an URL!)
-            if (urlString == null) {
-                urlString = XPathUtils.selectStringValueNormalize(imageConfig, "/image/path");
-            }
+                    result.useSandbox = selectBooleanValue(configDocument, "/config/use-sandbox", DEFAULT_USE_SANDBOX);
+                    result.cachePathEncoding = XPathUtils.selectStringValueNormalize(configDocument, "/config/cache/path-encoding");
 
-            float quality = selectFloatValue(imageConfig, "/image/quality", defaultQuality);
-            boolean useCache = cacheDir != null && selectBooleanValue(imageConfig, "/image/use-cache", DEFAULT_USE_CACHE);
-            int transformCount = XPathUtils.selectIntegerValue(imageConfig, "count(/image/transform)").intValue();
-            Object transforms = XPathUtils.selectObjectValue(imageConfig, "/image/transform");
-            if (transforms != null && transforms instanceof Node)
-                transforms = Collections.singletonList(transforms);
-            Iterator transformIterator = XPathUtils.selectIterator(imageConfig, "/image/transform");
+                    return result;
+                }
+            });
+
+            // Read image configuration
+            final ImageConfig imageConfig = (ImageServer.ImageConfig) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_IMAGE), new CacheableInputReader() {
+                public Object read(PipelineContext pipelineContext, ProcessorInput processorInput) {
+
+                    final Document imageConfigDocument = readCacheInputAsDOM4J(pipelineContext, INPUT_IMAGE);
+                    final ImageConfig result = new ImageConfig();
+
+                    // Read URL
+                    result.urlString = XPathUtils.selectStringValueNormalize(imageConfigDocument, "/image/url");
+
+                    // For backward compatibility, try to get path element (which also contained an URL!)
+                    if (result.urlString == null) {
+                        result.urlString = XPathUtils.selectStringValueNormalize(imageConfigDocument, "/image/path");
+                    }
+
+                    String qualityString = XPathUtils.selectStringValueNormalize(imageConfigDocument, "/image/quality");
+                    result.quality = (qualityString == null) ? null : new Float(qualityString);
+
+                    String useCacheString = XPathUtils.selectStringValueNormalize(imageConfigDocument, "/image/use-cache");
+                    result.useCache = (useCacheString == null) ? null : new Boolean(useCacheString);
+
+                    result.transformCount = XPathUtils.selectIntegerValue(imageConfigDocument, "count(/image/transform)").intValue();
+                    Object transforms = XPathUtils.selectObjectValue(imageConfigDocument, "/image/transform");
+                    if (transforms != null && transforms instanceof Node)
+                        transforms = Collections.singletonList(transforms);
+                    result.transformIterator = XPathUtils.selectIterator(imageConfigDocument, "/image/transform");
+
+                    return result;
+                }
+            });
+
+            final float quality = (imageConfig.quality == null) ? config.defaultQuality : imageConfig.quality.floatValue();
+            final boolean useCache = config.cacheDir != null && ((imageConfig.useCache == null) ? DEFAULT_USE_CACHE : imageConfig.useCache.booleanValue());
 
             URLConnection urlConnection = null;
             InputStream urlConnectionInputStream = null;
@@ -124,11 +176,11 @@ public class ImageServer extends ProcessorImpl {
                 // Make sure the requested resource exists and is valid
                 URL newURL = null;
                 try {
-                    newURL = URLFactory.createURL(imageDirectoryURL, urlString);
+                    newURL = URLFactory.createURL(config.imageDirectoryURL, imageConfig.urlString);
                     // Check if new URL is relative to image directory URL
-                    boolean relative = NetUtils.relativeURL(imageDirectoryURL, newURL);
-                    if (useSandbox && !relative) {
-                        response.setStatus(ExternalContext.SC_NOT_FOUND);
+                    boolean relative = NetUtils.relativeURL(config.imageDirectoryURL, newURL);
+                    if (config.useSandbox && !relative) {
+                        imageResponse.setStatus(ExternalContext.SC_NOT_FOUND);
                         return;
                     }
                     // Try to open the connection
@@ -140,11 +192,11 @@ public class ImageServer extends ProcessorImpl {
                     // Make sure the resource looks like a JPEG file
                     String contentType = URLConnection.guessContentTypeFromStream(urlConnectionInputStream);
                     if (!"image/jpeg".equals(contentType)) {
-                        response.setStatus(ExternalContext.SC_NOT_FOUND);
+                        imageResponse.setStatus(ExternalContext.SC_NOT_FOUND);
                         return;
                     }
                 } catch (IOException e) {
-                    response.setStatus(ExternalContext.SC_NOT_FOUND);
+                    imageResponse.setStatus(ExternalContext.SC_NOT_FOUND);
                     return;
                 }
 
@@ -152,27 +204,27 @@ public class ImageServer extends ProcessorImpl {
                 long lastModified = NetUtils.getLastModified(urlConnection);
 
                 // Cache handling
-                String cacheFileName = useCache ? computeCacheFileName(cachePathEncoding, urlString, (List) transforms) : null;
-                File cacheFile = useCache ? new File(cacheDir, cacheFileName) : null;
+                String cacheFileName = useCache ? computeCacheFileName(config.cachePathEncoding, imageConfig.urlString, (List) imageConfig.transforms) : null;
+                File cacheFile = useCache ? new File(config.cacheDir, cacheFileName) : null;
                 boolean cacheInvalid = !useCache || !cacheFile.exists() || lastModified == 0 || lastModified > cacheFile.lastModified() || cacheFile.length() == 0;
                 boolean mustProcess = cacheInvalid;
                 boolean updateCache = useCache && cacheInvalid;
 
                 // Set Last-Modified, required for caching and conditional get
-                response.setCaching(lastModified, false, false);
+                imageResponse.setCaching(lastModified, false, false);
 
                 // Check If-Modified-Since and don't return content if condition is met
-                if ((transformCount == 0 || !mustProcess) && !response.checkIfModifiedSince(lastModified, false)) {
-                    response.setStatus(ExternalContext.SC_NOT_MODIFIED);
+                if ((imageConfig.transformCount == 0 || !mustProcess) && !imageResponse.checkIfModifiedSince(lastModified, false)) {
+                    imageResponse.setStatus(ExternalContext.SC_NOT_MODIFIED);
                     return;
                 }
 
                 // Set Content-Type
-                response.setContentType("image/jpeg");
+                imageResponse.startDocument("image/jpeg");
 
                 // Optimize if no transformation is specified
-                if (transformCount == 0) {
-                    NetUtils.copyStream(urlConnectionInputStream, response.getOutputStream());
+                if (imageConfig.transformCount == 0) {
+                    NetUtils.copyStream(urlConnectionInputStream, imageResponse.getOutputStream());
                     return;
                 }
 
@@ -207,20 +259,20 @@ public class ImageServer extends ProcessorImpl {
                         }
 
                         // Filter image
-                        BufferedImage img2 = filter(img1, transformIterator);
+                        BufferedImage img2 = filter(img1, imageConfig.transformIterator);
 
                         // Create OutputStream
                         if (updateCache) {
                             File outputDir = cacheFile.getParentFile();
                             if (!outputDir.exists() && !outputDir.mkdirs()) {
                                 logger.info("Cannot create cache directory: " + outputDir.getCanonicalPath());
-                                response.setStatus(ExternalContext.SC_INTERNAL_SERVER_ERROR);
+                                imageResponse.setStatus(ExternalContext.SC_INTERNAL_SERVER_ERROR);
                                 return;
                             }
                             os = new FileOutputStream(cacheFile);
                             closeOutputStream = true;
                         } else {
-                            os = response.getOutputStream();
+                            os = imageResponse.getOutputStream();
                         }
 
                         // Encode image to OutputStream
@@ -231,7 +283,7 @@ public class ImageServer extends ProcessorImpl {
                         encoder.encode(img2);
                     } catch (OXFException e) {
                         logger.error(OXFException.getRootThrowable(e));
-                        response.setStatus(ExternalContext.SC_INTERNAL_SERVER_ERROR);
+                        imageResponse.setStatus(ExternalContext.SC_INTERNAL_SERVER_ERROR);
                         return;
                     } finally {
                         if (os != null && closeOutputStream) os.close();
@@ -241,7 +293,7 @@ public class ImageServer extends ProcessorImpl {
                 // Send cached image if relevant
                 if (useCache) {
                     InputStream is = new FileInputStream(cacheFile);
-                    OutputStream os = response.getOutputStream();
+                    OutputStream os = imageResponse.getOutputStream();
                     try {
                         NetUtils.copyStream(is, os);
                     } finally {
@@ -263,6 +315,160 @@ public class ImageServer extends ProcessorImpl {
         } catch (Exception e) {
             throw new OXFException(e);
         }
+    }
+
+    /**
+     * This processor supports having no output. In this mode, it serializes the image data directly
+     * to an ExternalContext.Response.
+     */
+    public void start(PipelineContext pipelineContext) {
+        final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
+        final ExternalContext.Response response = externalContext.getResponse();
+
+        processImage(pipelineContext, new ImageResponse() {
+            public void setStatus(int status) {
+                response.setStatus(status);
+            }
+
+            public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
+                response.setCaching(lastModified, revalidate, allowOverride);
+            }
+
+            public OutputStream getOutputStream() throws IOException {
+                return response.getOutputStream();
+            }
+
+            public void startDocument(String contentType) {
+                response.setContentType(contentType);
+            }
+
+            public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
+                return response.checkIfModifiedSince(lastModified, allowOverride);
+            }
+        });
+    }
+
+    /**
+     * This processor supports a "data" output. In this mode, it streams the resulting image data to
+     * that output.
+     */
+    public ProcessorOutput createOutput(String name) {
+        ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
+
+            public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
+
+                final ContentHandlerOutputStream contentHandlerOutputStream = new ContentHandlerOutputStream(contentHandler);
+
+                // Start processing
+                processImage(pipelineContext, new ImageResponse() {
+
+                    public boolean checkIfModifiedSince(long lastModified, boolean allowOverride) {
+                        // Always modifed
+                        return true;
+                    }
+
+                    public OutputStream getOutputStream() {
+                        return contentHandlerOutputStream;
+                    }
+
+                    public void setCaching(long lastModified, boolean revalidate, boolean allowOverride) {
+                        // NOP
+                    }
+
+                    public void startDocument(String contentType) {
+                        try {
+                            // Create and start document
+                            contentHandlerOutputStream.startDocument(contentType);
+                        } catch (SAXException e) {
+                            throw new OXFException(e);
+                        }
+                    }
+
+                    public void setStatus(int status) {
+                        if (status == ExternalContext.SC_NOT_FOUND) {
+                            throw new OXFException("Image not not found.");
+                        } else if (status == ExternalContext.SC_INTERNAL_SERVER_ERROR) {
+                            throw new OXFException("Error while processing image.");
+                        }
+                    }
+                });
+
+                try {
+                    // This is necessary so that flushing occurs
+                    contentHandlerOutputStream.close();
+                    // End the document
+                    contentHandlerOutputStream.endDocument();
+                } catch (Exception e) {
+                    throw new OXFException(e);
+                }
+            }
+
+            protected boolean supportsLocalKeyValidity() {
+                return true;
+            }
+
+            protected CacheKey getLocalKey(PipelineContext pipelineContext) {
+                final URL newURL = getLocalURL(pipelineContext);
+                return (newURL == null) ? null : new InternalCacheKey(ImageServer.this, "local-file-path", newURL.toExternalForm());
+            }
+
+            protected Object getLocalValidity(PipelineContext pipelineContext) {
+                final URL newURL = getLocalURL(pipelineContext);
+
+                URLConnection urlConnection = null;
+                try {
+                    urlConnection = newURL.openConnection();
+                    final long lastModified = NetUtils.getLastModified(urlConnection);
+                    return lastModified <= 0 ? null : new Long(lastModified);
+                } catch (IOException e) {
+                    throw new OXFException(e);
+                } finally {
+                }
+            }
+
+            private URL getLocalURL(PipelineContext pipelineContext) {
+
+                // Find Config object if any
+                final Config config;
+                {
+                    KeyValidity keyValidity = getInputKeyValidity(pipelineContext, INPUT_CONFIG);
+                    if (keyValidity == null)
+                        return null;
+
+                    config = (Config) ObjectCache.instance().findValid(pipelineContext, keyValidity.key, keyValidity.validity);
+                    if (config == null)
+                        return null;
+                }
+
+                // Find ImageConfig object if any
+                final ImageConfig imageConfig;
+                {
+                    KeyValidity keyValidity = getInputKeyValidity(pipelineContext, INPUT_IMAGE);
+                    if (keyValidity == null)
+                        return null;
+
+                    imageConfig = (ImageConfig) ObjectCache.instance().findValid(pipelineContext, keyValidity.key, keyValidity.validity);
+                    if (imageConfig == null)
+                        return null;
+                }
+
+                try {
+                    return URLFactory.createURL(config.imageDirectoryURL, imageConfig.urlString);
+                } catch (MalformedURLException e) {
+                    throw new OXFException(e);
+                }
+            }
+        };
+        addOutput(name, output);
+        return output;
+    }
+
+    private static interface ImageResponse {
+        public void setStatus(int status);
+        public void setCaching(long lastModified, boolean revalidate, boolean allowOverride);
+        public boolean checkIfModifiedSince(long lastModified, boolean allowOverride);
+        public void startDocument(String contentType);
+        public OutputStream getOutputStream() throws IOException;
     }
 
     private String computeCacheFileName(String type, String path, List nodes) {

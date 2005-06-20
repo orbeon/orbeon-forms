@@ -244,7 +244,7 @@ public class FileSerializer extends CachedSerializer {
 
             // Delete file if it exists
             if (file.exists() && file.canWrite())
-                file.delete();
+                file.delete();//TODO: make sure the file was deleted
             // Create file
             if (!file.createNewFile())
                 throw new OXFException("Can't create file: " + file);

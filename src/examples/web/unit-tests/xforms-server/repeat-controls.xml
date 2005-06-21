@@ -11,7 +11,7 @@
 <!--            <tr>-->
 <!--                <td>-->
 <!--                    <table>-->
-                        <xforms:repeat nodeset="employee" id="id124">
+                        <xforms:repeat nodeset="employee" id="id124" startindex="2">
                             <xforms:action ev:event="DOMActivate">
                                 <xforms:insert nodeset="../../department[index('id123')]/employee" at="1" position="after"/>
 <!--                                <xforms:insert nodeset="../../department[index('id123')]/employee" at="1" position="after"/>-->

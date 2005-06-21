@@ -119,7 +119,20 @@
                 <optional>
                     <element name="xxforms:repeats">
                         <zeroOrMore>
-                            <ref name="repeatInfo"/>
+                            <element name="xxforms:repeat-index">
+                                <attribute name="id"/>
+                                <attribute name="index">
+                                    <data type="positiveInteger"/>
+                                </attribute>
+                            </element>
+                        </zeroOrMore>
+                        <zeroOrMore>
+                            <element name="xxforms:repeat-iteration">
+                                <attribute name="id"/>
+                                <attribute name="occurs">
+                                    <data type="nonNegativeInteger"/>
+                                </attribute>
+                            </element>
                         </zeroOrMore>
                     </element>
                 </optional>
@@ -147,20 +160,5 @@
             </element>
         </element>
     </start>
-
-    <define name="repeatInfo">
-        <element name="xxforms:repeat">
-            <attribute name="id"/>
-            <attribute name="occurs">
-                <data type="nonNegativeInteger"/>
-            </attribute>
-            <attribute name="index">
-                <data type="positiveInteger"/>
-            </attribute>
-            <zeroOrMore>
-                <ref name="repeatInfo"/>
-            </zeroOrMore>
-        </element>
-    </define>
 
 </grammar>

@@ -28,8 +28,11 @@
     <xsl:variable name="response" as="element()" 
         select="doc('input:response')/xxforms:event-response"/>
 
-    <xsl:variable name="repeats" as="element()*"
-        select="$response/xxforms:action/xxforms:repeats/xxforms:repeat" />
+    <xsl:variable name="repeat-indexes" as="element()*"
+        select="$response/xxforms:action/xxforms:repeats/xxforms:repeat-index" />
+
+    <xsl:variable name="repeat-iterations" as="element()*"
+        select="$response/xxforms:action/xxforms:repeats/xxforms:repeat-iteration" />
 
     <xsl:variable name="itemsets" as="element()*"
         select="$response/xxforms:action/xxforms:itemsets/xxforms:itemset"/>
@@ -345,15 +348,15 @@
     <!-- - - - - - - XForms repeat - - - - - - -->
 
     <xsl:template match="xforms:repeat">
-        <xsl:param name="current-repeats" select="$repeats" tunnel="yes"/>
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="top-level-repeat" select="true()" as="xs:boolean" tunnel="yes"/>
         <xsl:param name="generate-template" select="true()" as="xs:boolean" tunnel="yes"/>
+        <xsl:param name="repeat-selected" select="true()" as="xs:boolean" tunnel="yes"/>
 
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xsl:variable name="xforms-repeat" select="." as="element()"/>
-        <xsl:variable name="xforms-repeat-id" select="$xforms-repeat/@id" as="xs:string"/>
-        <xsl:variable name="current-repeat" select="$current-repeats[@id = $xforms-repeat-id]" as="element()?"/>
+        <xsl:variable name="current-repeat-index" select="$repeat-indexes[@id = $xforms-repeat/@id]" as="element()"/>
+        <xsl:variable name="current-repeat-iteration" select="$repeat-iterations[@id = $id]" as="element()?"/>
 
         <xsl:variable name="delimiter-local-name" as="xs:string" select="local-name(*[1])"/>
         <xsl:variable name="delimiter-namespace-uri" as="xs:string" select="namespace-uri(*[1])"/>
@@ -364,21 +367,23 @@
 
         <xsl:if test="$top-level-repeat or not($generate-template)">
             <!-- Repeat content for the number of occurrences the XForms Server gives us -->
-            <xsl:for-each select="(1 to $current-repeat/@occurs)">
+            <xsl:for-each select="(1 to $current-repeat-iteration/@occurs)">
                 <!-- Delimiter: between repeat entries -->
                 <xsl:copy-of select="xxforms:repeat-delimiter($delimiter-namespace-uri, $delimiter-local-name, ())"/>
+                <!-- Is the current iteration selected? -->
+                <xsl:variable name="current-repeat-selected" as="xs:boolean" select="$repeat-selected and current() = $current-repeat-index/@index"/>
                 <xsl:apply-templates select="$xforms-repeat/*">
-                    <xsl:with-param name="current-repeats" select="$current-repeat/xxforms:repeat[current()]" tunnel="yes"/>
                     <xsl:with-param name="id-postfix" select="concat($id-postfix, '-', current())" tunnel="yes"/>
                     <xsl:with-param name="top-level-repeat" select="false()" tunnel="yes"/>
                     <xsl:with-param name="generate-template" select="false()" tunnel="yes"/>
+                    <xsl:with-param name="repeat-selected" select="$current-repeat-selected" tunnel="yes"/>
                 </xsl:apply-templates>
             </xsl:for-each>
         </xsl:if>
 
         <xsl:if test="$generate-template">
             <!-- Produce templates -->
-            <xsl:if test="$current-repeat/@occurs > 0">
+            <xsl:if test="$current-repeat-iteration/@occurs > 0">
                 <xsl:copy-of select="xxforms:repeat-delimiter($delimiter-namespace-uri, $delimiter-local-name, ())"/>
             </xsl:if>
             <xsl:for-each select="$xforms-repeat/*">
@@ -387,10 +392,10 @@
                     <xsl:attribute name="class" select="string-join
                         ((@xhtml:class, @class, 'xforms-repeat-template'), ' ')"/>
                     <xsl:apply-templates select="*">
-                        <xsl:with-param name="current-repeats" select="()" tunnel="yes"/>
                         <xsl:with-param name="id-postfix" select="$id-postfix" tunnel="yes"/>
                         <xsl:with-param name="top-level-repeat" select="false()" tunnel="yes"/>
                         <xsl:with-param name="generate-template" select="true()" tunnel="yes"/>
+                        <xsl:with-param name="selected" select="false()" tunnel="yes"/>
                     </xsl:apply-templates>
                 </xsl:copy>
             </xsl:for-each>

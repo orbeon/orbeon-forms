@@ -40,7 +40,7 @@ public class XFormsServer extends ProcessorImpl {
     //static private Logger logger = LoggerFactory.createLogger(XFormsServer.class);
 
     private static final String INPUT_REQUEST = "request";
-    //private static final String OUTPUT_RESPONSE = "response";
+    //private static final String OUTPUT_RESPONSE = "response"; // optional
 
     public static final Map XFORMS_NAMESPACES = new HashMap();
 
@@ -200,7 +200,7 @@ public class XFormsServer extends ProcessorImpl {
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeats");
                         if (isInitializationRun) {
-                            outputInitialRepeats(ch, xFormsControls.getRepeatInfo());
+                            outputInitialRepeats(ch, xFormsControls.getCurrentControlsState());
                         }
                         ch.endElement();
                     }
@@ -483,17 +483,32 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private void outputInitialRepeats(ContentHandlerHelper ch, XFormsControls.RepeatInfo repeatInfo) {
-        if (repeatInfo != null) {
-            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat",
-                    new String[]{"id", repeatInfo.getId(), "occurs", Integer.toString(repeatInfo.getOccurs()), "index", Integer.toString(repeatInfo.getIndex())});
-            if (repeatInfo.getChildren() != null) {
-                for (Iterator i = repeatInfo.getChildren().iterator(); i.hasNext();) {
-                    XFormsControls.RepeatInfo childRepeatInfo = (XFormsControls.RepeatInfo) i.next();
-                    outputInitialRepeats(ch, childRepeatInfo);
-                }
+    private void outputInitialRepeats(ContentHandlerHelper ch, XFormsControls.ControlsState controlsState) {
+
+        // Output repeat index information
+        final Map initialRepeatIdToIndex = controlsState.getInitialRepeatIdToIndex();
+        if (initialRepeatIdToIndex != null) {
+            for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String repeatId = (String) currentEntry.getKey();
+                final Integer index = (Integer) currentEntry.getValue();
+
+                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
+                    new String[]{"id", repeatId, "index", index.toString()});
             }
-            ch.endElement();
+        }
+
+        // Output repeat iteration information
+        final Map effectiveRepeatIdToIterations = controlsState.getEffectiveRepeatIdToIterations();
+        if (effectiveRepeatIdToIterations != null) {
+            for (Iterator i = effectiveRepeatIdToIterations.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String effectiveRepeatId = (String) currentEntry.getKey();
+                final Integer iterations = (Integer) currentEntry.getValue();
+
+                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration",
+                    new String[]{"id", effectiveRepeatId, "occurs", iterations.toString()});
+            }
         }
     }
 

@@ -681,11 +681,12 @@
                     </xxf:control-values>
                     <xxf:divs/>
                     <xxf:repeats>
-                        <xxf:repeat id="id123" occurs="3" index="1">
-                            <xxf:repeat id="id124" occurs="2" index="1"/>
-                            <xxf:repeat id="id124" occurs="1" index="1"/>
-                            <xxf:repeat id="id124" occurs="4" index="1"/>
-                        </xxf:repeat>
+                        <xxf:repeat-index id="id123" index="1"/>
+                        <xxf:repeat-index id="id124" index="2"/>
+                        <xxf:repeat-iteration id="id124-3" occurs="4"/>
+                        <xxf:repeat-iteration id="id123" occurs="3"/>
+                        <xxf:repeat-iteration id="id124-1" occurs="2"/>
+                        <xxf:repeat-iteration id="id124-2" occurs="1"/>
                     </xxf:repeats>
                     <xxf:itemsets/>
                     <xxforms:controls xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">

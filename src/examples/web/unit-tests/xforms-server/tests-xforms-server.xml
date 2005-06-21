@@ -110,7 +110,6 @@
                         <xxf:div id="multiply" visibility="hidden"/>
                         <xxf:div id="divide" visibility="hidden"/>
                     </xxf:divs>
-                    <xxf:repeats/>
                     <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
@@ -184,7 +183,6 @@
                         <xxf:div id="multiply" visibility="hidden"/>
                         <xxf:div id="divide" visibility="hidden"/>
                     </xxf:divs>
-                    <xxf:repeats/>
                     <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
@@ -385,7 +383,6 @@
                         <xxf:control id="id214b" readonly="false" required="false" relevant="true" valid="true">214</xxf:control>
                     </xxf:control-values>
                     <xxf:divs/>
-                    <xxf:repeats/>
                     <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
@@ -478,7 +475,6 @@
                 <xxf:action>
                     <xxf:control-values/>
                     <xxf:divs/>
-                    <xxf:repeats/>
                     <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
@@ -579,7 +575,6 @@
                 <xxf:action>
                     <xxf:control-values/>
                     <xxf:divs/>
-                    <xxf:repeats/>
                     <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>
@@ -656,6 +651,10 @@
                             </form>
                         </instances>
                         <divs/>
+                        <repeat-indexes>
+                            <repeat-index id="id123" index="1"/>
+                            <repeat-index id="id124" index="2"/>
+                        </repeat-indexes>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
@@ -847,20 +846,42 @@
                                         <employee first="f33" last="l33"/>
                                         <employee first="f34" last="l34"/>
                                     </department>
+                                    <department>
+                                        <employee first="f31" last="l31"/>
+                                        <employee first="f32" last="l32"/>
+                                        <employee first="f33" last="l33"/>
+                                        <employee first="f34" last="l34"/>
+                                    </department>
                                 </departments>
                             </form>
                         </instances>
                         <divs/>
+                        <repeat-indexes>
+                            <repeat-index id="id123" index="3"/>
+                            <repeat-index id="id124" index="2"/>
+                        </repeat-indexes>
                     </dynamic-state>
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
+                        <xxf:copy-repeat-template id="id123" id-suffix="-4"/>
                         <xxf:copy-repeat-template id="id124" id-suffix="-3"/>
                         <xxf:control id="id125-1-3" readonly="false" required="false" relevant="true" valid="true">f12</xxf:control>
                         <xxf:control id="id126-1-3" readonly="false" required="false" relevant="true" valid="true">l12</xxf:control>
+                        <xxf:control id="id124-4" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="id125-4-1" readonly="false" required="false" relevant="true" valid="true">f31</xxf:control>
+                        <xxf:control id="id126-4-1" readonly="false" required="false" relevant="true" valid="true">l31</xxf:control>
+                        <xxf:control id="id125-4-2" readonly="false" required="false" relevant="true" valid="true">f32</xxf:control>
+                        <xxf:control id="id126-4-2" readonly="false" required="false" relevant="true" valid="true">l32</xxf:control>
+                        <xxf:control id="id125-4-3" readonly="false" required="false" relevant="true" valid="true">f33</xxf:control>
+                        <xxf:control id="id126-4-3" readonly="false" required="false" relevant="true" valid="true">l33</xxf:control>
+                        <xxf:control id="id125-4-4" readonly="false" required="false" relevant="true" valid="true">f34</xxf:control>
+                        <xxf:control id="id126-4-4" readonly="false" required="false" relevant="true" valid="true">l34</xxf:control>
                     </xxf:control-values>
                     <xxf:divs/>
-                    <xxf:repeats/>
+                    <xxf:repeat-indexes>
+                        <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
+                    </xxf:repeat-indexes>
                     <xxf:itemsets/>
                 </xxf:action>
             </xxf:event-response>

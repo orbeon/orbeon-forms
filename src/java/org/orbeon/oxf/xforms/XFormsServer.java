@@ -135,6 +135,7 @@ public class XFormsServer extends ProcessorImpl {
                 // NOTE: Static state is produced externally during initialization
 
                 // Output dynamic state
+                final XFormsControls.ControlsState currentControlsState = xFormsControls.getCurrentControlsState(pipelineContext);
                 {
                     final Document dynamicStateDocument = Dom4jUtils.createDocument();
                     final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
@@ -155,6 +156,22 @@ public class XFormsServer extends ProcessorImpl {
                     {
                         final Element divsElement = dynamicStateElement.addElement("divs");
                         outputSwitchDivs(divsElement, xFormsControls);
+                    }
+
+                    // Output repeat index information
+                    {
+                        final Map initialRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
+                        if (initialRepeatIdToIndex != null && initialRepeatIdToIndex.size() != 0) {
+                            final Element repeatIndexesElement = dynamicStateElement.addElement("repeat-indexes");
+                            for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
+                                final Map.Entry currentEntry = (Map.Entry) i.next();
+                                final String repeatId = (String) currentEntry.getKey();
+                                final Integer index = (Integer) currentEntry.getValue();
+                                final Element newElement = repeatIndexesElement.addElement("repeat-index");
+                                newElement.addAttribute("id", repeatId);
+                                newElement.addAttribute("index", index.toString());
+                            }
+                        }
                     }
 
                     // Submission automatic event if needed
@@ -184,7 +201,7 @@ public class XFormsServer extends ProcessorImpl {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
                         diffControlsState(ch, isInitializationRun ? null : xFormsControls.getInitialControlsState().getChildren(),
-                                xFormsControls.getControlsState(pipelineContext).getChildren());
+                                currentControlsState.getChildren());
 
                         ch.endElement();
                     }
@@ -198,11 +215,37 @@ public class XFormsServer extends ProcessorImpl {
 
                     // Output repeats information
                     {
-                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeats");
                         if (isInitializationRun) {
-                            outputInitialRepeats(ch, xFormsControls.getCurrentControlsState());
+                            // Output initial repeat information
+                            outputInitialRepeatInfo(ch, currentControlsState);
+                        } else {
+                            // Output index updates
+                            final Map initialRepeatIdToIndex = xFormsControls.getInitialControlsState().getRepeatIdToIndex();
+                            final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
+                            if (currentRepeatIdToIndex != null && currentRepeatIdToIndex.size() != 0) {
+                                boolean found = false;
+                                for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
+                                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                                    final String repeatId = (String) currentEntry.getKey();
+                                    final Integer index = (Integer) currentEntry.getValue();
+
+                                    // Output information if there is a difference
+                                    final Integer newIndex = (Integer) currentRepeatIdToIndex.get(repeatId);
+                                    if (!index.equals(newIndex)) {
+
+                                        if (!found) {
+                                            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-indexes");
+                                            found = true;
+                                        }
+
+                                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
+                                                new String[] {"id", repeatId, "old-index", index.toString(), "new-index", newIndex.toString()});
+                                    }
+                                }
+                                if (found)
+                                    ch.endElement();
+                            }
                         }
-                        ch.endElement();
                     }
 
                     // Output itemset information
@@ -218,9 +261,9 @@ public class XFormsServer extends ProcessorImpl {
 
                     // Output submit information
                     {
-                        XFormsModelSubmission submission = containingDocument.getActiveSubmission();
+                        final XFormsModelSubmission submission = containingDocument.getActiveSubmission();
                         if (submission != null)
-                            outputSubmissionInfo(pipelineContext, ch, submission);
+                            outputSubmissionInfo(pipelineContext, ch);
                     }
 
                     ch.endElement();
@@ -400,7 +443,7 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private void outputSubmissionInfo(PipelineContext pipelineContext, ContentHandlerHelper ch, XFormsModelSubmission activeSubmission) {
+    private void outputSubmissionInfo(PipelineContext pipelineContext, ContentHandlerHelper ch) {
         final ExternalContext externalContext = (ExternalContext) pipelineContext.getAttribute(PipelineContext.EXTERNAL_CONTEXT);
         final String requestURL = externalContext.getRequest().getRequestURL();
 
@@ -483,32 +526,43 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private void outputInitialRepeats(ContentHandlerHelper ch, XFormsControls.ControlsState controlsState) {
+    private void outputInitialRepeatInfo(ContentHandlerHelper ch, XFormsControls.ControlsState controlsState) {
 
-        // Output repeat index information
-        final Map initialRepeatIdToIndex = controlsState.getInitialRepeatIdToIndex();
-        if (initialRepeatIdToIndex != null) {
-            for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String repeatId = (String) currentEntry.getKey();
-                final Integer index = (Integer) currentEntry.getValue();
 
-                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
-                    new String[]{"id", repeatId, "index", index.toString()});
-            }
-        }
-
-        // Output repeat iteration information
+        final Map initialRepeatIdToIndex = controlsState.getRepeatIdToIndex();
         final Map effectiveRepeatIdToIterations = controlsState.getEffectiveRepeatIdToIterations();
-        if (effectiveRepeatIdToIterations != null) {
-            for (Iterator i = effectiveRepeatIdToIterations.entrySet().iterator(); i.hasNext();) {
-                final Map.Entry currentEntry = (Map.Entry) i.next();
-                final String effectiveRepeatId = (String) currentEntry.getKey();
-                final Integer iterations = (Integer) currentEntry.getValue();
 
-                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration",
-                    new String[]{"id", effectiveRepeatId, "occurs", iterations.toString()});
+        if (initialRepeatIdToIndex != null || effectiveRepeatIdToIterations != null) {
+
+            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeats");
+
+            // Output repeat index information
+
+            if (initialRepeatIdToIndex != null) {
+                for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                    final String repeatId = (String) currentEntry.getKey();
+                    final Integer index = (Integer) currentEntry.getValue();
+
+                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-index",
+                        new String[]{"id", repeatId, "index", index.toString()});
+                }
             }
+
+            // Output repeat iteration information
+
+            if (effectiveRepeatIdToIterations != null) {
+                for (Iterator i = effectiveRepeatIdToIterations.entrySet().iterator(); i.hasNext();) {
+                    final Map.Entry currentEntry = (Map.Entry) i.next();
+                    final String effectiveRepeatId = (String) currentEntry.getKey();
+                    final Integer iterations = (Integer) currentEntry.getValue();
+
+                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration",
+                        new String[]{"id", effectiveRepeatId, "occurs", iterations.toString()});
+                }
+            }
+
+            ch.endElement();
         }
     }
 
@@ -531,6 +585,9 @@ public class XFormsServer extends ProcessorImpl {
 
         // Get divs from dynamic state
         final Element divsElement = (dynamicStateDocument == null) ? null : dynamicStateDocument.getRootElement().element("divs");
+
+        // Get repeat indexes from dynamic state
+        final Element repeatIndexesElement = (dynamicStateDocument == null) ? null : dynamicStateDocument.getRootElement().element("repeat-indexes");
 
         // Get automatic event from dynamic state
         final Element eventElement = (dynamicStateDocument == null) ? null : dynamicStateDocument.getRootElement().element("event");
@@ -605,9 +662,12 @@ public class XFormsServer extends ProcessorImpl {
         else
             containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument));
 
+
+        final XFormsControls xFormsControls = containingDocument.getXFormsControls();
+        final XFormsControls.ControlsState initialControlsState = xFormsControls.getInitialControlsState();
+
         // Set switch state
         // TODO: send this info with XFormsEvents.XXFORMS_INITIALIZE_STATE event?
-        final XFormsControls xFormsControls = containingDocument.getXFormsControls();
         if (divsElement != null) {
             for (Iterator i = divsElement.elements().iterator(); i.hasNext();) {
                 final Element divElement = (Element) i.next();
@@ -619,7 +679,18 @@ public class XFormsServer extends ProcessorImpl {
             }
         }
 
-        // TODO: update repeat indexes from request if needed
+        // Set repeat index state
+        // TODO: send this info with XFormsEvents.XXFORMS_INITIALIZE_STATE event?
+        if (repeatIndexesElement != null) {
+            for (Iterator i = repeatIndexesElement.elements().iterator(); i.hasNext();) {
+                final Element repeatIndexElement = (Element) i.next();
+
+                final String repeatId = repeatIndexElement.attributeValue("id");
+                final String index = repeatIndexElement.attributeValue("index");
+
+                initialControlsState.updateRepeatIndex(repeatId, Integer.parseInt(index));
+            }
+        }
 
         // Run automatic event if present
         if (eventElement != null) {

@@ -137,6 +137,21 @@
                     </element>
                 </optional>
                 <optional>
+                    <element name="xxforms:repeat-indexes">
+                        <zeroOrMore>
+                            <element name="xxforms:repeat-index">
+                                <attribute name="id"/>
+                                <attribute name="old-index">
+                                    <data type="positiveInteger"/>
+                                </attribute>
+                                <attribute name="new-index">
+                                    <data type="positiveInteger"/>
+                                </attribute>
+                            </element>
+                        </zeroOrMore>
+                    </element>
+                </optional>
+                <optional>
                     <element name="xxforms:itemsets">
                         <zeroOrMore>
                             <element name="xxforms:itemset">

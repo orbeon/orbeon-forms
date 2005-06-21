@@ -806,7 +806,7 @@
         </output>
     </test>
 
-    <test description="Test for xforms:repeat actions (insert, delete, setindex)" name="oxf:pipeline">
+    <test description="Test for xforms:repeat insert action" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
                 <p:param name="response" type="output"/>
@@ -881,6 +881,84 @@
                     <xxf:divs/>
                     <xxf:repeat-indexes>
                         <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
+                    </xxf:repeat-indexes>
+                    <xxf:itemsets/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
+    <test description="Test for xforms:repeat delete action" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <p:input name="event">
+                        <xxforms:event name="DOMActivate" source-control-id="id124-1"/>
+                    </p:input>
+                    <p:input name="controls">
+                        <controls
+                            xmlns:xforms="http://www.w3.org/2002/xforms"
+                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                            xmlns:ev="http://www.w3.org/2001/xml-events">
+                            <xforms:repeat nodeset="/form/departments/department" id="id123">
+                                <xforms:repeat nodeset="employee" id="id124" startindex="2">
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:delete nodeset="../../department[index('id123')]/employee" at="2"/>
+<!--                                        <xforms:delete nodeset="../../department" at="2"/>-->
+                                    </xforms:action>
+                                    <xforms:output ref="@first" id="id125"/>
+                                    <xforms:output ref="@last" id="id126"/>
+                                </xforms:repeat>
+                            </xforms:repeat>
+                        </controls>
+                    </p:input>
+                    <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
+                    <p:input name="instances">
+                        <xxforms:instances/>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <form>
+                                <departments>
+                                    <department>
+                                        <employee first="f11" last="l11"/>
+                                    </department>
+                                    <department>
+                                        <employee first="f21" last="l21"/>
+                                    </department>
+                                    <department>
+                                        <employee first="f31" last="l31"/>
+                                        <employee first="f32" last="l32"/>
+                                        <employee first="f33" last="l33"/>
+                                        <employee first="f34" last="l34"/>
+                                    </department>
+                                </departments>
+                            </form>
+                        </instances>
+                        <divs/>
+                        <repeat-indexes>
+                            <repeat-index id="id123" index="1"/>
+                            <repeat-index id="id124" index="1"/>
+                        </repeat-indexes>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:delete-element id="id124-1-2"/>
+                    </xxf:control-values>
+                    <xxf:divs/>
+                    <xxf:repeat-indexes>
+                        <xxf:repeat-index id="id124" old-index="2" new-index="1"/>
                     </xxf:repeat-indexes>
                     <xxf:itemsets/>
                 </xxf:action>

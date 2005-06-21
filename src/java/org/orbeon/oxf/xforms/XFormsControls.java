@@ -997,6 +997,52 @@ public class XFormsControls implements XFormsEventTarget {
 
             callEventHandlers(pipelineContext, xformsEvent);
 
+        } else if (XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(eventName)) {
+            // 4.4.8 The DOMFocusIn Event
+            // Bubbles: Yes / Cancelable: No / Context Info: None
+            // The default action for this event results in the following: None; notification event only.
+
+            callEventHandlers(pipelineContext, xformsEvent);
+
+            // Try to update xforms:repeat indices based on this
+            final ControlInfo targetControlInfo = (ControlInfo) xformsEvent.getTargetObject();
+            {
+                final List ancestorRepeats = new ArrayList();
+                final Map ancestorRepeatsMap = new HashMap();
+
+                // Find current path through ancestor xforms:repeat elements, if any
+                ControlInfo currentControlInfo = targetControlInfo.getParent();
+                while (currentControlInfo != null) {
+
+                    if (currentControlInfo instanceof RepeatIterationInfo) {
+                        final RepeatIterationInfo repeatIterationInfo = (RepeatIterationInfo) currentControlInfo;
+                        final int iteration = repeatIterationInfo.getIteration();
+                        final String repeatId = repeatIterationInfo.getParent().getElement().attributeValue("id");
+
+                        ancestorRepeats.add(repeatId);
+                        ancestorRepeatsMap.put(repeatId,  new Integer(iteration));
+                    }
+
+                    currentControlInfo = currentControlInfo.getParent();
+                }
+
+                if (ancestorRepeats.size() > 0) {
+
+                    // Update ControlsState if needed as we are going to make some changes
+                    if (initialControlsState == currentControlsState)
+                        currentControlsState = getCurrentControlsState(pipelineContext);
+
+                    // Iterate from root to leaf
+                    Collections.reverse(ancestorRepeats);
+                    for (Iterator i = ancestorRepeats.iterator(); i.hasNext();) {
+                        final String repeatId = (String) i.next();
+                        final Integer iteration = (Integer) ancestorRepeatsMap.get(repeatId);
+
+                        currentControlsState.updateRepeatIndex(repeatId, iteration.intValue());
+                    }
+                }
+            }
+
         } else if (XFormsEvents.XFORMS_VALUE_CHANGED.equals(eventName)) {
             // 4.4.2 The xforms-value-changed Event
             // Bubbles: Yes / Cancelable: No / Context Info: None
@@ -1491,7 +1537,7 @@ public class XFormsControls implements XFormsEventTarget {
                 // Update ControlsState if needed as we are going to make some changes
                 if (initialControlsState == currentControlsState)
                     currentControlsState = getCurrentControlsState(pipelineContext);
-                
+
                 final int index = Integer.parseInt(indexString);
 
                 final Map repeatIdToRepeatControlInfo = currentControlsState.getRepeatIdToRepeatControlInfo();

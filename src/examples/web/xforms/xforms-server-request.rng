@@ -37,6 +37,11 @@
                                 <data type="string"/>
                             </attribute>
                             <optional>
+                                <attribute name="other-control-id">
+                                    <data type="string"/>
+                                </attribute>
+                            </optional>
+                            <optional>
                                 <data type="string"/>
                             </optional>
                         </optional>

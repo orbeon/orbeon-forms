@@ -14,7 +14,6 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.Document;
-import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.event.*;
@@ -120,13 +119,14 @@ public class XFormsContainingDocument implements XFormsEventTarget {
     /**
      * Execute an external event on element with id targetElementId and event eventName.
      */
-    public void executeExternalEvent(PipelineContext pipelineContext, String targetElementId, String eventName, String contextString) {
+    public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String controlId, String otherControlId, String contextString) {
 
-        // Get target object (right now control element or submission)
-        final Object targetObject = getObjectById(pipelineContext, targetElementId);
+        // Get event target object (right now control element or submission)
+        final Object eventTargetObject = getObjectById(pipelineContext, controlId);
+        final Object otherTargetObject = (otherControlId == null) ? null : getObjectById(pipelineContext, otherControlId);
 
         // Create event
-        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, targetObject, contextString, null, null);
+        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTargetObject, otherTargetObject, contextString, null, null);
 
         // Interpret event
         interpretEvent(pipelineContext, xformsEvent);
@@ -166,11 +166,10 @@ public class XFormsContainingDocument implements XFormsEventTarget {
             model.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
             model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
 
-            xformsControls.dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(concreteEvent.getTargetObject()));
             xformsControls.dispatchEvent(pipelineContext, new XFormsValueChangeEvent(concreteEvent.getTargetObject()));
-
-            // TODO (missing new control information!)
-            //xFormsControls.dispatchEvent(pipelineContext, XFormsEvents.XFORMS_DOM_FOCUS_IN, newControlElement);
+            xformsControls.dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(concreteEvent.getTargetObject()));
+            if (concreteEvent.getOtherTargetObject() != null) // we SHOULD have this but the client may not send it
+                xformsControls.dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(concreteEvent.getOtherTargetObject()));
 
             model.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
 

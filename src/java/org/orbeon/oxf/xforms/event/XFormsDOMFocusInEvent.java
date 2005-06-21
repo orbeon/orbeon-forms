@@ -15,22 +15,12 @@ package org.orbeon.oxf.xforms.event;
 
 
 /**
- * Internal XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE event.
+ * 4.4.8 The DOMFocusIn Event
+ *
+ * Target: form control / Bubbles: Yes / Cancelable: No / Context Info: None
  */
-public class XXFormsValueChangeWithFocusChangeEvent extends XFormsEvent {
-    private String newValue;
-    private Object otherTargetObject;
-    public XXFormsValueChangeWithFocusChangeEvent(Object targetObject, Object otherTargetObject, String newValue) {
-        super(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE, targetObject, false, false);
-        this.otherTargetObject = otherTargetObject;
-        this.newValue = newValue;
-    }
-
-    public Object getOtherTargetObject() {
-        return otherTargetObject;
-    }
-
-    public String getNewValue() {
-        return newValue;
+public class XFormsDOMFocusInEvent extends XFormsEvent {
+    public XFormsDOMFocusInEvent(Object targetObject) {
+        super(XFormsEvents.XFORMS_DOM_FOCUS_IN, targetObject, true, false);
     }
 }

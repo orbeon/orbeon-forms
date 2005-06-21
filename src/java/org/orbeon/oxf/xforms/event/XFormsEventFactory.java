@@ -22,18 +22,18 @@ import org.orbeon.oxf.common.OXFException;
 public class XFormsEventFactory {
 
     public static XFormsEvent createEvent(String newEventName, Object targetObject) {
-        return createEvent(newEventName, targetObject, false, true, true, null, null, null);
+        return createEvent(newEventName, targetObject, null, false, true, true, null, null, null);
     }
 
-    public static XFormsEvent createEvent(String newEventName, Object targetObject, String contextString, Element contextElement, Throwable contextThrowable) {
-        return createEvent(newEventName, targetObject, false, true, true, contextString, contextElement, contextThrowable);
+    public static XFormsEvent createEvent(String newEventName, Object targetObject, Object otherTargetObject, String contextString, Element contextElement, Throwable contextThrowable) {
+        return createEvent(newEventName, targetObject, otherTargetObject, false, true, true, contextString, contextElement, contextThrowable);
     }
 
     public static XFormsEvent createEvent(String newEventName, Object targetObject, boolean bubbles, boolean cancelable) {
-        return createEvent(newEventName, targetObject, true, bubbles, cancelable, null, null, null);
+        return createEvent(newEventName, targetObject, null, true, bubbles, cancelable, null, null, null);
     }
 
-    public static XFormsEvent createEvent(String eventName, Object targetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable,
+    private static XFormsEvent createEvent(String eventName, Object targetObject, Object otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable,
                                           String contextString, Element contextElement, Throwable contextThrowable) {
 
         // TODO
@@ -74,7 +74,7 @@ public class XFormsEventFactory {
         } else if (eventName.equals(XFormsEvents.XXFORMS_INITIALIZE_STATE)) {
             return new XXFormsInitializeStateEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
-            return new XXFormsValueChangeWithFocusChangeEvent(targetObject, contextString);
+            return new XXFormsValueChangeWithFocusChangeEvent(targetObject, otherTargetObject, contextString);
         } else if (eventName.equals(XFormsEvents.XXFORMS_SUBMIT)) {
             return new XXFormsSubmissionEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_CONSTRUCT)) {

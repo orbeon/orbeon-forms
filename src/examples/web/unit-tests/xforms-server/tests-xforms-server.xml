@@ -1045,4 +1045,80 @@
         </output>
     </test>
 
+    <test description="Test for repeat index change upon focus change" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <p:input name="event">
+                        <xxforms:event name="xxforms-value-change-with-focus-change" source-control-id="id125-1-1" other-control-id="id125-3-2">Hello!</xxforms:event>
+                    </p:input>
+                    <p:input name="controls">
+                        <controls
+                            xmlns:xforms="http://www.w3.org/2002/xforms"
+                            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+                            xmlns:ev="http://www.w3.org/2001/xml-events">
+                            <xforms:repeat nodeset="/form/departments/department" id="id123">
+                                <xforms:repeat nodeset="employee" id="id124">
+                                    <xforms:output ref="@first" id="id125"/>
+                                    <xforms:output ref="@last" id="id126"/>
+                                </xforms:repeat>
+                            </xforms:repeat>
+                        </controls>
+                    </p:input>
+                    <p:input name="models" href="aggregate('models', xforms-server/repeat-model.xml)"/>
+                    <p:input name="instances">
+                        <xxforms:instances/>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <form>
+                                <departments>
+                                    <department>
+                                        <employee first="Hello!" last="l11"/>
+                                        <employee first="f12" last="l12"/>
+                                    </department>
+                                    <department>
+                                        <employee first="f21" last="l21"/>
+                                    </department>
+                                    <department>
+                                        <employee first="f31" last="l31"/>
+                                        <employee first="f32" last="l32"/>
+                                        <employee first="f33" last="l33"/>
+                                        <employee first="f34" last="l34"/>
+                                    </department>
+                                </departments>
+                            </form>
+                        </instances>
+                        <divs/>
+                        <repeat-indexes>
+                            <repeat-index id="id123" index="3"/>
+                            <repeat-index id="id124" index="2"/>
+                        </repeat-indexes>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="id125-1-1">Hello!</xxf:control>
+                    </xxf:control-values>
+                    <xxf:divs/>
+                    <xxf:repeat-indexes>
+                        <xxf:repeat-index id="id123" old-index="1" new-index="3"/>
+                        <xxf:repeat-index id="id124" old-index="1" new-index="2"/>
+                    </xxf:repeat-indexes>
+                    <xxf:itemsets/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

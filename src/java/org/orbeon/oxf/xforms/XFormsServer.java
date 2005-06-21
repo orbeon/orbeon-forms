@@ -105,15 +105,16 @@ public class XFormsServer extends ProcessorImpl {
         {
             final Element eventElement = actionElement.element(XFormsConstants.XXFORMS_EVENT_QNAME);
             if (eventElement != null) {
-                final String controlId = eventElement.attributeValue("source-control-id");
+                final String sourceControlId = eventElement.attributeValue("source-control-id");
+                final String otherControlId = eventElement.attributeValue("other-control-id");
                 final String eventName = eventElement.attributeValue("name");
                 final String value = eventElement.getText();
 
-                if (controlId != null && eventName != null) {
+                if (sourceControlId != null && eventName != null) {
                     // An event is passed
-                    containingDocument.executeExternalEvent(pipelineContext, controlId, eventName, value);
+                    containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value);
                     isInitializationRun = false;
-                } else if (!(controlId == null && eventName == null)) {
+                } else if (!(sourceControlId == null && eventName == null)) {
                     throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
                 } else {
                     isInitializationRun = true;
@@ -696,7 +697,7 @@ public class XFormsServer extends ProcessorImpl {
         if (eventElement != null) {
             final String controlId = eventElement.attributeValue("source-control-id");
             final String eventName = eventElement.attributeValue("name");
-            containingDocument.executeExternalEvent(pipelineContext, controlId, eventName, null);
+            containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, null, null);
         }
 
         return containingDocument;

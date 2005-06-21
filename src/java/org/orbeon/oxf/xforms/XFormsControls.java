@@ -1046,6 +1046,20 @@ public class XFormsControls implements XFormsEventTarget {
 
             callEventHandlers(pipelineContext, xformsEvent);
 
+        } else if (XFormsEvents.XFORMS_SCROLL_FIRST.equals(eventName)) {
+            // 4.4.4 The xforms-scroll-first and xforms-scroll-last Events
+            // Target: repeat / Bubbles: Yes / Cancelable: No / Context Info: None
+            // The default action for this event results in the following: None; notification event only.
+
+            callEventHandlers(pipelineContext, xformsEvent);
+
+        } else if (XFormsEvents.XFORMS_SCROLL_LAST.equals(eventName)) {
+            // 4.4.4 The xforms-scroll-first and xforms-scroll-last Events
+            // Target: repeat / Bubbles: Yes / Cancelable: No / Context Info: None
+            // The default action for this event results in the following: None; notification event only.
+
+            callEventHandlers(pipelineContext, xformsEvent);
+
         } else {
             throw new OXFException("Invalid action requested: " + eventName);
         }
@@ -1321,7 +1335,9 @@ public class XFormsControls implements XFormsEventTarget {
                     }
                     for (Iterator i = childrenRepeatIds.keySet().iterator(); i.hasNext();) {
                         final String repeatId = (String) i.next();
-                        currentControlsState.updateRepeatIndex(repeatId, ((Integer) currentControlsState.getInitialRepeatIdToIndex().get(repeatId)).intValue());
+                        //final int newIndex = ((Integer) currentControlsState.getInitialRepeatIdToIndex().get(repeatId)).intValue();
+                        final int newIndex = 1;
+                        currentControlsState.updateRepeatIndex(repeatId, newIndex);
                     }
                 }
 
@@ -1430,7 +1446,9 @@ public class XFormsControls implements XFormsEventTarget {
                     if (updateInnerRepeats) {
                         for (Iterator i = childrenRepeatIds.keySet().iterator(); i.hasNext();) {
                             final String repeatId = (String) i.next();
-                            currentControlsState.updateRepeatIndex(repeatId, ((Integer) currentControlsState.getInitialRepeatIdToIndex().get(repeatId)).intValue());
+                            //final int newIndex = ((Integer) currentControlsState.getInitialRepeatIdToIndex().get(repeatId)).intValue();
+                            final int newIndex = 1;
+                            currentControlsState.updateRepeatIndex(repeatId, newIndex);
                         }
                     }
                 }
@@ -1456,7 +1474,59 @@ public class XFormsControls implements XFormsEventTarget {
         } else if (XFormsActions.XFORMS_SETINDEX_ACTION.equals(actionEventName)) {
             // 9.3.7 The setindex Element
 
-            // TODO
+            final String repeatId = eventHandlerElement.attributeValue("repeat");
+            final String indexXPath = eventHandlerElement.attributeValue("index");
+
+            setBinding(pipelineContext, eventHandlerControlInfo);
+            pushBinding(pipelineContext, eventHandlerElement);
+
+            final XFormsInstance currentInstance = getCurrentInstance();
+            final String indexString = currentInstance.evaluateXPathAsString(pipelineContext,
+                    "string(number(" + indexXPath + "))", Dom4jUtils.getNamespaceContextNoDefault(eventHandlerElement), null, functionLibrary, null);
+
+            if ("NaN".equals(indexString)) {
+                // "If the index evaluates to NaN the action has no effect."
+            } else {
+
+                // Update ControlsState if needed as we are going to make some changes
+                if (initialControlsState == currentControlsState)
+                    currentControlsState = getCurrentControlsState(pipelineContext);
+                
+                final int index = Integer.parseInt(indexString);
+
+                final Map repeatIdToRepeatControlInfo = currentControlsState.getRepeatIdToRepeatControlInfo();
+                final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatIdToRepeatControlInfo.get(repeatId);
+
+                if (index <= 0) {
+                    // "If the selected index is 0 or less, an xforms-scroll-first event is dispatched
+                    // and the index is set to 1."
+                    dispatchEvent(pipelineContext, new XFormsScrollFirstEvent(repeatControlInfo));
+                    currentControlsState.updateRepeatIndex(repeatId, 1);
+                } else {
+                    final List children = repeatControlInfo.getChildren();
+
+                    if (children != null && index > children.size()) {
+                        // "If the selected index is greater than the index of the last repeat
+                        // item, an xforms-scroll-last event is dispatched and the index is set to
+                        // that of the last item."
+
+                        dispatchEvent(pipelineContext, new XFormsScrollLastEvent(repeatControlInfo));
+                        currentControlsState.updateRepeatIndex(repeatId, children.size());
+                    } else {
+                        // Otherwise just set the index
+                        currentControlsState.updateRepeatIndex(repeatId, index);
+                    }
+                }
+
+                // "The indexes for inner nested repeat collections are re-initialized to 1."
+                final List nestedRepeatIds = currentControlsState.getNestedRepeatIds(repeatId);
+                if (nestedRepeatIds != null) {
+                    for (Iterator i = nestedRepeatIds.iterator(); i.hasNext();) {
+                        final String currentRepeatId = (String) i.next();
+                        currentControlsState.updateRepeatIndex(currentRepeatId, 1);
+                    }
+                }
+            }
 
         } else if (XFormsActions.XFORMS_SEND_ACTION.equals(actionEventName)) {
             // 10.1.10 The send Element
@@ -1519,7 +1589,7 @@ public class XFormsControls implements XFormsEventTarget {
                 if (controlElement.getName().equals("repeat")) {
                     if (foundControlElement == null) {
                         // We are not yet inside a matching xforms:repeat
-                        setBinding(pipelineContext, controlElement);
+//                        setBinding(pipelineContext, controlElement);
                         final Element currentNode = (Element) getCurrentSingleNode();
                         final Element currentParent = currentNode.getParent();
                         if (currentParent == parentElement) {
@@ -1597,6 +1667,11 @@ public class XFormsControls implements XFormsEventTarget {
     public static interface ControlVisitorListener {
         public boolean startVisitControl(Element controlElement, String effectiveControlId);
         public boolean endVisitControl(Element controlElement, String effectiveControlId);
+    }
+
+    public static interface ControlInfoVisitorListener {
+        public void startVisitControl(ControlInfo controlInfo);
+        public void endVisitControl(ControlInfo controlInfo);
     }
 
     /**
@@ -1727,6 +1802,80 @@ public class XFormsControls implements XFormsEventTarget {
         public Map getEffectiveRepeatIdToIterations() {
             return effectiveRepeatIdToIterations;
         }
+
+        /**
+         * Return the list of repeat ids under a given repeat id.
+         */
+        public List getNestedRepeatIds(String repeatId) {
+            final Map repeatIdToRepeatControlInfo = getRepeatIdToRepeatControlInfo();
+            final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatIdToRepeatControlInfo.get(repeatId);
+            final int index = ((Integer) getRepeatIdToIndex().get(repeatId)).intValue();
+            final List newChildren = repeatControlInfo.getChildren();
+            if (newChildren != null && newChildren.size() > 0) {
+                Map result = new HashMap();
+                visitRepeatHierarchy(result, Collections.singletonList(newChildren.get(index - 1)));
+                return new ArrayList(result.keySet());
+            } else {
+                return null;
+            }
+        }
+
+        /**
+         * Return a map of repeat ids -> RepeatControlInfo objects, following the current indexes
+         * of the repeat elements.
+         */
+        public Map getRepeatIdToRepeatControlInfo() {
+            final Map result = new HashMap();
+            visitRepeatHierarchy(result);
+            return result;
+        }
+
+        private void visitRepeatHierarchy(Map result) {
+            visitRepeatHierarchy(result, this.children);
+        }
+
+        private void visitRepeatHierarchy(Map result, List children) {
+            for (Iterator i = children.iterator(); i.hasNext();) {
+                final ControlInfo currentControlInfo = (ControlInfo) i.next();
+
+                if ("repeat".equals(currentControlInfo.getName())) {
+
+                    final String repeatId = currentControlInfo.getElement().attributeValue("id");
+                    final int index = ((Integer) getRepeatIdToIndex().get(repeatId)).intValue();
+
+                    result.put(repeatId, currentControlInfo);
+
+                    if (index > 0) {
+                        final List newChildren = currentControlInfo.getChildren();
+                        if (newChildren != null && newChildren.size() > 0)
+                            visitRepeatHierarchy(result, Collections.singletonList(newChildren.get(index - 1)));
+                    }
+
+                } else {
+                    final List newChildren = currentControlInfo.getChildren();
+                    if (newChildren != null)
+                        visitRepeatHierarchy(result, newChildren);
+                }
+            }
+        }
+
+//        public void visitControlInfo(ControlInfoVisitorListener controlInfoVisitorListener) {
+//            visitControlInfo(controlInfoVisitorListener, this.children);
+//        }
+//
+//        private void visitControlInfo(ControlInfoVisitorListener controlInfoVisitorListener, List children) {
+//            for (Iterator i = children.iterator(); i.hasNext();) {
+//                final ControlInfo currentControlInfo = (ControlInfo) i.next();
+//
+//                controlInfoVisitorListener.startVisitControl(currentControlInfo);
+//
+//                final List newChildren = currentControlInfo.getChildren();
+//                if (newChildren != null)
+//                    visitControlInfo(controlInfoVisitorListener, newChildren);
+//
+//                controlInfoVisitorListener.endVisitControl(currentControlInfo);
+//            }
+//        }
     }
 
     /**

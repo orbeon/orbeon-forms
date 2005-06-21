@@ -58,6 +58,9 @@ public class XFormsEvents {
     public static final String XFORMS_INSERT = "xforms-insert";
     public static final String XFORMS_DELETE = "xforms-delete";
 
+    public static final String XFORMS_SCROLL_FIRST = "xforms-scroll-first";
+    public static final String XFORMS_SCROLL_LAST = "xforms-scroll-last";
+
     // DOM events
     public static final String XFORMS_DOM_ACTIVATE = "DOMActivate";
     public static final String XFORMS_DOM_FOCUS_OUT = "DOMFocusOut";

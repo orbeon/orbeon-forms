@@ -127,6 +127,7 @@ public class XFormsServer extends ProcessorImpl {
         // Create resulting document if there is a ContentHandler
         if (contentHandler != null) {
             final XFormsControls xFormsControls = containingDocument.getXFormsControls();
+            final XFormsControls.ControlsState currentControlsState = xFormsControls.getCurrentControlsState(pipelineContext);
             try {
                 final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
                 ch.startDocument();
@@ -136,7 +137,6 @@ public class XFormsServer extends ProcessorImpl {
                 // NOTE: Static state is produced externally during initialization
 
                 // Output dynamic state
-                final XFormsControls.ControlsState currentControlsState = xFormsControls.getCurrentControlsState(pipelineContext);
                 {
                     final Document dynamicStateDocument = Dom4jUtils.createDocument();
                     final Element dynamicStateElement = dynamicStateDocument.addElement("dynamic-state");
@@ -156,7 +156,7 @@ public class XFormsServer extends ProcessorImpl {
                     // Output divs information
                     {
                         final Element divsElement = dynamicStateElement.addElement("divs");
-                        outputSwitchDivs(divsElement, xFormsControls);
+                        outputSwitchDivs(divsElement, currentControlsState);
                     }
 
                     // Output repeat index information
@@ -210,7 +210,7 @@ public class XFormsServer extends ProcessorImpl {
                     // Output divs information
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "divs");
-                        outputSwitchDivs(ch, xFormsControls);
+                        outputSwitchDivs(ch, currentControlsState);
                         ch.endElement();
                     }
 
@@ -475,52 +475,66 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private void outputSwitchDivs(Element divsElement, XFormsControls xFormsControls) {
-        final Map switchInfoMap = xFormsControls.getSwitchIdToToSwitchInfoMap();
-        if (switchInfoMap != null) {
+    private void outputSwitchDivs(Element divsElement, XFormsControls.ControlsState controlsState) {
+        final Map switchIdToSelectedCaseIdMap = controlsState.getSwitchIdToSelectedCaseIdMap();
+        if (switchIdToSelectedCaseIdMap != null) {
             // There are some xforms:switch/xforms:case controls
 
-            for (Iterator i = switchInfoMap.entrySet().iterator(); i.hasNext();) {
-                final XFormsControls.SwitchInfo switchInfo = (XFormsControls.SwitchInfo) ((Map.Entry) i.next()).getValue();
+            for (Iterator i = switchIdToSelectedCaseIdMap.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String switchId = (String) currentEntry.getKey();
+                final String selectedCaseId = (String) currentEntry.getValue();
 
                 // Output selected ids
                 {
                     final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                    divElement.addAttribute("id", switchInfo.getSelectedCaseId());
+                    divElement.addAttribute("id", selectedCaseId);
                     divElement.addAttribute("visibility", "visible");
                 }
 
                 // Output deselected ids
-                if (switchInfo.getDeselectedCaseIds() != null) {
-                    for (Iterator j = switchInfo.getDeselectedCaseIds().iterator(); j.hasNext();) {
-                        final String caseId = (String) j.next();
+                final XFormsControls.ControlInfo switchControlInfo = (XFormsControls.ControlInfo) controlsState.getIdsToControlInfo().get(switchId);
+                final List children = switchControlInfo.getChildren();
+                if (children != null && children.size() > 0) {
+                    for (Iterator j = children.iterator(); j.hasNext();) {
+                        final XFormsControls.ControlInfo caseControlInfo = (XFormsControls.ControlInfo) j.next();
 
-                        final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
-                        divElement.addAttribute("id", caseId);
-                        divElement.addAttribute("visibility", "hidden");
+                        if (!caseControlInfo.getId().equals(selectedCaseId)) {
+                            final Element divElement = divsElement.addElement("xxf:div", XFormsConstants.XXFORMS_NAMESPACE_URI);
+                            divElement.addAttribute("id", caseControlInfo.getId());
+                            divElement.addAttribute("visibility", "hidden");
+                        }
                     }
                 }
             }
         }
     }
 
-    private void outputSwitchDivs(ContentHandlerHelper ch, XFormsControls xFormsControls) {
-
-        Map switchInfoMap = xFormsControls.getSwitchIdToToSwitchInfoMap();
-        if (switchInfoMap != null) {
+    private void outputSwitchDivs(ContentHandlerHelper ch, XFormsControls.ControlsState controlsState) {
+        final Map switchIdToSelectedCaseIdMap = controlsState.getSwitchIdToSelectedCaseIdMap();
+        if (switchIdToSelectedCaseIdMap != null) {
             // There are some xforms:switch/xforms:case controls
 
-            for (Iterator i = switchInfoMap.entrySet().iterator(); i.hasNext();) {
-                XFormsControls.SwitchInfo switchInfo = (XFormsControls.SwitchInfo) ((Map.Entry) i.next()).getValue();
+            for (Iterator i = switchIdToSelectedCaseIdMap.entrySet().iterator(); i.hasNext();) {
+                final Map.Entry currentEntry = (Map.Entry) i.next();
+                final String switchId = (String) currentEntry.getKey();
+                final String selectedCaseId = (String) currentEntry.getValue();
 
                 // Output selected ids
-                ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", switchInfo.getSelectedCaseId(), "visibility", "visible"});
+                {
+                    ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", selectedCaseId, "visibility", "visible"});
+                }
 
                 // Output deselected ids
-                if (switchInfo.getDeselectedCaseIds() != null) {
-                    for (Iterator j = switchInfo.getDeselectedCaseIds().iterator(); j.hasNext();) {
-                        String caseId = (String) j.next();
-                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseId, "visibility", "hidden"});
+                final XFormsControls.ControlInfo switchControlInfo = (XFormsControls.ControlInfo) controlsState.getIdsToControlInfo().get(switchId);
+                final List children = switchControlInfo.getChildren();
+                if (children != null && children.size() > 0) {
+                    for (Iterator j = children.iterator(); j.hasNext();) {
+                        final XFormsControls.ControlInfo caseControlInfo = (XFormsControls.ControlInfo) j.next();
+
+                        if (!caseControlInfo.getId().equals(selectedCaseId)) {
+                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "div", new String[]{"id", caseControlInfo.getId(), "visibility", "hidden"});
+                        }
                     }
                 }
             }

@@ -38,9 +38,7 @@ public class XFormsControls implements XFormsEventTarget {
 
     private Locator locator;
 
-    private Map switchIdToToSwitchInfoMap;// TODO: update this to SwitchControlInfo
-    private Map caseIdToSwitchInfoMap;// TODO: update this to SwitchControlInfo
-    private Map itemsetIdToItemsetInfoMap;
+    private Map itemsetIdToItemsetInfoMap;// TODO: this may be also refactored into ControlsState
 
     private ControlsState initialControlsState;
     private ControlsState currentControlsState;
@@ -136,8 +134,6 @@ public class XFormsControls implements XFormsEventTarget {
         initializeContextStack();
 
         if (controlsDocument != null) {
-            // Initialize switch information
-            initializeSwitchInfo(pipelineContext);
             // Initialize itemset information
             itemsetIdToItemsetInfoMap = getItemsetInfo(pipelineContext, null);
             // Get initial controls state information
@@ -392,119 +388,50 @@ public class XFormsControls implements XFormsEventTarget {
     }
 
     /**
-     * Compute all default xforms:switch/xforms:case information.
-     */
-    private void initializeSwitchInfo(PipelineContext pipelineContext) {
-        final Map switchInfoMap = new HashMap();
-        final Map caseIdToSwitchInfoMap = new HashMap();
-        visitAllControlsHandleRepeat(pipelineContext, new ControlVisitorListener() {
-            private Stack switchStack = new Stack();
-            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
-                final String controlName = controlElement.getName();
-                //final String controlId = controlElement.attributeValue("id");
-                //TODO: check behavior of switch within repeat: do we need the effective id, or not?
-                if (controlName.equals("switch")) {
-                    switchStack.push(new SwitchInfo(effectiveControlId));
-                } else if (controlName.equals("case")) {
-                    final SwitchInfo switchInfo = (SwitchInfo) switchStack.peek();
-
-                    caseIdToSwitchInfoMap.put(effectiveControlId, switchInfo);
-
-                    if (switchInfo.getSelectedCaseId() == null) {
-                        // If case is not already selected and there is a select attribute, set it
-                        final String selectedAttribute = controlElement.attributeValue("selected");
-                        if ("true".equals(selectedAttribute))
-                            switchInfo.setSelectedCaseId(effectiveControlId);
-                        else
-                            switchInfo.addDeselectedCaseId(effectiveControlId);
-                    } else {
-                        // Remember deselected case id
-                        switchInfo.addDeselectedCaseId(effectiveControlId);
-                    }
-                }
-
-                return true;
-            }
-            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
-                final String controlName = controlElement.getName();
-                if (controlName.equals("switch")) {
-                    final SwitchInfo switchInfo = (SwitchInfo) switchStack.peek();
-                    if (switchInfo.getSelectedCaseId() == null) {
-                        // No case was selected, select first id
-                        final List deselectedCaseIds = switchInfo.getDeselectedCaseIds();
-                        if (deselectedCaseIds.size() > 0) {
-                            switchInfo.setSelectedCaseId((String) deselectedCaseIds.get(0));
-                            deselectedCaseIds.remove(0);
-                        }
-                    }
-
-                    // Add new switchInfo
-                    switchInfoMap.put(switchInfo.getSwitchId(), switchInfo);
-
-                    switchStack.pop();
-                }
-                return true;
-            }
-        });
-        this.switchIdToToSwitchInfoMap = switchInfoMap;
-        this.caseIdToSwitchInfoMap = caseIdToSwitchInfoMap;
-    }
-
-    /**
      * Update xforms:switch/xforms:case information with newly selected case id.
      */
     private void updateSwitchInfo(final PipelineContext pipelineContext, final String selectedCaseId) {
-        visitAllControlsHandleRepeat(pipelineContext, new ControlVisitorListener() {
-            private Stack switchStack = new Stack();
-            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
-                final String controlName = controlElement.getName();
-                //final String controlId = controlElement.attributeValue("id");
-                //TODO: check behavior of switch within repeat: do we need the effective id, or not?
-                if (controlName.equals("switch")) {
-                    switchStack.push(switchIdToToSwitchInfoMap.get(effectiveControlId));
-                } else if (controlName.equals("case")) {
-                    final SwitchInfo switchInfo = (SwitchInfo) switchStack.peek();
 
-                    if (selectedCaseId.equals(effectiveControlId) && !selectedCaseId.equals(switchInfo.getSelectedCaseId())) {
-                        // This is the case that just got selected, and it was not previously selected
-                        switchInfo.startUpdateSelectedCaseId(selectedCaseId);
-                    }
-                }
+        // Find SwitchControlInfo
+        final ControlInfo caseControlInfo = (ControlInfo) currentControlsState.getIdsToControlInfo().get(selectedCaseId);
+        if (caseControlInfo == null)
+            throw new OXFException("No ControlInfo found for case id '" + selectedCaseId + "'.");
+        final ControlInfo switchControlInfo = (ControlInfo) caseControlInfo.getParent();
+        if (switchControlInfo == null)
+            throw new OXFException("No SwitchControlInfo found for case id '" + selectedCaseId + "'.");
 
-                return true;
-            }
-            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
-                final String controlName = controlElement.getName();
-                if (controlName.equals("switch")) {
-                    final SwitchInfo switchInfo = (SwitchInfo) switchStack.peek();
+        final String currentSelectedCaseId = (String) currentControlsState.getSwitchIdToSelectedCaseIdMap().get(switchControlInfo.getId());
+        if (!selectedCaseId.equals(currentSelectedCaseId)) {
+            // A new selection occurred on this switch
 
-                    final String previouslySelected = switchInfo.getPreviouslySelectedCaseId();
-                    if (previouslySelected != null) {
-                        // A new selection occurred on this switch
+            // "This action adjusts all selected attributes on the affected cases to reflect the
+            // new state, and then performs the following:"
+            currentControlsState.getSwitchIdToSelectedCaseIdMap().put(switchControlInfo.getId(), selectedCaseId);
 
-                        // "1. Dispatching an xforms-deselect event to the currently selected case."
-                        dispatchEvent(pipelineContext, new XFormsDeselectEvent(currentControlsState.getIdsToControlInfo().get(previouslySelected)));
+            // "1. Dispatching an xforms-deselect event to the currently selected case."
+            dispatchEvent(pipelineContext, new XFormsDeselectEvent(currentControlsState.getIdsToControlInfo().get(currentSelectedCaseId)));
 
-                        // "2. Dispatching an xform-select event to the case to be selected."
-                        dispatchEvent(pipelineContext, new XFormsSelectEvent(currentControlsState.getIdsToControlInfo().get(switchInfo.getSelectedCaseId())));
-
-                        switchInfo.endUpdateSelectedCaseId();
-                    }
-
-                    switchStack.pop();
-                }
-                return true;
-            }
-        });
+            // "2. Dispatching an xform-select event to the case to be selected."
+            dispatchEvent(pipelineContext, new XFormsSelectEvent(currentControlsState.getIdsToControlInfo().get(selectedCaseId)));
+        }
     }
 
+    /**
+     * Update switch info state for the given case id.
+     */
     public void updateSwitchInfo(String caseId, boolean visible) {
-        SwitchInfo switchInfo = (SwitchInfo) caseIdToSwitchInfoMap.get(caseId);
-        if (switchInfo == null)
-            throw new OXFException("No SwitchInfo found for case id '" + caseId + "'.");
+
+        // Find SwitchControlInfo
+        final ControlInfo caseControlInfo = (ControlInfo) currentControlsState.getIdsToControlInfo().get(caseId);
+        if (caseControlInfo == null)
+            throw new OXFException("No ControlInfo found for case id '" + caseId + "'.");
+        final ControlInfo switchControlInfo = (ControlInfo) caseControlInfo.getParent();
+        if (switchControlInfo == null)
+            throw new OXFException("No SwitchControlInfo found for case id '" + caseId + "'.");
+
+        // Update currently selected case id
         if (visible) {
-            switchInfo.startUpdateSelectedCaseId(caseId);
-            switchInfo.endUpdateSelectedCaseId();
+            currentControlsState.getSwitchIdToSelectedCaseIdMap().put(switchControlInfo.getId(), caseId);
         }
     }
 
@@ -515,6 +442,8 @@ public class XFormsControls implements XFormsEventTarget {
         final ControlInfo rootControlInfo = new ControlInfo(null, null, "root", null);// this is temporary and won't be stored
         final Map idsToControlInfo = new HashMap();
 
+        final Map switchIdToSelectedCaseIdMap = new HashMap();
+
         visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlVisitorListener() {
 
             private ControlInfo currentControlsContainer = rootControlInfo;
@@ -523,6 +452,8 @@ public class XFormsControls implements XFormsEventTarget {
 
                 if (effectiveControlId == null)
                     throw new OXFException("Control element doesn't have an id: " + controlElement.getQualifiedName());
+
+                final String controlName = controlElement.getName();
 
                 // Check repeat iteration containers
                 if (currentControlsContainer.getName().equals("repeat")) {
@@ -543,16 +474,29 @@ public class XFormsControls implements XFormsEventTarget {
                 // Create ControlInfo with basic information
                 final ControlInfo controlInfo;
                 {
-                    if (controlElement.getName().equals("repeat")) {
+                    if (controlName.equals("repeat")) {
                         final RepeatControlInfo repeatControlInfo = new RepeatControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
                         result.setInitialRepeatIndex(controlElement.attributeValue("id"), repeatControlInfo.getStartIndex());
                         controlInfo = repeatControlInfo;
-
                     } else {
-                        controlInfo = new ControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
+                        controlInfo = new ControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     }
                 }
                 idsToControlInfo.put(effectiveControlId, controlInfo);
+
+                // Handle xforms:case
+                if (controlName.equals("case")) {
+                    if (!(currentControlsContainer.getName().equals("switch")))
+                        throw new OXFException("xforms:case with id '" + effectiveControlId + "' is not directly within an xforms:switch container.");
+                    final String switchId = currentControlsContainer.getId();
+
+                    if (switchIdToSelectedCaseIdMap.get(switchId) == null) {
+                        // If case is not already selected for this switch and there is a select attribute, set it
+                        final String selectedAttribute = controlElement.attributeValue("selected");
+                        if ("true".equals(selectedAttribute))
+                            switchIdToSelectedCaseIdMap.put(switchId, effectiveControlId);
+                    }
+                }
 
                 // Get control children values
                 controlInfo.setLabel(getLabelValue(pipelineContext));
@@ -577,14 +521,13 @@ public class XFormsControls implements XFormsEventTarget {
                 }
 
                 // Get current value if possible for this control
-                if (isValueControl(controlElement.getName())) {
+                if (isValueControl(controlName)) {
                     controlInfo.setValue(XFormsInstance.getValueForNode(currentNode));
                 }
 
-                currentControlsContainer.addChild(controlInfo);
-
                 // Handle grouping controls
-                if (isGroupingControl(controlElement.getName())) {
+                currentControlsContainer.addChild(controlInfo);
+                if (isGroupingControl(controlName)) {
                     currentControlsContainer = controlInfo;
                 }
 
@@ -592,9 +535,22 @@ public class XFormsControls implements XFormsEventTarget {
             }
             public boolean endVisitControl(Element controlElement, String effectiveControlId) {
 
+                final String controlName = controlElement.getName();
+
+                // Handle xforms:switch
+                if (controlName.equals("switch")) {
+
+                    if (switchIdToSelectedCaseIdMap.get(effectiveControlId) == null) {
+                        // No case was selected, select first case id
+                        final List children = currentControlsContainer.getChildren();
+                        if (children != null && children.size() > 0)
+                            switchIdToSelectedCaseIdMap.put(effectiveControlId, ((ControlInfo) children.get(0)).getId());
+                    }
+                }
+
                 // Handle grouping controls
-                if (isGroupingControl(controlElement.getName())) {
-                    if (controlElement.getName().equals("repeat") && currentControlsContainer instanceof RepeatIterationInfo) {
+                if (isGroupingControl(controlName)) {
+                    if (controlName.equals("repeat") && currentControlsContainer instanceof RepeatIterationInfo) {
                         // Store number of repeat iterations for the effective id
                         result.setRepeatIterations(effectiveControlId, currentControlsContainer.getParent().getChildren().size());
                         // Get back to parent of repeat
@@ -617,6 +573,7 @@ public class XFormsControls implements XFormsEventTarget {
 
         result.setChildren(rootChildren);
         result.setIdsToControlInfo(idsToControlInfo);
+        result.setSwitchIdToSelectedCaseIdMap(switchIdToSelectedCaseIdMap);
 
         return result;
     }
@@ -632,10 +589,21 @@ public class XFormsControls implements XFormsEventTarget {
      * Get the list of current ControlInfo.
      */
     public ControlsState getCurrentControlsState(PipelineContext pipelineContext) {
+        // Create new controls state
         final ControlsState result = getControlsState(pipelineContext);
+
+        // Transfer some of the previous information
+        // Keep repeat index information
         final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
-        if (currentRepeatIdToIndex != null)
+        if (currentRepeatIdToIndex != null) {
             result.setRepeatIdToIndex(currentRepeatIdToIndex);
+        }
+        // Keep switch index information
+        final Map switchIdToSelectedCaseIdMap = currentControlsState.getSwitchIdToSelectedCaseIdMap();
+        if (switchIdToSelectedCaseIdMap != null) {
+            result.setSwitchIdToSelectedCaseIdMap(switchIdToSelectedCaseIdMap);
+        }
+
         return result;
     }
 
@@ -831,13 +799,6 @@ public class XFormsControls implements XFormsEventTarget {
                 break;
         }
         return doContinue;
-    }
-
-    /**
-     * Get xforms:switch information.
-     */
-    public Map getSwitchIdToToSwitchInfoMap() {
-        return switchIdToToSwitchInfoMap;
     }
 
     /**
@@ -1292,7 +1253,7 @@ public class XFormsControls implements XFormsEventTarget {
         } else if (XFormsActions.XFORMS_TOGGLE_ACTION.equals(actionEventName)) {
             // 9.2.3 The toggle Element
 
-            String caseId = eventHandlerElement.attributeValue("case");
+            final String caseId = eventHandlerElement.attributeValue("case");
 
             // Update xforms:switch info and dispatch events
             updateSwitchInfo(pipelineContext, caseId);
@@ -1312,14 +1273,12 @@ public class XFormsControls implements XFormsEventTarget {
             if (collectionToBeUpdated.size() > 0) {
                 // "If the collection is empty, the insert action has no effect."
 
-                // "2. The corresponding node-set of the initial instance data is located to determine
-                // the prototypical member of the collection. The final member of this collection is
-                // cloned to produce the node that will be inserted."
+                // "2. The node-set binding identifies a homogeneous collection in the instance
+                // data. The final member of this collection is cloned to produce the node that will
+                // be inserted."
                 final Element clonedElement;
                 {
-                    final List initialInstanceNodeset = collectionToBeUpdated;
-                    // TODO: use initial instance to compute this - well: errata appears to have canceled this
-                    final Element lastElement = (Element) initialInstanceNodeset.get(initialInstanceNodeset.size() - 1);
+                    final Element lastElement = (Element) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1);
                     clonedElement = (Element) lastElement.createCopy();
                 }
 
@@ -1635,7 +1594,6 @@ public class XFormsControls implements XFormsEventTarget {
                 if (controlElement.getName().equals("repeat")) {
                     if (foundControlElement == null) {
                         // We are not yet inside a matching xforms:repeat
-//                        setBinding(pipelineContext, controlElement);
                         final Element currentNode = (Element) getCurrentSingleNode();
                         final Element currentParent = currentNode.getParent();
                         if (currentParent == parentElement) {
@@ -1721,78 +1679,15 @@ public class XFormsControls implements XFormsEventTarget {
     }
 
     /**
-     * Represents xforms:case information.
+     * Represents the state of a tree of XForms controls.
      */
-    public static class SwitchInfo {
-        private String switchId;
-        private String selectedCaseId;
-        private List deselectedCaseIds = new ArrayList();
-
-        private String previouslySelectedCaseId;
-
-        public SwitchInfo(String switchId) {
-            this.switchId = switchId;
-        }
-
-        public String getSwitchId() {
-            return switchId;
-        }
-
-        public String getSelectedCaseId() {
-            return selectedCaseId;
-        }
-
-        public void setSelectedCaseId(String selectedCaseId) {
-            this.selectedCaseId = selectedCaseId;
-        }
-
-        public List getDeselectedCaseIds() {
-            return deselectedCaseIds;
-        }
-
-        public void addDeselectedCaseId(String caseId) {
-            deselectedCaseIds.add(caseId);
-        }
-
-        public String startUpdateSelectedCaseId(String newSelectedCaseId) {
-
-            // Remember previously selected case id
-            previouslySelectedCaseId = selectedCaseId;
-
-            if (!newSelectedCaseId.equals(selectedCaseId)) {
-
-                // Set new selected case id
-                setSelectedCaseId(newSelectedCaseId);
-
-                // Remove new selected case id from list of deselected ids
-                final List previouslyDeselected = getDeselectedCaseIds();
-                if (previouslyDeselected != null) {
-                    int index = previouslyDeselected.indexOf(newSelectedCaseId);
-                    if (index != -1)
-                        previouslyDeselected.remove(index);
-                }
-
-                // Add previously selected case id to list of deselected ids
-                addDeselectedCaseId(previouslySelectedCaseId);
-            }
-            return previouslySelectedCaseId;
-        }
-
-        public void endUpdateSelectedCaseId() {
-            previouslySelectedCaseId = null;
-        }
-
-        public String getPreviouslySelectedCaseId() {
-            return previouslySelectedCaseId;
-        }
-    }
-
     public static class ControlsState {
         private List children;
         private Map idsToControlInfo;
         private Map initialRepeatIdToIndex;
         private Map repeatIdToIndex;
         private Map effectiveRepeatIdToIterations;
+        private Map switchIdToSelectedCaseIdMap;
 
         public ControlsState() {
         }
@@ -1835,6 +1730,14 @@ public class XFormsControls implements XFormsEventTarget {
             return idsToControlInfo;
         }
 
+        public Map getSwitchIdToSelectedCaseIdMap() {
+            return switchIdToSelectedCaseIdMap;
+        }
+
+        public void setSwitchIdToSelectedCaseIdMap(Map switchIdToSelectedCaseIdMap) {
+            this.switchIdToSelectedCaseIdMap = switchIdToSelectedCaseIdMap;
+        }
+
         public Map getInitialRepeatIdToIndex() {
             return initialRepeatIdToIndex;
         }
@@ -1850,7 +1753,7 @@ public class XFormsControls implements XFormsEventTarget {
         }
 
         /**
-         * Return the list of repeat ids under a given repeat id.
+         * Return the list of repeat ids descendent of a given repeat id, null if none.
          */
         public List getNestedRepeatIds(String repeatId) {
             final Map repeatIdToRepeatControlInfo = getRepeatIdToRepeatControlInfo();
@@ -1867,8 +1770,8 @@ public class XFormsControls implements XFormsEventTarget {
         }
 
         /**
-         * Return a map of repeat ids -> RepeatControlInfo objects, following the current indexes
-         * of the repeat elements.
+         * Return a map of repeat ids -> RepeatControlInfo objects, following the branches of the
+         * current indexes of the repeat elements.
          */
         public Map getRepeatIdToRepeatControlInfo() {
             final Map result = new HashMap();
@@ -1904,24 +1807,6 @@ public class XFormsControls implements XFormsEventTarget {
                 }
             }
         }
-
-//        public void visitControlInfo(ControlInfoVisitorListener controlInfoVisitorListener) {
-//            visitControlInfo(controlInfoVisitorListener, this.children);
-//        }
-//
-//        private void visitControlInfo(ControlInfoVisitorListener controlInfoVisitorListener, List children) {
-//            for (Iterator i = children.iterator(); i.hasNext();) {
-//                final ControlInfo currentControlInfo = (ControlInfo) i.next();
-//
-//                controlInfoVisitorListener.startVisitControl(currentControlInfo);
-//
-//                final List newChildren = currentControlInfo.getChildren();
-//                if (newChildren != null)
-//                    visitControlInfo(controlInfoVisitorListener, newChildren);
-//
-//                controlInfoVisitorListener.endVisitControl(currentControlInfo);
-//            }
-//        }
     }
 
     /**
@@ -2112,7 +1997,9 @@ public class XFormsControls implements XFormsEventTarget {
     }
 
     /**
-     * Represents xforms:repeat information.
+     * Represents xforms:repeat iteration information.
+     *
+     * This is not really a control, but an abstraction for xforms:repeat branches.
      */
     public static class RepeatIterationInfo extends ControlInfo {
         private int iteration;

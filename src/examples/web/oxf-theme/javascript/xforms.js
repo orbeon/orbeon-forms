@@ -25,10 +25,15 @@ var TEXT_TYPE = document.createTextNode("").nodeType;
 
 /* * * * * * Utility functions * * * * * */
 
+
+function xformsIsDefined(thing) {
+    return typeof thing != "undefined";
+}
+
 /**
- * Create an element with a namespace. Offers the same functionality 
- * as the DOM2 Document.createElementNS method.
- */
+* Create an element with a namespace. Offers the same functionality
+* as the DOM2 Document.createElementNS method.
+*/
 function xformsCreateElementNS(namespaceURI, qname) {
     var localName = qname.indexOf(":") == -1 ? "" : ":" + qname.substr(0, qname.indexOf(":"));
     var request = Sarissa.getDomDocument();
@@ -78,8 +83,7 @@ function xformsGetElementPosition(element) {
         offsetTop += offsetTrail.offsetTop;
         offsetTrail = offsetTrail.offsetParent;
     }
-    if (navigator.userAgent.indexOf("Mac") != -1 && 
-        typeof document.body.leftMargin != "undefined") {
+    if (navigator.userAgent.indexOf("Mac") != -1 && xformsIsDefined(document.body.leftMargin)) {
         offsetLeft += document.body.leftMargin;
         offsetTop += document.body.topMargin;
     }
@@ -275,28 +279,13 @@ function xformsInitCheckesRadios(control) {
  *     XMLHttpRequest  xformsXMLHttpRequest
  *
  */
-function xformsPageLoaded() {
+function xformsInitializeControlsUnder(root) {
 
-    // Initialize tooltip library
-    tt_init();
-
-    // Initialize XForms server URL
-    var scripts = document.getElementsByTagName("script");
-    for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
-        var script = scripts[scriptIndex];
-        var startPathToJavaScript = script.getAttribute("src").indexOf(PATH_TO_JAVASCRIPT);
-        if (startPathToJavaScript != -1) {
-            BASE_URL = script.getAttribute("src").substr(0, startPathToJavaScript);
-            XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
-            break;
-        }
-    }
-    
     // Gather all potential form controls
     var interestingTagNames = new Array("span", "button", "textarea", "input", "label", "select", "td", "table", "div");
     var formsControls = new Array();
     for (var tagIndex = 0; tagIndex < interestingTagNames.length; tagIndex++) {
-        var elements = document.getElementsByTagName(interestingTagNames[tagIndex]);
+        var elements = root.getElementsByTagName(interestingTagNames[tagIndex]);
         for (var elementIndex = 0; elementIndex < elements.length; elementIndex++)
             formsControls = formsControls.concat(elements[elementIndex]);
     }
@@ -462,18 +451,39 @@ function xformsPageLoaded() {
             xformsUpdateStyle(control);
         }
     }
-    
+}
+
+function xformsPageLoaded() {
+
+    // Initialize tooltip library
+    tt_init();
+
+    // Initialize XForms server URL
+    var scripts = document.getElementsByTagName("script");
+    for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
+        var script = scripts[scriptIndex];
+        var startPathToJavaScript = script.getAttribute("src").indexOf(PATH_TO_JAVASCRIPT);
+        if (startPathToJavaScript != -1) {
+            BASE_URL = script.getAttribute("src").substr(0, startPathToJavaScript);
+            XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
+            break;
+        }
+    }
+
+    // Initialize controls
+    xformsInitializeControlsUnder(document);
+
     // Initialize attributes on form
     var forms = document.getElementsByTagName("form");
     for (var formIndex = 0; formIndex < forms.length; formIndex++) {
         var form = forms[formIndex];
         var spans = form.getElementsByTagName("span");
         for (var spanIndex = 0; spanIndex < spans.length; spanIndex++) {
-            if (spans[spanIndex].className == "xforms-loading-loading") 
+            if (spans[spanIndex].className == "xforms-loading-loading")
                 forms[formIndex].xformsLoadingLoading = spans[spanIndex];
-            if (spans[spanIndex].className == "xforms-loading-error") 
+            if (spans[spanIndex].className == "xforms-loading-error")
                 forms[formIndex].xformsLoadingError = spans[spanIndex];
-            if (spans[spanIndex].className == "xforms-loading-none") 
+            if (spans[spanIndex].className == "xforms-loading-none")
                 forms[formIndex].xformsLoadingNone = spans[spanIndex];
         }
         var elements = form.elements;
@@ -493,7 +503,7 @@ function xformsPageLoaded() {
             }
         }
     }
-    
+
     // Initialize attributes on document
     document.xformsNextRequests = new Array();
     document.xformsLastRequestIsIncremental = false;
@@ -683,12 +693,24 @@ function xformsHandleResponse() {
                                             // Store validity, label, hint, help in element
                                             var newValid = controlElement.getAttribute("valid");
                                             if (newValid != null) documentElement.isValid = newValid != "false";
+                                            // Store new hint message in control attribute
                                             var newLabel = controlElement.getAttribute("label");
-                                            if (newLabel != null) documentElement.labelMessage = newLabel;
+                                            if (newLabel && newLabel != documentElement.labelMessage) {
+                                                documentElement.labelMessage = newLabel;
+                                                xformsUpdateStyle(documentElement.labelElement);
+                                            }
+                                            // Store new hint message in control attribute
                                             var newHint = controlElement.getAttribute("hint");
-                                            if (newHint != null) documentElement.hintMessage = newHint;
+                                            if (newHint && newHint != documentElement.hintMessage) {
+                                                documentElement.hintMessage = newHint;
+                                                xformsUpdateStyle(documentElement.hintElement);
+                                            }
+                                            // Store new help message in control attribute
                                             var newHelp = controlElement.getAttribute("help");
-                                            if (newHelp) documentElement.helpMessage = newHelp;
+                                            if (newHelp && newHelp != documentElement.helpMessage) {
+                                                documentElement.helpMessage = newHelp;
+                                                xformsUpdateStyle(documentElement.helpElement);
+                                            }
 
                                             // Update style
                                             xformsUpdateStyle(documentElement);
@@ -739,28 +761,7 @@ function xformsHandleResponse() {
                                             for (var templateNodeIndex = 0; templateNodeIndex < templateNodes.length; templateNodeIndex++) {
                                                 templateNode = templateNodes[templateNodeIndex];
                                                 afterTemplateCopy.parentNode.insertBefore(templateNode, afterTemplateCopy);
-                                                // Look for help, alert, hint labels in template
-                                                var updateControlToLabels = function(element) {
-                                                    if (typeof element.htmlFor != "undefined") {
-                                                        var control = document.getElementById(element.htmlFor);
-                                                        switch (element.className) {
-                                                            case "xforms-help":
-                                                                control.helpElement = element; break;
-                                                            case "xforms-alert-valid":
-                                                                control.alertElement = element; break;
-                                                            case "xforms-hint":
-                                                                control.hintElement = element; break;
-                                                            case "xforms-label":
-                                                                control.labelElement = element; break;
-                                                        }
-                                                    }
-                                                    for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
-                                                        var childNode = element.childNodes[childIndex];
-                                                        if (childNode.nodeType == ELEMENT_TYPE)
-                                                            updateControlToLabels(childNode);
-                                                    }
-                                                };
-                                                updateControlToLabels(templateNode);
+                                                xformsInitializeControlsUnder(templateNode);
                                             }
                                             // Insert delimiter
                                             var newDelimiter = document.createElement(templateNodes[0].tagName);
@@ -769,7 +770,7 @@ function xformsHandleResponse() {
                                             break;
                                         }
 
-                                        // Copy repeat template
+                                        // Delete element in repeat
                                         case "delete-element": {
                                             var deleteElementElement = controlValuesElement.childNodes[j];
                                             var deleteId = deleteElementElement.getAttribute("id");

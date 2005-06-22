@@ -37,7 +37,37 @@ function xformsUpdateStyle(element) {
                 element.style.display = "inline";
             }
 
+            if (className == "xforms-label") {
+
+                // Initialize hint message on control if not set already
+                var control = document.getElementById(element.htmlFor);
+                if (!xformsIsDefined(control.labelMessage)) {
+                    control.labelMessage = xformsStringValue(element);
+                    control.labelElement = element;
+                }
+
+                // Update label if it changed
+                if (control.labelMessage != xformsStringValue(element)) {
+                    while (element.firstChild) element.removeChild(element.firstChild);
+                    element.appendChild(document.createTextNode(control.labelMessage));
+                }
+            }
+
             if (className == "xforms-hint") {
+
+                // Initialize hint message on control if not set already
+                var control = document.getElementById(element.htmlFor);
+                if (!xformsIsDefined(control.hintMessage)) {
+                    control.hintMessage = xformsStringValue(element);
+                    control.hintElement = element;
+                }
+
+                // Update hint if it changed
+                if (control.hintMessage != xformsStringValue(element)) {
+                    while (element.firstChild) element.removeChild(element.firstChild);
+                    element.appendChild(document.createTextNode(control.hintMessage));
+                }
+
                 // Only add listener once
                 if (!element.listenerRegistered) {
                     element.listenerRegistered = true;
@@ -53,7 +83,6 @@ function xformsUpdateStyle(element) {
                     var controlLoosesFocus = function() { element.className = classes.join(" "); };
 
                     // Add listeners on control
-                    var control = element.ownerDocument.getElementById(element.htmlFor);
                     if (control.addEventListener) {
                         control.addEventListener("focus", controlGetsFocus, false);
                         control.addEventListener("blur", controlLoosesFocus, false);
@@ -65,22 +94,51 @@ function xformsUpdateStyle(element) {
             }
             
             if (className == "xforms-help") {
-                if (!element.divId) {
-                    element.divId = element.id + "-div";
-                    var divHTML = tt_Htm(this, element.divId, xformsStringValue(element));
-                    var container = element.cloneNode(true);
-                    container.innerHTML = divHTML;
-                    document.body.appendChild(container.firstChild);
+
+                // Initialize help message on control if not set already
+                var control = document.getElementById(element.htmlFor);
+                if (!xformsIsDefined(control.helpMessage)) {
+                    control.helpMessage = xformsStringValue(element);
+                    control.helpElement = element;
                 }
 
-                
-                xformsAddEventListener(element, "mouseover", function(event) {
-                    tt_Show(event, getEventTarget(event).divId, false, 0, false, false, 
-                        ttOffsetX, ttOffsetY, false, false, ttTemp);
-                });
-                xformsAddEventListener(element, "mouseout", function() {
-                    tt_Hide();
-                });
+                // Figure out if we need to create a div
+                // When there is an existing div, check if it has the same message
+                var needToCreateDiv;
+                if (element.divId) {
+                    var existingDiv = document.getElementById(element.divId);
+                    if (existingDiv.helpMessage == control.helpMessage) {
+                        needToCreateDiv = false;
+                    } else {
+                        needToCreateDiv = true;
+                        existingDiv.parentNode.removeChild(existingDiv);
+                    }
+                } else {
+                    needToCreateDiv = true;
+                }
+
+                // Create new div when necessary
+                if (needToCreateDiv) {
+                    element.divId = element.id + "-div";
+                    var divHTML = tt_Htm(this, element.divId, control.helpMessage);
+                    var container = element.cloneNode(true);
+                    container.innerHTML = divHTML;
+                    var newDiv = container.firstChild;
+                    newDiv.helpMessage = control.helpMessage;
+                    document.body.appendChild(newDiv);
+                }
+
+                // Only add listener once
+                if (!element.listenerRegistered) {
+                    element.listenerRegistered = true;
+                    xformsAddEventListener(element, "mouseover", function(event) {
+                        tt_Show(event, getEventTarget(event).divId, false, 0, false, false,
+                            ttOffsetX, ttOffsetY, false, false, ttTemp);
+                    });
+                    xformsAddEventListener(element, "mouseout", function() {
+                        tt_Hide();
+                    });
+                }
             }
             
             if (className == "xforms-date") {
@@ -108,21 +166,21 @@ function xformsUpdateStyle(element) {
             if (className == "xforms-select1-compact") {
                 // Prevent end-user from selecting multiple values
                 
-                function select1CompactChanged(event) {
+                var select1CompactChanged = function (event) {
                     var target = getEventTarget(event);
                     target.selectedIndex = target.selectedIndex;
-                } 
+                };
                 
                 xformsAddEventListener(element, "change", select1CompactChanged);
             }
             
             if (className == "wide-textarea") {
                 if (!element.changeHeightHandlerRegistered) {
-                    function changeHeightHandler() {
+                    var changeHeightHandler = function () {
                         var lineNumber = element.value.split("\n").length;
                         if (lineNumber < 5) lineNumber = 5;
                         element.style.height = 3 + lineNumber * 1.1 + "em";
-                    }
+                    };
                     element.changeHeightHandlerRegistered = true;
                     changeHeightHandler();
                     xformsAddEventListener(element, "keyup", changeHeightHandler);
@@ -134,21 +192,6 @@ function xformsUpdateStyle(element) {
             if (element.alertElement && typeof(element.isValid) != "undefined") {
                 element.alertElement.className = element.isValid ? "xforms-alert-inactive" 
                     : "xforms-alert-active";
-            }
-
-            // Update label
-            if (element.labelElement && typeof(element.labelMessage) != "undefined") {
-                updateLabel(element.labelElement, element.labelMessage);
-            }
-
-            // Update hint
-            if (element.hintElement && typeof(element.hintMessage) != "undefined") {
-                updateLabel(element.hintElement, element.hintMessage);
-            }
-
-            // Update help
-            if (element.helpElement && typeof(element.helpMessage) != "undefined") {
-                updateLabel(element.helpElement, element.helpMessage);
             }
 
             // This is for widgets. Code for widgets should be modularized and moved out of this file
@@ -164,7 +207,7 @@ function xformsUpdateStyle(element) {
             if (className == "widget-tab-inactive" || className == "widget-tab-active") {
                 if (!element.eventRegistered) {
                     element.eventRegistered = true;
-                    function clickEventHandler(event) {
+                    var clickEventHandler = function (event) {
                         var td = getEventTarget(event);
                         var tr = td.parentNode;
                         
@@ -185,7 +228,7 @@ function xformsUpdateStyle(element) {
                         }
                         
                         
-                    }
+                    };
                     xformsAddEventListener(element, "click", clickEventHandler);
                 }
             }

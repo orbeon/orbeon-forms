@@ -74,6 +74,22 @@ function xformsArrayContains(array, element) {
     return false;
 }
 
+function xformsArrayRemove(array, element) {
+    // Look for position of element to remove
+    var elementIndex = -1;
+    for (var i = 0; i < array.length; i++)
+        if (array[i] == element)
+            elementIndex = i;
+    // Remove element if found
+    if (elementIndex != -1) {
+        // If the element is not the last one, save the last one at the position of the element to remove
+        if (elementIndex < array.length - 1)
+            array[elementIndex] = array[array.length - 1];
+        array.pop();
+    }
+    return array;
+}
+
 function xformsGetElementPosition(element) {
     var offsetTrail = element;
     var offsetLeft = 0;
@@ -139,6 +155,19 @@ function xformsStringReplace(node, placeholder, replacement) {
     xformsStringReplaceWorker(node);
 }
 
+/**
+ * Locate the delimiter at the given position starting from a repeat begin element.
+ */
+function xformsFindRepeatDelimiter(beginElement, index) {
+    var cursor = beginElement;
+    for (var cursorPosition = 0; cursorPosition < index; cursorPosition++) {
+        // Move cursor forward until it is on a delimiter
+        while (cursor.nodeType != ELEMENT_TYPE || cursor.className != "xforms-repeat-delimiter")
+            cursor = cursor.nextSibling;
+    }
+    return cursor;
+}
+
 function log(text) {
     document.getElementById("debug").innerHTML += text + " | ";
 }
@@ -163,14 +192,14 @@ function xformsDisplayLoading(form, state) {
     }
 }
 
-function xformsValueChanged(target, incremental) {
+function xformsValueChanged(target, incremental, other) {
     if (target.value != target.previousValue) {
         target.previousValue = target.value;
-        xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value, incremental);
+        xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value, incremental, other);
     }
 }
 
-function xformsFireEvent(target, eventName, value, incremental) {
+function xformsFireEvent(target, eventName, value, incremental, other) {
 
     // Build request
     var eventFiredElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event-request");
@@ -193,6 +222,8 @@ function xformsFireEvent(target, eventName, value, incremental) {
     actionElement.appendChild(eventElement);
     eventElement.setAttribute("name", eventName);
     eventElement.setAttribute("source-control-id", target.id);
+    if (other != null)
+        eventElement.setAttribute("other-control-id", other.id);
     if (value != null)
         eventElement.appendChild(eventElement.ownerDocument.createTextNode(value));
 
@@ -262,12 +293,13 @@ function xformsInitCheckesRadios(control) {
 /**
  * Initializes attributes of each form:
  *
- *     Div             xformsLoadingLoading
- *     Div             xformsLoadingError
- *     Div             xformsLoadingNone
- *     Input           xformsStaticState
- *     Input           xformsDynamicState
- *     Element         xformsCurrentDivs
+ *     Div              xformsLoadingLoading
+ *     Div              xformsLoadingError
+ *     Div              xformsLoadingNone
+ *     Input            xformsStaticState
+ *     Input            xformsDynamicState
+ *     Element          xformsCurrentDivs
+ *     Array id->index  xformsRepeatIndices
  *
  * Initializes attributes on the document object:
  *
@@ -277,6 +309,7 @@ function xformsInitCheckesRadios(control) {
  *     boolean         xformsRequestInProgress
  *     Form            xformsTargetOfCurrentRequest
  *     XMLHttpRequest  xformsXMLHttpRequest
+ *     Element         xformsPreviousValueChanged
  *
  */
 function xformsInitializeControlsUnder(root) {
@@ -436,11 +469,39 @@ function xformsInitializeControlsUnder(root) {
                 // Handle value change and incremental modification
                 control.previousValue = null;
                 control.userModications = false;
-                xformsAddEventListener(control, "change", function(event)
-                    { xformsValueChanged(getEventTarget(event), false); });
+                xformsAddEventListener(control, "change", function(event) {
+                    // If previous change is still not handled, handle it now
+                    if (document.xformsPreviousValueChanged) {
+                        xformsValueChanged(getEventTarget(event), false);
+                        document.xformsPreviousValueChanged = null;
+                    }
+                    // Delay execution by 50 ms
+                    document.xformsPreviousValueChanged = getEventTarget(event);
+                    window.setTimeout(function() {
+                        if (document.xformsPreviousValueChanged) {
+                            xformsValueChanged(getEventTarget(event), false);
+                            document.xformsPreviousValueChanged = null;
+                        }
+                    });
+                });
                 if (isIncremental)
-                    xformsAddEventListener(control, "keyup", function(event)
-                        { xformsValueChanged(getEventTarget(event), true); });
+                    xformsAddEventListener(control, "keyup", function(event) {
+                        xformsValueChanged(getEventTarget(event), true);
+                    });
+            }
+
+            if (!control.focusEventListenerRegistered) {
+                control.focusEventListenerRegistered = true;
+                xformsAddEventListener(control, "focus", function(event) {
+                    var target = getEventTarget(event);
+                    if (document.xformsPreviousValueChanged) {
+                        // We have just received a change event: combine both
+                        xformsValueChanged(document.xformsPreviousValueChanged, false, target);
+                        document.xformsPreviousValueChanged = null;
+                    } else {
+                        // TODO: handle just focus change. Waiting for server to handle this.
+                    }
+                });
             }
 
             // If alert, store reference in control element to this alert element
@@ -804,6 +865,46 @@ function xformsHandleResponse() {
                                         var visibile = divElement.getAttribute("visibility") == "visible";
                                         var documentElement = document.getElementById(controlId);
                                         documentElement.style.display = visibile ? "block" : "none";
+                                    }
+                                }
+                                break;
+                            }
+
+                            // Change highlighted section in repeat
+                            case "repeat-indexes": {
+                                var repeatIndexesElement = actionElement.childNodes[actionIndex];
+                                for (var j = 0; j < repeatIndexesElement.childNodes.length; j++) {
+                                    if (xformsGetLocalName(repeatIndexesElement.childNodes[j]) == "repeat-index") {
+                                        // Extract data from server response
+                                        var repeatIndexElement = repeatIndexesElement.childNodes[j];
+                                        var repeatId = repeatIndexElement.getAttribute("id");
+                                        var oldIndex = repeatIndexElement.getAttribute("old-index");
+                                        var newIndex = repeatIndexElement.getAttribute("new-index");
+                                        // Unhighlight item at old index
+                                        var repeatBegin = document.getElementById(repeatId + "-repeat-begin");
+                                        var oldItemDelimiter = xformsFindRepeatDelimiter(repeatBegin, oldIndex);
+                                        cursor = oldItemDelimiter.nextSibling;
+                                        while (cursor.nodeType != ELEMENT_TYPE ||
+                                               (cursor.className != "xforms-repeat-delimiter"
+                                               && cursor.className != "xforms-repeat-begin-end")) {
+                                            if (cursor.nodeType == ELEMENT_TYPE)
+                                                cursor.className = xformsArrayRemove(cursor.className.split(" "),
+                                                    "xforms-repeat-selected-item").join(" ");
+                                            cursor = cursor.nextSibling;
+                                        }
+                                        // Highlight item a new index
+                                        var newItemDelimiter = xformsFindRepeatDelimiter(repeatBegin, newIndex);
+                                        cursor = newItemDelimiter.nextSibling;
+                                        while (cursor.nodeType != ELEMENT_TYPE ||
+                                               (cursor.className != "xforms-repeat-delimiter"
+                                               && cursor.className != "xforms-repeat-begin-end")) {
+                                            if (cursor.nodeType == ELEMENT_TYPE) {
+                                                var classNameArray = cursor.className.split(" ");
+                                                classNameArray.push("xforms-repeat-selected-item");
+                                                cursor.className = classNameArray.join(" ");
+                                            }
+                                            cursor = cursor.nextSibling;
+                                        }
                                     }
                                 }
                                 break;

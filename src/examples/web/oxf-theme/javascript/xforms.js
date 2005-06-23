@@ -160,10 +160,13 @@ function xformsStringReplace(node, placeholder, replacement) {
  */
 function xformsFindRepeatDelimiter(beginElement, index) {
     var cursor = beginElement;
-    for (var cursorPosition = 0; cursorPosition < index; cursorPosition++) {
-        // Move cursor forward until it is on a delimiter
+    var cursorPosition = 0;
+    while (true) {
         while (cursor.nodeType != ELEMENT_TYPE || cursor.className != "xforms-repeat-delimiter")
             cursor = cursor.nextSibling;
+        cursorPosition++;
+        if (cursorPosition == index) break;
+        cursor = cursor.nextSibling;
     }
     return cursor;
 }

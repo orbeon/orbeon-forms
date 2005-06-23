@@ -1,7 +1,7 @@
 package org.orbeon.oxf.xforms.action;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * XForms actions definitions.

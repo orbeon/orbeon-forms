@@ -22,8 +22,10 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
-import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.events.XFormsRevalidateEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
@@ -36,7 +38,6 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -382,14 +383,18 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         if (resultCode == 200) {
                             // Sucessful response
 
-                            if (!resultInputStream.markSupported())
-                                resultInputStream = new BufferedInputStream(resultInputStream);
-
                             final boolean hasContent;
                             {
-                                resultInputStream.mark(1);
-                                hasContent = resultInputStream.read() != -1;
-                                resultInputStream.reset();
+                                if (resultInputStream == null) {
+                                    hasContent = false;
+                                } else {
+                                    if (!resultInputStream.markSupported())
+                                        resultInputStream = new BufferedInputStream(resultInputStream);
+
+                                    resultInputStream.mark(1);
+                                    hasContent = resultInputStream.read() != -1;
+                                    resultInputStream.reset();
+                                }
                             }
 
                             if (hasContent) {
@@ -440,7 +445,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             currentInstance.setInstanceDocument(resultingInstanceDocument);
 
                                             // Dispatch events
-                                            containingDocument.dispatchEvent(pipelineContext, new XFormsModelConstructEvent(model));
+                                            containingDocument.dispatchEvent(pipelineContext, new org.orbeon.oxf.xforms.event.events.XFormsModelConstructEvent(model));
                                             containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                                         } catch (Exception e) {
                                             throw new OXFException("xforms:submission: exception while serializing XML to instance.", e);

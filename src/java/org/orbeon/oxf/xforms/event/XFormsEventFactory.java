@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.event;
 
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.xforms.event.events.*;
 
 /**
  * Factory for XForms events
@@ -46,7 +47,7 @@ public class XFormsEventFactory {
         if (eventName.equals(XFormsEvents.XFORMS_DOM_ACTIVATE)) {
             return new XFormsDOMActivateEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_COMPUTE_EXCEPTION)) {
-            return new XFormsComputeExceptionEvent(targetObject, contextString, contextThrowable);
+            return new org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent(targetObject, contextString, contextThrowable);
         } else if (eventName.equals(XFormsEvents.XFORMS_DELETE)) {
             return new XFormsDeleteEvent(targetObject, contextString);
         } else if (eventName.equals(XFormsEvents.XFORMS_DESELECT)) {
@@ -82,7 +83,7 @@ public class XFormsEventFactory {
         } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE)) {
             return new XFormsModelConstructDoneEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_READY)) {
-            return new XFormsReady(targetObject);
+            return new XFormsReadyEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_REBUILD)) {
             return new XFormsRebuildEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_RECALCULATE)) {

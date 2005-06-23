@@ -18,7 +18,6 @@ import org.orbeon.oxf.pipeline.StaticExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.XFormsElementContext;
 import org.orbeon.oxf.xforms.XFormsModel;
-import org.orbeon.oxf.xforms.event.XFormsComputeExceptionEvent;
 import org.orbeon.saxon.expr.Expression;
 import org.orbeon.saxon.expr.StaticContext;
 import org.orbeon.saxon.expr.XPathContext;
@@ -66,7 +65,7 @@ public class Index extends XFormsFunction {
 
                 final XFormsModel currentModel = getXFormsControls().getCurrentModel();
                 currentModel.getContainingDocument().dispatchEvent(pipelineContext,
-                        new XFormsComputeExceptionEvent(currentModel, message, exception));
+                        new org.orbeon.oxf.xforms.event.events.XFormsComputeExceptionEvent(currentModel, message, exception));
 
                 // TODO: stop processing!
                 // How do we do this: throw special exception? Or should throw exception with

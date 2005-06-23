@@ -22,8 +22,10 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.events.XFormsRecalculateEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsRefreshEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsRevalidateEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
@@ -709,7 +711,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // TODO: a, b, c xxx
 
             // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
+            containingDocument.dispatchEvent(pipelineContext, new org.orbeon.oxf.xforms.event.events.XFormsRebuildEvent(this));
             containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this, false));
             containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
 
@@ -856,7 +858,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             // "Then, the events xforms-rebuild, xforms-recalculate, xforms-revalidate and
             // xforms-refresh are dispatched to the model element in sequence."
-            containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(XFormsModel.this));
+            containingDocument.dispatchEvent(pipelineContext, new org.orbeon.oxf.xforms.event.events.XFormsRebuildEvent(XFormsModel.this));
             containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(XFormsModel.this, true));
             containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this, true));
             containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(XFormsModel.this));

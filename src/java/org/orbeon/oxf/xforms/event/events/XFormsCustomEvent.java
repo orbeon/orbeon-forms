@@ -11,15 +11,16 @@
  *
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
-package org.orbeon.oxf.xforms.event;
+package org.orbeon.oxf.xforms.event.events;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 
 /**
- * XFormsEventTarget is implemented by classes that support dispatch of XForms events.
+ * Custom (i.e. non-XForms) event.
  */
-public interface XFormsEventTarget {
-    public String getId();
-    public XFormsEventHandlerContainer getParentContainer();
-    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event);
+public class XFormsCustomEvent extends XFormsEvent {
+    public XFormsCustomEvent(String eventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
+        super(eventName, targetObject, bubbles, cancelable);
+    }
 }

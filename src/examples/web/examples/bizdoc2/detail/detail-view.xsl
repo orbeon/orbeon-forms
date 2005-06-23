@@ -25,12 +25,21 @@
     <head>
         <title>BizDoc Detail</title>
         <xforms:model schema="oxf:/examples/bizdoc/detail/form-schema.xsd">
+            <xforms:action ev:event="xforms-submit-done">
+                <xforms:setvalue ref="instance('main-instance')/message">Submission successful!</xforms:setvalue>
+                <xforms:toggle case="message"/>
+                <xforms:toggle case="ok-message"/>
+            </xforms:action>
+            <xforms:action ev:event="xforms-submit-error">
+                <xforms:setvalue ref="instance('main-instance')/message">Submission failed! Please correct errors first.</xforms:setvalue>
+                <xforms:toggle case="message"/>
+                <xforms:toggle case="error-message"/>
+            </xforms:action>
             <!-- The XForms instance with application data -->
             <xforms:instance id="main-instance">
-                <!-- Get submitted instance -->
                 <form xmlns="">
                     <action/>
-                    <message/>
+                    <message>No message</message>
                     <show-errors/>
                     <xsl:copy-of select="doc('input:instance')/*/(document-id | document)"/>
                 </form>
@@ -59,7 +68,45 @@
         <div class="maincontent">
             <xforms:group ref="instance('main-instance')">
                 <xi:include href="../../bizdoc/summary/view-logo.xml"/>
-                <xi:include href="detail-view-header.xml"/>
+
+                <h2 style="margin-top: 0">Document Information</h2>
+                <p>
+                    <table>
+                        <tr>
+                            <th>Identifier</th>
+                            <td>
+                                <xforms:output ref="document-id"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th align="right">Action</th>
+                            <td>
+                                <xforms:switch>
+                                    <xforms:case id="no-message">
+                                        -
+                                    </xforms:case>
+                                    <xforms:case id="message">
+                                        <div>
+                                            <xforms:switch>
+                                                <xforms:case id="ok-message">
+                                                    <span style="color: green">
+                                                        <xforms:output ref="message"/>
+                                                    </span>
+                                                </xforms:case>
+                                                <xforms:case id="error-message">
+                                                    <span style="color: red">
+                                                        <xforms:output ref="message"/>
+                                                    </span>
+                                                </xforms:case>
+                                            </xforms:switch>
+                                        </div>
+                                    </xforms:case>
+                                </xforms:switch>
+                            </td>
+                        </tr>
+                    </table>
+                </p>
+
                 <xforms:group ref="document">
 
                     <xforms:switch>
@@ -208,13 +255,16 @@
                                         </xforms:trigger>
                                         <xforms:trigger>
                                             <xforms:label>Next</xforms:label>
-                                            <xforms:toggle ev:event="DOMActivate" case="page-2"/>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:toggle case="page-2"/>
+                                                <xforms:toggle case="no-message"/>
+                                            </xforms:action>
                                         </xforms:trigger>
                                     </td>
                                 </tr>
                             </table>
                         </xforms:case>
-                        <xforms:case id="page-2" selected="true">
+                        <xforms:case id="page-2">
 
                             <xforms:group ref="claim:claim/claim:insured-info">
                                 <h2 style="margin-top: 0">Additonal Claimant Information</h2>
@@ -424,7 +474,10 @@
                                         </xforms:trigger>
                                         <xforms:trigger>
                                             <xforms:label>Back</xforms:label>
-                                            <xforms:toggle ev:event="DOMActivate" case="page-1"/>
+                                            <xforms:action ev:event="DOMActivate">
+                                                <xforms:toggle case="page-1"/>
+                                                <xforms:toggle case="no-message"/>
+                                            </xforms:action>
                                         </xforms:trigger>
                                     </td>
                                 </tr>

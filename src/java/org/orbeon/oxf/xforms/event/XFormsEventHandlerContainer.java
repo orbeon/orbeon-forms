@@ -13,13 +13,13 @@
  */
 package org.orbeon.oxf.xforms.event;
 
-import org.orbeon.oxf.pipeline.api.PipelineContext;
+import java.util.List;
 
 /**
- * XFormsEventTarget is implemented by classes that support dispatch of XForms events.
+ * Represents a container of XFormsEventHandler.
  */
-public interface XFormsEventTarget {
+public interface XFormsEventHandlerContainer {
     public String getId();
+    public List getEventHandlers();
     public XFormsEventHandlerContainer getParentContainer();
-    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event);
 }

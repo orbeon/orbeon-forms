@@ -122,7 +122,7 @@
                     <!-- Get initial instances -->
                     <p:processor name="oxf:xforms-server">
                         <p:input name="request" href="#request"/>
-                        <p:output name="response" id="response"/>
+                        <p:output name="response" id="response" debug="xxxinitialresponse"/>
                     </p:processor>
                     <p:processor name="oxf:xslt">
                         <p:input name="config" href="xforms-to-ajax-xhtml.xsl"/>

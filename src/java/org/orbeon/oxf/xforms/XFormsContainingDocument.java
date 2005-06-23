@@ -19,6 +19,7 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.events.*;
 
 import java.util.*;
 
@@ -188,7 +189,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             dispatchEvent(pipelineContext, new XFormsValueChangeEvent(concreteEvent.getTargetObject()));
             dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(concreteEvent.getTargetObject()));
             if (concreteEvent.getOtherTargetObject() != null) { // we SHOULD have this but the client may not send it
-                dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(concreteEvent.getOtherTargetObject()));
+                dispatchEvent(pipelineContext, new org.orbeon.oxf.xforms.event.events.XFormsDOMFocusInEvent(concreteEvent.getOtherTargetObject()));
             }
 
             dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));

@@ -18,7 +18,10 @@ import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
-import org.orbeon.oxf.xforms.event.*;
+import org.orbeon.oxf.xforms.event.XFormsEventFactory;
+import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
+import org.orbeon.oxf.xforms.event.XFormsEventTarget;
+import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
 import java.util.HashMap;
@@ -390,7 +393,7 @@ public class XFormsActionInterpreter {
                 }
 
                 // "4. If the delete is successful, the event xforms-delete is dispatched."
-                containingDocument.dispatchEvent(pipelineContext, new XFormsDeleteEvent(currentInstance, atAttribute));
+                containingDocument.dispatchEvent(pipelineContext, new org.orbeon.oxf.xforms.event.events.XFormsDeleteEvent(currentInstance, atAttribute));
 
                 if (actionContext != null) {
                     // "XForms Actions that change the tree structure of instance data result in setting all four flags to true"
@@ -521,11 +524,11 @@ public class XFormsActionInterpreter {
         if (eventHandlerContainer instanceof XFormsControls.ControlInfo) {
             // The event handler is contained within a control. Bindings are relative to that control
             xformsControls.setBinding(pipelineContext, (XFormsControls.ControlInfo) eventHandlerContainer);
-            xformsControls.pushBinding(pipelineContext, actionElement);
         } else {
             // The event handler is not contained within a control (e.g. model or submission)
             xformsControls.resetBindingContext();
         }
+        xformsControls.pushBinding(pipelineContext, actionElement);
     }
 
     private void findAffectedRepeatIds(final PipelineContext pipelineContext, final Element parentElement, final Map setRepeatIds, final Map resetRepeatIds) {

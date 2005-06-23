@@ -695,7 +695,7 @@ public class XFormsControls {
         if (itemsetIdToItemsetInfoUpdateMap == null) {
             itemsetIdToItemsetInfoUpdateMap = result;
         } else {
-            itemsetIdToItemsetInfoUpdateMap.putAll(result);
+            itemsetIdToItemsetInfoUpdateMap.putAll(result);// FIXME: Why do we do this? Can't we just to as above?
         }
     }
 
@@ -816,7 +816,7 @@ public class XFormsControls {
      * Get full xforms:itemset information.
      */
     public Map getItemsetFull() {
-        return itemsetIdToItemsetInfoMap;
+        return (itemsetIdToItemsetInfoUpdateMap != null) ? itemsetIdToItemsetInfoUpdateMap : itemsetIdToItemsetInfoMap;
     }
 
     /**

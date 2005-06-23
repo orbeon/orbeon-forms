@@ -40,7 +40,6 @@ public class XFormsEventFactory {
         // TODO
         // XFORMS_MODEL_DESTRUCT
         // XFORMS_RESET
-        // XFORMS_DOM_FOCUS_IN
 
         // TODO: more efficient way to switch!
 
@@ -80,6 +79,10 @@ public class XFormsEventFactory {
             return new XXFormsSubmissionEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_CONSTRUCT)) {
             return new XFormsModelConstructEvent(targetObject);
+//        } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_DESTRUCT)) {
+//            return new XFormsModelDestructEvent(targetObject);
+//        } else if (eventName.equals(XFormsEvents.XFORMS_RESET)) {
+//            return new XFormsResetEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE)) {
             return new XFormsModelConstructDoneEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_READY)) {
@@ -94,6 +97,8 @@ public class XFormsEventFactory {
             return new XFormsValueChangeEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_OUT)) {
             return new XFormsDOMFocusOutEvent(targetObject);
+        } else if (eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_IN)) {
+            return new XFormsDOMFocusInEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_VALID)) {
             return new XFormsValidEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_INVALID)) {

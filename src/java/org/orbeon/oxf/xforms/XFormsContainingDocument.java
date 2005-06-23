@@ -154,10 +154,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     private void interpretEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
         final String eventName = xformsEvent.getEventName();
-        if (XFormsEvents.XFORMS_DOM_ACTIVATE.equals(eventName)) {
-            // 4.4.1 The DOMActivate Event
-            // Bubbles: Yes / Cancelable: Yes / Context Info: None
-            // The default action for this event results in the following: None; notification event only.
+        if (XFormsEvents.XFORMS_DOM_ACTIVATE.equals(eventName)
+            || XFormsEvents.XFORMS_DOM_FOCUS_OUT.equals(eventName)
+            || XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(eventName)
+            || XFormsEvents.XFORMS_VALUE_CHANGED.equals(eventName)) {
+
+            // These are events we allow directly from the client and actually handle
 
             dispatchEvent(pipelineContext, xformsEvent);
 
@@ -187,9 +189,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
 
             dispatchEvent(pipelineContext, new XFormsValueChangeEvent(concreteEvent.getTargetObject()));
-            dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(concreteEvent.getTargetObject()));
-            if (concreteEvent.getOtherTargetObject() != null) { // we SHOULD have this but the client may not send it
-                dispatchEvent(pipelineContext, new org.orbeon.oxf.xforms.event.events.XFormsDOMFocusInEvent(concreteEvent.getOtherTargetObject()));
+            if (concreteEvent.getOtherTargetObject() != null) {
+                // We have a focus change (otherwise, the focus is assumed to remain the same)
+                dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(concreteEvent.getTargetObject()));
+                dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(concreteEvent.getOtherTargetObject()));
             }
 
             dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
@@ -199,7 +202,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             dispatchEvent(pipelineContext, xformsEvent);
 
         } else {
-            throw new OXFException("Invalid event requested: " + eventName);
+            throw new OXFException("Invalid event dispatched by client: " + eventName);
         }
     }
 

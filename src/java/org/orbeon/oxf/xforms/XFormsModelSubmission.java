@@ -252,9 +252,20 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 try {
                     if (action.startsWith("/")) {
-                        // This is a "local" submission, i.e. in the same Servlet container
+
+                        // TODO
+                        //  && !externalContext.getRequest().getContainerType().equals("portlet")
+
+                        // This is a "local" submission, i.e. in the same web application
                         // The submission can be optimized.
-                        // FIXME: How to deal with absolute paths on the same server, but not in the servlet container?
+
+                        // NOTE: It is not possible to use include() with portlets, because it is
+                        // not possible to intercept the response, unlike with servlets. Also, there
+                        // is no concept of forward() with portlets. In the case of portlets, we can
+                        // therefore not optimize.
+
+                        // FIXME: How to deal with absolute paths on the same server, but not in
+                        // the web application? Just use absolute URLs?
 
                         ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action);
                         try {
@@ -301,21 +312,27 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         }
 
                     } else {
-                        // This is a "remote" submission, i.e. using an absolute URL
+                        // This is a "remote" submission, i.e. using an absolute URL, OR a "local" submission from a portlet
 
                         // Compute submission URL
                         final URL submissionURL;
                         try {
-                            if (NetUtils.urlHasProtocol(action)) {
+                            if (action.startsWith("/")) {
+                                // Case of "local" portlet submission
+                                final String requestURL = externalContext.getRequest().getRequestURL();
+                                submissionURL = URLFactory.createURL(requestURL, externalContext.getRequest().getContextPath() + action);
+                            } else if (NetUtils.urlHasProtocol(action)) {
+                                // Case of absolute URL
                                 submissionURL = URLFactory.createURL(action);
                             } else {
-                                final String requestURL = externalContext.getRequest().getRequestURL();
-
-                                if (requestURL != null) {
-                                    submissionURL = URLFactory.createURL(requestURL, action);
-                                } else {
-                                    throw new OXFException("xforms:submission: cannot resolve relative action: " + action);
-                                }
+                                throw new OXFException("xforms:submission: invalid action: " + action);
+//                                final String requestURL = externalContext.getRequest().getRequestURL();
+//
+//                                if (requestURL != null) {
+//                                    submissionURL = URLFactory.createURL(requestURL, action);
+//                                } else {
+//                                    throw new OXFException("xforms:submission: cannot resolve relative action: " + action);
+//                                }
                             }
                         } catch (MalformedURLException e) {
                             throw new OXFException("xforms:submission: invalid action: " + action, e);

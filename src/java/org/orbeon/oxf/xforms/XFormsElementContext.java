@@ -85,7 +85,7 @@ public class XFormsElementContext extends XFormsControls {
         popBinding();
         List newNodeset = new ArrayList();
         newNodeset.add(getCurrentNodeset().get(index - 1));
-        contextStack.push(new Context(getCurrentContext().model, newNodeset, true, null));//TODO: check this
+        contextStack.push(new BindingContext(getCurrentContext().model, newNodeset, true, null));//TODO: check this
 
         if (repeatId != null)
             repeatIdToIndex.put(repeatId, new Integer(index));

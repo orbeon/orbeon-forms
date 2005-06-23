@@ -21,11 +21,11 @@ package org.orbeon.oxf.xforms.event;
 public abstract class XFormsEvent {
 
     private String eventName;
-    private Object targetObject;
+    private XFormsEventTarget targetObject;
     private boolean bubbles;
     private boolean cancelable;
 
-    protected XFormsEvent(String eventName, Object targetObject, boolean bubbles, boolean cancelable) {
+    protected XFormsEvent(String eventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
         this.eventName = eventName;
         this.targetObject = targetObject;
         this.bubbles = bubbles;
@@ -36,7 +36,7 @@ public abstract class XFormsEvent {
         return eventName;
     }
 
-    public Object getTargetObject() {
+    public XFormsEventTarget getTargetObject() {
         return targetObject;
     }
 

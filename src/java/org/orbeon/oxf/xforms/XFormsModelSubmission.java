@@ -22,6 +22,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
+import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -35,6 +36,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -42,11 +44,16 @@ import java.util.Map;
 /**
  * Represents an XForms model submission instance.
  */
-public class XFormsModelSubmission implements XFormsEventTarget {
+public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHandlerContainer {
 
+    private XFormsContainingDocument containingDocument;
+    private String id;
     private XFormsModel model;
     private Element submissionElement;
     private boolean submissionElementExtracted = false;
+
+    // Event handlers
+    private List eventHandlers;
 
     private String action; // required
     private String method; // required
@@ -63,9 +70,14 @@ public class XFormsModelSubmission implements XFormsEventTarget {
     private String separator = ";";
     private String includenamespaceprefixes;
 
-    public XFormsModelSubmission(Element submissionElement, XFormsModel model) {
+    public XFormsModelSubmission(XFormsContainingDocument containingDocument, String id, Element submissionElement, XFormsModel model) {
+        this.containingDocument = containingDocument;
+        this.id = id;
         this.submissionElement = submissionElement;
         this.model = model;
+
+        // Extract event handlers
+        eventHandlers = XFormsEventHandlerImpl.extractEventHandlers(containingDocument, this, submissionElement);
     }
 
     public Element getSubmissionElement() {
@@ -105,12 +117,19 @@ public class XFormsModelSubmission implements XFormsEventTarget {
     }
 
     public String getId() {
-        return submissionElement.attributeValue("id");
+        return id;
     }
 
-    public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent xformsEvent) {
+    public XFormsEventHandlerContainer getParentContainer() {
+        return model;
+    }
 
-        final String eventName = xformsEvent.getEventName();
+    public List getEventHandlers() {
+        return eventHandlers;
+    }
+
+    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
+        final String eventName = event.getEventName();
 
         if (XFormsEvents.XFORMS_SUBMIT.equals(eventName) || XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
             // 11.1 The xforms-submit Event
@@ -121,7 +140,7 @@ public class XFormsModelSubmission implements XFormsEventTarget {
                 extractSubmissionElement();
 
                 // Select node based on ref or bind
-                final XFormsControls xformsControls = model.getContainingDocument().getXFormsControls();
+                final XFormsControls xformsControls = containingDocument.getXFormsControls();
                 xformsControls.setBinding(pipelineContext, submissionElement); // FIXME: the submission element is not a control...
 
                 final Node currentNode = xformsControls.getCurrentSingleNode();
@@ -134,7 +153,7 @@ public class XFormsModelSubmission implements XFormsEventTarget {
 
                 // Revalidate instance
                 // TODO: we should only revalidate relevant parts
-                model.dispatchEvent(pipelineContext,  new XFormsRevalidateEvent(model, false));
+                containingDocument.dispatchEvent(pipelineContext,  new XFormsRevalidateEvent(model, false));
 
                 final Document documentToSubmit;
                 {
@@ -179,7 +198,7 @@ public class XFormsModelSubmission implements XFormsEventTarget {
                 // Deferred submission
                 // NOTE: When replace="all", we don't actually do the submission here when we are called from the XForms Server
                 if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL) && XFormsEvents.XFORMS_SUBMIT.equals(eventName)) {
-                    model.getContainingDocument().setActiveSubmission(this);
+                    containingDocument.setActiveSubmission(this);
                     return;
                 }
 
@@ -246,7 +265,7 @@ public class XFormsModelSubmission implements XFormsEventTarget {
                                 if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL)) {
                                     // Just forward the reply
                                     // TODO: xforms-submit-done must be sent before the body is forwarded
-                                    dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                    containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                                     requestDispatcher.forward(requestAdapter, externalContext.getResponse());
                                     forwarded = true;
                                 } else {
@@ -381,7 +400,7 @@ public class XFormsModelSubmission implements XFormsEventTarget {
                                     // directly to an external context, if any.
 
                                     // "the event xforms-submit-done is dispatched"
-                                    dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                    containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
 
                                     final ExternalContext.Response response = externalContext.getResponse();
 
@@ -421,8 +440,8 @@ public class XFormsModelSubmission implements XFormsEventTarget {
                                             currentInstance.setInstanceDocument(resultingInstanceDocument);
 
                                             // Dispatch events
-                                            model.dispatchEvent(pipelineContext, new XFormsModelConstructEvent(model));
-                                            dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                            containingDocument.dispatchEvent(pipelineContext, new XFormsModelConstructEvent(model));
+                                            containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                                         } catch (Exception e) {
                                             throw new OXFException("xforms:submission: exception while serializing XML to instance.", e);
                                         }
@@ -432,14 +451,14 @@ public class XFormsModelSubmission implements XFormsEventTarget {
                                     }
                                 } else if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_NONE)) {
                                     // Just notify that processing is terminated
-                                    dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                    containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                                 } else {
                                     throw new OXFException("xforms:submission: invalid replace attribute: " + replace);
                                 }
 
                             } else {
                                 // There is no body, notify that processing is terminated
-                                dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                             }
                         } else if (resultCode == 302 || resultCode == 301) {
                             // Got a redirect
@@ -491,21 +510,9 @@ public class XFormsModelSubmission implements XFormsEventTarget {
                 }
             } catch (Exception e) {
                 // Any exception will cause an error event to be dispatched
-                dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(XFormsModelSubmission.this, action, e));
+                containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(XFormsModelSubmission.this, action, e));
             }
 
-        } else if (XFormsEvents.XFORMS_SUBMIT_DONE.equals(eventName)) {
-            // 4.4.18 The xforms-submit-done Event
-            // Bubbles: Yes / Cancelable: Yes / Context Info: None
-            // The default action for this event results in the following: None; notification event only.
-
-        } else if (XFormsEvents.XFORMS_SUBMIT_ERROR.equals(eventName)) {
-            // 4.4.19 The xforms-submit-error Event
-            // Bubbles: Yes / Cancelable: Yes / Context Info: The submit method URI that failed (xsd:anyURI)
-            // The default action for this event results in the following: None; notification event only.
-
-        } else {
-            throw new OXFException("Invalid event dispatched: " + eventName);
         }
     }
 }

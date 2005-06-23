@@ -33,6 +33,15 @@ public class XFormsConstants {
 
     public static final String XML_EVENTS_PREFIX = "ev";
     public static final String XML_EVENTS_NAMESPACE_URI = "http://www.w3.org/2001/xml-events";
+    public static final Namespace XML_EVENTS_NAMESPACE = new Namespace(XML_EVENTS_PREFIX, XML_EVENTS_NAMESPACE_URI);
+
+    public static final QName XML_EVENTS_EVENT_ATTRIBUTE_QNAME = new QName("event", XFormsConstants.XML_EVENTS_NAMESPACE);
+    public static final QName XML_EVENTS_OBSERVER_ATTRIBUTE_QNAME = new QName("observer", XFormsConstants.XML_EVENTS_NAMESPACE);
+    public static final QName XML_EVENTS_TARGET_ATTRIBUTE_QNAME = new QName("target", XFormsConstants.XML_EVENTS_NAMESPACE);
+    public static final QName XML_EVENTS_HANDLER_ATTRIBUTE_QNAME = new QName("handler", XFormsConstants.XML_EVENTS_NAMESPACE);
+    public static final QName XML_EVENTS_PHASE_ATTRIBUTE_QNAME = new QName("phase", XFormsConstants.XML_EVENTS_NAMESPACE);
+    public static final QName XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate", XFormsConstants.XML_EVENTS_NAMESPACE);
+    public static final QName XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME = new QName("defaultAction", XFormsConstants.XML_EVENTS_NAMESPACE);
 
     public static final String XXFORMS_VALID_ATTRIBUTE_NAME = "valid";
     public static final QName XXFORMS_VALID_ATTRIBUTE_QNAME = new QName(XXFORMS_VALID_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);

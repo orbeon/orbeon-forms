@@ -21,19 +21,19 @@ import org.orbeon.oxf.common.OXFException;
  */
 public class XFormsEventFactory {
 
-    public static XFormsEvent createEvent(String newEventName, Object targetObject) {
+    public static XFormsEvent createEvent(String newEventName, XFormsEventTarget targetObject) {
         return createEvent(newEventName, targetObject, null, false, true, true, null, null, null);
     }
 
-    public static XFormsEvent createEvent(String newEventName, Object targetObject, Object otherTargetObject, String contextString, Element contextElement, Throwable contextThrowable) {
+    public static XFormsEvent createEvent(String newEventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, String contextString, Element contextElement, Throwable contextThrowable) {
         return createEvent(newEventName, targetObject, otherTargetObject, false, true, true, contextString, contextElement, contextThrowable);
     }
 
-    public static XFormsEvent createEvent(String newEventName, Object targetObject, boolean bubbles, boolean cancelable) {
+    public static XFormsEvent createEvent(String newEventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
         return createEvent(newEventName, targetObject, null, true, bubbles, cancelable, null, null, null);
     }
 
-    private static XFormsEvent createEvent(String eventName, Object targetObject, Object otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable,
+    private static XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable,
                                           String contextString, Element contextElement, Throwable contextThrowable) {
 
         // TODO

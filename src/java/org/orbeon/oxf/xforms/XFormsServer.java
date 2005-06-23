@@ -127,7 +127,8 @@ public class XFormsServer extends ProcessorImpl {
         // Create resulting document if there is a ContentHandler
         if (contentHandler != null) {
             final XFormsControls xFormsControls = containingDocument.getXFormsControls();
-            final XFormsControls.ControlsState currentControlsState = xFormsControls.getCurrentControlsState(pipelineContext);
+            xFormsControls.rebuildCurrentControlsState(pipelineContext);
+            final XFormsControls.ControlsState currentControlsState = xFormsControls.getCurrentControlsState();
             try {
                 final ContentHandlerHelper ch = new ContentHandlerHelper(contentHandler);
                 ch.startDocument();
@@ -673,9 +674,9 @@ public class XFormsServer extends ProcessorImpl {
         // Initialize XForms Engine
         containingDocument.initialize(pipelineContext);
         if (isInitializeEvent)
-            containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
+            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
         else
-            containingDocument.dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument));
+            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument));
 
 
         final XFormsControls xFormsControls = containingDocument.getXFormsControls();

@@ -22,8 +22,8 @@ import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.scope.ScopeStore;
+import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xforms.event.XFormsEvents;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -44,13 +44,15 @@ public class XFormsInstance implements XFormsEventTarget {
     public static final String DEFAULT_UPLOAD_TYPE = "xs:anyURI";
 
     private PipelineContext pipelineContext;
+    private String id;
     private XFormsModel model;
     private Document instanceDocument;
 
     private DocumentXPathEvaluator documentXPathEvaluator;
 
-    public XFormsInstance(PipelineContext pipelineContext, Document instanceDocument, XFormsModel model) {
+    public XFormsInstance(PipelineContext pipelineContext, String id, Document instanceDocument, XFormsModel model) {
         this.pipelineContext = pipelineContext;
+        this.id = id;
         this.model = model;
         setInstanceDocument(instanceDocument);
     }
@@ -233,7 +235,7 @@ public class XFormsInstance implements XFormsEventTarget {
     public static XFormsInstance createInstanceFromContext(PipelineContext pipelineContext) {
         ExternalContext.Request request = getRequest(pipelineContext);
         ScopeStore instanceContextStore = (ScopeStore) request.getAttributesMap().get(REQUEST_INSTANCE_DOCUMENT);
-        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, instanceContextStore.getSaxStore().getDocument(), null);
+        return instanceContextStore == null || instanceContextStore.getSaxStore() == null ? null : new XFormsInstance(pipelineContext, null, instanceContextStore.getSaxStore().getDocument(), null);
     }
 
     private static ExternalContext.Request getRequest(PipelineContext context) {
@@ -244,20 +246,15 @@ public class XFormsInstance implements XFormsEventTarget {
         return request;
     }
 
-    public void dispatchEvent(final PipelineContext pipelineContext, org.orbeon.oxf.xforms.event.XFormsEvent xformsEvent) {
-        final String eventName = xformsEvent.getEventName();
-        if (XFormsEvents.XFORMS_INSERT.equals(eventName)) {
-            // 4.4.5 The xforms-insert and xforms-delete Events
-            // Bubbles: Yes / Cancelable: No / Context Info: Path expression used for insert/delete (xsd:string).
-            // The default action for this event results in the following: None; notification event only.
+    public String getId() {
+        return id;
+    }
 
-        } else if (XFormsEvents.XFORMS_DELETE.equals(eventName)) {
-            // 4.4.5 The xforms-insert and xforms-delete Events
-            // Bubbles: Yes / Cancelable: No / Context Info: Path expression used for insert/delete (xsd:string).
-            // The default action for this event results in the following: None; notification event only.
+    public XFormsEventHandlerContainer getParentContainer() {
+        return model;
+    }
 
-        } else {
-            throw new OXFException("Invalid action requested: " + eventName);
-        }
+    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
+        // NOP
     }
 }

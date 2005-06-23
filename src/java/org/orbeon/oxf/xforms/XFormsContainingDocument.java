@@ -14,14 +14,13 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.Document;
+import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.*;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Represents an XForms containing document.
@@ -32,7 +31,7 @@ import java.util.Map;
  * o XForms controls
  * o Event handlers hierarchy
  */
-public class XFormsContainingDocument implements XFormsEventTarget {
+public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventHandlerContainer {
 
     private List models;
     private Map modelsMap = new HashMap();
@@ -40,14 +39,16 @@ public class XFormsContainingDocument implements XFormsEventTarget {
 
     private XFormsModelSubmission activeSubmission;
 
+    private XFormsActionInterpreter actionInterpreter;
+
     public XFormsContainingDocument(List models, Document controlsDocument) {
         this.models = models;
         this.xformsControls = new XFormsControls(this, controlsDocument);
 
         for (Iterator i = models.iterator(); i.hasNext();) {
             XFormsModel model = (XFormsModel) i.next();
-            if (model.getModelId() != null)
-                modelsMap.put(model.getModelId(), model);
+            if (model.getId() != null)
+                modelsMap.put(model.getId(), model);
             model.setContainingDocument(this);
         }
     }
@@ -121,12 +122,30 @@ public class XFormsContainingDocument implements XFormsEventTarget {
      */
     public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String controlId, String otherControlId, String contextString) {
 
-        // Get event target object (right now control element or submission)
-        final Object eventTargetObject = getObjectById(pipelineContext, controlId);
-        final Object otherTargetObject = (otherControlId == null) ? null : getObjectById(pipelineContext, otherControlId);
+        // Get event target object
+        final XFormsEventTarget eventTarget;
+        {
+            final Object eventTargetObject = getObjectById(pipelineContext, controlId);
+            if (!(eventTargetObject instanceof XFormsEventTarget))
+                throw new OXFException("Event target is not an XFormsEventTarget.");
+            eventTarget = (XFormsEventTarget) eventTargetObject;
+        }
+
+        // Get other event target
+        final XFormsEventTarget otherEventTarget;
+        {
+            final Object otherEventTargetObject = (otherControlId == null) ? null : getObjectById(pipelineContext, otherControlId);
+            if (otherEventTargetObject == null)
+                otherEventTarget = null;
+            else if (!(otherEventTargetObject instanceof XFormsEventTarget))
+                throw new OXFException("Other event target is not an XFormsEventTarget.");
+            else
+                otherEventTarget = (XFormsEventTarget) otherEventTargetObject;
+
+        }
 
         // Create event
-        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTargetObject, otherTargetObject, contextString, null, null);
+        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget, contextString, null, null);
 
         // Interpret event
         interpretEvent(pipelineContext, xformsEvent);
@@ -139,7 +158,7 @@ public class XFormsContainingDocument implements XFormsEventTarget {
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
             // The default action for this event results in the following: None; notification event only.
 
-            xformsControls.dispatchEvent(pipelineContext, xformsEvent);
+            dispatchEvent(pipelineContext, xformsEvent);
 
         } else if (XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE.equals(eventName)) {
             // 4.6.7 Sequence: Value Change with Focus Change
@@ -163,27 +182,27 @@ public class XFormsContainingDocument implements XFormsEventTarget {
 
             // Dispatch events
             final XFormsModel model = xformsControls.getCurrentModel();
-            model.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
-            model.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
+            dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
+            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
 
-            xformsControls.dispatchEvent(pipelineContext, new XFormsValueChangeEvent(concreteEvent.getTargetObject()));
-            xformsControls.dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(concreteEvent.getTargetObject()));
-            if (concreteEvent.getOtherTargetObject() != null) // we SHOULD have this but the client may not send it
-                xformsControls.dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(concreteEvent.getOtherTargetObject()));
+            dispatchEvent(pipelineContext, new XFormsValueChangeEvent(concreteEvent.getTargetObject()));
+            dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(concreteEvent.getTargetObject()));
+            if (concreteEvent.getOtherTargetObject() != null) { // we SHOULD have this but the client may not send it
+                dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(concreteEvent.getOtherTargetObject()));
+            }
 
-            model.dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
+            dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
 
         } else if (XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
             // Internal submission event
-            final XFormsModelSubmission targetSubmission = (XFormsModelSubmission) xformsEvent.getTargetObject();
-            targetSubmission.dispatchEvent(pipelineContext, xformsEvent);
+            dispatchEvent(pipelineContext, xformsEvent);
 
         } else {
             throw new OXFException("Invalid event requested: " + eventName);
         }
     }
 
-    public void dispatchEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
+    public void dispatchExternalEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
         final String eventName = xformsEvent.getEventName();
         if (XFormsEvents.XXFORMS_INITIALIZE.equals(eventName)) {
             // 4.2 Initialization Events
@@ -195,25 +214,137 @@ public class XFormsContainingDocument implements XFormsEventTarget {
             final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, XFormsEvents.XFORMS_READY };
             for (int i = 0; i < eventsToDispatch.length; i++) {
                 if (XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE.equals(eventsToDispatch[i])) {
-                    dispatchEvent(pipelineContext, new XXFormsInitializeControlsEvent(this));
+                    dispatchExternalEvent(pipelineContext, new XXFormsInitializeControlsEvent(this));
                 }
                 for (Iterator j = getModels().iterator(); j.hasNext();) {
                     final XFormsModel currentModel = (XFormsModel) j.next();
-                    currentModel.dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
+                    dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(eventsToDispatch[i], currentModel));
                 }
             }
         } else if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
             // Restore models state
             for (Iterator j = getModels().iterator(); j.hasNext();) {
                 final XFormsModel currentModel = (XFormsModel) j.next();
-                currentModel.dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(currentModel));
+                dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(currentModel));
             }
-            dispatchEvent(pipelineContext, new XXFormsInitializeControlsEvent(this));
+            dispatchExternalEvent(pipelineContext, new XXFormsInitializeControlsEvent(this));
         } else if (XFormsEvents.XXFORMS_INITIALIZE_CONTROLS.equals(eventName)) {
             // Make sure controls are initialized
             xformsControls.initialize(pipelineContext);
         } else {
             throw new OXFException("Invalid event dispatched: " + eventName);
         }
+    }
+
+    public XFormsEventHandlerContainer getParentContainer() {
+        return null;
+    }
+
+    public List getEventHandlers() {
+        return null;
+    }
+
+    public String getId() {
+        throw new OXFException("Method get() should not be called on XFormsContainingDocument.");
+    }
+
+    public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
+        throw new OXFException("Method performDefaultAction() should not be called on XFormsContainingDocument.");
+    }
+
+    /**
+     * Main event dispatching entry.
+     */
+    public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event) {
+
+        final XFormsEventTarget targetObject = (XFormsEventTarget) event.getTargetObject();
+
+        // Find all event handler containers
+        final List containers = new ArrayList();
+        {
+            XFormsEventHandlerContainer container = (targetObject instanceof XFormsEventHandlerContainer) ? (XFormsEventHandlerContainer) targetObject : targetObject.getParentContainer();
+            while (container != null) {
+                containers.add(container);
+                container = container.getParentContainer();
+            }
+        }
+
+        boolean propagate = true;
+        boolean performDefaultAction = true;
+
+        // Go from root to leaf
+        Collections.reverse(containers);
+
+        // Capture phase
+        for (Iterator i = containers.iterator(); i.hasNext();) {
+            final XFormsEventHandlerContainer container = (XFormsEventHandlerContainer) i.next();
+            final List eventHandlers = container.getEventHandlers();
+
+            if (eventHandlers != null) {
+                if (container != targetObject) {
+                    // Event listeners on the target which are in capture mode are not called
+
+                    for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
+                        final XFormsEventHandler eventHandlerImpl = (XFormsEventHandler) j.next();
+
+                        if (!eventHandlerImpl.isPhase() && eventHandlerImpl.getEventName().equals(event.getEventName())) {
+                            // Capture phase match
+                            eventHandlerImpl.handleEvent(pipelineContext, event);
+                            propagate &= eventHandlerImpl.isPropagate();
+                            performDefaultAction &= eventHandlerImpl.isDefaultAction();
+                        }
+                    }
+                    // Cancel propagation if requested and if authorized by event
+                    if (!propagate && event.isCancelable())
+                        break;
+                }
+            }
+        }
+
+        // Go from leaf to root
+        Collections.reverse(containers);
+
+        // Bubbling phase
+        if (propagate && event.isBubbles()) {
+            for (Iterator i = containers.iterator(); i.hasNext();) {
+                final XFormsEventHandlerContainer container = (XFormsEventHandlerContainer) i.next();
+                final List eventHandlers = container.getEventHandlers();
+
+                if (eventHandlers != null) {
+                    for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
+                        final XFormsEventHandler eventHandlerImpl = (XFormsEventHandler) j.next();
+
+                        if (eventHandlerImpl.isPhase() && eventHandlerImpl.getEventName().equals(event.getEventName())) {
+                            // Bubbling phase match
+                            eventHandlerImpl.handleEvent(pipelineContext, event);
+                            propagate &= eventHandlerImpl.isPropagate();
+                            performDefaultAction &= eventHandlerImpl.isDefaultAction();
+                        }
+                    }
+                    // Cancel propagation if requested and if authorized by event
+                    if (!propagate)
+                        break;
+                }
+            }
+        }
+
+        // Perform default action is allowed to
+        if (performDefaultAction || !event.isCancelable()) {
+            targetObject.performDefaultAction(pipelineContext, event);
+        }
+    }
+
+    /**
+     * Execute an XForms action.
+     *
+     * @param pipelineContext       current PipelineContext
+     * @param targetId              id of the target control
+     * @param eventHandlerContainer event handler containe this action is running in
+     * @param actionElement         Element specifying the action to execute
+     */
+    public void runAction(final PipelineContext pipelineContext, String targetId, XFormsEventHandlerContainer eventHandlerContainer, Element actionElement) {
+        if (actionInterpreter == null)
+            actionInterpreter = new XFormsActionInterpreter(this);
+        actionInterpreter.runAction(pipelineContext, targetId, eventHandlerContainer, actionElement, null);
     }
 }

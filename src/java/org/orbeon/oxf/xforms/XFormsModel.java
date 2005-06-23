@@ -22,6 +22,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
+import org.orbeon.oxf.xforms.action.XFormsActions;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -41,7 +42,7 @@ import java.util.*;
 /**
  * Represents an XForms model.
  */
-public class XFormsModel implements XFormsEventTarget, Cloneable {
+public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContainer, Cloneable {
 
     private Document modelDocument;
 
@@ -52,6 +53,9 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
     private List instanceIds;
     private List instances;
     private Map instancesMap;
+
+    // Event handlers
+    private List eventHandlers;
 
     private InstanceConstructListener instanceConstructListener;
 
@@ -66,14 +70,14 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
     private XFormsModelSchemaValidator schemaValidator;
 
     // Containing document
-    private XFormsContainingDocument xformsContainingDocument;
+    private XFormsContainingDocument containingDocument;
 
     public XFormsModel(Document modelDocument) {
         this.modelDocument = modelDocument;
 
         // Basic check trying to make sure this is an XForms model
         // TODO: should rather use schema here or when obtaining document passed to this constructor
-        Element modelElement = modelDocument.getRootElement();
+        final Element modelElement = modelDocument.getRootElement();
         String rootNamespaceURI = modelElement.getNamespaceURI();
         if (!rootNamespaceURI.equals(XFormsConstants.XFORMS_NAMESPACE_URI))
             throw new ValidationException("Root element of XForms model must be in namespace '"
@@ -97,6 +101,13 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                 }
             }
         }
+    }
+
+    public void setContainingDocument(XFormsContainingDocument xFormsContainingDocument) {
+
+        this.containingDocument = xFormsContainingDocument;
+
+        final Element modelElement = modelDocument.getRootElement();
 
         // Get <xforms:submission> elements (may be missing)
         {
@@ -106,19 +117,18 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                 if (submissionId == null)
                     submissionId = "";
 
-                if (submissions == null)
-                    submissions = new HashMap();
-                submissions.put(submissionId, new XFormsModelSubmission(submissionElement, this));
+                if (this.submissions == null)
+                    this.submissions = new HashMap();
+                this.submissions.put(submissionId, new XFormsModelSubmission(containingDocument, submissionId, submissionElement, this));
             }
         }
-    }
 
-    public void setContainingDocument(XFormsContainingDocument xFormsContainingDocument) {
-        this.xformsContainingDocument = xFormsContainingDocument;
+        // Extract event handlers
+        eventHandlers = XFormsEventHandlerImpl.extractEventHandlers(containingDocument, this, modelElement);
     }
 
     public XFormsContainingDocument getContainingDocument() {
-        return xformsContainingDocument;
+        return containingDocument;
     }
 
     /**
@@ -224,11 +234,11 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             instancesMap = new HashMap(instanceIds.size());
         }
         // Prepare and set instance
-        XFormsInstance newInstance = new XFormsInstance(pipelineContext, instanceDocument, this);
+        final String instanceId = (String) instanceIds.get(instancePosition);
+        XFormsInstance newInstance = new XFormsInstance(pipelineContext, instanceId, instanceDocument, this);
         instances.set(instancePosition, newInstance);
 
         // Create mapping instance id -> instance
-        final String instanceId = (String) instanceIds.get(instancePosition);
         if (instanceId != null)
             instancesMap.put(instanceId, newInstance);
     }
@@ -550,7 +560,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
         void handleNode(Node node);
     }
 
-    public String getModelId() {
+    public String getId() {
         return modelId;
     }
 
@@ -632,14 +642,25 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
         }
     }
 
-    public void dispatchEvent(final PipelineContext pipelineContext, XFormsEvent xformsEvent) {
-        final String eventName = xformsEvent.getEventName();
+    public XFormsEventHandlerContainer getParentContainer() {
+        return containingDocument;
+    }
+
+    /**
+     * Return the List of XFormsEventHandler objects within this object.
+     */
+    public List getEventHandlers() {
+        return eventHandlers;
+    }
+
+    public void performDefaultAction(final PipelineContext pipelineContext, XFormsEvent event) {
+        final String eventName = event.getEventName();
         if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
             // Internal event to restore state
 
             loadSchemasIfNeeded(pipelineContext);
             applyComputedExpressionBinds(pipelineContext);
-            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
 
         } else if (XFormsEvents.XFORMS_MODEL_CONSTRUCT.equals(eventName)) {
             // 4.2.1 The xforms-model-construct Event
@@ -688,9 +709,9 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // TODO: a, b, c xxx
 
             // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-            dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
-            dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this, false));
-            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this, false));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
 
         } else if (XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE.equals(eventName)) {
             // 4.2.2 The xforms-model-construct-done Event
@@ -699,14 +720,6 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // TODO: if instance exists (for now it does!), check that controls can bind, otherwise control must be "irrelevant"
             // TODO: implicit lazy instance construction
 
-        } else if (XFormsEvents.XFORMS_READY.equals(eventName)) {
-            // 4.2.3 The xforms-ready Event
-            // Bubbles: Yes / Cancelable: No / Context Info: None
-            // The default action for this event results in the following: None
-        } else if (XFormsEvents.XFORMS_MODEL_DESTRUCT.equals(eventName)) {
-            // 4.2.4 The xforms-model-destruct Event
-            // Bubbles: No / Cancelable: No / Context Info: None
-            // The default action for this event results in the following: None
         } else if (XFormsEvents.XFORMS_REBUILD.equals(eventName)) {
             // 4.3.7 The xforms-rebuild Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
@@ -716,7 +729,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // 4.3.6 The xforms-recalculate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
-            final XFormsRecalculateEvent xformsRecalculateEvent = (XFormsRecalculateEvent) xformsEvent;
+            final XFormsRecalculateEvent xformsRecalculateEvent = (XFormsRecalculateEvent) event;
 
             // Clear all existing computed expression binds
             for (Iterator i = instances.iterator(); i.hasNext();) {
@@ -739,8 +752,8 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             applyComputedExpressionBinds(pipelineContext);
 
             // Send events if needed
-            if (xformsRecalculateEvent.isSendEvents() && xformsContainingDocument.getXFormsControls() != null) {
-                final XFormsControls xformsControls = xformsContainingDocument.getXFormsControls();
+            if (xformsRecalculateEvent.isSendEvents() && containingDocument.getXFormsControls() != null) {
+                final XFormsControls xformsControls = containingDocument.getXFormsControls();
                 for (Iterator i = instances.iterator(); i.hasNext();) {
                     XFormsUtils.updateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
                         public void walk(Node node, InstanceData instanceData) {
@@ -749,9 +762,9 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                                 final boolean previousRequiredState = instanceData.getPreviousRequiredState();
                                 final boolean newRequiredState = instanceData.getRequired().get();
                                 if (previousRequiredState && !newRequiredState) {
-//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsOptionalEvent(null));// TODO: find bound control
+//                                    containingDocument.dispatchEvent(pipelineContext, new XFormsOptionalEvent(null));// TODO: find bound control
                                 } else if (!previousRequiredState && newRequiredState) {
-//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsRequiredEvent(null));// TODO: find bound control
+//                                    containingDocument.dispatchEvent(pipelineContext, new XFormsRequiredEvent(null));// TODO: find bound control
                                 }
                             }
                             // Dispatch xforms-enabled/xforms-disabled
@@ -759,9 +772,9 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                                 final boolean previousRelevantState = instanceData.getPreviousRelevantState();
                                 final boolean newRelevantState = instanceData.getRelevant().get();
                                 if (previousRelevantState && !newRelevantState) {
-//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsDisabledEvent(null));// TODO: find bound control
+//                                    containingDocument.dispatchEvent(pipelineContext, new XFormsDisabledEvent(null));// TODO: find bound control
                                 } else if (!previousRelevantState && newRelevantState) {
-//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsEnabledEvent(null));// TODO: find bound control
+//                                    containingDocument.dispatchEvent(pipelineContext, new XFormsEnabledEvent(null));// TODO: find bound control
                                 }
                             }
                             // Dispatch xforms-readonly/xforms-readwrite
@@ -769,9 +782,9 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                                 final boolean previousReadonlyState = instanceData.getPreviousReadonlyState();
                                 final boolean newReadonlyState = instanceData.getReadonly().get();
                                 if (previousReadonlyState && !newReadonlyState) {
-//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsReadwriteEvent(null));// TODO: find bound control
+//                                    containingDocument.dispatchEvent(pipelineContext, new XFormsReadwriteEvent(null));// TODO: find bound control
                                 } else if (!previousReadonlyState && newReadonlyState) {
-//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsReadonlyEvent(null));// TODO: find bound control
+//                                    containingDocument.dispatchEvent(pipelineContext, new XFormsReadonlyEvent(null));// TODO: find bound control
                                 }
                             }
                         }
@@ -783,7 +796,7 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // 4.3.5 The xforms-revalidate Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
-            final XFormsRevalidateEvent xformsRevalidateEvent = (XFormsRevalidateEvent) xformsEvent;
+            final XFormsRevalidateEvent xformsRevalidateEvent = (XFormsRevalidateEvent) event;
 
             // Clear all existing validation binds
             for (Iterator i = instances.iterator(); i.hasNext();) {
@@ -804,8 +817,8 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             });
 
             // Send events if needed
-            if (xformsRevalidateEvent.isSendEvents() && xformsContainingDocument.getXFormsControls() != null) {
-                final XFormsControls xformsControls = xformsContainingDocument.getXFormsControls();
+            if (xformsRevalidateEvent.isSendEvents() && containingDocument.getXFormsControls() != null) {
+                final XFormsControls xformsControls = containingDocument.getXFormsControls();
                 for (Iterator i = instances.iterator(); i.hasNext();) {
                     XFormsUtils.updateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
                         public void walk(Node node, InstanceData instanceData) {
@@ -814,9 +827,9 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
                                 final boolean previousValidState = instanceData.getPreviousValidState();
                                 final boolean newValidState = instanceData.getValid().get();
                                 if (previousValidState && !newValidState) {
-//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsInvalidEvent(null));// TODO: find bound control
+//                                    containingDocument.dispatchEvent(pipelineContext, new XFormsInvalidEvent(null));// TODO: find bound control
                                 } else if (!previousValidState && newValidState) {
-//                                    xformsControls.dispatchEvent(pipelineContext, new XFormsValidEvent(null));// TODO: find bound control
+//                                    containingDocument.dispatchEvent(pipelineContext, new XFormsValidEvent(null));// TODO: find bound control
                                 }
                             }
                         }
@@ -829,8 +842,8 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
             // Must ask controls to refresh for this model
-            if (xformsContainingDocument.getXFormsControls() != null) {
-                xformsContainingDocument.getXFormsControls().refreshForModel(pipelineContext, this);
+            if (containingDocument.getXFormsControls() != null) {
+                containingDocument.getXFormsControls().refreshForModel(pipelineContext, this);
             }
 
         } else if (XFormsEvents.XFORMS_RESET.equals(eventName)) {
@@ -843,21 +856,10 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
 
             // "Then, the events xforms-rebuild, xforms-recalculate, xforms-revalidate and
             // xforms-refresh are dispatched to the model element in sequence."
-            dispatchEvent(pipelineContext, new XFormsRebuildEvent(XFormsModel.this));
-            dispatchEvent(pipelineContext, new XFormsRecalculateEvent(XFormsModel.this, true));
-            dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this, true));
-            dispatchEvent(pipelineContext, new XFormsRefreshEvent(XFormsModel.this));
-
-        } else if (XFormsEvents.XFORMS_LINK_ERROR.equals(eventName)) {
-            // 4.5.2 The xforms-link-error Event
-            // Bubbles: Yes / Cancelable: No / Context Info: The URI that failed to load (xsd:anyURI)
-
-            //callEventHandlers(pipelineContext, xformsEvent, eventName, xformsEvent.getControlElement());
-
-            // The default action for this event results in the following: None; notification event only.
-            //XFormsLinkError xFormsLinkError = (XFormsLinkError) xformsEvent;
-
-            // TODO
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(XFormsModel.this));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(XFormsModel.this, true));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(XFormsModel.this, true));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRefreshEvent(XFormsModel.this));
 
         } else if (XFormsEvents.XFORMS_COMPUTE_EXCEPTION.equals(eventName)) {
             // 4.5.4 The xforms-compute-exception Event
@@ -866,8 +868,6 @@ public class XFormsModel implements XFormsEventTarget, Cloneable {
 
             // TODO
 
-        } else {
-            throw new OXFException("Invalid event dispatched: " + eventName);
         }
     }
 

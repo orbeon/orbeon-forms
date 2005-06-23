@@ -396,12 +396,22 @@ public class Dom4jUtils {
             return null;
         Map namespaces = getNamespaceContext(element);
         int colonIndex = qNameString.indexOf(':');
-        String prefix = qNameString.substring(0, colonIndex);
-        String localName = qNameString.substring(colonIndex + 1);
-        String namespaceURI = (String) namespaces.get(prefix);
-        if (namespaceURI == null)
-            throw new OXFException("No namespace declaration found for prefix: " + prefix);
-
+        final String prefix;
+        final String localName;
+        final String namespaceURI;
+        if ( colonIndex == -1 ) {
+            prefix = "";
+            localName = qNameString;
+            final String nsURI = (String) namespaces.get(prefix);
+            namespaceURI = nsURI == null ? "" : nsURI;
+        } else {
+            prefix = qNameString.substring(0, colonIndex);
+            localName = qNameString.substring(colonIndex + 1);
+            namespaceURI = (String) namespaces.get(prefix);
+            if ( namespaceURI == null) {
+                throw new OXFException("No namespace declaration found for prefix: " + prefix);
+            }
+        }
         return new QName(localName, new Namespace(prefix, namespaceURI));
     }
 

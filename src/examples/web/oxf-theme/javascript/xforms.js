@@ -519,7 +519,7 @@ function xformsInitializeControlsUnder(root) {
                     });
             }
 
-            if (false && !control.focusBlurEventListenerRegistered) {
+            if (!control.focusBlurEventListenerRegistered) {
                 control.focusBlurEventListenerRegistered = true;
                 xformsAddEventListener(control, "blur", function(event) {
                     var target = getEventTarget(event);

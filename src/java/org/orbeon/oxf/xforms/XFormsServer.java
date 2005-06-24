@@ -100,23 +100,24 @@ public class XFormsServer extends ProcessorImpl {
                 = createXFormsEngine(pipelineContext, staticStateString, dynamicStateString);
 
         // Run event if any
-        final boolean isInitializationRun;
+        boolean isInitializationRun = true;
         {
-            final Element eventElement = actionElement.element(XFormsConstants.XXFORMS_EVENT_QNAME);
-            if (eventElement != null) {
-                final String sourceControlId = eventElement.attributeValue("source-control-id");
-                final String otherControlId = eventElement.attributeValue("other-control-id");
-                final String eventName = eventElement.attributeValue("name");
-                final String value = eventElement.getText();
+            final List eventElements = actionElement.elements(XFormsConstants.XXFORMS_EVENT_QNAME);
+            if (eventElements != null && eventElements.size() > 0) {
+                for (Iterator i = eventElements.iterator(); i.hasNext();) {
+                    final Element eventElement = (Element) i.next();
+                    final String sourceControlId = eventElement.attributeValue("source-control-id");
+                    final String otherControlId = eventElement.attributeValue("other-control-id");
+                    final String eventName = eventElement.attributeValue("name");
+                    final String value = eventElement.getText();
 
-                if (sourceControlId != null && eventName != null) {
-                    // An event is passed
-                    containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value);
-                    isInitializationRun = false;
-                } else if (!(sourceControlId == null && eventName == null)) {
-                    throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
-                } else {
-                    isInitializationRun = true;
+                    if (sourceControlId != null && eventName != null) {
+                        // An event is passed
+                        containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value);
+                        isInitializationRun = false;
+                    } else if (!(sourceControlId == null && eventName == null)) {
+                        throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
+                    }
                 }
             } else {
                 isInitializationRun = true;

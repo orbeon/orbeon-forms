@@ -223,7 +223,7 @@ function xformsUpdateStyle(element) {
                             var child = td.childNodes[i];
                             if (typeof(child.className) != "undefined"
                                     && xformsArrayContains(child.className.split(" "), "xforms-trigger")) {
-                                xformsFireEvent(child, "DOMActivate", null, false);
+                                xformsFireEvents(new Array(xformsCreateEventArray(child, "DOMActivate", null, false)));
                             }
                         }
                         

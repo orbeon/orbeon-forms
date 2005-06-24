@@ -60,7 +60,7 @@
         </action>
         <!-- View PDF form -->
         <action when="/form/action = 'show-pdf'" action="summary/find-document-action.xpl">
-            <result page="pdf-detail">
+            <result page="pdf-detail" instance-passing="redirect-exit-portal">
                 <xu:update select="/form/document-id">
                     <xu:value-of select="document('input:action')/document-info/document-id"/>
                 </xu:update>
@@ -71,7 +71,7 @@
         </action>
         <!-- View XML -->
         <action when="/form/action = 'show-xml'" action="summary/find-document-action.xpl">
-            <result page="xml-detail">
+            <result page="xml-detail" instance-passing="redirect-exit-portal">
                 <xu:update select="/form/document-id">
                     <xu:value-of select="document('input:action')/document-info/document-id"/>
                 </xu:update>
@@ -82,8 +82,8 @@
         </action>
     </page>
 
-    <page id="pdf-detail" path-info="/direct/pdf/pdf-template/pdf-detail" xforms="detail/detail-xforms-model.xml" model="pdf-detail/pdf-detail-model.xpl"/>
-    <page id="xml-detail" path-info="/direct/pdf/pdf-template/xml-detail" xforms="detail/detail-xforms-model.xml" model="xml-detail/xml-detail-model.xpl"/>
+    <page id="pdf-detail" path-info="/direct/pdf-template/pdf-detail" xforms="detail/detail-xforms-model.xml" model="pdf-detail/pdf-detail-model.xpl"/>
+    <page id="xml-detail" path-info="/direct/pdf-template/xml-detail" xforms="detail/detail-xforms-model.xml" model="xml-detail/xml-detail-model.xpl"/>
 
     <page id="detail-1" path-info="/pdf-template/detail-1" xforms="detail/detail-xforms-model.xml" model="detail/debug-model.xpl" view="detail/detail-view-1.xsl">
         <!-- Save the current document and documemnt is valid -->

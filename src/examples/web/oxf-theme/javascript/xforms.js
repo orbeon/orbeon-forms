@@ -519,7 +519,7 @@ function xformsInitializeControlsUnder(root) {
                     });
             }
 
-            if (!control.focusBlurEventListenerRegistered) {
+            if (false && !control.focusBlurEventListenerRegistered) {
                 control.focusBlurEventListenerRegistered = true;
                 xformsAddEventListener(control, "blur", function(event) {
                     var target = getEventTarget(event);
@@ -888,21 +888,21 @@ function xformsHandleResponse() {
 
                                         // Delete element in repeat
                                         case "delete-element": {
+                                            // Extract data from server response
                                             var deleteElementElement = controlValuesElement.childNodes[j];
                                             var deleteId = deleteElementElement.getAttribute("id");
-                                            var repeatId = deleteId.substring(0, deleteId.lastIndexOf("-"));
-                                            // Locate end of repeat
-                                            var cursor = document.getElementById(repeatId + "-repeat-end");
-                                            // Move to last delimiter
-                                            while (cursor.className != "xforms-repeat-delimiter")
-                                                cursor = cursor.previousSibling;
-                                            // Eat everything until next delimiter
+                                            var indexOfDash = deleteId.lastIndexOf("-");
+                                            var repeatId = deleteId.substring(0, indexOfDash);
+                                            var itemIndex = parseInt(deleteId.substring(indexOfDash + 1));
+                                            // Locate the delimiter before the item to remove
+                                            var cursor = xformsFindRepeatDelimiter(document.getElementById(repeatId + "-repeat-begin"), itemIndex);
+                                            // Eat everything until next delimiter or end of repeat
                                             do {
-                                                var nextCursor = cursor.previousSibling;
+                                                var nextCursor = cursor.nextSibling;
                                                 cursor.parentNode.removeChild(cursor);
                                                 cursor = nextCursor;
-                                            } while (cursor.className != "xforms-repeat-delimiter");
-
+                                            } while (cursor.className != "xforms-repeat-delimiter"
+                                                && cursor.className != "xforms-repeat-begin-end");
                                             break;
                                         }
                                     }

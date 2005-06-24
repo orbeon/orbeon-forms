@@ -198,18 +198,24 @@ function xformsDisplayLoading(form, state) {
 function xformsValueChanged(target, incremental, other) {
     if (target.value != target.previousValue) {
         target.previousValue = target.value;
-        xformsFireEvent(target, "xxforms-value-change-with-focus-change", target.value, incremental, other);
+        xformsFireEvents(new Array(xformsCreateEventArray
+                (target, "xxforms-value-change-with-focus-change", target.value, incremental, other)));
     }
 }
 
-function xformsFireEvent(target, eventName, value, incremental, other) {
+/**
+* Parameter is an array of arrays with each array containing:
+* new Array(target, eventName, value, incremental, other)
+*/
+function xformsFireEvents(events) {
 
     // Build request
     var eventFiredElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event-request");
     
     // Add static state
     var staticStateElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:static-state");
-    staticStateElement.appendChild(staticStateElement.ownerDocument.createTextNode(target.form.xformsStaticState.value));
+    var firstTarget = events[0][0];
+    staticStateElement.appendChild(staticStateElement.ownerDocument.createTextNode(firstTarget.form.xformsStaticState.value));
     eventFiredElement.appendChild(staticStateElement);
     
     // Add dynamic state (element is just created and will be filled just before we send the request)
@@ -221,14 +227,27 @@ function xformsFireEvent(target, eventName, value, incremental, other) {
     eventFiredElement.appendChild(actionElement);
 
     // Add event
-    var eventElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event");
-    actionElement.appendChild(eventElement);
-    eventElement.setAttribute("name", eventName);
-    eventElement.setAttribute("source-control-id", target.id);
-    if (other != null)
-        eventElement.setAttribute("other-control-id", other.id);
-    if (value != null)
-        eventElement.appendChild(eventElement.ownerDocument.createTextNode(value));
+    var allEventsAreIncremental = true;
+    for (var i = 0; i < events.length; i++) {
+        // Extract information from event array
+        var event = events[i];
+        var target = event[0];
+        var eventName = event[1];
+        var value = event[2];
+        var incremental = event[3];
+        var other = event[4];
+        // Create <xxforms:event> element
+        var eventElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:event");
+        actionElement.appendChild(eventElement);
+        eventElement.setAttribute("name", eventName);
+        eventElement.setAttribute("source-control-id", target.id);
+        if (other != null)
+            eventElement.setAttribute("other-control-id", other.id);
+        if (value != null)
+            eventElement.appendChild(eventElement.ownerDocument.createTextNode(value));
+        if (!incremental)
+            allEventsAreIncremental = false;
+    }
 
     // If last request added to queue is incremental, remove it    
     if (document.xformsLastRequestIsIncremental && document.xformsNextRequests.length > 0) {
@@ -237,12 +256,18 @@ function xformsFireEvent(target, eventName, value, incremental, other) {
     }
 
     // Set as next request to execute and trigger execution
-    document.xformsLastRequestIsIncremental = incremental;
+    document.xformsLastRequestIsIncremental = allEventsAreIncremental;
     document.xformsNextRequests.push(eventFiredElement.ownerDocument);
-    document.xformsNextTargets.push(target);
+    // FIXME: this is used to retrieve the form and to avoid updating a field we are currently editing.
+    // We need a better way to do this.
+    document.xformsNextTargets.push(firstTarget);
     xformsExecuteNextRequest();
     
     return false;
+}
+
+function xformsCreateEventArray(target, eventName, value, incremental, other) {
+    return new Array(target, eventName, value, incremental, other);
 }
 
 function getEventTarget(event) {
@@ -275,7 +300,8 @@ function xformsInitCheckesRadios(control) {
             span = span.parentNode;
         }
         computeSpanValue(span);
-        xformsFireEvent(span, "xxforms-value-change-with-focus-change", span.value, false);
+        xformsFireEvents(new Array(xformsCreateEventArray
+                (span, "xxforms-value-change-with-focus-change", span.value, false)));
     }
 
     // Register event listener on every checkbox
@@ -368,7 +394,7 @@ function xformsInitializeControlsUnder(root) {
             if (control.tagName == "BUTTON") {
                 // Handle click
                 xformsAddEventListener(control, "click", function(event) {
-                    xformsFireEvent(getEventTarget(event), "DOMActivate", null, false);
+                    xformsFireEvents(new Array(xformsCreateEventArray(getEventTarget(event), "DOMActivate", null, false)));
                 });
             } else if (isXFormsCheckboxRadio) {
 
@@ -392,8 +418,8 @@ function xformsInitializeControlsUnder(root) {
                 var selectChanged = function (event) {
                     var select = getEventTarget(event);
                     computeSelectValue(select);
-                    xformsFireEvent(select, "xxforms-value-change-with-focus-change",
-                        select.selectValue, false);
+                    xformsFireEvents(new Array(xformsCreateEventArray(select, "xxforms-value-change-with-focus-change",
+                        select.selectValue, false)));
                 };
 
                 // Register event listener on select
@@ -475,14 +501,14 @@ function xformsInitializeControlsUnder(root) {
                 xformsAddEventListener(control, "change", function(event) {
                     // If previous change is still not handled, handle it now
                     if (document.xformsPreviousValueChanged) {
-                        xformsValueChanged(getEventTarget(event), false);
+                        xformsValueChanged(document.xformsPreviousValueChanged, false);
                         document.xformsPreviousValueChanged = null;
                     }
                     // Delay execution by 50 ms
                     document.xformsPreviousValueChanged = getEventTarget(event);
                     window.setTimeout(function() {
                         if (document.xformsPreviousValueChanged) {
-                            xformsValueChanged(getEventTarget(event), false);
+                            xformsValueChanged(document.xformsPreviousValueChanged, false);
                             document.xformsPreviousValueChanged = null;
                         }
                     });
@@ -493,16 +519,42 @@ function xformsInitializeControlsUnder(root) {
                     });
             }
 
-            if (!control.focusEventListenerRegistered) {
-                control.focusEventListenerRegistered = true;
+            if (!control.focusBlurEventListenerRegistered) {
+                control.focusBlurEventListenerRegistered = true;
+                xformsAddEventListener(control, "blur", function(event) {
+                    var target = getEventTarget(event);
+                    // If previous DOMFocusOut is still not handled, handle it now
+                    if (document.xformsPreviousDOMFocusOut) {
+                        xformsFireEvents(new Array(xformsCreateEventArray
+                            (document.xformsPreviousDOMFocusOut, "DOMFocusOut", null, false)));
+                        document.xformsPreviousDOMFocusOut = null;
+                    }
+                    // Delay execution by 50 ms
+                    document.xformsPreviousDOMFocusOut = getEventTarget(event);
+                    window.setTimeout(function() {
+                        if (document.xformsPreviousDOMFocusOut) {
+                            xformsFireEvents(new Array(xformsCreateEventArray
+                                (document.xformsPreviousDOMFocusOut, "DOMFocusOut", null, false)));
+                            document.xformsPreviousDOMFocusOut = null;
+                        }
+                    }, 50);
+                });
                 xformsAddEventListener(control, "focus", function(event) {
                     var target = getEventTarget(event);
                     if (document.xformsPreviousValueChanged) {
                         // We have just received a change event: combine both
                         xformsValueChanged(document.xformsPreviousValueChanged, false, target);
                         document.xformsPreviousValueChanged = null;
+                        document.xformsPreviousDOMFocusOut = null;
                     } else {
-                        // TODO: handle just focus change. Waiting for server to handle this.
+                        var events = new Array();
+                        if (document.xformsPreviousDOMFocusOut) {
+                            events.push(xformsCreateEventArray
+                                (document.xformsPreviousDOMFocusOut, "DOMFocusOut", null, false));
+                            document.xformsPreviousDOMFocusOut = null;
+                        }
+                        events.push(xformsCreateEventArray(target, "DOMFocusIn", null, false));
+                        xformsFireEvents(events);
                     }
                 });
             }

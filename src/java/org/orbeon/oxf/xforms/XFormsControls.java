@@ -570,9 +570,11 @@ public class XFormsControls {
 
         // Make it so that all the root ControlInfo don't have a parent
         final List rootChildren = rootControlInfo.getChildren();
-        for (Iterator i = rootChildren.iterator(); i.hasNext();) {
-            final ControlInfo currentControlInfo = (ControlInfo) i.next();
-            currentControlInfo.detach();
+        if (rootChildren != null) {
+            for (Iterator i = rootChildren.iterator(); i.hasNext();) {
+                final ControlInfo currentControlInfo = (ControlInfo) i.next();
+                currentControlInfo.detach();
+            }
         }
 
         result.setChildren(rootChildren);

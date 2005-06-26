@@ -41,6 +41,39 @@
             ul ul { list-style-image: url('/images/bullet1.gif') }
             a:hover { background: rgb(92,116,152); color: white }
         </style>
+        <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms"
+              xmlns:xi="http://www.w3.org/2003/XInclude"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema"
+              xmlns:xdt="http://www.w3.org/2004/07/xpath-datatypes">
+            <xforms:instance>
+                <form xmlns="">
+                    <action/>
+                    <show-errors/>
+                    <count>10</count>
+                    <comment>
+                        <date-created/>
+                        <name/>
+                        <email/>
+                        <uri/>
+                        <text/>
+                    </comment>
+                    <check>
+                        <value1></value1>
+                        <value2></value2>
+                        <value3/>
+                    </check>
+                </form>
+            </xforms:instance>
+            <xforms:bind nodeset="/form/check/value1" calculate="if (. castable as xs:integer) then . else xs:integer(seconds-from-time(current-time()))"/>
+            <xforms:bind nodeset="/form/check/value2" calculate="if (. castable as xs:integer) then . else xs:integer(minutes-from-time(current-time()))"/>
+            <xforms:bind nodeset="/form/comment/date-created" calculate="xs:string(adjust-dateTime-to-timezone(current-dateTime(), xdt:dayTimeDuration('PT0H')))"/>
+
+        <!--    <xforms:bind nodeset="/form/comment/email" constraint="normalize-space(.) = '' or matches(., '[A-Za-z0-9!#-''\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-''\*\+\-/=\?\^_`\{-~]+)*@[A-Za-z0-9!#-''\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-''\*\+\-/=\?\^_`\{-~]+)*')"/>-->
+<!--            <xforms:bind nodeset="/form/comment/text" constraint="normalize-space(.) != ''"/>-->
+
+            <xforms:bind nodeset="/form/check/value3" constraint=". castable as xs:positiveInteger and (xs:integer(.) = xs:integer(/form/check/value1) + xs:integer(/form/check/value2))"/>
+            <xforms:submission method="post"/>
+        </xforms:model>
     </head>
     <body>
         <table>
@@ -135,7 +168,7 @@
                             </xsl:for-each>
 
                             <xsl:if test="$only-post">
-                                <xforms:group ref="/form" xxforms:show-errors="{$instance/form/action != ''}">
+                                <xforms:group ref="/form">
                                     <!-- Display comment for preview if needed -->
                                     <xsl:if test="$instance/form/action = 'preview'">
                                         <p>

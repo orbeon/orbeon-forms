@@ -12,7 +12,8 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <grammar xmlns="http://relaxng.org/ns/structure/1.0"
-          xmlns:p="http://www.orbeon.com/oxf/pipeline">
+         datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+         xmlns:p="http://www.orbeon.com/oxf/pipeline">
 
     <start>
         <ref name="config"/>
@@ -69,6 +70,12 @@
             </optional>
             <optional>
                 <attribute name="encapsulation"/>
+            </optional>
+            <optional>
+                <!-- Because of XInclude -->
+                <attribute name="xml:base">
+                    <data type="anyURI"/>
+                </attribute>
             </optional>
 
             <interleave>

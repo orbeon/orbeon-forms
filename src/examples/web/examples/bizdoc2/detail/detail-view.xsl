@@ -35,6 +35,10 @@
                 <xforms:toggle case="message"/>
                 <xforms:toggle case="error-message"/>
             </xforms:action>
+            <xforms:action ev:event="xforms-insert">
+<!--                <xforms:setvalue ref="instance('main-instance')/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child[index('childSet')]/claim:birth-date"/>-->
+<!--                <xforms:setvalue ref="instance('main-instance')/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child[index('childSet')]/claim:first-name"/>-->
+            </xforms:action>
             <!-- The XForms instance with application data -->
             <xforms:instance id="main-instance">
                 <form xmlns="">
@@ -67,7 +71,7 @@
     <body>
         <div class="maincontent">
             <xforms:group ref="instance('main-instance')">
-                <xi:include href="../../bizdoc/summary/view-logo.xml"/>
+                <xi:include href="../summary/view-logo.xml"/>
 
                 <h2 style="margin-top: 0">Document Information</h2>
                 <p>
@@ -382,23 +386,17 @@
                                                         <xforms:help>Please enter a first name here</xforms:help>
                                                     </xforms:input>
                                                 </td>
-<!--                                                <td>-->
-<!--                                                    <xforms:trigger>-->
-<!--                                                        <xforms:label>X</xforms:label>-->
-<!--                                                        <xforms:delete ev:event="DOMActivate" nodeset="../claim:child" at="last()"/>-->
-<!--                                                    </xforms:trigger>-->
-<!--                                                </td>-->
                                             </tr>
                                         </xforms:repeat>
                                         <tr>
                                             <td colspan="2">
                                                 <xforms:trigger>
                                                     <xforms:label>Add Child</xforms:label>
-                                                    <xforms:insert ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()" position="after"/>
+                                                    <xforms:insert ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()" position="after"/><!-- index('childSet') -->
                                                 </xforms:trigger>
                                                 <xforms:trigger>
                                                     <xforms:label>Remove Child</xforms:label>
-                                                    <xforms:delete ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()"/>
+                                                    <xforms:delete ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()"/><!-- index('childSet') -->
                                                 </xforms:trigger>
                                             </td>
                                         </tr>

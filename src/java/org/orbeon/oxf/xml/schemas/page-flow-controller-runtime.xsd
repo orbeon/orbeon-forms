@@ -81,6 +81,7 @@
                         </sequence>
                         <attributeGroup ref="c:path"/>
                         <attribute name="xforms" type="string" use="optional"/>
+                        <attribute name="request-instance" type="string" use="optional"/>
                         <attribute name="model" type="string" use="optional"/>
                         <attribute name="view" type="string" use="optional"/>
                         <attribute name="id" type="string" use="optional"/>

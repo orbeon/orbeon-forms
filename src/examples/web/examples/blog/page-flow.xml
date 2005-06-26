@@ -37,9 +37,10 @@
     <page path-info="/blog/test/create-user" model="data-access/test-create-user.xpl"/>
     <page path-info="/blog/test/delete-posts" model="data-access/test-delete-posts.xpl"/>
 
+
     <!-- A user's blog post with comments -->
     <page id="post" path-info="/blog/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          xforms="recent-posts/recent-posts-xforms-model.xml"
+          request-instance="recent-posts/recent-posts-request-instance.xml"
           model="recent-posts/recent-posts-model.xpl"
           view="recent-posts/recent-posts-view.xpl">
         <param ref="/form/username"/>
@@ -75,7 +76,7 @@
 
     <!-- A user's blog -->
     <page path-info="/blog/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          xforms="recent-posts/recent-posts-xforms-model.xml"
+          request-instance="recent-posts/recent-posts-request-instance.xml"
           model="recent-posts/recent-posts-model.xpl"
           view="recent-posts/recent-posts-view.xpl">
         <param ref="/form/username"/>

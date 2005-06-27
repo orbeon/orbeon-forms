@@ -70,6 +70,9 @@
     <!-- Standalone PDF Upload example (contribution) -->
     <page path-info="/pdf-upload*" model="/examples/pdf/pdf-upload/page-flow.xpl"/>
 
+    <!-- Standalone PDF Template example -->
+    <page path-info="/pdf-template*" model="/examples/pdf/pdf-template/page-flow.xpl"/>
+
     <!-- Struts and JSF -->
     <page path-info="/faces/*" model="/jsf/config/model.xpl"/>
     <page path-info="/examples/jsf*" model="/jsf/config/model.xpl"/>

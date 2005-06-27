@@ -41,7 +41,7 @@
                 <p:input name="config" href="recent-posts-rss20.xsl"/>
                 <p:input name="data" href="#data"/>
                 <p:input name="request" href="#request"/>
-                <p:output name="data" ref="data"/>
+                <p:output name="data" ref="data" debug="zzz"/>
             </p:processor>
         </p:when>
         <p:otherwise>

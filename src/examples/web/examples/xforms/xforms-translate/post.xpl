@@ -16,32 +16,18 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-    <!-- Extract request body -->
-    <p:processor name="oxf:request">
-        <p:input name="config">
-            <config stream-type="xs:anyURI">
-                <include>/request/body</include>
-            </config>
-        </p:input>
-        <p:output name="data" id="request"/>
-    </p:processor>
-
-    <!-- Dereference URI and return XML -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" href="aggregate('config', aggregate('url', #request#xpointer(string(/request/body))))"/>
-        <p:output name="data" id="xml-request"/>
-    </p:processor>
+    <p:param name="instance" type="input"/>
 
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="translate.xpl"/>
-        <p:input name="source" href="#xml-request#xpointer(/translation/source)"/>
-        <p:input name="language-pair" href="#xml-request#xpointer(/translation/language-pair)"/>
+        <p:input name="source" href="#instance#xpointer(/translation/source)"/>
+        <p:input name="language-pair" href="#instance#xpointer(/translation/language-pair)"/>
         <p:output name="data" id="target"/>
     </p:processor>
     
     <!-- Build respnse -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#xml-request"/>
+        <p:input name="data" href="#instance"/>
         <p:input name="target" href="#target"/>
         <p:input name="config">
             <xsl:transform version="2.0">

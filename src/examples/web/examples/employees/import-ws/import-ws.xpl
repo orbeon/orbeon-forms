@@ -19,24 +19,10 @@
     xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
     xmlns:employee="http://orbeon.org/ops/examples/employee-demo/employee">
 
-    <!-- Extract request body as a URI -->
-    <p:processor name="oxf:request">
-        <p:input name="config">
-            <config stream-type="xs:anyURI">
-                <include>/request/body</include>
-            </config>
-        </p:input>
-        <p:output name="data" id="request"/>
-    </p:processor>
-
-    <!-- Dereference URI and return XML -->
-    <p:processor name="oxf:url-generator">
-        <p:input name="config" href="aggregate('config', aggregate('url', #request#xpointer(string(/request/body))))"/>
-        <p:output name="data" id="file"/>
-    </p:processor>
+    <p:param name="instance" type="input"/>
 
     <!-- Iterate over employees and insert them into the database -->
-    <p:for-each href="#file" select="/soapenv:Envelope/soapenv:Body/employee:employees/employee:employee">
+    <p:for-each href="#instance" select="/soapenv:Envelope/soapenv:Body/employee:employees/employee:employee">
         <p:processor name="oxf:pipeline">
             <p:input name="config" href="../data-access/update-employee.xpl"/>
             <p:input name="employee" href="current()"/>

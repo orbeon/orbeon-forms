@@ -49,9 +49,10 @@
         <example id="java" label="Integrating w/Java"/>
         <example id="authentication" label="J2EE Authentication" standalone="true"/>
     </section>
-    <section label="Document-Centric App">
+    <section label="Document-Centric Apps">
         <example id="bizdoc" label="&quot;BizDoc&quot; Classic"/>
         <example id="bizdoc2" label="&quot;BizDoc&quot; NG" xforms-ng="true"/>
+        <example id="blog" label="The OPS Blog" xforms-ng="true"/>
     </section>
     <section label="Database App">
         <example id="employees" label="The &quot;Employees&quot; Example"/>

@@ -349,13 +349,6 @@ a:hover {
     padding: 0.5em;
 }
 
-.maincontent img {
-    display: block;
-    position: relative;
-    left: 10em
-    background-color: white;
-}
-
 .maincontent b, .bold {
     color: &dark-color;;
 }

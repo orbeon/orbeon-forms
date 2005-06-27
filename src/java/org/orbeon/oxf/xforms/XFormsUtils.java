@@ -255,19 +255,19 @@ public class XFormsUtils {
      * @param instanceDocument
      * @param instanceWalker
      */
-    public static void updateInstanceData(Document instanceDocument, InstanceWalker instanceWalker) {
-        updateInstanceData(instanceDocument.getRootElement(), instanceWalker);
+    public static void iterateInstanceData(Document instanceDocument, InstanceWalker instanceWalker) {
+        iterateInstanceData(instanceDocument.getRootElement(), instanceWalker);
     }
 
-    private static void updateInstanceData(Element element, InstanceWalker instanceWalker) {
+    private static void iterateInstanceData(Element element, InstanceWalker instanceWalker) {
         instanceWalker.walk(element, (InstanceData) element.getData());
         for (Iterator i = element.attributes().iterator(); i.hasNext();) {
-            Attribute attribute = (Attribute) i.next();
+            final Attribute attribute = (Attribute) i.next();
             instanceWalker.walk(attribute, (InstanceData) element.getData());
         }
         for (Iterator i = element.elements().iterator(); i.hasNext();) {
-            Element child = (Element) i.next();
-            updateInstanceData(child, instanceWalker);
+            final Element child = (Element) i.next();
+            iterateInstanceData(child, instanceWalker);
         }
     }
 

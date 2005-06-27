@@ -31,6 +31,7 @@
             <xforms:instance id="buttons-state">
                 <buttons-state>
                     <finish relevant="false"/>
+                    <validity-count>0</validity-count>
                 </buttons-state>
             </xforms:instance>
             <xforms:instance id="formatted">
@@ -47,6 +48,12 @@
     <xhtml:body>
         <xhtml:p>
             <xforms:group ref="instance('text')">
+                <xforms:action ev:event="xforms-invalid">
+                    <xforms:setvalue ref="instance('buttons-state')/validity-count" value="instance('buttons-state')/validity-count - 1"/>
+                </xforms:action>
+                <xforms:action ev:event="xforms-valid">
+                    <xforms:setvalue ref="instance('buttons-state')/validity-count" value="instance('buttons-state')/validity-count + 1"/>
+                </xforms:action>
                 <xforms:switch>
                     <xforms:case id="firstname">
                         <xhtml:p>Step 1 of 3</xhtml:p>
@@ -95,6 +102,9 @@
                         </xhtml:p>
                         <xhtml:p>
                             Finish enabled: <xforms:output ref="instance('buttons-state')/finish/@relevant"/>
+                        </xhtml:p>
+                        <xhtml:p>
+                            Validity count: <xforms:output ref="instance('buttons-state')/validity-count"/>
                         </xhtml:p>
                         <xhtml:p>
                             <xforms:trigger>

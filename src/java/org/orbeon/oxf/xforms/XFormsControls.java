@@ -960,6 +960,31 @@ public class XFormsControls {
     }
 
     /**
+     * Find the list of control ids bound to a particular node.
+     */
+    public List findBoundControlIds(final PipelineContext pipelineContext, final Node node) {
+        final List[] result = new List[1];
+        visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlVisitorListener() {
+            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
+                final Node currentNode = getCurrentSingleNode();
+
+                if (currentNode == node) {
+                    if (result[0] == null)
+                        result[0] = new ArrayList();
+                    result[0].add(effectiveControlId);
+                }
+
+                return true;
+            }
+            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
+                return true;
+            }
+        });
+
+        return result[0];
+    }
+
+    /**
      * Represents the state of a tree of XForms controls.
      */
     public static class ControlsState {

@@ -31,13 +31,13 @@
     <body>
         <div class="maincontent">
             <p>
-                Welcome to the Employees example application!
+                Welcome to the OPS Employees example application!
             </p>
             <h2>What is it?</h2>
             <p>
                 This is a sample application for <a
-                href="http://www.orbeon.com/software/presentation-server">Orbeon Presentation
-                Server</a>. It illustrates the following functionality:
+                href="http://www.orbeon.com/software/presentation-server">Orbeon
+                PresentationServer</a>. It illustrates the following functionality:
             </p>
             <ul>
                 <li>CRUD operations, paging and sorting with a SQL backend</li>

@@ -22,7 +22,7 @@ var PATH_TO_JAVASCRIPT = "/oxf-theme/javascript/xforms.js";
 var ELEMENT_TYPE = document.createElement("dummy").nodeType;
 var ATTRIBUTE_TYPE = document.createAttribute("dummy").nodeType;
 var TEXT_TYPE = document.createTextNode("").nodeType;
-var XFORMS_DEBUG_WINDOW_HEIGHT = 300;
+var XFORMS_DEBUG_WINDOW_HEIGHT = 600;
 var XFORMS_DEBUG_WINDOW_WIDTH = 300;
 var XFORMS_ONE_REQUEST_FOR_EVENTS_IN_MS = 100;
 
@@ -196,7 +196,21 @@ function xformsLog(text) {
         debugDiv.style.left = visibleWidth - (XFORMS_DEBUG_WINDOW_WIDTH + 50) + "px";
         debugDiv.style.height = XFORMS_DEBUG_WINDOW_HEIGHT + "px";
         debugDiv.style.top = visibleHeight - (XFORMS_DEBUG_WINDOW_HEIGHT + 20) + "px";
+
+        // Add "clear" button
+        var clear = document.createElement("button");
+        clear.appendChild(document.createTextNode("Clear"));
+        debugDiv.appendChild(clear);
         document.body.insertBefore(debugDiv, document.body.firstChild);
+
+        // Handle click on clear button
+        xformsAddEventListener(clear, "click", function (event) {
+            var target = getEventTarget(event);
+            alert("click");
+            while (target.nextSibling)
+                target.parentNode.removeChild(target.nextSibling);
+            return false;
+        });
 
         // Make it so user can move the debug window
         xformsAddEventListener(debugDiv, "mousedown", function (event) {

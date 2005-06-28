@@ -57,9 +57,9 @@ function xformsUpdateStyle(element) {
 
                 // Initialize hint message on control if not set already
                 var control = document.getElementById(element.htmlFor);
-                if (!xformsIsDefined(control.hintMessage)) {
-                    control.hintMessage = xformsStringValue(element);
+                if (control.hintElement != element) {
                     control.hintElement = element;
+                    control.hintMessage = xformsStringValue(element);
                 }
 
                 // Update hint if it changed

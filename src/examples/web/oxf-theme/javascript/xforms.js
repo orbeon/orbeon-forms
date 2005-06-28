@@ -927,6 +927,12 @@ function xformsHandleResponse() {
                                                     var addSuffixToIds = function(element, idSuffix) {
                                                         if (element.id) element.id += idSuffix;
                                                         if (element.htmlFor) element.htmlFor += idSuffix;
+                                                        // Remove references to hint, help, alert, label as they might have changed
+                                                        if (xformsIsDefined(element.labelElement)) element.labelElement = null;
+                                                        if (xformsIsDefined(element.hintElement)) element.hintElement = null;
+                                                        if (xformsIsDefined(element.helpElement)) element.helpElement = null;
+                                                        if (xformsIsDefined(element.alertElement)) element.alertElement = null;
+                                                        element.styleListenerRegistered = false;
                                                         for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
                                                             var childNode = element.childNodes[childIndex];
                                                             if (childNode.nodeType == ELEMENT_TYPE)

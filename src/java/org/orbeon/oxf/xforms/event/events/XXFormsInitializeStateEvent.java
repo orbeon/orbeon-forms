@@ -16,13 +16,28 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.dom4j.Element;
 
 
 /**
  * Internal XXFORMS_INITIALIZE_STATE event.
  */
 public class XXFormsInitializeStateEvent extends XFormsEvent {
-    public XXFormsInitializeStateEvent(XFormsEventTarget targetObject) {
+
+    private Element divsElement;
+    private Element repeatIndexesElement;
+
+    public XXFormsInitializeStateEvent(XFormsEventTarget targetObject, Element divsElement, Element repeatIndexesElement) {
         super(XFormsEvents.XXFORMS_INITIALIZE_STATE, targetObject, false, false);
+        this.divsElement = divsElement;
+        this.repeatIndexesElement = repeatIndexesElement;
+    }
+
+    public Element getDivsElement() {
+        return divsElement;
+    }
+
+    public Element getRepeatIndexesElement() {
+        return repeatIndexesElement;
     }
 }

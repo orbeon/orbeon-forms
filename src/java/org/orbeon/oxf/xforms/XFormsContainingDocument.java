@@ -218,7 +218,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             final String[] eventsToDispatch = { XFormsEvents.XFORMS_MODEL_CONSTRUCT, XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE, XFormsEvents.XFORMS_READY };
             for (int i = 0; i < eventsToDispatch.length; i++) {
                 if (XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE.equals(eventsToDispatch[i])) {
-                    dispatchExternalEvent(pipelineContext, new XXFormsInitializeControlsEvent(this));
+                    dispatchExternalEvent(pipelineContext, new XXFormsInitializeControlsEvent(this, null, null));
                 }
                 for (Iterator j = getModels().iterator(); j.hasNext();) {
                     final XFormsModel currentModel = (XFormsModel) j.next();
@@ -226,15 +226,17 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
                 }
             }
         } else if (XFormsEvents.XXFORMS_INITIALIZE_STATE.equals(eventName)) {
+            final XXFormsInitializeStateEvent initializeStateEvent = (XXFormsInitializeStateEvent) xformsEvent;
             // Restore models state
             for (Iterator j = getModels().iterator(); j.hasNext();) {
                 final XFormsModel currentModel = (XFormsModel) j.next();
-                dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(currentModel));
+                dispatchEvent(pipelineContext, new XXFormsInitializeStateEvent(currentModel, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement()));
             }
-            dispatchExternalEvent(pipelineContext, new XXFormsInitializeControlsEvent(this));
+            dispatchExternalEvent(pipelineContext, new XXFormsInitializeControlsEvent(this, initializeStateEvent.getDivsElement(), initializeStateEvent.getRepeatIndexesElement()));
         } else if (XFormsEvents.XXFORMS_INITIALIZE_CONTROLS.equals(eventName)) {
             // Make sure controls are initialized
-            xformsControls.initialize(pipelineContext);
+            final XXFormsInitializeControlsEvent initializeControlsEvent = (XXFormsInitializeControlsEvent) xformsEvent;
+            xformsControls.initialize(pipelineContext, initializeControlsEvent.getDivsElement(), initializeControlsEvent.getRepeatIndexesElement());
         } else {
             throw new OXFException("Invalid event dispatched: " + eventName);
         }

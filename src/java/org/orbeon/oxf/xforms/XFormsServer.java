@@ -22,6 +22,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
@@ -674,39 +675,9 @@ public class XFormsServer extends ProcessorImpl {
         // Initialize XForms Engine
         containingDocument.initialize(pipelineContext);
         if (isInitializeEvent)
-            containingDocument.dispatchExternalEvent(pipelineContext, new org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent(containingDocument));
+            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
         else
-            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument));
-
-
-        final XFormsControls xFormsControls = containingDocument.getXFormsControls();
-        final XFormsControls.ControlsState initialControlsState = xFormsControls.getInitialControlsState();
-
-        // Set switch state
-        // TODO: send this info with XFormsEvents.XXFORMS_INITIALIZE_STATE event?
-        if (divsElement != null) {
-            for (Iterator i = divsElement.elements().iterator(); i.hasNext();) {
-                final Element divElement = (Element) i.next();
-
-                final String caseId = divElement.attributeValue("id");
-                final String visibility = divElement.attributeValue("visibility");
-
-                xFormsControls.updateSwitchInfo(caseId, "visible".equals(visibility));
-            }
-        }
-
-        // Set repeat index state
-        // TODO: send this info with XFormsEvents.XXFORMS_INITIALIZE_STATE event?
-        if (repeatIndexesElement != null) {
-            for (Iterator i = repeatIndexesElement.elements().iterator(); i.hasNext();) {
-                final Element repeatIndexElement = (Element) i.next();
-
-                final String repeatId = repeatIndexElement.attributeValue("id");
-                final String index = repeatIndexElement.attributeValue("index");
-
-                initialControlsState.updateRepeatIndex(repeatId, Integer.parseInt(index));
-            }
-        }
+            containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeStateEvent(containingDocument, divsElement, repeatIndexesElement));
 
         // Run automatic event if present
         if (eventElement != null) {

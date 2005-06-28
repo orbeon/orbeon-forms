@@ -36,8 +36,8 @@
                 <xforms:toggle case="error-message"/>
             </xforms:action>
             <xforms:action ev:event="xforms-insert">
-<!--                <xforms:setvalue ref="instance('main-instance')/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child[index('childSet')]/claim:birth-date"/>-->
-<!--                <xforms:setvalue ref="instance('main-instance')/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child[index('childSet')]/claim:first-name"/>-->
+<!--                <xforms:setvalue ref="instance('main-instance')/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child[index('children')]/claim:birth-date"/>-->
+<!--                <xforms:setvalue ref="instance('main-instance')/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child[index('children')]/claim:first-name"/>-->
             </xforms:action>
             <!-- The XForms instance with application data -->
             <xforms:instance id="main-instance">
@@ -372,7 +372,7 @@
                                             <th align="left">Birth Date</th>
                                             <th align="left">Name</th>
                                         </tr>
-                                        <xforms:repeat nodeset="claim:children/claim:child" id="childSet">
+                                        <xforms:repeat nodeset="claim:children/claim:child" id="children">
                                             <tr>
                                                 <td>
                                                     <xforms:input ref="claim:birth-date">
@@ -390,13 +390,18 @@
                                         </xforms:repeat>
                                         <tr>
                                             <td colspan="2">
+                                                Currently selected row: <xforms:output value="index('children')"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">
                                                 <xforms:trigger>
                                                     <xforms:label>Add Child</xforms:label>
-                                                    <xforms:insert ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()" position="after"/><!-- index('childSet') -->
+                                                    <xforms:insert ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()" position="after"/><!-- index('children') -->
                                                 </xforms:trigger>
                                                 <xforms:trigger>
                                                     <xforms:label>Remove Child</xforms:label>
-                                                    <xforms:delete ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()"/><!-- index('childSet') -->
+                                                    <xforms:delete ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()"/><!-- index('children') -->
                                                 </xforms:trigger>
                                             </td>
                                         </tr>

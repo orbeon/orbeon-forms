@@ -482,6 +482,8 @@ public class XFormsControls {
                         controlInfo = repeatControlInfo;
                     } else if (controlName.equals("submit")) {
                         controlInfo = new SubmitControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
+                    } else if (controlName.equals("output")) {
+                        controlInfo = new OutputControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else {
                         controlInfo = new ControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     }
@@ -525,8 +527,8 @@ public class XFormsControls {
                 }
 
                 // Get current value if possible for this control
-                if (isValueControl(controlName)) {
-                    controlInfo.setValue(XFormsInstance.getValueForNode(currentNode));
+                if (controlInfo.isValueControl()) {
+                    controlInfo.setValue(pipelineContext);
                 }
 
                 // Handle grouping controls
@@ -1250,7 +1252,7 @@ public class XFormsControls {
             return value;
         }
 
-        public void setValue(String value) {
+        private void setValue(String value) {
             this.value = value;
         }
 
@@ -1306,6 +1308,14 @@ public class XFormsControls {
             return true;
         }
 
+        public boolean isValueControl() {
+            return XFormsControls.isValueControl(getName());
+        }
+
+        public void setValue(PipelineContext pipelineContext) {
+            setValue(XFormsInstance.getValueForNode(getCurrentSingleNode()));
+        }
+
         public XFormsEventHandlerContainer getParentContainer() {
             return parent;
         }
@@ -1358,6 +1368,33 @@ public class XFormsControls {
         }
     }
 
+    /**
+     * Represents an xforms:output control.
+     */
+    public class OutputControlInfo extends ControlInfo {
+        public OutputControlInfo(ControlInfo parent, Element element, String name, String id) {
+            super(parent, element, name, id);
+        }
+
+        public void setValue(PipelineContext pipelineContext) {
+            final String valueAttribute = getElement().attributeValue("value");
+            final Node currentNode = getCurrentSingleNode();
+            if (valueAttribute == null) {
+                // Use default way of obtaining control value
+                super.setValue(pipelineContext);
+            } else {
+                // Value comes from the XPath expression within the value attribute
+                final String value = getCurrentModel().getDefaultInstance().evaluateXPathAsString(pipelineContext, currentNode,
+                        "string(" + valueAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(getElement()), null, functionLibrary, null);
+
+                super.setValue(value);
+            }
+        }
+    }
+
+    /**
+     * Represents an xforms:submit control.
+     */
     public class SubmitControlInfo extends ControlInfo {
         public SubmitControlInfo(ControlInfo parent, Element element, String name, String id) {
             super(parent, element, name, id);

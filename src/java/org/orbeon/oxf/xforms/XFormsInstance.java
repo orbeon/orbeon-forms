@@ -136,9 +136,9 @@ public class XFormsInstance implements XFormsEventTarget {
     /**
      * Evaluate an XPath expression on the instance and return its string value.
      */
-    public String evaluateXPathAsString(PipelineContext pipelineContext, String xpathExpression, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
+    public String evaluateXPathAsString(PipelineContext pipelineContext, Node contextNode, String xpathExpression, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
 
-        return documentXPathEvaluator.evaluateAsString(pipelineContext, xpathExpression, prefixToURIMap,
+        return documentXPathEvaluator.evaluateAsString(pipelineContext, contextNode, xpathExpression, prefixToURIMap,
                 variableToValueMap, functionLibrary, baseURI);
     }
 

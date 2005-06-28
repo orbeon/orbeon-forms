@@ -76,14 +76,14 @@ public class XFormsActionInterpreter {
             if (value != null) {
                 // Value to set is computed with an XPath expression
                 Map namespaceContext = Dom4jUtils.getNamespaceContextNoDefault(actionElement);
-                valueToSet = currentInstance.evaluateXPathAsString(pipelineContext, value, namespaceContext, null, xformsControls.getFunctionLibrary(), null);
+                valueToSet = currentInstance.evaluateXPathAsString(pipelineContext, xformsControls.getCurrentSingleNode(), value, namespaceContext, null, xformsControls.getFunctionLibrary(), null);
             } else {
                 // Value to set is static content
                 valueToSet = content;
             }
 
             // Set value on current node
-            Node currentNode = xformsControls.getCurrentSingleNode();
+            final Node currentNode = xformsControls.getCurrentSingleNode();
             XFormsInstance.setValueForNode(currentNode, valueToSet);
 
             if (actionContext != null) {
@@ -220,7 +220,7 @@ public class XFormsActionInterpreter {
                 // specified by attributes position and at."
 
                 final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
-                final String insertionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
+                final String insertionIndexString = currentInstance.evaluateXPathAsString(pipelineContext, xformsControls.getCurrentSingleNode(),
                         "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
                 // Don't think we will get NaN with XPath 2.0...
@@ -316,7 +316,7 @@ public class XFormsActionInterpreter {
                 final Element parentElement;
                 int deletionIndex;
                 {
-                    final String deletionIndexString = currentInstance.evaluateXPathAsString(pipelineContext,
+                    final String deletionIndexString = currentInstance.evaluateXPathAsString(pipelineContext, xformsControls.getCurrentSingleNode(),
                             "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
                     // Don't think we will get NaN with XPath 2.0...
@@ -417,7 +417,7 @@ public class XFormsActionInterpreter {
             final String indexXPath = actionElement.attributeValue("index");
 
             final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
-            final String indexString = currentInstance.evaluateXPathAsString(pipelineContext,
+            final String indexString = currentInstance.evaluateXPathAsString(pipelineContext, xformsControls.getCurrentSingleNode(),
                     "string(number(" + indexXPath + "))", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
 
             if ("NaN".equals(indexString)) {

@@ -78,9 +78,9 @@ public class DocumentXPathEvaluator {
     /**
      * Evaluate an XPath expression on the document and return its string value.
      */
-    public String evaluateAsString(PipelineContext pipelineContext, String xpath, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
+    public String evaluateAsString(PipelineContext pipelineContext, Node contextNode, String xpath, Map prefixToURIMap, Map variableToValueMap, FunctionLibrary functionLibrary, String baseURI) {
         PooledXPathExpression xpathExpression =
-                XPathCache.getXPathExpression(pipelineContext, documentWrapper.wrap(document), "string(" + xpath + ")",
+                XPathCache.getXPathExpression(pipelineContext, documentWrapper.wrap(contextNode), "string(" + xpath + ")",
                         prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
         try {
             return (String) xpathExpression.evaluateSingle();

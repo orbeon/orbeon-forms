@@ -372,12 +372,30 @@
                 <xsl:copy-of select="xxforms:repeat-delimiter($delimiter-namespace-uri, $delimiter-local-name, ())"/>
                 <!-- Is the current iteration selected? -->
                 <xsl:variable name="current-repeat-selected" as="xs:boolean" select="$repeat-selected and current() = $current-repeat-index/@index"/>
-                <xsl:apply-templates select="$xforms-repeat/*">
-                    <xsl:with-param name="id-postfix" select="concat($id-postfix, '-', current())" tunnel="yes"/>
-                    <xsl:with-param name="top-level-repeat" select="false()" tunnel="yes"/>
-                    <xsl:with-param name="generate-template" select="false()" tunnel="yes"/>
-                    <xsl:with-param name="repeat-selected" select="$current-repeat-selected" tunnel="yes"/>
-                </xsl:apply-templates>
+                <xsl:variable name="current-repeat-children" as="element()*">
+                    <xsl:apply-templates select="$xforms-repeat/*">
+                        <xsl:with-param name="id-postfix" select="concat($id-postfix, '-', current())" tunnel="yes"/>
+                        <xsl:with-param name="top-level-repeat" select="false()" tunnel="yes"/>
+                        <xsl:with-param name="generate-template" select="false()" tunnel="yes"/>
+                        <xsl:with-param name="repeat-selected" select="$current-repeat-selected" tunnel="yes"/>
+                    </xsl:apply-templates>
+                </xsl:variable>
+                <xsl:choose>
+                    <!-- If currently selected, add class xforms-repeat-selected-item -->
+                    <xsl:when test="$current-repeat-selected">
+                        <xsl:for-each select="$current-repeat-children">
+                            <xsl:copy>
+                                <xsl:attribute name="class" select="concat(if (@class) then concat(@class, ' ') else '',
+                                    'xforms-repeat-selected-item')"/>
+                                <xsl:copy-of select="@* except @class"/>
+                                <xsl:copy-of select="node()"/>
+                            </xsl:copy>
+                        </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:copy-of select="$current-repeat-selected"/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:for-each>
         </xsl:if>
 

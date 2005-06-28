@@ -701,6 +701,16 @@ ul {
     background: #ffc;
 }
 
+.xforms-debug {
+    background: #fc9;
+    position: absolute;
+    -moz-opacity:0.5;
+    opacity: 0.5;
+    filter:alpha(opacity=50);
+    border: 1px solid red;
+    font-size: 11px;
+}
+
 <!-- Styles used by xforms-to-xhtml.xsl -->
 .xferrtable    { border: 0; margin: 0px; padding: 0px; }
 .xferrtable td { border: 0; margin: 0px; padding: 0px; }

@@ -51,6 +51,8 @@
                     <username/>
                     <blog-id/>
                     <post-id/>
+                    <format/>
+                    <category/>
                     <count>10</count>
                     <comment>
                         <date-created/>
@@ -295,7 +297,7 @@
 <!--                                <ol>-->
                                     <xsl:for-each select="/*/feeds/feed">
                                         <li style="white-space: nowrap; list-style-type: none; margin-left: 0px; padding-left: 0px">
-                                            <a href="{link}">
+                                            <a href="{link}" f:url-type="resource">
                                                 <img src="/images/xml.gif" width="36" height="14" style="border: 0px; vertical-align: middle"/>
                                             </a>
                                             <xsl:text> </xsl:text>

@@ -25,14 +25,53 @@
 
     <!-- TODO: Separate data access -->
 
-    <!-- Create post document -->
+    <!-- Get post with given id  -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#params"/>
         <p:input name="config">
-            <post xsl:version="2.0">
-                <post-id><xsl:value-of select="/params/param[1]/value/string"/></post-id>
+            <query xsl:version="2.0">
                 <username><xsl:value-of select="/params/param[2]/value/string"/></username>
-                <blog-id></blog-id>
+                <post-id><xsl:value-of select="/params/param[1]/value/string"/></post-id>
+            </query>
+        </p:input>
+        <p:output name="data" id="post-query"/>
+    </p:processor>
+
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../data-access/get-post.xpl"/>
+        <p:input name="query" href="#post-query"/>
+        <p:output name="post" id="current-post"/>
+    </p:processor>
+
+    <!-- Call data access to get list of categories -->
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data" href="#current-post"/>
+        <p:input name="config">
+            <query xsl:version="2.0">
+                <username><xsl:value-of select="/*/username"/></username>
+                <blog-id><xsl:value-of select="/*/blog-id"/></blog-id>
+            </query>
+        </p:input>
+        <p:output name="data" id="categories-query"/>
+    </p:processor>
+
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../data-access/get-categories.xpl"/>
+        <p:input name="query" href="#categories-query"/>
+        <p:output name="categories" id="categories" debug="xxxcategories"/>
+    </p:processor>
+
+    <!-- Create updated post document -->
+    <p:processor name="oxf:xslt">
+        <p:input name="data" href="#params"/>
+        <p:input name="current-post" href="#current-post"/>
+        <p:input name="categories" href="#categories"/>
+        <p:input name="config">
+            <post xsl:version="2.0">
+                <xsl:variable name="current-post" select="doc('input:current-post')" as="document-node()"/>
+                <xsl:variable name="categories" select="doc('input:categories')/*/*" as="element()*"/>
+
+                <xsl:copy-of select="$current-post/(post-id|username|blog-id)"/>
                 <title><xsl:value-of select="/params/param[4]/value/struct/member[name = 'title']/value"/></title>
                 <description>
                     <xsl:copy-of select="saxon:parse(concat('&lt;root>', /params/param[4]/value/struct/member[name = 'description']/value, '&lt;/root>'))/*/node()"/>
@@ -42,9 +81,10 @@
                 <xsl:if test="/params/param[4]/value/struct/member[name = 'categories']/value/array/data/value/string[normalize-space(.) != '']">
                     <categories>
                         <xsl:for-each select="/params/param[4]/value/struct/member[name = 'categories']/value/array/data/value/string">
-                            <category-name>
-                                <xsl:value-of select="normalize-space(.)"/>
-                            </category-name>
+                            <xsl:variable name="category-name" select="normalize-space(.)"/>
+                            <category-id>
+                                <xsl:value-of select="($categories[name = $category-name]/id, $categories[1]/id)[1]"/>
+                            </category-id>
                         </xsl:for-each>
                     </categories>
                 </xsl:if>

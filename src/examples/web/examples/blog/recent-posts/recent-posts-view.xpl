@@ -24,7 +24,6 @@
     <p:processor name="oxf:request">
         <p:input name="config">
             <config>
-                <include>/request/parameters/parameter[name = 'format' or name = 'category']</include>
                 <include>/request/scheme</include>
                 <include>/request/server-name</include>
                 <include>/request/server-port</include>
@@ -34,8 +33,8 @@
         <p:output name="data" id="request"/>
     </p:processor>
 
-    <p:choose href="#request">
-        <p:when test="/*/parameters/parameter[name = 'format']/value = 'rss20'">
+    <p:choose href="#instance">
+        <p:when test="/*/format = 'rss20'">
             <!-- Generate RSS 2.0 feed -->
             <p:processor name="oxf:xslt">
                 <p:input name="config" href="recent-posts-rss20.xsl"/>

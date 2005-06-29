@@ -21,4 +21,9 @@
     <element name="count">
         <data type="positiveInteger"/>
     </element>
+    <optional>
+        <element name="category">
+            <data type="positiveInteger"/>
+        </element>
+    </optional>
 </element>

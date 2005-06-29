@@ -25,11 +25,32 @@
 
     <!-- TODO: Separate data access -->
 
-    <!-- Create post document -->
+    <!-- Call data access to get list of categories -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#params"/>
         <p:input name="config">
+            <query xsl:version="2.0">
+                <username><xsl:value-of select="/params/param[2]/value/string"/></username>
+                <blog-id><xsl:value-of select="/params/param[1]/value/string"/></blog-id>
+            </query>
+        </p:input>
+        <p:output name="data" id="categories-query"/>
+    </p:processor>
+
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="../data-access/get-categories.xpl"/>
+        <p:input name="query" href="#categories-query"/>
+        <p:output name="categories" id="categories" debug="xxxcategories"/>
+    </p:processor>
+
+    <!-- Create post document -->
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data" href="#params"/>
+        <p:input name="categories" href="#categories"/>
+        <p:input name="config">
             <post xsl:version="2.0" xmlns:uuid="java:org.orbeon.oxf.util.UUIDUtils">
+                <xsl:variable name="categories" select="doc('input:categories')/*/*" as="element()*"/>
+
                 <post-id><xsl:value-of select="uuid:createPseudoUUID()"/></post-id>
                 <username><xsl:value-of select="/params/param[2]/value/string"/></username>
                 <blog-id><xsl:value-of select="/params/param[1]/value/string"/></blog-id>
@@ -42,16 +63,17 @@
                 <xsl:if test="/params/param[4]/value/struct/member[name = 'categories']/value/array/data/value/string[normalize-space(.) != '']">
                     <categories>
                         <xsl:for-each select="/params/param[4]/value/struct/member[name = 'categories']/value/array/data/value/string">
-                            <category-name>
-                                <xsl:value-of select="normalize-space(.)"/>
-                            </category-name>
+                            <xsl:variable name="category-name" select="normalize-space(.)"/>
+                            <category-id>
+                                <xsl:value-of select="($categories[name = $category-name]/id, $categories[1]/id)[1]"/>
+                            </category-id>
                         </xsl:for-each>
                     </categories>
                 </xsl:if>
                 <comments/>
             </post>
         </p:input>
-        <p:output name="data" id="post"/>
+        <p:output name="data" id="post" debug="xxxnewpost"/>
     </p:processor>
 
     <!-- Insert it -->

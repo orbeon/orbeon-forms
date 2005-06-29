@@ -13,7 +13,7 @@
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
-        xmlns:xu="http://www.xmldb.org/xupdate"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         instance-passing="forward">
 
@@ -37,7 +37,6 @@
     <page path-info="/blog/test/create-user" model="data-access/test-create-user.xpl"/>
     <page path-info="/blog/test/delete-posts" model="data-access/test-delete-posts.xpl"/>
 
-
     <!-- A user's blog post with comments -->
     <page id="post" path-info="/blog/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
           default-submission="recent-posts/recent-posts-default-submission.xml"
@@ -46,30 +45,24 @@
         <setvalue ref="/form/username" matcher-group="1"/>
         <setvalue ref="/form/blog-id" matcher-group="2"/>
         <setvalue ref="/form/post-id" matcher-group="3"/>
+        <setvalue ref="/form/format" parameter="format"/>
+        <setvalue ref="/form/category" parameter="category"/>
         <action when="/form/action = 'save' and not(/form//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="recent-posts/do-save-comment.xpl">
-            <result page="post" instance-passing="redirect">
-                <xu:update select="/form/username">
-                    <xu:value-of select="doc('input:instance')/form/username"/>
-                </xu:update>
-                <xu:update select="/form/blog-id">
-                    <xu:value-of select="doc('input:instance')/form/blog-id"/>
-                </xu:update>
-                <xu:update select="/form/post-id">
-                    <xu:value-of select="doc('input:instance')/form/post-id"/>
-                </xu:update>
+            <result page="post" transform="oxf:xslt" instance-passing="redirect">
+                <form xsl:version="2.0" xmlns="">
+                    <username><xsl:value-of select="doc('input:instance')/form/username"/></username>
+                    <blog-id><xsl:value-of select="doc('input:instance')/form/blog-id"/></blog-id>
+                    <post-id><xsl:value-of select="doc('input:instance')/form/post-id"/></post-id>
+                </form>
             </result>
         </action>
         <action when="/form/action = 'cancel'">
-            <result page="post" instance-passing="redirect">
-                <xu:update select="/form/username">
-                    <xu:value-of select="doc('input:instance')/form/username"/>
-                </xu:update>
-                <xu:update select="/form/blog-id">
-                    <xu:value-of select="doc('input:instance')/form/blog-id"/>
-                </xu:update>
-                <xu:update select="/form/post-id">
-                    <xu:value-of select="doc('input:instance')/form/post-id"/>
-                </xu:update>
+            <result page="post" transform="oxf:xslt" instance-passing="redirect">
+                <form xsl:version="2.0" xmlns="">
+                    <username><xsl:value-of select="doc('input:instance')/form/username"/></username>
+                    <blog-id><xsl:value-of select="doc('input:instance')/form/blog-id"/></blog-id>
+                    <post-id><xsl:value-of select="doc('input:instance')/form/post-id"/></post-id>
+                </form>
             </result>
         </action>
     </page>
@@ -81,6 +74,8 @@
           view="recent-posts/recent-posts-view.xpl">
         <setvalue ref="/form/username" matcher-group="1"/>
         <setvalue ref="/form/blog-id" matcher-group="2"/>
+        <setvalue ref="/form/format" parameter="format"/>
+        <setvalue ref="/form/category" parameter="category"/>
     </page>
 
     <!-- Home Page for a user -->

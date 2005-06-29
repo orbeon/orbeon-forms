@@ -14,8 +14,6 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:oxf="http://www.orbeon.com/oxf/processors"
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-        xmlns:xu="http://www.xmldb.org/xupdate"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         instance-passing="forward">
 
     <!-- Files to serve directly (for standalone operation) -->

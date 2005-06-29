@@ -16,4 +16,6 @@
     <blog-id/>
     <count>10</count>
     <post-id/>
+    <format/>
+    <category/>
 </form>

@@ -30,7 +30,8 @@
                     {
                         (for $i in
                             (/post[username = '<xsl:value-of select="/query/username"/>'
-                                   and blog-id = '<xsl:value-of select="/query/blog-id"/>'])
+                                   and blog-id = '<xsl:value-of select="/query/blog-id"/>'
+                                   and ('<xsl:value-of select="/query/category"/>' = '' or categories/category-id = '<xsl:value-of select="/query/category"/>')])
                         order by xs:dateTime($i/date-created) descending
                         return $i)[position() le <xsl:value-of select="/query/count"/>]
                     }

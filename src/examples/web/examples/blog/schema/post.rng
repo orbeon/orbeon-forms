@@ -39,8 +39,8 @@
             <optional>
                 <element name="categories">
                     <oneOrMore>
-                        <element name="category-name">
-                            <data type="string"/>
+                        <element name="category-id">
+                            <data type="positiveInteger"/>
                         </element>
                     </oneOrMore>
                 </element>

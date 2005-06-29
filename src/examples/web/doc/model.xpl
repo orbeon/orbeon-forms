@@ -75,26 +75,6 @@
             </p:processor>
         </p:when>
         <p:otherwise>
-            <!-- Skin left navigation bar -->
-<!--            <p:processor name="oxf:xslt">-->
-<!--                <p:input name="data" href="aggregate('navigation', #instance, book.xml)"/>-->
-<!--                <p:input name="config" href="skin/xslt/html/book2menu.xsl"/>-->
-<!--                <p:output name="data" id="menu-skinned"/>-->
-<!--            </p:processor>-->
-
-            <!-- Skin body (based on page) -->
-<!--            <p:processor name="oxf:xslt">-->
-<!--                <p:input name="data" href="#body"/>-->
-<!--                <p:input name="config" href="skin/xslt/html/document2html.xsl"/>-->
-<!--                <p:output name="data" id="body-skinned"/>-->
-<!--            </p:processor>-->
-
-            <!-- Put left bar and body together -->
-<!--            <p:processor name="oxf:xslt">-->
-<!--                <p:input name="data" href="aggregate('site', #menu-skinned, #body-skinned)"/>-->
-<!--                <p:input name="config" href="skin/xslt/html/site2xhtml.xsl"/>-->
-<!--                <p:output name="data" id="html"/>-->
-<!--            </p:processor>-->
 
             <p:processor name="oxf:xslt">
                 <p:input name="config" href="view-html.xsl"/>

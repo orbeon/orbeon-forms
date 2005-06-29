@@ -32,9 +32,16 @@
                 <element name="page" minOccurs="0" maxOccurs="unbounded">
                     <complexType>
                         <sequence>
-                            <element name="param" minOccurs="0" maxOccurs="unbounded">
+                            <element name="param" minOccurs="0" maxOccurs="unbounded"><!-- deprecated -->
                                 <complexType>
                                     <attribute name="ref" type="string" use="required"/>
+                                </complexType>
+                            </element>
+                            <element name="setvalue" minOccurs="0" maxOccurs="unbounded">
+                                <complexType>
+                                    <attribute name="ref" type="string" use="required"/>
+                                    <attribute name="parameter" type="string" use="optional"/>
+                                    <attribute name="matcher-group" type="positiveInteger" use="optional"/>
                                 </complexType>
                             </element>
                             <element name="action" minOccurs="0" maxOccurs="unbounded">
@@ -81,7 +88,7 @@
                         </sequence>
                         <attributeGroup ref="c:path"/>
                         <attribute name="xforms" type="string" use="optional"/>
-                        <attribute name="initial-instance" type="string" use="optional"/>
+                        <attribute name="default-submission" type="string" use="optional"/>
                         <attribute name="model" type="string" use="optional"/>
                         <attribute name="view" type="string" use="optional"/>
                         <attribute name="id" type="string" use="optional"/>

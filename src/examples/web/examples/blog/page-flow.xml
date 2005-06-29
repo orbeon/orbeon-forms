@@ -40,12 +40,12 @@
 
     <!-- A user's blog post with comments -->
     <page id="post" path-info="/blog/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          initial-instance="recent-posts/recent-posts-initial-instance.xml"
+          default-submission="recent-posts/recent-posts-default-submission.xml"
           model="recent-posts/recent-posts-model.xpl"
           view="recent-posts/recent-posts-view.xpl">
-        <param ref="/form/username"/>
-        <param ref="/form/blog-id"/>
-        <param ref="/form/post-id"/>
+        <setvalue ref="/form/username" matcher-group="1"/>
+        <setvalue ref="/form/blog-id" matcher-group="2"/>
+        <setvalue ref="/form/post-id" matcher-group="3"/>
         <action when="/form/action = 'save' and not(/form//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="recent-posts/do-save-comment.xpl">
             <result page="post" instance-passing="redirect">
                 <xu:update select="/form/username">
@@ -76,11 +76,11 @@
 
     <!-- A user's blog -->
     <page path-info="/blog/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
-          initial-instance="recent-posts/recent-posts-initial-instance.xml"
+          default-submission="recent-posts/recent-posts-default-submission.xml"
           model="recent-posts/recent-posts-model.xpl"
           view="recent-posts/recent-posts-view.xpl">
-        <param ref="/form/username"/>
-        <param ref="/form/blog-id"/>
+        <setvalue ref="/form/username" matcher-group="1"/>
+        <setvalue ref="/form/blog-id" matcher-group="2"/>
     </page>
 
     <!-- Home Page for a user -->
@@ -88,7 +88,7 @@
           xforms="user-home/user-home-xforms-model.xml"
           model="user-home/user-home-model.xpl"
           view="user-home/user-home-view.xsl">
-        <param ref="/form/username"/>
+        <setvalue ref="/form/username" matcher-group="1"/>
     </page>
 
     <!-- Home Page -->

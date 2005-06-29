@@ -27,9 +27,9 @@
 
     <page path-info="/example-resources/xforms-upload/db-image/(.*)"
           matcher="oxf:perl5-matcher"
-          xforms="database-upload-xforms-model.xml"
+          default-submission="database-upload-default-submission.xml"
           model="database-upload-model.xpl">
-        <param ref="/form/image-id"/>
+        <setvalue ref="/form/image-id" matcher-group="1"/>
     </page>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>

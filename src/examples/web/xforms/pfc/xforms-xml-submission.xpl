@@ -17,7 +17,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-    <p:param name="initial-instance" type="input"/>
+    <p:param name="default-submission" type="input"/>
     <p:param name="matcher-result" type="input"/>
     <p:param name="setvalues" type="input" debug="xxxsetvalues"/>
     <p:param name="instance" type="output" debug="xxxsubmitted-instance"/>
@@ -29,7 +29,7 @@
                 <include>/request/container-type</include>
                 <include>/request/content-type</include>
                 <include>/request/method</include>
-                <include>/request/parameters/parameter[name = '$instance']</include>
+                <include>/request/parameters</include>
             </config>
         </p:input>
         <p:output name="data" id="request-info"/>
@@ -70,6 +70,7 @@
                         <p:input name="data" href="#raw-instance"/>
                         <p:input name="setvalues" href="#setvalues"/>
                         <p:input name="matcher-result" href="#matcher-result"/>
+                        <p:input name="request-info" href="#request-info"/>
                         <p:input name="config" href="request-params.xsl"/>
                         <p:output name="data" ref="instance"/>
                     </p:processor>
@@ -77,7 +78,7 @@
             </p:choose>
 
         </p:when>
-        <p:when test="(lower-case(/*/method) = 'get' or /*/container-type = 'portlet') and /*/parameters/parameter">
+        <p:when test="(lower-case(/*/method) = 'get' or /*/container-type = 'portlet') and /*/parameters/parameter[name = '$instance']">
             <!-- Check for XML GET with $instance parameter -->
 
             <!-- Decode parameter -->
@@ -86,7 +87,7 @@
                 <p:input name="config">
                     <xsl:stylesheet version="2.0" xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
                         <xsl:template match="/">
-                            <xsl:copy-of select="context:decodeXML(normalize-space(/*/parameters/parameter/value))"/>
+                            <xsl:copy-of select="context:decodeXML(normalize-space(/*/parameters/parameter[name = '$instance']/value))"/>
                         </xsl:template>
                     </xsl:stylesheet>
                 </p:input>
@@ -108,6 +109,7 @@
                         <p:input name="data" href="#raw-instance"/>
                         <p:input name="setvalues" href="#setvalues"/>
                         <p:input name="matcher-result" href="#matcher-result"/>
+                        <p:input name="request-info" href="#request-info"/>
                         <p:input name="config" href="request-params.xsl"/>
                         <p:output name="data" ref="instance"/>
                     </p:processor>
@@ -117,9 +119,9 @@
         </p:when>
         <p:otherwise>
             
-            <p:choose href="#initial-instance">
+            <p:choose href="#default-submission">
                 <p:when test="/null/@xsi:nill = 'true'">
-                    <!-- No submission and no initial instance, return null document -->
+                    <!-- No submission and no default submission, return null document -->
                     <p:processor name="oxf:identity">
                         <p:input name="data">
                             <null xsi:nil="true"/>
@@ -128,11 +130,12 @@
                     </p:processor>
                 </p:when>
                 <p:otherwise>
-                    <!-- No submission but there is an initial instance which may have to be updated -->
+                    <!-- No submission but there is a default submission which may have to be updated -->
                     <p:processor name="oxf:unsafe-xslt">
-                        <p:input name="data" href="#initial-instance"/>
+                        <p:input name="data" href="#default-submission"/>
                         <p:input name="setvalues" href="#setvalues"/>
                         <p:input name="matcher-result" href="#matcher-result"/>
+                        <p:input name="request-info" href="#request-info"/>
                         <p:input name="config" href="request-params.xsl"/>
                         <p:output name="data" ref="instance"/>
                     </p:processor>

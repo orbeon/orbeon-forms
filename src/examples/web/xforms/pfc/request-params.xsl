@@ -23,8 +23,9 @@
 
     <!-- Inputs -->
     <xsl:variable name="instance" select="/" as="document-node()"/>
-    <xsl:variable name="setvalues" select="document('input:setvalues')/*/(c:param | c:setvalue)" as="element()*"/>
-    <xsl:variable name="matcher-results" select="document('oxf:matcher-result')/*/group" as="element()*"/>
+    <xsl:variable name="setvalues" select="doc('input:setvalues')/*/(c:param | c:setvalue)" as="element()*"/>
+    <xsl:variable name="matcher-results" select="doc('input:matcher-result')/*/group" as="element()*"/>
+    <xsl:variable name="request-info" select="doc('input:request-info')/*" as="element()"/>
 
     <!-- Nodes pointed to by setvalues -->
     <!-- FIXME: Somehow we get a list of nodes from function:evaluate(); the last one appears to be the one we are looking fore -->
@@ -48,7 +49,20 @@
         <xsl:variable name="param-index" select="index-of($param-nodes-ids, generate-id())" as="xs:integer"/>
         <xsl:copy>
             <xsl:copy-of select="@*"/>
-            <xsl:value-of select="$matcher-results[$param-index]"/>
+            <xsl:choose>
+                <xsl:when test="$setvalues[$param-index]/@parameter">
+                    <!-- Parameter name -->
+                    <xsl:value-of select="$request-info/parameters/parameter[name = $setvalues[$param-index]/@parameter]/value"/>
+                </xsl:when>
+                <xsl:when test="$setvalues[$param-index]/@matcher-group">
+                    <!-- Matcher group index -->
+                    <xsl:value-of select="$matcher-results[xs:integer($setvalues[$param-index]/@matcher-group)]"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <!-- Backward compatibility mode -->
+                    <xsl:value-of select="$matcher-results[$param-index]"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:copy>
     </xsl:template>
 

@@ -471,7 +471,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         final String xformsAttribute = pageElement.attributeValue("xforms");
         final String modelAttribute = pageElement.attributeValue("model");
         final String viewAttribute = pageElement.attributeValue("view");
-        final String initialInstanceAttribute = pageElement.attributeValue("initial-instance");
+        final String defaultSubmissionAttribute = pageElement.attributeValue("default-submission");
 
         // Get params
         final List paramElements = pageElement.elements("param");
@@ -502,12 +502,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         final List actionElements = pageElement.elements("action");
 
         // Handle initial instance
-        final ASTOutput initialInstance = new ASTOutput("data", "initial-instance");
-        if (initialInstanceAttribute != null) {
+        final ASTOutput defaultSubmission = new ASTOutput("data", "default-submission");
+        if (defaultSubmissionAttribute != null) {
             statementsList.add(new ASTProcessorCall(XMLConstants.URL_GENERATOR_PROCESSOR_QNAME) {{
                 final String url;
                 try {
-                    url = URLFactory.createURL(controllerContext, initialInstanceAttribute).toExternalForm();
+                    url = URLFactory.createURL(controllerContext, defaultSubmissionAttribute).toExternalForm();
                 } catch (MalformedURLException e) {
                     throw new OXFException(e);
                 }
@@ -515,7 +515,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 configDocument.getRootElement().addText(url);
 
                 addInput(new ASTInput("config", configDocument));
-                addOutput(initialInstance);
+                addOutput(defaultSubmission);
             }});
         }
 
@@ -560,10 +560,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 addInput(new ASTInput("request", new ASTHrefId(requestWithParameters)));
                 addOutput(xformedInstance);
             }});
-            if (initialInstanceAttribute != null) {
-                // Make sure the initial-instance output is used for p:choose
+            if (defaultSubmissionAttribute != null) {
+                // Make sure the default-submission output is used for p:choose
                 statementsList.add(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", new ASTHrefId(initialInstance)));
+                    addInput(new ASTInput("data", new ASTHrefId(defaultSubmission)));
                 }});
             }
         } else {
@@ -577,10 +577,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addInput(new ASTInput("setvalues", Dom4jUtils.NULL_DOCUMENT));
                     addInput(new ASTInput("matcher-result", Dom4jUtils.NULL_DOCUMENT));
                 }
-                if (initialInstanceAttribute != null) {
-                    addInput(new ASTInput("initial-instance", new ASTHrefId(initialInstance)));
+                if (defaultSubmissionAttribute != null) {
+                    addInput(new ASTInput("default-submission", new ASTHrefId(defaultSubmission)));
                 } else {
-                    addInput(new ASTInput("initial-instance", Dom4jUtils.NULL_DOCUMENT));
+                    addInput(new ASTInput("default-submission", Dom4jUtils.NULL_DOCUMENT));
                 }
                 addOutput(xformedInstance);
             }});

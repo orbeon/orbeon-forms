@@ -82,9 +82,11 @@
     <page path-info="/examples/doc" view="/doc/stub-view.xml"/>
     <page path-info="/doc/book" model="/doc/book/model.xpl"/>
 
+    <page path-info="/doc/" matcher="oxf:perl5-matcher"
+        default-submission="/doc/default-submission.xml" model="/doc/model.xpl"/>
     <page path-info="/doc/(.*)" matcher="oxf:perl5-matcher"
-            xforms="/doc/xforms.xml" model="/doc/model.xpl">
-        <param ref="/form/page"/>
+            default-submission="/doc/default-submission.xml" model="/doc/model.xpl">
+        <setvalue ref="/form/page" matcher-group="1"/>
     </page>
 
     <!-- XPL specification -->
@@ -100,10 +102,8 @@
     <page path-info="/examples/portal/*" model="/portal/config/model.xpl"/>
 
     <!-- OXFMark -->
-    <page path-info="/examples/oxfmark-machines"
-        model="/oxfmark/machines.xpl"/>
-    <page path-info="/examples/oxfmark-vms"
-        model="/oxfmark/vms.xpl"/>
+    <page path-info="/examples/oxfmark-machines" model="/oxfmark/machines.xpl"/>
+    <page path-info="/examples/oxfmark-vms" model="/oxfmark/vms.xpl"/>
 
     <page path-info="/dmv*" model="/examples/erik/dmv/page-flow.xpl"/>
 

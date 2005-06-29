@@ -18,6 +18,7 @@
     <menu label="Getting Started">
         <menu-item label="Welcome" href="index"/>
         <menu label="Changes">
+            <menu-item label="Version 2.9" href="home-changes-29"/>
             <menu-item label="Version 2.8" href="home-changes-28"/>
             <menu-item label="Version 2.7" href="home-changes-27"/>
             <menu-item label="Version 2.6" href="home-changes-26"/>
@@ -35,7 +36,7 @@
             <menu-item label="XForms Reference" href="reference-xforms"/>
             <menu-item label="XForms Compliance" href="reference-xforms-compliance"/>
         </menu>
-        <menu-item label="Page Flow" href="reference-controller"/>
+        <menu-item label="Page Flow" href="reference-page-flow"/>
         <menu-item label="XPL and XML Pipelines" href="reference-xpl-pipelines"/>
         <menu-item label="Non-XML Documents" href="reference-formats"/>
         <menu-item label="Properties" href="reference-properties"/>

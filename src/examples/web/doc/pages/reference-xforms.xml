@@ -164,7 +164,7 @@
                 </ul>
                 <p>
                     In this chapter we will explore the first two of the three aspects above. You
-                    hook-up your backend logic for a page in your application page flow. The <a href="reference-controller">Page Flow Controller</a> documentation details how
+                    hook-up your backend logic for a page in your application page flow. The <a href="reference-page-flow">Page Flow Controller</a> documentation details how
                     this is done.
                 </p>
             </section>
@@ -1029,7 +1029,7 @@
                 typically implement the page model as a pipeline that receives the XForms instance
                 in input, and you can do anything you want in that pipeline, like querying a
                 database based on values entered by the end-user, or modifying the XForms instance
-                (see the <a href="reference-controller">Page Flow Controller reference
+                (see the <a href="reference-page-flow">Page Flow Controller reference
                 documentation</a> for more information on this).
             </p>
             <p>

@@ -52,7 +52,7 @@
                     </li>
                     <li>Control the application workflow
                         -
-                        <a href="reference-controller">Page Flow Controller</a>
+                        <a href="reference-page-flow">Page Flow Controller</a>
                     </li>
                     <li>Implement custom processors
                         -
@@ -93,7 +93,7 @@
                     Most frameworks and platforms fail to deliver on the promise of CBD (Component
                     Based Development). PresentationServer provides the infrastructure to build
                     modular applications with reusable XML components. In addition, the <a
-                    href="reference-controller">Web Application Controller</a> provides advanced
+                    href="reference-page-flow">Web Application Controller</a> provides advanced
                     separation of concerns by separating site logic, page logic, page layout, and
                     site presentation following the MVC architecture.
                 </p>

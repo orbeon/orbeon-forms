@@ -473,7 +473,7 @@
                         <li>
                             <p>
                                 For the sake of clarity we have renamed the Web Application
-                                Controller the <a href="reference-controller">Page Flow
+                                Controller the <a href="reference-page-flow">Page Flow
                                 Controller</a>. Similarly files that were in the examples and named
                                 <code>controller.xml</code> have been renamed
                                 <code>page-flow.xml</code>.

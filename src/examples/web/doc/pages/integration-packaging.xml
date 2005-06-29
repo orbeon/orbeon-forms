@@ -222,7 +222,7 @@
                     <li>
                         The Page Flow Controller now handles client requests and dispatches them
                         to other pipelines. For more information about the role of the controller,
-                        see the <link href="reference-controller">Page Flow Controller
+                        see the <link href="reference-page-flow">Page Flow Controller
                         reference</link>.
                     </li>
                 </p>

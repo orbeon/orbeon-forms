@@ -35,7 +35,7 @@
         </section>
         <note>
             The Request generator can be used as the first component in a web application pipeline,
-            but it is recommended to use the <a href="reference-controller">Page Flow
+            but it is recommended to use the <a href="reference-page-flow">Page Flow
             Controller</a> and <a href="reference-xforms">XForms</a> whenever possible. There are
             cases where additional data from the request may be required, however, and where the
             Request generator must be used.

@@ -303,7 +303,7 @@
             </xml-source>
             <note>
                 It is recommended, whenever possible, to use the <link
-                href="reference-controller">Page Flow Controller</link> to perform page
+                href="reference-page-flow">Page Flow Controller</link> to perform page
                 redirections within a PresentationServer application. The Page Flow Controller
                 provides a much higher-level abstraction of the notion of redirection than the
                 Redirect Processor.

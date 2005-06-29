@@ -440,7 +440,7 @@
                     <li>
                         The <code>xforms-output-prologue</code> attribute was broken
                         in 2.0.0, 2.0.1 and 2.0.2. It now works as described in the
-                        <link href="reference-controller">Web Application
+                        <link href="reference-page-flow">Web Application
                         Controller section</link>.
                     </li>
                     <li>
@@ -1366,9 +1366,9 @@ select * from ps_book
                 <p>
                     In the Web Application Controller configuration, the <code>xforms</code>,
                     <code>model</code> and <code>view</code> attributes had to point to an XPL
-                    document. In this version, <link href="reference-controller#page-element">XPL,
+                    document. In this version, <link href="reference-page-flow#page-element">XPL,
                     XSLT and regular XML documents</link> are supported. In addition, a new
-                    mechanism allows <link href="reference-controller#passing-parameters">passing
+                    mechanism allows <link href="reference-page-flow#passing-parameters">passing
                     URL fragments to the model through the instance</link> using matchers.
                 </p>
 
@@ -1380,7 +1380,7 @@ select * from ps_book
 
                 <p>
                     The <code>view</code> element in the Web Application Controller configuration
-                    has a <link href="reference-controller#view-element">new optional
+                    has a <link href="reference-page-flow#view-element">new optional
                     attribute</link>: <code>xforms-output-prologue</code>. This attribute points to
                     an XSL (or XPL) file which is applied to the view before the XForms elements are
                     transformed into HTML-like attributes.
@@ -1500,7 +1500,7 @@ select * from ps_book
                 <title>New Namespace for Web Application Controller Configurations</title>
 
                 <p>Elements in the
-                    <link href="reference-controller">Web App
+                    <link href="reference-page-flow">Web App
                         Controller</link> configuration file must use the namespace
                     <code>http://www.orbeon.com/oxf/controller</code>. With the previous
                     version, there was no namespace declaration.

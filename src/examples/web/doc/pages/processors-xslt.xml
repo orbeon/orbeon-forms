@@ -198,12 +198,12 @@
                 <tr>
                     <td>oxf:pfc-xslt-1.0</td>
                     <td>XSLT 1.0</td>
-                    <td>Default JAXP (TrAX) XSLT 1.0 transformer used by the <a href="reference-controller">Page Flow Controller</a> (currently Saxon 8)</td>
+                    <td>Default JAXP (TrAX) XSLT 1.0 transformer used by the <a href="reference-page-flow">Page Flow Controller</a> (currently Saxon 8)</td>
                 </tr>
                 <tr>
                     <td>oxf:pfc-xslt-2.0</td>
                     <td>XSLT 2.0</td>
-                    <td>Default JAXP (TrAX) XSLT 2.0 transformer used by the <a href="reference-controller">Page Flow Controller</a> (currently Saxon 8)</td>
+                    <td>Default JAXP (TrAX) XSLT 2.0 transformer used by the <a href="reference-page-flow">Page Flow Controller</a> (currently Saxon 8)</td>
                 </tr>
             </table>
             <p>

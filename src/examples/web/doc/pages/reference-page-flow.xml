@@ -1,0 +1,620 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
+    <header>
+        <title>Page Flow</title>
+    </header>
+    <body>
+        <section>
+            <title>What is the Page Flow Controller?</title>
+            <p>
+                The OPS Page Flow Controller dispatches incoming user requests to individual pages
+                based on a declarative description of the pages, built out of models and views,
+                following the model-view-controller (MVC) architecture.
+            </p>
+            <p>
+                A Page Flow is an easy to use yet powerful way to declare an entire site's
+                navigation logic. With a central place where the navigation logic is defined, pages
+                can be developed completely independently from each other.
+            </p>
+        </section>
+
+        <section>
+            <title>Separation of Concerns</title>
+
+            <img print-format="pdf" src="pages/reference-controller-oxf-app.png"
+                style="float: right; margin-left: 1em"/>
+
+            <p>
+                The Page Flow Controller encourages designing applications with a total separation
+                between:
+            </p>
+
+            <ul>
+                <li><p><b>Site Logic</b> or <b>Page Flow</b>: when, and how to navigate from one
+                page to the other.</p></li>
+
+                <li><p><b>Page Logic</b> (the Model in MVC): how data entered by the user is
+                processed (for example validated, then fed to a backend), and how data is retrieved
+                from a backend.</p></li>
+
+                <li><p><b>Page Layout</b> (the View in MVC): how information is displayed and
+                presented to the user on the browser.</p></li>
+
+                <li><p><b>Site Presentation</b>: the layout and look and feel common to all pages in
+                the Web application or the Web site, e.g.: site navigation menus, headers and
+                footers, table backgrounds, or number formatting.</p></li>
+            </ul>
+            <p style="clear: right"/>
+
+            <section>
+                <title>Site Logic</title>
+
+                <img print-format="pdf" src="pages/reference-controller-navigation.png"
+                    style="float: right; margin-left: 1em"/>
+
+                <p>
+                    The site logic, also called page flow, describes the conditions that trigger the
+                    navigation from one page to the other. It also describes how arguments are passed
+                    from one page to the other. In a simple Web application simulating an ATM, the
+                    navigation logic could be similar to the one described in the diagram on the right.
+                    In this diagram, the square boxes represent pages and diamond-shaped boxes represent
+                    actions performed by the end-user.
+                </p>
+
+                <p>
+                    With the Page Flow Controller, the site logic is expressed outside of the
+                    pages. Consequently, the pages can be completely independent from each other.
+                    The benefits of a clear separation between site logic and page logic and layout
+                    include:
+                </p>
+
+                <ul>
+                    <li>Simplicity: the site logic is declared in one place and in a declarative
+                    way. You don't need to write custom logic to perform redirects between pages or
+                    pass arguments from page to page.</li>
+
+                    <li>Maintainability: having different developers implementing independent page
+                    becomes much easier. Since the relationship between pages is clearly stated in
+                    the Page Flow, it also becomes much easier to modify a page in an existing
+                    application without affecting other pages.</li>
+                </ul>
+
+                <p style="clear: right"/>
+            </section>
+
+            <section>
+                <title>Page Logic and Layout</title>
+
+                <p>
+                    In the <link href="model2x-intro">MVC architecture</link>, the page logic is
+                    in the <i>model</i>, and the page layout in the <i>view</i>. The MVC
+                    architecture promotes the separation of the model, view and controller:
+                </p>
+
+                <ul>
+                    <li><b>The model</b> is responsible for calling or implementing the business
+                    logic. In some cases the model produces data that is going to be displayed by
+                    the view.</li>
+
+                    <li><b>The view</b> receives data from the model and usually generates an HTML
+                    page.</li>
+
+                    <li><b>The controller</b> is responsible for dispatching a request to the
+                    appropriate model/view and connecting the model with the view.</li>
+                </ul>
+
+                <p>For instance, for a news page, the model would retrieve the list of headlines and
+                pass this information in an XML format to the view. The view would produce an HTML
+                page by creating a table with those headlines and potentially adding a logo at the
+                top of the page, a copyright at the bottom, and so on.</p>
+
+                <img print-format="pdf" src="pages/reference-controller-mvc.png"/>
+            </section>
+            <anchor id="epilogue"/>
+            <section>
+                <title>Site Presentation</title>
+
+                <p>
+                    In general, you want to have a common look and feel across pages. Instead of
+                    duplicating the code implementing this look and feel in every view, it is
+                    possible to put the presentation logic in a central location called the
+                    epilogue. If specified, the epilogue points to the pipeline which is applied to
+                    the XML data produced by the view of each page, as shown in the following
+                    diagram.
+                </p>
+
+                <img print-format="pdf" src="pages/reference-controller-epilogue.png"/>
+
+                <p>The configuration below shows an epilogue as represented in the previous
+                example.</p>
+
+                <xml-source>
+                    <config>
+                        <page path-info="/login" model="login/model.xpl" view="login/view.xml"/>
+                        <page path-info="/search" model="search/model.xpl" view="search/view.xml"/>
+                        <epilogue url="epilogue.xpl"/>
+                    </config>
+                </xml-source>
+            </section>
+        </section>
+
+        <section>
+            <title>The Configuration File</title>
+            <section>
+                <title>Overview</title>
+
+                <p>
+                    A <link href="reference-page-flow">Page Flow</link> file is comprised of three
+                    parts:
+                </p>
+
+                <ul>
+                    <li>The <code>files</code> elements list the files that must be sent directly
+                    to the client, such as images or CSS files.</li>
+
+                    <li>The <code>page</code> elements declare pages or groups of similar pages and
+                    define the XForms model, the MVC model, and the MVC view for each page.</li>
+
+                    <li>The <code>epilogue</code> and <code>not-found-handler</code> elements
+                    define properties that apply to all the pages.</li>
+                </ul>
+            </section>
+            <section>
+                <title>Static Files</title>
+
+                <p>Some files are not dynamically generated and need to be sent to the client
+                as-is. This is typically the case for GIF, JPEG, and CSS files.</p>
+
+                <p>You can add one or more <code>files</code> elements in the controller
+                configuration as illustrated in the example below:</p>
+
+                <xml-source>
+                    <config>
+                        <files path-info="*.gif"/>
+                        <files path-info="*.css"/>
+                        <files path-info="*.png"/>
+                        <page path-info="/login" model="login/model.xpl" view="login/view.xml"/>
+                    </config>
+                </xml-source>
+
+                <p>
+                    This specifies the files that must be sent directly to the client. For example,
+                    if you set <code>&lt;files path-info="*.gif"/&gt;</code> and a request comes in
+                    for <code>images/logo.gif</code> then the file <code>images/logo.gif</code>
+                    stored in the resource repository will be sent in response to that request.
+                </p>
+            </section>
+            <section>
+                <title>Pages</title>
+
+                <p>Consider a "view account" page in a hypothetical ATM Web application. The page
+                displays the current balance and lets the user enter an amount of money to withdraw
+                from the account. It could look like:</p>
+
+                <img print-format="png" src="pages/reference-controller-atm-screen.png" width="401" height="126"/>
+
+                <p>This page is composed of different parts (also illustrated in the figure
+                below):</p>
+
+                <ul>
+                    <li><b>The XForms model</b> declares the data model of the form, and other form
+                    related information as described in the <link href="processors-xforms">XForms
+                    processor</link> section.</li>
+
+                    <li><b>The model</b> retrieves the current balance.</li>
+
+                    <li><b>The view</b> displays the balance, and the form for the user to enter
+                    the amount to withdraw.</li>
+
+                    <li><b>An action</b> is executed when the user enters an amount in the text
+                    field. This action checks if the amount entered is inferior or equal to the
+                    account balance. If it is, the balance is decreased by the amount entered and
+                    the transaction is considered valid. Otherwise, the transaction is considered
+                    illegal. Depending on the validity of the transaction, a different page is
+                    displayed. If the transaction is valid, the <code>anything-else</code> page is
+                    displayed; otherwise the <code>low-balance</code> page is displayed.</li>
+                </ul>
+
+                <img print-format="pdf" src="pages/reference-controller-atm-logic.png"/>
+
+
+                <p>This situation is described in the Page Flow with:</p>
+
+                <xml-source>
+                    <page id="view-account" path-info="/view-account" xforms="view-account-form.xml"
+                            model="view-account-get-balance.xpl" view="view-account-view.xsl">
+                        <action when="/amount != ''" action="view-account-action.xpl">
+                            <result id="success" when="/success = 'true'" page="anything-else"/>
+                            <result id="failure" when="/success = 'false'" page="low-balance"/>
+                        </action>
+                    </page>
+                </xml-source>
+
+                <ul>
+                    <li>On the <code>&lt;page&gt;</code> element:
+
+                    <ul>
+                        <li>The <code>path-info</code> attribute tells the Page Flow Controller
+                        what relative URI corresponds to this page. The URI is relative to the
+                        application context path.</li>
+
+                        <li>The <code>xforms</code> attribute points to the XForms model.</li>
+
+                        <li>The <code>model</code> attribute points to the page model.</li>
+
+                        <li>The <code>view</code> attribute points to the page view.</li>
+
+                        <li>The <code>xforms</code>, <code>model</code>, and <code>view</code>
+                        attributes point to a static XML file, an XSL stylesheet or an XPL pipeline.
+                        More on this in <link href="#combinations">a subsequent section</link>.</li>
+                    </ul>
+                    </li>
+
+                    <li>The <code>&lt;page&gt;</code> element can contain zero or more
+                    <code>&lt;action&gt;</code> elements. They are named <i>action</i> because they
+                    are executed as a result of an action performed by the end-user. Typically by
+                    clicking on a button or a link.
+
+                    <ul>
+                        <li>The <code>when</code> attributes are evaluated. The first one with a
+                        <code>true</code> value is executed. The <code>when</code> is an XPath
+                        expression executed against the XForms instance. The <code>when</code>
+                        attribute is optional. A missing <code>when</code> attribute is equivalent
+                        to <code>when="true()"</code>.</li>
+
+                        <li>When the action is executed, if the optional <code>action</code>
+                        attribute is present, the pipeline it points to is executed.</li>
+                    </ul>
+                    </li>
+
+                    <li>The <code>&lt;action&gt;</code> element can contain zero or more
+                    <code>&lt;result&gt;</code> elements.
+
+                    <ul>
+                        <li>If an <code>action</code> attribute is specified on the
+                        <code>&lt;action&gt;</code> element, the <code>&lt;result&gt;</code> element
+                        can have a <code>when</code> attribute. The <code>when</code> is an XPath
+                        expression executed against the data output of the action pipeline. A
+                        missing <code>when</code> attribute is equivalent to
+                        <code>when="true()"</code>. The first <code>&lt;result&gt;</code> with a
+                        true <code>when</code> attribute is executed.</li>
+
+                        <li>A <code>&lt;result&gt;</code> element optionally has a <code>page</code>
+                        attribute. The <code>page</code> attribute points to a page id, declared in
+                        the same Page Flow file. When the result is executed and the
+                        <code>page</code> attribute is present, the user is forwarded to the
+                        corresponding page.</li>
+
+                        <li>A <code>&lt;result&gt;</code> element can optionally contain <link
+                        href="processors-xupdate">XUpdate instructions</link>. If present the
+                        XUpdate is run against the XForms instance. The XForms instance is either
+                        the current instance if the <code>page</code> attribute is missing or the
+                        XForms instance of the corresponding page otherwise. The updated instance is
+                        used for the rest of the processing if the <code>page</code> attribute is
+                        missing, or passed to the other page otherwise.</li>
+                    </ul>
+                    </li>
+                </ul>
+
+                <p>See the following examples to understand how <code>&lt;page&gt;</code>,
+                <code>&lt;action&gt;</code>, and <code>&lt;result&gt;</code> can be used in the Web
+                application controller configuration:</p>
+
+                <ul>
+                    <li><link href="../examples/source?src=config/page-flow.xml">The PresentationServer showcase
+                    application main configuration</link></li>
+
+                    <li><link href="../examples/source?src=atm%2Fpage-flow.xml">The ATM example
+                    configuration</link></li>
+                </ul>
+
+                <p>For further information please also see the <a href="Tutorial.pdf">Orbeon
+                PresentationServer Tutorial</a>.</p>
+
+            </section>
+            <section>
+                <title>Path info and matchers</title>
+
+                <p>
+                    The value of the <code>path-info</code> attribute can be either a simple or a
+                    custom pattern.
+                </p>
+
+
+                <table ca="|l|p{0.5\textwidth}|">
+                    <tr>
+                        <th>Value</th>
+                        <th>Description</th>
+                    </tr>
+
+                    <tr>
+                        <td>Simple</td>
+                        <td>
+                            Simple pattern can optionally start or end with a star character (
+                            <code>*</code>). For instance: <code>/about/company.html</code> matches
+                            exactly this URI, <code>about/*</code> matches any URI that starts with
+                            <code>about/</code>, <code>*.gif</code> matches any URI that ends with
+                            <code>.gif</code>.
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>Custom</td>
+                        <td>
+                            In this case, an additional <code>matcher</code> argument must be
+                            specified. The <code>matcher</code> argument must point to a matcher
+                            processor URI. Two matcher processors are provided with PresentationServer: the Perl5
+                            matcher (URI <code>oxf/processor/perl5-matcher</code>) and the Glob
+                            matcher (URI <code>oxf/processor/glob-matcher</code>). The Perl5 matcher
+                            accepts <link
+                            href="http://www.perl.com/doc/manual/html/pod/perlre.html">Perl regular
+                            expressions</link> and the Glob matcher accepts <link
+                            href="http://jakarta.apache.org/oro/api/org/apache/oro/text/GlobCompiler.html">Unix
+                            shell glob expressions</link>.
+                        </td>
+                    </tr>
+
+                </table>
+
+
+                <p>
+                    This is an example of <code>files</code> element using the Perl5 matcher:
+                </p>
+
+
+                <xml-source>
+                    <files path-info="/doc/[^.]*\.html" matcher="oxf:perl5-matcher"/>
+                </xml-source>
+
+                <p>
+                    As with the <code>files</code> element, a matcher can also be specified. When
+                    using a matcher where groups can be created, the part of the URI matched by
+                    those groups can be passed to the model and the view through the XForms
+                    instance. Note that the only matcher bundled with PresentationServer that
+                    accepts groups is the Perl5 matcher. For example, if you have the following
+                    configuration:
+                </p>
+
+                <xml-source>
+                    <page path-info="/([^/]*)/(.*)"
+                        matcher="oxf:perl5-matcher"
+                        xforms="xforms.xml"
+                        view="view.xsl">
+                        <param ref="/form/directory"/>
+                        <param ref="/form/file"/>
+                    </page>
+                </xml-source>
+
+                <p>
+                    And the content of the <code>xforms.xml</code> file is:
+                </p>
+
+                <xml-source>
+                    <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+                        <xforms:instance>
+                            <form>
+                                <directory/>
+                                <file/>
+                            </form>
+                        </xforms:instance>
+                    </xforms:model>
+                </xml-source>
+
+                <p>
+                    If the requested URI is <code>/doc/webapp-controller</code>, the instance
+                    received by the model and the view is:
+                </p>
+
+                <xml-source>
+                    <form>
+                        <directory>doc</directory>
+                        <file>webapp-controller</file>
+                    </form>
+                </xml-source>
+            </section>
+            <a name="view-element"/>
+            <section>
+                <title>Site Presentation</title>
+                <p>
+                    The <code>epilogue</code> element specifies the pipeline applying the
+                    application's site presentation logic.
+                </p>
+                <!--
+                <ul>
+                    <p>
+                        <li>
+                            Specifying the <i>epilogue</i> pipeline. This is the pipeline executed
+                            after each view. This attribute is optional. See the <link
+                            href="#epilogue">epilogue section</link> for more information.
+                        </li>
+                    </p>
+
+                    <p>
+                        <li>
+                            When XForms is used, the XForms elements generated by the view (e.g.
+                            <code>&lt;xforms:submit&gt; &lt;xforms:label&gt;Go!&lt;/xforms:label&gt;
+                            &lt;/xforms:submit&gt;</code>) are transformed into HTML-like elements
+                            (e.g. <code>&lt;input type="submit" value="Go!"/&gt;</code>). <br/> This
+                            transformation is performed before the epilogue is executed. In some
+                            cases, you might want to apply a system-wide transformation on the
+                            XForms elements before they are changed into HTML-like elements. You can
+                            do this by adding an <code>xforms-output-prologue</code> attribute to
+                            the <code>view</code> element. This attribute must point to either an
+                            XSL file or an XPL file with one input named <code>data</code> and one
+                            output named <code>data</code>.
+                        </li>
+                    </p>
+
+                    <p>
+                        <li>
+                            Specifying the namespace prefix and the URI used by the XForms output
+                            with the <code>xforms-output-namespace-prefix</code> and
+                            <code>xforms-output-namespace-uri</code> attributes. These two
+                            attributes are required when XForms is used. See the <link
+                            href="processors-xforms#output">XForms Output processor
+                            documentation</link> for more information on the output namespace prefix
+                            and URI.
+                        </li>
+                    </p>
+                </ul>
+                -->
+                <p>
+                    This is an example of <code>epilogue</code> element:
+                </p>
+                <xml-source>
+                    <epilogue url="oxf:/config/epilogue.xpl"/>
+                </xml-source>
+            </section>
+            <anchor id="not-found-handler"/>
+            <section>
+                <title>"Not Found" Handler</title>
+                <p>
+                    The <code>not-found-handler</code> element is used to specify the id of a page
+                    that is called when no <code>page</code> element in the Page Flow file matches
+                    the current request URL. There can be only one <code>not-found-handler</code>
+                    per Page Flow file.
+                </p>
+                <p>
+                    This is an example of <code>not-found-handler</code> element and the associated
+                    <code>page</code> element:
+                </p>
+                <xml-source>
+                    <comment> "Not Found" page displayed when no page matches the request URL </comment>
+                    <page id="not-found" path-info="/not-found" view="/config/not-found.xml"/>
+                    <not-found-handler page="not-found"/>
+                </xml-source>
+                <note>
+                    The <code>not-found-handler</code> element is not used for resources served
+                    through the <code>files</code> element. In that case, the PFC returns instead
+                    a "not found" code to the user agent (code 404 in the case of HTTP).
+                </note>
+            </section>
+        </section>
+
+        <a name="combinations"/>
+        <section>
+            <title>Valid Combinations of the xforms, model, and view Attributes</title>
+
+            <p>The <code>path-info</code> is the only attribute required. None of the
+            <code>xforms</code>, <code>model</code>, and <code>view</code> attributes are required,
+            but only certain combinations of those attributes make sense. The table below shows some
+            of the possible combinations:</p>
+
+            <section>
+                <title>View Only</title>
+                <p>
+                    Simple pages with no back-end code can be implemented in a single pipeline: the
+                    view pipeline. The view pipeline must have a <code>data</code> output. The XML
+                    generated by the view then goes to the epilogue and is then sent back to the
+                    browser.
+
+                    <img print-format="pdf" src="pages/reference-controller-view.png"/>
+                </p>
+            </section>
+
+            <section>
+                <title>Model Only</title>
+                <p>
+                    If a page is not sent back to the user (a browser in a Web app), there is no
+                    need for a view. This is typically the case when a redirect needs to be issued,
+                    or a binary file is produced (e.g. using the XSL-FO Processor to generate a PDF
+                    file).
+
+                    <img print-format="pdf" src="pages/reference-controller-model.png"/>
+                </p>
+            </section>
+
+            <section>
+                <title>View Only with XForms</title>
+                <p>
+                    This is a variant of the <i>view only</i> scenario, where an XForms is used. In
+                    this case, the view receives the XForms instance as an input.
+
+                    <img print-format="pdf" src="pages/reference-controller-view-xforms.png"/>
+                </p>
+            </section>
+
+            <section>
+                <title>Model Only with XForms</title>
+                <p>
+                    A variant of the <i>model only</i> scenario, where XForms is used.
+
+                    <img print-format="pdf" src="pages/reference-controller-model-xforms.png"/>
+                </p>
+            </section>
+            <section>
+                <title>View and Model</title>
+                <p>
+                    This is the classic case. A pipeline implements the MVC model and a second
+                    pipeline implements the MVC view with data produced by the model and consumed
+                    by the view.
+
+                    <img print-format="pdf" src="pages/reference-controller-view-model.png"/>
+                </p>
+            </section>
+            <section>
+                <title>View and Model with XForms, Case 1</title>
+                <p>
+                    This is the equivalent of the previous model where XForms is used. In this case
+                    an instance document connects to the input of the model and the view.
+
+                    <img print-format="pdf" src="pages/reference-controller-view-model-xforms-1.png"/>
+                </p>
+            </section>
+            <section>
+                <title>View and Model with XForms, Case 2</title>
+                <p>
+                    This is a variant of the previous case where the model declares an
+                    <code>instance</code> output. This is typically useful when the view displays
+                    some values from the instance but these values are not exactly the same as those
+                    entered by the user. For example, a page with a text field where the user types
+                    an airport code. If the user enters a known city such as San Francisco, the
+                    application may automatically replace it with the corresponding airport code
+                    (SFO in this case).
+
+                    <img print-format="pdf" src="pages/reference-controller-view-model-xforms-2.png"/>
+                </p>
+            </section>
+
+        </section>
+        <section>
+            <title>Error Handling</title>
+            <p>
+                TODO
+            </p>
+        </section>
+        <section>
+            <title>XML Submission</title>
+            <p>
+                TODO
+            </p>
+        </section>
+        <section>
+            <title>Navigating Between Pages</title>
+            <p>
+                TODO
+            </p>
+        </section>
+        <section>
+            <title>Differences with OPS 2.8</title>
+            <p>
+                TODO
+            </p>
+        </section>
+    </body>
+</document>

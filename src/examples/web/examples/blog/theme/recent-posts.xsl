@@ -48,7 +48,9 @@
             <xforms:instance>
                 <form xmlns="">
                     <action/>
-                    <show-errors/>
+                    <username/>
+                    <blog-id/>
+                    <post-id/>
                     <count>10</count>
                     <comment>
                         <date-created/>

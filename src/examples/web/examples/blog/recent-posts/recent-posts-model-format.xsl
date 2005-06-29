@@ -21,7 +21,6 @@
     <xsl:import href="../util/blog-functions.xsl"/>
 
     <xsl:variable name="instance" select="doc('input:instance')/*" as="element()"/>
-    <xsl:variable name="request-instance" select="doc('input:request-instance')/*" as="element()"/>
     <xsl:variable name="blog" select="doc('input:blog')/*" as="element()"/>
     <xsl:variable name="post" select="doc('input:post')/*" as="element()"/>
     <xsl:variable name="posts" select="doc('input:posts')/*" as="element()"/>
@@ -32,7 +31,7 @@
         <recent-posts>
 
             <user>
-                <username><xsl:value-of select="$request-instance/username"/></username>
+                <username><xsl:value-of select="$instance/username"/></username>
             </user>
 
             <xsl:copy-of select="$blog"/>
@@ -42,7 +41,7 @@
                     <xsl:copy>
                         <xsl:copy-of select="*"/>
                         <link>
-                            <xsl:value-of select="local:blog-path($request-instance/username, $blog/blog-id, id)"/>
+                            <xsl:value-of select="local:blog-path($instance/username, $blog/blog-id, id)"/>
                         </link>
                     </xsl:copy>
                 </xsl:for-each>
@@ -51,12 +50,12 @@
             <feeds>
                 <feed>
                     <name>All</name>
-                    <link><xsl:value-of select="local:blog-feed-path($request-instance/username, $blog/blog-id, 'rss20', ())"/></link>
+                    <link><xsl:value-of select="local:blog-feed-path($instance/username, $blog/blog-id, 'rss20', ())"/></link>
                 </feed>
                 <xsl:for-each select="$categories/category">
                     <feed>
                         <name><xsl:value-of select="name"/></name>
-                        <link><xsl:value-of select="local:blog-feed-path($request-instance/username, $blog/blog-id, 'rss20', id)"/></link>
+                        <link><xsl:value-of select="local:blog-feed-path($instance/username, $blog/blog-id, 'rss20', id)"/></link>
                     </feed>
                 </xsl:for-each>
             </feeds>
@@ -78,8 +77,8 @@
                                 <xsl:copy-of select="*"/>
                                 <links>
                                     <fragment-name><xsl:value-of select="concat('post-', post-id)"/></fragment-name>
-                                    <post><xsl:value-of select="local:post-path($request-instance/username, $blog/blog-id, post-id)"/></post>
-                                    <comments><xsl:value-of select="local:comments-path($request-instance/username, $blog/blog-id, post-id)"/></comments>
+                                    <post><xsl:value-of select="local:post-path($instance/username, $blog/blog-id, post-id)"/></post>
+                                    <comments><xsl:value-of select="local:comments-path($instance/username, $blog/blog-id, post-id)"/></comments>
                                     <category></category>
                                 </links>
                                 <formatted-date-created><xsl:value-of select="local:format-dateTime-default(date-created, true())"/></formatted-date-created>

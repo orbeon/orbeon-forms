@@ -17,29 +17,28 @@
           xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <p:param type="input" name="instance"/>
-    <p:param type="input" name="request-instance" debug="request-instance"/>
     <p:param type="output" name="data"/>
 
     <!-- Call data access to get blog information -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../data-access/get-user-blogs.xpl"/>
-        <p:input name="query" href="aggregate('query', #request-instance#xpointer(/*/username|/*/blog-id))"/>
+        <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username|/*/blog-id))"/>
         <p:output name="blogs" id="blogs"/>
     </p:processor>
 
     <!-- Call data access to get list of recent posts -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../data-access/get-recent-posts.xpl"/>
-        <p:input name="query" href="aggregate('query', #request-instance#xpointer(/*/username|/*/blog-id|/*/count))"/>
+        <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username|/*/blog-id|/*/count))"/>
         <p:output name="posts" id="posts"/>
     </p:processor>
 
     <!-- Call data access to get requested post if required -->
-    <p:choose href="#request-instance">
+    <p:choose href="#instance">
         <p:when test="/*/post-id != ''">
             <p:processor name="oxf:pipeline">
                 <p:input name="config" href="../data-access/get-post.xpl"/>
-                <p:input name="query" href="aggregate('query', #request-instance#xpointer(/*/username|/*/post-id))"/>
+                <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username|/*/post-id))"/>
                 <p:output name="post" id="post"/>
             </p:processor>
         </p:when>
@@ -54,7 +53,7 @@
     <!-- Call data access to get list of categories -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../data-access/get-categories.xpl"/>
-        <p:input name="query" href="aggregate('query', #request-instance#xpointer(/*/username|/*/blog-id))"/>
+        <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username|/*/blog-id))"/>
         <p:output name="categories" id="categories"/>
     </p:processor>
 
@@ -63,7 +62,6 @@
         <p:input name="config" href="recent-posts-model-format.xsl"/>
         <p:input name="data"><dummy/></p:input>
         <p:input name="instance" href="#instance"/>
-        <p:input name="request-instance" href="#request-instance"/>
         <p:input name="blog" href="#blogs#xpointer(/*/blog[1])"/>
         <p:input name="post" href="#post"/>
         <p:input name="posts" href="#posts"/>

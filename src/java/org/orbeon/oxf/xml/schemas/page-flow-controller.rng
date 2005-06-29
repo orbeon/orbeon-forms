@@ -47,7 +47,7 @@
                         <attribute name="xforms"/>
                     </optional>
                     <optional>
-                        <attribute name="request-instance"/>
+                        <attribute name="initial-instance"/>
                     </optional>
                     <ref name="path"/>
                     <zeroOrMore>

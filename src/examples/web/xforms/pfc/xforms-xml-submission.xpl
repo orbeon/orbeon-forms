@@ -17,7 +17,10 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-    <p:param name="instance" type="output"/>
+    <p:param name="initial-instance" type="input"/>
+    <p:param name="matcher-result" type="input"/>
+    <p:param name="setvalues" type="input" debug="xxxsetvalues"/>
+    <p:param name="instance" type="output" debug="xxxsubmitted-instance"/>
 
     <!-- Check content type -->
     <p:processor name="oxf:request">
@@ -35,6 +38,7 @@
     <p:choose href="#request-info">
         <!-- Check for XML post -->
         <p:when test="lower-case(/*/method) = 'post' and (/*/content-type = ('application/xml', 'text/xml') or ends-with(/*/content-type, '+xml'))">
+
             <!-- Extract request body -->
             <p:processor name="oxf:request">
                 <p:input name="config">
@@ -48,8 +52,30 @@
             <!-- Dereference URI and return XML instance -->
             <p:processor name="oxf:url-generator">
                 <p:input name="config" href="aggregate('config', aggregate('url', #request-body#xpointer(string(/request/body))))"/>
-                <p:output name="data" ref="instance"/>
+                <p:output name="data" id="raw-instance" debug="xxxraw-instance"/>
             </p:processor>
+
+            <!-- Update instance if needed -->
+            <p:choose href="#setvalues">
+                <p:when test="/null/@xsi:nill = 'true'">
+                    <!-- No updates to perform on the instance -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="#raw-instance"/>
+                        <p:output name="data" ref="instance"/>
+                    </p:processor>
+                </p:when>
+                <p:otherwise>
+                    <!-- Updates to do on the instance -->
+                    <p:processor name="oxf:unsafe-xslt">
+                        <p:input name="data" href="#raw-instance"/>
+                        <p:input name="setvalues" href="#setvalues"/>
+                        <p:input name="matcher-result" href="#matcher-result"/>
+                        <p:input name="config" href="request-params.xsl"/>
+                        <p:output name="data" ref="instance"/>
+                    </p:processor>
+                </p:otherwise>
+            </p:choose>
+
         </p:when>
         <p:when test="(lower-case(/*/method) = 'get' or /*/container-type = 'portlet') and /*/parameters/parameter">
             <!-- Check for XML GET with $instance parameter -->
@@ -64,18 +90,54 @@
                         </xsl:template>
                     </xsl:stylesheet>
                 </p:input>
-                <p:output name="data" ref="instance"/>
+                <p:output name="data" id="raw-instance" debug="xxxraw-instance"/>
             </p:processor>
+
+            <!-- Update instance if needed -->
+            <p:choose href="#setvalues">
+                <p:when test="/null/@xsi:nill = 'true'">
+                    <!-- No updates to perform on the instance -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="#raw-instance"/>
+                        <p:output name="data" ref="instance"/>
+                    </p:processor>
+                </p:when>
+                <p:otherwise>
+                    <!-- Updates to do on the instance -->
+                    <p:processor name="oxf:unsafe-xslt">
+                        <p:input name="data" href="#raw-instance"/>
+                        <p:input name="setvalues" href="#setvalues"/>
+                        <p:input name="matcher-result" href="#matcher-result"/>
+                        <p:input name="config" href="request-params.xsl"/>
+                        <p:output name="data" ref="instance"/>
+                    </p:processor>
+                </p:otherwise>
+            </p:choose>
 
         </p:when>
         <p:otherwise>
-            <!-- Return null document -->
-            <p:processor name="oxf:identity">
-                <p:input name="data">
-                    <null xsi:nil="true"/>
-                </p:input>
-                <p:output name="data" ref="instance"/>
-            </p:processor>
+            
+            <p:choose href="#initial-instance">
+                <p:when test="/null/@xsi:nill = 'true'">
+                    <!-- No submission and no initial instance, return null document -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data">
+                            <null xsi:nil="true"/>
+                        </p:input>
+                        <p:output name="data" ref="instance"/>
+                    </p:processor>
+                </p:when>
+                <p:otherwise>
+                    <!-- No submission but there is an initial instance which may have to be updated -->
+                    <p:processor name="oxf:unsafe-xslt">
+                        <p:input name="data" href="#initial-instance"/>
+                        <p:input name="setvalues" href="#setvalues"/>
+                        <p:input name="matcher-result" href="#matcher-result"/>
+                        <p:input name="config" href="request-params.xsl"/>
+                        <p:output name="data" ref="instance"/>
+                    </p:processor>
+                </p:otherwise>
+            </p:choose>
         </p:otherwise>
     </p:choose>
 

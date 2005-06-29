@@ -272,10 +272,7 @@
                         <p:output name="data" id="converted"/>
                     </p:processor>
                     <!-- END ASSUME NO XHTML CLIENTS -->
-                    
 
-                    
-                    
                     <!-- Serialize to HTTP -->
                     <p:processor name="oxf:http-serializer">
                         <p:input name="config">
@@ -349,9 +346,41 @@
         </p:when>
         <p:otherwise>
             <!-- Portlet -->
+            <p:choose href="#xformed-data">
+                <p:when test="/xhtml:html">
+                    <!-- Don't transform content for XHTML -->
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="#xformed-data"/>
+                        <p:output name="data" id="xformed-data-2"/>
+                    </p:processor>
+                </p:when>
+                <p:otherwise>
+                    <!-- Otherwise create an XHTML document which formats the XML content -->
+                    <p:processor name="oxf:unsafe-xslt">
+                        <p:input name="data" href="#xformed-data"/>
+                        <p:input name="request" href="#request"/>
+                        <p:input name="config">
+                            <xsl:stylesheet version="1.0"
+                                    xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+                                <xsl:template match="/">
+                                    <xhtml:html>
+                                        <xhtml:head><xhtml:title>XML Document</xhtml:title></xhtml:head>
+                                        <xhtml:body>
+                                            <f:xml-source>
+                                                <xsl:copy-of select="/*"/>
+                                            </f:xml-source>
+                                        </xhtml:body>
+                                    </xhtml:html>
+                                </xsl:template>
+                            </xsl:stylesheet>
+                        </p:input>
+                        <p:output name="data" id="xformed-data-2"/>
+                    </p:processor>
+                </p:otherwise>
+            </p:choose>
             <!-- Extract a fragment and apply theme -->
-            <p:processor name="oxf:unsafe-xslt"> <!-- saxon4 -->
-                <p:input name="data" href="#xformed-data"/>
+            <p:processor name="oxf:unsafe-xslt">
+                <p:input name="data" href="#xformed-data-2"/>
                 <p:input name="request" href="#request"/>
                 <p:input name="config">
                     <xsl:stylesheet version="1.0"
@@ -373,7 +402,7 @@
                 <p:output name="data" id="themed-data"/>
             </p:processor>
             <!-- Rewrite all URLs in HTML and XHTML documents -->
-            <p:processor name="oxf:unsafe-xslt"><!-- saxon5 -->
+            <p:processor name="oxf:unsafe-xslt">
                 <p:input name="data" href="#themed-data"/>
                 <p:input name="container-type" href="#request"/>
                 <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>

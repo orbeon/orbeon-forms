@@ -341,6 +341,7 @@ public class XFormsActionInterpreter {
                 }
 
                 // Rebuild ControlsState
+                final Map previousRepeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
                 xformsControls.rebuildCurrentControlsState(pipelineContext);
                 final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
@@ -353,12 +354,11 @@ public class XFormsActionInterpreter {
 
                 // Update repeat information for the ids found
                 if (boundRepeatIds.size() != 0 || childrenRepeatIds.size() != 0) {
-
                     boolean updateInnerRepeats = false;
                     for (Iterator i = boundRepeatIds.keySet().iterator(); i.hasNext();) {
                         final String repeatId = (String) i.next();
 
-                        final int currentlySelected = ((Integer) currentControlsState.getInitialRepeatIdToIndex().get(repeatId)).intValue();
+                        final int currentlySelected = ((Integer) previousRepeatIdToIndex.get(repeatId)).intValue();
                         if (currentlySelected == deletionIndex) {
                             if (deletionIndex == collectionToBeUpdated.size()) {
 

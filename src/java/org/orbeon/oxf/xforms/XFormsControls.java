@@ -1110,10 +1110,6 @@ public class XFormsControls {
             }
         }
 
-        public Map getInitialRepeatIdToIndex() {
-            return initialRepeatIdToIndex;
-        }
-
         public Map getRepeatIdToIndex() {
             if (repeatIdToIndex == null && initialRepeatIdToIndex != null)
                 repeatIdToIndex = new HashMap(initialRepeatIdToIndex);

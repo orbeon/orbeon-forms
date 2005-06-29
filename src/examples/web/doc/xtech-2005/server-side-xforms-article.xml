@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE article PUBLIC "-//IDEAlliance//DTD Conference Paper DocBook XML Subset V1.1//EN"
-"../dtd/ideadb.dtd">
+"ideadb-1.1/dtd/ideadb.dtd">
 <article>
     <title>Are Server-Side XForms Engines the Future of XForms?</title>
     <articleinfo>
@@ -232,7 +232,7 @@
             <title>Simple Server-Side XForms Architecture</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="xtech08.png"/>
+                    <imagedata fileref="/doc/xtech-2005/xtech08.png"/>
                 </imageobject>
             </mediaobject>
         </figure>
@@ -315,7 +315,7 @@
             <title>Examples of Credit Card Selection Form</title>
             <mediaobject>
                 <imageobject>
-                    <imagedata fileref="xtech07.png" />
+                    <imagedata fileref="/doc/xtech-2005/xtech07.png" />
                 </imageobject>
             </mediaobject>
         </figure>
@@ -414,7 +414,7 @@
                 <title>Examples of Controls with Open List Selection</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="xtech04.png" />
+                        <imagedata fileref="/doc/xtech-2005/xtech04.png" />
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -475,7 +475,7 @@
                 <title>Example of XForms Repeat</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="xtech02.png" />
+                        <imagedata fileref="/doc/xtech-2005/xtech02.png" />
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -595,7 +595,7 @@
                 <title>XForms Repeat with Newly Added Row</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="xtech03.png" />
+                        <imagedata fileref="/doc/xtech-2005/xtech03.png" />
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -647,7 +647,7 @@
                 <title>Traditional User Agent - Server Interaction Model</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="xtech10.png" />
+                        <imagedata fileref="/doc/xtech-2005/xtech10.png" />
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -655,7 +655,7 @@
                 <title>Ajax User Agent - Server Interaction Model</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="xtech11.png" />
+                        <imagedata fileref="/doc/xtech-2005/xtech11.png" />
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -685,7 +685,7 @@
                 <title>XForms + Ajax Architecture</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="xtech13.png" />
+                        <imagedata fileref="/doc/xtech-2005/xtech13.png" />
                     </imageobject>
                 </mediaobject>
             </figure>
@@ -966,7 +966,7 @@
                 <title>XForms Proxy Architecture</title>
                 <mediaobject>
                     <imageobject>
-                        <imagedata fileref="xtech14.png" />
+                        <imagedata fileref="/doc/xtech-2005/xtech14.png" />
                     </imageobject>
                 </mediaobject>
             </figure>

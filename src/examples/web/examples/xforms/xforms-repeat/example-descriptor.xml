@@ -14,8 +14,7 @@
 <example-descriptor>
     <title>XForms Repeat</title>
     <source>page-flow.xml</source>
-    <source>form.xml</source>
-    <source>view.xsl</source>
+    <source>view.xml</source>
     <description>
         <p>
             This example illustrates how to create repeating structures in PresentationServer with

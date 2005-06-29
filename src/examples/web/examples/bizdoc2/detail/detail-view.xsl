@@ -51,8 +51,8 @@
             <xforms:bind nodeset="/form/document/claim:claim">
                 <!-- This bind element handles the empty repeat entry necessary to add new entries with xforms:repeat -->
                 <xforms:bind nodeset="claim:insured-info/claim:family-info/claim:children">
-                    <xforms:bind nodeset="claim:child[last()]/claim:birth-date" required="false()"/>
-                    <xforms:bind nodeset="claim:child[last()]/claim:first-name" required="false()"/>
+                    <xforms:bind nodeset="claim:child[position() lt last()]/claim:birth-date" required="true()"/>
+                    <xforms:bind nodeset="claim:child[position() lt last()]/claim:first-name" required="true()"/>
                 </xforms:bind>
                 <!-- This bind element handles calculated values -->
                 <xforms:bind nodeset="claim:insured-info/claim:claim-info/claim:rate"
@@ -397,11 +397,15 @@
                                             <td colspan="2">
                                                 <xforms:trigger>
                                                     <xforms:label>Add Child</xforms:label>
-                                                    <xforms:insert ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()" position="after"/><!-- index('children') -->
+                                                    <xforms:action ev:event="DOMActivate" >
+                                                        <xforms:insert nodeset="claim:children/claim:child" at="index('children')" position="after"/>
+                                                        <xforms:setvalue ref="claim:children/claim:child[index('children')]/claim:birth-date" value="''"/>
+                                                        <xforms:setvalue ref="claim:children/claim:child[index('children')]/claim:first-name" value="''"/>
+                                                    </xforms:action>
                                                 </xforms:trigger>
                                                 <xforms:trigger>
                                                     <xforms:label>Remove Child</xforms:label>
-                                                    <xforms:delete ev:event="DOMActivate" nodeset="claim:children/claim:child" at="last()"/><!-- index('children') -->
+                                                    <xforms:delete ev:event="DOMActivate" nodeset="claim:children/claim:child" at="index('children')"/>
                                                 </xforms:trigger>
                                             </td>
                                         </tr>

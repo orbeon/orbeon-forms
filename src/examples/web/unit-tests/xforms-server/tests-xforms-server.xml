@@ -692,7 +692,7 @@
                         <table>
                             <tr id="id123-repeat-begin" class="xforms-repeat-begin-end"/>
                             <tr class="xforms-repeat-delimiter"/>
-                            <tr>
+                            <tr class="xforms-repeat-selected-item">
                                 <td>
                                     <table>
                                         <tr id="id124-1-repeat-begin" class="xforms-repeat-begin-end"/>
@@ -706,7 +706,7 @@
                                             </td>
                                         </tr>
                                         <tr class="xforms-repeat-delimiter"/>
-                                        <tr>
+                                        <tr class="xforms-repeat-selected-item">
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-1-2" class="xforms-control xforms-output">f12</xhtml:span>
                                             </td>

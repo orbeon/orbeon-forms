@@ -393,7 +393,7 @@
                         </xsl:for-each>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:copy-of select="$current-repeat-selected"/>
+                        <xsl:copy-of select="$current-repeat-children"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:for-each>

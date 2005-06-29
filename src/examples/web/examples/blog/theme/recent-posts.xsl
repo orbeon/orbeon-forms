@@ -86,15 +86,20 @@
                 <td style="vertical-align: top; padding: 10px; padding-top: 0px">
                     <!-- List all categories -->
                     <xsl:text>Categories: </xsl:text>
-                    <b>All </b>
-                    <xsl:text> | </xsl:text>
                     <xsl:for-each select="/*/categories/category">
                         <xsl:if test="position() > 1">
                             <xsl:text> | </xsl:text>
                         </xsl:if>
-                        <a href="{link}">
-                            <xsl:value-of select="name"/>
-                        </a>
+                        <xsl:choose>
+                            <xsl:when test="$instance/*/category = id">
+                                <xsl:value-of select="name"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <a href="{link}">
+                                    <xsl:value-of select="name"/>
+                                </a>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </xsl:for-each>
 
                     <!-- Display posts -->
@@ -301,7 +306,7 @@
                                                 <img src="/images/xml.gif" width="36" height="14" style="border: 0px; vertical-align: middle"/>
                                             </a>
                                             <xsl:text> </xsl:text>
-                                            <a href="{link}">
+                                            <a href="{link}" f:url-type="resource">
                                                 <xsl:value-of select="name"/>
                                             </a>
                                         </li>

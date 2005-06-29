@@ -27,7 +27,7 @@
 
     <!-- Append current comment -->
     <p:processor name="oxf:xslt">
-        <p:input name="config" debug="xxxst">
+        <p:input name="config">
             <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                 <xsl:template match="/post/comments">
@@ -39,7 +39,7 @@
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
-        <p:input name="data" href="#post" debug="xxxpost"/>
+        <p:input name="data" href="#post"/>
         <p:input name="instance" href="#instance"/>
         <p:output name="data" id="updated-post"/>
     </p:processor>

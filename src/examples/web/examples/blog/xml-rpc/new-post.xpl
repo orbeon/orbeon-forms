@@ -40,7 +40,7 @@
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../data-access/get-categories.xpl"/>
         <p:input name="query" href="#categories-query"/>
-        <p:output name="categories" id="categories" debug="xxxcategories"/>
+        <p:output name="categories" id="categories"/>
     </p:processor>
 
     <!-- Create post document -->
@@ -73,7 +73,7 @@
                 <comments/>
             </post>
         </p:input>
-        <p:output name="data" id="post" debug="xxxnewpost"/>
+        <p:output name="data" id="post"/>
     </p:processor>
 
     <!-- Insert it -->

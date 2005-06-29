@@ -34,7 +34,7 @@
                 </xu:modifications>
             </xdb:update>
         </p:input>
-        <p:output name="data" id="query" debug="xxxquery"/>
+        <p:output name="data" id="query"/>
     </p:processor>
 
     <!-- Run query and return document-info -->

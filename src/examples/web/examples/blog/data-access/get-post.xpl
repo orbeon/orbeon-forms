@@ -40,7 +40,7 @@
     <p:processor name="oxf:xmldb-query">
         <p:input name="datasource" href="../datasource.xml"/>
         <p:input name="query" href="#xmldb-query"/>
-        <p:output name="data" ref="post" debug="xxxposts"/>
+        <p:output name="data" ref="post"/>
     </p:processor>
 
 </p:config>

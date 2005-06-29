@@ -29,7 +29,7 @@
     <!-- Call data access to get list of recent posts -->
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../data-access/get-recent-posts.xpl"/>
-        <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username|/*/blog-id|/*/count|/*/category))" debug="xxxquery"/>
+        <p:input name="query" href="aggregate('query', #instance#xpointer(/*/username|/*/blog-id|/*/count|/*/category))"/>
         <p:output name="posts" id="posts"/>
     </p:processor>
 

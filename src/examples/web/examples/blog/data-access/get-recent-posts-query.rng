@@ -23,7 +23,9 @@
     </element>
     <optional>
         <element name="category">
-            <data type="positiveInteger"/>
+            <optional>
+                <data type="positiveInteger"/>
+            </optional>
         </element>
     </optional>
 </element>

@@ -23,7 +23,7 @@
 
     <!-- Authenticate user using an eXist extension function -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#query" debug="xxxquery"/>
+        <p:input name="data" href="#query"/>
         <p:input name="config">
             <xdb:query collection="/db/" xsl:version="2.0" xmlns:xmldb="http://exist-db.org/xquery/xmldb">
                 xquery version "1.0";

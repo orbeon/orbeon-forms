@@ -37,6 +37,13 @@
             <xsl:copy-of select="$blog"/>
 
             <categories>
+                <category>
+                    <name>All</name>
+                    <id/>
+                    <link>
+                        <xsl:value-of select="local:blog-path($instance/username, $blog/blog-id, ())"/>
+                    </link>
+                </category>
                 <xsl:for-each select="$categories/category">
                     <xsl:copy>
                         <xsl:copy-of select="*"/>

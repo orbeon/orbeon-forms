@@ -58,7 +58,7 @@
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="../data-access/get-categories.xpl"/>
         <p:input name="query" href="#categories-query"/>
-        <p:output name="categories" id="categories" debug="xxxcategories"/>
+        <p:output name="categories" id="categories"/>
     </p:processor>
 
     <!-- Create updated post document -->
@@ -71,7 +71,7 @@
                 <xsl:variable name="current-post" select="doc('input:current-post')" as="document-node()"/>
                 <xsl:variable name="categories" select="doc('input:categories')/*/*" as="element()*"/>
 
-                <xsl:copy-of select="$current-post/(post-id|username|blog-id)"/>
+                <xsl:copy-of select="$current-post/*/(post-id|username|blog-id)"/>
                 <title><xsl:value-of select="/params/param[4]/value/struct/member[name = 'title']/value"/></title>
                 <description>
                     <xsl:copy-of select="saxon:parse(concat('&lt;root>', /params/param[4]/value/struct/member[name = 'description']/value, '&lt;/root>'))/*/node()"/>

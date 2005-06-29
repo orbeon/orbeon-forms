@@ -32,7 +32,7 @@
         <xsl:param name="format" as="xs:string"/>
         <xsl:param name="category-id" as="xs:string?"/>
 
-        <xsl:value-of select="concat(local:blog-path($username, $blog-id, ()), '?format=', $format, if ($category-id) then concat('&amp;', '?category=', $category-id) else '')"/>
+        <xsl:value-of select="concat(local:blog-path($username, $blog-id, ()), '?format=', $format, if ($category-id) then concat('&amp;', 'category=', $category-id) else '')"/>
     </xsl:function>
 
     <xsl:function name="local:post-path" as="xs:string">

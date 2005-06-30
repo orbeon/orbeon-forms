@@ -1,0 +1,388 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <header>
+        <title>Changes in Version 3.0 BETA</title>
+    </header>
+    <body>
+        <section>
+            <title>Introduction</title>
+            <p>
+                Welcome to OPS 3.0 BETA!
+            </p>
+            <p>
+                OPS 3.0 features an XForms engine much improved over OPS 2.8's, some significant
+                improvements in the Page Flow Controller, and much more!
+            </p>
+            <note>
+                By default, your applications written against OPS 2.8 will use the legacy 2.8
+                XForms engine in OPS 3.0. With OPS 3.0, you use XForms in a way much closer to what
+                you would expect when combining XForms with XHTML, in that you do not need to
+                declare an XForms model separately from your XHTML page.
+            </note>
+        </section>
+        <section>
+            <title>XForms</title>
+            <p>
+                The OPS XForms engine introduces a big step towards supporting all of the XForms 1.0
+                specification. The main changes are described below. Please also visit the new
+                XForms examples, in particular the <a href="/goto-example/xforms-controls">XForms
+                Controls</a> and <a href="/goto-example/bizdoc2">BizDoc NG</a> example.
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Ajax-based engine.</b> The XForms engine is now based on Ajax
+                        technologies. This makes the XForms engine much more responsive to user
+                        interaction than in OPS 2.8.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>XForms event model.</b> The XForms engine supports the XForms event
+                        model, most XForms events and all XForms actions.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Multiple XForms models and instances.</b> The XForms engine supports
+                        multiple models and multiple instances within models. The
+                        <code>instance()</code> function is supported.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>XForms switch module.</b> The XForms engine fully supports the XForms
+                        switch module.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>XForms repeat module.</b> The XForms engine supports correctly the
+                        current index in repeated sections, including the <code>index()</code>
+                        function.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>XForms submission.</b> The XForms engine supports submitting forms as
+                        <code>application/xml</code>, including to external applications.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>XForms Range control.</b> The XForms engine supports a subset of the
+                        functionality of the XForms Range (or slider) control.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Extension functions.</b> The XForms engine supports the
+                        <code>xxforms:call-xpl()</code> extension function to call arbitrary XPL
+                        programs from XForms.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Dynamic XForms models.</b> The new XForms engine and PFC improvements
+                        now allow to easily generate XForms models based on XML submissions. With
+                        OPS 2.8, this was much more difficult as this had to be done in a dynamic
+                        XForms model pipeline, which did not have access to an XML submission.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Simplified theme.</b> The default theme and XForms make more use of CSS
+                        so that configuration of your own theme is easier.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        TODO: document change in coding style (with need for separate XForms model
+                        declaration gone).
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        TODO: document (X)HTML attributes supported on XForms elements: id, class,
+                        navindex, accesskey, plus tabindex, style, and how to handle other
+                        attributes (xhtml:*).
+                    </p>
+                </li>
+            </ul>
+            <p>
+                Incompatible changes:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        XSLT views now must always use <code>doc('input:instance')</code> to access
+                        a submitted XML instance instead of expecting the instance on their main
+                        input.
+                    </p>
+                </li>
+<!--                <li>-->
+<!--                    <p>-->
+<!--                        -->
+<!--                    </p>-->
+<!--                </li>-->
+            </ul>
+        </section>
+        <section>
+            <title>Page Flow</title>
+            <p>
+                Several improvements have been added to the Page Flow Controller, in part motivated
+                by the new XForms engine. The PFC is now more generic and less tied to the built-in
+                OPS XForms implementation. At the same time it plays better than before with XForms.
+                The major PFC concepts found in OPS 2.8 have not changed and backward
+                compatibility is kept. The main changes are the following:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Deprecation of the <code>xforms</code> attribute.</b> Using XForms in OPS
+                        no longer implies using an <code>xforms</code> attribute on the
+                        <code>page</code> element. Instead, XForms models are included in the XHTML
+                        page view under the <code>xhtml:head</code> element, as recommended by
+                        XForms 1.0. The <code>xforms</code> attribute is still supported for
+                        backward compatibility, and triggers the use of the legacy OPS 2.8 XForms
+                        engine.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>New XML submission mechanism.</b> The PFC features a new generic XML
+                        submission mechanism. Each page in the PFC, instead of supporting native
+                        OPS XForms engine submissions, now supports generic XML submissions. You
+                        submit XML by POST-ing content with an XML content-type (other types of XML
+                        submissions can be added). XML submissions can be performed from external
+                        applications (through Web Services, XML-RPC, etc.), client-side XForms
+                        engines, the built-in OPS XForms engine, or by the PFC itself when
+                        navigating between pages.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Deprecation of the <code>param</code> element.</b> The PFC's
+                        <code>param</code> element was used to set values into a submitted XForms
+                        instance. A new, more flexible element, <code>setvalue</code>, now performs
+                        the same task. The <code>setvalue</code> element supports extracting
+                        information from regular expressions applied to the request path, as well as
+                        extracting request parameters. This allows for creating "clean", REST-like
+                        URLs in your appliation. <code>param</code> is still supported for backward
+                        compatibility.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Generic XML submission transformations.</b> The PFC features a new
+                        generic and extensible XML submission transformation mechanism. In OPS 2.8,
+                        XUpdate code had to be used to transform XML instances between pages.
+                        XUpdate support in the PFC is now deprecated. Instead, XSLT or XQuery
+                        should be used for that purpose.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Accessing XML submissions.</b> XML submissions can be accessed from
+                        actions, page models, and page views, through the <code>instance</code>
+                        input. Users should not assume that XML submission are available from
+                        the <code>data</code> inputs.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Shorter page flows.</b> Because of the enhanced XForms support, in
+                        particular, the XForms switch module and support for
+                        <code>application/xml</code> submissions, page flows are typically shorter
+                        to write. Compare for example the <a href="/goto-example/bizdoc">BizDoc
+                        Classic</a> example with the <a href="/goto-example/bizdoc2">BizDoc NG</a>
+                        example.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Tracing: TODO
+                    </p>
+                </li>
+            </ul>
+            <note>
+                If a page uses XForms, which means either having <code>action</code> elements, or
+                reading the instance in the page model or page view, it must not expect to be able
+                to read the HTTP request body separately.
+            </note>
+        </section>
+        <section>
+            <title>XSLT processor</title>
+            <p>
+                The following improvements have been made to the XSLT processor:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Attributes input.</b> The <a href="/doc/processors-xslt">XSLT
+                        processor</a> supports a new <code>attributes</code> input, which allows
+                        setting JAXP TransformerFactory attributes.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Safer defaults.</b> The default <a href="/doc/processors-xslt">XSLT
+                        processor</a> (accessed with <code>oxf:xslt</code>, and configured in
+                        <code>processors.xml</code>) no longer allows executing external functions.
+                        To enable external functions, use <code>oxf:unsafe-xslt</code>, or configure
+                        the XSLT processor's <code>attributes</code> input. This makes the XSLT
+                        processor safer by default.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Default implementation.</b> The default XSLT 1.0 processor
+                        implementation, configured in <code>processors.xml</code>, is now Saxon 8
+                        instead of Xalan. The default XSLT 2.0 implementation remains Saxon 8, as
+                        was the case before.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Deprecated behavior.</b> The <a href="/doc/processors-xslt">XSLT
+                        processor</a> used to support a value of <code>DEFAULT</code> or
+                        <code>interpreter</code> for the <code>transformer</code> input, for
+                        backward compatibility. This is no longer supported. The
+                        <code>transformer</code> must provide only a valid JAXP TransformerFactory
+                        class name. Most users should not be affected by this change.
+                    </p>
+                </li>
+            </ul>
+            <note>
+                <p>
+                    These changes should not affect applications that used <code>oxf:xslt</code>
+                    unless stylesheets use external functions. In this case, you have to use
+                    <code>oxf:unsafe-xslt</code> instead.
+                </p>
+                <p>
+                    If you were using <code>oxf:xslt-1.0</code> or were using XSLT 1.0 stylesheets
+                    directly referenced from a page flow, and used Xalan-specific features, you
+                    have to either convert your stylesheet to use Saxon features instead, or use
+                    <code>oxf:xalan</code>.
+                </p>
+            </note>
+            <p>
+                TODO: document the fact that transformation is separate from serialization in OPS.
+                See XML serializer.
+            </p>
+        </section>
+        <section>
+            <title>XQuery processor</title>
+            <p>
+                The XQuery processor has been updated:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Default implementation.</b> The default implementation of the XQuery
+                        processor is now Saxon 8.
+                   </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Safer defaults.</b> This processor is available with
+                        <code>oxf:xquery</code> or <code>oxf:unsafe-xquery</code>. The former does
+                        not allow calling external functions by default, while the latter does,
+                        similar to the new behavior of the XSLT processor.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Query format.</b> In addition to XQuery code embedded into XML, the
+                        XQuery processor now supports in its <code>config</code> input a <a
+                        href="reference-formats#text-documents">text document</a> of the form:
+                    </p>
+                    <xml-source>
+                        <document xsi:type="xs:string" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            xquery version "1.0";
+                            ...
+                        </document>
+                    </xml-source>
+                </li>
+                <li>
+                    <p>
+                        <b>PFC integration.</b> XQuery can be used in the PFC to perform XML
+                        submission transformations.
+                    </p>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>XHTML Support</title>
+            <p>
+                XHTML is better supported:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Simplified theme.</b> There is no need to remove the XHTML namespace
+                        from XSLT, as was done before in <code>theme.xsl</code>. Your theme should
+                        simply use the XHTML namespace.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Switching between XHTML and HTML.</b> The standard epilogue illustrates
+                        how to generate XHTML and HTML to different browsers.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Using XHTML serialization.</b> The standard epilogue illustrates how to
+                        to connect the XHTML serializer.
+                    </p>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>Other Changes</title>
+            <p>
+
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>OPS Blog example.</b> This <a href="/goto-example/blog">new example</a>
+                        illustrates many of the capabilities of OPS, including:
+                    </p>
+                    <ul>
+                        <li>Implementing XML-RPC services</li>
+                        <li>Connecting to a native XML database</li>
+                        <li>Using XForms</li>
+                        <li>Producing XHTML, RSS and other formats from a single data source</li>
+                        <li>Implementing configurable themes with XSLT</li>
+                        <li>Creating "clean" URLs in a REST perspective</li>
+                    </ul>
+                </li>
+                <li>
+                    <p>
+                        TODO
+                    </p>
+                </li>
+            </ul>
+        </section>
+    </body>
+</document>

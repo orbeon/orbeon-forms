@@ -37,7 +37,7 @@
             <li>Implementing XML-RPC services</li>
             <li>Connecting to a native XML database</li>
             <li>Using XForms</li>
-            <li>Producing XHTML, RSS and other formats from a single data source3</li>
+            <li>Producing XHTML, RSS and other formats from a single data source</li>
             <li>Implementing configurable themes with XSLT</li>
             <li>Creating "clean" URLs in a REST perspective</li>
         </ul>

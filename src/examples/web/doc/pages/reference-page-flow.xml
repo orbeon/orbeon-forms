@@ -603,6 +603,44 @@
             <p>
                 TODO
             </p>
+            <p>
+                Each PFC page supports an XML submission. This means that at the URL corresponding
+                to the path, an XML document can be submitted.
+            </p>
+            <p>
+                Rationale: 
+            </p>
+            <p>
+                There are different ways to submit and XML document to a page:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        An external application or a client-side XForms engine uses HTTP POST to
+                        submit an XML document. xxx
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The OPS built-in XForms engine uses HTTP POST to submit and XML document.
+                        xxx
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Producing an XML document internally within the PFC from a source page.
+                        xxx
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Using the default submission document. xxx
+                    </p>
+                </li>
+                <p>
+
+                </p>
+            </ul>
         </section>
         <section>
             <title>Navigating Between Pages</title>

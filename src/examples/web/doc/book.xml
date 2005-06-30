@@ -18,7 +18,7 @@
     <menu label="Getting Started">
         <menu-item label="Welcome" href="index"/>
         <menu label="Changes">
-            <menu-item label="Version 2.9" href="home-changes-29"/>
+            <menu-item label="Version 3.0 BETA" href="home-changes-30"/>
             <menu-item label="Version 2.8" href="home-changes-28"/>
             <menu-item label="Version 2.7" href="home-changes-27"/>
             <menu-item label="Version 2.6" href="home-changes-26"/>

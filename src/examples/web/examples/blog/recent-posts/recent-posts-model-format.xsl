@@ -24,7 +24,7 @@
     <xsl:variable name="blog" select="doc('input:blog')/*" as="element()"/>
     <xsl:variable name="post" select="doc('input:post')/*" as="element()"/>
     <xsl:variable name="posts" select="doc('input:posts')/*" as="element()"/>
-    <xsl:variable name="categories" select="doc('input:categories')/*" as="element()"/>
+    <xsl:variable name="categories" select="doc('input:categories')/*/*" as="element()*"/>
 
     <xsl:template match="/">
 
@@ -44,7 +44,7 @@
                         <xsl:value-of select="local:blog-path($instance/username, $blog/blog-id, ())"/>
                     </link>
                 </category>
-                <xsl:for-each select="$categories/category">
+                <xsl:for-each select="$categories">
                     <xsl:copy>
                         <xsl:copy-of select="*"/>
                         <link>
@@ -59,7 +59,7 @@
                     <name>All</name>
                     <link><xsl:value-of select="local:blog-feed-path($instance/username, $blog/blog-id, 'rss20', ())"/></link>
                 </feed>
-                <xsl:for-each select="$categories/category">
+                <xsl:for-each select="$categories">
                     <feed>
                         <name><xsl:value-of select="name"/></name>
                         <link><xsl:value-of select="local:blog-feed-path($instance/username, $blog/blog-id, 'rss20', id)"/></link>
@@ -81,7 +81,21 @@
                                 <xsl:if test="post-id = $post/post-id">
                                     <xsl:attribute name="only" select="'true'"/>
                                 </xsl:if>
-                                <xsl:copy-of select="*"/>
+                                <xsl:copy-of select="*[name() != 'categories']"/>
+                                <xsl:if test="categories">
+                                    <categories>
+                                        <xsl:for-each select="categories/category-id">
+                                            <xsl:for-each select="$categories[id = current()]">
+                                                <xsl:copy>
+                                                    <xsl:copy-of select="*"/>
+                                                    <link>
+                                                        <xsl:value-of select="local:blog-path($instance/username, $blog/blog-id, id)"/>
+                                                    </link>
+                                                </xsl:copy>
+                                            </xsl:for-each>
+                                        </xsl:for-each>
+                                    </categories>
+                                </xsl:if>
                                 <links>
                                     <fragment-name><xsl:value-of select="concat('post-', post-id)"/></fragment-name>
                                     <post><xsl:value-of select="local:post-path($instance/username, $blog/blog-id, post-id)"/></post>

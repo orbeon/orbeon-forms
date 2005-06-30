@@ -130,7 +130,14 @@
                                     <!-- Display post information and links -->
                                     <div style="margin-left: 2em; padding: 1em">
                                         <xsl:text>Filed under:  </xsl:text>
-                                        <xsl:value-of select="categories"/><!-- TODO: link to category-->
+                                        <xsl:for-each select="categories/category">
+                                            <xsl:if test="position() > 1">
+                                                <xsl:text>, </xsl:text>
+                                            </xsl:if>
+                                            <a href="{link}">
+                                                <xsl:value-of select="name"/>
+                                            </a>
+                                        </xsl:for-each>
                                         <xsl:text> — </xsl:text>
                                         <xsl:value-of select="/*/user/username"/>
                                         <xsl:text> @ </xsl:text>

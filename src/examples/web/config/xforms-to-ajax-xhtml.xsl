@@ -363,7 +363,7 @@
 
         <!-- Delimiter: begin repeat -->
         <xsl:copy-of select="xxforms:repeat-delimiter($delimiter-namespace-uri,
-            $delimiter-local-name, concat($id, '-repeat-begin'))"/>
+            $delimiter-local-name, concat('repeat-begin-', $id))"/>
 
         <xsl:if test="$top-level-repeat or not($generate-template)">
             <!-- Repeat content for the number of occurrences the XForms Server gives us -->
@@ -385,8 +385,9 @@
                     <xsl:when test="$current-repeat-selected">
                         <xsl:for-each select="$current-repeat-children">
                             <xsl:copy>
+                                <xsl:variable name="number-parent-repeat" as="xs:integer" select="count(tokenize($id-postfix, '-'))"/>
                                 <xsl:attribute name="class" select="concat(if (@class) then concat(@class, ' ') else '',
-                                    'xforms-repeat-selected-item')"/>
+                                    'xforms-repeat-selected-item-', if ($number-parent-repeat mod 2 = 1) then '1' else '2')"/>
                                 <xsl:copy-of select="@* except @class"/>
                                 <xsl:copy-of select="node()"/>
                             </xsl:copy>
@@ -421,7 +422,7 @@
 
         <!-- Delimiter: end repeat -->
         <xsl:copy-of select="xxforms:repeat-delimiter($delimiter-namespace-uri,
-            $delimiter-local-name, concat($id, '-repeat-end'))"/>
+            $delimiter-local-name, concat('repeat-end-', $id))"/>
 
     </xsl:template>
 

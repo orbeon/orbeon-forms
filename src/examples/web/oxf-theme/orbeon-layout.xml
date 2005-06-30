@@ -30,7 +30,7 @@ body, input, button, table {
     font-size: 9pt;
     line-height: 13pt;
 }
-    
+
 th {
     color: #333333;
 }
@@ -697,8 +697,12 @@ ul {
     display: none;
 }
 
-.xforms-repeat-selected-item {
+.xforms-repeat-selected-item-1 {
     background: #ffc;
+}
+
+.xforms-repeat-selected-item-2 {
+    background: #ff9;
 }
 
 .xforms-debug {

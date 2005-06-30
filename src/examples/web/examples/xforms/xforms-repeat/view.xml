@@ -13,6 +13,7 @@
 -->
 <xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
         xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <xhtml:head>
         <xhtml:title>XForms Repeating Elements</xhtml:title>
@@ -47,43 +48,49 @@
                 <tr>
                     <td colspan="2">
                         <xforms:repeat nodeset="department" id="departmentSet">
-                            <div class="bodytd" style="margin-bottom: 1em; padding-left: 1em">
+                            <div style="margin-bottom: 1em; padding-left: 1em">
                                 <p>
-                                    <i>Department:</i>
-                                    <xforms:input ref="@name" xhtml:size="10"/>
-                                    <xforms:submit>
-                                        <xforms:label>X</xforms:label>
-                                        <xforms:delete nodeset="/form/department" at="index('departmentSet')"/>
-                                    </xforms:submit>
+                                    <xforms:input ref="@name" xhtml:size="10">
+                                        <xforms:label class="fixed-width">Department:</xforms:label>
+                                    </xforms:input>
                                 </p>
                                 <xforms:repeat nodeset="employee" id="employeeSet">
                                     <p style="margin-left: 2em; margin: 0.5em; white-space: nowrap">
-                                        <i> Employee:</i>
+                                        <xhtml:span class="fixed-width">Employee:</xhtml:span>
                                         <xforms:input ref="@firstname" xhtml:size="10"/>
                                         <xforms:input ref="@lastname" xhtml:size="10"/>
-                                        <xforms:submit>
-                                            <xforms:label>X</xforms:label>
-                                            <xforms:delete nodeset="/form/department[index('departmentSet')]/employee" at="index('employeeSet')"/>
-                                        </xforms:submit>
                                     </p>
                                 </xforms:repeat>
-                                <p style="margin-left: 2em; margin: 0.5em; white-space: nowrap">
-                                    <xforms:submit>
-                                        <xforms:label>Add employee</xforms:label>
-                                        <xforms:insert nodeset="/form/department[index('departmentSet')]/employee" at="last()" position="after"/>
-                                    </xforms:submit>
-                                </p>
                             </div>
                         </xforms:repeat>
-                        <p>
-                            <xforms:submit>
-                                <xforms:label>Add department</xforms:label>
-                                <xforms:insert nodeset="/form/department" at="last()" position="after"/>
-                            </xforms:submit>
-                            <xforms:submit>
-                                <xforms:label>Update instance</xforms:label>
-                            </xforms:submit>
-                        </p>
+                        <xhtml:fieldset>
+                            <xhtml:p>
+                                <xhtml:span class="fixed-width">Department:</xhtml:span>
+                                <xforms:trigger>
+                                    <xforms:label>Add</xforms:label>
+                                    <xforms:insert ev:event="DOMActivate" nodeset="/form/department"
+                                        at="index('departmentSet')" position="after"/>
+                                </xforms:trigger>
+                                <xforms:trigger>
+                                    <xforms:label>Remove</xforms:label>
+                                    <xforms:delete ev:event="DOMActivate" nodeset="/form/department"
+                                        at="index('departmentSet')"/>
+                                </xforms:trigger>
+                            </xhtml:p>
+                            <xhtml:p>
+                                <xhtml:span class="fixed-width">Employee:</xhtml:span>
+                                <xforms:trigger>
+                                    <xforms:label>Add</xforms:label>
+                                    <xforms:insert ev:event="DOMActivate" nodeset="/form/department[index('departmentSet')]/employee"
+                                        at="index('employeeSet')" position="after"/>
+                                </xforms:trigger>
+                                <xforms:trigger>
+                                    <xforms:label>Remove</xforms:label>
+                                    <xforms:delete ev:event="DOMActivate" nodeset="/form/department[index('departmentSet')]/employee"
+                                        at="index('employeeSet')"/>
+                                </xforms:trigger>
+                            </xhtml:p>
+                        </xhtml:fieldset>
                     </td>
                 </tr>
             </table>

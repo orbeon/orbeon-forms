@@ -232,22 +232,22 @@ function xformsLog(text) {
     debugDiv.innerHTML += text + " | ";
 }
 
-function xformsDisplayLoading(form, state) {
+function xformsDisplayLoading(state) {
     switch (state) {
         case "loading" :
-            form.xformsLoadingLoading.style.display = "block";
-            form.xformsLoadingError.style.display = "none";
-            form.xformsLoadingNone.style.display = "none";
+            document.xformsLoadingLoading.style.display = "block";
+            document.xformsLoadingError.style.display = "none";
+            document.xformsLoadingNone.style.display = "none";
             break;
         case "error":
-            form.xformsLoadingLoading.style.display = "none";
-            form.xformsLoadingError.style.display = "block";
-            form.xformsLoadingNone.style.display = "none";
+            document.xformsLoadingLoading.style.display = "none";
+            document.xformsLoadingError.style.display = "block";
+            document.xformsLoadingNone.style.display = "none";
             break;
         case "none":
-            form.xformsLoadingLoading.style.display = "none";
-            form.xformsLoadingError.style.display = "none";
-            form.xformsLoadingNone.style.display = "block";
+            document.xformsLoadingLoading.style.display = "none";
+            document.xformsLoadingError.style.display = "none";
+            document.xformsLoadingNone.style.display = "block";
             break;
     }
 }
@@ -284,8 +284,7 @@ function xformsFireEvents(events) {
 
             // Add static state
             var staticStateElement = xformsCreateElementNS(XXFORMS_NAMESPACE_URI, "xxforms:static-state");
-            var firstTarget = document.xformsEvents[0][0];
-            staticStateElement.appendChild(staticStateElement.ownerDocument.createTextNode(firstTarget.form.xformsStaticState.value));
+            staticStateElement.appendChild(staticStateElement.ownerDocument.createTextNode(document.xformsStaticState.value));
             eventFiredElement.appendChild(staticStateElement);
 
             // Add dynamic state (element is just created and will be filled just before we send the request)
@@ -323,7 +322,6 @@ function xformsFireEvents(events) {
             // If last request added to queue is incremental, remove it
             if (document.xformsLastRequestIsIncremental && document.xformsNextRequests.length > 0) {
                 document.xformsNextRequests.pop();
-                document.xformsNextTargets.pop();
             }
 
             // Set as next request to execute and trigger execution
@@ -331,7 +329,6 @@ function xformsFireEvents(events) {
             document.xformsNextRequests.push(eventFiredElement.ownerDocument);
             // FIXME: this is used to retrieve the form and to avoid updating a field we are currently editing.
             // We need a better way to do this.
-            document.xformsNextTargets.push(firstTarget);
             xformsExecuteNextRequest();
         }
     }, XFORMS_ONE_REQUEST_FOR_EVENTS_IN_MS);
@@ -382,34 +379,22 @@ function xformsInitCheckesRadios(control) {
     for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++)
         xformsAddEventListener(inputs[inputIndex], "click", inputSelected);
 
-    // Find parent form and store this in span
-    var parent = control;
-    while (parent.tagName != "FORM")
-       parent = parent.parentNode;
-    control.form = parent;
-
     // Compute the checkes value for the first time
     computeSpanValue(control);
 }
 
 /**
- * Initializes attributes of each form:
- *
- *     Div              xformsLoadingLoading
- *     Div              xformsLoadingError
- *     Div              xformsLoadingNone
- *     Input            xformsStaticState
- *     Input            xformsDynamicState
- *     Element          xformsCurrentDivs
- *     Array id->index  xformsRepeatIndices
- *
  * Initializes attributes on the document object:
  *
+ *     Form            xformsForm
+ *     Div             xformsLoadingLoading
+ *     Div             xformsLoadingError
+ *     Div             xformsLoadingNone
+ *     Input           xformsStaticState
+ *     Input           xformsDynamicState
  *     Document[]      xformsNextRequests
  *     boolean         xformsLastRequestIsIncremental
- *     Form            xformsNextTargets
  *     boolean         xformsRequestInProgress
- *     Form            xformsTargetOfCurrentRequest
  *     XMLHttpRequest  xformsXMLHttpRequest
  *     Element         xformsPreviousValueChanged
  *
@@ -551,12 +536,6 @@ function xformsInitializeControlsUnder(root) {
                             control.slider = child;
                     }
                     xformsAddEventListener(control.slider, "mousedown", rangeMouseDown);
-
-                    // Find parent form and store this in span
-                    var parent = control;
-                    while (parent.tagName != "FORM")
-                       parent = parent.parentNode;
-                    control.form = parent;
                 }
                 
                 if (!document.xformsRangeListenerRegistered) {
@@ -593,47 +572,64 @@ function xformsInitializeControlsUnder(root) {
                 }
             }
 
-            if (!control.focusBlurEventListenerRegistered) {
-                control.focusBlurEventListenerRegistered = true;
-                xformsAddEventListener(control, "blur", function(event) {
-                    // Focus out events are only handled when we have receive a focus in event.
-                    // Here we just save the event which will be handled when we receive a focus
-                    // in from the browser.
-                    var target = getEventTarget(event);
-                    document.xformsPreviousDOMFocusOut = getEventTarget(event);
-                });
-                xformsAddEventListener(control, "focus", function(event) {
-                    var target = getEventTarget(event);
-                    var sendFocusEvents = true;
+            // Register listener on focus in and out events
+            var registerForFocusBlurEvents = function(control) {
+                if (!control.focusBlurEventListenerRegistered) {
+                    control.focusBlurEventListenerRegistered = true;
+                    xformsAddEventListener(control, "blur", function(event) {
+                        // Focus out events are only handled when we have receive a focus in event.
+                        // Here we just save the event which will be handled when we receive a focus
+                        // in from the browser.
+                        var target = getEventTarget(event);
+                        while (!target.id) target = target.parentNode;
+                        document.xformsPreviousDOMFocusOut = target;
+                    });
+                    xformsAddEventListener(control, "focus", function(event) {
+                        var target = getEventTarget(event);
+                        while (!target.id) target = target.parentNode;
+                        xformsLog("Target id: " + target.id);
+                        var sendFocusEvents = true;
 
-                    // We have just received a change event: try to combine both
-                    if (document.xformsPreviousValueChanged) {
-                        var eventSent = xformsValueChanged(document.xformsPreviousValueChanged, false, target);
-                        document.xformsPreviousValueChanged = null;
-                        if (eventSent)
-                            document.xformsPreviousDOMFocusOut = null;
-                        // If value changed didn't send anything, we still want to send the focus events
-                        sendFocusEvents = !eventSent;
-                    }
-
-                    // Send focus events
-                    if (sendFocusEvents) {
-                        if (document.xformsPreviousDOMFocusOut) {
-                            if (document.xformsPreviousDOMFocusOut != target) {
-                                var events = new Array();
-                                events.push(xformsCreateEventArray
-                                    (document.xformsPreviousDOMFocusOut, "DOMFocusOut", null, false));
-                                events.push(xformsCreateEventArray(target, "DOMFocusIn", null, false));
-                                xformsFireEvents(events);
-                            }
-                            document.xformsPreviousDOMFocusOut = null;
-                        } else {
-                            if (document.xformsPreviousDOMFocusIn != target)
-                                xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null, false)));
+                        // We have just received a change event: try to combine both
+                        if (document.xformsPreviousValueChanged) {
+                            var eventSent = xformsValueChanged(document.xformsPreviousValueChanged, false, target);
+                            document.xformsPreviousValueChanged = null;
+                            if (eventSent)
+                                document.xformsPreviousDOMFocusOut = null;
+                            // If value changed didn't send anything, we still want to send the focus events
+                            sendFocusEvents = !eventSent;
                         }
-                    }
-                    document.xformsPreviousDOMFocusIn = target;
-                });
+
+                        // Send focus events
+                        if (sendFocusEvents) {
+                            if (document.xformsPreviousDOMFocusOut) {
+                                if (document.xformsPreviousDOMFocusOut != target) {
+                                    var events = new Array();
+                                    events.push(xformsCreateEventArray
+                                        (document.xformsPreviousDOMFocusOut, "DOMFocusOut", null, false));
+                                    events.push(xformsCreateEventArray(target, "DOMFocusIn", null, false));
+                                    xformsFireEvents(events);
+                                }
+                                document.xformsPreviousDOMFocusOut = null;
+                            } else {
+                                if (document.xformsPreviousDOMFocusIn != target) {
+                                    xformsLog("Sending just focus in: " + target.id);
+                                    xformsFireEvents(new Array(xformsCreateEventArray(target, "DOMFocusIn", null, false)));
+                                }
+                            }
+                        }
+                        document.xformsPreviousDOMFocusIn = target;
+                    });
+                }
+            };
+            if (isXFormsCheckboxRadio) {
+                var inputs = control.getElementsByTagName("input");
+                for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
+                    var input = inputs[inputIndex];
+                    registerForFocusBlurEvents(input);
+                }
+            } else {
+                registerForFocusBlurEvents(control);
             }
 
             // If alert, store reference in control element to this alert element
@@ -670,28 +666,32 @@ function xformsPageLoaded() {
     var forms = document.getElementsByTagName("form");
     for (var formIndex = 0; formIndex < forms.length; formIndex++) {
         var form = forms[formIndex];
-        var spans = form.getElementsByTagName("span");
-        for (var spanIndex = 0; spanIndex < spans.length; spanIndex++) {
-            if (spans[spanIndex].className == "xforms-loading-loading")
-                forms[formIndex].xformsLoadingLoading = spans[spanIndex];
-            if (spans[spanIndex].className == "xforms-loading-error")
-                forms[formIndex].xformsLoadingError = spans[spanIndex];
-            if (spans[spanIndex].className == "xforms-loading-none")
-                forms[formIndex].xformsLoadingNone = spans[spanIndex];
-        }
-        var elements = form.elements;
-        for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
-            var element = elements[elementIndex];
-            if (element.name) {
-                if (element.name.indexOf("$static-state") != -1)
-                    form.xformsStaticState = element;
-                if (element.name.indexOf("$dynamic-state") != -1) {
-                    form.xformsDynamicState = element;
-                }
-                if (element.name.indexOf("$temp-dynamic-state") != -1) {
-                    form.xformsTempDynamicState = element;
-                    if (element.value == "")
-                        element.value = form.xformsDynamicState.value;
+        if (xformsArrayContains(form.className.split(" "), "xforms-form")) {
+            // This is a XForms form
+            document.xformsForm = form;
+            var spans = form.getElementsByTagName("span");
+            for (var spanIndex = 0; spanIndex < spans.length; spanIndex++) {
+                if (spans[spanIndex].className == "xforms-loading-loading")
+                    document.xformsLoadingLoading = spans[spanIndex];
+                if (spans[spanIndex].className == "xforms-loading-error")
+                    document.xformsLoadingError = spans[spanIndex];
+                if (spans[spanIndex].className == "xforms-loading-none")
+                    document.xformsLoadingNone = spans[spanIndex];
+            }
+            var elements = form.elements;
+            for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
+                var element = elements[elementIndex];
+                if (element.name) {
+                    if (element.name.indexOf("$static-state") != -1)
+                        document.xformsStaticState = element;
+                    if (element.name.indexOf("$dynamic-state") != -1) {
+                        document.xformsDynamicState = element;
+                    }
+                    if (element.name.indexOf("$temp-dynamic-state") != -1) {
+                        document.xformsTempDynamicState = element;
+                        if (element.value == "")
+                            element.value = document.xformsDynamicState.value;
+                    }
                 }
             }
         }
@@ -700,9 +700,7 @@ function xformsPageLoaded() {
     // Initialize attributes on document
     document.xformsNextRequests = new Array();
     document.xformsLastRequestIsIncremental = false;
-    document.xformsNextTargets = new Array();
     document.xformsRequestInProgress = false;
-    document.xformsTargetOfCurrentRequest = null;
 }
 
 function xformsGetLocalName(element) {
@@ -717,7 +715,6 @@ function xformsGetLocalName(element) {
 
 function xformsHandleResponse() {
     if (document.xformsXMLHttpRequest.readyState == 4) {
-        var form = document.xformsTargetOfCurrentRequest.form;
         var responseXML = document.xformsXMLHttpRequest.responseXML;
         if (responseXML && responseXML.documentElement
                 && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
@@ -845,9 +842,7 @@ function xformsHandleResponse() {
                                             var documentElementClasses = documentElement.className.split(" ");
 
                                             // Update value
-                                            if (document.xformsTargetOfCurrentRequest.id == controlId) {
-                                                // Don't update the control that we just modified
-                                            } else if (xformsArrayContains(documentElementClasses, "xforms-trigger")) {
+                                            if (xformsArrayContains(documentElementClasses, "xforms-trigger")) {
                                                 // Triggers don't have a value: don't update them
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-select-full")
                                                     || xformsArrayContains(documentElementClasses, "xforms-select1-full")) {
@@ -890,7 +885,10 @@ function xformsHandleResponse() {
                                             var newLabel = controlElement.getAttribute("label");
                                             if (newLabel && newLabel != documentElement.labelMessage) {
                                                 documentElement.labelMessage = newLabel;
-                                                xformsUpdateStyle(documentElement.labelElement);
+                                                // At this point we only support updating dynamically the label if
+                                                // there is a <label> is generated
+                                                if (documentElement.labelElement)
+                                                    xformsUpdateStyle(documentElement.labelElement);
                                             }
                                             // Store new hint message in control attribute
                                             var newHint = controlElement.getAttribute("hint");
@@ -1052,8 +1050,8 @@ function xformsHandleResponse() {
                             case "submission": {
                                 if (xformsGetLocalName(actionElement.childNodes[actionIndex]) == "submission") {
                                     newDynamicStateTriggersPost = true;
-                                    form.xformsDynamicState.value = newDynamicState;
-                                    form.submit();
+                                    document.xformsDynamicState.value = newDynamicState;
+                                    document.xformsForm.submit();
                                 }
                                 break;
                             }
@@ -1064,10 +1062,10 @@ function xformsHandleResponse() {
 
             // Store new dynamic state if that state did not trigger a post
             if (!newDynamicStateTriggersPost) {
-                form.xformsTempDynamicState.value = newDynamicState;
+                document.xformsTempDynamicState.value = newDynamicState;
             }
 
-            xformsDisplayLoading(form, "none");
+            xformsDisplayLoading("none");
             
         } else if (responseXML && responseXML.documentElement 
                 && responseXML.documentElement.tagName.indexOf("exceptions") != -1) {
@@ -1075,17 +1073,17 @@ function xformsHandleResponse() {
             // We received an error from the server
             var errorMessageNode = document.createTextNode
                 (responseXML.getElementsByTagName("message")[0].firstChild.data);
-            var errorContainer = form.xformsLoadingError;
+            var errorContainer = document.xformsLoadingError;
             while (errorContainer.firstChild)
                 errorContainer.removeChild(errorContainer.firstChild);
             errorContainer.appendChild(errorMessageNode);
-            xformsDisplayLoading(form, "error");
+            xformsDisplayLoading("error");
             
         } else {
 
             // The server didn't send valid XML
-            form.xformsLoadingError.innerHTML = "Unexpected response received from server";
-            xformsDisplayLoading(form, "error");
+            document.xformsLoadingError.innerHTML = "Unexpected response received from server";
+            xformsDisplayLoading("error");
             
         }
 
@@ -1102,24 +1100,22 @@ function xformsExecuteNextRequest() {
         if (document.xformsNextRequests.length > 0) {
             // Get next request
             var request = document.xformsNextRequests.shift();
-            var target = document.xformsNextTargets.shift();
-            
+
             // Mark this as loading
             document.xformsRequestInProgress = true;
-            xformsDisplayLoading(target.form, "loading");
-            
+            xformsDisplayLoading("loading");
+
             // Set the value of the dynamic-state in the request
             var requestElements = request.documentElement.childNodes;
             for (var i = 0; i < requestElements.length; i++) {
                 if (requestElements[i].tagName.indexOf("dynamic-state") != -1) {
                     var dynamicStateElement = requestElements[i];
                     dynamicStateElement.appendChild(dynamicStateElement.ownerDocument.createTextNode
-                        (target.form.xformsTempDynamicState.value));
+                        (document.xformsTempDynamicState.value));
                 }
             }
             
             // Send request
-            document.xformsTargetOfCurrentRequest = target;
             document.xformsXMLHttpRequest = new XMLHttpRequest();
             document.xformsXMLHttpRequest.open("POST", XFORMS_SERVER_URL, true);
             document.xformsXMLHttpRequest.onreadystatechange = xformsHandleResponse;

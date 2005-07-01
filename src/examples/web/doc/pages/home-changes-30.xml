@@ -236,6 +236,12 @@
                         Tracing: TODO
                     </p>
                 </li>
+                <li>
+                    <p>
+                        <b>Documentation.</b> The PFC documentation has been reworked and
+                        improved.
+                    </p>
+                </li>
             </ul>
             <note>
                 If a page uses XForms, which means either having <code>action</code> elements, or

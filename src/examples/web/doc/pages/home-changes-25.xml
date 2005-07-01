@@ -1024,7 +1024,7 @@
                             </xforms:instance>
                         </xforms:model>
                     </xml-source>
-                    <p>Limitation:</p>
+                    <p>Limitations:</p>
                     <ul>
                         <li>
                             Files that are included with XInclude must be static: their content cannot

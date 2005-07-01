@@ -31,6 +31,9 @@
                 PresentationServer application.
             </p>
         </section>
+
+        xxx document initializing an XForms instance with the current XML submission xxx
+
         <a name="introduction"/>
         <section>
             <title>Introduction to XForms</title>

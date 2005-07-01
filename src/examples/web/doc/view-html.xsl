@@ -22,7 +22,7 @@
     <xsl:template match="/">
         <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting">
             <xhtml:head>
-                <xhtml:title>PresentationServer Documentation</xhtml:title>
+                <xhtml:title>PresentationServer User Guide</xhtml:title>
             </xhtml:head>
             <xhtml:body>
                 <table cellpadding="0" cellspacing="0" border="0" id="main">
@@ -56,7 +56,7 @@
                     <tr>
                         <!-- List of sections -->
                         <td id="leftcontent" valign="top" width="1%">
-                            <h1>PresentationServer Documentation</h1>
+                            <h1>OPS User Guide</h1>
                             <ul class="tree-sections">
                                 <xsl:apply-templates select="doc('book.xml')/book/menu"/>
                             </ul>

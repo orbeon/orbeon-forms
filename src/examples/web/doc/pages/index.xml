@@ -21,23 +21,26 @@
     <body>
         <section>
             <title>Introduction</title>
-            <p>Welcome to the Orbeon PresentationServer User Guide!</p>
             <p>
-                Orbeon PresentationServer (OPS) is an open source J2EE-based platform for
-                XML-centric web applications. OPS is built around XHTML, XForms, XSLT, XML
-                pipelines, and Web Services, which makes it ideal for applications that capture,
-                process and present XML data.
+                Welcome to the Orbeon PresentationServer (OPS) User Guide, the home base of the OPS
+                documentation!
             </p>
             <p>
-                Unlike other popular web application frameworks like Struts or WebWork that are
+                OPS is an open source J2EE-based platform for XML-centric web applications. OPS is
+                built around XML technologies such as XHTML, XForms, XSLT, XML pipelines, and web
+                services, which makes it ideal for applications that capture, process and present
+                XML data.
+            </p>
+            <p>
+                Unlike other popular web application frameworks like Struts or WebWork which are
                 based on Java objects and JSP, OPS is based on XML documents and XML technologies.
                 This leads to an architecture better suited for the tasks of capturing, processing,
                 and presenting information in XML format, and often does not require writing any
-                Java code at all to implement your presentation layer.
+                Java code at all to implement the presentation layer of your web application.
             </p>
             <p>
-                OPS is built around Orbeon's optimized <a href="reference-xpl-pipelines">XPL
-                engine</a>, a mature, high-performance XML pipeline engine for processing XML data.
+                OPS is built around Orbeon's <a href="reference-xpl-pipelines">XPL engine</a>, a
+                mature, high-performance XML pipeline engine for processing XML data.
             </p>
         </section>
 
@@ -45,34 +48,70 @@
             <title>Purpose of the User Guide</title>
 
             <p>
-                The purpose of this guide is to get users acquainted with the fundamental concepts
-                of PresentationServer: XML processors and XML pipelines, the XML Pipeline
-                Definition Language (XPL), XForms, the Page Flow Controller (PFC), and
-                PresentationServer's built-in XML processors. It is highly recommended to quickly
-                get to the <a href="/doc/pages/Tutorial.pdf">Tutorial</a> to get started with
-                developing applications with PresentationServer.
+                The purpose of this guide is to get you acquainted with the main components of OPS:
             </p>
-
+            <ul>
+                <li>
+                    <p>
+                        <a href="reference-xforms"><b>XForms.</b></a> XForms is the W3C standard
+                        for creating complex web forms.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <a href="reference-page-flow"><b>The Page Flow Controller (PFC).</b></a>
+                        The PFC is the heart of your OPS application. It defines your application's
+                        pages and how you navigate between them.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <a href="reference-xpl-pipelines"><b>The XML Pipeline Definition Language
+                        (XPL).</b></a> XPL allows you to implement lightweight processes that handle
+                        XML data, without writing a single line of Java or other scripting language.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>OPS's built-in XML components.</b> The built-in OPS XML components
+                        provide services such as accessing databases, performing data
+                        transformations, calling web services, and more. If you need more, you can
+                        write your own XML components.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                It is highly recommended to follow the <a
+                href="/doc/pages/Tutorial.pdf">Tutorial</a> to get started with developing
+                applications with OPS, and to refer to the User Guide as a reference.
+            </p>
         </section>
 
         <section>
             <title>Prerequisites</title>
 
             <p>
-                This guide should be accessible to anyone with some experience
-                developing simple Web applications. It is helpful to understand
-                the basics of XML and Extensible Stylesheet Language
-                Transformations (XSLT) before reading this documentation. For
-                more information, consult the following sources as a starting
-                point:
+                This guide should be accessible to anyone with some experience developing simple web
+                applications. It is helpful to understand the basics of XML, Extensible Stylesheet
+                Language Transformations (XSLT), and XForms before reading this documentation. For
+                more information, consult the following sources as a starting point:
             </p>
 
             <ul>
                 <li>
-                    <a href="http://www.w3.org/XML/">XML</a>
+                    <p>
+                        <a href="http://www.w3.org/XML/">XML</a>
+                    </p>
                 </li>
                 <li>
-                    <a href="http://www.w3.org/Style/XSL/">XSLT</a>
+                    <p>
+                        <a href="http://www.w3.org/Style/XSL/">XSLT</a>
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <a href="http://www.w3.org/MarkUp/Forms/">XForms</a>
+                    </p>
                 </li>
             </ul>
 

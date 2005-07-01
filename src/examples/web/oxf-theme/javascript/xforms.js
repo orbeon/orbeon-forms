@@ -161,7 +161,21 @@ function xformsStringReplace(node, placeholder, replacement) {
 /**
  * Locate the delimiter at the given position starting from a repeat begin element.
  */
-function xformsFindRepeatDelimiter(beginElement, index) {
+function xformsFindRepeatDelimiter(repeatId, index) {
+
+    // Find id of repeat begin for the current repeatId
+    var parentRepeatIndexes = "";
+    {
+        var currentId = repeatId;
+        while (true) {
+            var parent = document.xformsRepeatTree[currentId];
+            if (parent == null) break;
+            parentRepeatIndexes = "-" + document.xformsRepeatIndexes[parent] + parentRepeatIndexes;
+            currentId = parent;
+        }
+    }
+
+    var beginElement = document.getElementById("repeat-begin-" + repeatId + parentRepeatIndexes);
     var cursor = beginElement;
     var cursorPosition = 0;
     while (true) {
@@ -665,7 +679,7 @@ function xformsPageLoaded() {
         var repeatInfo = repeatIndexes[repeatIndex].split(" ");
         var id = repeatInfo[0];
         var index = repeatInfo[1];
-        document.xformsRepeatTree[id] = index;
+        document.xformsRepeatIndexes[id] = index;
     }
 }
 
@@ -954,7 +968,7 @@ function xformsHandleResponse() {
                                             var repeatId = deleteId.substring(0, indexOfDash);
                                             var itemIndex = parseInt(deleteId.substring(indexOfDash + 1));
                                             // Locate the delimiter before the item to remove
-                                            var cursor = xformsFindRepeatDelimiter(document.getElementById("repeat-begin-" + repeatId), itemIndex);
+                                            var cursor = xformsFindRepeatDelimiter(repeatId, itemIndex);
                                             // Eat everything until next delimiter or end of repeat
                                             do {
                                                 var nextCursor = cursor.nextSibling;
@@ -994,27 +1008,36 @@ function xformsHandleResponse() {
                                         var repeatId = repeatIndexElement.getAttribute("id");
                                         var oldIndex = repeatIndexElement.getAttribute("old-index");
                                         var newIndex = repeatIndexElement.getAttribute("new-index");
+                                        // Store new index
+                                        document.xformsRepeatIndexes[repeatId] = newIndex;
+                                        // Figure out class of this repeat id based on depth
+                                        var depth = 1;
+                                        var currentRepeatId = repeatId;
+                                        while (true) {
+                                            currentRepeatId = document.xformsRepeatTree[currentRepeatId];
+                                            if (currentRepeatId == null) break;
+                                            depth = depth == 1 ? 2 : 1;
+                                        }
+                                        var repeatClassName = "xforms-repeat-selected-item-" + depth;
                                         // Unhighlight item at old index
-                                        var repeatBegin = document.getElementById("repeat-begin-" + repeatId);
-                                        var oldItemDelimiter = xformsFindRepeatDelimiter(repeatBegin, oldIndex);
+                                        var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, oldIndex);
                                         cursor = oldItemDelimiter.nextSibling;
                                         while (cursor.nodeType != ELEMENT_TYPE ||
                                                (cursor.className != "xforms-repeat-delimiter"
                                                && cursor.className != "xforms-repeat-begin-end")) {
                                             if (cursor.nodeType == ELEMENT_TYPE)
-                                                cursor.className = xformsArrayRemove(cursor.className.split(" "),
-                                                    "xforms-repeat-selected-item-1").join(" ");
+                                                cursor.className = xformsArrayRemove(cursor.className.split(" "), repeatClassName).join(" ");
                                             cursor = cursor.nextSibling;
                                         }
                                         // Highlight item a new index
-                                        var newItemDelimiter = xformsFindRepeatDelimiter(repeatBegin, newIndex);
+                                        var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
                                         cursor = newItemDelimiter.nextSibling;
                                         while (cursor.nodeType != ELEMENT_TYPE ||
                                                (cursor.className != "xforms-repeat-delimiter"
                                                && cursor.className != "xforms-repeat-begin-end")) {
                                             if (cursor.nodeType == ELEMENT_TYPE) {
                                                 var classNameArray = cursor.className.split(" ");
-                                                classNameArray.push("xforms-repeat-selected-item-1");
+                                                classNameArray.push(repeatClassName);
                                                 cursor.className = classNameArray.join(" ");
                                             }
                                             cursor = cursor.nextSibling;

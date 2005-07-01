@@ -1321,13 +1321,14 @@
                     <img print-format="pdf" src="pages/reference-controller-view-model-xforms-2.png"/>
                 </p>
             </section>
-
         </section>
+        <!--
         <section>
             <title>Differences with OPS 2.8</title>
             <p>
                 TODO
             </p>
         </section>
+        -->
     </body>
 </document>

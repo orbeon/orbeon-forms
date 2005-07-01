@@ -56,6 +56,13 @@
                 </li>
                 <li>
                     <p>
+                        <b>Better XHTML integration.</b> The XForms engine works on standard XHTML +
+                        XForms documents, without the need for a separately described XForms model
+                        as was the case in OPS 2.8.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         <b>XForms event model.</b> The XForms engine supports the XForms event
                         model, most XForms events and all XForms actions.
                     </p>
@@ -83,7 +90,9 @@
                 <li>
                     <p>
                         <b>XForms submission.</b> The XForms engine supports submitting forms as
-                        <code>application/xml</code>, including to external applications.
+                        <code>application/xml</code>, including to external applications. Support
+                        for <code>replace="instance"</code>, <code>replace="all"</code>, and
+                        <code>replace="none"</code> is included.
                     </p>
                 </li>
                 <li>
@@ -115,8 +124,9 @@
                 </li>
                 <li>
                     <p>
-                        TODO: document change in coding style (with need for separate XForms model
-                        declaration gone).
+                        <b>Other changes.</b> The XForms engine supports the <code>value</code>
+                        attribute on <code>xforms:output</code>, handles inheritance of model item
+                        properties, and includes numerous bug fixes.
                     </p>
                 </li>
                 <li>
@@ -144,6 +154,10 @@
 <!--                    </p>-->
 <!--                </li>-->
             </ul>
+            <note>
+                The Ajax-based XForms engine currently works with Mozilla Firefox and Microsoft
+                Internet Explorer 6. Support for Opera and Safari is planned.
+            </note>
         </section>
         <section>
             <title>Page Flow</title>

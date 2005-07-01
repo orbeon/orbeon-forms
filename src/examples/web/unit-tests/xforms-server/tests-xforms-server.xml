@@ -690,12 +690,12 @@
                     <xxf:itemsets/>
                     <xxforms:controls xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
                         <table>
-                            <tr id="id123-repeat-begin" class="xforms-repeat-begin-end"/>
+                            <tr id="repeat-begin-id123" class="xforms-repeat-begin-end"/>
                             <tr class="xforms-repeat-delimiter"/>
-                            <tr class="xforms-repeat-selected-item">
+                            <tr class="xforms-repeat-selected-item-1">
                                 <td>
                                     <table>
-                                        <tr id="id124-1-repeat-begin" class="xforms-repeat-begin-end"/>
+                                        <tr id="repeat-begin-id124-1" class="xforms-repeat-begin-end"/>
                                         <tr class="xforms-repeat-delimiter"/>
                                         <tr>
                                             <td>
@@ -706,7 +706,7 @@
                                             </td>
                                         </tr>
                                         <tr class="xforms-repeat-delimiter"/>
-                                        <tr class="xforms-repeat-selected-item">
+                                        <tr class="xforms-repeat-selected-item-2">
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125-1-2" class="xforms-control xforms-output">f12</xhtml:span>
                                             </td>
@@ -714,7 +714,7 @@
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-1-2" class="xforms-control xforms-output">l12</xhtml:span>
                                             </td>
                                         </tr>
-                                        <tr id="id124-1-repeat-end" class="xforms-repeat-begin-end"/>
+                                        <tr id="repeat-end-id124-1" class="xforms-repeat-begin-end"/>
                                     </table>
                                 </td>
                             </tr>
@@ -722,7 +722,7 @@
                             <tr>
                                 <td>
                                     <table>
-                                        <tr id="id124-2-repeat-begin" class="xforms-repeat-begin-end"/>
+                                        <tr id="repeat-begin-id124-2" class="xforms-repeat-begin-end"/>
                                         <tr class="xforms-repeat-delimiter"/>
                                         <tr>
                                             <td>
@@ -732,7 +732,7 @@
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-2-1" class="xforms-control xforms-output">l21</xhtml:span>
                                             </td>
                                         </tr>
-                                        <tr id="id124-2-repeat-end" class="xforms-repeat-begin-end"/>
+                                        <tr id="repeat-end-id124-2" class="xforms-repeat-begin-end"/>
                                     </table>
                                 </td>
                             </tr>
@@ -740,7 +740,7 @@
                             <tr>
                                 <td>
                                     <table>
-                                        <tr id="id124-3-repeat-begin" class="xforms-repeat-begin-end"/>
+                                        <tr id="repeat-begin-id124-3" class="xforms-repeat-begin-end"/>
                                         <tr class="xforms-repeat-delimiter"/>
                                         <tr>
                                             <td>
@@ -777,7 +777,7 @@
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126-3-4" class="xforms-control xforms-output">l34</xhtml:span>
                                             </td>
                                         </tr>
-                                        <tr id="id124-3-repeat-end" class="xforms-repeat-begin-end"/>
+                                        <tr id="repeat-end-id124-3" class="xforms-repeat-begin-end"/>
                                     </table>
                                 </td>
                             </tr>
@@ -785,7 +785,7 @@
                             <tr class="xforms-repeat-template">
                                 <td>
                                     <table>
-                                        <tr id="id124-repeat-begin" class="xforms-repeat-begin-end"/>
+                                        <tr id="repeat-begin-id124" class="xforms-repeat-begin-end"/>
                                         <tr class="xforms-repeat-template">
                                             <td>
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125" class="xforms-control xforms-output">$xforms-output-value$</xhtml:span>
@@ -794,11 +794,11 @@
                                                 <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126" class="xforms-control xforms-output">$xforms-output-value$</xhtml:span>
                                             </td>
                                         </tr>
-                                        <tr id="id124-repeat-end" class="xforms-repeat-begin-end"/>
+                                        <tr id="repeat-end-id124" class="xforms-repeat-begin-end"/>
                                     </table>
                                 </td>
                             </tr>
-                            <tr id="id123-repeat-end" class="xforms-repeat-begin-end"/>
+                            <tr id="repeat-end-id123" class="xforms-repeat-begin-end"/>
                         </table>
                     </xxforms:controls>
                 </xxf:action>

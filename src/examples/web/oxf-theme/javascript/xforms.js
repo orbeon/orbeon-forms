@@ -342,6 +342,8 @@ function xformsInitCheckesRadios(control) {
  *     XMLHttpRequest  xformsXMLHttpRequest
  *     Element         xformsPreviousValueChanged
  *     Array           xformsChangedIdsRequest       Ids of controls changed while request is processed by server
+ *     Array[id]->id   xformsRepeatTree              Returns the direct parent for each repeat id (or null if no parent)
+ *     Array[id]->#    xformsRepeatIndexes           Current index for each repeat id
  */
 function xformsInitializeControlsUnder(root) {
 
@@ -642,6 +644,28 @@ function xformsPageLoaded() {
                 }
             }
         }
+    }
+
+    // Parse and store initial repeat hierarchy
+    document.xformsRepeatTree = new Array();
+    var repeatTreeString = xformsStringValue(document.getElementById("xforms-repeat-tree"));
+    var repeatTree = repeatTreeString.split(",");
+    for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
+        var repeatInfo = repeatTree[repeatIndex].split(" ");
+        var id = repeatInfo[0];
+        var parent = repeatInfo.length > 1 ? repeatInfo[1] : null;
+        document.xformsRepeatTree[id] = parent;
+    }
+
+    // Parse and store initial repeat indexes
+    document.xformsRepeatIndexes = new Array();
+    var repeatIndexesString = xformsStringValue(document.getElementById("xforms-repeat-indexes"));
+    var repeatIndexes = repeatIndexesString.split(",");
+    for (var repeatIndex = 0; repeatIndex < repeatIndexes.length; repeatIndex++) {
+        var repeatInfo = repeatIndexes[repeatIndex].split(" ");
+        var id = repeatInfo[0];
+        var index = repeatInfo[1];
+        document.xformsRepeatTree[id] = index;
     }
 }
 

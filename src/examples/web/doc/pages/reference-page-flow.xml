@@ -1177,7 +1177,39 @@
         <section>
             <title>Error Handling</title>
             <p>
-                TODO
+                Several things can go wrong during the execution of a page flow by the PFC, in
+                particular:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        The page flow may be ill-formed.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        A runtime error may be encountered when processing the page flow, such as
+                        not finding a particular page model referenced by a page.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        An action, page model, page view or epilogue may generate an error at
+                        runtime.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                Those error conditions are not directly handled by the PFC. Instead, they are
+                handled with the error XPL pipeline specified in the web application's
+                <code>web.xml</code> file. By default, the error processor is the Pipeline
+                processor, which runs the <code>oxf:/config/error.xpl</code> XPL pipeline. You can
+                configure <code>error.xpl</code> for your own needs. By default, it formats and
+                displays the Java exception which caused ther error.
+            </p>
+            <p>
+                See <a href="integration-packaging">Packaging and Deployment</a> for more
+                information about configuring error processors.
             </p>
         </section>
         <a name="combinations"/>

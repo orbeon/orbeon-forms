@@ -23,6 +23,14 @@
             <name>oxf.main-processor.input.config</name>
             <value>oxf:/examples/dispatch.xpl</value>
         </init-param>
+        <init-param>
+            <name>oxf.error-processor.name</name>
+            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
+        </init-param>
+        <init-param>
+            <name>oxf.error-processor.input.config</name>
+            <value>oxf:/config/error.xpl</value>
+        </init-param>
         <supports>
             <mime-type>text/html</mime-type>
         </supports>
@@ -42,6 +50,14 @@
             <name>oxf.main-processor.input.controller</name>
             <value>oxf:/examples-portal/portlets/documentation/page-flow.xml</value>
         </init-param>
+        <init-param>
+            <name>oxf.error-processor.name</name>
+            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
+        </init-param>
+        <init-param>
+            <name>oxf.error-processor.input.config</name>
+            <value>oxf:/config/error.xpl</value>
+        </init-param>
         <supports>
             <mime-type>text/html</mime-type>
         </supports>
@@ -60,6 +76,14 @@
         <init-param>
             <name>oxf.main-processor.input.controller</name>
             <value>oxf:/examples-portal/portlets/source/page-flow.xml</value>
+        </init-param>
+        <init-param>
+            <name>oxf.error-processor.name</name>
+            <value>{http://www.orbeon.com/oxf/processors}pipeline</value>
+        </init-param>
+        <init-param>
+            <name>oxf.error-processor.input.config</name>
+            <value>oxf:/config/error.xpl</value>
         </init-param>
         <supports>
             <mime-type>text/html</mime-type>

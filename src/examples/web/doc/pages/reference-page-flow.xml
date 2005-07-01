@@ -21,7 +21,6 @@
     <header>
         <title>Page Flow Controller</title>
     </header>
-    <!-- TODO: explain action XPL pipeline: inputs, outputs -->
     <body>
         <section>
             <title>Introduction to the Page Flow Controller</title>
@@ -875,8 +874,37 @@
                          </li>
                     </ul>
                     <p>
-                        This is an example of using XSLT to produce an XML submission passed to a
-                        destination page:
+                        An action XPL pipeline supports an optional <code>instance</code> input
+                        containing the current XML submission, and produces an optional
+                        <code>data</code> output with an action result document which may be used by
+                        a <code>&lt;result&gt;</code> element's <code>when</code> attribute, as well
+                        as by an XML submission-producing transformation. This is an example of
+                        action XPL pipeline:
+                    </p>
+                    <xml-source>
+                        <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                                  xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+                            <p:param name="instance" type="input"/>
+                            <p:param name="data" type="output"/>
+
+                            <comment> Call the data access layer </comment>
+                            <p:processor name="oxf:pipeline">
+                                <p:input name="config" href="../data-access/delegate/read-document.xpl"/>
+                                <p:input name="document-id" href="#instance#xpointer(/*/document-id)"/>
+                                <p:output name="document-info" ref="data"/>
+                            </p:processor>
+
+                        </p:config>
+                    </xml-source>
+                    <p>
+                        Notice the <code>instance</code> input, the <code>data</code> output, as
+                        well as a call to a data access layer which uses information from the XML
+                        submission and directly returns an action result document.
+                    </p>
+                    <p>
+                        The following is an example of using XSLT within <code>&lt;result&gt;</code>
+                        element in order to produce an XML submission passed to a destination page:
                     </p>
                     <xml-source>
                         <action when="/form/action = 'show-detail'" action="../bizdoc/summary/find-document-action.xpl">

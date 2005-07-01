@@ -271,7 +271,7 @@
              <xhtml:tr>
                  <xhtml:td style="white-space: normal">
                      <f:xml-source>
-                         <xsl:copy-of select="document('input:instance')/form/chart"/>
+                         <xsl:copy-of select="doc('input:instance')/form/chart"/>
                      </f:xml-source>
                  </xhtml:td>
              </xhtml:tr>
@@ -283,7 +283,7 @@
              <xhtml:tr>
                  <xhtml:td>
                      <f:xml-source>
-                         <xsl:copy-of select="document('input:instance')/form/data"/>
+                         <xsl:copy-of select="doc('input:instance')/form/data"/>
                      </f:xml-source>
                  </xhtml:td>
              </xhtml:tr>

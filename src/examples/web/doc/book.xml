@@ -36,7 +36,7 @@
             <menu-item label="XForms Reference" href="reference-xforms"/>
             <menu-item label="XForms Compliance" href="reference-xforms-compliance"/>
         </menu>
-        <menu-item label="Page Flow" href="reference-page-flow"/>
+        <menu-item label="Page Flow Controller" href="reference-page-flow"/>
         <menu-item label="Page Flow Epilogue" href="reference-epilogue"/>
         <menu-item label="XPL and XML Pipelines" href="reference-xpl-pipelines"/>
         <menu-item label="Non-XML Documents" href="reference-formats"/>

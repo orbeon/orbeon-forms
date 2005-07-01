@@ -23,7 +23,7 @@
         <p:input name="config">
             <xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
                 <xsl:import href="tour.xsl"/>
-                <xsl:variable name="test" select="document('tour.xsl')"/>
+                <xsl:variable name="test" select="doc('tour.xsl')"/>
                 <xsl:variable name="start-cell" select="/form/start"/>
                 <xsl:param
                     name="start"

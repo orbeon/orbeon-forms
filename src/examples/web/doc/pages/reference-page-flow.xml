@@ -16,10 +16,12 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:xforms="http://www.w3.org/2002/xforms"
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <header>
         <title>Page Flow Controller</title>
     </header>
+    <!-- TODO: explain action XPL pipeline: inputs, outputs -->
     <body>
         <section>
             <title>Introduction to the Page Flow Controller</title>
@@ -121,11 +123,11 @@
                         (slashes).</p>
                     </li>
                     <li>
-                        <p><code>?first=12&amp;count=10</code> is an optional <i>query string</i> which
-                        identifies zero or more <i>parameters</i> passed to that page. Each parameter
-                        has a value. This example has two parameters: the first one is called
-                        <code>first</code> with value <code>12</code>, and the second one is called
-                        <code>count</code> with value <code>10</code>.</p>
+                        <p><code>?first=12&amp;count=10</code> specifies an optional <i>query
+                        string</i> which identifies zero or more <i>parameters</i> passed to that
+                        page. Each parameter has a value. This example has two parameters: the
+                        first one is called <code>first</code> with value <code>12</code>, and the
+                        second one is called <code>count</code> with value <code>10</code>.</p>
                     </li>
                     <li>
                         <p><code>#middle</code> is an optional fragment identifier identifying a section
@@ -135,10 +137,11 @@
                     </li>
                 </ul>
                 <p>
-                    For a particular web application, what usually matters to identify a particular page
-                    is the path within the URL under the context path, here <code>/report/detail</code>.
-                    Therefore, in an OPS page flow, each page is identified with a unique path
-                    information. You declare a minimal page like this:
+                    For a particular web application, what usually matters in order to identify a
+                    particular page is the path within the URL under the context
+                    path, here <code>/report/detail</code>. Therefore, in an OPS page flow, each
+                    page is identified with a unique path information. You declare a minimal page
+                    like this:
                 </p>
                 <xml-source>
                     <page path-info="/report/detail"/>
@@ -150,6 +153,10 @@
                     <page path-info="/report/summary"/>
                     <page path-info="/home"/>
                 </xml-source>
+                <p>
+                    A <code>&lt;page&gt;</code> element can have an optional <code>id</code>
+                    attribute useful for <a href="#page-navigation">navigating between pages</a>.
+                </p>
             </section>
             <section>
                 <title>Simple Pages</title>
@@ -161,17 +168,17 @@
                     <page path-info="/report/detail" view="oxf:/report/detail/report-detail-view.xhtml"/>
                 </xml-source>
                 <p>
-                    Here, using the <code>oxf:</code> protocol means that the files are searched through
-                    the OPS <a href="reference-resource-managers">resource manager</a>. It is also
-                    possible to use relative paths, for example:
+                    Here, using the <code>oxf:</code> protocol means that the file is searched
+                    through the OPS <a href="reference-resource-managers">resource manager</a>
+                    sandbox. It is also possible to use relative paths, for example:
                 </p>
                 <xml-source>
                     <page path-info="/report/detail" view="report/detail/report-detail-view.xhtml"/>
                 </xml-source>
                 <p>
-                    The paths are relative to the location of the page flow configuration file where the
-                    <code>&lt;page&gt;</code> element is contained. Here is an example of the content
-                    of <code>report-detail-view.xhtml</code>:
+                    The path is relative to the location of the page flow configuration file where
+                    the <code>&lt;page&gt;</code> element is contained. Here is an example of the
+                    content of <code>report-detail-view.xhtml</code>:
                 </p>
                 <xml-source>
                     <xhtml:html xmlns:xhtml="http://www.w3.org/1999/xhtml">
@@ -216,13 +223,10 @@
                 <xml-source>
                     <page path-info="/report/detail" view="report/detail/report-detail-view.xsl"/>
                 </xml-source>
-                <p>
-                    A <code>&lt;page&gt;</code> element can have an optional <code>id</code> attribute
-                    useful for navigating between page.
-                </p>
             </section>
             <section>
                 <title>Page Model and Page View</title>
+                <img print-format="pdf" src="pages/reference-controller-mvc.png" style="float: right; margin-left: 1em"/>
                 <p>
                     In the MVC architecture, the page logic is implemented by a <i>page model</i>, and
                     the page layout by a <i>page view</i>. The MVC architecture promotes the separation
@@ -262,7 +266,6 @@
                     XHTML page by creating a table with the content of the headlines, adding a logo at
                     the top of the page, a copyright notice at the bottom, etc.
                 </p>
-                <img print-format="pdf" src="pages/reference-controller-mvc.png"/>
                 <p>
                     Each PFC <code>&lt;page&gt;</code> element therefore supports attributes defining
                     what page model and page view must be used:
@@ -351,7 +354,9 @@
                     following:
                 </p>
                 <xml-source>
-                    <name>John Smith</name>
+                    <employee>
+                        <name>John Smith</name>
+                    </employee>
                 </xml-source>
                 <p>
                     Then an XSLT view can display the content of the <code>&lt;name&gt;</code> element
@@ -365,7 +370,7 @@
                             <title>Hello World MVC</title>
                         </head>
                         <body>
-                            <p>Hello <xsl:value-of select="/name"/>!</p>
+                            <p>Hello <xsl:value-of select="/employee/name"/>!</p>
                         </body>
                     </html>
                 </xml-source>
@@ -393,7 +398,7 @@
                 <ul>
                     <li>
                         <p>
-                            <b>Internal XForms submission.</b> The OPS built-in XForms engine uses
+                            <b>Internal XForms submission.</b> The built-in OPS XForms engine uses
                             an HTTP POST XForms submission to submit an XForms instance.
                         </p>
                     </li>
@@ -431,7 +436,7 @@
                     <page path-info="/report/detail" model="report/detail/report-detail-model.xpl" view="report/detail/report-detail-view.xsl"/>
                 </xml-source>
                 <p>
-                    If you wish to sumbmit an XForms instance to this page from within
+                    If you wish to submit an XForms instance to this page from within
                     <code>report-detail-view.xsl</code>, create an XForms submission as follows:
                 </p>
                 <xml-source>
@@ -547,8 +552,8 @@
                 <ul>
                     <li>
                         <p>
-                            <b>Using URL parameters.</b> URL parameters are specified after question
-                            mark on the URL, explained above.
+                            <b>Using URL parameters.</b> URL parameters are specified in a query
+                            string after a question mark in the URL, explained above.
                         </p>
                     </li>
                     <li>
@@ -586,11 +591,11 @@
                 </xml-source>
                 <p>
                     The <code>&lt;setvalue&gt;</code> element uses the <code>ref</code> attribute,
-                    which contains an XPath expression, to identify exactly one element or attribute
-                    in the XML document. The text value of the element or attribute is then set with
-                    the value of the URL parameter specified. If there is no parameter with a
-                    matching name, the element or attribute is not modified. This allows using
-                    default values, for example:
+                    which contains an XPath 2.0 expression identifying exactly one element or
+                    attribute in the XML document. The text value of the element or attribute is
+                    then set with the value of the URL parameter specified. If there is no parameter
+                    with a matching name, the element or attribute is not modified. This allows
+                    using default values, for example:
                 </p>
                 <xml-source>
                     <submission>
@@ -633,9 +638,10 @@
                 </p>
                 <p>
                     It is also possible to extract data from the URL path. To do so, use a
-                    <code>matcher</code> attribute on the page as documented below. You can then
-                    extract regular expression groups using the <code>&lt;setvalue&gt;</code>
-                    element with the <code>matcher-group</code> attribute:
+                    <code>matcher</code> attribute on the page as <a href="#matchers">documented
+                    below</a>. You can then extract regular expression groups using the
+                    <code>&lt;setvalue&gt;</code> element with the <code>matcher-group</code>
+                    attribute:
                 </p>
                 <xml-source>
                     <page path-info="/blog/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"
@@ -654,6 +660,7 @@
                 </p>
             </section>
         </section>
+        <a name="page-navigation"/>
         <section>
             <title>Navigating Between Pages</title>
             <section>
@@ -695,178 +702,200 @@
             </section>
             <section>
                 <title>Actions and Results</title>
-                <p>
-                    Consider a <code>view-account</code> page in the ATM web application. The page
-                    displays the current balance and lets the user enter an amount of money to
-                    withdraw from the account. The page looks like this:
-                </p>
-                <img print-format="png" src="pages/reference-controller-atm-screen.png" width="401" height="126"/>
-                <p>
-                    This page is composed of different parts illustrated in the figure below:
-                </p>
-                <ul>
-                    <li>
-                        <p>
-                            <b>The page model</b> retrieves the current balance.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>The page view</b> displays the balance, and presents a form for the
-                            user to enter the amount to withdraw.
-                        </p>
-                    </li>
-                    <li>
-                        <p>
-                            <b>An action</b> executed when the user enters an amount in the text
-                            field. This action checks if the amount entered is inferior or equal to
-                            the account balance. If it is, the balance is decreased by the amount
-                            entered and the transaction is considered valid. Otherwise, the
-                            transaction is considered illegal. Depending on the validity of the
-                            transaction, a different page is displayed. If the transaction is
-                            valid, the <code>anything-else</code> page is displayed; otherwise the
-                            <code>low-balance</code> page is displayed.
-                        </p>
-                    </li>
-                </ul>
-                <img print-format="pdf" src="pages/reference-controller-atm-logic.png"/>
-                <p>
-                    This behavior is described in the Page Flow with:
-                </p>
-                <xml-source>
-                    <page id="view-account" path-info="/view-account" model="view-account-get-balance-model.xpl" view="view-account-get-balance-view.xsl">
-                        <action when="/amount != ''" action="view-account-action.xpl">
-                            <result id="success" when="/success = 'true'" page="anything-else"/>
-                            <result id="failure" when="/success = 'false'" page="low-balance"/>
+                <section>
+                    <title>An Example</title>
+                    <p>
+                        Consider a <code>view-account</code> page in the ATM web application. The page
+                        displays the current balance and lets the user enter an amount of money to
+                        withdraw from the account. The page looks like this:
+                    </p>
+                    <img print-format="png" src="pages/reference-controller-atm-screen.png" width="401" height="126"/>
+                    <p>
+                        This page is composed of different parts illustrated in the figure below:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                <b>The page model</b> retrieves the current balance.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>The page view</b> displays the balance, and presents a form for the
+                                user to enter the amount to withdraw.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                <b>An action</b> executed when the user enters an amount in the text
+                                field. This action checks if the amount entered is inferior or equal to
+                                the account balance. If it is, the balance is decreased by the amount
+                                entered and the transaction is considered valid. Otherwise, the
+                                transaction is considered illegal. Depending on the validity of the
+                                transaction, a different page is displayed. If the transaction is
+                                valid, the <code>anything-else</code> page is displayed; otherwise the
+                                <code>low-balance</code> page is displayed.
+                            </p>
+                        </li>
+                    </ul>
+                    <img print-format="pdf" src="pages/reference-controller-atm-logic.png"/>
+                    <p>
+                        This behavior is described in the Page Flow with:
+                    </p>
+                    <xml-source>
+                        <page id="view-account" path-info="/view-account" model="view-account-get-balance-model.xpl" view="view-account-get-balance-view.xsl">
+                            <action when="/amount != ''" action="view-account-action.xpl">
+                                <result id="success" when="/success = 'true'" page="anything-else"/>
+                                <result id="failure" when="/success = 'false'" page="low-balance"/>
+                            </action>
+                        </page>
+                    </xml-source>
+                </section>
+                <section>
+                    <title>The <code>&lt;page&gt;</code> element</title>
+                    <p>
+                        On the <code>&lt;page&gt;</code> element, as documented above:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                The <code>path-info</code> attribute tells the PFC what relative
+                                URL corresponds to this page. The URL is relative to the
+                                application context path.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                The <code>model</code> attribute points to the page model XPL pipeline.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                The <code>view</code> attribute points to the page view XSLT template.
+                            </p>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <title>The <code>&lt;action&gt;</code> element</title>
+                    <p>
+                        The <code>&lt;page&gt;</code> element contains an
+                        <code>&lt;action&gt;</code> element. It is named <i>action</i> because it is
+                        typically executed as a consequence of an action performed by the end-user,
+                        for example by clicking on a button or a link which causes a form to be
+                        submitted. There may be more than one <code>&lt;action&gt;</code> element
+                        within a <code>&lt;page&gt;</code> element element. On an
+                        <code>&lt;action&gt;</code> element:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                The <code>when</code> attribute contains an XPath 2.0 expression
+                                executed against the XML submission. The first
+                                <code>&lt;action&gt;</code> element with a <code>when</code>
+                                attribute evaluating to <code>true()</code> is executed. The
+                                <code>when</code> attribute is optional: a missing <code>when</code>
+                                attribute is equivalent to <code>when="true()"</code>.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                When the action is executed, if the optional <code>action</code>
+                                attribute is present, the XPL pipeline it points to is executed.
+                            </p>
+                        </li>
+                    </ul>
+                </section>
+                <section>
+                    <title>The <code>&lt;result&gt;</code> element</title>
+                    <p>
+                        The <code>&lt;action&gt;</code> element can contain zero or more
+                        <code>&lt;result&gt;</code> elements.
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                If an <code>action</code> attribute is specified on the
+                                <code>&lt;action&gt;</code> element, the <code>&lt;result&gt;</code>
+                                element can have a <code>when</code> attribute. The
+                                <code>when</code> attribute contains an XPath 2.0 expression
+                                executed against the <code>data</code> output of the action XPL
+                                pipeline. A missing <code>when</code> attribute is equivalent to
+                                <code>when="true()"</code>. The first <code>&lt;result&gt;</code>
+                                evaluating to <code>true()</code> is executed.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                A <code>&lt;result&gt;</code> element optionally has a
+                                <code>page</code> attribute. The <code>page</code> attribute
+                                contains a page id pointing to a page declared in the same page
+                                flow. When the result is executed and the <code>page</code>
+                                attribute is present, the destination page is executed, and the user
+                                is forwarded to the corresponding page.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                A <code>&lt;result&gt;</code> element can optionally contain an XML
+                                submission. The submission can be created using XSLT, XQuery, or the
+                                deprecated XUpdate. You specify which language to use with the
+                                <code>transform</code> attribute on the <code>&lt;result&gt;</code>
+                                element. The inline content of the <code>&lt;result&gt;</code>
+                                contains then a transformation in the language specified. Using XSLT
+                                is recommended.
+                            </p>
+                            <p>
+                                The transformation has automatically access to:
+                            </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        An <code>instance</code> input, containing the current XML
+                                        submission. From XSLT, XQuery and XUpdate, this input is
+                                        available with the <code>doc('input:instance')</code>
+                                        function.
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        An <code>action</code> input, containing the result of the
+                                        action XPL pipeline if present. From XSLT, XQuery and
+                                        XUpdate, this input is available with the
+                                        <code>doc('input:action')</code> function.
+                                    </p>
+                                </li>
+                            </ul>
+                            <p>
+                                The result of the transformation is automatically submitted to the
+                                destination page. If there is no destination page, it replaces the
+                                current XML submission document made availabe to the page model and
+                                page view.
+                            </p>
+                         </li>
+                    </ul>
+                    <p>
+                        This is an example of using XSLT to produce an XML submission passed to a
+                        destination page:
+                    </p>
+                    <xml-source>
+                        <action when="/form/action = 'show-detail'" action="../bizdoc/summary/find-document-action.xpl">
+                            <result page="detail" transform="oxf:xslt">
+                                <form xsl:version="2.0" xmlns="">
+                                    <document-id><xsl:value-of select="doc('input:action')/document-info/document-id"/></document-id>
+                                    <document><xsl:copy-of select="doc('input:action')/document-info/document/*"/></document>
+                                </form>
+                            </result>
                         </action>
-                    </page>
-                </xml-source>
-                <ul>
-                    <li>
-                        <p>
-                            On the <code>&lt;page&gt;</code> element:
-                        </p>
-                        <ul>
-                            <li>
-                                <p>
-                                    The <code>path-info</code> attribute tells the Page Flow Controller
-                                    what relative URI corresponds to this page. The URI is relative to the
-                                    application context path.
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    The <code>model</code> attribute points to the page model XPL pipeline.
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    The <code>view</code> attribute points to the page view XSLT template.
-                                </p>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <p>
-                            The <code>&lt;page&gt;</code> element contains
-                            <code>&lt;action&gt;</code> elements. They are named <i>action</i>
-                            because they are executed as a result of an action performed by the
-                            end-user, typically by clicking on a button or a link. On an
-                            <code>&lt;action&gt;</code> element:
-                        </p>
-                        <ul>
-                            <li>
-                                <p>
-                                    The <code>when</code> attributes is evaluated. The first
-                                    <code>&lt;action&gt;</code> element with a <code>when</code>
-                                    attribute evaluating to <code>true</code> is executed. The
-                                    <code>when</code> attribute contains an XPath 2.0 expression
-                                    executed against the XML submission. The <code>when</code>
-                                    attribute is optional: a missing <code>when</code> attribute is
-                                    equivalent to <code>when="true()"</code>.
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    When the action is executed, if the optional <code>action</code>
-                                    attribute is present, the XPL pipeline it points to is
-                                    executed.
-                                </p>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <p>
-                            The <code>&lt;action&gt;</code> element can contain zero or more
-                            <code>&lt;result&gt;</code> elements.
-                        </p>
-                        <ul>
-                            <li>
-                                <p>
-                                    If an <code>action</code> attribute is specified on the
-                                    <code>&lt;action&gt;</code> element, the
-                                    <code>&lt;result&gt;</code> element can have a <code>when</code>
-                                    attribute. The <code>when</code> attribute contains an XPath
-                                    2.0 expression executed against the <code>data</code> output of
-                                    the action pipeline. A missing <code>when</code> attribute is
-                                    equivalent to <code>when="true()"</code>. The first
-                                    <code>&lt;result&gt;</code> evaluating to <code>true</code> is
-                                    executed.
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    A <code>&lt;result&gt;</code> element optionally has a
-                                    <code>page</code> attribute. The <code>page</code> attribute
-                                    contains a page id pointing to a page declared in the same page
-                                    flow. When the result is executed and the <code>page</code>
-                                    attribute is present, the destination page is executed, and the
-                                    user is forwarded to the corresponding page.
-                                </p>
-                            </li>
-                            <li>
-                                <p>
-                                    A <code>&lt;result&gt;</code> element can optionally contain an
-                                    XML submission. The submission can be created using XSLT,
-                                    XQuery, or the deprecated XUpdate. You specify which language to
-                                    use with the <code>transform</code> attribute on the
-                                    <code>&lt;result&gt;</code> element. The inline content of the
-                                    <code>&lt;result&gt;</code> contains then a transformation in
-                                    the language specified. Using XSLT is recommended.
-                                </p>
-                                <p>
-                                    The transformation has automatically access to:
-                                </p>
-                                <ul>
-                                    <li>
-                                        <p>
-                                            An <code>instance</code> input, containing the current
-                                            XML submission. From XSLT, XQuery and XUpdate, this
-                                            input is available with the
-                                            <code>doc('input:instance')</code> function.
-                                        </p>
-                                    </li>
-                                    <li>
-                                        <p>
-                                            An <code>action</code> input, containing the result of
-                                            the action XPL pipeline if present. From XSLT, XQuery
-                                            and XUpdate, this input is available with the
-                                            <code>doc('input:action')</code> function.
-                                        </p>
-                                    </li>
-                                </ul>
-                                <p>
-                                    The result of the transformation is automatically submitted to
-                                    the destination page. if there is no destination page, it
-                                    replaces the current XML submission document made availabe to
-                                    the page model and page view.
-                                </p>
-                             </li>
-                        </ul>
-                    </li>
-                </ul>
+                    </xml-source>
+                    <p>
+                        Notice the <code>transform</code> attribute set to <code>oxf:xslt</code>,
+                        and the use of the <code>doc('input:action')</code> to refer to the output
+                        of the action XPL pipeline specified by the <code>action</code> attribute on
+                        the <code>&lt;action&gt;</code> element. The current XML submission can also
+                        be accessed with<code>doc('input:instance')</code>.
+                    </p>
+                </section>
                 <p>
                     See the following examples to understand how <code>&lt;page&gt;</code>,
                     <code>&lt;action&gt;</code>, and <code>&lt;result&gt;</code> can be used in a
@@ -891,7 +920,7 @@
             <section>
                 <title>Controlling Internal XML Submissions</title>
                 <p>
-                    You can control what method is used to execute an internal XML submission
+                    You can control what method is used to perform an internal XML submission
                     described within a <code>&lt;result&gt;</code> element. Consider this page
                     flow:
                 </p>
@@ -968,7 +997,7 @@
                             element:
                         </p>
                         <xml-source>
-                            <page id="a" path-info="/a" xforms="..." model="..." view="...">
+                            <page id="a" path-info="/a" model="..." view="...">
                                 <action when="...">
                                     <result page="b" instance-passing="forward|redirect"/>
                                 </action>
@@ -990,7 +1019,7 @@
             <section>
                 <title>Overview</title>
                 <p>
-                    A fage flow file is comprised of three sections:
+                    A page flow file is comprised of three sections:
                 </p>
                 <ul>
                     <li>
@@ -1039,6 +1068,7 @@
                     stored in the resource repository will be sent in response to that request.
                 </p>
             </section>
+            <a name="matchers"/>
             <section>
                 <title>Paths and Matchers</title>
                 <p>
@@ -1055,8 +1085,8 @@
                         <td>
                             Simple patterns optionally start or end with a star character (
                             <code>*</code>). For instance: <code>/about/company.html</code> matches
-                            exactly this URL, <code>about/*</code> matches any URI that starts with
-                            <code>about/</code>, <code>*.gif</code> matches any URI that ends with
+                            exactly this URL, <code>about/*</code> matches any URL that starts with
+                            <code>about/</code>, <code>*.gif</code> matches any URL that ends with
                             <code>.gif</code>.
                         </td>
                     </tr>
@@ -1066,8 +1096,8 @@
                             In this case, an additional <code>matcher</code> attribute must be
                             specified on the <code>&lt;page&gt;</code> element. The
                             <code>matcher</code> argument points to a matcher processor qualified
-                            name. Two matcher processors are provided with PresentationServer: the
-                            Perl5 matcher (<code>oxf:perl5-matcher</code>) and the Glob matcher
+                            name. Two matcher processors are provided with OPS: the Perl5 matcher
+                            (<code>oxf:perl5-matcher</code>) and the Glob matcher
                             (<code>oxf:glob-matcher</code>). The Perl5 matcher accepts <link
                             href="http://www.perl.com/doc/manual/html/pod/perlre.html">Perl regular
                             expressions</link> and the Glob matcher accepts <link
@@ -1100,8 +1130,8 @@
                     look and feel across pages. Instead of duplicating the code implementing this
                     look and feel in every view, it is possible to put the presentation logic in a
                     central location called the epilogue. If specified, the epilogue points to the
-                    pipeline which is applied to the XML data produced by the view of each page, as
-                    shown in the following diagram.
+                    XPL pipeline which is applied to the XML data produced by the view of each
+                    page, as shown in the following diagram.
                 </p>
                 <note>
                     The PFC epilogue is only called for <code>&lt;page&gt;</code> element with a
@@ -1123,7 +1153,7 @@
                 <title>The not-found-handler Element</title>
                 <p>
                     The <code>&lt;not-found-handler&gt;</code> element is used to specify the
-                    identifyier of a page to call when no <code>&lt;page&gt;</code> element in the
+                    identifier of a page to call when no <code>&lt;page&gt;</code> element in the
                     page flow is matched by the current request. There can be only one
                     <code>&lt;not-found-handler&gt;</code> per page flow.
                 </p>
@@ -1159,9 +1189,10 @@
             <section>
                 <title>View Only</title>
                 <p>
-                    Simple pages with no back-end code can be implemented with a single pipeline,
-                    XSLT template or static page. A view pipeline must have a <code>data</code>
-                    output. The XML generated by the view then goes to the epilogue.
+                    Simple pages with no back-end code can be implemented with a single XPL
+                    pipeline, XSLT template or static page. A view XPL pipeline must have a
+                    <code>data</code> output. The XML generated by the view then goes to the
+                    epilogue.
 
                     <img print-format="pdf" src="pages/reference-controller-view.png"/>
                 </p>

@@ -51,14 +51,20 @@
                     <p>
                         <b>Ajax-based engine.</b> The XForms engine is now based on Ajax
                         technologies. This makes the XForms engine much more responsive to user
-                        interaction than in OPS 2.8.
+                        interaction than with OPS 2.8.
                     </p>
                 </li>
                 <li>
                     <p>
-                        <b>Better XHTML integration.</b> The XForms engine works on standard XHTML +
-                        XForms documents, without the need for a separately described XForms model
-                        as was the case in OPS 2.8.
+                        <b>Standard XHTML integration.</b> The XForms engine works on standard XHTML
+                        + XForms documents, without the need for a separately described XForms model
+                        as was the case with OPS 2.8. XForms models are simply included in the
+                        XHTML page view under the <code>&lt;xhtml:head&gt;</code> element, as
+                        recommended by XForms 1.0. In this mode, you don't use the
+                        <code>xforms</code> attribute on the PFC <code>&lt;page&gt;</code>
+                        elements. The <code>xforms</code> attribute is still supported for backward
+                        compatibility, but its use triggers the use of the legacy OPS 2.8 XForms
+                        engine.
                     </p>
                 </li>
                 <li>
@@ -148,11 +154,44 @@
                         input.
                     </p>
                 </li>
-<!--                <li>-->
-<!--                    <p>-->
-<!--                        -->
-<!--                    </p>-->
-<!--                </li>-->
+                <li>
+                    <p>
+                        With OPS 2.8 if your XForms instance was:
+                    </p>
+                    <xml-source>
+                        <credit-card>
+                            <type>visa</type>
+                            ...
+                        </credit-card>
+                    </xml-source>
+                    <p>
+                        and your first XForms element under the <code>&lt;xhtml:body&gt;</code>
+                        element was:
+                    </p>
+                    <xml-source>
+                        <xforms:group ref="credit-card"/>
+                    </xml-source>
+                    <p>
+                        then <code>credit-card</code> would evaluate against the <i>document
+                        node</i> of the unique XForms instance. The above code worked, but this
+                        behavior was incorrect. The XPath evaluation context for top-level XForms
+                        controls has to be the root <i>element</i> of the default XForms instance
+                        instead. This means that the code above must be changed in one of two ways:
+                    </p>
+                    <xml-source>
+                        <xforms:group ref="/credit-card"/>
+                    </xml-source>
+                    <p>
+                        or:
+                    </p>
+                    <xml-source>
+                        <xforms:group ref="."/>
+                    </xml-source>
+                    <p>
+                        If you always used absolute XPath expressions for your top-level XForms
+                        controls, no change is necessary.
+                    </p>
+                </li>
             </ul>
             <note>
                 The Ajax-based XForms engine currently works with Mozilla Firefox and Microsoft
@@ -165,19 +204,19 @@
                 Several improvements have been added to the Page Flow Controller, in part motivated
                 by the new XForms engine. The PFC is now more generic and less tied to the built-in
                 OPS XForms implementation. At the same time it plays better than before with XForms.
-                The major PFC concepts found in OPS 2.8 have not changed and backward
+                The major PFC concepts found with OPS 2.8 have not changed and backward
                 compatibility is kept. The main changes are the following:
             </p>
             <ul>
                 <li>
                     <p>
-                        <b>Deprecation of the <code>xforms</code> attribute.</b> Using XForms in OPS
+                        <b>Deprecation of the <code>xforms</code> attribute.</b> Using XForms with OPS
                         no longer implies using an <code>xforms</code> attribute on the
-                        <code>page</code> element. Instead, XForms models are included in the XHTML
-                        page view under the <code>xhtml:head</code> element, as recommended by
-                        XForms 1.0. The <code>xforms</code> attribute is still supported for
-                        backward compatibility, and triggers the use of the legacy OPS 2.8 XForms
-                        engine.
+                        <code>&lt;page&gt;</code> element. Instead, XForms models are included in
+                        the XHTML page view under the <code>&lt;xhtml:head&gt;</code> element, as
+                        recommended by XForms 1.0. The <code>xforms</code> attribute is still
+                        supported for backward compatibility, and triggers the use of the legacy OPS
+                        2.8 XForms engine.
                     </p>
                 </li>
                 <li>
@@ -194,23 +233,26 @@
                 </li>
                 <li>
                     <p>
-                        <b>Deprecation of the <code>param</code> element.</b> The PFC's
-                        <code>param</code> element was used to set values into a submitted XForms
-                        instance. A new, more flexible element, <code>setvalue</code>, now performs
-                        the same task. The <code>setvalue</code> element supports extracting
-                        information from regular expressions applied to the request path, as well as
-                        extracting request parameters. This allows for creating "clean", REST-like
-                        URLs in your appliation. <code>param</code> is still supported for backward
+                        <b>Deprecation of the <code>&lt;param&gt;</code> element.</b> The PFC's
+                        <code>&lt;param&gt;</code> element was used to set values into a submitted
+                        XForms instance. A new, more flexible element,
+                        <code>&lt;setvalue&gt;</code>, now performs the same task. The
+                        <code>&lt;setvalue&gt;</code> element supports extracting information from
+                        regular expressions applied to the request path, as well as extracting
+                        request parameters. This allows for creating "clean", REST-like URLs in
+                        your appliation. <code>param</code> is still supported for backward
                         compatibility.
                     </p>
                 </li>
                 <li>
                     <p>
                         <b>Generic XML submission transformations.</b> The PFC features a new
-                        generic and extensible XML submission transformation mechanism. In OPS 2.8,
-                        XUpdate code had to be used to transform XML instances between pages.
+                        generic and extensible XML submission transformation mechanism. With OPS
+                        2.8, XUpdate code had to be used to transform XML instances between pages.
                         XUpdate support in the PFC is now deprecated. Instead, XSLT or XQuery
-                        should be used for that purpose.
+                        should be used for that purpose. For more information, please refer to the
+                        <a href="reference-page-flow#result-element"><code>&lt;result&gt;</code>
+                        element section</a> of the PFC documentation.
                     </p>
                 </li>
                 <li>
@@ -244,9 +286,9 @@
                 </li>
             </ul>
             <note>
-                If a page uses XForms, which means either having <code>action</code> elements, or
-                reading the instance in the page model or page view, it must not expect to be able
-                to read the HTTP request body separately.
+                If a page uses XForms, which means either having <code>&lt;action&gt;</code>
+                elements, or reading the instance in the page model or page view, it must not expect
+                to be able to read the HTTP request body separately.
             </note>
         </section>
         <section>
@@ -305,8 +347,8 @@
                 </p>
             </note>
             <p>
-                TODO: document the fact that transformation is separate from serialization in OPS.
-                See XML serializer.
+                TODO: document the fact that transformation is separate from serialization with
+                OPS. See XML serializer.
             </p>
         </section>
         <section>

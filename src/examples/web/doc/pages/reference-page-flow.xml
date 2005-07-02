@@ -805,6 +805,7 @@
                         </li>
                     </ul>
                 </section>
+                <a name="result-element"/>
                 <section>
                     <title>The <code>&lt;result&gt;</code> element</title>
                     <p>
@@ -1330,5 +1331,6 @@
             </p>
         </section>
         -->
+        <!-- TODO: maybe mention how the PFC is configured by default in web.xml? -->
     </body>
 </document>

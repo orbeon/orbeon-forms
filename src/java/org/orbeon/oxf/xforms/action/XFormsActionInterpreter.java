@@ -532,7 +532,7 @@ public class XFormsActionInterpreter {
     }
 
     private void findAffectedRepeatIds(final PipelineContext pipelineContext, final Element parentElement, final Map setRepeatIds, final Map resetRepeatIds) {
-        xformsControls.visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlVisitorListener() {
+        xformsControls.visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlElementVisitorListener() {
             private Element foundControlElement = null;
             public boolean startVisitControl(Element controlElement, String effectiveControlId) {
                 if (controlElement.getName().equals("repeat")) {

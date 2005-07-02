@@ -789,8 +789,8 @@
                 <p>
                     It is recommended to start by changing the container parameters that control
                     threads. With Tomcat (see the <a
-                    href="http://jakarta.apache.org/tomcat/tomcat-5.5-doc/config/http.html
-                    ">documentation</a>), try first:
+                    href="http://jakarta.apache.org/tomcat/tomcat-5.5-doc/config/http.html">documentation</a>),
+                    try first:
                 </p>
                 <ul>
                     <li>maxThreads="3"</li>

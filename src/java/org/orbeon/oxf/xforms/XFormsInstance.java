@@ -27,12 +27,15 @@ import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
 import java.util.List;
 import java.util.Map;
 
@@ -214,6 +217,12 @@ public class XFormsInstance implements XFormsEventTarget {
         } catch (SAXException e) {
             throw new OXFException(e);
         }
+    }
+
+    public void readOut() {
+        final TransformerHandler  th = TransformerUtils.getIdentityTransformerHandler();
+        th.setResult(new StreamResult(System.out));
+        read(th);
     }
 
     private String convertUploadTypes(String value, String currentType, String newType) {

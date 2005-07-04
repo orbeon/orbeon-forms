@@ -214,6 +214,7 @@ public class XFormsActionInterpreter {
                 {
                     final Element lastElement = (Element) collectionToBeUpdated.get(collectionToBeUpdated.size() - 1);
                     clonedElement = (Element) lastElement.createCopy();
+                    XFormsUtils.setInitialDecoration(clonedElement);
                 }
 
                 // "Finally, this newly created node is inserted into the instance data at the location

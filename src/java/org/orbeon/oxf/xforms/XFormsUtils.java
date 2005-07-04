@@ -114,8 +114,7 @@ public class XFormsUtils {
     }
 
     /**
-     * Recursively decorate the element and its attribute with empty instances
-     * of <code>InstanceData</code>.
+     * Recursively decorate all the elements and attributes with default <code>InstanceData</code>.
      */
     public static void setInitialDecoration(Document document) {
         Element rootElement = document.getRootElement();
@@ -124,17 +123,30 @@ public class XFormsUtils {
         ((InstanceData) rootElement.getData()).setIdToNodeMap(idToNodeMap);
     }
 
+    /**
+     * Recursively decorate the element and its attributes with default <code>InstanceData</code>.
+     */
+    public static void setInitialDecoration(Element element) {
+        setInitialDecorationWorker(element, null, null);
+    }
+
     private static void setInitialDecorationWorker(Element element, int[] currentId, Map idToNodeMap) {
-        int elementId = ++currentId[0];
-        idToNodeMap.put(new Integer(elementId), element);
+        // NOTE: ids are only used by the legacy XForms engine
+        int elementId = (currentId != null) ? ++currentId[0] : -1;
+        if (idToNodeMap != null) {
+            idToNodeMap.put(new Integer(elementId), element);
+        }
 
         element.setData(newInstanceData(element.getData(), elementId));
 
         for (Iterator i = element.attributes().iterator(); i.hasNext();) {
             Attribute attribute = (Attribute) i.next();
             if (!XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attribute.getNamespaceURI())) {
-                int attributeId = ++currentId[0];
-                idToNodeMap.put(new Integer(attributeId), attribute);
+                // NOTE: ids are only used by the legacy XForms engine
+                int attributeId = (currentId != null) ? ++currentId[0] : -1;
+                if (idToNodeMap != null) {
+                    idToNodeMap.put(new Integer(attributeId), attribute);
+                }
                 attribute.setData(newInstanceData(attribute.getData(), attributeId));
             }
         }

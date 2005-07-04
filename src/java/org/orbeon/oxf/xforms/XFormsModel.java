@@ -710,7 +710,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // TODO: a, b, c xxx
 
             // 5. xforms-rebuild, xforms-recalculate, xforms-revalidate
-            containingDocument.dispatchEvent(pipelineContext, new org.orbeon.oxf.xforms.event.events.XFormsRebuildEvent(this));
+            containingDocument.dispatchEvent(pipelineContext, new XFormsRebuildEvent(this));
             containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(this, false));
             containingDocument.dispatchEvent(pipelineContext, new XFormsRevalidateEvent(this, false));
 

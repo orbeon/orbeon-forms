@@ -25,8 +25,10 @@
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
-    <!-- The document produced by the page view XForms processing performed -->
+    <!-- The document produced by the page view with XForms processing performed -->
     <p:param type="input" name="xformed-data"/>
+    <!-- The raw document produced by the page view -->
+<!--    <p:param type="input" name="data"/>-->
     <!-- The XML submission if any -->
 <!--    <p:param type="input" name="instance"/>-->
 
@@ -44,27 +46,13 @@
 
     <!-- The container is a servlet -->
     <p:choose href="#xformed-data">
-        <!-- XSL-FO detection. Use the XSL-FO serializer -->
-        <p:when test="/fo:root">
-            <p:processor name="oxf:xslfo-serializer">
-                <p:input name="config">
-                    <config>
-                        <header>
-                           <name>Content-Disposition</name>
-                            <value>attachment; filename=document.pdf</value>
-                        </header>
-                    </config>
-                </p:input>
-                <p:input name="data" href="#xformed-data"/>
-            </p:processor>
-        </p:when>
         <!-- XHTML detection. Apply the theme, rewrite URLs, and serialize to HTML or XHTML. -->
         <p:when test="/xhtml:html">
             <!-- Apply theme -->
             <p:processor name="oxf:xslt">
                 <p:input name="data" href="#xformed-data"/>
                 <p:input name="request" href="#request"/>
-                <p:input name="config" href="oxf:/oxf-theme/theme.xsl"/>
+                <p:input name="config" href="oxf:/config/theme/theme.xsl"/>
                 <p:output name="data" id="themed-data"/>
             </p:processor>
             <!-- Rewrite all URLs in HTML and XHTML documents -->
@@ -216,6 +204,20 @@
                     </config>
                 </p:input>
                 <p:input name="data" href="#converted"/>
+            </p:processor>
+        </p:when>
+        <!-- XSL-FO detection. Use the XSL-FO serializer -->
+        <p:when test="/fo:root">
+            <p:processor name="oxf:xslfo-serializer">
+                <p:input name="config">
+                    <config>
+                        <header>
+                           <name>Content-Disposition</name>
+                            <value>attachment; filename=document.pdf</value>
+                        </header>
+                    </config>
+                </p:input>
+                <p:input name="data" href="#xformed-data"/>
             </p:processor>
         </p:when>
         <!-- No particular document format detected. Output plain XML. -->

@@ -210,6 +210,13 @@
             <ul>
                 <li>
                     <p>
+                        <b>Documentation.</b> The <a href="reference-page-flow">PFC
+                        documentation</a> has been reworked and greatly improved. The page flow
+                        epilogue is now <a href="reference-epilogue">documented in depth</a>.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         <b>Deprecation of the <code>xforms</code> attribute.</b> Using XForms with OPS
                         no longer implies using an <code>xforms</code> attribute on the
                         <code>&lt;page&gt;</code> element. Instead, XForms models are included in
@@ -276,12 +283,6 @@
                 <li>
                     <p>
                         Tracing: TODO
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Documentation.</b> The PFC documentation has been reworked and
-                        improved.
                     </p>
                 </li>
             </ul>

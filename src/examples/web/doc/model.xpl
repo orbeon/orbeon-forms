@@ -86,7 +86,7 @@
             <p:processor name="oxf:xslt">
                 <p:input name="data" href="#view"/>
                 <p:input name="request"><request/></p:input>
-                <p:input name="config" href="oxf:/oxf-theme/theme.xsl"/>
+                <p:input name="config" href="oxf:/config/theme/theme.xsl"/>
                 <p:output name="data" id="html"/>
             </p:processor>
 

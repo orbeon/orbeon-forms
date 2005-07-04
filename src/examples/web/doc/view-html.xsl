@@ -32,7 +32,7 @@
                             <a href="/" f:url-norewrite="true">
                                 <img f:url-norewrite="false" width="199" height="42"
                                      style="border: 0 white; margin-top: 0.2em; margin-bottom: 0.4em"
-                                     src="/oxf-theme/images/orbeon-small-blueorange.gif"/>
+                                     src="/config/theme/images/orbeon-small-blueorange.gif"/>
                             </a>
                         </div>
                         <span id="navigation" style="float: right; margin-right: 1em; margin-top: .2em; white-space: nowrap">

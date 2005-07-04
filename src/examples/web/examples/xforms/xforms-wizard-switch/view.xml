@@ -42,7 +42,7 @@
                 relevant="@relevant = 'true'"/>
             <xforms:bind nodeset="instance('formatted')" 
                 calculate="saxon:serialize(xxforms:call-xpl
-                    ('oxf:/oxf-theme/format.xpl', 'data', instance('text'), 'data')/*, 'html')"/>
+                    ('oxf:/config/theme/format.xpl', 'data', instance('text'), 'data')/*, 'html')"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

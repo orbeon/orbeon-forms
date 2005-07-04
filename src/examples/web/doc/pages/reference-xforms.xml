@@ -388,7 +388,7 @@
                                                     The input field is complemented by a pop-up calendar. The user can enter a date manually, 
                                                     or use the calendar to select a date in the past or in the future. The calendar is customizable 
                                                     by the application developer by editing the following file: 
-                                                    <code>oxf-theme/javascript/calendar.js</code>
+                                                    <code>config/theme/javascript/calendar.js</code>
                                                </p>
                                             </li>
                                             <li>
@@ -396,7 +396,7 @@
                                                     The input field is broken up into three fields: hours, minutes, and seconds. Javascript validation 
                                                     verifies the user's entries, and prevents non-numeric characters, as well as overflowing values (hours 
                                                     greater than 23, minutes and seconds over 59). The Javascript code is customizable in the following file:
-                                                    <code>oxf-theme/javascript/time-utils.js</code>
+                                                    <code>config/theme/javascript/time-utils.js</code>
                                                 </p>
                                             </li>
                                         </ul>

@@ -111,7 +111,7 @@
                 calculate="instance('instance')/country"/>
             <xforms:bind nodeset="instance('formatted')" 
                 calculate="saxon:serialize(xxforms:call-xpl
-                    ('oxf:/oxf-theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
+                    ('oxf:/config/theme/format.xpl', 'data', instance('instance'), 'data')/*, 'html')"/>
             <xforms:bind nodeset="instance('ui')/show-instance" relevant=". = 'true'"/>
             
             <xforms:submission ref="instance('countries')" id="countries-submission" 

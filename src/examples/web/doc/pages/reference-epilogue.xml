@@ -92,13 +92,16 @@
         <section>
             <title>Basics</title>
             <section>
-                <title>Configuration and Execution</title>
+                <title>Configuration</title>
                 <p>
                     The epilogue pipeline is specified with the <a
                     href="reference-page-flow#epilogue-element"><code>&lt;epilogue&gt;</code>
-                    element</a>, which by default points to the OPS <i>standard epilogue</i> located
-                    under <code>oxf:/config/epilogue.xpl</code>.
+                    element</a> in your page flow. By default, the <i>standard epilogue</i> located
+                    under <code>oxf:/config/epilogue.xpl</code> is used.
                 </p>
+            </section>
+            <section>
+                <title>Execution</title>
                 <p>
                     The epilogue is executed by the PFC only after a page view executes. This means
                     that for a given execution of a page, the following conditions must be met for the
@@ -112,59 +115,403 @@
                     </li>
                     <li>
                         <p>
-                            No page result element with a <code>page</code> attribute executes.
+                            No page result element with a <code>page</code> attribute executes
+                            (because in that case, a redirection to another page occurs, and neither
+                            model nor view of the current page executes).
                         </p>
                     </li>
                 </ul>
             </section>
             <section>
-                <title>Inputs</title>
+                <title>Inputs and Outputs</title>
+                <table>
+                    <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td align="center">Input</td>
+                        <td><code>data</code></td>
+                        <td>
+                            <p>
+                                When executed, the epilogue XPL pipeline has a <code>data</code> input containing
+                                the XML document produced by the page view which just executed. In particular, if
+                                the page view is:
+                            </p>
+                            <ul>
+                                <li>
+                                    <p>
+                                        <b>A static XML file:</b> the <code>data</code> input directly receives the
+                                        unmodified content of that file.
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <b>An XSLT template:</b> the <code>data</code> input receives the default
+                                        output of the XSLT template.
+                                    </p>
+                                </li>
+                                <li>
+                                    <p>
+                                        <b>An XPL pipeline:</b> the <code>data</code> input receives the content of
+                                        the <code>data</code> output of that pipeline.
+                                    </p>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">Input</td>
+                        <td><code>instance</code></td>
+                        <td>
+                            <p>
+                                The epilogue XPL pipeline receives on its <code>instance</code> input the <a
+                                href="reference-page-flow#xml-submission"> XML submission</a> performed on the
+                                page, if any. The epilogue usually does not use this input.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">Input</td>
+                        <td><code>xforms-model</code></td>
+                        <td>
+                            <p>
+                                The epilogue XPL pipeline also receives on its <code>xforms-model</code> input
+                                the legacy XForms model as specified on the <code>&lt;page&gt;</code> element's
+                                <code>xforms</code> attribute. This input is for the private use of the legacy
+                                server-side XForms engine in OPS. You usually do not have to deal with it.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">Output</td>
+                        <td><code>-</code></td>
+                        <td>
+                            <p>
+                                The epilogue XPL pipeline does not have any output: the result of
+                                the XPL pipeline must be produced using a serializer, usually the <a
+                                href="processors-serializers-http">HTTP serializer</a>, which
+                                serializes the resulting data directly to an HTTP client such as a
+                                web browser.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </section>
+        </section>
+        <a name="default-epilogue"/>
+        <section>
+            <title>The Default Epilogue: epilogue.xpl</title>
+            <p>
+                The default epilogue is found under <code>oxf:/config/epilogue.xpl</code>. It
+                performs the following tasks:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>XForms processing:</b> it applies server-side XForms processing if
+                        needed. If your application does not use the OPS built-in XForms engine
+                        at all, you can bypass XForms processing.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Container type selection:</b> it dispatches to two sub-epilogues,
+                        <code>oxf:/config/epilogue-servlet.xpl</code> and
+                        <code>oxf:/config/epilogue-portlet.xpl</code>, depending on whether the
+                        page is running in a servlet or portlet environment. If your application
+                        does not use portlets at all, you can bypass this choice.
+                    </p>
+                    <note>
+                        <p>
+                            With OPS 3.0, only the servlet environment is officially supported. The
+                            portlet environment is however used for the examples portal. Please also
+                            refer to this <a href="home-faq#jsr-168">FAQ entry</a>.
+                        </p>
+                        <p>
+                            This means that for your OPS applications,
+                            <code>epilogue-servlet.xpl</code> is usually the relevant file to
+                            consider.
+                        </p>
+                    </note>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>The Servlet Epilogue: epilogue-servlet.xpl</title>
+            <section>
+                <title>Introduction</title>
                 <p>
-                    When executed, the epilogue XPL pipeline has a <code>data</code> input containing
-                    the XML document produced by the page view which just executed. In particular, if
-                    the page view is:
+                    <code>oxf:/config/epilogue-servlet.xpl</code> is the epilogue file you are the
+                    most likely to configure.
+                </p>
+            </section>
+            <section>
+                <title>Inputs and Outputs</title>
+                <table>
+                    <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Purpose</th>
+                    </tr>
+                    <tr>
+                        <td align="center">Input</td>
+                        <td><code>xformed-data</code></td>
+                        <td>
+                            <p>
+                                This XPL pipeline receives on this input the XML document produced
+                                by the page view and then transformed by server-side XForms
+                                processing. This means that if the page view produces an XHTML +
+                                XForms document, the document received by
+                                <code>epilogue-servlet.xpl</code> on its <code>xformed-data</code>
+                                is already transformed by the server-sided XForms engine into XHTML.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">Input</td>
+                        <td><code>data</code></td>
+                        <td>
+                            <p>
+                                This XPL pipeline also receives on its <code>data</code> input the
+                                raw XML document produced by the page view. This is the same XML
+                                document received by <code>epilogue.xpl</code>.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="center">Output</td>
+                        <td><code>-</code></td>
+                        <td>
+                            <p>
+                                This XPL pipeline does not have any output: the result of the XPL
+                                pipeline must be produced using a serializer, usually the <a
+                                href="processors-serializers-http">HTTP serializer</a>, which
+                                serializes the resulting data directly to an HTTP client such as a
+                                web browser.
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </section>
+            <section>
+                <title>Processing Logic</title>
+                <p>
+                    <code>epilogue-servlet.xpl</code> performs different tasks depending on the input
+                    XML document.
                 </p>
                 <ul>
                     <li>
                         <p>
-                            <b>A static XML file:</b> the <code>data</code> input directly receives the
-                            unmodified content of that file.
+                            <b>XHTML:</b> for XHTML documents, identified with a root element of
+                            <code>xhtml:html</code> (in the XHTML namespace):
+                        </p>
+                        <ol>
+                            <li>
+                                <p>The default theme is applied.</p>
+                            </li>
+                            <li>
+                                <p>URLs are rewritten.</p>
+                            </li>
+                            <li>
+                                <p>XHTML is converted to HTML by moving the XHTML elements to no namespace.</p>
+                            </li>
+                            <li>
+                                <p>The result is converted to plain HTML.</p>
+                            </li>
+                            <li>
+                                <p>The resulting HTML document is sent to the client through HTTP.</p>
+                            </li>
+                        </ol>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Plain HTML:</b> for plain HTML documents, identified with a root element
+                            of <code>html</code> (in no namespace):
+                        </p>
+                        <ol>
+                            <li>
+                                <p>URLs are rewritten.</p>
+                            </li>
+                            <li>
+                                <p>The result is converted to plain HTML.</p>
+                            </li>
+                            <li>
+                                <p>The resulting HTML document is sent to the client through HTTP.</p>
+                            </li>
+                        </ol>
+                        <p>
+                            Note that no theme stylesheet is applied in this case. The idea is that
+                            you are encouraged to write XHTML and use a single theme which matches
+                            against XHTML elements only. It is however possible to apply a theme
+                            stylesheet in this case as well by inserting a call to the XSLT
+                            processor in this case as well.
                         </p>
                     </li>
                     <li>
                         <p>
-                            <b>An XSLT template:</b> the <code>data</code> input receives the default
-                            output of the XSLT template.
+                            <b>XSL-FO:</b> if the document is an XSL-FO document, identified with a root
+                            element of <code>fo:root</code> (in the XSL-FO namespace):
                         </p>
+                        <ol>
+                            <li>
+                                <p>The XSL-FO serializer is called.</p>
+                            </li>
+                        </ol>
                     </li>
                     <li>
                         <p>
-                            <b>An XPL pipeline:</b> the <code>data</code> input receives the content of
-                            the <code>data</code> output of that pipeline.
+                            <b>Plain XML:</b> in all other cases:
                         </p>
+                        <ol>
+                            <li>
+                                <p>The XML document is converted to plain XML.</p>
+                            </li>
+                            <li>
+                                <p>The plain XML document is sent to the client through HTTP.</p>
+                            </li>
+                        </ol>
                     </li>
                 </ul>
                 <p>
-                    The epilogue XPL pipeline also receives on its <code>instance</code> input the <a
-                    href="reference-page-flow#xml-submission"> XML submission</a> performed on the page,
-                    if any. The epilogue does not have to use that input, but it may do so.
+                    You are free to:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Modify the support for the document formats handled by default.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Add support for his own document formats by adding <code>p:when</code>
+                            branches to the <code>p:choose</code> statement.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+        </section>
+        <section>
+            <title>The Portlet Epilogue: epilogue-portlet.xpl</title>
+            <section>
+                <title>Introduction</title>
+                <p>
+                    <code>oxf:/config/epilogue-portlet.xpl</code> is the epilogue file used for the
+                    examples portal. You usually do not have to worry about this XPL pipeline unless
+                    you add new examples, or unless you deploy as a JSR-168 portlet.
                 </p>
             </section>
             <section>
-                <title>Outputs</title>
+                <title>Inputs and Outputs</title>
                 <p>
-                    The epilogue XPL pipeline does not have any pipeline output: the result of the
-                    XPL pipeline must be produced using a serializer, usually the <a
-                    href="processors-serializers-http">HTTP serializer</a>, which serializes the
-                    resulting data directly to an HTTP client such as a web browser.
+                    <code>epilogue-portlet.xpl</code> has the same inputs as the
+                    <code>epilogue-servlet.xpl</code> epilogue.
                 </p>
+            </section>
+            <section>
+                <title>Processing Logic</title>
+                <p>
+                    <code>epilogue-portlet.xpl</code> performs different tasks depending on the input
+                    XML document.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>XHTML:</b> for XHTML documents, identified with a root element of
+                            <code>xhtml:html</code> (in the XHTML namespace):
+                        </p>
+                        <ol>
+                            <li>
+                                <p>
+                                    The default theme is applied but an XHTML fragment enclosed in a
+                                    <code>xhtml:div</code> element is produced instead of a
+                                    full-fledged XHTML document.
+                                </p>
+                            </li>
+                            <li>
+                                <p>URLs are rewritten.</p>
+                            </li>
+                            <li>
+                                <p>The resulting XHTML document is sent to the portlet container as an XHTML fragment.</p>
+                            </li>
+                        </ol>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Plain XML:</b> in all other cases:
+                        </p>
+                        <ol>
+                            <li>
+                                <p>The XML document is included in a simple XHTML document and formatted into XHTML.</p>
+                            </li>
+                            <li>
+                                <p>The resulting XHTML document then goes through the same steps as a regular XHTML document..</p>
+                            </li>
+                        </ol>
+                    </li>
+                </ul>
+                <p>
+                    You are free to:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            Modify the support for the document formats handled by default.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            Add support for his own document formats by adding <code>p:when</code>
+                            branches to the <code>p:choose</code> statement. In a portlet
+                            environment, it is important to remember that a portlet can usually only
+                            output a markup fragment such as HTML or XML, but no associated
+                            resources such as images, PDF files, etc.
+                        </p>
+                    </li>
+                </ul>
             </section>
         </section>
         <section>
             <title>XForms Processing</title>
             <p>
-                xxx
+                The OPS built-in <a href="reference-xforms">XForms engine</a> allows you to write
+                not only raw XHTML, but also supports XForms 1.0. To achieve this, the XForms engine
+                rewrites XHTML + XForms into XHTML + Javascript + CSS. This transformation also
+                occurs in the epilogue, as mentioned <a href="#default-epilogue">above</a>.
             </p>
+            <p>
+                While it is not necessary to know in details the work performed by the XForms
+                engine, it is important to know that:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        XForms processing is triggered when either a legacy XForms model is found on
+                        the <code>xforms-model</code> input of the epilogue, or when an XForms model
+                        is found under <code>/xhtml:html/xhtml:head</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The result of XForms processing is that all the elements in the XForms
+                        namespace are removed, including the XForms models you may have under
+                        <code>xhtml:head</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Instead of XForms elements, you will find XHTML elements. Those elements may
+                        use some CSS classes defined in <code>orbeon-layout.xml</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The default theme includes some default OPS CSS stylesheets and scripts
+                        used by the XForms engine.
+                    </p>
+                </li>
+            </ul>
         </section>
         <section>
             <title>The Default Theme</title>

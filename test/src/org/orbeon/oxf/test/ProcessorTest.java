@@ -86,7 +86,7 @@ public class ProcessorTest extends TestCase {
             ResourceManagerWrapper.init(props);
             resourceManager = ResourceManagerWrapper.instance();
 
-            OXFProperties.init("oxf:/unit-tests/properties.xml");
+            OXFProperties.init("oxf:/ops/unit-tests/properties.xml");
 
             // Initialize log4j with a DOMConfiguration
             LoggerFactory.initLogger();

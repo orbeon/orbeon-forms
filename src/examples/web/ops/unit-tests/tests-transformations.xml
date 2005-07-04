@@ -1,0 +1,525 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="Transformations" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+    <test description="Simple transformation" name="oxf:xslt">
+        <input name="data">
+            <root>
+                <a>a</a>
+                <b>b</b>
+            </root>
+        </input>
+        <input name="config">
+            <xsl:stylesheet version="1.0">
+                <xsl:template match="/">
+                    <new-root>
+                        <xsl:value-of select="/root/a"/>
+                        <xsl:value-of select="/root/b"/>
+                    </new-root>
+                </xsl:template>
+            </xsl:stylesheet>
+        </input>
+        <output name="data">
+            <new-root>ab</new-root>
+        </output>
+    </test>
+
+    <test description="saxon:parse() function" name="oxf:xslt">
+        <input name="config">
+            <xsl:stylesheet xmlns:saxon="http://saxon.sf.net/" version="2.0">
+                <xsl:template match="/">
+                    <xsl:copy-of select="saxon:parse(/document/xml-string)"/>
+                </xsl:template>
+            </xsl:stylesheet>
+        </input>
+        <input name="data">
+            <document>
+                <xml-string>
+                    &lt;name&gt;
+                        &lt;first&gt;John&lt;/first&gt;
+                        &lt;last&gt;Smith&lt;/last&gt;
+                    &lt;/name&gt;
+                </xml-string>
+            </document>
+        </input>
+        <output name="data">
+            <name>
+                <first>John</first>
+                <last>Smith</last>
+            </name>
+        </output>
+    </test>
+
+    <test description="Making sure the that .// works correctly" name="oxf:xslt">
+        <input name="data">
+            <root>
+                <x>
+                    <a>a</a>
+                </x>
+                <y>
+                    <a>b</a>
+                </y>
+            </root>
+        </input>
+        <input name="config">
+            <xsl:stylesheet version="1.0">
+                <xsl:template match="/">
+                    <new-root>
+                        <xsl:for-each select="root/y">
+                            <xsl:copy-of select=".//a"/>
+                        </xsl:for-each>
+                    </new-root>
+                </xsl:template>
+            </xsl:stylesheet>
+        </input>
+        <output name="data">
+            <new-root>
+                <a>b</a>
+            </new-root>
+        </output>
+    </test>
+
+    <test description="xalan:nodeset() function" name="oxf:xalan">
+        <input name="data">
+            <gaga/>
+        </input>
+        <input name="config">
+            <xsl:stylesheet version="1.0" exclude-result-prefixes="xalan" xmlns:xalan="http://xml.apache.org/xalan">
+                <xsl:template match="/">
+                    <xsl:variable name="gaga">
+                        <xsl:call-template name="gaga"/>
+                    </xsl:variable>
+                    <xsl:copy-of select="xalan:nodeset($gaga)/root/gaga"/>
+                </xsl:template>
+                <xsl:template name="gaga">
+                    <root>
+                        <gaga/>
+                    </root>
+                </xsl:template>
+            </xsl:stylesheet>
+        </input>
+        <output name="data">
+            <gaga/>
+        </output>
+    </test>
+
+    <!--    <disable reason="STX doesn't support multi treading">-->
+    <test description="STX Transformation on a request-like document" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                xmlns:d="http://orbeon.org/oxf/xml/document">
+                <p:processor name="oxf:identity">
+                    <p:input name="data">
+                        <request>
+                            <path-info>/this/is/a/path/info</path-info>
+                        </request>
+                    </p:input>
+                    <p:output name="data" id="request"/>
+                </p:processor>
+                <p:processor name="oxf:stx">
+                    <p:input name="data" href="#request"/>
+                    <p:input name="config">
+                        <stx:transform version="1.0" xmlns:stx="http://stx.sourceforge.net/2002/ns">
+                            <stx:template match="/">
+                                <d:document>
+                                    <d:body>
+                                        <stx:process-children/>
+                                    </d:body>
+                                </d:document>
+                            </stx:template>
+                            <stx:template match="request/path-info/text()">
+                                <stx:copy/>
+                            </stx:template>
+                        </stx:transform>
+                    </p:input>
+                    <p:output name="data" id="result"/>
+                </p:processor>
+                <p:processor name="oxf:null-serializer">
+                    <p:input name="data" href="#result"/>
+                </p:processor>
+            </p:config>
+        </input>
+    </test>
+    <!--  </disable>-->
+
+    <test description="XSLT Transformation on a request-like document" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                xmlns:d="http://orbeon.org/oxf/xml/document">
+                <p:processor name="oxf:identity">
+                    <p:input name="data">
+                        <request>
+                            <path-info>/this/is/a/path/info</path-info>
+                        </request>
+                    </p:input>
+                    <p:output name="data" id="request"/>
+                </p:processor>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#request"/>
+                    <p:input name="config">
+                        <xsl:transform version="1.0">
+                            <xsl:template match="/">
+                                <d:document>
+                                    <d:body>
+                                        <xsl:value-of select="request/path-info"/>
+                                    </d:body>
+                                </d:document>
+                            </xsl:template>
+                        </xsl:transform>
+                    </p:input>
+                    <p:output name="data" id="result"/>
+                </p:processor>
+                <p:processor name="oxf:null-serializer">
+                    <p:input name="data" href="#result"/>
+                </p:processor>
+            </p:config>
+        </input>
+    </test>
+
+    <test description="Docbase in XSLT" name="oxf:xslt">
+        <input name="data">
+            <a/>
+        </input>
+        <input name="config">
+            <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+                <xsl:import href="oxf:/ops/unit-tests/docbase/style.xsl"/>
+            </xsl:stylesheet>
+        </input>
+        <output name="data">
+            <a>
+                <b/>
+            </a>
+        </output>
+    </test>
+
+    <test description="XQuery: a little bit of everything" name="oxf:xquery">
+        <input name="data">
+            <company>
+                <department id="1" name="HR">
+                    <employee firstname="John" lastname="Smith">a</employee>
+                    <employee firstname="Peter" lastname="Strain"/>
+                    <employee firstname="Carl" lastname="Thompson"/>
+                </department>
+                <department id="2" name="Engineering">
+                    <employee firstname="Letticia" lastname="Vallejo"/>
+                    <employee firstname="Bruce" lastname="Wilson">b</employee>
+                    <employee firstname="David" lastname="Williams"/>
+                </department>
+            </company>
+        </input>
+        <input name="config">
+            <xquery>
+                xquery version "1.0";
+                declare namespace xs = "http://www.w3.org/2001/XMLSchema";
+                declare namespace local = "http://orbeon.org/oxf/xml/local";
+
+                (: Find employees of a certain department :)
+                declare function local:employees($company as element(), $name as xs:string) as element()* {
+                     $company/department[@name = $name]/employee
+                };
+
+                (: Compute longest last name :)
+                declare function local:maxLastnameLength($employees as element()*) as xs:integer {
+                    let $lengths :=
+                        for $e in $employees
+                        return string-length($e/@lastname)
+                    return max($lengths)
+                };
+
+                let $company := /*
+                let $hrEmployees := local:employees($company, "HR")
+                let $engineeringEmployees := local:employees($company, "Engineering")
+
+                return
+                    <mixed-up-company employee-count="{count($company/department/employee)}"
+                            max-lastname-length="{local:maxLastnameLength($company/department/employee)}">
+                        {
+                            for $first in $hrEmployees
+                            for $second in $engineeringEmployees
+                            return <employee firstname="{$first/@firstname}" lastname="{$second/@lastname}"/>
+                        }
+                    </mixed-up-company>
+            </xquery>
+        </input>
+        <output name="data">
+            <mixed-up-company max-lastname-length="8" employee-count="6">
+                <employee lastname="Vallejo" firstname="John"/>
+                <employee lastname="Wilson" firstname="John"/>
+                <employee lastname="Williams" firstname="John"/>
+                <employee lastname="Vallejo" firstname="Peter"/>
+                <employee lastname="Wilson" firstname="Peter"/>
+                <employee lastname="Williams" firstname="Peter"/>
+                <employee lastname="Vallejo" firstname="Carl"/>
+                <employee lastname="Wilson" firstname="Carl"/>
+                <employee lastname="Williams" firstname="Carl"/>
+            </mixed-up-company>
+        </output>
+    </test>
+
+    <test description="XQuery: a little bit of everything (as xs:string)" name="oxf:xquery">
+        <input name="data">
+            <company>
+                <department id="1" name="HR">
+                    <employee firstname="John" lastname="Smith">a</employee>
+                    <employee firstname="Peter" lastname="Strain"/>
+                    <employee firstname="Carl" lastname="Thompson"/>
+                </department>
+                <department id="2" name="Engineering">
+                    <employee firstname="Letticia" lastname="Vallejo"/>
+                    <employee firstname="Bruce" lastname="Wilson">b</employee>
+                    <employee firstname="David" lastname="Williams"/>
+                </department>
+            </company>
+        </input>
+        <input name="config">
+            <document xsi:type="xs:string" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                xquery version "1.0";
+                declare namespace xs = "http://www.w3.org/2001/XMLSchema";
+                declare namespace local = "http://orbeon.org/oxf/xml/local";
+
+                (: Find employees of a certain department :)
+                declare function local:employees($company as element(), $name as xs:string) as element()* {
+                     $company/department[@name = $name]/employee
+                };
+
+                (: Compute longest last name :)
+                declare function local:maxLastnameLength($employees as element()*) as xs:integer {
+                    let $lengths :=
+                        for $e in $employees
+                        return string-length($e/@lastname)
+                    return max($lengths)
+                };
+
+                let $company := /*
+                let $hrEmployees := local:employees($company, "HR")
+                let $engineeringEmployees := local:employees($company, "Engineering")
+
+                return
+                    &lt;mixed-up-company employee-count="{count($company/department/employee)}"
+                            max-lastname-length="{local:maxLastnameLength($company/department/employee)}">
+                        {
+                            for $first in $hrEmployees
+                            for $second in $engineeringEmployees
+                            return &lt;employee firstname="{$first/@firstname}" lastname="{$second/@lastname}"/>
+                        }
+                    &lt;/mixed-up-company>
+            </document>
+        </input>
+        <output name="data">
+            <mixed-up-company max-lastname-length="8" employee-count="6">
+                <employee lastname="Vallejo" firstname="John"/>
+                <employee lastname="Wilson" firstname="John"/>
+                <employee lastname="Williams" firstname="John"/>
+                <employee lastname="Vallejo" firstname="Peter"/>
+                <employee lastname="Wilson" firstname="Peter"/>
+                <employee lastname="Williams" firstname="Peter"/>
+                <employee lastname="Vallejo" firstname="Carl"/>
+                <employee lastname="Wilson" firstname="Carl"/>
+                <employee lastname="Williams" firstname="Carl"/>
+            </mixed-up-company>
+        </output>
+    </test>
+
+    <test description="XSLT 2.0 Simple Type" name="oxf:xslt">
+        <input name="data">
+            <root>
+                <a>1</a>
+                <b>2.0</b>
+            </root>
+        </input>
+        <input name="config">
+            <xsl:stylesheet version="2.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xsl:template match="/">
+                    <root>
+                        <xsl:variable name="a" select="/root/a" as="xs:int"/>
+                        <xsl:variable name="b" select="/root/b" as="xs:double"/>
+                        <xsl:value-of select="$a + $b"/>
+                    </root>
+                </xsl:template>
+            </xsl:stylesheet>
+        </input>
+        <output name="data">
+            <root>3</root>
+        </output>
+    </test>
+
+    <test description="XSLT 2.0 Evaluate" name="oxf:unsafe-xslt">
+        <input name="data">
+            <root>
+                <a>
+                    <b>1</b>
+                </a>
+                <b>
+                    <a>2</a>
+                </b>
+            </root>
+        </input>
+        <input name="config">
+            <xsl:stylesheet version="2.0" xmlns:function="http://www.orbeon.com/xslt-function" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+                <xsl:import href="/oxf/xslt/utils/evaluate.xsl"/>
+
+                <xsl:template match="/">
+                    <xsl:variable name="root" select="/" as="node()"/>
+                    <xsl:variable name="xpath" as="xs:string">/root/a/b</xsl:variable>
+                    <new-root>
+                        <xsl:copy-of select="function:evaluate($root, $xpath, ())"/>
+                    </new-root>
+                </xsl:template>
+            </xsl:stylesheet>
+        </input>
+        <output name="data">
+            <new-root>
+                <b>1</b>
+            </new-root>
+        </output>
+    </test>
+
+
+    <test description="XSLT: Relative doc() in Literal Element Stylesheet" name="oxf:xslt">
+        <input name="data">
+            <root/>
+        </input>
+        <input name="config">
+            <root xsl:version="2.0">
+                <xsl:copy-of select="document('note.xml')/*"/>
+            </root>
+        </input>
+        <output name="data">
+            <root>
+                <note>
+                    <from>Jani</from>
+                    <to>Tove</to>
+                    <body>Don't forget me this weekend</body>
+                </note>
+            </root>
+        </output>
+    </test>
+
+    <!-- This currently (Saxon 8.1.1) produces only a warning. It would be cleaning to get rid of it... -->
+    <test description="XSLT: Ambiguous template" name="oxf:xslt"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+        <input name="data">
+            <root>
+                <test>
+                    <xhtml:html>
+                        <xhtml:form xhtml:id="test">
+                            <a>
+                                <xhtml:br/>
+                            </a>
+                        </xhtml:form>
+                    </xhtml:html>
+                </test>
+            </root>
+        </input>
+        <input name="config">
+            <xsl:stylesheet version="2.0" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+                <xsl:template match="xhtml:*">
+                    <xsl:element name="{local-name()}">
+                        <xsl:apply-templates select="@*|node()"/>
+                    </xsl:element>
+                </xsl:template>
+
+                <xsl:template match="@xhtml:*">
+                    <xsl:attribute name="{local-name()}">
+                        <xsl:value-of select="."/>
+                    </xsl:attribute>
+                </xsl:template>
+
+                <xsl:template match="@*|node()" priority="-2">
+                    <xsl:copy>
+                        <xsl:apply-templates select="@*|node()"/>
+                    </xsl:copy>
+                </xsl:template>
+            </xsl:stylesheet>
+        </input>
+        <output name="data">
+            <root>
+                <test>
+                    <html>
+                        <form id="test">
+                            <a>
+                                <br/>
+                            </a>
+                        </form>
+                    </html>
+                </test>
+            </root>
+        </output>
+    </test>
+
+    <test description="Prevent doc('input:data') from being read in XSLT and XUpdate" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="result"/>
+
+                <p:processor name="oxf:xupdate">
+                    <p:input name="data">
+                        <a/>
+                    </p:input>
+                    <p:input name="config">
+                        <xu:modifications>
+                            <xu:copy-of select="doc('input:data')"/>
+                        </xu:modifications>
+                    </p:input>
+                    <p:output name="data" id="xupdate-result"/>
+                </p:processor>
+
+                <p:processor name="oxf:exception-catcher">
+                    <p:input name="data" href="#xupdate-result"/>
+                    <p:output name="data" id="xupdate-exception"/>
+                </p:processor>
+
+                <p:processor name="oxf:xslt">
+                    <p:input name="data">
+                        <a/>
+                    </p:input>
+                    <p:input name="config">
+                        <xsl:stylesheet version="2.0">
+                            <xsl:template match="/">
+                                <gaga>
+                                    <xsl:copy-of select="doc('input:data')"/>
+                                </gaga>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="xslt-result"/>
+                </p:processor>
+
+                <p:processor name="oxf:exception-catcher">
+                    <p:input name="data" href="#xslt-result"/>
+                    <p:output name="data" id="xslt-exception"/>
+                </p:processor>
+
+                <p:for-each href="aggregate('root', #xupdate-exception, #xslt-exception)" select="root/*" root="root" ref="result">
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="aggregate('result', current()#xpointer(contains(/exceptions/exception[1]/message, 'Can''t read ''data'' input')))"/>
+                        <p:output name="data" ref="result"/>
+                    </p:processor>
+                </p:for-each>
+
+            </p:config>
+        </input>
+        <output name="result">
+            <root>
+                <result>true</result>
+                <result>true</result>
+            </root>
+        </output>
+    </test>
+
+</group>

@@ -373,7 +373,7 @@
             <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FlatFileResourceManagerFactory"/>
             <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
             <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
-            <sysproperty key="oxf.test.config" value="unit-tests/tests.xml"/>
+            <sysproperty key="oxf.test.config" value="ops/unit-tests/tests.xml"/>
         	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}" />
             <!--            <arg line="-class org.orbeon.oxf.test.ProcessorTest"/>-->
             <classpath>
@@ -412,7 +412,7 @@
             <sysproperty key="oxf.resources.priority.1" value="org.orbeon.oxf.resources.FlatFileResourceManagerFactory"/>
             <sysproperty key="oxf.resources.priority.2" value="org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory"/>
             <sysproperty key="oxf.resources.common.min-reload-interval" value="50"/>
-            <sysproperty key="oxf.test.config" value="unit-tests/tests.xml"/>
+            <sysproperty key="oxf.test.config" value="ops/unit-tests/tests.xml"/>
         	<sysproperty key="java.io.tmpdir" value="${test.tmp.dir}" />
             <!--            <arg line="-class org.orbeon.oxf.test.ProcessorTest"/>-->
             <classpath>
@@ -523,7 +523,7 @@
                 <exclude name="oracle/**"/>
                 <exclude name="oracle-xmldb/**"/>
                 <exclude name="other-examples/**"/>
-                <exclude name="unit-tests/**"/>
+                <exclude name="ops/unit-tests/**"/>
             </zipfileset>
             <zipfileset dir="doc/Tutorial" prefix="WEB-INF/resources/doc/pages">
                 <include name="Tutorial.pdf"/>
@@ -539,7 +539,6 @@
             <zipfileset dir="${web-examples-src.dir}" prefix="WEB-INF/resources">
                 <include name="config/**/*"/>
                 <include name="images/**/*"/>
-                <include name="oxf-theme/**/*"/>
             </zipfileset>
             <zipfileset dir="${web-examples-src.dir}/examples/bizdoc" prefix="WEB-INF/resources/bizdoc">
                 <include name="**/*"/>
@@ -560,7 +559,6 @@
                 <include name="examples/employees/export-excel/employees.xls"/>
                 <include name="images/**/*"/>
                 <include name="init-database/**/*"/>
-                <include name="oxf-theme/**/*"/>
             </zipfileset>
             <zipfileset dir="${web-examples-src.dir}/examples/employees" prefix="WEB-INF/resources/employees">
                 <include name="**/*"/>
@@ -744,7 +742,7 @@
                 <include name="hello/view.xsl"/>
                 <include name="hello/xforms.xml"/>
                 <include name="welcome/page.xml"/>
-                <include name="oxf-theme/theme.xsl"/>
+                <include name="config/theme/theme.xsl"/>
             </fileset>
             <fileset dir="build/oxfmark/lib"/>
         </jar>

@@ -27,6 +27,8 @@
 
     <!-- The document produced by the page view XForms processing performed -->
     <p:param type="input" name="xformed-data"/>
+    <!-- The raw document produced by the page view -->
+<!--    <p:param type="input" name="data"/>-->
     <!-- The XML submission if any -->
 <!--    <p:param type="input" name="instance"/>-->
 
@@ -82,16 +84,16 @@
             <xsl:stylesheet version="1.0"
                     xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
                     xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
-                <xsl:import href="oxf:/oxf-theme/theme.xsl"/>
+                <xsl:import href="oxf:/config/theme/theme.xsl"/>
                 <xsl:template match="/">
                     <!-- Try to output a title -->
                     <xsl:if test="normalize-space(/xhtml:html/xhtml:head/xhtml:title)">
                         <xsl:value-of select="context:setTitle(normalize-space(/xhtml:html/xhtml:head/xhtml:title))"/>
                     </xsl:if>
-                    <div xmlns:f="http://orbeon.org/oxf/xml/formatting">
+                    <xhtml:div xmlns:f="http://orbeon.org/oxf/xml/formatting">
                         <xsl:apply-templates select="/xhtml:html/xhtml:head/f:tabs"/>
                         <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
-                    </div>
+                    </xhtml:div>
                 </xsl:template>
             </xsl:stylesheet>
         </p:input>
@@ -104,20 +106,28 @@
         <p:input name="config" href="oxf:/ops/pfc/url-rewrite.xsl"/>
         <p:output name="data" id="rewritten-data"/>
     </p:processor>
-    <!-- Serialize to XML -->
-    <p:processor name="oxf:xml-serializer">
+    <!-- Convert and serialize to XML -->
+    <p:processor name="oxf:xml-converter">
         <p:input name="config">
             <config>
                 <!-- Not necessary to indent at this point -->
                 <indent>false</indent>
-                <!-- Disable caching, so that the title is always generated -->
-                <cache-control>
-                    <use-local-cache>false</use-local-cache>
-                </cache-control>
                 <!-- Do not output any doctype, this is a fragment -->
             </config>
         </p:input>
         <p:input name="data" href="#rewritten-data"/>
+        <p:output name="data" id="converted"/>
+    </p:processor>
+    <p:processor name="oxf:http-serializer">
+        <p:input name="config">
+            <config>
+                <!-- Disable caching, so that the title is always generated -->
+                <cache-control>
+                    <use-local-cache>false</use-local-cache>
+                </cache-control>
+            </config>
+        </p:input>
+        <p:input name="data" href="#converted"/>
     </p:processor>
 
 </p:config>

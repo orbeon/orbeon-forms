@@ -1,0 +1,999 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<group description="XPL" 
+    xmlns:p="http://www.orbeon.com/oxf/pipeline"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+<!--    <test description="Broken Error Handling 1" name="oxf:pipeline" only="true">-->
+<!--        <input name="data">-->
+<!--            <this-is-my-data/>-->
+<!--        </input>-->
+<!--        <input name="config">-->
+<!--            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">-->
+<!--                <p:param type="input" name="data"/>-->
+<!--                <p:param type="output" name="result"/>-->
+<!---->
+<!--                <p:processor name="oxf:pipeline">-->
+<!--                    <p:input name="data" href="#data"/>-->
+<!--                    <p:input name="config" href="xpl/broken-error-handling-1.xpl"/>-->
+<!--                    <p:output name="data" ref="result"/>-->
+<!--                </p:processor>-->
+<!--            </p:config>-->
+<!--        </input>-->
+<!--        <output name="result">-->
+<!--            <this-is-my-data/>-->
+<!--        </output>-->
+<!--    </test>-->
+
+    <test description="Empty output, loop simulation, multiple pipelines with same config but different data" name="oxf:pipeline">
+        <input name="numbers">
+            <numbers>
+                <number>42</number>
+                <number>83</number>
+                <number>79</number>
+                <number>15</number>
+                <number>12</number>
+            </numbers>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="input" name="numbers"/>
+                <p:param type="output" name="data"/>
+
+                <p:processor name="oxf:xslt" id="call-generation">
+                    <p:input name="data" href="#numbers"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="1.0">
+                            <xsl:template match="/">
+                                <p:config>
+                                    <p:param type="output" name="data"/>
+                                    <xsl:for-each select="/numbers/number">
+                                        <p:processor name="oxf:pipeline" id="one-call-{position()}">
+                                            <p:input name="config" href="oxf:/ops/unit-tests/odd-even.xpl"/>
+                                            <p:input name="number">
+                                                <xsl:copy-of select="."/>
+                                            </p:input>
+                                            <p:output name="data" id="one-call-{position()}"/>
+                                        </p:processor>
+                                    </xsl:for-each>
+                                    <p:processor name="oxf:aggregator" id="final-aggregation">
+                                        <xsl:for-each select="/numbers/number">
+                                            <p:input name="data" href="#one-call-{position()}"/>
+                                        </xsl:for-each>
+                                        <p:input name="config">
+                                            <config>
+                                                <root>root</root>
+                                            </config>
+                                        </p:input>
+                                        <p:output name="data" ref="data"/>
+                                    </p:processor>
+                                </p:config>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="calls-to-odd-even"/>
+                </p:processor>
+
+                <p:processor name="oxf:pipeline" id="call-sequence">
+                    <p:input name="config" href="#calls-to-odd-even"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <root>
+                <root>even</root>
+                <root>odd</root>
+                <root>odd</root>
+                <root>odd</root>
+                <root>even</root>
+            </root>
+        </output>
+    </test>
+
+    <test description="Choose: simple test with all possible cases" name="oxf:pipeline">
+        <input name="data">
+            <letters>
+                <letter>a</letter>
+                <letter>b</letter>
+                <letter>c</letter>
+            </letters>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="input" name="data"/>
+                <p:param type="output" name="data"/>
+
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#data"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="1.0">
+                            <xsl:template match="/">
+                                <p:config>
+                                    <p:param type="output" name="messages"/>
+                                    <xsl:for-each select="letters/letter">
+                                        <p:processor name="oxf:identity">
+                                            <p:input name="data">
+                                                <xsl:copy-of select="."/>
+                                            </p:input>
+                                            <p:output name="data" id="letter{position()}"/>
+                                        </p:processor>
+                                        <p:choose href="#letter{position()}">
+                                            <p:when test="/letter = 'a'">
+                                                <p:processor name="oxf:identity">
+                                                    <p:input name="data">
+                                                        <message>First letter</message>
+                                                    </p:input>
+                                                    <p:output name="data" id="message{position()}"/>
+                                                </p:processor>
+                                            </p:when>
+                                            <p:when test="/letter = 'b'">
+                                                <p:processor name="oxf:identity">
+                                                    <p:input name="data">
+                                                        <message>Second letter</message>
+                                                    </p:input>
+                                                    <p:output name="data" id="message{position()}"/>
+                                                </p:processor>
+                                            </p:when>
+                                            <p:otherwise>
+                                                <p:processor name="oxf:identity">
+                                                    <p:input name="data">
+                                                        <message>Unknown letter</message>
+                                                    </p:input>
+                                                    <p:output name="data" id="message{position()}"/>
+                                                </p:processor>
+                                            </p:otherwise>
+                                        </p:choose>
+                                    </xsl:for-each>
+                                    <p:processor name="oxf:aggregator">
+                                        <p:input name="config">
+                                            <config>
+                                                <root>messages</root>
+                                            </config>
+                                        </p:input>
+                                        <xsl:for-each select="letters/letter">
+                                            <p:input name="data" href="#message{position()}"/>
+                                        </xsl:for-each>
+                                        <p:output name="messages" ref="messages"/>
+                                    </p:processor>
+                                </p:config>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="message-generator"/>
+                </p:processor>
+                <p:processor name="oxf:pipeline" id="pipelinegen">
+                    <p:input name="config" href="#message-generator"/>
+                    <p:output name="messages" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <messages>
+                <message>First letter</message>
+                <message>Second letter</message>
+                <message>Unknown letter</message>
+            </messages>
+        </output>
+    </test>
+
+    <test description="Choose: direct reference to param in branch" name="oxf:pipeline">
+        <input name="in">
+            <letter>a</letter>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="input" name="in"/>
+                <p:param type="output" name="out"/>
+                <p:choose href="#in">
+                    <p:when test="letter = 'a'">
+                        <p:processor name="oxf:identity">
+                            <p:input name="data">
+                                <message>First letter</message>
+                            </p:input>
+                            <p:output name="data" ref="out"/>
+                        </p:processor>
+                    </p:when>
+                </p:choose>
+            </p:config>
+        </input>
+        <output name="out">
+            <message>First letter</message>
+        </output>
+    </test>
+
+    <test description="Choose: choose inside choose" name="oxf:pipeline">
+        <input name="a">
+            <letter>a</letter>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="input" name="a"/>
+                <p:param type="output" name="data"/>
+                <p:choose href="#a">
+                    <p:when test="letter = 'a'">
+                        <p:processor name="oxf:identity">
+                            <p:input name="data">
+                                <letter>b</letter>
+                            </p:input>
+                            <p:output name="data" id="b"/>
+                        </p:processor>
+                        <p:choose href="#b">
+                            <p:when test="letter = 'b'">
+                                <p:processor name="oxf:identity">
+                                    <p:input name="data">
+                                        <message>First letter</message>
+                                    </p:input>
+                                    <p:output name="data" ref="data"/>
+                                </p:processor>
+                            </p:when>
+                        </p:choose>
+                    </p:when>
+                </p:choose>
+            </p:config>
+        </input>
+        <output name="data">
+            <message>First letter</message>
+        </output>
+    </test>
+
+    <test description="Serial pipelines with same config" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:identity">
+                    <p:input name="data">
+                        <p:config>
+                            <p:param type="input" name="data"/>
+                            <p:param type="output" name="data"/>
+                            <p:processor name="oxf:xslt">
+                                <p:input name="data" href="#data"/>
+                                <p:input name="config">
+                                    <xsl:stylesheet version="1.0">
+                                        <xsl:template match="/">
+                                            <gaga>
+                                                <xsl:copy-of select="/"/>
+                                            </gaga>
+                                        </xsl:template>
+                                    </xsl:stylesheet>
+                                </p:input>
+                                <p:output name="data" ref="data"/>
+                            </p:processor>
+                        </p:config>
+                    </p:input>
+                    <p:output name="data" id="pipeline-config"/>
+                </p:processor>
+                <p:processor name="oxf:pipeline" id="first">
+                    <p:input name="config" href="#pipeline-config"/>
+                    <p:input name="data">
+                        <x/>
+                    </p:input>
+                    <p:output name="data" id="first-output"/>
+                </p:processor>
+                <p:processor name="oxf:pipeline" id="second">
+                    <p:input name="config" href="#pipeline-config"/>
+                    <p:input name="data" href="#first-output"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <gaga>
+                <gaga>
+                    <x/>
+                </gaga>
+            </gaga>
+        </output>
+    </test>
+
+    <test description="Embedded pipelines with same config" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" id="top">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:pipeline" id="first-call">
+                    <p:input name="config" href="oxf:/ops/unit-tests/recurse.xml"/>
+                    <p:input name="data">
+                        <count>42</count>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <count>0</count>
+        </output>
+    </test>
+
+    <test description="Use of namespace in p:when" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:identity">
+                    <p:input name="data">
+                        <root>
+                            <x>41</x>
+                            <gaga:x xmlns:gaga="http://www.orbeon.com/gaga">42</gaga:x>
+                        </root>
+                    </p:input>
+                    <p:output name="data" id="document"/>
+                </p:processor>
+                <p:choose href="#document" xmlns:toto="http://www.orbeon.com/gaga">
+                    <p:when test="/root/toto:x = 42">
+                        <p:processor name="oxf:identity">
+                            <p:input name="data">
+                                <success/>
+                            </p:input>
+                            <p:output name="data" ref="data"/>
+                        </p:processor>
+                    </p:when>
+                </p:choose>
+            </p:config>
+        </input>
+        <output name="data">
+            <success/>
+        </output>
+    </test>
+
+    <test description="Use of namespace in p:when with attribute" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:identity">
+                    <p:input name="data">
+                        <root>
+                            <x y="41"/>
+                            <x xmlns:gaga="http://www.orbeon.com/gaga" gaga:y="42"/>
+                        </root>
+                    </p:input>
+                    <p:output name="data" id="document"/>
+                </p:processor>
+                <p:choose href="#document" xmlns:toto="http://www.orbeon.com/gaga">
+                    <p:when test="//@toto:y = 42">
+                        <p:processor name="oxf:identity">
+                            <p:input name="data">
+                                <success/>
+                            </p:input>
+                            <p:output name="data" ref="data"/>
+                        </p:processor>
+                    </p:when>
+                    <p:otherwise>
+                        <p:processor name="oxf:identity">
+                            <p:input name="data">
+                                <failure/>
+                            </p:input>
+                            <p:output name="data" ref="data"/>
+                        </p:processor>
+                    </p:otherwise>
+                </p:choose>
+            </p:config>
+        </input>
+        <output name="data">
+            <success/>
+        </output>
+    </test>
+
+    <test description="Implicit Tee" name="oxf:pipeline">
+        <input name="data">
+            <gaga/>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="input" name="data"/>
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:aggregator">
+                    <p:input name="config">
+                        <config>
+                            <root>root</root>
+                        </config>
+                    </p:input>
+                    <p:input name="data" href="#data"/>
+                    <p:input name="data" href="#data"/>
+                    <p:input name="data" href="#data"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <root>
+                <gaga/>
+                <gaga/>
+                <gaga/>
+            </root>
+        </output>
+    </test>
+
+    <test description="XPointer" name="oxf:pipeline">
+        <input name="data">
+            <a>
+                <b c="a">
+                    <d/>
+                </b>
+            </a>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+                <p:param type="input" name="data"/>
+                <p:param type="output" name="data"/>
+
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href="#data#xpointer(/*[name() = 'a']/b[@c = 'a']/d)"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <d/>
+        </output>
+    </test>
+
+    <test description="Detection of id in p:choose with NullSerialisers (bug 861)" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:processor name="oxf:identity">
+                    <p:input name="data">
+                        <gaga/>
+                    </p:input>
+                    <p:output name="data" id="data"/>
+                </p:processor>
+                <p:choose href="#data">
+                    <p:when test="count(/gaga) = 1">
+                        <p:processor name="oxf:null-serializer">
+                            <p:input name="data" href="aggregate('gaga', aggregate('gaga', #data))"/>
+                        </p:processor>
+                    </p:when>
+                </p:choose>
+            </p:config>
+        </input>
+    </test>
+
+    <test description="Namespace used in XPath-only (bug 874)" name="oxf:pipeline">
+        <input name="data">
+            <ns1:element xmlns:ns1="http://www.example.com/ns">gaga</ns1:element>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="input" name="data"/>
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data" href="#data"/>
+                    <p:input name="config">
+                        <xsl:stylesheet version="1.0">
+                            <xsl:template match="/">
+                                <result>
+                                    <xsl:value-of select="/ns2:element" xmlns:ns2="http://www.example.com/ns"/>
+                                </result>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <result>gaga</result>
+        </output>
+    </test>
+
+    <test description="Support for both red and id on outputs (bug 875)" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="first"/>
+                <p:param type="output" name="second"/>
+                <p:processor name="oxf:identity">
+                    <p:input name="data">
+                        <gaga/>
+                    </p:input>
+                    <p:output name="data" id="data" ref="first"/>
+                </p:processor>
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href="#data"/>
+                    <p:output name="data" ref="second"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="first">
+            <gaga/>
+        </output>
+        <output name="second">
+            <gaga/>
+        </output>
+    </test>
+
+    <test description="Namespace in p:choose (bug 890)" name="oxf:pipeline">
+        <input name="data">
+            <ns1:element xmlns:ns1="http://www.example.com/ns">
+                <result/>
+            </ns1:element>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="input" name="data"/>
+                <p:param type="output" name="data"/>
+                <p:choose href="#data" xmlns:ns2="http://www.example.com/ns">
+                    <p:when test="count(/ns2:element) = 1">
+                        <p:processor name="oxf:identity">
+                            <p:input name="data" href="#data#xpointer(/*/*)"/>
+                            <p:output name="data" ref="data"/>
+                        </p:processor>
+                    </p:when>
+                </p:choose>
+            </p:config>
+        </input>
+        <output name="data">
+            <result/>
+        </output>
+    </test>
+
+    <test description="Namespace in XPointer (bug 921)" name="oxf:pipeline">
+        <input name="data">
+            <ns1:element xmlns:ns1="http://www.example.com/ns">
+                <result/>
+            </ns1:element>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="input" name="data"/>
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href="#data#xpointer(/ns2:element/result)"
+                        xmlns:ns2="http://www.example.com/ns"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <result/>
+        </output>
+    </test>
+
+    <test description="Schema attributes on p:param" name="oxf:pipeline">
+        <input name="data">
+            <addressBook/>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="input" name="data" schema-href="oxf:/ops/unit-tests/address-book-schema.xml"/>
+                <p:param type="output" name="data" schema-uri="urn://adress-book"/>
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href="#data"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <addressBook/>
+        </output>
+    </test>
+
+    <test description="For-each" name="oxf:pipeline">
+        <input name="data">
+            <x:company xmlns:x="http://localhost/company">
+                <x:department>
+                    <x:employee firstname="John"/>
+                    <x:employee firstname="Peter"/>
+                </x:department>
+                <x:department>
+                    <x:employee firstname="Carl"/>
+                </x:department>
+            </x:company>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:y="http://localhost/company">
+                <p:param type="input" name="data"/>
+                <p:param type="output" name="data"/>
+                <p:for-each href="#data" select="/y:company/y:department" root="emps" ref="data">
+                    <p:for-each href="current()" select="/y:department/y:employee" root="emps" id="emps">
+                        <p:processor name="oxf:identity">
+                            <p:input name="data" href="current()"/>
+                            <p:output name="data" ref="emps"/>
+                        </p:processor>
+                    </p:for-each>
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="#emps#xpointer(/emps/*)"/>
+                        <p:output name="data" ref="data"/>
+                    </p:processor>
+                </p:for-each>
+            </p:config>
+        </input>
+        <output name="data">
+            <emps>
+                <x:employee xmlns:x="http://localhost/company" firstname="John"/>
+                <x:employee xmlns:x="http://localhost/company" firstname="Peter"/>
+                <x:employee xmlns:x="http://localhost/company" firstname="Carl"/>
+            </emps>
+        </output>
+    </test>
+
+    <test description="Input and Output validation" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:identity">
+                    <p:input name="data" schema-href="oxf:/ops/unit-tests/address-book-schema.xml">
+                        <addressBook>
+                            <card>
+                                <name q="a">John Smith</name>
+                                <email>js@example.com</email>
+                            </card>
+                            <card>
+                                <name q="b">Fred Bloggs</name>
+                                <email>fb@example.net</email>
+                            </card>
+                        </addressBook>
+                    </p:input>
+                    <p:output name="data" ref="data" schema-uri="urn://adress-book"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <addressBook>
+                <card>
+                    <name q="a">John Smith</name>
+                    <email>js@example.com</email>
+                </card>
+                <card>
+                    <name q="b">Fred Bloggs</name>
+                    <email>fb@example.net</email>
+                </card>
+            </addressBook>
+        </output>
+    </test>
+
+    <test description="W3C Schema import" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:identity">
+                    <p:input name="data" schema-href="oxf:/ops/unit-tests/chapter03env.xsd">
+                        <envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+                            <order xmlns="http://example.org/ord"
+                                xmlns:prod="http://example.org/prod">
+                                <number>123ABBCC123</number>
+                                <items>
+                                    <product xmlns="http://example.org/prod">
+                                        <number prod:id="prod557">557</number>
+                                        <name xmlns="">Short-Sleeved Linen Blouse</name>
+                                        <prod:size system="US-DRESS">10</prod:size>
+                                        <prod:color xmlns:prod="http://example.org/prod2"
+                                            prod:value="blue"/>
+                                    </product>
+                                </items>
+                            </order>
+                        </envelope>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <envelope>
+                <order xmlns="http://example.org/ord"
+                    xmlns:prod="http://example.org/prod">
+                    <number>123ABBCC123</number>
+                    <items>
+                        <product xmlns="http://example.org/prod">
+                            <number prod:id="prod557">557</number>
+                            <name xmlns="">Short-Sleeved Linen Blouse</name>
+                            <prod:size system="US-DRESS">10</prod:size>
+                            <prod:color xmlns:prod="http://example.org/prod2"
+                                prod:value="blue"/>
+                        </product>
+                    </items>
+                </order>
+            </envelope>
+        </output>
+    </test>
+
+    <test description="RNG Schema Import" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:identity">
+                    <p:input name="data" schema-href="oxf:/ops/unit-tests/note.rng">
+                        <note>
+                            <from>Jani</from>
+                            <to>Tove</to>
+                            <body>Don't forget me this weekend</body>
+                        </note>
+                    </p:input>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <note>
+                <from>Jani</from>
+                <to>Tove</to>
+                <body>Don't forget me this weekend</body>
+            </note>
+        </output>
+    </test>
+
+    <test description="Embedded calls to aggregate()" name="oxf:pipeline">
+        <input name="data-1">
+            <dupont/>
+        </input>
+        <input name="data-2">
+            <dupond/>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+                <p:param type="input" name="data-1"/>
+                <p:param type="input" name="data-2"/>
+                <p:param type="output" name="data"/>
+
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href=
+                        "aggregate('a', #data-1, aggregate('b', #data-2, #data-1), #data-2)"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <a>
+                <dupont/>
+                <b>
+                    <dupond/>
+                    <dupont/>
+                </b>
+                <dupond/>
+            </a>
+        </output>
+    </test>
+
+    <test description="Docbase" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="oxf:/ops/unit-tests/docbase/pipeline.xml"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+
+            </p:config>
+        </input>
+        <output name="data">
+            <a>
+                <b/>
+            </a>
+        </output>
+    </test>
+
+    <test description="oxf: protocol in a pipeline input" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor id="identity" name="oxf:identity">
+                    <p:input name="data" href="oxf:/ops/unit-tests/company.xml"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <company>
+                <name>Orbeon</name>
+                <employee>
+                    <firstname>Omar</firstname>
+                    <lastname>Tazi</lastname>
+                </employee>
+            </company>
+        </output>
+    </test>
+
+    <test description="Aggregator with no processor" name="oxf:pipeline">
+        <input name="first">
+            <dupont/>
+        </input>
+        <input name="second">
+            <dupond/>
+        </input>
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="input" name="first"/>
+                <p:param type="input" name="second"/>
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:identity">
+                    <p:input name="data" href="aggregate('root', #first, #second)"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <root>
+                <dupont/>
+                <dupond/>
+            </root>
+        </output>
+    </test>
+
+    <test description="Namespace preservation" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param type="output" name="data"/>
+                <p:processor name="oxf:xslt">
+                    <p:input name="data">
+                        <root/>
+                    </p:input>
+                    <p:input name="config">
+                        <xsl:stylesheet version="1.0">
+                            <xsl:template match="/">
+                                <p:config>
+                                    <p:param type="output" name="data"/>
+                                    <p:processor name="oxf:identity">
+                                        <p:input name="data">
+                                            <root>Hello, world!</root>
+                                        </p:input>
+                                        <p:output name="data" ref="data"/>
+                                    </p:processor>
+                                </p:config>
+                            </xsl:template>
+                        </xsl:stylesheet>
+                    </p:input>
+                    <p:output name="data" id="hello-generator"/>
+                </p:processor>
+                <p:processor name="oxf:pipeline" id="hello-executor">
+                    <p:input name="config" href="#hello-generator"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <root>Hello, world!</root>
+        </output>
+    </test>
+    
+    <test description="Redefinition of id in inner block" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="y" type="output"/>
+                <p:processor name="oxf:identity">
+                    <p:input name="data"><a/></p:input>
+                    <p:output name="data" id="x"/>
+                </p:processor>
+                <p:for-each href="#x" select="/*" ref="y" root="b">
+                    <p:processor name="oxf:identity">
+                        <p:input name="data"><c/></p:input>
+                        <p:output name="data" id="x"/>
+                    </p:processor>
+                    <p:processor name="oxf:identity">
+                        <p:input name="data" href="#x"/>
+                        <p:output name="data" ref="y"/>
+                    </p:processor>
+                </p:for-each>
+            </p:config>
+        </input>
+        <output name="y">
+            <b><c/></b>
+        </output>
+    </test>
+
+    <test description="Output and serializer: pipeline, no read" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="reset-scope.xpl"/>
+                </p:processor>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="serialize-and-return-pipeline.xpl"/>
+                </p:processor>
+                <p:processor name="oxf:scope-generator">
+                    <p:input name="config">
+                        <config>
+                            <key>key</key>
+                            <scope>application</scope>
+                        </config>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <x/>
+        </output>
+    </test>
+    
+    <test description="Output and serializer: pipeline, do read" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="reset-scope.xpl"/>
+                </p:processor>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="serialize-and-return-pipeline.xpl"/>
+                    <p:output name="sub-output" id="sub-output"/>
+                </p:processor>
+                <p:processor name="oxf:null-serializer">
+                    <p:input name="data" href="#sub-output"/>
+                </p:processor>
+                <p:processor name="oxf:scope-generator">
+                    <p:input name="config">
+                        <config>
+                            <key>key</key>
+                            <scope>application</scope>
+                        </config>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <x/>
+        </output>
+    </test>
+    
+    <test description="Output and serializer: choose, no read" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="reset-scope.xpl"/>
+                </p:processor>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="serialize-and-return-choose.xpl"/>
+                </p:processor>
+                <p:processor name="oxf:scope-generator">
+                    <p:input name="config">
+                        <config>
+                            <key>key</key>
+                            <scope>application</scope>
+                        </config>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <empty/>
+        </output>
+    </test>
+    
+    <test description="Output and serializer: choose, do read" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="result" type="output"/>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="reset-scope.xpl"/>
+                </p:processor>
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="serialize-and-return-choose.xpl"/>
+                    <p:output name="sub-output" id="sub-output"/>
+                </p:processor>
+                <p:processor name="oxf:null-serializer">
+                    <p:input name="data" href="#sub-output"/>
+                </p:processor>
+                <p:processor name="oxf:scope-generator">
+                    <p:input name="config">
+                        <config>
+                            <key>key</key>
+                            <scope>application</scope>
+                        </config>
+                    </p:input>
+                    <p:output name="data" ref="result"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="result">
+            <x/>
+        </output>
+    </test>
+
+</group>

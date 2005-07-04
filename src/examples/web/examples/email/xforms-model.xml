@@ -61,7 +61,7 @@
                             </html>
                         </part>
                         <!-- Attachments -->
-                        <part name="image" content-type="image/gif" content-disposition="inline; filename=&quot;logo.gif&quot;" content-id="id1" src="oxf:/oxf-theme/images/oxf-powered-80.gif"/>
+                        <part name="image" content-type="image/gif" content-disposition="inline; filename=&quot;logo.gif&quot;" content-id="id1" src="oxf:/config/theme/images/oxf-powered-80.gif"/>
                         <part name="pdf" content-type="application/pdf" content-disposition="inline; filename=&quot;report.pdf&quot;" src="input:pdf-document"/>
                         <part name="chart" content-type="image/png" content-disposition="inline; filename=&quot;chart.png&quot;" content-id="id2" src="input:png-document"/>
                         <part name="xforms" content-type="application/xml" content-disposition="inline; filename=&quot;instance.xml&quot;" src="input:xforms-instance"/>

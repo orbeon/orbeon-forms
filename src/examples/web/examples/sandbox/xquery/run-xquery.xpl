@@ -56,7 +56,7 @@
 
     <!-- Format output -->
     <p:processor name="oxf:pipeline">
-        <p:input name="config" href="oxf:/oxf-theme/format.xpl"/>
+        <p:input name="config" href="oxf:/config/theme/format.xpl"/>
         <p:input name="data" href="#output"/>
         <p:output name="data" ref="formatted-output"/>
     </p:processor>

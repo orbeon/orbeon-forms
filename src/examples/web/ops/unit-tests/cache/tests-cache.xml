@@ -13,7 +13,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <group description="Cache" xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors">
+    xmlns:oxf="http://www.orbeon.com/oxf/processors" only="true">
 
     <test description="Simple URL Generator" name="oxf:test-script">
         <input name="config">
@@ -249,7 +249,7 @@
                             <e2 a1="v1" a2="v2"/>
                             <e3>Some text</e3>
                         </test-document>Yet some other text
-                        <included2 xml:base="oxf:/ops/unit-tests/cache/document2.xml">
+                        <included2 xml:base="oxf:ops/unit-tests/cache/document2.xml">
                             <abc/>
                             <def/>
                             <ghi/>
@@ -261,7 +261,7 @@
                             </test-document>
                         </included2>Some text
                         <some-element/>
-                        <d2 xml:base="oxf:/ops/unit-tests/cache/d-2.xml">
+                        <d2 xml:base="oxf:ops/unit-tests/cache/d-2.xml">
                             <abc/>
                             <def/>
                             <ghi/>
@@ -277,7 +277,7 @@
                             <def/>
                             <ghi/>
                             <a10/>
-                            <e1 xml:base="oxf:/ops/unit-tests/cache/e-1.xml">
+                            <e1 xml:base="oxf:ops/unit-tests/cache/e-1.xml">
                                 <e1/>
                                 <e2 a1="v1" a2="v2"/>
                                 <e3>Some text</e3>

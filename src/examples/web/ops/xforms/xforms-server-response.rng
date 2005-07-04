@@ -1,0 +1,179 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<grammar datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+         xmlns="http://relaxng.org/ns/structure/1.0"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+
+    <include href="xforms-server-common.rng"/>
+
+    <start>
+        <element name="xxforms:event-response">
+            <optional>
+                <element name="xxforms:static-state">
+                    <data type="string"/>
+                </element>
+            </optional>
+            <element name="xxforms:dynamic-state">
+                <data type="string"/>
+            </element>
+            <element name="xxforms:action">
+                <element name="xxforms:control-values">
+                    <zeroOrMore>
+                        <choice>
+                            <element name="xxforms:control">
+                                <attribute name="id">
+                                    <data type="string"/>
+                                </attribute>
+                                <optional>
+                                    <attribute name="hint"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="alert"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="label"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="help"/>
+                                </optional>
+                                <optional>
+                                    <attribute name="readonly">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="required">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="relevant">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="valid">
+                                        <choice>
+                                            <value>true</value>
+                                            <value>false</value>
+                                        </choice>
+                                    </attribute>
+                                </optional>
+                                <optional>
+                                    <attribute name="type"/>
+                                </optional>
+                                <optional>
+                                    <data type="string"/>
+                                </optional>
+                            </element>
+                            <element name="xxforms:copy-repeat-template">
+                                <attribute name="id">
+                                    <data type="string"/>
+                                </attribute>
+                                <attribute name="id-suffix">
+                                    <data type="string"/>
+                                </attribute>
+                            </element>
+                            <element name="xxforms:delete-element">
+                                <attribute name="id">
+                                    <data type="string"/>
+                                </attribute>
+                            </element>
+                        </choice>
+                    </zeroOrMore>
+                </element>
+                <element name="xxforms:divs">
+                    <zeroOrMore>
+                        <element name="xxforms:div">
+                            <attribute name="id"/>
+                            <attribute name="visibility">
+                                <choice>
+                                    <value>hidden</value>
+                                    <value>visible</value>
+                                </choice>
+                            </attribute>
+                        </element>
+                    </zeroOrMore>
+                </element>
+                <optional>
+                    <element name="xxforms:repeats">
+                        <zeroOrMore>
+                            <element name="xxforms:repeat-index">
+                                <attribute name="id"/>
+                                <attribute name="index">
+                                    <data type="nonNegativeInteger"/>
+                                </attribute>
+                            </element>
+                        </zeroOrMore>
+                        <zeroOrMore>
+                            <element name="xxforms:repeat-iteration">
+                                <attribute name="id"/>
+                                <attribute name="occurs">
+                                    <data type="nonNegativeInteger"/>
+                                </attribute>
+                            </element>
+                        </zeroOrMore>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="xxforms:repeat-indexes">
+                        <zeroOrMore>
+                            <element name="xxforms:repeat-index">
+                                <attribute name="id"/>
+                                <attribute name="old-index">
+                                    <data type="nonNegativeInteger"/>
+                                </attribute>
+                                <attribute name="new-index">
+                                    <data type="nonNegativeInteger"/>
+                                </attribute>
+                            </element>
+                        </zeroOrMore>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="xxforms:itemsets">
+                        <zeroOrMore>
+                            <element name="xxforms:itemset">
+                                <attribute name="id"/>
+                                <zeroOrMore>
+                                    <element name="xxforms:item">
+                                        <attribute name="label"/>
+                                        <attribute name="value"/>
+                                    </element>
+                                </zeroOrMore>
+                            </element>
+                        </zeroOrMore>
+                    </element>
+                </optional>
+                <optional>
+                    <element name="xxforms:submission">
+                        <attribute name="action"/>
+                        <attribute name="method"/>
+                    </element>
+                </optional>
+            </element>
+        </element>
+    </start>
+
+</grammar>

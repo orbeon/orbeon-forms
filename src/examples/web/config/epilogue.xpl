@@ -13,8 +13,8 @@
 -->
 <!--
     The epilogue is run after all page views. It is typically used to perform tasks that need to be
-    done for all views, for example running the XForms engine, applying a common theme, serialize
-    the pages to HTML or XML, etc.
+    done for all views, for example running the server-side XForms engine, applying a common theme,
+    serializing the pages to HTML or XML, etc.
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -24,9 +24,22 @@
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
+    <!-- The document produced by the page view -->
     <p:param type="input" name="data"/>
+    <!-- The XML submission if any -->
     <p:param type="input" name="instance"/>
+    <!-- The legacy XForms model as produced by the PFC's page/@xforms attribute if any -->
     <p:param type="input" name="xforms-model"/>
+
+    <!-- Run the XForms epilogue -->
+    <!-- If you don't use XForms at all, you can bypass this -->
+    <p:processor name="oxf:pipeline">
+        <p:input name="config" href="/ops/pfc/xforms-epilogue.xpl"/>
+        <p:input name="data" href="#data"/>
+        <p:input name="instance" href="#instance"/>
+        <p:input name="xforms-model" href="#xforms-model"/>
+        <p:output name="xformed-data" id="xformed-data"/>
+    </p:processor>
 
     <!-- Get request information -->
     <p:processor name="oxf:request">
@@ -40,113 +53,11 @@
         <p:output name="data" id="request"/>
     </p:processor>
 
-    <!-- Annotate XForms elements and generate XHTML if necessary -->
-    <p:choose href="#xforms-model">
-        <p:when test="/xforms:model">
-            <p:processor name="oxf:xforms-output">
-                <p:input name="model" href="#xforms-model"/>
-                <p:input name="instance" href="#instance"/>
-                <p:input name="data" href="#data"/>
-                <p:output name="data" id="annotated-data"/>
-            </p:processor>
-            <!-- Transform annotated XForms to XHTML -->
-            <p:processor name="oxf:unsafe-xslt">
-                <p:input name="config" href="xforms-to-xhtml.xsl"/>
-                <p:input name="model" href="#xforms-model"/>
-                <p:input name="instance" href="#instance"/>
-                <p:input name="data" href="#annotated-data"/>
-                <p:output name="data" id="xhtml-data"/>
-            </p:processor>
-            <p:choose href="#request">
-                <p:when test="/request/container-type = 'servlet'">
-                    <!-- Handle portlet forms (you can skip this step if you are not including portlets in your page) -->
-                    <p:processor name="oxf:xslt">
-                        <p:input name="config" href="xforms-portlet-forms.xsl"/>
-                        <p:input name="data" href="#xhtml-data"/>
-                        <p:output name="data" id="xformed-data"/>
-                    </p:processor>
-                </p:when>
-                <p:otherwise>
-                    <!-- Don't go through this step if we are implementing a portlet -->
-                    <p:processor name="oxf:identity">
-                        <p:input name="data" href="#xhtml-data"/>
-                        <p:output name="data" id="xformed-data"/>
-                    </p:processor>
-                </p:otherwise>
-            </p:choose>
-        </p:when>
-        <p:otherwise>
-            <p:choose href="#data">
-                <p:when test="//xforms:model">
-                    <!-- Handle widgets -->
-                    <p:processor name="oxf:xslt">
-                        <p:input name="data" href="#data"/>
-                        <p:input name="config" href="xforms-widgets.xsl"/>
-                        <p:output name="data" id="widgeted-view"/>
-                    </p:processor>
-                    <!-- Annotate controls in view with and id -->
-                    <p:processor name="oxf:xslt">
-                        <p:input name="data" href="#widgeted-view"/>
-                        <p:input name="config" href="xforms-annotate-controls.xsl"/>
-                        <p:output name="data" id="annotated-view"/>
-                    </p:processor>
-                    <!-- Extract models and controls -->
-                    <p:processor name="oxf:unsafe-xslt">
-                        <p:input name="data" href="#annotated-view"/>
-                        <p:input name="config" href="xforms-extract-controls.xsl"/>
-                        <p:output name="data" id="xforms-models-controls"/>
-                    </p:processor>
-                    <!-- Builds request to XForms server -->
-                    <p:processor name="oxf:unsafe-xslt">
-                        <p:input name="data" href="#xforms-models-controls"/>
-                        <p:input name="config">
-                            <xxforms:event-request xsl:version="2.0" 
-                                    xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
-                                <xxforms:static-state>
-                                    <xsl:variable name="static-state" as="document-node()">
-                                        <xsl:document>
-                                            <static-state>
-                                                <xsl:copy-of select="/*/models"/>
-                                                <xsl:copy-of select="/*/controls"/>
-                                            </static-state>
-                                        </xsl:document>
-                                    </xsl:variable>
-                                    <xsl:value-of select="context:encodeXML($static-state)"/>
-                                </xxforms:static-state>
-                                <xxforms:dynamic-state/>
-                                <xxforms:action/>
-                            </xxforms:event-request>
-                        </p:input>
-                        <p:output name="data" id="request"/>
-                    </p:processor>
-                    <!-- Get initial instances -->
-                    <p:processor name="oxf:xforms-server">
-                        <p:input name="request" href="#request"/>
-                        <p:output name="response" id="response" debug="xxxinitialresponse"/>
-                    </p:processor>
-                    <p:processor name="oxf:xslt">
-                        <p:input name="config" href="xforms-to-ajax-xhtml.xsl"/>
-                        <p:input name="data" href="#annotated-view"/>
-                        <p:input name="request" href="#request"/>
-                        <p:input name="response" href="#response"/>
-                        <p:output name="data" id="xformed-data"/>
-                    </p:processor>
-                </p:when>
-                <p:otherwise>
-                    <p:processor name="oxf:identity">
-                        <p:input name="data" href="#data"/>
-                        <p:output name="data" id="xformed-data"/>
-                    </p:processor>
-                </p:otherwise>
-            </p:choose>
-        </p:otherwise>
-    </p:choose>
-    
     <p:choose  href="#request">
         <p:when test="/request/container-type = 'servlet'">
-            <!-- Servlet -->
+            <!-- The container is a servlet -->
             <p:choose href="#xformed-data">
-                <!-- Auto-detected XSL-FO. Use the XSL-FO Serializer -->
+                <!-- XSL-FO detection. Use the XSL-FO serializer -->
                 <p:when test="/fo:root">
                     <p:processor name="oxf:xslfo-serializer">
                         <p:input name="config">
@@ -160,7 +71,7 @@
                         <p:input name="data" href="#xformed-data"/>
                     </p:processor>
                 </p:when>
-                <!-- Regular XHTML -->
+                <!-- XHTML detection. Apply the theme, rewrite URLs, and serialize to HTML or XHTML. -->
                 <p:when test="/xhtml:html">
                     <!-- Apply theme -->
                     <p:processor name="oxf:xslt">
@@ -177,72 +88,73 @@
                         <p:output name="data" id="rewritten-data"/>
                     </p:processor>
 
-                    <!-- Use this choose block if you want to send XHTML to those browser to  -->
-                    <!-- support it. -->
+                    <!-- Use this choose block if you want to send XHTML to browsers that support it. -->
                     <!-- BEGIN ASSUME SOME XHTML CLIENTS -->
-<!--                    <p:choose href="#request">-->
-<!--                        <p:when test="false() and contains(/request/headers/header[name = 'accept'], 'application/xhtml+xml')">-->
-<!--                            <p:processor name="oxf:qname-converter">-->
-<!--                                <p:input name="config">-->
-<!--                                    <config>-->
-<!--                                        <match>-->
-<!--                                            <uri>http://www.w3.org/1999/xhtml</uri>-->
-<!--                                        </match>-->
-<!--                                        <replace>-->
-<!--                                            <prefix></prefix>-->
-<!--                                        </replace>-->
-<!--                                    </config>-->
-<!--                                </p:input>-->
-<!--                                <p:input name="data" href="#rewritten-data"/>-->
-<!--                                <p:output name="data" id="xhtml-data"/>-->
-<!--                            </p:processor>-->
-<!--                            <p:processor name="oxf:xml-converter">-->
-<!--                                <p:input name="config">-->
-<!--                                    <config>-->
-<!--                                        <method>xhtml</method>-->
-<!--                                        <public-doctype>-//W3C//DTD XHTML 1.0 Transitional//EN</public-doctype>-->
-<!--                                        <system-doctype>http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</system-doctype>-->
-<!--                                        <encoding>utf-8</encoding>-->
-<!--                                        <content-type>application/xhtml+xml</content-type>-->
-<!--                                    </config>-->
-<!--                                </p:input>-->
-<!--                                <p:input name="data" href="#xhtml-data"/>-->
-<!--                                <p:output name="data" id="converted"/>-->
-<!--                            </p:processor>-->
-<!--                        </p:when>-->
-<!--                        <p:otherwise>-->
-<!--                            <p:processor name="oxf:qname-converter">-->
-<!--                                <p:input name="config">-->
-<!--                                    <config>-->
-<!--                                        <match>-->
-<!--                                            <uri>http://www.w3.org/1999/xhtml</uri>-->
-<!--                                        </match>-->
-<!--                                        <replace>-->
-<!--                                            <uri></uri>-->
-<!--                                            <prefix></prefix>-->
-<!--                                        </replace>-->
-<!--                                    </config>-->
-<!--                                </p:input>-->
-<!--                                <p:input name="data" href="#rewritten-data"/>-->
-<!--                                <p:output name="data" id="html-data"/>-->
-<!--                            </p:processor>-->
-<!--                            <p:processor name="oxf:html-converter">-->
-<!--                                <p:input name="config">-->
-<!--                                    <config>-->
-<!--                                        <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>-->
-<!--                                        <version>4.01</version>-->
-<!--                                        <encoding>utf-8</encoding>-->
-<!--                                    </config>-->
-<!--                                </p:input>-->
-<!--                                <p:input name="data" href="#html-data"/>-->
-<!--                                <p:output name="data" id="converted"/>-->
-<!--                            </p:processor>-->
-<!--                        </p:otherwise>-->
-<!--                    </p:choose>-->
+                    <!--
+                    <p:choose href="#request">
+                        <p:when test="false() and contains(/request/headers/header[name = 'accept'], 'application/xhtml+xml')">
+                            <p:processor name="oxf:qname-converter">
+                                <p:input name="config">
+                                    <config>
+                                        <match>
+                                            <uri>http://www.w3.org/1999/xhtml</uri>
+                                        </match>
+                                        <replace>
+                                            <prefix></prefix>
+                                        </replace>
+                                    </config>
+                                </p:input>
+                                <p:input name="data" href="#rewritten-data"/>
+                                <p:output name="data" id="xhtml-data"/>
+                            </p:processor>
+                            <p:processor name="oxf:xml-converter">
+                                <p:input name="config">
+                                    <config>
+                                        <method>xhtml</method>
+                                        <public-doctype>-//W3C//DTD XHTML 1.0 Transitional//EN</public-doctype>
+                                        <system-doctype>http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</system-doctype>
+                                        <encoding>utf-8</encoding>
+                                        <content-type>application/xhtml+xml</content-type>
+                                    </config>
+                                </p:input>
+                                <p:input name="data" href="#xhtml-data"/>
+                                <p:output name="data" id="converted"/>
+                            </p:processor>
+                        </p:when>
+                        <p:otherwise>
+                            <p:processor name="oxf:qname-converter">
+                                <p:input name="config">
+                                    <config>
+                                        <match>
+                                            <uri>http://www.w3.org/1999/xhtml</uri>
+                                        </match>
+                                        <replace>
+                                            <uri></uri>
+                                            <prefix></prefix>
+                                        </replace>
+                                    </config>
+                                </p:input>
+                                <p:input name="data" href="#rewritten-data"/>
+                                <p:output name="data" id="html-data"/>
+                            </p:processor>
+                            <p:processor name="oxf:html-converter">
+                                <p:input name="config">
+                                    <config>
+                                        <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
+                                        <version>4.01</version>
+                                        <encoding>utf-8</encoding>
+                                    </config>
+                                </p:input>
+                                <p:input name="data" href="#html-data"/>
+                                <p:output name="data" id="converted"/>
+                            </p:processor>
+                        </p:otherwise>
+                    </p:choose>
+                    -->
                     <!-- END ASSUME SOME XHTML CLIENTS -->
 
+                    <!-- Use this choose block if you don't want to send any XHTML but just plain HTML to browsers. -->
                     <!-- BEGIN NO ASSUME XHTML CLIENTS -->
-                    <!-- Just send plain HTML -->
                     <!-- Move from XHTML namespace to no namespace -->
                     <p:processor name="oxf:qname-converter">
                         <p:input name="config">
@@ -259,7 +171,7 @@
                         <p:input name="data" href="#rewritten-data"/>
                         <p:output name="data" id="html-data"/>
                     </p:processor>
-                    <!-- Output regular HTML -->
+                    <!-- Convert to plain HTML -->
                     <p:processor name="oxf:html-converter">
                         <p:input name="config">
                             <config>
@@ -286,7 +198,7 @@
                         <p:input name="data" href="#converted"/>
                     </p:processor>
                 </p:when>
-                <!-- Regular HTML -->
+                <!-- Plain HTML detection. No theme is applied, but URLs are rewritten. -->
                 <p:when test="/html">
                     <!-- Rewrite all URLs in HTML and XHTML documents -->
                     <p:processor name="oxf:unsafe-xslt">
@@ -319,8 +231,9 @@
                         <p:input name="data" href="#converted"/>
                     </p:processor>
                 </p:when>
+                <!-- No particular document format detected. Output plain XML. -->
                 <p:otherwise>
-                    <!-- Output XML -->
+                    <!-- Convert and serialize to XML -->
                     <p:processor name="oxf:xml-converter">
                         <p:input name="config">
                             <config>
@@ -345,17 +258,17 @@
             </p:choose>
         </p:when>
         <p:otherwise>
-            <!-- Portlet -->
+            <!-- The container is a portlet -->
             <p:choose href="#xformed-data">
+                <!-- XHTML detection. Don't transform the content. -->
                 <p:when test="/xhtml:html">
-                    <!-- Don't transform content for XHTML -->
                     <p:processor name="oxf:identity">
                         <p:input name="data" href="#xformed-data"/>
                         <p:output name="data" id="xformed-data-2"/>
                     </p:processor>
                 </p:when>
+                <!-- No particular document format detected. Create an XHTML document which formats the XML content. -->
                 <p:otherwise>
-                    <!-- Otherwise create an XHTML document which formats the XML content -->
                     <p:processor name="oxf:unsafe-xslt">
                         <p:input name="data" href="#xformed-data"/>
                         <p:input name="request" href="#request"/>

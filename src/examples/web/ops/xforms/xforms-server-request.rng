@@ -1,0 +1,54 @@
+<!--
+    Copyright (C) 2005 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<grammar datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+         xmlns="http://relaxng.org/ns/structure/1.0"
+         xmlns:xforms="http://www.w3.org/2002/xforms"
+         xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+
+    <include href="xforms-server-common.rng"/>
+
+    <start>
+        <element name="xxforms:event-request">
+            <element name="xxforms:static-state">
+                <data type="string"/>
+            </element>
+            <element name="xxforms:dynamic-state">
+                <data type="string"/>
+            </element>
+            <element name="xxforms:action">
+                <zeroOrMore>
+                    <element name="xxforms:event">
+                        <optional>
+                            <attribute name="name">
+                                <ref name="xformsActionName"/>
+                            </attribute>
+                            <attribute name="source-control-id">
+                                <data type="string"/>
+                            </attribute>
+                            <optional>
+                                <attribute name="other-control-id">
+                                    <data type="string"/>
+                                </attribute>
+                            </optional>
+                            <optional>
+                                <data type="string"/>
+                            </optional>
+                        </optional>
+                    </element>
+                </zeroOrMore>
+            </element>
+        </element>
+    </start>
+
+</grammar>

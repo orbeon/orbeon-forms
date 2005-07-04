@@ -20,16 +20,175 @@
     </header>
     <body>
         <section>
-            <title>Introduction</title>
+            <title>Introduction to the Page Flow Epilogue</title>
             <p>
-                The OPS Page Flow Controller (PFC) supports a
+                The OPS <i>page flow epilogue</i> is an <a href="reference-xpl-pipelines">XPL
+                pipeline</a> executed by the <a href="reference-page-flow">Page Flow
+                Controller</a> (PFC) in order to perform tasks common to all the pages in an OPS
+                application. Such tasks include:
             </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>Look and feel.</b> Adding a common look and feel to all the XHTML pages
+                        in an application.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Page layout.</b> Adding a page header, footer, or navigation bar.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Linking common files.</b> Adding common links to external CSS
+                        stylesheets or scripts.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Document-aware formatting.</b> Formatting the document differently
+                        depending on the type of document produced by a page view, for example XHTML
+                        or XSL-FO.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Client-aware formatting.</b> Producing XHTML or plain HTML depending on
+                        the user agent requesting the page, or different versions of HTML depending
+                        on different clients.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Server-side XForms processing.</b> The OPS server-side XForms engine is
+                        hooked up in the epilogue.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>URL rewriting.</b> Rewriting URLs so that XHTML pages are written
+                        independently from their final location.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Servlet and portlet support.</b> Formatting pages differently for
+                        deployment as a portlet.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>User-defined configuration.</b> Finally, because the epilogue is a
+                        configurable XPL pipeline, there is no limit to the tasks it can acomplish!
+                    </p>
+                </li>
+            </ul>
+            <p>
+                Thanks to the page flow epilogue, it is not necessary to duplicate common behavior
+                in all the page views of a given OPS application.
+            </p>
+        </section>
+        <section>
+            <title>Basics</title>
+            <section>
+                <title>Configuration and Execution</title>
+                <p>
+                    The epilogue pipeline is specified with the <a
+                    href="reference-page-flow#epilogue-element"><code>&lt;epilogue&gt;</code>
+                    element</a>, which by default points to the OPS <i>standard epilogue</i> located
+                    under <code>oxf:/config/epilogue.xpl</code>.
+                </p>
+                <p>
+                    The epilogue is executed by the PFC only after a page view executes. This means
+                    that for a given execution of a page, the following conditions must be met for the
+                    epilogue to execute:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            The <code>&lt;page&gt;</code> elements has a <code>view</code> attribute.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            No page result element with a <code>page</code> attribute executes.
+                        </p>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>Inputs</title>
+                <p>
+                    When executed, the epilogue XPL pipeline has a <code>data</code> input containing
+                    the XML document produced by the page view which just executed. In particular, if
+                    the page view is:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>A static XML file:</b> the <code>data</code> input directly receives the
+                            unmodified content of that file.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>An XSLT template:</b> the <code>data</code> input receives the default
+                            output of the XSLT template.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>An XPL pipeline:</b> the <code>data</code> input receives the content of
+                            the <code>data</code> output of that pipeline.
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    The epilogue XPL pipeline also receives on its <code>instance</code> input the <a
+                    href="reference-page-flow#xml-submission"> XML submission</a> performed on the page,
+                    if any. The epilogue does not have to use that input, but it may do so.
+                </p>
+            </section>
+            <section>
+                <title>Outputs</title>
+                <p>
+                    The epilogue XPL pipeline does not have any pipeline output: the result of the
+                    XPL pipeline must be produced using a serializer, usually the <a
+                    href="processors-serializers-http">HTTP serializer</a>, which serializes the
+                    resulting data directly to an HTTP client such as a web browser.
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>XForms Processing</title>
+            <p>
+                xxx
+            </p>
+        </section>
+        <section>
+            <title>The Default Theme</title>
             <p>
 
             </p>
         </section>
         <section>
-            <title>TODO</title>
+            <title>User Configurability</title>
+            <p>
+
+            </p>
+        </section>
+        <section>
+            <title></title>
+            <p>
+
+            </p>
+        </section>
+        <section>
+            <title></title>
+            <p>
+
+            </p>
         </section>
     </body>
 </document>

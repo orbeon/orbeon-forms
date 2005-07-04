@@ -82,7 +82,7 @@
             <xsl:comment> Set XML Server configuration file </xsl:comment>
             <context-param>
                 <param-name>oxf.xml-server.config</param-name>
-                <param-value>oxf:/config/xml-server.xml</param-value>
+                <param-value>oxf:/ops/xml-server/xml-server.xml</param-value>
             </context-param>
 
             <xsl:comment> Set context listener processors </xsl:comment>
@@ -223,7 +223,7 @@
                 </init-param>
                 <init-param>
                     <param-name>oxf.main-processor.input.config</param-name>
-                    <param-value>oxf:/xforms/xforms-server.xpl</param-value>
+                    <param-value>oxf:/ops/xforms/xforms-server.xpl</param-value>
                 </init-param>
                 <xsl:comment> Set error processor </xsl:comment>
                 <init-param>
@@ -232,7 +232,7 @@
                 </init-param>
                 <init-param>
                     <param-name>oxf.error-processor.input.config</param-name>
-                    <param-value>oxf:/xforms/xforms-server-error.xpl</param-value>
+                    <param-value>oxf:/ops/xforms/xforms-server-error.xpl</param-value>
                 </init-param>
                 <load-on-startup>1</load-on-startup>
             </servlet>

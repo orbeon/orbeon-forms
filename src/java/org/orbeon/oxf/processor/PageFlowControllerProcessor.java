@@ -569,7 +569,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         } else {
             // Use XML Submission pipeline
             statementsList.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
-                addInput(new ASTInput("config", new ASTHrefURL("oxf:/xforms/pfc/xforms-xml-submission.xpl")));
+                addInput(new ASTInput("config", new ASTHrefURL("oxf:/ops/pfc/xforms-xml-submission.xpl")));
                 if (setValueDocument != null) {
                     addInput(new ASTInput("setvalues", setValueDocument));
                     addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));

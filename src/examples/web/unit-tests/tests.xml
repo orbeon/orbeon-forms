@@ -45,7 +45,7 @@
 
     <!-- This test should probably be hand-customized to be clearer -->
     <test description="xforms-portlet-forms" name="oxf:xslt">
-        <input name="config" href="oxf:/config/xforms-portlet-forms.xsl"/>
+        <input name="config" href="oxf:/ops/pfc/xforms-portlet-forms.xsl"/>
         <input name="data" href="oxf:/unit-tests/xforms-portlet-forms/input-data.xml"/>
         <input name="annotated-data" href="oxf:/unit-tests/xforms-portlet-forms/input-annotated-data.xml"/>
         <output name="data" href="oxf:/unit-tests/xforms-portlet-forms/output-data.xml"/>

@@ -47,24 +47,6 @@
         <setvalue ref="/form/post-id" matcher-group="3"/>
         <setvalue ref="/form/format" parameter="format"/>
         <setvalue ref="/form/category" parameter="category"/>
-        <action when="/form/action = 'save' and not(/form//*[@xxforms:valid = 'false' and not(ancestor-or-self::*[@xxforms:relevant = 'false'])])" action="recent-posts/do-save-comment.xpl">
-            <result page="post" transform="oxf:xslt" instance-passing="redirect">
-                <form xsl:version="2.0" xmlns="">
-                    <username><xsl:value-of select="doc('input:instance')/form/username"/></username>
-                    <blog-id><xsl:value-of select="doc('input:instance')/form/blog-id"/></blog-id>
-                    <post-id><xsl:value-of select="doc('input:instance')/form/post-id"/></post-id>
-                </form>
-            </result>
-        </action>
-        <action when="/form/action = 'cancel'">
-            <result page="post" transform="oxf:xslt" instance-passing="redirect">
-                <form xsl:version="2.0" xmlns="">
-                    <username><xsl:value-of select="doc('input:instance')/form/username"/></username>
-                    <blog-id><xsl:value-of select="doc('input:instance')/form/blog-id"/></blog-id>
-                    <post-id><xsl:value-of select="doc('input:instance')/form/post-id"/></post-id>
-                </form>
-            </result>
-        </action>
     </page>
 
     <!-- A user's blog -->
@@ -84,6 +66,20 @@
           model="user-home/user-home-model.xpl"
           view="user-home/user-home-view.xsl">
         <setvalue ref="/form/username" matcher-group="1"/>
+    </page>
+
+    <page path-info="/save-comment">
+        <action>
+            <result page="post" transform="oxf:xslt" instance-passing="redirect">
+                <form xsl:version="2.0" xmlns="">
+                    <username><xsl:value-of select="doc('input:instance')/form/username"/></username>
+                    <blog-id><xsl:value-of select="doc('input:instance')/form/blog-id"/></blog-id>
+                    <post-id><xsl:value-of select="doc('input:instance')/form/post-id"/></post-id>
+                    <format><xsl:value-of select="doc('input:instance')/form/format"/></format>
+                    <category><xsl:value-of select="doc('input:instance')/form/category"/></category>
+                </form>
+            </result>
+        </action>
     </page>
 
     <!-- Home Page -->

@@ -76,7 +76,7 @@
 <!--            <xforms:bind nodeset="/form/comment/text" constraint="normalize-space(.) != ''"/>-->
 
             <xforms:bind nodeset="/form/check/value3" constraint=". castable as xs:positiveInteger and (xs:integer(.) = xs:integer(/form/check/value1) + xs:integer(/form/check/value2))"/>
-            <xforms:submission method="post"/>
+            <xforms:submission id="comment-submission" method="post" action="/save-comment"/>
         </xforms:model>
     </head>
     <body>
@@ -264,7 +264,7 @@
                                             </td>
                                         </tr>
                                     </table>
-                                    <xforms:submit>
+                                    <xforms:submit submission="">
                                         <xforms:label>Preview</xforms:label>
                                         <xforms:setvalue ref="/form/action">preview</xforms:setvalue>
                                     </xforms:submit>

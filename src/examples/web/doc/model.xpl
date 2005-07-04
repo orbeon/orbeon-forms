@@ -91,7 +91,7 @@
             </p:processor>
 
             <p:processor name="oxf:unsafe-xslt">
-                <p:input name="config" href="oxf:/oxf/pfc/oxf-rewrite.xsl"/>
+                <p:input name="config" href="oxf:/ops/pfc/url-rewrite.xsl"/>
                 <p:input name="data" href="#html"/>
                 <p:input name="container-type" href="#request"/>
                 <p:output name="data" id="fixed-html"/>

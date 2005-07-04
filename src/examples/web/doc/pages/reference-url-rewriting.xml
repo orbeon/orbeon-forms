@@ -105,10 +105,11 @@
             <p>
                 This section describes the default URL rewriting implementation in Presentation
                 Server. It is implemented in a pipeline called
-                <code>oxf:/oxf/pfc/oxf-rewrite.xsl</code> bundled within <code>orbeon.jar</code>. It is
-                referred to by the default epilogue under <code>oxf:/config/epilogue.xpl</code>,
-                the default error page under <code>oxf:/config/error.xpl</code>, as well as the JSF
-                epilogue example under <code>oxf:/jsf/config/epilogue.xpl</code>.
+                <code>oxf:/ops/pfc/url-rewrite.xsl</code> bundled within <code>orbeon.jar</code>.
+                It is referred to by the default epilogue under
+                <code>oxf:/config/epilogue.xpl</code>, the default error page under
+                <code>oxf:/config/error.xpl</code>, as well as the JSF epilogue example under
+                <code>oxf:/jsf/config/epilogue.xpl</code>.
             </p>
             <section>
                 <title>What is Rewritten?</title>
@@ -375,13 +376,13 @@
             <ul>
                 <li>
                     Modify your Page Flow Controller epilogue to no longer point to the default
-                    <code>oxf-rewrite.xpl</code> and implement your own rewriting algorithm, either
+                    <code>url-rewrite.xpl</code> and implement your own rewriting algorithm, either
                     directly in the epilogue or in a stylesheet, pipeline or processor pointed to by
                     your epilogue.
                 </li>
                 <li>
-                    Use <code>oxf-rewrite.xsl</code> as a starting point. To do this, extract
-                    <code>oxf-rewrite.xsl</code> from <code>orbeon.jar</code> and make a local copy
+                    Use <code>url-rewrite.xsl</code> as a starting point. To do this, extract
+                    <code>url-rewrite.xsl</code> from <code>orbeon.jar</code> and make a local copy
                     in your resource directory. Make sure your epilogue points to your version of
                     the rewriting pipeline. Modify your copy according to your needs.
                 </li>

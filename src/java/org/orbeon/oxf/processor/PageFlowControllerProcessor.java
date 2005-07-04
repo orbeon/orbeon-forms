@@ -51,6 +51,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     public final static String EXTRACT_INSTANCE_XPATH
             = "/*/*[local-name() = 'instance' and namespace-uri() = '" + XFormsConstants.XFORMS_NAMESPACE_URI + "']/*[1]";
 
+    // External resources
+    private final static String REVERSE_PARAMS_XSL = "oxf:/ops/pfc/reverse-params.xsl";
+    private final static String REWRITE_XSL = "oxf:/ops/pfc/rewrite.xsl";
+    private final static String XFORMS_XML_SUBMISSION_XPL = "oxf:/ops/pfc/xforms-xml-submission.xpl";
+
     // Instance passing configuration
     private final static String INSTANCE_PASSING_REDIRECT = "redirect";
     private final static String INSTANCE_PASSING_FORWARD = "forward";
@@ -569,7 +574,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         } else {
             // Use XML Submission pipeline
             statementsList.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
-                addInput(new ASTInput("config", new ASTHrefURL("oxf:/ops/pfc/xforms-xml-submission.xpl")));
+                addInput(new ASTInput("config", new ASTHrefURL(XFORMS_XML_SUBMISSION_XPL)));
                 if (setValueDocument != null) {
                     addInput(new ASTInput("setvalues", setValueDocument));
                     addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));
@@ -1010,7 +1015,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     redirectDataAggregate.getHrefs().add(new ASTHrefId(parametersOutput));
 
                     when.addStatement(new ASTProcessorCall(XMLConstants.UNSAFE_XSLT_PROCESSOR_QNAME) {{
-                        addInput(new ASTInput("config", new ASTHrefURL("oxf:/oxf/private/page-flow/reverse-params.xsl")));
+                        addInput(new ASTInput("config", new ASTHrefURL(REVERSE_PARAMS_XSL)));
                         addInput(new ASTInput("data", redirectDataAggregate));
                         addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
                         addInput(new ASTInput("params", paramsDocument));
@@ -1113,7 +1118,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         addStatement(new ASTProcessorCall(XMLConstants.XSLT_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefAggregate("root",
                                     new ASTHrefId(stepURLInput), new ASTHrefId(matcherInput))));
-                            addInput(new ASTInput("config", new ASTHrefURL("oxf:/oxf/private/page-flow/rewrite.xsl")));
+                            addInput(new ASTInput("config", new ASTHrefURL(REWRITE_XSL)));
                             addOutput(new ASTOutput("data", rewroteStepURL));
                         }});
                     }});

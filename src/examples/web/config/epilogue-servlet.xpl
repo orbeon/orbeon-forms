@@ -208,16 +208,25 @@
         </p:when>
         <!-- XSL-FO detection. Use the XSL-FO serializer -->
         <p:when test="/fo:root">
-            <p:processor name="oxf:xslfo-serializer">
+            <p:processor name="oxf:xslfo-converter">
+                <p:input name="config"><config/></p:input>
+                <p:input name="data" href="#xformed-data"/>
+                <p:output name="data" id="converted"/>
+            </p:processor>
+            <p:processor name="oxf:http-serializer">
                 <p:input name="config">
                     <config>
                         <header>
-                           <name>Content-Disposition</name>
+                            <name>Cache-Control</name>
+                            <value>post-check=0, pre-check=0</value>
+                        </header>
+                        <header>
+                            <name>Content-Disposition</name>
                             <value>attachment; filename=document.pdf</value>
                         </header>
                     </config>
                 </p:input>
-                <p:input name="data" href="#xformed-data"/>
+                <p:input name="data" href="#converted"/>
             </p:processor>
         </p:when>
         <!-- No particular document format detected. Output plain XML. -->

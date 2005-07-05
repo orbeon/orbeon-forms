@@ -31,9 +31,7 @@
                             <xforms:setvalue ref="/action">report-xml-hierarchy</xforms:setvalue>
                         </xforms:submit>:
 
-                        this is the output of the SQL processor, called in <a
-                        href="/goto-source/reports/xml-hierarchy.xpl"
-                        f:url-type="resource">xml-hierarchy.xpl</a> and formatted in <a
+                        this is the output of the SQL processor, called by <a
                         href="/goto-source/reports/xml-hierarchy.xsl"
                         f:url-type="resource">xml-hierarchy.xsl</a>
                     </xhtml:li>

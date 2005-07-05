@@ -25,7 +25,6 @@
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
     <xsl:include href="formatting.xsl"/>
-    <xsl:include href="oxf:/inspector/xml-formatting.xsl"/>
 
     <!-- This contains some useful request information -->
     <xsl:variable name="request" select="doc('input:request')" as="document-node()"/>
@@ -35,21 +34,13 @@
         <xhtml:html>
             <xhtml:head>
                 <!-- Handle meta elements -->
-                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:meta">
-                    <xsl:copy-of select="."/>
-                </xsl:for-each>
+                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:meta"/>
                 <!-- Copy user-defined links -->
-                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:links">
-                    <xsl:copy-of select="."/>
-                </xsl:for-each>
+                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:link"/>
                 <!-- Copy user-defined stylesheets -->
-                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:style">
-                    <xsl:copy-of select="."/>
-                </xsl:for-each>
+                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:style"/>
                 <!-- Copy user-defined scripts -->
-                <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:script">
-                    <xsl:copy-of select="."/>
-                </xsl:for-each>
+                <xsl:copy-of select="/xhtml:html/xhtml:head/xhtml:script"/>
                 <!-- Calendar -->
                 <xhtml:link rel="stylesheet" href="/config/theme/jscalendar/calendar-blue.css" type="text/css"/>
                 <xhtml:script type="text/javascript" src="/config/theme/jscalendar/calendar.js"/>
@@ -70,8 +61,7 @@
                             <xsl:value-of select="/xhtml:html/xhtml:head/xhtml:title"/>
                         </xsl:when>
                         <xsl:when test="/xhtml:html/xhtml:body/xhtml:example-header">
-                            <xsl:variable name="title" select="/xhtml:html/xhtml:body/xhtml:example-header/*/title"/>
-                            <xsl:value-of select="$title"/>
+                            <xsl:value-of select="/xhtml:html/xhtml:body/f:example-header/*/title"/>
                         </xsl:when>
                         <xsl:otherwise>
                             <xsl:value-of select="(/xhtml:html/xhtml:body/xhtml:h1)[1]"/>
@@ -140,76 +130,11 @@
         </xsl:copy>
     </xsl:template>
     
-    <!-- Should this be here? -->
-    <xsl:template match='xhtml:td[ @xxforms:error-cell="true" ]' >
+    <!-- Legacy XForms error cell styling -->
+    <xsl:template match="xhtml:td[@xxforms:error-cell = 'true']" >
         <xhtml:td>
             <xhtml:img src="/images/error.gif" style="margin: 5px"/>
         </xhtml:td>
-    </xsl:template>
-
-    <!-- - - - - - - Named templates - - - - - - -->
-    
-    <!-- Should this be here? -->
-    <xsl:template match='xhtml:td[ @xxforms:error-cell="true" ]' >
-        <xhtml:td>
-            <xhtml:img src="/images/error.gif" style="margin: 5px"/>
-        </xhtml:td>
-    </xsl:template>
-    
-    <xsl:template name="ignore-first-empty-lines">
-        <xsl:param name="text"/>
-        <xsl:variable name="first-line" select="substring-before($text, '&#xA;')"/>
-        <xsl:choose>
-            <xsl:when test="normalize-space($first-line) = ''">
-                <!-- First line empty, skip it -->
-                <xsl:call-template name="ignore-first-empty-lines">
-                    <xsl:with-param name="text" select="substring-after($text, '&#xA;')"/>
-                </xsl:call-template>
-            </xsl:when>
-            <xsl:otherwise>
-                <!-- Start truncating the margin -->
-                <xsl:call-template name="truncate-margin">
-                    <xsl:with-param name="text" select="$text"/>
-                    <xsl:with-param name="width">
-                        <xsl:call-template name="leading-spaces-count">
-                            <xsl:with-param name="text" select="substring-before($text, '&#xA;')"/>
-                        </xsl:call-template>
-                    </xsl:with-param>
-                </xsl:call-template>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template name="leading-spaces-count">
-        <xsl:param name="text"/>
-        <xsl:choose>
-            <xsl:when test="substring($text, 1, 1) = ' '">
-                <xsl:variable name="recurse">
-                    <xsl:call-template name="leading-spaces-count">
-                        <xsl:with-param name="text" select="substring($text, 2, string-length($text) - 1)"/>
-                    </xsl:call-template>
-                </xsl:variable>
-                <xsl:value-of select="$recurse + 1"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:value-of select="0"/>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:template>
-
-    <xsl:template name="truncate-margin">
-        <xsl:param name="text"/>
-        <xsl:param name="width"/>
-        <xsl:variable name="first-line" select="substring-before($text, '&#xA;')"/>
-        <xsl:variable name="rest" select="substring-after($text, '&#xA;')"/>
-        <xsl:value-of select="substring($first-line, $width + 1)"/>
-        <xsl:if test="substring-after($rest, '&#xA;') != ''">
-            <xsl:value-of select="'&#xA;'"/>
-            <xsl:call-template name="truncate-margin">
-                <xsl:with-param name="text" select="$rest"/>
-                <xsl:with-param name="width" select="$width"/>
-            </xsl:call-template>
-        </xsl:if>
     </xsl:template>
 
     <!-- - - - - - - Generic copy rules - - - - - - -->
@@ -231,7 +156,7 @@
     <!-- - - - - - - Make sure that portlet content is never rewritten in the theme - - - - - - -->
 
     <!-- Any element with portlet:is-portlet-content = 'true' attribute doesn't have theme applied -->
-    <xsl:template match="xhtml:div[@portlet:is-portlet-content='true']" priority="200">
+    <xsl:template match="xhtml:div[@portlet:is-portlet-content = 'true']" priority="200">
         <xsl:copy>
             <xsl:copy-of select="@*[namespace-uri() = '']"/>
             <xsl:copy-of select="@f:url-norewrite"/>

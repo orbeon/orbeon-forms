@@ -31,12 +31,16 @@
                 OPS 3.0 features an XForms engine much improved over OPS 2.8's, significant
                 improvements in the Page Flow Controller, and much more!
             </p>
-            <note>
-                By default, your applications written against OPS 2.8 will use the legacy 2.8 XForms
-                engine in OPS 3.0. With OPS 3.0, you use XForms in the way you expect when combining
-                XForms with XHTML, in that you do not declare an XForms model separately from your
-                XHTML page.
-            </note>
+            <p>
+                The purpose of the OPS 3.0 BETA is to provide you with a first glimpse of the OPS
+                3.0 functionality, while OPS developers keep ironing out the last bugs and finishing
+                up the documentation! During the beta period, we are looking for as much feedback as
+                possible related to all the aspects of the OPS 3.0 BETA release.
+            </p>
+            <p>
+                Please use the <a href="http://forge.objectweb.org/mail/?group_id=168">ops-users
+                mailing-list</a> for feedback about OPS 3.0 BETA.
+            </p>
         </section>
         <section>
             <title>XForms</title>
@@ -145,6 +149,10 @@
                         </p>
                     </li>
                 </ul>
+                <note>
+                    The OPS XForms reference documentation has not yet been updated to reflect all
+                    the changes in OPS 3.0. Please refer to the "XForms NG" examples for details.
+                </note>
                 <p>
                     TODO: link to updated XForms conformance map.
                 </p>
@@ -205,6 +213,12 @@
             </section>
             <section>
                 <title>Migrating to the OPS 3.0 XForms Engine</title>
+                <warning>
+                    By default, your applications written against OPS 2.8 will use the legacy 2.8
+                    XForms engine in OPS 3.0. With OPS 3.0, you use XForms in the way you expect
+                    when combining XForms with XHTML, in that you do not declare an XForms model
+                    separately from your XHTML page.
+                </warning>
                 <p>
                     In order to leverage most of the new features of XForms 3.0, it is necessary to
                     migrate your forms. This is a list of tasks to accomplish and possible caveats:
@@ -353,11 +367,6 @@
                     </p>
                 </li>
             </ul>
-            <note>
-                If a page uses XForms, which means either having <code>&lt;action&gt;</code>
-                elements, or reading the instance in the page model or page view, it must not expect
-                to be able to read the HTTP request body separately.
-            </note>
         </section>
         <section>
             <title>XSLT processor</title>

@@ -679,6 +679,12 @@
                     <code>jdoe</code>, and the second group the value <code>456</code>.
                 </p>
             </section>
+            <note>
+                If a page actually uses an XML submission, which means either having
+                <code>&lt;action&gt;</code> elements, or reading the instance in the page model or
+                page view, it must not expect to be able to read the HTTP request body separately
+                using the <a href="processors-generators-request">Request generator</a>.
+            </note>
         </section>
         <a name="page-navigation"/>
         <section>

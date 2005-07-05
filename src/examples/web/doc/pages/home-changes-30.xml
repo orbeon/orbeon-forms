@@ -28,175 +28,242 @@
                 Welcome to OPS 3.0 BETA!
             </p>
             <p>
-                OPS 3.0 features an XForms engine much improved over OPS 2.8's, some significant
+                OPS 3.0 features an XForms engine much improved over OPS 2.8's, significant
                 improvements in the Page Flow Controller, and much more!
             </p>
             <note>
-                By default, your applications written against OPS 2.8 will use the legacy 2.8
-                XForms engine in OPS 3.0. With OPS 3.0, you use XForms in a way much closer to what
-                you would expect when combining XForms with XHTML, in that you do not need to
-                declare an XForms model separately from your XHTML page.
+                By default, your applications written against OPS 2.8 will use the legacy 2.8 XForms
+                engine in OPS 3.0. With OPS 3.0, you use XForms in the way you expect when combining
+                XForms with XHTML, in that you do not declare an XForms model separately from your
+                XHTML page.
             </note>
         </section>
         <section>
             <title>XForms</title>
-            <p>
-                The OPS XForms engine introduces a big step towards supporting all of the XForms 1.0
-                specification. The main changes are described below. Please also visit the new
-                XForms examples, in particular the <a href="/goto-example/xforms-controls">XForms
-                Controls</a> and <a href="/goto-example/bizdoc2">BizDoc NG</a> example.
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        <b>Ajax-based engine.</b> The XForms engine is now based on Ajax
-                        technologies. This makes the XForms engine much more responsive to user
-                        interaction than with OPS 2.8.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Standard XHTML integration.</b> The XForms engine works on standard XHTML
-                        + XForms documents, without the need for a separately described XForms model
-                        as was the case with OPS 2.8. XForms models are simply included in the
-                        XHTML page view under the <code>&lt;xhtml:head&gt;</code> element, as
-                        recommended by XForms 1.0. In this mode, you don't use the
-                        <code>xforms</code> attribute on the PFC <code>&lt;page&gt;</code>
-                        elements. The <code>xforms</code> attribute is still supported for backward
-                        compatibility, but its use triggers the use of the legacy OPS 2.8 XForms
-                        engine.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>XForms event model.</b> The XForms engine supports the XForms event
-                        model, most XForms events and all XForms actions.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Multiple XForms models and instances.</b> The XForms engine supports
-                        multiple models and multiple instances within models. The
-                        <code>instance()</code> function is supported.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>XForms switch module.</b> The XForms engine fully supports the XForms
-                        switch module.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>XForms repeat module.</b> The XForms engine supports correctly the
-                        current index in repeated sections, including the <code>index()</code>
-                        function.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>XForms submission.</b> The XForms engine supports submitting forms as
-                        <code>application/xml</code>, including to external applications. Support
-                        for <code>replace="instance"</code>, <code>replace="all"</code>, and
-                        <code>replace="none"</code> is included.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>XForms Range control.</b> The XForms engine supports a subset of the
-                        functionality of the XForms Range (or slider) control.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Extension functions.</b> The XForms engine supports the
-                        <code>xxforms:call-xpl()</code> extension function to call arbitrary XPL
-                        programs from XForms.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Dynamic XForms models.</b> The new XForms engine and PFC improvements
-                        now allow to easily generate XForms models based on XML submissions. With
-                        OPS 2.8, this was much more difficult as this had to be done in a dynamic
-                        XForms model pipeline, which did not have access to an XML submission.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Simplified theme.</b> The default theme and XForms make more use of CSS
-                        so that configuration of your own theme is easier.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Other changes.</b> The XForms engine supports the <code>value</code>
-                        attribute on <code>xforms:output</code>, handles inheritance of model item
-                        properties, and includes numerous bug fixes.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        TODO: document (X)HTML attributes supported on XForms elements: id, class,
-                        navindex, accesskey, plus tabindex, style, and how to handle other
-                        attributes (xhtml:*).
-                    </p>
-                </li>
-            </ul>
-            <p>
-                Incompatible changes:
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        XSLT views now must always use <code>doc('input:instance')</code> to access
-                        a submitted XML instance instead of expecting the instance on their main
-                        input.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        With OPS 2.8 if your XForms instance was:
-                    </p>
-                    <xml-source>
-                        <credit-card>
-                            <type>visa</type>
-                            ...
-                        </credit-card>
-                    </xml-source>
-                    <p>
-                        and your first XForms element under the <code>&lt;xhtml:body&gt;</code>
-                        element was:
-                    </p>
-                    <xml-source>
-                        <xforms:group ref="credit-card"/>
-                    </xml-source>
-                    <p>
-                        then <code>credit-card</code> would evaluate against the <i>document
-                        node</i> of the unique XForms instance. The above code worked, but this
-                        behavior was incorrect. The XPath evaluation context for top-level XForms
-                        controls has to be the root <i>element</i> of the default XForms instance
-                        instead. This means that the code above must be changed in one of two ways:
-                    </p>
-                    <xml-source>
-                        <xforms:group ref="/credit-card"/>
-                    </xml-source>
-                    <p>
-                        or:
-                    </p>
-                    <xml-source>
-                        <xforms:group ref="."/>
-                    </xml-source>
-                    <p>
-                        If you always used absolute XPath expressions for your top-level XForms
-                        controls, no change is necessary.
-                    </p>
-                </li>
-            </ul>
-            <note>
-                The Ajax-based XForms engine currently works with Mozilla Firefox and Microsoft
-                Internet Explorer 6. Support for Opera and Safari is planned.
-            </note>
+            <section>
+                <title>New Features</title>
+                <p>
+                    The OPS XForms engine introduces a big step towards supporting all of the XForms 1.0
+                    specification. The main changes are described below. Please also visit the new
+                    XForms examples, in particular the <a href="/goto-example/xforms-controls">XForms
+                    Controls</a> and <a href="/goto-example/bizdoc2">BizDoc NG</a> example.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>Ajax-based engine.</b> The XForms engine is now based on Ajax
+                            technologies. This makes the XForms engine much more responsive to user
+                            interaction than with OPS 2.8.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Standard XHTML integration.</b> The XForms engine works on standard XHTML
+                            + XForms documents, without the need for a separately described XForms model
+                            as was the case with OPS 2.8. XForms models are simply included in the
+                            XHTML page view under the <code>&lt;xhtml:head&gt;</code> element, as
+                            recommended by XForms 1.0. In this mode, you don't use the
+                            <code>xforms</code> attribute on the PFC <code>&lt;page&gt;</code>
+                            elements. The <code>xforms</code> attribute is still supported for backward
+                            compatibility, but its use triggers the use of the legacy OPS 2.8 XForms
+                            engine.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XForms event model.</b> The XForms engine supports the XForms event
+                            model, most XForms events and all XForms actions.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Multiple XForms models and instances.</b> The XForms engine supports
+                            multiple models and multiple instances within models. The
+                            <code>instance()</code> function is supported.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XForms switch module.</b> The XForms engine fully supports the XForms
+                            switch module.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XForms repeat module.</b> The XForms engine supports correctly the
+                            current index in repeated sections, including the <code>index()</code>
+                            function.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XForms submission.</b> The XForms engine supports submitting forms as
+                            <code>application/xml</code>, including to external applications. Support
+                            for <code>replace="instance"</code>, <code>replace="all"</code>, and
+                            <code>replace="none"</code> is included.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XForms Range control.</b> The XForms engine supports a subset of the
+                            functionality of the XForms Range (or slider) control.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Extension functions.</b> The XForms engine supports the
+                            <code>xxforms:call-xpl()</code> extension function to call arbitrary XPL
+                            programs from XForms.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Dynamic XForms models.</b> The new XForms engine and PFC improvements
+                            now allow to easily generate XForms models based on XML submissions. With
+                            OPS 2.8, this was much more difficult as this had to be done in a dynamic
+                            XForms model pipeline, which did not have access to an XML submission.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Simplified theme.</b> The default theme and XForms make more use of CSS
+                            so that configuration of your own theme is easier.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Other changes.</b> The XForms engine supports the <code>value</code>
+                            attribute on <code>xforms:output</code>, handles inheritance of model item
+                            properties, and includes numerous bug fixes.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            TODO: document (X)HTML attributes supported on XForms elements: id, class,
+                            navindex, accesskey, plus tabindex, style, and how to handle other
+                            attributes (xhtml:*).
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    TODO: link to updated XForms conformance map.
+                </p>
+            </section>
+            <section>
+                <title>Incompatible changes</title>
+                <ul>
+                    <li>
+                        <p>
+                            XSLT views now must always use <code>doc('input:instance')</code> to access
+                            a submitted XML instance instead of expecting the instance on their main
+                            input.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            With OPS 2.8 if your XForms instance was:
+                        </p>
+                        <xml-source>
+                            <credit-card>
+                                <type>visa</type>
+                                ...
+                            </credit-card>
+                        </xml-source>
+                        <p>
+                            and your first XForms element under the <code>&lt;xhtml:body&gt;</code>
+                            element was:
+                        </p>
+                        <xml-source>
+                            <xforms:group ref="credit-card"/>
+                        </xml-source>
+                        <p>
+                            then <code>credit-card</code> would evaluate against the <i>document
+                            node</i> of the unique XForms instance. The above code worked, but this
+                            behavior was incorrect. The XPath evaluation context for top-level XForms
+                            controls has to be the root <i>element</i> of the default XForms instance
+                            instead. This means that the code above must be changed in one of two ways:
+                        </p>
+                        <xml-source>
+                            <xforms:group ref="/credit-card"/>
+                        </xml-source>
+                        <p>
+                            or:
+                        </p>
+                        <xml-source>
+                            <xforms:group ref="."/>
+                        </xml-source>
+                        <p>
+                            If you already use absolute XPath expressions for your top-level XForms
+                            controls, no change is necessary.
+                        </p>
+                    </li>
+                </ul>
+                <note>
+                    The Ajax-based XForms engine currently works with Mozilla Firefox and Microsoft
+                    Internet Explorer 6. Support for Opera and Safari is planned.
+                </note>
+            </section>
+            <section>
+                <title>Migrating to the OPS 3.0 XForms Engine</title>
+                <p>
+                    In order to leverage most of the new features of XForms 3.0, it is necessary to
+                    migrate your forms. This is a list of tasks to accomplish and possible caveats:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            For a given <code>&lt;page&gt;</code> element:if your OPS 2.8 XForms
+                            model is static (which is usually the case), copy it under your XHTML
+                            page view's <code>xhtml:head</code> element. Then remove the
+                            <code>xforms</code> attribute from the <code>&lt;page&gt;</code>
+                            element. You can then remove the file containing your XForms model.
+                        </p>
+                        <p>
+                            Another possibility is to keep your XForms model file, and to XInclude
+                            that file in your XHTML page view under the <code>xhtml:head</code>
+                            element. Here again, you must remove the <code>xforms</code> attribute
+                            from the <code>&lt;page&gt;</code> element.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            With OPS 2.8,
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            TODO: xforms:submission and xforms:submit (id, action, method).
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            TODO: handling submissions: there are no longer roundtrips which are
+                            visible to the PFC for xforms:repeat, etc.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            TODO: instance validation (remove from PFC, do it with XForms).
+                            Question of custom instance validation.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            TODO: converting dynamic XForms models.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            TODO: using events.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            TODO: more?
+                        </p>
+                    </li>
+                </ul>
+            </section>
         </section>
         <section>
             <title>Page Flow</title>

@@ -22,14 +22,13 @@
         <title>Page Flow Controller</title>
     </header>
     <body>
-        <!-- TODO: example with page/action/result doing simple redirect -->
         <section>
             <title>Introduction to the Page Flow Controller</title>
             <img print-format="pdf" src="pages/reference-controller-oxf-app.png" style="float: right; margin-left: 1em"/>
             <p>
-                The OPS Page Flow Controller (PFC) is the heart of your web application. It
-                dispatches incoming user requests to individual pages built out of models and
-                views, following the model / view / controller (MVC) architecture.
+                The OPS Page Flow Controller (PFC) is the heart of your OPS web application. It
+                dispatches incoming user requests to individual pages built out of models and views,
+                following the model / view / controller (MVC) architecture.
             </p>
             <p>
                 The PFC is configured with a file called a <i>page flow</i>. A page flow not only
@@ -45,7 +44,7 @@
                 <li>
                     <p>
                         <b>Site Logic</b> or <b>Page Flow</b>: when, and how to navigate from one
-                        page to the other.
+                        page to another.
                     </p>
                 </li>
                 <li>
@@ -69,6 +68,13 @@
                     </p>
                 </li>
             </ul>
+            <note>
+                By default, the PFC is configured in <code>web.xml</code> as the main processor for
+                the OPS servlet and portlet. However, you are not required to use the PFC with OPS:
+                you can define your own main processor for servlets and portlets, as documented in
+                <a href="integration-packaging#main-processor">Packaging and Deployment</a>. For
+                most web applications, the PFC should be used.
+            </note>
         </section>
         <section>
             <title>Basics</title>
@@ -1108,27 +1114,44 @@
             </section>
             <section>
                 <title>The files Element</title>
-
                 <p>
                     Some files are not dynamically generated and are served to the client as-is.
-                    This is typically the case for GIF, JPEG, and CSS files.
+                    This is typically the case for images such as GIF, JPEG, CSS files, etc..
                 </p>
                 <p>
-                    You can add one or more <code>&lt;files&gt;</code> elements in the controller
-                    configuration as illustrated in the example below:
+                    You tell the PFC what files to serve directly with one or more
+                    <code>&lt;files&gt;</code> elements in the page flow. The example below shows
+                    the configuration used by the OPS examples:
                 </p>
                 <xml-source>
                     <config>
                         <files path-info="*.gif"/>
                         <files path-info="*.css"/>
+                        <files path-info="*.pdf"/>
+                        <files path-info="*.js"/>
                         <files path-info="*.png"/>
+                        <files path-info="*.jpg"/>
+                        <files path-info="*.wsdl"/>
+                        <files path-info="*.html" mime-type="text/html"/>
+                        <files path-info="*.java" mime-type="text/plain"/>
+                        <files path-info="*.txt" mime-type="text/plain"/>
+                        <files path-info="*.xq" mime-type="text/plain"/>
+                        ...
                     </config>
                 </xml-source>
                 <p>
-                    This specifies the files that must be sent directly to the client. For example,
-                    if you set <code>&lt;files path-info="*.gif"/&gt;</code> and a request comes in
-                    for <code>images/logo.gif</code> then the file <code>images/logo.gif</code>
-                    stored in the resource repository will be sent in response to that request.
+                    With <code>&lt;files path-info="*.gif"/&gt;</code>, if a request reaches the
+                    PFC with the path <code>images/logo.gif</code>, the file
+                    <code>oxf:/images/logo.gif</code> is sent in response to that request.
+                </p>
+                <p>
+                    The <code>&lt;files&gt;</code> element supports the <a
+                    href="#matchers"><code>path-info</code> and <code>matcher</code></a> attributes
+                    like the <code>&lt;page&gt;</code> element. It also supports a
+                    <code>mime-type</code> attribute telling the PFC what media type must be sent
+                    to the client with the files. The PFC uses defaults for well-known extension,
+                    as defined by the <a href="processors-other#resource-server">Resource Server
+                    processor</a>. In doubt, you can specify the <code>mime-type</code> attribute.
                 </p>
             </section>
             <a name="matchers"/>
@@ -1184,7 +1207,7 @@
                     only matcher bundled with OPS that accepts groups is the Perl5 matcher.
                 </p>
             </section>
-            <anchor id="epilogue-element"/>
+            <a name="epilogue-element"/>
             <section>
                 <title>The epilogue Element</title>
                 <img print-format="pdf" src="pages/reference-controller-epilogue.png"/>
@@ -1208,7 +1231,7 @@
                     href="reference-epilogue">Page Flow Epilogue</a> documentation.
                 </p>
             </section>
-            <anchor id="not-found-handler"/>
+            <a name="not-found-handler"/>
             <section>
                 <title>The not-found-handler Element</title>
                 <p>
@@ -1226,6 +1249,10 @@
                     <page id="not-found" path-info="/not-found" view="/config/not-found.xml"/>
                     <not-found-handler page="not-found"/>
                 </xml-source>
+                <p>
+                    By default, <code>oxf:/config/not-found.xml</code> displays a simple XHTML page
+                    telling the user that the page requested cannot be found.
+                </p>
                 <note>
                     The <code>&lt;not-found-handler&gt;</code> element is not used for resources
                     served through the <code>&lt;files&gt;</code> element. In that case, the PFC
@@ -1354,6 +1381,79 @@
                 </p>
             </section>
         </section>
+        <section>
+            <title>Examples</title>
+            <section>
+                <title>Redirection With the PFC</title>
+                <p>
+                    The following example illustrates how to perform a simple redirection with the PFC.
+                    Assume you want some path, <code>/a</code>, to be redirect to another path,
+                    <code>/b</code>. You can do this as follows:
+                </p>
+                <xml-source>
+                    <page path-info="/a">
+                        <action>
+                            <result page="page-b" instance-passing="redirect"/>
+                        </action>
+                    </page>
+                    <page id="page-b" path-info="/b">
+                        ...
+                    </page>
+                </xml-source>
+                <p>
+                    Note that you do not have to use <code>redirect</code>, but that doing so will cause
+                    the user agent to display the path to page <code>/b</code> in its URL bar. The
+                    <code>instance-passing</code> attribute is also unnecessary if
+                    <code>redirect</code> is already the default instance passing mode.
+                </p>
+            </section>
+            <section>
+                <title>Implementing XML Services With the PFC</title>
+                <p>
+                    The PFC allows you to very easily receive an XML document submitted, for
+                    example with an HTTP POST, and to generate an XML response. This can be useful
+                    to implement XML services such as XML-RPC, SOAP, or any XML-over-HTTP service.
+                    The following PFC configuration defines a simple XML service:
+                </p>
+                <xml-source>
+                    <page path-info="/xmlrpc" model="xml-rpc.xpl"/>
+                </xml-source>
+                <p>
+                    Notice that there is no <code>view</code> attribute: all the processing for this
+                    page is done in the page model.
+                </p>
+                <p>
+                    The following content for <code>xml-rpc.xpl</code> implements an XML service
+                    returning as a response the POST-ed XML document:
+                </p>
+                <xml-source>
+                    <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                        xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+                        <comment> The XML submission is available on the "instance" input </comment>
+                        <p:param name="instance" type="input" schema-href="request.rng"/>
+
+                        <comment> Processing of the XML submission (here we just return the request) </comment>
+                        <p:processor name="oxf:identity">
+                            <p:input name="data" href="#instance"/>
+                            <p:output name="data" id="response"/>
+                        </p:processor>
+
+                        <comment> Generate a response </comment>
+                        <p:processor name="oxf:xml-serializer">
+                            <p:input name="data" href="#response" schema-href="response.rng"/>
+                            <p:input name="config">
+                                <config/>
+                            </p:input>
+                        </p:processor>
+                    </p:config>
+                </xml-source>
+                <p>
+                    Notice the optional <code>schema-href</code> attributes which allow validating
+                    the request and the response against schemas.
+                </p>
+            </section>
+        </section>
         <!--
         <section>
             <title>Differences with OPS 2.8</title>
@@ -1362,6 +1462,5 @@
             </p>
         </section>
         -->
-        <!-- TODO: maybe mention how the PFC is configured by default in web.xml? -->
     </body>
 </document>

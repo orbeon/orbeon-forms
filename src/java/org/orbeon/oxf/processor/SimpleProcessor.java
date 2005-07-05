@@ -23,7 +23,7 @@ import java.util.Map;
 
 /**
  * This is the class that must be extended to create a custom processor. See the <a
- * href="http://www.orbeon.com/oxf/doc/reference-processor-api">Processor API section</a> in the OXF
+ * href="http://www.orbeon.com/ops/doc/reference-processor-api">Processor API section</a> in the OXF
  * Manual for more information.
  */
 public abstract class SimpleProcessor extends ProcessorImpl {

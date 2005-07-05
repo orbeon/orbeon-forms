@@ -19,7 +19,7 @@
         <title>Other Processors</title>
     </header>
     <body>
-        <anchor id="ResourceServer"/>
+        <a name="resource-server"/>
         <section>
             <title>Resource Server</title>
             <p>

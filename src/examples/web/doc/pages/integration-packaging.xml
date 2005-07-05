@@ -228,6 +228,7 @@
                 </p>
 			</ol>
 		</section>
+        <a name="main-processor"/>
         <section>
 			<title>Main Processor</title>
             <section>
@@ -316,7 +317,7 @@
                 </p>
             </section>
         </section>
-        <anchor id="error-processor"/>
+        <a name="error-processor"/>
         <section>
 			<title>Error Processor</title>
             <section>
@@ -329,7 +330,7 @@
                     href="reference-error-pipeline">Error Pipeline</a> documentation.
                 </p>
             </section>
-            <anchor id="error-configuration"/>
+            <a name="error-configuration"/>
             <section>
                 <title>Configuring the Error Processor</title>
                 <p>

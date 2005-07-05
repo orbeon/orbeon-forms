@@ -46,7 +46,6 @@
         <menu-item label="Error Pipeline" href="reference-error-pipeline"/>
         <menu-item label="Listeners" href="reference-listeners"/>
         <menu-item label="URL Rewriting" href="reference-url-rewriting"/>
-        <menu-item label="Processor API" href="reference-processor-api"/>
         <menu-item label="XML Namespaces" href="reference-xml-namespaces"/>
     </menu>
     <menu label="Processor Reference">
@@ -87,18 +86,24 @@
         <menu-item label="Struts" href="processors-struts"/>
         <menu-item label="Other Processors" href="processors-other"/>
     </menu>
+    <menu label="API Reference">
+        <menu-item label="Processor API" href="reference-processor-api"/>
+        <menu-item label="Pipeline Engine API" href="reference-pipeline-api"/>
+    </menu>
     <menu label="Integration">
-        <menu-item label="Pipeline Engine API" href="integration-pipeline-api"/>
         <menu-item label="Command Line Applications" href="integration-command-line"/>
         <menu-item label="Web Services" href="integration-webservices"/>
         <menu-item label="Packaging and Deployment" href="integration-packaging"/>
 <!--        <menu-item label="JSR-168 Portlets" href="integration-portlets"/>-->
         <menu-item label="EJB Support" href="integration-ejb"/>
-        <menu-item label="XUpdate JAXP Support" href="integration-xupdate"/>
         <menu-item label="Struts Support" href="model2x-struts"/>
-<!--        <menu-item label="PresentationServer with JSF" href="model2x-jsf"/>-->
+
     </menu>
     <menu label="Internals">
-        <menu-item label="XForms" href="internals-xforms"/> 
+    </menu>
+    <menu label="Obsolete">
+        <menu-item label="XForms" href="internals-xforms"/>
+        <menu-item label="XUpdate JAXP Support" href="integration-xupdate"/>
+<!--        <menu-item label="PresentationServer with JSF" href="model2x-jsf"/>-->
     </menu>
 </book>

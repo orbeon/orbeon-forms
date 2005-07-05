@@ -178,15 +178,15 @@
             </p>
 
             <p>
-                The PresentationServer processor servlet is configured to use a simple pipeline
-                that looks at the request's path and executes the corresponding pipeline, feeding it
-                with the bean form generator. The pipeline's output is then processed through a
-                second pipeline, the epilogue. This allows to apply common stylesheets ot all pages,
-                such as style, internationalization, etc. The main pipeline is also responsible to
-                serve static resources, such as images or css style sheets. Theses resources are
-                served via the ResourceServer. You will find below the complete source of the Struts
-                main pipeline. The same file, <code>struts.xpl</code> is also available with the
-                struts examples bundled in PresentationServer distribution.
+                The PresentationServer processor servlet is configured to use a simple pipeline that
+                looks at the request's path and executes the corresponding pipeline, feeding it with
+                the bean form generator. The pipeline's output is then processed through a second
+                pipeline, the epilogue. This allows to apply common stylesheets ot all pages, such
+                as style, internationalization, etc. The main pipeline is also responsible to serve
+                static resources, such as images or css style sheets. Theses resources are served
+                via the Resource Server processor. You will find below the complete source of the
+                Struts main pipeline. The same file, <code>struts.xpl</code> is also available with
+                the struts examples bundled in PresentationServer distribution.
             </p>
 
             <xml-source>

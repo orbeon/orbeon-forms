@@ -58,7 +58,7 @@
                     <li>
                         The pipeline API is now exposed and documented. It allows running pipelines
                         from any Java application. Please visit the <a
-                        href="integration-pipeline-api">documentation</a> for more information.
+                        href="reference-pipeline-api">documentation</a> for more information.
                     </li>
                 </ul>
             </section>
@@ -1065,7 +1065,7 @@
                 <section>
                     <title>Resource Server</title>
                     <p>
-                        The <a href="processors-other#ResourceServer">Resource Server</a> now
+                        The <a href="processors-other#resource-server">Resource Server</a> now
                         supports serving any URL, in addition to serving OXF resources (URLs with
                         the form oxf:*). Additionally, case insensitive pattern matching is used for
                         the <code>content-type</code> header generation.

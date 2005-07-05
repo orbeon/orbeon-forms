@@ -305,25 +305,112 @@
                     <li>
                         <p>
                             <b>XHTML:</b> for XHTML documents, identified with a root element of
-                            <code>xhtml:html</code> (in the XHTML namespace):
+                            <code>xhtml:html</code> (in the XHTML namespace), two options are
+                            proposed:
                         </p>
-                        <ol>
+                        <ul>
                             <li>
-                                <p>The default theme is applied.</p>
+                                <p>
+                                    <b>Option 1: conversion from XHTML to HTML.</b>
+                                </p>
+                                <ol>
+                                    <li>
+                                        <p>The default theme is applied.</p>
+                                    </li>
+                                    <li>
+                                        <p>URLs are rewritten.</p>
+                                    </li>
+                                    <li>
+                                        <p>
+                                            XHTML is converted to HTML by moving the XHTML elements
+                                            to no namespace and by removing their prefixes, if any.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p>
+                                            The result is converted to plain HTML according to the
+                                            <a
+                                            href="http://www.w3.org/TR/xslt-xquery-serialization/">XSLT
+                                            2.0 and XQuery 1.0 Serialization</a> HTML output method.
+                                        </p>
+                                    </li>
+                                    <li>
+                                        <p>The resulting HTML document is sent to the client through HTTP.</p>
+                                    </li>
+                                </ol>
                             </li>
                             <li>
-                                <p>URLs are rewritten.</p>
+                                <p>
+                                    <b>Option 2: browser detection with native XHTML output
+                                    option.</b> This option is commented out so that the default is
+                                    just to send plain HTML to the client.
+                                </p>
+                                <ol>
+                                    <li>
+                                        <p>The default theme is applied.</p>
+                                    </li>
+                                    <li>
+                                        <p>URLs are rewritten.</p>
+                                    </li>
+                                    <li>
+                                        <p>
+                                            If the client tells the server, with an
+                                            <code>accept</code> header, that it accepts XHTML
+                                            documents:
+                                        </p>
+                                        <ol>
+                                            <li>
+                                                <p>
+                                                    XHTML elements are stripped from their prefixes,
+                                                    if any, but they are left in the XHTML
+                                                    namespace. This makes the XHTML more compatible
+                                                    with certain non-XHTML-aware user agents.
+                                                </p>
+                                            </li>
+                                            <li>
+                                                <p>
+                                                    The result is converted to serialized XHTML
+                                                    according to the <a
+                                                    href="http://www.w3.org/TR/xslt-xquery-serialization/">XSLT
+                                                    2.0 and XQuery 1.0 Serialization</a> XHTML
+                                                    output method.
+                                                </p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p>Otherwise:</p>
+                                        <ol>
+                                            <li>
+                                                <p>
+                                                    XHTML is converted to HTML by moving the XHTML
+                                                    elements to no namespace and by removing their
+                                                    prefixes, if any.
+                                                </p>
+                                            </li>
+                                            <li>
+                                                <p>
+                                                    The result is converted to plain HTML according
+                                                    to the <a
+                                                    href="http://www.w3.org/TR/xslt-xquery-serialization/">XSLT
+                                                    2.0 and XQuery 1.0 Serialization</a> HTML output
+                                                    method.
+                                                </p>
+                                            </li>
+                                        </ol>
+                                    </li>
+                                    <li>
+                                        <p>The resulting document is sent to the client through HTTP.</p>
+                                    </li>
+                                </ol>
                             </li>
-                            <li>
-                                <p>XHTML is converted to HTML by moving the XHTML elements to no namespace.</p>
-                            </li>
-                            <li>
-                                <p>The result is converted to plain HTML.</p>
-                            </li>
-                            <li>
-                                <p>The resulting HTML document is sent to the client through HTTP.</p>
-                            </li>
-                        </ol>
+                        </ul>
+                        <note>
+                            <p>
+                                You can easily construct variations on those options, such as
+                                sending XHTML only to certain user agents, or always sending XHTML.
+                            </p>
+                        </note>
                     </li>
                     <li>
                         <p>
@@ -335,7 +422,11 @@
                                 <p>URLs are rewritten.</p>
                             </li>
                             <li>
-                                <p>The result is converted to plain HTML.</p>
+                                <p>
+                                    The result is converted to plain HTML according to the <a
+                                    href="http://www.w3.org/TR/xslt-xquery-serialization/">XSLT 2.0
+                                    and XQuery 1.0 Serialization</a> HTML output method.
+                                </p>
                             </li>
                             <li>
                                 <p>The resulting HTML document is sent to the client through HTTP.</p>
@@ -356,7 +447,15 @@
                         </p>
                         <ol>
                             <li>
-                                <p>The XSL-FO serializer is called.</p>
+                                <p>
+                                    The XSL-FO converter is called. It generates a binary PDF
+                                    document.
+                                </p>
+                            </li>
+                            <li>
+                                <p>
+                                    The resulting PDF document is sent to the client through HTTP.
+                                </p>
                             </li>
                         </ol>
                     </li>
@@ -366,7 +465,11 @@
                         </p>
                         <ol>
                             <li>
-                                <p>The XML document is converted to plain XML.</p>
+                                <p>
+                                    The result is converted to plain XML according to the <a
+                                    href="http://www.w3.org/TR/xslt-xquery-serialization/">XSLT 2.0
+                                    and XQuery 1.0 Serialization</a> XML output method.
+                                </p>
                             </li>
                             <li>
                                 <p>The plain XML document is sent to the client through HTTP.</p>
@@ -516,26 +619,103 @@
         <section>
             <title>The Default Theme</title>
             <p>
-
+                The default OPS theme is found under the <code>oxf:/config/theme</code> directory.
+                The entry point of the theme is the <code>theme.xsl</code> stylesheet, called from
+                the epilogue XPL pipelines.
             </p>
-        </section>
-        <section>
-            <title>User Configurability</title>
             <p>
-
+                As documented above, the default theme is called only for views that generate XHTML
+                documents. The default theme does not run, for example, on plain HTML, XSL-FO, or
+                plain XML documents.
+            </p>
+            <p>
+                The default theme does the following:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        It copies, under <code>xhtml:head</code>, the <code>xhtml:meta</code>,
+                        <code>xhtml:link</code>, <code>xhtml:style</code>, and
+                        <code>xhtml:script</code> elements from the source XHTML document. This
+                        allows you for example to link to a particualar Javascript script on a page
+                        by page basis, instead of including the script in all the pages of your
+                        application.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        It adds, under <code>xhtml:head</code>, links to OPS CSS stylesheets and
+                        scripts necessary for the server-side XForms engine.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        It generates, under <code>xhtml:head</code>, an <code>xhtml:title</code>
+                        element, first by looking in the XHTML document if present. If not found, it
+                        looks for a <code>f:example-header</code> element (this element is used by
+                        some OPS examples). Finally, it looks for the first <code>xhtml:h1</code>
+                        element in the body of the XHTML document.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        It handles the <code>f:tabs</code> element used by some OPS examples.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        It processes the source <code>xhtml:body</code> element. This mostly results
+                        in copying the content of the source <code>xhtml:body</code>, with the
+                        following exceptions:
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                 Styling is applied to some XHTML forms elements.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Attribute in the XHTML namespace are copied but in no namespace.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Some special handling is performed for the body of included portlets
+                                so that URLs do not get rewritten in this case. This is useful only
+                                for the examples portal.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Any element within the
+                                <code>http://orbeon.org/oxf/xml/formatting</code> namespace, usually
+                                prefixed with <code>f:</code>, is handled by the included
+                                <code>formatting.xsl</code> stylesheet. This stylesheet contains
+                                some useful formatting templates, in particular to format XML and
+                                display tabs. None of the templates in this stylesheet is required
+                                for your OPS application.
+                            </p>
+                        </li>
+                    </ul>
+                    <p>
+                        The categories above are implemented with sets of <code>xsl:template</code>
+                        elements. Those are clearly delimited in <code>theme.xsl</code>.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                You can configure the default theme at your leisure for your own application. You
+                typically get started by modifying <code>theme.xsl</code>.
             </p>
         </section>
+        <!--
         <section>
             <title></title>
             <p>
 
             </p>
         </section>
-        <section>
-            <title></title>
-            <p>
-
-            </p>
-        </section>
+        -->
     </body>
 </document>

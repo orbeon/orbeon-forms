@@ -21,14 +21,14 @@
 ]>
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>Installing Orbeon Presentation Server</title>
+        <title>Installing Orbeon PresentationServer</title>
     </header>
     <body>
         <section>
             <title>Downloading</title>
 
             <p>
-            	Presentation Server can be downloaded from
+            	Orbeon PresentationServer (OPS) can be downloaded from
                 <link href="http://www.orbeon.com/community/downloads">http://www.orbeon.com/community/downloads</link>.
             </p>
         </section>
@@ -36,9 +36,9 @@
             <title>System Requirements</title>
 
             <p>
-                To install Presentation Server you need an application server that runs on Java
-                version 1.4.1 (or later) and implements the Servlet API 2.3 (or later). Presentation
-                Server is supported on the following application servers:
+                To install OPS you need an application server that runs on Java version 1.4.1 (or
+                later) and implements the Servlet API 2.3 (or later). OPS is supported on the
+                following application servers:
             </p>
 
             <ul>
@@ -54,7 +54,7 @@
             or versions.</p>
         </section>
         <section>
-            <title>Installing Presentation Server on Apache Tomcat</title>
+            <title>Installing OPS on Apache Tomcat</title>
 
             <ol>
                 <li><p>Assuming that <code>TOMCAT_HOME</code> represents the location of your
@@ -67,8 +67,7 @@
                 <li><p>With Tomcat 5, move <code>xercesImpl.jar</code> and
                 <code>xmlParserAPIs.jar</code> from <code>common/endorsed</code> to
                 <code>server/lib</code>. This way Xerces will be available to Tomcat, but it won't
-                override the version of Xerces and standard XML APIs that comes with Presentation
-                Server.</p></li>
+                override the version of Xerces and standard XML APIs that comes with OPS.</p></li>
 
                 <li><p>You can now start Tomcat, and access
                 <code>http://localhost:8080/orbeon/</code> to test your installation (replacing
@@ -241,7 +240,7 @@
             </ol>
         </section>
         <section>
-            <title>Installing Presentation Server on BEA WebLogic 7 and 8.1</title>
+            <title>Installing OPS on BEA WebLogic 7 and 8.1</title>
 
             <ol>
                 <p><li>Assume that <code>DOMAIN</code> represents your WebLogic domain directory
@@ -266,7 +265,7 @@
                         <li>Start WebLogic (e.g. with
                         <code>startWebLogic.cmd</code>)</li>
 
-                        <li>Make sure you can access the Presentation Server examples with your
+                        <li>Make sure you can access the OPS examples with your
                         browser (by going to
                         <code>http://localhost:7001/orbeon/</code>)</li>
 
@@ -277,7 +276,7 @@
                         Name="orbeon"&gt;</code> element and add the attribute:
                         <code>ServletReloadCheckSecs="-1"</code>. This will
                         prevent WebLogic from checking if a servlet has changed
-                        in the application and will make Presentation Server <i>much</i>
+                        in the application and will make OPS <i>much</i>
                         faster.</li>
                     </ol></p>
                 </li></p>
@@ -408,13 +407,13 @@
                     </ol></p>
                 </li></p>
                 -->
-                <p><li>Once Presentation Server is properly installed, you can start WebLogic as
+                <p><li>Once OPS is properly installed, you can start WebLogic as
                 usual with the <code>startWeblogic.cmd</code> script (in
                 <code>DOMAIN</code>).</li></p>
             </ol>
         </section>
         <section>
-            <title>Installing Presentation Server on IBM WebSphere 6</title>
+            <title>Installing OPS on IBM WebSphere 6</title>
             <ol>
                 <li>
                     <p>
@@ -440,7 +439,7 @@
                 </li>
                 <li>
                     <p>
-                        Install and deploy Presentation Server (<code>orbeon.war</code>).
+                        Install and deploy OPS (<code>orbeon.war</code>).
                         <ul>
                             <li>Click on Applications / Install New Application.</li>
                             <li>
@@ -459,7 +458,7 @@
                         <ul>
                             <li>Go to <code>http://localhost:9080/ops/</code>.</li>
                             <li>
-                                You can view the log from PresentationServer in
+                                You can view the log from OPS in
                                 <code>WSAS_HOME/profiles/default/logs/server1/SystemOut.log</code>.
                             </li>
                             <li>
@@ -481,7 +480,7 @@
                      <ul>
                          <p><li>
                              Extract the
-                             <code>hsqldb-1_7_2_4_orbeon.jar</code> file from Presentation Server
+                             <code>hsqldb-1_7_2_4_orbeon.jar</code> file from OPS
                              WAR file, and save it on WebSphere's directory.
                          </li></p>
 
@@ -662,7 +661,7 @@
 <!--        </section>-->
         <anchor id="jboss"/>
         <section>
-            <title>Installing Presentation Server on &jboss-vers;</title>
+            <title>Installing OPS on &jboss-vers;</title>
             <ol>
                 <li>Assuming that <code>JBOSS_HOME</code> represents the location of your JBoss
                 installation: create a new <code>JBOSS_HOME/server/default/deploy/orbeon.war</code>
@@ -786,8 +785,8 @@
         <section>
             <title>Running the BizDoc Tutorial Application</title>
             <p>
-                To install the standalone BizDoc example application described in the Presentation
-                Server Tutorial, please follow the instructions under <a
+                To install the standalone BizDoc example application described in the OPS Tutorial,
+                please follow the instructions under <a
                 href="http://www.orbeon.com/community/downloads">Installing Example
                 Applications</a> from the Orbeon web site.
             </p>
@@ -802,7 +801,7 @@
         <section>
             <title>Security</title>
             <p>
-                For security reasons, you might want to run Presentation Server under a Security Manager. Java's
+                For security reasons, you might want to run OPS under a Security Manager. Java's
                 Security Manager allows you to control the Java sandbox and which resources the
                 application can access. When installed correctly, the Security Manager can prevent
                 unauthorized code to execute malicious actions, such as deleting files on the server
@@ -847,8 +846,8 @@
                     <li>
                         Add the following system properties to the server startup script.
                         <ul>
-                            <li><i>oxf.home</i>: Location of the Presentation Server exploded WAR file</li>
-                            <li><i>oxf.resources</i>: Location of Presentation Server resources directory</li>
+                            <li><i>oxf.home</i>: Location of the OPS exploded WAR file</li>
+                            <li><i>oxf.resources</i>: Location of OPS resources directory</li>
                         </ul>
                     </li>
                     <li>

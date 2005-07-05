@@ -332,7 +332,7 @@
             <section>
                 <title>Resource Server</title>
                 <p>
-                    The <link href="processors-other#ResourceServer">Resource
+                    The <link href="processors-other#resource-server">Resource
                     Server</link> MIME Media Type input name has been changed
                     from <code>mime-type</code> to <code>mime-types</code> for
                     consistancy reasons.
@@ -1122,7 +1122,7 @@ select * from ps_book
                         <link href="processors-image">Image Server</link>
                     </li>
                     <li>The
-                        <link href="processors-other#ResourceServer">Resource Server</link>
+                        <link href="processors-other#resource-server">Resource Server</link>
                     </li>
                     <li>The
                         <link href="processors-generators#bean-generator">Bean Generator</link>

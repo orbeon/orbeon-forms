@@ -11,11 +11,11 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting" >
+<example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting">
     <title>Hello World Classic</title>
     <source>page-flow.xml</source>
     <source>view.xhtml</source>
-    <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
+    <description>
         <p>
             Please refer to the <a href="/doc/pages/Tutorial.pdf" f:url-type="resource">Orbeon
             PresentationServer Tutorial</a> for the complete documentation of this example.

@@ -67,7 +67,7 @@
                                 $request/server-name,
                                 if ($request/server-port = '80') then '' else concat(':', $request/server-port),
                                 $request/context-path,
-                                '/example-resources/xml-to-url/doc?xml=',
+                                '/direct/xml-to-url/doc?xml=',
                                 escape-uri($base64-string, true()))"/>
                         </original>
                     </xsl:otherwise>

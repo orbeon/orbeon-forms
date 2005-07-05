@@ -23,7 +23,7 @@
                 <xsl:template match="/">
                     <root>
                         <config>
-                            <service id="yim" type="webservice" endpoint="{/root/request/scheme}://{/root/request/server-name}:{/root/request/server-port}{/root/request/context-path}/example-resources/yim/im">
+                            <service id="yim" type="webservice" endpoint="{/root/request/scheme}://{/root/request/server-name}:{/root/request/server-port}{/root/request/context-path}/direct/yim/im">
                                 <operation nsuri="urn:orbeon.com" name="sendYIM"/>
                             </service>
                         </config>

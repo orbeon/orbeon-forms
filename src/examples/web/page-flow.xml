@@ -36,8 +36,7 @@
     <page path-info="/goto-example/.+" matcher="oxf:perl5-matcher" model="/examples-portal/page-flow.xpl"/>
     <page path-info="/goto-source/.+" matcher="oxf:perl5-matcher" model="/examples-portal/page-flow.xpl"/>
 
-    <!-- Dispatch resources for the examples. This is necessary, since portlets cannot serve resources directly. -->
-    <page path-info="/example-resources/.*" matcher="oxf:perl5-matcher" model="/examples/dispatch.xpl"/>
+    <!-- Dispatch resources for the examples. This is necessary, since portlets cannot serve resources directly by design. -->
     <page path-info="/direct/.*" matcher="oxf:perl5-matcher" model="/examples/dispatch.xpl"/>
 
     <!-- Struts Examples -->

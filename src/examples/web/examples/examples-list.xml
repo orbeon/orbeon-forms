@@ -30,16 +30,19 @@
   example path.
 
   Portlets cannot serve resources directly. Examples that want to serve dynamic resources must
-  prepend "/example-resources/" to the paths in the page flow. The examples framework will
+  prepend "/direct/" to the paths in the page flow. The examples framework will
   automatically dispatch the requests for such resources. For example, the Image Server example
   serves dynamic images with the following:
 
-  <page path-info="/example-resources/imageserver/image" xforms="form.xml" model="image.xpl"/>
+  <page path-info="/direct/imageserver/image" xforms="form.xml" model="image.xpl"/>
 
   Examples with standalone="true" live in the examples-standalone directory. They do not run as
   portlets.
 -->
 <examples-list>
+    <section label="Welcome">
+        <example id="welcome" path="welcome" label="Welcome"/>
+    </section>
     <section label="The Basics">
     	<example id="tutorial-hello1" path="tutorial/hello1" label="Hello World Classic"/>
         <example id="tutorial-hello2" path="tutorial/hello2" label="Hello World MVC"/>

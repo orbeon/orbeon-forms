@@ -6,9 +6,9 @@
         <action when="/form/action = 'send'" action="send.xpl"/>
     </page>
 
-    <page path-info="/example-resources/yim/view-wsdl" model="view-wsdl.xpl"/>
+    <page path-info="/direct/yim/view-wsdl" model="view-wsdl.xpl"/>
 
-    <page path-info="/example-resources/yim/im" model="yim-webservice.xpl"/>
+    <page path-info="/direct/yim/im" model="yim-webservice.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

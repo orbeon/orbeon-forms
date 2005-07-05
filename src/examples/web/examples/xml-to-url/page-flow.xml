@@ -14,7 +14,7 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <page path-info="/example-resources/xml-to-url/doc" model="url-to-xml.xpl"/>
+    <page path-info="/direct/xml-to-url/doc" model="url-to-xml.xpl"/>
 
     <page path-info="*" xforms="xforms-model.xml" model="model.xpl" view="view.xsl"/>
 

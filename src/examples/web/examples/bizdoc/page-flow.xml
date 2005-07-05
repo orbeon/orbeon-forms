@@ -69,7 +69,7 @@
     </page>
 
     <!-- Show XML document -->
-    <page id="xml-detail" path-info="/example-resources/bizdoc/xml-detail" xforms="detail/xml-detail-xforms-model.xml" model="detail/xml-detail-model.xpl"/>
+    <page id="xml-detail" path-info="/direct/bizdoc/xml-detail" xforms="detail/xml-detail-xforms-model.xml" model="detail/xml-detail-model.xpl"/>
 
     <page id="detail-1" path-info="/bizdoc/detail-1" xforms="detail/detail-xforms-model.xml" view="detail/detail-view-1.xsl">
         <!-- Save the current document and documemnt is valid -->

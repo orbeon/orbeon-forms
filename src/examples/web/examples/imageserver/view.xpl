@@ -292,7 +292,7 @@
                             </xforms:group>
 
                             <br/>
-                            <center><img src="/example-resources/imageserver/image{net:url(/*)}"/></center>
+                            <center><img src="/direct/imageserver/image{net:url(/*)}"/></center>
                             <br/>
                         </xhtml:body>
                     </xhtml:html>

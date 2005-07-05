@@ -27,7 +27,7 @@
     </binding>
     <service name="orbeonService">
         <port name="orbeonPort" binding="tns:orbeonBinding">
-            <soap:address location="http://www.orbeon.com/ois/example-resources/yim/im"/>
+            <soap:address location="http://www.orbeon.com/ois/direct/yim/im"/>
         </port>
     </service>
 </definitions>

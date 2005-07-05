@@ -11,13 +11,14 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:xu="http://www.xmldb.org/xupdate">
-
-    <page path-info="/imageserver" xforms="form.xml" view="view.xpl"/>
-
-    <page path-info="/direct/imageserver/image" xforms="form.xml" model="image.xpl"/>
-
-    <epilogue url="oxf:/config/epilogue.xpl"/>
-
-</config>
+<example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting" >
+    <title>Welcome</title>
+    <source>page-flow.xml</source>
+    <source>view.xhtml</source>
+    <description>
+        <p>
+            This is a welcome page for the OPS examples. Please refer to the main page of the
+            example for more information.
+		</p>
+    </description>
+</example-descriptor>

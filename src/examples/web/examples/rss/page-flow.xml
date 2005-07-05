@@ -62,7 +62,7 @@
         </action>
     </page>
 
-    <page id="rss" path-info="/example-resources/rss/rss-feed" xforms="form.xml" model="model.xpl">
+    <page id="rss" path-info="/direct/rss/rss-feed" xforms="form.xml" model="model.xpl">
         <action when="/form/action = 'test'" action="action/test.xpl"/>
         <action when="/form/action = 'rss'" action="action/rss.xpl"/>
     </page>

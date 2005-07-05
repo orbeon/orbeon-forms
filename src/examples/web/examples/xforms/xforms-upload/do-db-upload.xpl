@@ -54,7 +54,7 @@
                             <sql:results>
                                 <sql:row-results>
                                     <url>
-                                        <sql:text>/example-resources/xforms-upload/db-image/</sql:text>
+                                        <sql:text>/direct/xforms-upload/db-image/</sql:text>
                                         <sql:get-column column="id" type="xs:int"/>
                                     </url>
                                 </sql:row-results>

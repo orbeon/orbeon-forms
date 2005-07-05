@@ -25,7 +25,7 @@
         <action when="/form/action = 'goto-simple-upload'"><result page="main" instance-passing="redirect-exit-portal"/></action>
     </page>
 
-    <page path-info="/example-resources/xforms-upload/db-image/(.*)"
+    <page path-info="/direct/xforms-upload/db-image/(.*)"
           matcher="oxf:perl5-matcher"
           default-submission="database-upload-default-submission.xml"
           model="database-upload-model.xpl">

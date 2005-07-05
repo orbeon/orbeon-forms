@@ -42,7 +42,7 @@
             <p>
                 Uploading an Excel file through this form will send the data in the XML file to the
                 Web service defined by <a f:url-type="resource"
-                href="/example-resources/employees/import-wsdl">this WSDL file</a>.
+                href="/direct/employees/import-wsdl">this WSDL file</a>.
             </p>
         </div>
     </body>

@@ -26,8 +26,8 @@
     <page id="report-xml-table" path-info="/reports/report-xml-table" model="xml-table.xpl" view="xml-table.xsl"/>
     <page id="report-html" path-info="/reports/report-html" model="model.xpl" view="generic-table.xsl"/>
 
-    <page id="report-pdf" path-info="/example-resources/reports/report-pdf" model="model.xpl" view="pdf.xpl"/>
-    <page id="report-excel" path-info="/example-resources/reports/report-excel" model="excel.xpl"/>
+    <page id="report-pdf" path-info="/direct/reports/report-pdf" model="model.xpl" view="pdf.xpl"/>
+    <page id="report-excel" path-info="/direct/reports/report-excel" model="excel.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

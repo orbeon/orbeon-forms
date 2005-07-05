@@ -602,94 +602,97 @@ function xformsInitializeControlsUnder(root) {
 
 function xformsPageLoaded() {
 
-    // Initialize tooltip library
-    tt_init();
+    if (document.getElementById("xforms-form")) {
 
-    // Initialize XForms server URL
-    var scripts = document.getElementsByTagName("script");
-    for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
-        var script = scripts[scriptIndex];
-        var startPathToJavaScript = script.getAttribute("src").indexOf(PATH_TO_JAVASCRIPT);
-        if (startPathToJavaScript != -1) {
-            BASE_URL = script.getAttribute("src").substr(0, startPathToJavaScript);
-            XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
-            break;
-        }
-    }
+        // Initialize tooltip library
+        tt_init();
 
-    // Initialize attributes on document
-    document.xformsRequestInProgress = false;
-    document.xformsEvents = new Array();
-    document.xformsChangedIdsRequest = new Array();
-
-    // Initialize controls
-    xformsInitializeControlsUnder(document);
-
-    // Initialize attributes on form
-    var forms = document.getElementsByTagName("form");
-    for (var formIndex = 0; formIndex < forms.length; formIndex++) {
-        var form = forms[formIndex];
-        if (xformsArrayContains(form.className.split(" "), "xforms-form")) {
-            // This is a XForms form
-            document.xformsForm = form;
-            var spans = form.getElementsByTagName("span");
-            for (var spanIndex = 0; spanIndex < spans.length; spanIndex++) {
-                if (spans[spanIndex].className == "xforms-loading-loading")
-                    document.xformsLoadingLoading = spans[spanIndex];
-                if (spans[spanIndex].className == "xforms-loading-error")
-                    document.xformsLoadingError = spans[spanIndex];
-                if (spans[spanIndex].className == "xforms-loading-none")
-                    document.xformsLoadingNone = spans[spanIndex];
+        // Initialize XForms server URL
+        var scripts = document.getElementsByTagName("script");
+        for (var scriptIndex = 0; scriptIndex < scripts.length; scriptIndex++) {
+            var script = scripts[scriptIndex];
+            var startPathToJavaScript = script.getAttribute("src").indexOf(PATH_TO_JAVASCRIPT);
+            if (startPathToJavaScript != -1) {
+                BASE_URL = script.getAttribute("src").substr(0, startPathToJavaScript);
+                XFORMS_SERVER_URL = BASE_URL + "/xforms-server";
+                break;
             }
-            var elements = form.elements;
-            for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
-                var element = elements[elementIndex];
-                if (element.name) {
-                    if (element.name.indexOf("$static-state") != -1)
-                        document.xformsStaticState = element;
-                    if (element.name.indexOf("$dynamic-state") != -1) {
-                        document.xformsDynamicState = element;
-                    }
-                    if (element.name.indexOf("$temp-dynamic-state") != -1) {
-                        document.xformsTempDynamicState = element;
-                        if (element.value == "")
-                            element.value = document.xformsDynamicState.value;
+        }
+
+        // Initialize attributes on document
+        document.xformsRequestInProgress = false;
+        document.xformsEvents = new Array();
+        document.xformsChangedIdsRequest = new Array();
+
+        // Initialize controls
+        xformsInitializeControlsUnder(document);
+
+        // Initialize attributes on form
+        var forms = document.getElementsByTagName("form");
+        for (var formIndex = 0; formIndex < forms.length; formIndex++) {
+            var form = forms[formIndex];
+            if (xformsArrayContains(form.className.split(" "), "xforms-form")) {
+                // This is a XForms form
+                document.xformsForm = form;
+                var spans = form.getElementsByTagName("span");
+                for (var spanIndex = 0; spanIndex < spans.length; spanIndex++) {
+                    if (spans[spanIndex].className == "xforms-loading-loading")
+                        document.xformsLoadingLoading = spans[spanIndex];
+                    if (spans[spanIndex].className == "xforms-loading-error")
+                        document.xformsLoadingError = spans[spanIndex];
+                    if (spans[spanIndex].className == "xforms-loading-none")
+                        document.xformsLoadingNone = spans[spanIndex];
+                }
+                var elements = form.elements;
+                for (var elementIndex = 0; elementIndex < elements.length; elementIndex++) {
+                    var element = elements[elementIndex];
+                    if (element.name) {
+                        if (element.name.indexOf("$static-state") != -1)
+                            document.xformsStaticState = element;
+                        if (element.name.indexOf("$dynamic-state") != -1) {
+                            document.xformsDynamicState = element;
+                        }
+                        if (element.name.indexOf("$temp-dynamic-state") != -1) {
+                            document.xformsTempDynamicState = element;
+                            if (element.value == "")
+                                element.value = document.xformsDynamicState.value;
+                        }
                     }
                 }
             }
         }
-    }
 
-    // Parse and store initial repeat hierarchy
-    document.xformsRepeatTreeChildToParent = new Array();
-    var repeatTreeString = xformsStringValue(document.getElementById("xforms-repeat-tree"));
-    var repeatTree = repeatTreeString.split(",");
-    for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
-        var repeatInfo = repeatTree[repeatIndex].split(" ");
-        var id = repeatInfo[0];
-        var parent = repeatInfo.length > 1 ? repeatInfo[1] : null;
-        document.xformsRepeatTreeChildToParent[id] = parent;
-    }
-    document.xformsRepeatTreeParentToAllChildren = new Array();
-    for (var child in document.xformsRepeatTreeChildToParent) {
-        var parent = document.xformsRepeatTreeChildToParent[child];
-        while (parent != null) {
-            if (!document.xformsRepeatTreeParentToAllChildren[parent])
-                document.xformsRepeatTreeParentToAllChildren[parent] = new Array();
-            document.xformsRepeatTreeParentToAllChildren[parent].push(child);
-            parent = document.xformsRepeatTreeChildToParent[parent];
+        // Parse and store initial repeat hierarchy
+        document.xformsRepeatTreeChildToParent = new Array();
+        var repeatTreeString = xformsStringValue(document.getElementById("xforms-repeat-tree"));
+        var repeatTree = repeatTreeString.split(",");
+        for (var repeatIndex = 0; repeatIndex < repeatTree.length; repeatIndex++) {
+            var repeatInfo = repeatTree[repeatIndex].split(" ");
+            var id = repeatInfo[0];
+            var parent = repeatInfo.length > 1 ? repeatInfo[1] : null;
+            document.xformsRepeatTreeChildToParent[id] = parent;
         }
-    }
+        document.xformsRepeatTreeParentToAllChildren = new Array();
+        for (var child in document.xformsRepeatTreeChildToParent) {
+            var parent = document.xformsRepeatTreeChildToParent[child];
+            while (parent != null) {
+                if (!document.xformsRepeatTreeParentToAllChildren[parent])
+                    document.xformsRepeatTreeParentToAllChildren[parent] = new Array();
+                document.xformsRepeatTreeParentToAllChildren[parent].push(child);
+                parent = document.xformsRepeatTreeChildToParent[parent];
+            }
+        }
 
-    // Parse and store initial repeat indexes
-    document.xformsRepeatIndexes = new Array();
-    var repeatIndexesString = xformsStringValue(document.getElementById("xforms-repeat-indexes"));
-    var repeatIndexes = repeatIndexesString.split(",");
-    for (var repeatIndex = 0; repeatIndex < repeatIndexes.length; repeatIndex++) {
-        var repeatInfo = repeatIndexes[repeatIndex].split(" ");
-        var id = repeatInfo[0];
-        var index = repeatInfo[1];
-        document.xformsRepeatIndexes[id] = index;
+        // Parse and store initial repeat indexes
+        document.xformsRepeatIndexes = new Array();
+        var repeatIndexesString = xformsStringValue(document.getElementById("xforms-repeat-indexes"));
+        var repeatIndexes = repeatIndexesString.split(",");
+        for (var repeatIndex = 0; repeatIndex < repeatIndexes.length; repeatIndex++) {
+            var repeatInfo = repeatIndexes[repeatIndex].split(" ");
+            var id = repeatInfo[0];
+            var index = repeatInfo[1];
+            document.xformsRepeatIndexes[id] = index;
+        }
     }
 }
 

@@ -4,7 +4,7 @@
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="org.orbeon.oxf.test.ProcessorTest"/>
 <stringAttribute key="org.eclipse.jdt.junit.TESTNAME" value=""/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="orbeon"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Doxf.resources.factory=org.orbeon.oxf.resources.PriorityResourceManagerFactory -Doxf.resources.flatfile.rootdir=${project_loc}/src/examples/web -Doxf.resources.priority.1=org.orbeon.oxf.resources.FlatFileResourceManagerFactory -Doxf.resources.priority.2=org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory -Doxf.resources.common.min-reload-interval=50 -Doxf.test.config=unit-tests/tests.xml -Djava.io.tmpdir=${project_loc}/build/temp/test"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Doxf.resources.factory=org.orbeon.oxf.resources.PriorityResourceManagerFactory &quot;-Doxf.resources.flatfile.rootdir=${project_loc}/src/examples/web&quot; -Doxf.resources.priority.1=org.orbeon.oxf.resources.FlatFileResourceManagerFactory -Doxf.resources.priority.2=org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory -Doxf.resources.common.min-reload-interval=50 -Doxf.test.config=unit-tests/tests.xml &quot;-Djava.io.tmpdir=${project_loc}/build/temp/test&quot;"/>
 <stringAttribute key="org.eclipse.jdt.junit.CONTAINER" value=""/>
 <booleanAttribute key="org.eclipse.debug.core.appendEnvironmentVariables" value="true"/>
 </launchConfiguration>

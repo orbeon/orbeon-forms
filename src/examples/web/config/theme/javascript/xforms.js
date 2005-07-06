@@ -836,7 +836,7 @@ function xformsHandleResponse() {
                                             var newControlValue = xformsStringValue(controlElement);
                                             var controlId = controlElement.getAttribute("id");
                                             var documentElement = document.getElementById(controlId);
-                                            if (!documentElement) break; // TODO: fix this
+                                            if (!documentElement) break; // We don't handle <xxf:control id="employeeSet-2" relevant="false"/>
                                             var documentElementClasses = documentElement.className.split(" ");
 
                                             // Check if this control has been modified while the event was processed

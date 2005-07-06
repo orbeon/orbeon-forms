@@ -175,12 +175,16 @@ function xformsFindRepeatDelimiter(repeatId, index) {
         }
     }
 
-    var beginElement = document.getElementById("repeat-begin-" + repeatId + parentRepeatIndexes);
+    var beginElementId = "repeat-begin-" + repeatId + parentRepeatIndexes;
+    var beginElement = document.getElementById(beginElementId);
+    if (! beginElement) return null;
     var cursor = beginElement;
     var cursorPosition = 0;
     while (true) {
-        while (cursor.nodeType != ELEMENT_TYPE || cursor.className != "xforms-repeat-delimiter")
+        while (cursor.nodeType != ELEMENT_TYPE || cursor.className != "xforms-repeat-delimiter") {
             cursor = cursor.nextSibling;
+            if (!cursor) return null;
+        }
         cursorPosition++;
         if (cursorPosition == index) break;
         cursor = cursor.nextSibling;
@@ -832,6 +836,7 @@ function xformsHandleResponse() {
                                             var newControlValue = xformsStringValue(controlElement);
                                             var controlId = controlElement.getAttribute("id");
                                             var documentElement = document.getElementById(controlId);
+                                            if (!documentElement) break; // TODO: fix this
                                             var documentElementClasses = documentElement.className.split(" ");
 
                                             // Check if this control has been modified while the event was processed
@@ -917,58 +922,83 @@ function xformsHandleResponse() {
                                         case "copy-repeat-template": {
                                             var copyRepeatTemplateElement = controlValuesElement.childNodes[j];
                                             var repeatId = copyRepeatTemplateElement.getAttribute("id");
+                                            var parentIndexes = copyRepeatTemplateElement.getAttribute("parent-indexes");
                                             var idSuffix = copyRepeatTemplateElement.getAttribute("id-suffix");
-                                            // Locate end of the repeat
-                                            var repeatEnd = document.getElementById("repeat-end-" + repeatId);
-                                            // Put nodes of the template in an array in reverse order
+                                            // Put nodes of the template in an array
                                             var templateNodes = new Array();
-                                            var templateNode = repeatEnd.previousSibling;
-                                            while (templateNode.className != "xforms-repeat-delimiter") {
-                                                if (templateNode.nodeType == ELEMENT_TYPE) {
+                                            {
+                                                // Locate end of the repeat
+                                                var templateRepeatEnd = document.getElementById("repeat-end-" + repeatId);
+                                                var templateNode = templateRepeatEnd.previousSibling;
+                                                while (templateNode.className != "xforms-repeat-delimiter") {
                                                     var nodeCopy = templateNode.cloneNode(true);
-                                                    // Add suffix to all the ids
-                                                    var addSuffixToIds = function(element, idSuffix) {
-                                                        if (element.id) element.id += idSuffix;
-                                                        if (element.htmlFor) element.htmlFor += idSuffix;
-                                                        // Remove references to hint, help, alert, label as they might have changed
-                                                        if (xformsIsDefined(element.labelElement)) element.labelElement = null;
-                                                        if (xformsIsDefined(element.hintElement)) element.hintElement = null;
-                                                        if (xformsIsDefined(element.helpElement)) element.helpElement = null;
-                                                        if (xformsIsDefined(element.alertElement)) element.alertElement = null;
-                                                        element.styleListenerRegistered = false;
-                                                        for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
-                                                            var childNode = element.childNodes[childIndex];
-                                                            if (childNode.nodeType == ELEMENT_TYPE)
-                                                                addSuffixToIds(childNode, idSuffix);
+                                                    if (templateNode.nodeType == ELEMENT_TYPE) {
+                                                        // Add suffix to all the ids
+                                                        function addSuffixToIds(element, idSuffix, repeatDepth) {
+                                                            var idSuffixWithDepth = idSuffix;
+                                                            for (var repeatDepthIndex = 0; repeatDepthIndex < repeatDepth; repeatDepthIndex++)
+                                                                 idSuffixWithDepth += "-1";
+                                                            if (element.id) element.id += idSuffixWithDepth;
+                                                            if (element.htmlFor) element.htmlFor += idSuffixWithDepth;
+                                                            // Remove references to hint, help, alert, label as they might have changed
+                                                            if (xformsIsDefined(element.labelElement)) element.labelElement = null;
+                                                            if (xformsIsDefined(element.hintElement)) element.hintElement = null;
+                                                            if (xformsIsDefined(element.helpElement)) element.helpElement = null;
+                                                            if (xformsIsDefined(element.alertElement)) element.alertElement = null;
+                                                            element.styleListenerRegistered = false;
+                                                            for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
+                                                                var childNode = element.childNodes[childIndex];
+                                                                if (childNode.nodeType == ELEMENT_TYPE) {
+                                                                    if (childNode.id && childNode.id.indexOf("repeat-end-") == 0) repeatDepth--;
+                                                                    addSuffixToIds(childNode, idSuffix, repeatDepth);
+                                                                    if (childNode.id && childNode.id.indexOf("repeat-begin-") == 0) repeatDepth++
+                                                                }
+                                                            }
                                                         }
-                                                    };
-                                                    addSuffixToIds(nodeCopy, idSuffix);
-                                                    // Remove "xforms-repeat-template" from classes on copy of element
-                                                    var nodeCopyClasses = nodeCopy.className.split(" ");
-                                                    var nodeCopyNewClasses = new Array();
-                                                    for (var nodeCopyClassIndex = 0; nodeCopyClassIndex < nodeCopyClasses.length; nodeCopyClassIndex++) {
-                                                        var currentClass = nodeCopyClasses[nodeCopyClassIndex];
-                                                        if (currentClass != "xforms-repeat-template")
-                                                            nodeCopyNewClasses.push(currentClass);
+                                                        addSuffixToIds(nodeCopy, parentIndexes == "" ? idSuffix : "-" + parentIndexes + idSuffix, 0);
+                                                        // Remove "xforms-repeat-template" from classes on copy of element
+                                                        var nodeCopyClasses = nodeCopy.className.split(" ");
+                                                        var nodeCopyNewClasses = new Array();
+                                                        for (var nodeCopyClassIndex = 0; nodeCopyClassIndex < nodeCopyClasses.length; nodeCopyClassIndex++) {
+                                                            var currentClass = nodeCopyClasses[nodeCopyClassIndex];
+                                                            if (currentClass != "xforms-repeat-template")
+                                                                nodeCopyNewClasses.push(currentClass);
+                                                        }
+                                                        nodeCopy.className = nodeCopyNewClasses.join(" ");
                                                     }
-                                                    nodeCopy.className = nodeCopyNewClasses.join(" ");
                                                     templateNodes.push(nodeCopy);
+                                                    templateNode = templateNode.previousSibling;
                                                 }
-                                                templateNode = templateNode.previousSibling;
+                                                // Add a delimiter
+                                                var newDelimiter = document.createElement(templateNodes[0].tagName);
+                                                newDelimiter.className = "xforms-repeat-delimiter";
+                                                templateNodes.push(newDelimiter);
+                                                // Reverse nodes as they were inserted in reverse order
+                                                templateNodes = templateNodes.reverse();
                                             }
-                                            // Figure out tag name for delimiter element
-                                            var tagName = templateNodes[0].tagName;
+                                            // Find element after insertion point
+                                            var afterInsertionPoint;
+                                            {
+                                                if (parentIndexes == "") {
+                                                    // Top level repeat: contains a template
+                                                    var repeatEnd = document.getElementById("repeat-end-" + repeatId);
+                                                    var cursor = repeatEnd;
+                                                    while (cursor.nodeType != ELEMENT_TYPE || cursor.className != "xforms-repeat-delimiter")
+                                                        cursor = cursor.previousSibling;
+                                                    afterInsertionPoint = cursor;
+                                                } else {
+                                                    // Nested repeat: does not contain a template
+                                                    var repeatEnd = document.getElementById("repeat-end-" + repeatId + "-" + parentIndexes);
+                                                    afterInsertionPoint = repeatEnd;
+                                                }
+                                            }
                                             // Insert copy of template nodes
-                                            var afterTemplateCopy = templateNode.nextSibling;
-                                            for (var templateNodeIndex = 0; templateNodeIndex < templateNodes.length; templateNodeIndex++) {
+                                            for (var templateNodeIndex in templateNodes) {
                                                 templateNode = templateNodes[templateNodeIndex];
-                                                afterTemplateCopy.parentNode.insertBefore(templateNode, afterTemplateCopy);
-                                                xformsInitializeControlsUnder(templateNode);
+                                                afterInsertionPoint.parentNode.insertBefore(templateNode, afterInsertionPoint);
+                                                if (templateNode.nodeType == ELEMENT_TYPE)
+                                                    xformsInitializeControlsUnder(templateNode);
                                             }
-                                            // Insert delimiter
-                                            var newDelimiter = document.createElement(templateNodes[0].tagName);
-                                            newDelimiter.className = "xforms-repeat-delimiter";
-                                            afterTemplateCopy.parentNode.insertBefore(newDelimiter, afterTemplateCopy);
                                             break;
                                         }
 
@@ -977,18 +1007,26 @@ function xformsHandleResponse() {
                                             // Extract data from server response
                                             var deleteElementElement = controlValuesElement.childNodes[j];
                                             var deleteId = deleteElementElement.getAttribute("id");
+                                            // Remove the last "-x"
                                             var indexOfDash = deleteId.lastIndexOf("-");
-                                            var repeatId = deleteId.substring(0, indexOfDash);
-                                            var itemIndex = parseInt(deleteId.substring(indexOfDash + 1));
-                                            // Locate the delimiter before the item to remove
-                                            var cursor = xformsFindRepeatDelimiter(repeatId, itemIndex);
+                                            deleteId = deleteId.substring(0, indexOfDash);
+                                            var cursor = document.getElementById("repeat-end-" + deleteId);
+                                            cursor = cursor.previousSibling;
                                             // Eat everything until next delimiter or end of repeat
-                                            do {
-                                                var nextCursor = cursor.nextSibling;
+                                            while(true) {
+                                                // Jump over template if this is one
+                                                if (cursor.nodeType == ELEMENT_TYPE
+                                                        && xformsArrayContains(cursor.className.split(" "), "xforms-repeat-template")) {
+                                                    while (!(cursor.nodeType == ELEMENT_TYPE) || cursor.className != "xforms-repeat-delimiter")
+                                                        cursor = cursor.previousSibling;
+                                                    cursor = cursor.previousSibling;
+                                                }
+                                                var wasDelimiter = cursor.className == "xforms-repeat-delimiter";
+                                                var previousCursor = cursor.previousSibling;
                                                 cursor.parentNode.removeChild(cursor);
-                                                cursor = nextCursor;
-                                            } while (cursor.className != "xforms-repeat-delimiter"
-                                                && cursor.className != "xforms-repeat-begin-end");
+                                                cursor = previousCursor;
+                                                if (wasDelimiter || cursor.className == "xforms-repeat-begin-end") break;
+                                            }
                                             break;
                                         }
                                     }
@@ -1013,7 +1051,7 @@ function xformsHandleResponse() {
 
                             // Change highlighted section in repeat
                             case "repeat-indexes": {
-                                var getClassForReapeatId = function (repeatId) {
+                                function getClassForReapeatId(repeatId) {
                                     var depth = 1;
                                     var currentRepeatId = repeatId;
                                     while (true) {
@@ -1022,7 +1060,7 @@ function xformsHandleResponse() {
                                         depth = depth == 1 ? 2 : 1;
                                     }
                                     return "xforms-repeat-selected-item-" + depth;
-                                };
+                                }
                                 var repeatIndexesElement = actionElement.childNodes[actionIndex];
                                 var newRepeatIndexes = new Array();
                                 // Extract data from server response
@@ -1049,13 +1087,15 @@ function xformsHandleResponse() {
                                 for (var repeatId in newRepeatIndexes) {
                                     var newIndex = newRepeatIndexes[repeatId];
                                     var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, document.xformsRepeatIndexes[repeatId]);
-                                    cursor = oldItemDelimiter.nextSibling;
-                                    while (cursor.nodeType != ELEMENT_TYPE ||
-                                           (cursor.className != "xforms-repeat-delimiter"
-                                           && cursor.className != "xforms-repeat-begin-end")) {
-                                        if (cursor.nodeType == ELEMENT_TYPE)
-                                            cursor.className = xformsArrayRemove(cursor.className.split(" "), getClassForReapeatId(repeatId)).join(" ");
-                                        cursor = cursor.nextSibling;
+                                    if (oldItemDelimiter != null) {
+                                        cursor = oldItemDelimiter.nextSibling;
+                                        while (cursor.nodeType != ELEMENT_TYPE ||
+                                               (cursor.className != "xforms-repeat-delimiter"
+                                               && cursor.className != "xforms-repeat-begin-end")) {
+                                            if (cursor.nodeType == ELEMENT_TYPE)
+                                                cursor.className = xformsArrayRemove(cursor.className.split(" "), getClassForReapeatId(repeatId)).join(" ");
+                                            cursor = cursor.nextSibling;
+                                        }
                                     }
                                 }
                                 // Highlight item a new index

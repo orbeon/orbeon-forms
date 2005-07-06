@@ -1003,29 +1003,37 @@ function xformsHandleResponse() {
                                         }
 
                                         // Delete element in repeat
-                                        case "delete-element": {
+                                        case "delete-repeat-elements": {
                                             // Extract data from server response
                                             var deleteElementElement = controlValuesElement.childNodes[j];
                                             var deleteId = deleteElementElement.getAttribute("id");
-                                            // Remove the last "-x"
-                                            var indexOfDash = deleteId.lastIndexOf("-");
-                                            deleteId = deleteId.substring(0, indexOfDash);
-                                            var cursor = document.getElementById("repeat-end-" + deleteId);
-                                            cursor = cursor.previousSibling;
-                                            // Eat everything until next delimiter or end of repeat
-                                            while(true) {
-                                                // Jump over template if this is one
-                                                if (cursor.nodeType == ELEMENT_TYPE
-                                                        && xformsArrayContains(cursor.className.split(" "), "xforms-repeat-template")) {
-                                                    while (!(cursor.nodeType == ELEMENT_TYPE) || cursor.className != "xforms-repeat-delimiter")
-                                                        cursor = cursor.previousSibling;
-                                                    cursor = cursor.previousSibling;
+                                            var parentIndexes = deleteElementElement.getAttribute("parent-indexes");
+                                            var count = deleteElementElement.getAttribute("count");
+                                            // Find end of the repeat
+                                            var repeatEnd = document.getElementById("repeat-end-" + deleteId
+                                                + (parentIndexes == "" ? "" : "-" + parentIndexes));
+                                            // Find last element to delete
+                                            var lastElementToDelete;
+                                            {
+                                                lastElementToDelete = repeatEnd.previousSibling;
+                                                if (parentIndexes == "") {
+                                                    // Top-level repeat: need to go over template
+                                                    while (lastElementToDelete.nodeType != ELEMENT_TYPE
+                                                            || lastElementToDelete.className != "xforms-repeat-delimiter")
+                                                        lastElementToDelete = lastElementToDelete.previousSibling;
+                                                    lastElementToDelete = lastElementToDelete.previousSibling;
                                                 }
-                                                var wasDelimiter = cursor.className == "xforms-repeat-delimiter";
-                                                var previousCursor = cursor.previousSibling;
-                                                cursor.parentNode.removeChild(cursor);
-                                                cursor = previousCursor;
-                                                if (wasDelimiter || cursor.className == "xforms-repeat-begin-end") break;
+                                            }
+                                            // Perform delete
+                                            for (var countIndex = 0; countIndex < count; countIndex++) {
+                                                while (true) {
+                                                    var wasDelimiter = lastElementToDelete.nodeType == ELEMENT_TYPE
+                                                        && lastElementToDelete.className == "xforms-repeat-delimiter";
+                                                    var previous = lastElementToDelete.previousSibling;
+                                                    lastElementToDelete.parentNode.removeChild(lastElementToDelete);
+                                                    lastElementToDelete = previous;
+                                                    if (wasDelimiter) break;
+                                                }
                                             }
                                             break;
                                         }

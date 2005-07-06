@@ -67,7 +67,7 @@
             <!-- BEGIN ASSUME SOME XHTML CLIENTS -->
             <!--
             <p:choose href="#request">
-                <p:when test="false() and contains(/request/headers/header[name = 'accept'], 'application/xhtml+xml')">
+                <p:when test="contains(/request/headers/header[name = 'accept'], 'application/xhtml+xml')">
                     <p:processor name="oxf:qname-converter">
                         <p:input name="config">
                             <config>

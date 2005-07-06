@@ -43,6 +43,65 @@
             </p>
         </section>
         <section>
+            <title>Known Limitations of OPS 3.0 BETA</title>
+            <p>
+                The following limitations are known:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        Initial generation of an XForms page may have poor performance.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <code>xforms:upload</code> is not yet implemented in the OPS 3.0 XForms
+                        engine. <code>xforms:upload</code> remains implemented when the legacy OPS
+                        2.8 compatibility mode is enabled.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Image and link appearances are not supported for the
+                        <code>xforms:submit</code> and <code>xforms:trigger</code> controls.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The <code>xforms:message</code> action is not implemented.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Not all the OPS examples have been updated to reflect the new XForms engine
+                        capabilities.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The OPS reference XForms documentation has not yet been updated to reflect
+                        all the changes in OPS 3.0. Please refer to the "XForms NG" examples for
+                        details.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        Migration documentation from 2.8 to 3.0 is not complete yet.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The OPS Tutorial has not been updated for 3.0.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        The OPS Blog example is not complete.
+                    </p>
+                </li>
+            </ul>
+        </section>
+        <section>
             <title>XForms</title>
             <section>
                 <title>New Features</title>
@@ -150,10 +209,6 @@
                         </p>
                     </li>
                 </ul>
-                <note>
-                    The OPS XForms reference documentation has not yet been updated to reflect all
-                    the changes in OPS 3.0. Please refer to the "XForms NG" examples for details.
-                </note>
                 <p>
                     TODO: link to updated XForms conformance map.
                 </p>
@@ -516,6 +571,17 @@
                         <li>Implementing configurable themes with XSLT</li>
                         <li>Creating "clean" URLs in a REST perspective</li>
                     </ul>
+                </li>
+                <li>
+                    <p>
+                        <b>Resource Manager.</b> The Flat File and <a
+                        href="reference-resource-managers#filesystem">Filesystem</a> resource
+                        managers have been merged. The Flat File resource manager is now deprecated,
+                        and the Filesystem resource manager should be used instead. The Flat File
+                        resource manager can still be used for backward compability. The main
+                        difference between the two resource managers is that the Filesystem resource
+                        manager can be configured with or without a sandbox.
+                    </p>
                 </li>
                 <li>
                     <p>

@@ -50,21 +50,18 @@
                     bundled configuration resources that must be accessible.
                 </p>
                 <p>
-                    In this particular case, depending on whether the <code>-r</code> command-line
-                    argument is present, a Flat File Resource Manager or a Filesystem Resource
-                    Manager is instanciated.
+                    In this particular case, if the <code>-r</code> command-line argument is
+                    present, a sandbox directory path is passed to the Filesystem resource manager
+                    upon instanciation.
                 </p>
                 <source><![CDATA[
 Map props = new HashMap();
 props.put("oxf.resources.factory", "org.orbeon.oxf.resources.PriorityResourceManagerFactory");
-if (resourceManagerRoot != null) {
-    // Use a sandbox file resource manager
-    props.put("oxf.resources.flatfile.rootdir", resourceManagerRoot);
-    props.put("oxf.resources.priority.1", "org.orbeon.oxf.resources.FlatFileResourceManagerFactory");
-} else {
-    // Use the whole filesystem as resource manager
-    props.put("oxf.resources.priority.1", "org.orbeon.oxf.resources.FilesystemResourceManagerFactory");
+if (resourceManagerSandbox != null) {
+    // Use a sandbox
+    props.put("oxf.resources.filesystem.sandbox-directory", resourceManagerSandbox);
 }
+props.put("oxf.resources.priority.1", "org.orbeon.oxf.resources.FilesystemResourceManagerFactory");
 props.put("oxf.resources.priority.2", "org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory");
 if (logger.isInfoEnabled())
     logger.info("Initializing Resource Manager with: " + props);

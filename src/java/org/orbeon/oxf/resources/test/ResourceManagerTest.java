@@ -17,10 +17,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import org.apache.log4j.Logger;
-import org.orbeon.oxf.resources.DataSourceResourceManagerFactory;
-import org.orbeon.oxf.resources.FlatFileResourceManagerFactory;
-import org.orbeon.oxf.resources.ResourceManager;
-import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.resources.*;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.w3c.dom.Node;
@@ -126,11 +123,11 @@ public class ResourceManagerTest extends TestCase {
     }
 
 
-    public void testFlatFileDOM() {
+    public void testFilesystemDOM() {
         try {
             Properties props = new Properties();
-            props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, FlatFileResourceManagerFactory.class.getName());
-            props.setProperty(FlatFileResourceManagerFactory.ROOT_DIR_PROPERTY, "src/org/orbeon/oxf/resources/test/import");
+            props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, FilesystemResourceManagerFactory.class.getName());
+            props.setProperty(FilesystemResourceManagerFactory.SANDBOX_DIRECTORY_PROPERTY, "src/org/orbeon/oxf/resources/test/import");
             ResourceManagerWrapper.init(props);
 
             Node doc = ResourceManagerWrapper.instance().getContentAsDOM("/display/orbeon.xml");
@@ -144,12 +141,12 @@ public class ResourceManagerTest extends TestCase {
     }
 
 
-    public void testFlatFileSAX() {
+    public void testFilesystemSAX() {
         try {
 
             Properties props = new Properties();
-            props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, FlatFileResourceManagerFactory.class.getName());
-            props.setProperty(FlatFileResourceManagerFactory.ROOT_DIR_PROPERTY, "src/org/orbeon/oxf/resources/test/import");
+            props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, FilesystemResourceManagerFactory.class.getName());
+            props.setProperty(FilesystemResourceManagerFactory.SANDBOX_DIRECTORY_PROPERTY, "src/org/orbeon/oxf/resources/test/import");
             ResourceManagerWrapper.init(props);
 
 
@@ -241,8 +238,8 @@ public class ResourceManagerTest extends TestCase {
     public void testLocator() {
         logger.debug("aaa");
         Properties props = new Properties();
-        props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, FlatFileResourceManagerFactory.class.getName());
-        props.setProperty(FlatFileResourceManagerFactory.ROOT_DIR_PROPERTY, "src/org/orbeon/oxf/resources/test/import");
+        props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, FilesystemResourceManagerFactory.class.getName());
+        props.setProperty(FilesystemResourceManagerFactory.SANDBOX_DIRECTORY_PROPERTY, "src/org/orbeon/oxf/resources/test/import");
         ResourceManagerWrapper.init(props);
 
         XMLReader reader = ResourceManagerWrapper.instance().getXMLReader();
@@ -291,8 +288,8 @@ public class ResourceManagerTest extends TestCase {
     public void testNamespace() {
         try {
             Properties props = new Properties();
-            props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, FlatFileResourceManagerFactory.class.getName());
-            props.setProperty(FlatFileResourceManagerFactory.ROOT_DIR_PROPERTY, "src/org/orbeon/oxf/resources/test/import");
+            props.setProperty(ResourceManagerWrapper.FACTORY_PROPERTY, FilesystemResourceManagerFactory.class.getName());
+            props.setProperty(FilesystemResourceManagerFactory.SANDBOX_DIRECTORY_PROPERTY, "src/org/orbeon/oxf/resources/test/import");
             ResourceManagerWrapper.init(props);
 
 

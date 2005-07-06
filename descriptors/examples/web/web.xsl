@@ -44,7 +44,7 @@
                 <xsl:with-param name="commented" select="$target != 'devel'"/>
                 <xsl:with-param name="content">
                     <context-param>
-                        <param-name>oxf.resources.flatfile.rootdir</param-name>
+                        <param-name>oxf.resources.filesystem.sandbox-directory</param-name>
                         <param-value>
                             <xsl:choose>
                                 <xsl:when test="$target = 'devel'"><xsl:value-of select="$build-root"/>/src/examples/web</xsl:when>
@@ -54,7 +54,7 @@
                     </context-param>
                     <context-param>
                         <param-name>oxf.resources.priority.1</param-name>
-                        <param-value>org.orbeon.oxf.resources.FlatFileResourceManagerFactory</param-value>
+                        <param-value>org.orbeon.oxf.resources.FilesystemResourceManagerFactory</param-value>
                     </context-param>
                 </xsl:with-param>
             </xsl:call-template>

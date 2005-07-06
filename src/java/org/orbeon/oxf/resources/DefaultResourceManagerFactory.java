@@ -35,7 +35,7 @@ public class DefaultResourceManagerFactory implements ResourceManagerFactoryFunc
     public static final String JDBC_DRIVER = "org.orbeon.oxf.resources.DBResourceManagerFactory.driver";
     public static final String JDBC_USERNAME = "org.orbeon.oxf.resources.DBResourceManagerFactory.username";
     public static final String JDBC_PASSWORD = "org.orbeon.oxf.resources.DBResourceManagerFactory.password";
-    public static final String USE_CACHE = "org.orbeon.oxf.resources.FlatFileResourceManagerFactory.useCache";
+    public static final String USE_CACHE = "org.orbeon.oxf.resources.FilesystemResourceManagerFactory.useCache";
 
     private String jdbcUrl = null;
     private Properties info = null;

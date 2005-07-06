@@ -59,7 +59,7 @@ public class OXF {
 
     private static Logger logger = Logger.getLogger(OXF.class);
 
-    private String resourceManagerRoot;
+    private String resourceManagerSandbox;
     private String[] otherArgs;
 
     private ProcessorDefinition processorDefinition;
@@ -81,14 +81,11 @@ public class OXF {
         // Resources are first searched in a file hierarchy, then from the classloader
         Map props = new HashMap();
         props.put("oxf.resources.factory", "org.orbeon.oxf.resources.PriorityResourceManagerFactory");
-        if (resourceManagerRoot != null) {
-            // Use a sandbox file resource manager
-            props.put("oxf.resources.flatfile.rootdir", resourceManagerRoot);
-            props.put("oxf.resources.priority.1", "org.orbeon.oxf.resources.FlatFileResourceManagerFactory");
-        } else {
-            // Use the whole filesystem as resource manager
-            props.put("oxf.resources.priority.1", "org.orbeon.oxf.resources.FilesystemResourceManagerFactory");
+        if (resourceManagerSandbox != null) {
+            // Use a sandbox
+            props.put("oxf.resources.filesystem.sandbox-directory", resourceManagerSandbox);
         }
+        props.put("oxf.resources.priority.1", "org.orbeon.oxf.resources.FilesystemResourceManagerFactory");
         props.put("oxf.resources.priority.2", "org.orbeon.oxf.resources.ClassLoaderResourceManagerFactory");
         if (logger.isInfoEnabled())
             logger.info("Initializing Resource Manager with: " + props);
@@ -138,7 +135,7 @@ public class OXF {
             CommandLine cmd = new PosixParser().parse(options, args, true);
 
             // Get resource manager root if any
-            resourceManagerRoot = cmd.getOptionValue('r');
+            resourceManagerSandbox = cmd.getOptionValue('r');
 
             // Check for remaining args
             otherArgs = cmd.getArgs();

@@ -42,8 +42,8 @@
 
             </p>
             <note>
-                The <link href="reference-resource-managers#flatfile">Flat File</link> Resource
-                Manager is the only Resource Manager supporting write operations.
+                The <link href="reference-resource-managers#filesystem">Filesystem</link> resource
+                manager is the only Resource Manager supporting write operations.
             </note>
             <p>
                 The URL serializer takes a <code>config</code> input with a single <code>url</code>

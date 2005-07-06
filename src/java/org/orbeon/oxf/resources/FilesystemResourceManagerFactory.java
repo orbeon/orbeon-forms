@@ -17,6 +17,8 @@ import java.util.Map;
 
 public class FilesystemResourceManagerFactory implements ResourceManagerFactoryFunctor {
 
+    public static final String SANDBOX_DIRECTORY_PROPERTY = "oxf.resources.filesystem.sandbox-directory";
+
     private Map props;
 
     public FilesystemResourceManagerFactory(Map props) {

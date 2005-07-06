@@ -241,20 +241,16 @@
         <section>
             <title>Limitations</title>
             <ul>
-                <li>A custom processor used with the Java processor cannot use
-                its <code>config</code> input, as this input is used to
-                configure the Java processor.</li>
-                <li>Java source files must be stored on the file system, i.e.
-                the resources can only be loaded with the Flat File or Web app
-                <link href="reference-resource-managers">resource
-                managers</link>. This is due to a limitation of Sun's
-                <code>javac</code> that can only compile source files stored on
-                disk.</li>
-                <li>The Java processor will recompile a custom processor only
-                if the Java source of the processor itself has changed. If only
-                one of the classes (that the custom processor depends on) has changed
-                since the last compilation, the source of the customer processor
-                must be "touched" to force a re-compilation.</li>
+                <li>A custom processor used with the Java processor cannot use its
+                <code>config</code> input, as this input is used to configure the Java
+                processor.</li> <li>Java source files must be stored on the file system, i.e. the
+                resources can only be loaded with the Filesystem or Web App <link
+                href="reference-resource-managers">resource managers</link>. This is due to a
+                limitation of Sun's <code>javac</code> which can only compile source files stored
+                on disk.</li> <li>The Java processor will recompile a custom processor only if the
+                Java source of the processor itself has changed. If only one of the classes (that
+                the custom processor depends on) has changed since the last compilation, the source
+                of the customer processor must be "touched" to force a re-compilation.</li>
             </ul>
         </section>
         <section>

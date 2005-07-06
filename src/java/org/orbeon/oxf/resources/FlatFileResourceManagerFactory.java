@@ -18,6 +18,8 @@ import java.util.Map;
 /**
  * This factory creates a flat file resource manager, rooted with the specified
  * property.
+ *
+ * NOTE: This resource manager is now deprecated. Use the Filsystem resource manager instead.
  */
 public class FlatFileResourceManagerFactory implements ResourceManagerFactoryFunctor {
 

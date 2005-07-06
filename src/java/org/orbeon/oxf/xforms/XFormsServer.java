@@ -298,6 +298,7 @@ public class XFormsServer extends ProcessorImpl {
             final XFormsControls.ControlInfo controlInfo1 = (state1 == null) ? null : (XFormsControls.ControlInfo) j.next();
             final XFormsControls.ControlInfo controlInfo2 = (XFormsControls.ControlInfo) i.next();
 
+            // 1: Check current control
             if (!(controlInfo2 instanceof XFormsControls.RepeatIterationInfo)) {
                 // Output diffs between controlInfo1 and controlInfo2
 
@@ -398,7 +399,9 @@ public class XFormsServer extends ProcessorImpl {
                 final List children1 = (controlInfo1 == null) ? null : controlInfo1.getChildren();
                 final List children2 = controlInfo2.getChildren();
 
-                if (controlInfo2.getName().equals("repeat") && children1 != null) {
+                if (controlInfo2 instanceof XFormsControls.RepeatControlInfo && children1 != null) {
+
+                    final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo2;
 
                     // Special case of repeat update
 
@@ -412,13 +415,8 @@ public class XFormsServer extends ProcessorImpl {
                         // Size has grown
 
                         // Copy template instructions
-                        final String repeatControlId = controlInfo2.getId();
-                        final int indexOfDash = repeatControlId.indexOf('-');
-                        final String templateId = (indexOfDash == -1) ? repeatControlId : repeatControlId.substring(0, indexOfDash);
-                        final String parentIndexes = (indexOfDash == -1) ? "" : repeatControlId.substring(indexOfDash + 1);
                         for (int k = size1 + 1; k <= size2; k++) {
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "copy-repeat-template",
-                                    new String[]{"id", templateId, "parent-indexes", parentIndexes,  "id-suffix", "-" + k});
+                            outputCopyRepeatTemplate(ch, repeatControlInfo, k);
                         }
 
                         // Diff the common subset
@@ -429,11 +427,6 @@ public class XFormsServer extends ProcessorImpl {
 
                     } else if (size2 < size1) {
                         // Size has shrunk
-
-                        // Delete element and hierarchy underneath it
-//                        for (int k = size2 + 1; k <= size1; k++) {
-//                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-element", new String[]{"id", controlInfo2.getId() + "-" + k});
-//                        }
 
                         final String repeatControlId = controlInfo2.getId();
                         final int indexOfDash = repeatControlId.indexOf('-');
@@ -446,6 +439,20 @@ public class XFormsServer extends ProcessorImpl {
                         // Diff the remaining subset
                         diffControlsState(ch, children1.subList(0, size2), children2);
                     }
+                } else if ((controlInfo2 instanceof XFormsControls.RepeatControlInfo) && controlInfo1 == null) {
+
+                    final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo2;
+
+                    // Handle new sub-xforms:repeat
+
+                    // Copy template instructions
+                    final int size2 = children2.size();
+                    for (int k = 2; k <= size2; k++) { // don't copy the first template, which is already copied when the parent is copied
+                        outputCopyRepeatTemplate(ch, repeatControlInfo, k);
+                    }
+
+                    // Issue new values for the children
+                    diffControlsState(ch, null, children2);
 
                 } else {
                     // Other grouping controls
@@ -453,6 +460,16 @@ public class XFormsServer extends ProcessorImpl {
                 }
             }
         }
+    }
+
+    private void outputCopyRepeatTemplate(ContentHandlerHelper ch, XFormsControls.RepeatControlInfo repeatControlInfo, int idSuffix) {
+
+        final String repeatControlId = repeatControlInfo.getId();
+        final int indexOfDash = repeatControlId.indexOf('-');
+        final String parentIndexes = (indexOfDash == -1) ? "" : repeatControlId.substring(indexOfDash + 1);
+
+        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "copy-repeat-template",
+                new String[]{"id", repeatControlInfo.getRepeatId(), "parent-indexes", parentIndexes,  "id-suffix", "-" + idSuffix});
     }
 
     private void outputSubmissionInfo(PipelineContext pipelineContext, ContentHandlerHelper ch) {

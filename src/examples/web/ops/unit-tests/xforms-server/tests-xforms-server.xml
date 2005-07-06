@@ -864,8 +864,8 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:copy-repeat-template id="id123" id-suffix="-4"/>
-                        <xxf:copy-repeat-template id="id124" id-suffix="-3"/>
+                        <xxf:copy-repeat-template id="id123" parent-indexes="" id-suffix="-4"/>
+                        <xxf:copy-repeat-template id="id124" parent-indexes="1" id-suffix="-3"/>
                         <xxf:control id="id125-1-3" readonly="false" required="false" relevant="true" valid="true">f12</xxf:control>
                         <xxf:control id="id126-1-3" readonly="false" required="false" relevant="true" valid="true">l12</xxf:control>
                         <xxf:control id="id124-4" readonly="false" required="false" relevant="true" valid="true"/>
@@ -955,7 +955,7 @@
                 </xxf:dynamic-state>
                 <xxf:action>
                     <xxf:control-values>
-                        <xxf:delete-element id="id124-1-2"/>
+                        <xxf:delete-repeat-elements id="id124" parent-indexes="1" count="1"/>
                     </xxf:control-values>
                     <xxf:divs/>
                     <xxf:repeat-indexes>

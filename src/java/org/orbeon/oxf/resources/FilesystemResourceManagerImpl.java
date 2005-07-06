@@ -27,7 +27,7 @@ import java.util.Map;
 public class FilesystemResourceManagerImpl extends FlatFileResourceManagerImpl {
 
     public FilesystemResourceManagerImpl(Map props) throws OXFException {
-        super(props);
+        super(props, false);
     }
 
     protected File getFile(String key) {

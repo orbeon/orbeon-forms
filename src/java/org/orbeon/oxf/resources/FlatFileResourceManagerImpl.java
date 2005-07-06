@@ -40,6 +40,18 @@ public class FlatFileResourceManagerImpl extends ResourceManagerBase {
             throw new OXFException("Root directory " + root + " does not refer to a valid directory");
     }
 
+    protected FlatFileResourceManagerImpl(Map props, boolean useRootDir) throws OXFException {
+        super(props);
+        if (useRootDir) {
+            String root = (String) props.get(FlatFileResourceManagerFactory.ROOT_DIR_PROPERTY);
+            if (root == null)
+                throw new OXFException("Property " + FlatFileResourceManagerFactory.ROOT_DIR_PROPERTY + " is null");
+            rootDirectory = new File(root);
+            if (!rootDirectory.isDirectory())
+                throw new OXFException("Root directory " + root + " does not refer to a valid directory");
+        }
+    }
+
     /**
      * Returns a binary input stream for the specified key. The key could point
      * to any document type (text or binary).

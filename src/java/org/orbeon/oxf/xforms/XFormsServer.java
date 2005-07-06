@@ -415,9 +415,10 @@ public class XFormsServer extends ProcessorImpl {
                         final String repeatControlId = controlInfo2.getId();
                         final int indexOfDash = repeatControlId.indexOf('-');
                         final String templateId = (indexOfDash == -1) ? repeatControlId : repeatControlId.substring(0, indexOfDash);
+                        final String parentIndexes = (indexOfDash == -1) ? "" : repeatControlId.substring(indexOfDash + 1);
                         for (int k = size1 + 1; k <= size2; k++) {
                             ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "copy-repeat-template",
-                                    new String[]{"id", templateId, "id-suffix", "-" + k});
+                                    new String[]{"id", templateId, "parent-indexes", parentIndexes,  "id-suffix", "-" + k});
                         }
 
                         // Diff the common subset

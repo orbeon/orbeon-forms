@@ -91,6 +91,9 @@
                                 <attribute name="id">
                                     <data type="string"/>
                                 </attribute>
+                                <attribute name="parent-indexes">
+                                    <data type="string"/>
+                                </attribute>
                                 <attribute name="id-suffix">
                                     <data type="string"/>
                                 </attribute>

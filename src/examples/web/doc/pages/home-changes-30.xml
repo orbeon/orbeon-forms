@@ -551,6 +551,13 @@
                     </p>
                 </li>
             </ul>
+            <note>
+                <p>
+                    In order to benefit from features such as XForms, you should make sure that
+                    your page views generate XHTML. In particular, your XHTML elements must in the
+                    XHTML namespace (<code>http://www.w3.org/1999/xhtml</code>).
+                </p>
+            </note>
         </section>
         <section>
             <title>Other Changes</title>
@@ -578,7 +585,7 @@
                         href="reference-resource-managers#filesystem">Filesystem</a> resource
                         managers have been merged. The Flat File resource manager is now deprecated,
                         and the Filesystem resource manager should be used instead. The Flat File
-                        resource manager can still be used for backward compability. The main
+                        resource manager can still be used for backward compatibility. The main
                         difference between the two resource managers is that the Filesystem resource
                         manager can be configured with or without a sandbox.
                     </p>

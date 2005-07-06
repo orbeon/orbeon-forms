@@ -414,8 +414,8 @@
                     </li>
                     <li>
                         <p>
-                            <b>Plain HTML:</b> for plain HTML documents, identified with a root element
-                            of <code>html</code> (in no namespace):
+                            <b>Pseudo-HTML:</b> for pseudo-HTML documents, identified with a root
+                            element of <code>html</code> (in lowercase and in no namespace):
                         </p>
                         <ol>
                             <li>
@@ -432,13 +432,21 @@
                                 <p>The resulting HTML document is sent to the client through HTTP.</p>
                             </li>
                         </ol>
-                        <p>
-                            Note that no theme stylesheet is applied in this case. The idea is that
-                            you are encouraged to write XHTML and use a single theme which matches
-                            against XHTML elements only. It is however possible to apply a theme
-                            stylesheet in this case as well by inserting a call to the XSLT
-                            processor in this case as well.
-                        </p>
+                        <note>
+                            <p>
+                                No theme stylesheet is applied in this case. You are encouraged to
+                                write XHTML and use a single theme which matches against XHTML
+                                elements only, leaving possible conversion to HTML for subsequent
+                                steps. It is however possible to apply a theme stylesheet in this
+                                case as well by inserting a call to the XSLT processor in this case
+                                as well.
+                            </p>
+                            <p>
+                                It should also be noted that URL rewriting only applies to lowercase
+                                HTML elements. URL rewriting for pseudo-HTML documents is
+                                deprecated.
+                            </p>
+                        </note>
                     </li>
                     <li>
                         <p>
@@ -625,7 +633,7 @@
             </p>
             <p>
                 As documented above, the default theme is called only for views that generate XHTML
-                documents. The default theme does not run, for example, on plain HTML, XSL-FO, or
+                documents. The default theme does not run, for example, on pseudo-HTML, XSL-FO, or
                 plain XML documents.
             </p>
             <p>

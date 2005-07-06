@@ -94,6 +94,10 @@
                 not specified, no sandbox is defined, and it is possible to access all the files on
                 the filesystem.
             </p>
+            <p>
+                Using the Filesystem resource manager without a sandbox is particularly useful for
+                command-line applications.
+            </p>
             <section>
                 <title>Example</title>
                 <xml-source>

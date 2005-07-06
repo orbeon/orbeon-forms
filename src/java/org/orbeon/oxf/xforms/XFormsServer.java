@@ -431,9 +431,17 @@ public class XFormsServer extends ProcessorImpl {
                         // Size has shrunk
 
                         // Delete element and hierarchy underneath it
-                        for (int k = size2 + 1; k <= size1; k++) {
-                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-element", new String[]{"id", controlInfo2.getId() + "-" + k});
-                        }
+//                        for (int k = size2 + 1; k <= size1; k++) {
+//                            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-element", new String[]{"id", controlInfo2.getId() + "-" + k});
+//                        }
+
+                        final String repeatControlId = controlInfo2.getId();
+                        final int indexOfDash = repeatControlId.indexOf('-');
+                        final String templateId = (indexOfDash == -1) ? repeatControlId : repeatControlId.substring(0, indexOfDash);
+                        final String parentIndexes = (indexOfDash == -1) ? "" : repeatControlId.substring(indexOfDash + 1);
+
+                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "delete-repeat-elements",
+                                new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1 - size2)});
 
                         // Diff the remaining subset
                         diffControlsState(ch, children1.subList(0, size2), children2);

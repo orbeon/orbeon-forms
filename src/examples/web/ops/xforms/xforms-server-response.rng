@@ -98,9 +98,15 @@
                                     <data type="string"/>
                                 </attribute>
                             </element>
-                            <element name="xxforms:delete-element">
+                            <element name="xxforms:delete-repeat-elements">
                                 <attribute name="id">
                                     <data type="string"/>
+                                </attribute>
+                                <attribute name="parent-indexes">
+                                    <data type="string"/>
+                                </attribute>
+                                <attribute name="count">
+                                    <data type="positiveInteger"/>
                                 </attribute>
                             </element>
                         </choice>

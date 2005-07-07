@@ -109,6 +109,9 @@ public class XHTMLRewrite extends ProcessorImpl {
      * @author d
      */
     static final String BACKGROUND_ATT = "background";
+    
+    static final String NOREWRITE_ATT ="url-norewrite";
+    
     /**
      * <!-- State -->
      * Base state.  Simply forwards data to the destination content handler and returns itself.
@@ -453,8 +456,9 @@ public class XHTMLRewrite extends ProcessorImpl {
 
                 ret = this;
                 final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace( atts );
-                final String newHref = response.rewriteResourceURL( res, false );
-                newAtts.addAttribute( "", resAtt, resAtt, "", newHref );
+                final String newRes = response.rewriteResourceURL( res, false );
+                final int idx = newAtts.getIndex( "", resAtt );
+                newAtts.setValue( idx, newRes );
                 contentHandler.startElement( ns, lnam, qnam, newAtts  );
             } 
             return ret;
@@ -515,8 +519,11 @@ public class XHTMLRewrite extends ProcessorImpl {
                 } else {
                     newHref = null;
                 }
-                if ( newHref != null ) {
-                    newAtts.addAttribute( "", HREF_ATT, HREF_ATT, "", newHref );
+                final int idx = newAtts.getIndex( "", HREF_ATT );
+                if ( newHref == null && idx != -1 ) {
+                	newAtts.removeAttribute( idx );
+                } else {
+                    newAtts.setValue( idx, newHref );
                 }
                 contentHandler.startElement( ns, lnam, qnam, newAtts  );
             } 
@@ -557,7 +564,8 @@ public class XHTMLRewrite extends ProcessorImpl {
                 ret = this;
                 final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace( atts );
                 final String newHref = response.rewriteActionURL( href );
-                newAtts.addAttribute( "", HREF_ATT, HREF_ATT, "", newHref );
+                final int idx = newAtts.getIndex( "", HREF_ATT );
+                newAtts.setValue( idx, newHref );
                 contentHandler.startElement( ns, lnam, qnam, newAtts  );
             }
             return ret;
@@ -691,14 +699,16 @@ public class XHTMLRewrite extends ProcessorImpl {
 
                 final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace( atts );
 
-                final String actn = atts.getValue( "", ACTION_ATT );
+                final String actn = newAtts.getValue( "", ACTION_ATT );
                 final String newActn;
                 if ( actn == null ) {
                     newActn = response.rewriteActionURL( "" );
+                    newAtts.addAttribute( "", ACTION_ATT, ACTION_ATT, "", newActn );
                 } else {
+                    final int idx = newAtts.getIndex( "", ACTION_ATT );
                     newActn = response.rewriteActionURL( actn );
+                    newAtts.setValue( idx, newActn );
                 }
-                newAtts.addAttribute( "", ACTION_ATT, ACTION_ATT, "", newActn );
                 
                 if ( atts.getValue( "", METHOD_ATT ) == null && isPortlet ) {
                     newAtts.addAttribute( "", METHOD_ATT, METHOD_ATT, "", "post" );
@@ -875,7 +885,7 @@ public class XHTMLRewrite extends ProcessorImpl {
         ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
         throws SAXException {
             flushCharacters();
-            final String no_urlrewrite = atts.getValue( FORMATTING_URI, "url-norewrite" );
+            final String no_urlrewrite = atts.getValue( FORMATTING_URI, NOREWRITE_ATT );
             depth++;            
             State ret = this;
             if ( "true".equals( no_urlrewrite ) ) {
@@ -960,7 +970,7 @@ public class XHTMLRewrite extends ProcessorImpl {
         public State startElement
         ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
         throws SAXException {
-            final String no_urlrewrite = atts .getValue( FORMATTING_URI, "url-norewrite" );
+            final String no_urlrewrite = atts .getValue( FORMATTING_URI, NOREWRITE_ATT );
             final Attributes newAtts = XMLUtils.getAttribsFromDefaultNamespace( atts );
             contentHandler.startElement( ns, lnam, qnam, newAtts  );
             depth++;            

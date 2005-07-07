@@ -951,4 +951,24 @@ public class XMLUtils {
         return loc.getSystemId()+ ", line " + loc.getLineNumber() + ", column " 
                + loc.getColumnNumber();
     }
-}
+    /**
+     * <!-- getAttribsFromDefaultNamespace -->
+     * @param atts src attribs
+     * @return new AttributesImpl containing  all attribs that were in src attribs and that were
+     *         in the default name space.   
+     * @author d
+     */
+    public static AttributesImpl getAttribsFromDefaultNamespace( final Attributes atts ) {
+        final AttributesImpl ret = new AttributesImpl();
+        final int size = atts.getLength();
+        for ( int i =0; i < size; i++ ) {
+            final String ns = atts.getURI( i );
+            if ( !"".equals( ns ) ) continue;
+            final String lnam = atts.getLocalName( i );
+            final String qnam = atts.getQName( i );
+            final String typ = atts.getType( i );
+            final String val = atts.getValue( i );
+            ret.addAttribute( ns, lnam, qnam, typ, val );
+        }
+        return ret;
+    }}

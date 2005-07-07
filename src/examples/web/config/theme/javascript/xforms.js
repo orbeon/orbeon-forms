@@ -270,7 +270,7 @@ function xformsDisplayLoading(state) {
     }
 }
 
-function xformsValueChanged(target, incremental, other) {
+function xformsValueChanged(target, other) {
     var sendEvent = target.value != target.previousValue;
     if (sendEvent) {
         target.previousValue = target.value;
@@ -481,7 +481,7 @@ function xformsInitializeControlsUnder(root) {
                         
                         // Notify server that value changed
                         rangeControl.value = value;
-                        xformsValueChanged(rangeControl, true);
+                        xformsValueChanged(rangeControl, null);
                     }
                     
                     return false;
@@ -517,21 +517,21 @@ function xformsInitializeControlsUnder(root) {
                 xformsAddEventListener(control, "change", function(event) {
                     // If previous change is still not handled, handle it now
                     if (document.xformsPreviousValueChanged) {
-                        xformsValueChanged(document.xformsPreviousValueChanged, false);
+                        xformsValueChanged(document.xformsPreviousValueChanged, null);
                         document.xformsPreviousValueChanged = null;
                     }
                     // Delay execution by 50 ms
                     document.xformsPreviousValueChanged = getEventTarget(event);
                     window.setTimeout(function() {
                         if (document.xformsPreviousValueChanged) {
-                            xformsValueChanged(document.xformsPreviousValueChanged, false);
+                            xformsValueChanged(document.xformsPreviousValueChanged, null);
                             document.xformsPreviousValueChanged = null;
                         }
                     });
                 });
                 if (isIncremental) {
                     xformsAddEventListener(control, "keyup", function(event) {
-                        xformsValueChanged(getEventTarget(event), true);
+                        xformsValueChanged(getEventTarget(event), null);
                     });
                 }
             }
@@ -555,7 +555,7 @@ function xformsInitializeControlsUnder(root) {
 
                         // We have just received a change event: try to combine both
                         if (document.xformsPreviousValueChanged) {
-                            var eventSent = xformsValueChanged(document.xformsPreviousValueChanged, false, target);
+                            var eventSent = xformsValueChanged(document.xformsPreviousValueChanged, target);
                             document.xformsPreviousValueChanged = null;
                             if (eventSent)
                                 document.xformsPreviousDOMFocusOut = null;

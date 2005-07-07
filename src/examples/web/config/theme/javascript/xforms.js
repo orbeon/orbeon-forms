@@ -250,6 +250,17 @@ function xformsLog(text) {
     debugDiv.innerHTML += text + " | ";
 }
 
+function xformsLogProperties(object) {
+    var message = "[";
+    var first = true;
+    for (var p in object) {
+        if (first) first = false; else message += ", ";
+        message += p + ": " + object[p];
+    }
+    message += "]";
+    xformsLog(message);
+}
+
 function xformsDisplayLoading(state) {
     switch (state) {
         case "loading" :
@@ -840,12 +851,18 @@ function xformsHandleResponse() {
                                             if (!documentElement) break; // We don't handle <xxf:control id="employeeSet-2" relevant="false"/>
                                             var documentElementClasses = documentElement.className.split(" ");
 
-                                            // Check if this control has been modified while the event was processed
+                                            // Check if this control was modified and we haven't even received the key event yet
                                             var foundControlModified = false;
-                                            for (var indexId = 0; indexId < document.xformsChangedIdsRequest.length; indexId++) {
-                                                if (document.xformsChangedIdsRequest[indexId] == controlId) {
-                                                    foundControlModified = true;
-                                                    break;
+                                            if (xformsIsDefined(documentElement.previousValue)
+                                                    && documentElement.previousValue != documentElement.value)
+                                                foundControlModified = true;
+                                            // Check if this control has been modified while the event was processed
+                                            if (!foundControlModified) {
+                                                for (var indexId = 0; indexId < document.xformsChangedIdsRequest.length; indexId++) {
+                                                    if (document.xformsChangedIdsRequest[indexId] == controlId) {
+                                                        foundControlModified = true;
+                                                        break;
+                                                    }
                                                 }
                                             }
 

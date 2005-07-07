@@ -215,13 +215,8 @@ public class XHTMLRewrite extends ProcessorImpl {
         State endElement( final String ns, final String lnam, final String qnam ) 
         throws SAXException {
             depth--;
-            final State ret;
-            if ( depth >= 0 || previous == null ) {
-                contentHandler.endElement( ns, lnam, qnam );
-                ret = this;
-            } else {
-                ret = previous.endElement( ns, lnam, qnam );
-            }
+            contentHandler.endElement( ns, lnam, qnam );
+            final State ret = depth == 0 ? previous : this;
             return ret;
         }
         /**
@@ -884,18 +879,33 @@ public class XHTMLRewrite extends ProcessorImpl {
         public State startElement
         ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
         throws SAXException {
-            flushCharacters();
             final String no_urlrewrite = atts.getValue( FORMATTING_URI, NOREWRITE_ATT );
-            depth++;            
-            State ret = this;
-            if ( "true".equals( no_urlrewrite ) ) {
-                final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace( atts );
-                contentHandler.startElement( ns, lnam, qnam, newAtts  );
-                ret = new NoRewriteState
-                    ( this, contentHandler, response, isPortlet, haveScriptAncestor );
-            } else if ( "http://www.w3.org/1999/xhtml".equals( ns ) ) {
-                done : {
-                    ret = handleA( ns, lnam, qnam, atts );
+            State ret = null;
+            done : if ( "true".equals( no_urlrewrite ) ) {
+            	final State stt = new NoRewriteState
+            	    ( this, contentHandler, response, isPortlet, haveScriptAncestor );
+            	ret = stt.startElement( ns, lnam, qnam, atts );
+            } else if ( FORMATTING_URI.equals( ns ) && "rewrite".equals( lnam ) ) {
+                flushCharacters();
+                final String typ = atts.getValue( "", "type" );
+                final String url = atts.getValue( "", "url" );
+                if ( url != null ) {
+                    final String newURL;
+                    if ( "action".equals( typ ) ) {
+                        newURL = response.rewriteActionURL( url );
+                    } else if ( "render".equals( typ ) ) {
+                        newURL = response.rewriteRenderURL( url );
+                    } else {
+                        newURL = response.rewriteResourceURL( url, false );
+                    }
+                    final char[] chs = newURL.toCharArray();
+                    contentHandler.characters( chs, 0, chs.length );
+                }
+            } else {
+                flushCharacters();
+                depth++;
+            	if ( "http://www.w3.org/1999/xhtml".equals( ns ) ) {
+                	ret = handleA( ns, lnam, qnam, atts );
                     if ( ret != null ) break done;
                     
                     ret = handleForm( ns, lnam, qnam, atts );
@@ -921,26 +931,7 @@ public class XHTMLRewrite extends ProcessorImpl {
                     
                     ret = handleEltWithResource( "body", BACKGROUND_ATT, ns, lnam, qnam, atts );
                     if ( ret != null ) break done;
-                    
-                    ret = this;
-                    contentHandler.startElement( ns, lnam, qnam, atts  );
-                }
-            } else if ( FORMATTING_URI.equals( ns ) && "rewrite".equals( lnam ) ) {
-                final String typ = atts.getValue( "", "type" );
-                final String url = atts.getValue( "", "url" );
-                if ( url != null ) {
-                    final String newURL;
-                    if ( "action".equals( typ ) ) {
-                        newURL = response.rewriteActionURL( url );
-                    } else if ( "render".equals( typ ) ) {
-                        newURL = response.rewriteRenderURL( url );
-                    } else {
-                        newURL = response.rewriteResourceURL( url, false );
-                    }
-                    final char[] chs = newURL.toCharArray();
-                    contentHandler.characters( chs, 0, chs.length );
-                }
-            } else {
+            	}
                 ret = this;
                 contentHandler.startElement( ns, lnam, qnam, atts  );
             }
@@ -970,15 +961,16 @@ public class XHTMLRewrite extends ProcessorImpl {
         public State startElement
         ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
         throws SAXException {
-            final String no_urlrewrite = atts .getValue( FORMATTING_URI, NOREWRITE_ATT );
-            final Attributes newAtts = XMLUtils.getAttribsFromDefaultNamespace( atts );
-            contentHandler.startElement( ns, lnam, qnam, newAtts  );
-            depth++;            
+            final String no_urlrewrite = atts.getValue( FORMATTING_URI, NOREWRITE_ATT );
             final State ret;
-            if ( "false".equals( no_urlrewrite ) ) {
-                ret = new RewriteState
+            if ( "false".equals( no_urlrewrite) ) {
+                final State stt = new RewriteState
                     ( this, contentHandler, response, isPortlet, haveScriptAncestor );
+                ret = stt.startElement( ns, lnam, qnam, atts );
             } else {
+                final Attributes newAtts = XMLUtils.getAttribsFromDefaultNamespace( atts );
+                contentHandler.startElement( ns, lnam, qnam, newAtts  );
+                depth++;            
                 ret = this; 
             }
             return ret;

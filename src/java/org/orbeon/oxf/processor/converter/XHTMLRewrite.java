@@ -744,19 +744,14 @@ public class XHTMLRewrite extends ProcessorImpl {
                 while ( wsrprewriteMatcher.find() ) {
                     final int strt = wsrprewriteMatcher.start();
                     final int len = strt - last;
-                    //ensureOutbufCapacity( len );
-                    //copyFromInToOut( last, strt );
-                    //contentHandler.characters( outBuf, 0, len );
                     contentHandler.characters( chs, chsStrt + strt, len );
-                    contentHandler.characters( WSRP_REWRITE_REPLACMENT_CHARS, 0, WSRP_REWRITE_REPLACMENT_CHARS.length );
+                    contentHandler.characters
+                        ( WSRP_REWRITE_REPLACMENT_CHARS, 0, WSRP_REWRITE_REPLACMENT_CHARS.length );
                     last = wsrprewriteMatcher.end();
                 }
                 if ( last < bfLen )
                 {
                     final int len = bfLen - last;
-                    //ensureOutbufCapacity( len );
-                    //copyFromInToOut( last, bfLen );
-                    //contentHandler.characters( outBuf, 0, len );
                     contentHandler.characters( chs, chsStrt + last, len );
                 }
                 charactersBuf.clear();
@@ -970,7 +965,7 @@ public class XHTMLRewrite extends ProcessorImpl {
             contentHandler.startElement( ns, lnam, qnam, newAtts  );
             depth++;            
             final State ret;
-            if ( "false".equals( no_urlrewrite) ) {
+            if ( "false".equals( no_urlrewrite ) ) {
                 ret = new RewriteState
                     ( this, contentHandler, response, isPortlet, haveScriptAncestor );
             } else {
@@ -1149,6 +1144,7 @@ public class XHTMLRewrite extends ProcessorImpl {
     }
     /**
      * <!-- createOutput -->
+     * @return new RewriteOutput( cls, nam ) after adding it with addOutput.
      * @author d
      */
     public ProcessorOutput createOutput( final String nam ) {

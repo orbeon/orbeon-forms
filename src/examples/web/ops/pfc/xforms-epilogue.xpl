@@ -15,7 +15,9 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+>
 
     <p:param type="input" name="data"/>
     <p:param type="input" name="instance"/>
@@ -69,7 +71,7 @@
         </p:when>
         <p:otherwise>
             <p:choose href="#data">
-                <p:when test="//xforms:model">
+                <p:when test="/xhtml:html/xhtml:head/xforms:model"> 
                     <!-- Handle widgets -->
                     <p:processor name="oxf:xslt">
                         <p:input name="data" href="#data"/>

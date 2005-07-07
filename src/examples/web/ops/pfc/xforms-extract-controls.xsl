@@ -26,7 +26,7 @@
     <xsl:template match="/">
         <static-state>
             <models>
-                <xsl:apply-templates select="//xforms:model"/>
+                <xsl:apply-templates select="/xhtml:html/xhtml:head/xforms:model"/> 
             </models>
             <controls>
                 <xsl:apply-templates select="//xforms:*[local-name() != 'model' and not(ancestor::xforms:*)]" mode="controls"/>

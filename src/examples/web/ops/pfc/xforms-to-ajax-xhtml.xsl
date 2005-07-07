@@ -74,8 +74,37 @@
     </xsl:template>
     
     <!-- - - - - - - XForms controls - - - - - - -->
-    
-    <xsl:template match="xforms:output | xforms:input 
+
+    <!-- Add classes to control elements reflecting model item properties -->
+    <xsl:template match="xforms:output | xforms:input
+            | xforms:secret | xforms:textarea | xforms:select | xforms:select1
+            | xforms:range | xforms:trigger | xforms:submit" priority="3">
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
+
+        <xsl:choose>
+            <xsl:when test="$generate-template">
+                <xsl:next-match/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+                <xsl:variable name="control-rendered" as="element()+">
+                    <xsl:next-match/>
+                </xsl:variable>
+                <xsl:for-each select="$control-rendered">
+                    <xsl:copy>
+                        <xsl:copy-of select="@* except @class"/>
+                        <xsl:variable name="classes" as="xs:string*" select="(if (@class) then @class else (),
+                            if (xxforms:control($id)/@relevant = 'false') then  'xforms-disabled' else ())"/>
+                        <xsl:attribute name="class" select="string-join($classes , ' ')"/>
+                        <xsl:copy-of select="node()"/>
+                    </xsl:copy>
+                </xsl:for-each>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="xforms:output | xforms:input
             | xforms:secret | xforms:textarea | xforms:select | xforms:select1 
             | xforms:range" priority="2">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>

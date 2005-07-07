@@ -715,6 +715,10 @@ ul {
     font-size: 11px;
 }
 
+.xforms-disabled {
+    display: none;
+}
+
 #xforms-repeat-tree {
     display: none;
 }

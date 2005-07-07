@@ -835,6 +835,7 @@ function xformsHandleResponse() {
                                             var controlElement = controlValuesElement.childNodes[j];
                                             var newControlValue = xformsStringValue(controlElement);
                                             var controlId = controlElement.getAttribute("id");
+                                            var relevant = controlElement.getAttribute("relevant");
                                             var documentElement = document.getElementById(controlId);
                                             if (!documentElement) break; // We don't handle <xxf:control id="employeeSet-2" relevant="false"/>
                                             var documentElementClasses = documentElement.className.split(" ");
@@ -911,6 +912,11 @@ function xformsHandleResponse() {
                                             if (newHelp && newHelp != documentElement.helpMessage) {
                                                 documentElement.helpMessage = newHelp;
                                                 xformsUpdateStyle(documentElement.helpElement);
+                                            }
+
+                                            // Update relevant
+                                            if (relevant) {
+                                                documentElement.isRelevant = relevant == "true";
                                             }
 
                                             // Update style

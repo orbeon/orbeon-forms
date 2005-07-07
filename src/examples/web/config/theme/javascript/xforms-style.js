@@ -27,6 +27,21 @@ function xformsUpdateStyle(element) {
         }
     }
 
+    function updateElementClasses(element, isRelevant) {
+        var classes = element.className.split(" ");
+        if (element.isRelevant) {
+            // Remove xforms-disabled if present
+            xformsArrayRemove(classes, "xforms-disabled");
+            element.className = classes.join(" ");
+        } else {
+            // Add xforms-disabled if not present
+            if (!xformsArrayContains(classes, "xforms-disabled")) {
+                classes.push("xforms-disabled");
+                element.className = classes.join(" ");
+            }
+        }
+    }
+
     if (element.className) {
         var classes = element.className.split(" ");
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
@@ -192,6 +207,11 @@ function xformsUpdateStyle(element) {
             if (element.alertElement && typeof(element.isValid) != "undefined") {
                 element.alertElement.className = element.isValid ? "xforms-alert-inactive" 
                     : "xforms-alert-active";
+            }
+
+            // Update relevant
+            if (xformsIsDefined(element.isRelevant)) {
+                updateElementClasses(element, element.isRelevant);
             }
 
             // This is for widgets. Code for widgets should be modularized and moved out of this file

@@ -27,7 +27,25 @@
                 <xi:include href="../schema/empty-instance.xml"/>
             </document>
         </form>
-    </xforms:instance> <xforms:submission method="post"/>
+    </xforms:instance>
+    <xforms:submission method="post"/>
+    <!-- Add some required elements -->
+    <xforms:bind nodeset="/form/document/claim:claim/claim:insured-info/claim:general-info/claim:name-info/claim:last-name"
+        required="true()"/>
+    <xforms:bind nodeset="/form/document/claim:claim/claim:insured-info/claim:general-info/claim:name-info/claim:first-name"
+        required="true()"/>
+    <xforms:bind nodeset="/form/document/claim:claim/claim:insured-info/claim:general-info/claim:address/claim:address-detail/claim:street-name"
+        required="true()"/>
+    <xforms:bind nodeset="/form/document/claim:claim/claim:insured-info/claim:general-info/claim:address/claim:city"
+        required="true()"/>
+    <xforms:bind nodeset="/form/document/claim:claim/claim:insured-info/claim:general-info/claim:address/claim:state-province"
+        required="true()"/>
+    <xforms:bind nodeset="/form/document/claim:claim/claim:insured-info/claim:general-info/claim:address/claim:country"
+        required="true()"/>
+    <xforms:bind nodeset="/form/document/claim:claim/claim:insured-info/claim:person-info/claim:birth-date"
+        required="true()"/>
+    <xforms:bind nodeset="/form/document/claim:claim/claim:insured-info/claim:person-info/claim:occupation"
+        required="true()"/>
     <!-- This bind element handles the empty repeat entry necessary to add new entries with xforms:repeat -->
     <xforms:bind nodeset="/form/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child"
         relevant="count(following-sibling::claim:child) > 0"/>

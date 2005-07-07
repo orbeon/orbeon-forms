@@ -49,6 +49,23 @@
                 </form>
             </xforms:instance>
             <xforms:bind nodeset="/form/document/claim:claim">
+                
+                <!-- Add some required elements -->
+                <xforms:bind nodeset="claim:insured-info">
+                    <xforms:bind nodeset="claim:general-info">
+                        <xforms:bind nodeset="claim:name-info/claim:last-name" required="true()"/>
+                        <xforms:bind nodeset="claim:name-info/claim:first-name" required="true()"/>
+                        <xforms:bind nodeset="claim:address/claim:address-detail/claim:street-name" required="true()"/>
+                        <xforms:bind nodeset="claim:address/claim:city" required="true()"/>
+                        <xforms:bind nodeset="claim:address/claim:state-province" required="true()"/>
+                        <xforms:bind nodeset="claim:address/claim:country" required="true()"/>
+                    </xforms:bind>
+                    <xforms:bind nodeset="claim:person-info">
+                        <xforms:bind nodeset="claim:birth-date" required="true()"/>
+                        <xforms:bind nodeset="claim:occupation" required="true()"/>
+                    </xforms:bind>
+                </xforms:bind>
+
                 <!-- This bind element handles the empty repeat entry necessary to add new entries with xforms:repeat -->
                 <xforms:bind nodeset="claim:insured-info/claim:family-info/claim:children">
 <!--                    <xforms:bind nodeset="claim:child[position() = 1]/claim:birth-date" relevant="false()"/>-->

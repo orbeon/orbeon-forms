@@ -99,6 +99,12 @@
                         The OPS Blog example is not complete.
                     </p>
                 </li>
+                <li>
+                    <p>
+                        The Ajax-based XForms engine currently works with Mozilla Firefox and
+                        Microsoft Internet Explorer 6. Support for Opera and Safari is planned.
+                    </p>
+                </li>
             </ul>
         </section>
         <section>
@@ -261,11 +267,19 @@
                             controls, no change is necessary.
                         </p>
                     </li>
+                    <li>
+                        <p>
+                            With OPS 2.8, the "required" model item property did not apply to
+                            elements validated with XML schemas. If for example a value was of type
+                            <code>xs:integer</code> but missing, it was marked as invalid. With OPS
+                            3.0, the default value for the "required" model item property is "false"
+                            for values validated with XML schemas as well. This means that with OPS
+                            3.0, some values invalid with OSP 2.8 are now valid. In order to fix
+                            this, explicitly set the "required" model item properties on values you
+                            would like to be required.
+                        </p>
+                    </li>
                 </ul>
-                <note>
-                    The Ajax-based XForms engine currently works with Mozilla Firefox and Microsoft
-                    Internet Explorer 6. Support for Opera and Safari is planned.
-                </note>
             </section>
             <section>
                 <title>Migrating to the OPS 3.0 XForms Engine</title>

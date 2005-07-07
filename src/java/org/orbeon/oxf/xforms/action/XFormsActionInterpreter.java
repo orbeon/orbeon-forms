@@ -558,6 +558,12 @@ public class XFormsActionInterpreter {
                     foundControlElement = null;
                 return true;
             }
+
+            public void startRepeatIteration(int iteration) {
+            }
+
+            public void endRepeatIteration(int iteration) {
+            }
         });
     }
 

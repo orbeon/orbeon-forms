@@ -48,41 +48,7 @@
                                 <optional>
                                     <attribute name="help"/>
                                 </optional>
-                                <optional>
-                                    <attribute name="readonly">
-                                        <choice>
-                                            <value>true</value>
-                                            <value>false</value>
-                                        </choice>
-                                    </attribute>
-                                </optional>
-                                <optional>
-                                    <attribute name="required">
-                                        <choice>
-                                            <value>true</value>
-                                            <value>false</value>
-                                        </choice>
-                                    </attribute>
-                                </optional>
-                                <optional>
-                                    <attribute name="relevant">
-                                        <choice>
-                                            <value>true</value>
-                                            <value>false</value>
-                                        </choice>
-                                    </attribute>
-                                </optional>
-                                <optional>
-                                    <attribute name="valid">
-                                        <choice>
-                                            <value>true</value>
-                                            <value>false</value>
-                                        </choice>
-                                    </attribute>
-                                </optional>
-                                <optional>
-                                    <attribute name="type"/>
-                                </optional>
+                                <ref name="model-item-properties"/>
                                 <optional>
                                     <data type="string"/>
                                 </optional>
@@ -108,6 +74,15 @@
                                 <attribute name="count">
                                     <data type="positiveInteger"/>
                                 </attribute>
+                            </element>
+                            <element name="xxforms:repeat-iteration">
+                                <attribute name="id">
+                                    <data type="string"/>
+                                </attribute>
+                                <attribute name="iteration">
+                                    <data type="positiveInteger"/>
+                                </attribute>
+                                <ref name="model-item-properties"/>
                             </element>
                         </choice>
                     </zeroOrMore>
@@ -184,5 +159,43 @@
             </element>
         </element>
     </start>
+    
+    <define name="model-item-properties">
+        <optional>
+            <attribute name="readonly">
+                <choice>
+                    <value>true</value>
+                    <value>false</value>
+                </choice>
+            </attribute>
+        </optional>
+        <optional>
+            <attribute name="required">
+                <choice>
+                    <value>true</value>
+                    <value>false</value>
+                </choice>
+            </attribute>
+        </optional>
+        <optional>
+            <attribute name="relevant">
+                <choice>
+                    <value>true</value>
+                    <value>false</value>
+                </choice>
+            </attribute>
+        </optional>
+        <optional>
+            <attribute name="valid">
+                <choice>
+                    <value>true</value>
+                    <value>false</value>
+                </choice>
+            </attribute>
+        </optional>
+        <optional>
+            <attribute name="type"/>
+        </optional>
+    </define>
 
 </grammar>

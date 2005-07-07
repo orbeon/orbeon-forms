@@ -299,9 +299,10 @@ public class XFormsServer extends ProcessorImpl {
             final XFormsControls.ControlInfo controlInfo2 = (XFormsControls.ControlInfo) i.next();
 
             // 1: Check current control
-            if (!(controlInfo2 instanceof XFormsControls.RepeatIterationInfo)) {
-                // Output diffs between controlInfo1 and controlInfo2
+            if (!(controlInfo2 instanceof XFormsControls.RepeatControlInfo)) {
+                // xforms:repeat which doesn't need to be handled independently, iterations do it
 
+                // Output diffs between controlInfo1 and controlInfo2\
                 if (!controlInfo2.equals(controlInfo1)) { // don't send anything if nothing has changed
 
                     attributesImpl.clear();
@@ -310,44 +311,45 @@ public class XFormsServer extends ProcessorImpl {
                     attributesImpl.addAttribute("", "id", "id", ContentHandlerHelper.CDATA, controlInfo2.getId());
 
                     // Control children values
-                    {
-                        final String labelValue1 = (controlInfo1 == null) ? null : controlInfo1.getLabel();
-                        final String labelValue2 = controlInfo2.getLabel();
+                    if (!(controlInfo2 instanceof XFormsControls.RepeatIterationInfo)) {
+                        {
+                            final String labelValue1 = (controlInfo1 == null) ? null : controlInfo1.getLabel();
+                            final String labelValue2 = controlInfo2.getLabel();
 
-                        if (!((labelValue1 == null && labelValue2 == null) || (labelValue1 != null && labelValue2 != null && labelValue1.equals(labelValue2)))) {
-                            attributesImpl.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, labelValue2 != null ? labelValue2 : "");
+                            if (!((labelValue1 == null && labelValue2 == null) || (labelValue1 != null && labelValue2 != null && labelValue1.equals(labelValue2)))) {
+                                attributesImpl.addAttribute("", "label", "label", ContentHandlerHelper.CDATA, labelValue2 != null ? labelValue2 : "");
+                            }
                         }
-                    }
 
-                    {
-                        final String helpValue1 = (controlInfo1 == null) ? null : controlInfo1.getHelp();
-                        final String helpValue2 = controlInfo2.getHelp();
+                        {
+                            final String helpValue1 = (controlInfo1 == null) ? null : controlInfo1.getHelp();
+                            final String helpValue2 = controlInfo2.getHelp();
 
-                        if (!((helpValue1 == null && helpValue2 == null) || (helpValue1 != null && helpValue2 != null && helpValue1.equals(helpValue2)))) {
-                            attributesImpl.addAttribute("", "help", "help", ContentHandlerHelper.CDATA, helpValue2 != null ? helpValue2 : "");
+                            if (!((helpValue1 == null && helpValue2 == null) || (helpValue1 != null && helpValue2 != null && helpValue1.equals(helpValue2)))) {
+                                attributesImpl.addAttribute("", "help", "help", ContentHandlerHelper.CDATA, helpValue2 != null ? helpValue2 : "");
+                            }
                         }
-                    }
 
-                    {
-                        final String hintValue1 = (controlInfo1 == null) ? null : controlInfo1.getHint();
-                        final String hintValue2 = controlInfo2.getHint();
+                        {
+                            final String hintValue1 = (controlInfo1 == null) ? null : controlInfo1.getHint();
+                            final String hintValue2 = controlInfo2.getHint();
 
-                        if (!((hintValue1 == null && hintValue2 == null) || (hintValue1 != null && hintValue2 != null && hintValue1.equals(hintValue2)))) {
-                            attributesImpl.addAttribute("", "hint", "hint", ContentHandlerHelper.CDATA, hintValue2 != null ? hintValue2 : "");
+                            if (!((hintValue1 == null && hintValue2 == null) || (hintValue1 != null && hintValue2 != null && hintValue1.equals(hintValue2)))) {
+                                attributesImpl.addAttribute("", "hint", "hint", ContentHandlerHelper.CDATA, hintValue2 != null ? hintValue2 : "");
+                            }
                         }
-                    }
 
-                    {
-                        final String alertValue1 = (controlInfo1 == null) ? null : controlInfo1.getAlert();
-                        final String alertValue2 = controlInfo2.getAlert();
+                        {
+                            final String alertValue1 = (controlInfo1 == null) ? null : controlInfo1.getAlert();
+                            final String alertValue2 = controlInfo2.getAlert();
 
-                        if (!((alertValue1 == null && alertValue2 == null) || (alertValue1 != null && alertValue2 != null && alertValue1.equals(alertValue2)))) {
-                            attributesImpl.addAttribute("", "alert", "alert", ContentHandlerHelper.CDATA, alertValue2 != null ? alertValue2 : "");
+                            if (!((alertValue1 == null && alertValue2 == null) || (alertValue1 != null && alertValue2 != null && alertValue1.equals(alertValue2)))) {
+                                attributesImpl.addAttribute("", "alert", "alert", ContentHandlerHelper.CDATA, alertValue2 != null ? alertValue2 : "");
+                            }
                         }
                     }
 
                     // Model item properties
-
                     if (controlInfo1 == null || controlInfo1.isReadonly() != controlInfo2.isReadonly()) {
                         attributesImpl.addAttribute("", XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
                                 XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
@@ -369,7 +371,7 @@ public class XFormsServer extends ProcessorImpl {
                                 ContentHandlerHelper.CDATA, Boolean.toString(controlInfo2.isValid()));
                     }
 
-                    {
+                    if (!(controlInfo2 instanceof XFormsControls.RepeatIterationInfo)) {
                         final String typeValue1 = (controlInfo1 == null) ? null : controlInfo1.getType();
                         final String typeValue2 = controlInfo2.getType();
 
@@ -379,17 +381,27 @@ public class XFormsServer extends ProcessorImpl {
                         }
                     }
 
-                    ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
+                    if (!(controlInfo2 instanceof XFormsControls.RepeatIterationInfo)) {
+                        // Regular control
 
-                    // Get current value if possible for this control
-                    // NOTE: We issue the new value anyway because we don't have yet a mechanism
-                    // to tell the client not to update the value, unlike with attributes which can
-                    // be missing
-                    if (XFormsControls.isValueControl(controlInfo2.getName())) {
-                        ch.text(controlInfo2.getValue());
+                        ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
+
+                        // Get current value if possible for this control
+                        // NOTE: We issue the new value anyway because we don't have yet a mechanism
+                        // to tell the client not to update the value, unlike with attributes which can
+                        // be missing
+                        if (XFormsControls.isValueControl(controlInfo2.getName())) {
+                            ch.text(controlInfo2.getValue());
+                        }
+
+                        ch.endElement();
+                    } else {
+                        // Repeat iteration
+                        final XFormsControls.RepeatIterationInfo repeatIterationInfo = (XFormsControls.RepeatIterationInfo) controlInfo2;
+                        attributesImpl.addAttribute("", "iteration", "iteration", ContentHandlerHelper.CDATA, Integer.toString(repeatIterationInfo.getIteration()));
+
+                        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "repeat-iteration", attributesImpl);
                     }
-
-                    ch.endElement();
                 }
             }
 

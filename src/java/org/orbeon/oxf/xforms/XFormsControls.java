@@ -475,22 +475,6 @@ public class XFormsControls {
 
                 final String controlName = controlElement.getName();
 
-                // Check repeat iteration containers
-                if (currentControlsContainer.getName().equals("repeat")) {
-                    final int currentIteration = Integer.parseInt(effectiveControlId.substring(effectiveControlId.lastIndexOf('-') + 1));
-                    final ControlInfo repeatIterationInfo = new RepeatIterationInfo(currentControlsContainer, currentIteration);
-                    currentControlsContainer.addChild(repeatIterationInfo);
-                    currentControlsContainer = repeatIterationInfo;
-                } else if (currentControlsContainer instanceof RepeatIterationInfo) {
-                    final int currentIteration = Integer.parseInt(effectiveControlId.substring(effectiveControlId.lastIndexOf('-') + 1));
-                    final int containerIteration = ((RepeatIterationInfo) currentControlsContainer).getIteration();
-                    if (currentIteration != containerIteration) {
-                        final ControlInfo repeatIterationInfo = new RepeatIterationInfo(currentControlsContainer.getParent(), currentIteration);
-                        currentControlsContainer.getParent().addChild(repeatIterationInfo);
-                        currentControlsContainer = repeatIterationInfo;
-                    }
-                }
-
                 // Create ControlInfo with basic information
                 final ControlInfo controlInfo;
                 {
@@ -577,17 +561,38 @@ public class XFormsControls {
 
                 // Handle grouping controls
                 if (isGroupingControl(controlName)) {
-                    if (controlName.equals("repeat") && currentControlsContainer instanceof RepeatIterationInfo) {
+                    if (controlName.equals("repeat")) {
                         // Store number of repeat iterations for the effective id
-                        result.setRepeatIterations(effectiveControlId, currentControlsContainer.getParent().getChildren().size());
-                        // Get back to parent of repeat
-                        currentControlsContainer = currentControlsContainer.getParent().getParent();
-                    } else {
-                        currentControlsContainer = currentControlsContainer.getParent();
+                        result.setRepeatIterations(effectiveControlId, currentControlsContainer.getChildren().size());
                     }
+
+                    currentControlsContainer = currentControlsContainer.getParent();
                 }
 
                 return true;
+            }
+
+            public void startRepeatIteration(int iteration) {
+
+                final ControlInfo repeatIterationInfo = new RepeatIterationInfo(currentControlsContainer, iteration);
+                currentControlsContainer.addChild(repeatIterationInfo);
+                currentControlsContainer = repeatIterationInfo;
+
+                // Set current binding for control element
+                final Node currentNode = getCurrentSingleNode();
+
+                // Get model item properties
+                final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(currentNode);
+                if (instanceData != null) {
+                    repeatIterationInfo.setReadonly(instanceData.getReadonly().get());
+                    repeatIterationInfo.setRequired(instanceData.getRequired().get());
+                    repeatIterationInfo.setRelevant(instanceData.getRelevant().get());
+                    repeatIterationInfo.setValid(instanceData.getValid().get());
+                }
+            }
+
+            public void endRepeatIteration(int iteration) {
+                currentControlsContainer = currentControlsContainer.getParent();
             }
         });
 
@@ -710,6 +715,12 @@ public class XFormsControls {
             public boolean endVisitControl(Element controlElement, String effectiveControlId) {
                 return true;
             }
+
+            public void startRepeatIteration(int iteration) {
+            }
+
+            public void endRepeatIteration(int iteration) {
+            }
         });
         return resultMap[0];
     }
@@ -800,8 +811,11 @@ public class XFormsControls {
                         contextStack.push(new BindingContext(currentBindingContext.getModel(), Collections.singletonList(currentNode), true, null));
                         try {
                             // Handle children of xforms:repeat
-                            if (doContinue)
+                            if (doContinue) {
+                                controlElementVisitorListener.startRepeatIteration(currentIndex);
                                 doContinue = handleControls(pipelineContext, controlElementVisitorListener, controlElement, idPostfix + "-" + currentIndex);
+                                controlElementVisitorListener.endRepeatIteration(currentIndex);
+                            }
                         } finally {
                             contextStack.pop();
                         }
@@ -1031,6 +1045,8 @@ public class XFormsControls {
     public static interface ControlElementVisitorListener {
         public boolean startVisitControl(Element controlElement, String effectiveControlId);
         public boolean endVisitControl(Element controlElement, String effectiveControlId);
+        public void startRepeatIteration(int iteration);
+        public void endRepeatIteration(int iteration);
     }
 
     public static interface ControlInfoVisitorListener {
@@ -1057,6 +1073,12 @@ public class XFormsControls {
             }
             public boolean endVisitControl(Element controlElement, String effectiveControlId) {
                 return true;
+            }
+
+            public void startRepeatIteration(int iteration) {
+            }
+
+            public void endRepeatIteration(int iteration) {
             }
         });
 
@@ -1540,7 +1562,7 @@ public class XFormsControls {
     public class RepeatIterationInfo extends ControlInfo {
         private int iteration;
         public RepeatIterationInfo(ControlInfo parent, int iteration) {
-            super(parent, null, "xxforms-repeat-iteration", null);
+            super(parent, null, "xxforms-repeat-iteration", parent.getId());
             this.iteration = iteration;
         }
 

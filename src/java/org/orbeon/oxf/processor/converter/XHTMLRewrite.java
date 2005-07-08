@@ -80,6 +80,18 @@ public class XHTMLRewrite extends ProcessorImpl {
      */
     static final String FORMATTING_URI = "http://orbeon.org/oxf/xml/formatting";
     /**
+     * <!-- XHTML_URI -->
+     * What you think.
+     * @author d
+     */
+    static final String XHTML_URI = "http://www.w3.org/1999/xhtml";
+    /**
+     * <!-- SCRIPT_ELT -->
+     * What you think.
+     * @author d
+     */
+    static final String SCRIPT_ELT = "script";
+    /**
      * <!-- ACTION_ATT -->
      * What you think.
      * @author d
@@ -109,9 +121,12 @@ public class XHTMLRewrite extends ProcessorImpl {
      * @author d
      */
     static final String BACKGROUND_ATT = "background";
-    
-    static final String NOREWRITE_ATT ="url-norewrite";
-    
+    /**
+     * <!-- NOREWRITE_ATT -->
+     * What you think.
+     * @author d
+     */
+    static final String NOREWRITE_ATT = "url-norewrite";
     /**
      * <!-- State -->
      * Base state.  Simply forwards data to the destination content handler and returns itself.
@@ -148,7 +163,7 @@ public class XHTMLRewrite extends ProcessorImpl {
          */
         protected final boolean isPortlet;
         /**
-         * <!-- haveScriptAncestor -->
+         * <!-- scriptDepth -->
          * Could have been another State.  However since the value is determined in one state and
          * then used by a 'descendent' state doing so would have meant that descendent would have
          * to walk it's ancestors to get the value.  So, since making this a field instead of
@@ -156,7 +171,7 @@ public class XHTMLRewrite extends ProcessorImpl {
          * @see XHTMLRewrite  
          * @author d 
          */
-        protected final boolean haveScriptAncestor;
+        protected int scriptDepth;
         /**
          * <!-- depth -->
          * At the moment are state transitions only happen on start element and end element events.
@@ -181,12 +196,12 @@ public class XHTMLRewrite extends ProcessorImpl {
          * @author d
          */
         State( final State stt, final ContentHandler cntntHndlr, final Response rspns
-               , final boolean isPrtlt, final boolean scrptAncstr ) {
+               , final boolean isPrtlt, final int scrptDpth ) {
             previous = stt;
             contentHandler = cntntHndlr;
             response = rspns;
             isPortlet = isPrtlt;
-            haveScriptAncestor = scrptAncstr;
+            scriptDepth = scrptDpth;
         }
         /**
          * <!-- characters -->
@@ -215,6 +230,7 @@ public class XHTMLRewrite extends ProcessorImpl {
         State endElement( final String ns, final String lnam, final String qnam ) 
         throws SAXException {
             depth--;
+            scriptDepthOnEnd( ns, lnam );
             contentHandler.endElement( ns, lnam, qnam );
             final State ret = depth == 0 ? previous : this;
             return ret;
@@ -275,18 +291,23 @@ public class XHTMLRewrite extends ProcessorImpl {
             contentHandler.startDocument();
             return this;
         }
+        final void scriptDepthOnStart( final String ns, final String lnam ) {
+        	if ( XHTML_URI.equals( ns ) && SCRIPT_ELT.equals( lnam ) ) {
+        		scriptDepth++;
+        	}
+        }
+        final void scriptDepthOnEnd( final String ns, final String lnam ) {
+        	if ( XHTML_URI.equals( ns ) && SCRIPT_ELT.equals( lnam ) ) {
+        		scriptDepth--;
+        	}
+        }
         /**
          * <!-- startElement -->
          * @see State
          * @author d
-         */        
-        State startElement
-        ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
-        throws SAXException {
-            depth++;
-            contentHandler.startElement( ns, lnam, qnam, atts );
-            return this;
-        }
+         */
+        abstract State startElement( final String ns, final String lnam, final String qnam, final Attributes atts ) 
+        throws SAXException;
         /**
          * <!-- startPrefixMapping -->
          * @see State
@@ -312,8 +333,8 @@ public class XHTMLRewrite extends ProcessorImpl {
          * @author d
          */
         RootFilter( final State stt, final ContentHandler cntntHnder, final Response rspns
-                    , final boolean isPrtlt, final boolean scrptAncstr ) {
-            super( stt, cntntHnder, rspns, isPrtlt, scrptAncstr );
+                    , final boolean isPrtlt, final int scrptDpth ) {
+            super( stt, cntntHnder, rspns, isPrtlt, scrptDpth );
         }
         /**
          * <!-- startElement -->
@@ -325,7 +346,7 @@ public class XHTMLRewrite extends ProcessorImpl {
         ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
         throws SAXException {
             final State ret = new RewriteState
-                ( this, contentHandler, response, isPortlet, haveScriptAncestor );
+                ( this, contentHandler, response, isPortlet, scriptDepth );
             return ret.startElement( ns, lnam, qnam, atts );
         }
         /**
@@ -411,8 +432,8 @@ public class XHTMLRewrite extends ProcessorImpl {
          * @see State#State(State, ContentHandler, Response, boolean, boolean)
          */
         RewriteState( final State stt, final ContentHandler cntntHndlr, final Response rspns
-                      , final boolean isPrtlt, final boolean scrptAncstr ) {
-            super( stt, cntntHndlr, rspns, isPrtlt, scrptAncstr );
+                      , final boolean isPrtlt, final int scrptDpth ) {
+            super( stt, cntntHndlr, rspns, isPrtlt, scrptDpth );
             final Pattern ptrn = Pattern.compile( "wsrp_rewrite" );
             wsrprewriteMatcher = ptrn.matcher( "" );
         }
@@ -566,45 +587,6 @@ public class XHTMLRewrite extends ProcessorImpl {
             return ret;
         }        
         /**
-         * <!-- handleScript -->
-         * Handler for {http://www.w3.org/1999/xhtml}script.  Assumes namespace test has already 
-         * happened.  Implements : 
-         * <pre>
-         *   <xsl:template match="xhtml:script[@src]" >
-         *     <xsl:copy>
-         *       <xsl:copy-of select="@*[namespace-uri() = '']"/>
-         *         <xsl:attribute name="src">
-         *           <xsl:value-of select="context:rewriteActionURL(@src)"/>
-         *         </xsl:attribute>
-         *         <xsl:apply-templates/>
-         *       </xsl:copy>
-         *   </xsl:template>
-         * </pre>
-         * 
-         * If match is satisfied then modified event is sent to destination contentHandler.
-         * 
-         * @return If handleEltWithResource( "script", "src", ... ) returns non-null then returns
-         *         new RewriteState( this, contentHandler, response, isPortlet, true ) else returns
-         *         null.  The final boolean conveys the fact that there is a script ancestor.
-         * @throws SAXException if destination contentHandler throws SAXException
-         * @see XHTMLRewrite
-         * @see State#State(State, ContentHandler, Response, boolean, boolean)
-         * @see State#haveScriptAncestor
-         * @author d
-         */
-        private State handleScript
-        ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
-        throws SAXException {
-            final State stt = handleEltWithResource( "script", SRC_ATT, ns, lnam, qnam, atts );
-            final State ret;
-            if ( stt == null ) {
-                ret = null;
-            } else {
-                ret = new RewriteState( this, contentHandler, response, isPortlet, true );
-            }
-            return ret;
-        }
-        /**
          * <!-- handleInput -->
          * Handler for {http://www.w3.org/1999/xhtml}input.  Assumes namespace test has already 
          * happened.  Implements : 
@@ -713,7 +695,7 @@ public class XHTMLRewrite extends ProcessorImpl {
                     = atts.getValue( "http://orbeon.org/oxf/xml/portlet", "is-portlet-form" );
                 if ( "true".equals( isPrtltFrm ) ) {
                     ret = new NoRewriteState
-                        ( this, contentHandler, response, isPortlet, haveScriptAncestor );
+                        ( this, contentHandler, response, isPortlet, scriptDepth );
                 } else {
                     ret = this;
                 }
@@ -749,7 +731,7 @@ public class XHTMLRewrite extends ProcessorImpl {
                 while ( wsrprewriteMatcher.find() ) {
                     final int strt = wsrprewriteMatcher.start();
                     final int len = strt - last;
-                    contentHandler.characters( chs, chsStrt + strt, len );
+                    contentHandler.characters( chs, chsStrt + last, len );
                     contentHandler.characters
                         ( WSRP_REWRITE_REPLACMENT_CHARS, 0, WSRP_REWRITE_REPLACMENT_CHARS.length );
                     last = wsrprewriteMatcher.end();
@@ -774,7 +756,7 @@ public class XHTMLRewrite extends ProcessorImpl {
          */
         public State characters( final char[] ch, final int strt, final int len ) 
         throws SAXException {
-            if ( haveScriptAncestor ) {
+            if ( scriptDepth > 0 ) {
                 contentHandler.characters( ch, strt, len );
             } else {
                 final int bufLen = charactersBuf == null ? 0 : charactersBuf.position();  
@@ -883,7 +865,7 @@ public class XHTMLRewrite extends ProcessorImpl {
             State ret = null;
             done : if ( "true".equals( no_urlrewrite ) ) {
             	final State stt = new NoRewriteState
-            	    ( this, contentHandler, response, isPortlet, haveScriptAncestor );
+            	    ( this, contentHandler, response, isPortlet, scriptDepth );
             	ret = stt.startElement( ns, lnam, qnam, atts );
             } else if ( FORMATTING_URI.equals( ns ) && "rewrite".equals( lnam ) ) {
                 flushCharacters();
@@ -903,8 +885,9 @@ public class XHTMLRewrite extends ProcessorImpl {
                 }
             } else {
                 flushCharacters();
-                depth++;
-            	if ( "http://www.w3.org/1999/xhtml".equals( ns ) ) {
+                scriptDepthOnStart( ns, lnam );
+            	if ( XHTML_URI.equals( ns ) ) {
+                    depth++;
                 	ret = handleA( ns, lnam, qnam, atts );
                     if ( ret != null ) break done;
                     
@@ -920,10 +903,12 @@ public class XHTMLRewrite extends ProcessorImpl {
                     ret = handleEltWithResource( "img", SRC_ATT, ns, lnam, qnam, atts );
                     if ( ret != null ) break done;
                     
-                    ret = handleInput( ns, lnam, qnam, atts );
-                    if ( ret != null ) break done;
+                    ret = handleEltWithResource( SCRIPT_ELT, SRC_ATT, ns, lnam, qnam, atts );
+                    if ( ret != null ) {
+                    	break done;
+                    }
                     
-                    ret = handleScript( ns, lnam, qnam, atts );
+                    ret = handleInput( ns, lnam, qnam, atts );
                     if ( ret != null ) break done;
                     
                     ret = handleEltWithResource( "td", BACKGROUND_ATT, ns, lnam, qnam, atts );
@@ -950,8 +935,8 @@ public class XHTMLRewrite extends ProcessorImpl {
      */
     static class NoRewriteState extends State {
         NoRewriteState( final State stt, final ContentHandler cntntHndlr, final Response rspns
-                        , final boolean isPrtlt, final boolean scrptAncstr ) {
-            super( stt, cntntHndlr, rspns, isPrtlt, scrptAncstr );
+                        , final boolean isPrtlt, final int scrptDpth ) {
+            super( stt, cntntHndlr, rspns, isPrtlt, scrptDpth );
         }
         /**
          * <!-- startElement -->
@@ -965,9 +950,10 @@ public class XHTMLRewrite extends ProcessorImpl {
             final State ret;
             if ( "false".equals( no_urlrewrite) ) {
                 final State stt = new RewriteState
-                    ( this, contentHandler, response, isPortlet, haveScriptAncestor );
+                    ( this, contentHandler, response, isPortlet, scriptDepth );
                 ret = stt.startElement( ns, lnam, qnam, atts );
             } else {
+            	scriptDepthOnStart( ns, lnam );
                 final Attributes newAtts = XMLUtils.getAttribsFromDefaultNamespace( atts );
                 contentHandler.startElement( ns, lnam, qnam, newAtts  );
                 depth++;            
@@ -1000,7 +986,7 @@ public class XHTMLRewrite extends ProcessorImpl {
          * @author d
          */
         StatefullHandler( final ContentHandler dst, final Response rspns, final boolean isPrtlt ) {
-            state = new RootFilter( null, dst, rspns, isPrtlt, false );    
+            state = new RootFilter( null, dst, rspns, isPrtlt, 0 );    
         }
         /**
          * <!-- characters -->

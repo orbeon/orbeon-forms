@@ -1032,7 +1032,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 }
                 // Execute the redirect
                 when.addStatement(new ASTProcessorCall(XMLConstants.REDIRECT_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("data", redirectURLData) {{setDebug("redirect 2");}});// {{setDebug("redirect 2");}}
+                    addInput(new ASTInput("data", redirectURLData));// {{setDebug("redirect 2");}}
                 }});
             }
         }

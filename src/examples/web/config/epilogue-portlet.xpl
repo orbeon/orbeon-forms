@@ -99,12 +99,10 @@
         </p:input>
         <p:output name="data" id="themed-data"/>
     </p:processor>
-    <!-- Rewrite all URLs in HTML and XHTML documents -->
-    <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#themed-data"/>
-        <p:input name="container-type" href="#request"/>
-        <p:input name="config" href="oxf:/ops/pfc/url-rewrite.xsl"/>
-        <p:output name="data" id="rewritten-data"/>
+    <!-- Rewrite all URLs in XHTML documents -->
+    <p:processor name="oxf:xhtml-rewrite" >
+        <p:input name="rewrite-in" href="#themed-data" />
+        <p:output name="rewrite-out" id="rewritten-data" />
     </p:processor>
     <!-- Convert and serialize to XML -->
     <p:processor name="oxf:xml-converter">

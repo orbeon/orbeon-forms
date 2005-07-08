@@ -316,6 +316,8 @@ public class XFormsActionInterpreter {
                 final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
                 final Element parentElement;
                 int deletionIndex;
+                final List siblingElements;
+                final int actualIndex;
                 {
                     final String deletionIndexString = currentInstance.evaluateXPathAsString(pipelineContext, xformsControls.getCurrentSingleNode(),
                             "round(" + atAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(actionElement), null, xformsControls.getFunctionLibrary(), null);
@@ -334,12 +336,17 @@ public class XFormsActionInterpreter {
                     final Element indexElement = (Element) collectionToBeUpdated.get(deletionIndex - 1);
 
                     parentElement = indexElement.getParent();
-                    final List siblingElements = parentElement.elements();
-                    final int actualIndex = siblingElements.indexOf(indexElement);
-
-                    // Delete node
-                    siblingElements.remove(actualIndex);
+                    siblingElements = parentElement.elements();
+                    actualIndex = siblingElements.indexOf(indexElement);
                 }
+
+                // Find list of affected repeat ids
+                final Map boundRepeatIds = new HashMap();
+                final Map childrenRepeatIds = new HashMap();
+                findAffectedRepeatIds(pipelineContext, parentElement, boundRepeatIds, childrenRepeatIds);
+
+                // Then only perform the deletion (so that the list above is correct even when the last node is deleted)
+                siblingElements.remove(actualIndex);
 
                 // Rebuild ControlsState
                 final Map previousRepeatIdToIndex = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
@@ -347,38 +354,38 @@ public class XFormsActionInterpreter {
                 final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
                 // Update repeat information for the ids found
-
-                // Find list of affected repeat ids
-                final Map boundRepeatIds = new HashMap();
-                final Map childrenRepeatIds = new HashMap();
-                findAffectedRepeatIds(pipelineContext, parentElement, boundRepeatIds, childrenRepeatIds);
-
-                // Update repeat information for the ids found
                 if (boundRepeatIds.size() != 0 || childrenRepeatIds.size() != 0) {
                     boolean updateInnerRepeats = false;
+                    // Iterate over bound repeat ids
                     for (Iterator i = boundRepeatIds.keySet().iterator(); i.hasNext();) {
                         final String repeatId = (String) i.next();
 
-                        final int currentlySelected = ((Integer) previousRepeatIdToIndex.get(repeatId)).intValue();
-                        if (currentlySelected == deletionIndex) {
-                            if (deletionIndex == collectionToBeUpdated.size()) {
+                        if (collectionToBeUpdated.size() == 1) {
+                            // Delete the last element of the collection: the index must be set to 0
+                            currentControlsState.updateRepeatIndex(repeatId, 0);
+                            updateInnerRepeats = true;
+                        } else {
+                            final int currentlySelected = ((Integer) previousRepeatIdToIndex.get(repeatId)).intValue();
+                            if (currentlySelected == deletionIndex) {
+                                if (deletionIndex == collectionToBeUpdated.size()) {
 
-                                // o "When the last remaining item in the collection is removed,
-                                // the index position becomes 0."
+                                    // o "When the last remaining item in the collection is removed,
+                                    // the index position becomes 0."
 
-                                // o "When the index was pointing to the deleted node, which was
-                                // the last item in the collection, the index will point to the new
-                                // last node of the collection and the index of inner repeats is
-                                // reinitialized."
+                                    // o "When the index was pointing to the deleted node, which was
+                                    // the last item in the collection, the index will point to the new
+                                    // last node of the collection and the index of inner repeats is
+                                    // reinitialized."
 
-                                currentControlsState.updateRepeatIndex(repeatId, currentlySelected - 1);
-                                updateInnerRepeats = true;
-                            } else {
-                                // o "When the index was pointing to the deleted node, which was
-                                // not the last item in the collection, the index position is not
-                                // changed and the index of inner repeats is re-initialized."
+                                    currentControlsState.updateRepeatIndex(repeatId, currentlySelected - 1);
+                                    updateInnerRepeats = true;
+                                } else {
+                                    // o "When the index was pointing to the deleted node, which was
+                                    // not the last item in the collection, the index position is not
+                                    // changed and the index of inner repeats is re-initialized."
 
-                                updateInnerRepeats = true;
+                                    updateInnerRepeats = true;
+                                }
                             }
                         }
                     }
@@ -386,8 +393,7 @@ public class XFormsActionInterpreter {
                     if (updateInnerRepeats) {
                         for (Iterator i = childrenRepeatIds.keySet().iterator(); i.hasNext();) {
                             final String repeatId = (String) i.next();
-                            //final int newIndex = ((Integer) currentControlsState.getInitialRepeatIdToIndex().get(repeatId)).intValue();
-                            final int newIndex = 1;
+                            final int newIndex = (collectionToBeUpdated.size() == 1) ? 0 : 1;
                             currentControlsState.updateRepeatIndex(repeatId, newIndex);
                         }
                     }
@@ -539,12 +545,15 @@ public class XFormsActionInterpreter {
                 if (controlElement.getName().equals("repeat")) {
                     if (foundControlElement == null) {
                         // We are not yet inside a matching xforms:repeat
-                        final Element currentNode = (Element) xformsControls.getCurrentSingleNode();
-                        final Element currentParent = currentNode.getParent();
-                        if (currentParent == parentElement) {
-                            // Found xforms:repeat affected by the change
-                            setRepeatIds.put(controlElement.attributeValue("id"), "");
-                            foundControlElement = controlElement;
+                        final List currentNodeset = xformsControls.getCurrentNodeset();
+                        if (currentNodeset.size() > 0) {
+                            final Element currentNode = (Element) xformsControls.getCurrentSingleNode();
+                            final Element currentParent = currentNode.getParent();
+                            if (currentParent == parentElement) {
+                                // Found xforms:repeat affected by the change
+                                setRepeatIds.put(controlElement.attributeValue("id"), "");
+                                foundControlElement = controlElement;
+                            }
                         }
                     } else {
                         // This xforms:repeat is inside a matching xforms:repeat

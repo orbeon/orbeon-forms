@@ -409,7 +409,7 @@ public class XFormsServer extends ProcessorImpl {
             if (XFormsControls.isGroupingControl(controlInfo2.getName()) || controlInfo2 instanceof XFormsControls.RepeatIterationInfo) {
 
                 final List children1 = (controlInfo1 == null) ? null : controlInfo1.getChildren();
-                final List children2 = controlInfo2.getChildren();
+                final List children2 = (controlInfo2.getChildren() == null) ? Collections.EMPTY_LIST : controlInfo2.getChildren();
 
                 if (controlInfo2 instanceof XFormsControls.RepeatControlInfo && children1 != null) {
 

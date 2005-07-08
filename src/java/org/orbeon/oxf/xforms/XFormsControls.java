@@ -514,30 +514,36 @@ public class XFormsControls {
 
                 // Set current binding for control element
                 final BindingContext currentBindingContext = getCurrentContext();
-                final Node currentNode = currentBindingContext.getSingleNode();
+                final List currentNodeset = currentBindingContext.getNodeset();
 
-                // Get model item properties
-                final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(currentNode);
-                if (instanceData != null) {
-                    controlInfo.setReadonly(instanceData.getReadonly().get());
-                    controlInfo.setRequired(instanceData.getRequired().get());
-                    controlInfo.setRelevant(instanceData.getRelevant().get());
-                    controlInfo.setValid(instanceData.getValid().get());
-                    final int typeCode = instanceData.getType().get();
-                    if (typeCode != 0) {
-                        controlInfo.setType(StandardNames.getPrefix(typeCode) + ":" + StandardNames.getLocalName(typeCode));
+                if (!(controlInfo instanceof RepeatControlInfo && currentNodeset.size() == 0)) {
+                    final Node currentNode = currentBindingContext.getSingleNode();
+
+                    // Get model item properties
+                    final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(currentNode);
+                    if (instanceData != null) {
+                        controlInfo.setReadonly(instanceData.getReadonly().get());
+                        controlInfo.setRequired(instanceData.getRequired().get());
+                        controlInfo.setRelevant(instanceData.getRelevant().get());
+                        controlInfo.setValid(instanceData.getValid().get());
+                        final int typeCode = instanceData.getType().get();
+                        if (typeCode != 0) {
+                            controlInfo.setType(StandardNames.getPrefix(typeCode) + ":" + StandardNames.getLocalName(typeCode));
+                        }
+                    }
+
+                    // If control can have a value, prepare it
+                    // NOTE: We defer the evaluation because some controls like xforms:output can use the index() function
+                    if (controlInfo.isValueControl()) {
+                        controlInfo.prepareValue(pipelineContext, currentBindingContext);
+                        valueControls.add(controlInfo);
                     }
                 }
 
-                // If control can have a value, prepare it
-                // NOTE: We defer the evaluation because some controls like xforms:output can use the index() function
-                if (controlInfo.isValueControl()) {
-                    controlInfo.prepareValue(pipelineContext, currentBindingContext);
-                    valueControls.add(controlInfo);
-                }
-
-                // Handle grouping controls
+                // Add to current controls container
                 currentControlsContainer.addChild(controlInfo);
+
+                // Current grouping control becomes the current controls container
                 if (isGroupingControl(controlName)) {
                     currentControlsContainer = controlInfo;
                 }
@@ -563,7 +569,8 @@ public class XFormsControls {
                 if (isGroupingControl(controlName)) {
                     if (controlName.equals("repeat")) {
                         // Store number of repeat iterations for the effective id
-                        result.setRepeatIterations(effectiveControlId, currentControlsContainer.getChildren().size());
+                        final List children = currentControlsContainer.getChildren();
+                        result.setRepeatIterations(effectiveControlId, (children == null) ? 0 : children.size());
                     }
 
                     currentControlsContainer = currentControlsContainer.getParent();
@@ -1061,12 +1068,15 @@ public class XFormsControls {
         final List[] result = new List[1];
         visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlElementVisitorListener() {
             public boolean startVisitControl(Element controlElement, String effectiveControlId) {
-                final Node currentNode = getCurrentSingleNode();
+                final List currentNodeset = getCurrentNodeset();
+                if (currentNodeset.size() > 0) {
+                    final Node currentNode = getCurrentSingleNode();
 
-                if (currentNode == node) {
-                    if (result[0] == null)
-                        result[0] = new ArrayList();
-                    result[0].add(effectiveControlId);
+                    if (currentNode == node) {
+                        if (result[0] == null)
+                            result[0] = new ArrayList();
+                        result[0].add(effectiveControlId);
+                    }
                 }
 
                 return true;

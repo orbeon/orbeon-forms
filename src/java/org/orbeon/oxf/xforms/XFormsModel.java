@@ -756,7 +756,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             if (xformsRecalculateEvent.isSendEvents() && containingDocument.getXFormsControls() != null) {
                 final XFormsControls xformsControls = containingDocument.getXFormsControls();
                 for (Iterator i = instances.iterator(); i.hasNext();) {
-                    XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new xxx(pipelineContext, xformsControls) {
+                    XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new BoundNodeInstanceWalker(pipelineContext, xformsControls) {
 
                         public void walk(Node node, InstanceData instanceData) {
 
@@ -831,7 +831,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             if (xformsRevalidateEvent.isSendEvents() && containingDocument.getXFormsControls() != null) {
                 final XFormsControls xformsControls = containingDocument.getXFormsControls();
                 for (Iterator i = instances.iterator(); i.hasNext();) {
-                    XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new xxx(pipelineContext, xformsControls) {
+                    XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new BoundNodeInstanceWalker(pipelineContext, xformsControls) {
                         public void walk(Node node, InstanceData instanceData) {
                             // Remember current node
                             setNode(node);
@@ -886,7 +886,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         }
     }
 
-    private static abstract class xxx implements XFormsUtils.InstanceWalker {
+    private static abstract class BoundNodeInstanceWalker implements XFormsUtils.InstanceWalker {
 
         private PipelineContext pipelineContext;
         private XFormsControls xformsControls;
@@ -895,7 +895,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         private boolean mustFindControls = true;
         private List boundControls = null;
 
-        protected xxx(PipelineContext pipelineContext, XFormsControls xformsControls) {
+        protected BoundNodeInstanceWalker(PipelineContext pipelineContext, XFormsControls xformsControls) {
             this.pipelineContext = pipelineContext;
             this.xformsControls = xformsControls;
         }

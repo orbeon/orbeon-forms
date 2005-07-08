@@ -26,37 +26,37 @@
         <xsl:choose>
             <!-- User has logged-in -->
             <xsl:when test="/request-security/remote-user">
-                <p>
+                <xhtml:p>
                     You are now logged in as <b><xsl:value-of
                     select="/request-security/remote-user"/></b> <xsl:text> over a </xsl:text>
                     <b><xsl:if test="/request-security/secure = 'false'">non-</xsl:if>secure</b>
                     <xsl:text> connection.</xsl:text>
-                </p>
-                <p>
+                </xhtml:p>
+                <xhtml:p>
                     The "logout" button below will log you out and bring you back to the
                     PresentationServer examples home page. If from there you come back to this
                     authentication example, you will have to login again.
-                </p>
-                <p>
+                </xhtml:p>
+                <xhtml:p>
                     <xforms:group>
                         <xforms:submit>
                             <xforms:label>Logout</xforms:label>
                             <xforms:setvalue ref="/action">logout</xforms:setvalue>
                         </xforms:submit>
                     </xforms:group>
-                </p>
+                </xhtml:p>
             </xsl:when>
             <!-- User is not logged-in -->
             <xsl:otherwise>
-                <p>
+                <xhtml:p>
                     You are not logged in. This means that you have not yet configured the
-                    authentication in your application server. Please read the <a
-                    href="doc/intro-install">documentation</a> for more information.
-                </p>
+                    authentication in your application server. Please read the <xhtml:a
+                    href="doc/intro-install">documentation</xhtml:a> for more information.
+                </xhtml:p>
             </xsl:otherwise>
         </xsl:choose>
         <xhtml:p>
-            <a href="/">Back</a> to examples page
+            <xhtml:a href="/">Back</xhtml:a> to examples page
         </xhtml:p>
     </xhtml:body>
 </xhtml:html>

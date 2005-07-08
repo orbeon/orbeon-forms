@@ -104,12 +104,8 @@
             <title>Default URL Rewriting</title>
             <p>
                 This section describes the default URL rewriting implementation in Presentation
-                Server. It is implemented in a pipeline called
-                <code>oxf:/ops/pfc/url-rewrite.xsl</code> bundled within <code>orbeon.jar</code>.
-                It is referred to by the default epilogue under
-                <code>oxf:/config/epilogue.xpl</code>, the default error page under
-                <code>oxf:/config/error.xpl</code>, as well as the JSF epilogue example under
-                <code>oxf:/jsf/config/epilogue.xpl</code>.
+                Server. It is implemented in the processors <code>oxf:xhtml-rewrite</code> and 
+                <code>oxf:html-rewrite</code>.
             </p>
             <section>
                 <title>What is Rewritten?</title>
@@ -354,39 +350,6 @@
                     </tr>
                 </table>
             </section>
-        </section>
-        <section>
-            <title>Customizing URL Rewriting</title>
-            <p>
-                There are multiple reasons why the default PresentationServer URL rewriting may
-                need to be modified, including:
-            </p>
-            <ul>
-                <li>Supporting markup languages other than HTML and XHTML</li>
-                <li>
-                    Gaining more control over action URLs and render URLs in Portlets. The current
-                    schema considers that only HTML and XHTML form elements generate actions.
-                    Modifying the default behavior allows you to enable some or all hyperlinks to
-                    generate actions URLs.
-                </li>
-            </ul>
-            <p>
-                To implement your own URL Rewriting, you can either:
-            </p>
-            <ul>
-                <li>
-                    Modify your Page Flow Controller epilogue to no longer point to the default
-                    <code>url-rewrite.xpl</code> and implement your own rewriting algorithm, either
-                    directly in the epilogue or in a stylesheet, pipeline or processor pointed to by
-                    your epilogue.
-                </li>
-                <li>
-                    Use <code>url-rewrite.xsl</code> as a starting point. To do this, extract
-                    <code>url-rewrite.xsl</code> from <code>orbeon.jar</code> and make a local copy
-                    in your resource directory. Make sure your epilogue points to your version of
-                    the rewriting pipeline. Modify your copy according to your needs.
-                </li>
-            </ul>
         </section>
         <section>
             <title>Known Limitations</title>

@@ -111,10 +111,9 @@
         <p:input name="config" href="oxf:/config/theme/theme.xsl"/>
         <p:output name="data" id="themed"/>
     </p:processor>
-    <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#themed"/>
-        <p:input name="config" href="oxf:/ops/pfc/url-rewrite.xsl"/>
-        <p:output name="data" id="html"/>
+    <p:processor name="oxf:xhtml-rewrite">
+        <p:input name="rewrite-in" href="#themed"/>
+        <p:output name="rewrite-out" id="html"/>
     </p:processor>
     <p:processor name="oxf:html-serializer">
         <p:input name="config">

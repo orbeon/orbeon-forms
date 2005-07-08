@@ -173,12 +173,10 @@
         </p:when>
         <!-- Plain HTML detection. No theme is applied, but URLs are rewritten. -->
         <p:when test="/html">
-            <!-- Rewrite all URLs in HTML and XHTML documents -->
-            <p:processor name="oxf:unsafe-xslt">
-                <p:input name="data" href="#xformed-data"/>
-                <p:input name="container-type" href="#request"/>
-                <p:input name="config" href="oxf:/ops/pfc/url-rewrite.xsl"/>
-                <p:output name="data" id="rewritten-data"/>
+            <!-- Rewrite all URLs in HTML documents -->
+            <p:processor name="oxf:html-rewrite" >
+                <p:input debug="xr3" name="rewrite-in" href="#xformed-data" />
+                <p:output name="rewrite-out" id="rewritten-data" />
             </p:processor>
             <!-- Output regular HTML doctype -->
             <p:processor name="oxf:html-converter">

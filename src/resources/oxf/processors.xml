@@ -337,6 +337,10 @@
         <class name="org.orbeon.oxf.processor.converter.XHTMLRewrite"/>
     </processor>
 
+    <processor name="oxf:html-rewrite">
+        <class name="org.orbeon.oxf.processor.converter.HTMLRewrite"/>
+    </processor>
+
     <!-- True serializers -->
     <processor name="oxf:http-serializer" uri="oxf/processor/http-serializer">
         <class name="org.orbeon.oxf.processor.serializer.HttpSerializer"/>

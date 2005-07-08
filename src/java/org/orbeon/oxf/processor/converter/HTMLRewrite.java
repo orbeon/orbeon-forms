@@ -14,17 +14,17 @@
 package org.orbeon.oxf.processor.converter;
 
 /**
- * <!-- XHTMLRewrite -->
+ * <!-- HTMLRewrite -->
  * @see org.orbeon.oxf.processor.converter.AbstractRewrite
  * @author dsmall
  */
-public class XHTMLRewrite extends AbstractRewrite {
+public class HTMLRewrite extends AbstractRewrite {
 	/**
-	 * <!-- XHTMLRewrite -->
-	 * Just calls super( "http://www.w3.org/1999/xhtml" )
+	 * <!-- HTMLRewrite -->
+	 * Just calls super( "" )
 	 *@author d
 	 */
-	public XHTMLRewrite() {
-		super( "http://www.w3.org/1999/xhtml" );
+	public HTMLRewrite() {
+		super( "" );
 	}
 }

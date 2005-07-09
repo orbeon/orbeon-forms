@@ -15,7 +15,7 @@
   xmlns:f="http://orbeon.org/oxf/xml/formatting" 
   xmlns:xhtml="http://www.w3.org/1999/xhtml" 
 >
-    <xhtml:title>Saving State in Session</xhtml:title>
+    <title>Saving State in Session</title>
     <source>model.xpl</source>
     <source>form.xml</source>
     <source>add.xpl</source>

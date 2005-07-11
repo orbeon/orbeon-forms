@@ -13,8 +13,7 @@
 -->
 <example-descriptor>
     <title>XForms Tax Form Example</title>
-    <source>page-flow.xml</source>
-    <source>sample1.xhtml</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             TODO

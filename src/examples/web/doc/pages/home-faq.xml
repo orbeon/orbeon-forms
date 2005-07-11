@@ -117,12 +117,12 @@
                 <title>What does an XML pipeline look like?</title>
 
                     <p>
-                        This particular example illustrates a simple 2-stage XPL pipeline that performs
-                        an XSLT transformation on an XML document that is located on disk, and then
-                        writes the result back to a another file on disk. For more details about XPL,
-                        please see the <a href="/ops/doc/reference-xpl-pipelines">XPL and Pipelines
-                        reference documentation</a>, or the <a
-                        href="/ops/doc/pages/Tutorial.pdf">BizDoc tutorial</a>.
+                        This particular example illustrates a simple 2-stage XPL pipeline that
+                        performs an XSLT transformation on an XML document that is located on disk,
+                        and then writes the result back to a another file on disk. For more details
+                        about XPL, please see the <a href="/ops/doc/reference-xpl-pipelines">XPL and
+                        Pipelines reference documentation</a>, or the <a
+                        href="/ops/doc/pages/Tutorial.pdf">OPS tutorial</a>.
                     </p>
                     <div class="image">
                         <img width="482" height="310" src="pages/2-stage-pipeline.png"/>

@@ -12,25 +12,11 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>XForms Text Controls</title>
-    <source>form.xml</source>
-    <source>view.xsl</source>
+    <title>XForms Controls</title>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
-            Shows the XForms text controls: textfield, password textfield and text area.
+            This example illustrates the XForms controls.
         </p>
-        <ol>
-            <li>The first time you load this page, the first two checkboxes are
-            selected. This is because they are both <a
-            href="source?src=xforms-default/xforms.xml">listed in the XForms
-            Model</a> and are therefore considered as default values.</li>
-
-            <li>If you change the checkbox selection and submit the form, the
-            page is displayed again and the checkboxes are automatically populated
-            per your selection. The includes the case where you have unselected all
-            the checkboxes before submitting the form.</li>
-        </ol>
-        <p>Note: This example uses checkboxes, but the same logic applies to all
-        the XForms controls.</p>
     </description>
 </example-descriptor>

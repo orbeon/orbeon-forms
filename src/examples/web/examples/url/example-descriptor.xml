@@ -13,12 +13,7 @@
 -->
 <example-descriptor>
     <title>HTML Screen-Scraping</title>
-    <source>news/model.xpl</source>
-    <source>weather/model.xpl</source>
-    <source>weather/model-standalone.xpl</source>
-    <source>model.xpl</source>
-    <source>view.xsl</source>
-    <source>page-flow.xml</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             PresentationServer loads resources URLs (<code>oxf:</code>, <code>http:</code>,

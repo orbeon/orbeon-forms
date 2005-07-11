@@ -783,7 +783,7 @@
 <!--        </section>-->
         <anchor id="tutorial"/>
         <section>
-            <title>Running the BizDoc Tutorial Application</title>
+            <title>Running the BizDoc Application from the OPS Tutorial</title>
             <p>
                 To install the standalone BizDoc example application described in the OPS Tutorial,
                 please follow the instructions under <a

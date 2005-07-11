@@ -13,10 +13,7 @@
 -->
 <example-descriptor>
     <title>XSLT Sandbox</title>
-    <source>view.xml</source>
-    <source>run-xsl.xpl</source>
-    <source>initial-xsl.xml</source>
-    <source>page-flow.xml</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             This example demonstrates the use of XSLT 2.0 to transform XML documents. 

@@ -13,11 +13,7 @@
 -->
 <example-descriptor>
     <title>XForms Report Table</title>
-    <source>page-flow.xml</source>
-    <source>form.xml</source>
-    <source>model.xpl</source>
-    <source>view.xsl</source>
-    <source>data.xml</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             This page shows how HTML controls can be mixed with links in the same form to create a

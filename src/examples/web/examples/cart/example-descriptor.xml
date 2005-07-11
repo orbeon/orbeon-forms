@@ -12,24 +12,19 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor 
-  xmlns:f="http://orbeon.org/oxf/xml/formatting" 
-  xmlns:xhtml="http://www.w3.org/1999/xhtml" 
->
+      xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <title>Saving State in Session</title>
-    <source>model.xpl</source>
-    <source>form.xml</source>
-    <source>add.xpl</source>
-    <source>clear.xpl</source>
-    <source>view.xsl</source>
-    <source>page-flow.xml</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
+        
         <xhtml:p>
             This example illustrates the use of the Scope generator and serializer. The <xhtml:a
             href="/doc/processors-generators#ContextGenerator" f:url-type="resource">Scope
-            generator</xhtml:a> retrieves an XML Document from a Request, Session or Application 
+            generator</xhtml:a> retrieves an XML Document from a Request, Session or Application
             context and sends it to a pipeline. The <xhtml:a
             href="/doc/processors-serializers#ContextSerializer" f:url-type="resource">Scope
-            serializer</xhtml:a> stores an XML document to a Request, Session or Application 
+            serializer</xhtml:a> stores an XML document to a Request, Session or Application
             context.
         </xhtml:p>
         <xhtml:p>
@@ -40,10 +35,11 @@
         <xhtml:ul>
             <xhtml:p>
                 <xhtml:li>
-                    <xhtml:a href="../examples/source?src=session%2Fxforms.xml">xforms.xml</xhtml:a>
-                    . This XForms model describes two fields: <xhtml:code>text</xhtml:code> which 
-                    contains the string entered by the user, and <code>action</code> indicates which 
-                    button has been activated.
+                    <xhtml:a
+                    href="../examples/source?src=session%2Fxforms.xml">xforms.xml</xhtml:a>. This
+                    XForms model describes two fields: <xhtml:code>text</xhtml:code> which contains
+                    the string entered by the user, and <code>action</code> indicates which button
+                    has been activated.
                 </xhtml:li>
             </xhtml:p>
 
@@ -63,32 +59,32 @@
                 </xhtml:li>
             </xhtml:p>
 
-            <xhtml:p>
-                <xhtml:li>
-                    <xhtml:a href="../examples/source?src=session%2Fadd.xpl">add.xpl</xhtml:a>. This 
-                    pipeline is called if the <code>action</code> field in the XForms instance is 
-                    set to the value <xhtml:code>add</xhtml:code>. The document currently stored in 
-                    the session is copied,  and the new value is added to the document. Finally, the 
-                    Scope serializer stores the resulting document in the session.
-                </xhtml:li>
-            </xhtml:p>
+            <p>
+                <li>
+                    <a href="../examples/source?src=session%2Fadd.xpl">add.xpl</a>. This pipeline is
+                    called if the <code>action</code> field in the XForms instance is set to the
+                    value <code>add</code>. The document currently stored in the session is copied,
+                    and the new value is added to the document. Finally, the Scope serializer
+                    stores the resulting document in the session.
+                </li>
+            </p>
 
-            <xhtml:p>
-                <xhtml:li>
-                    <xhtml:a href="../examples/source?src=session%2Fclear.xpl">clear.xpl</xhtml:a>. 
-                    This pipeline is called if the <code>action</code> field in the XForms instance 
-                    is set to the value <code>clear</code>. The document currently stored in the
+            <p>
+                <li>
+                    <a href="../examples/source?src=session%2Fclear.xpl">clear.xpl</a>. This
+                    pipeline is called if the <code>action</code> field in the XForms instance is
+                    set to the value <code>clear</code>. The document currently stored in the
                     session is emptied, leaving only a root element.
-                </xhtml:li>
-            </xhtml:p>
+                </li>
+            </p>
 
-            <xhtml:p>
-                <xhtml:li>
-                    <xhtml:a href="../examples/source?src=session%2Fview.xsl">view.xpl</xhtml:a>. 
-                    Finally,  the view converts the cart document into HTML. XForms controls are 
-                    used to display the buttons and the text fields.
-                </xhtml:li>
-            </xhtml:p>
-        </xhtml:ul>
+            <p>
+                <li>
+                    <a href="../examples/source?src=session%2Fview.xsl">view.xpl</a>. Finally,
+                    the view converts the cart document into HTML. XForms controls are used to
+                    display the buttons and the text fields.
+                </li>
+            </p>
+        </ul>
     </description>
 </example-descriptor>

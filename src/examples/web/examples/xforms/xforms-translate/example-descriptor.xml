@@ -13,9 +13,7 @@
 -->
 <example-descriptor>
     <title>Translate This</title>
-    <source>view.xml</source>
-    <source>page-flow.xml</source>
-    <source>translate.xpl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             This translates on the fly the text that you type. Keystrokes are intercepted on the

@@ -13,11 +13,7 @@
 -->
 <example-descriptor>
     <title>Google Spell Checker</title>
-    <source>page-flox.xml</source>
-    <source>xforms-model.xml</source>
-    <source>model.xpl</source>
-    <source>check.xpl</source>
-    <source>view.xsl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         When you perform a search on Google, sometimes Google will <a
         href="http://www.google.com/help/features.html#spell">suggest a more common spelling</a> for

@@ -79,10 +79,21 @@
         <p:output name="data" id="themed-data"/>
     </p:processor>
 
+    <!-- Get container type information -->
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config>
+                <include>/request/container-type</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="container-type"/>
+    </p:processor>
+
     <!-- Rewrite all URLs in HTML and XHTML documents -->
     <p:processor name="oxf:unsafe-xslt">
         <p:input name="data" href="#themed-data"/>
-        <p:input name="config" href="oxf:/ops/pfc/url--rewrite.xsl"/>
+        <p:input name="container-type" href="#container-type"/>
+        <p:input name="config" href="oxf:/ops/pfc/url-rewrite.xsl"/>
         <p:output name="data" ref="data"/>
     </p:processor>
 

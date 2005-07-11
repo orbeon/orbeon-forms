@@ -13,8 +13,7 @@
 -->
 <example-descriptor>
     <title>XForms Repeat</title>
-    <source>page-flow.xml</source>
-    <source>view.xml</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             This example illustrates how to create repeating structures in PresentationServer with

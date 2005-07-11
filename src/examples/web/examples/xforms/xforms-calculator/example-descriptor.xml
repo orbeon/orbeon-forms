@@ -13,11 +13,10 @@
 -->
 <example-descriptor>
     <title>XForms Calculator</title>
-    <source>page-flow.xml</source>
-    <source>calc.xhtml</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
-            TODO
+            This is an example showing a simple calculator written entirely with standard XForms.
         </p>
     </description>
 </example-descriptor>

@@ -12,35 +12,14 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>BizDoc Manipulation</title>
-    <source>page-flow.xml</source>
-    <source>summary/summary-xforms-model.xml</source>
-    <source>summary/summary-model.xpl</source>
-    <source>summary/summary-model.xsd</source>
-    <source>summary/summary-view.xsl</source>
-    <source>summary/new-document-action.xpl</source>
-    <source>summary/find-document-action.xpl</source>
-    <source>summary/delete-documents-action.xpl</source>
-    <source>schema/claim-schema.xsd</source>
-    <source>schema/empty-instance.xml</source>
-    <source>detail/detail-xforms-model.xml</source>
-    <source>detail/detail-view-1.xsl</source>
-    <source>detail/detail-view-2.xsl</source>
-    <source>detail/detail-view-header.xml</source>
-    <source>detail/save-document-action.xpl</source>
-    <source>detail/form-schema.xsd</source>
-    <source>data-access/exist/datasource.xml</source>
-    <source>data-access/exist/list-documents.xpl</source>
-    <source>data-access/exist/create-document.xpl</source>
-    <source>data-access/exist/read-documents.xpl</source>
-    <source>data-access/exist/update-document.xpl</source>
-    <source>data-access/exist/delete-document.xpl</source>
+    <title>BizDoc Example</title>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <p>
             BizDoc is a sample application that illustrates basic business document manipulation.
             Fictitious claim documents are created, read, updated, and deleted from a database. It
             is the basis for the Orbeon PresentationServer Tutorial - please refer to the <a
-            href="/doc/pages/Tutorial.pdf" f:url-type="resource">PresentationServer Tutorial</a> for the complete
+            href="/doc/pages/Tutorial.pdf" f:url-type="resource">OPS Tutorial</a> for the complete
             documentation of this example.
         </p>
     </description>

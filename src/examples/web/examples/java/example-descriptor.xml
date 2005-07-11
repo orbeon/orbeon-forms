@@ -13,9 +13,7 @@
 -->
 <example-descriptor>
     <title>Integrating with Java</title>
-    <source>model.xpl</source>
-    <source html="true">SystemProperties.java.xhtml</source>
-    <source>view.xsl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         This example shows how to create a custom processor, and how to use it in a pipeline through
         the Java processor. Here the custom processor (<a

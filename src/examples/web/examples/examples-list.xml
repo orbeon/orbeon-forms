@@ -59,6 +59,9 @@
     </section>
     <section label="Database App">
         <example id="employees" label="The &quot;Employees&quot; Example"/>
+        <!--
+        <example id="petstore" label="The &quot;Pet Store&quot; Example"/>
+        -->
     </section>
     <section label="Controlling Page Flow">
         <example id="atm" label="ATM Page Flow"/>

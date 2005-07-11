@@ -87,6 +87,7 @@
         <include name="itext-xml-1_02.jar"/>
         <include name="xml-apis-xerces_2_6_2_orbeon.jar"/>
         <include name="pdfbox-0_7_1.jar"/>
+        <include name="ant-1_5_4.jar"/>
     </fileset>
     <fileset id='war.libs.private' dir="${lib.dir}">
       <include name='xercesImpl_2_6_2_orbeon.jar' />

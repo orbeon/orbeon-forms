@@ -13,10 +13,7 @@
 -->
 <example-descriptor>
     <title>California Highway Traffic</title>
-    <source>model.xpl</source>
-    <source>form.xml</source>
-    <source>view.xsl</source>
-    <source>highway.rng</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             This example asks a user to enter a highway number and then displays the current traffic

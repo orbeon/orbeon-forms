@@ -13,10 +13,7 @@
 -->
 <example-descriptor>
     <title>XSLT Knight Tour</title>
-    <source>form.xml</source>
-    <source>model.xpl</source>
-    <source>view.xsl</source>
-    <source>tour.xsl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             This example illustrates the use of XSLT 2.0. It shows the <a

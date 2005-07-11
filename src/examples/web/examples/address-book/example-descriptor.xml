@@ -13,11 +13,7 @@
 -->
 <example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <title>Address Book</title>
-    <source>xforms-model.xml</source>
-    <source>model.xpl</source>
-    <source>view.xsl</source>
-    <source>initialization/init-database.xpl</source>
-    <source>initialization/init-script.xpl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             This example demonstrates a basic use of the <a href="/doc/processors-sql"

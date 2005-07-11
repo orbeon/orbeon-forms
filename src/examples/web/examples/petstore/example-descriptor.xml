@@ -13,6 +13,7 @@
 -->
 <example-descriptor>
     <title>OXF Pet Store</title>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <requires-setup>true</requires-setup>
     <description>
         <h4>About the OXF Pet Store</h4>

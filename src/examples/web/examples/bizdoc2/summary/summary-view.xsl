@@ -31,7 +31,7 @@
     </head>
     <body>
         <div class="maincontent">
-            <xi:include href="view-logo.xml"/>
+            <xi:include href="../view-logo.xml"/>
             <xforms:group ref="/form">
                 <h2 style="margin-top: 0">Available Documents</h2>
                 <table class="gridtable">

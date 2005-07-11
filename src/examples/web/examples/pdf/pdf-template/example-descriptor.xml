@@ -13,6 +13,7 @@
 -->
 <example-descriptor>
     <title>PDF Templates</title>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <p>
 

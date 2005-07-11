@@ -13,12 +13,7 @@
 -->
 <example-descriptor>
 	<title>PDF Upload Example</title>
-	<source>page-flow.xml</source>
-	<source>pdf-form.xml</source>
-	<source>pdf-model.xpl</source>
-	<source>pdf-upload.xpl</source>
-	<source>read-uri.xpl</source>
-	<source>pdf-view.xsl</source>
+	<xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
 	<description>
 		<p>
             You can upload PDF Files with the form.<br/> The uploaded PDF gets processed by the

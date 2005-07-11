@@ -13,18 +13,7 @@
 -->
 <example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting" >
     <title>ATM Page Flow</title>
-    <source>page-flow.xml</source>
-    <source>anything-else-form.xml</source>
-    <source>anything-else-view.xml</source>
-    <source>enter-pin-action.xsl</source>
-    <source>enter-pin-view.xsl</source>
-    <source>low-balance-form.xml</source>
-    <source>low-balance-view.xml</source>
-    <source>see-you-again-view.xml</source>
-    <source>view-account-action.xpl</source>
-    <source>view-account-form.xml</source>
-    <source>view-account-get-balance.xpl</source>
-    <source>view-account-view.xsl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             This example shows how to declare the site navigation logic in the Page Flow

@@ -13,58 +13,12 @@
 -->
 <example-descriptor>
     <title>Employees</title>
-    <source>data-access/initialization/create-database.xpl</source>
-    <source>data-access/initialization/init-database.xpl</source>
-    <source>data-access/initialization/init-script.xpl</source>
-    <source>data-access/auth-info.xpl</source>
-    <source>data-access/create-employee.xpl</source>
-    <source>data-access/delete-all-employees.xpl</source>
-    <source>data-access/delete-employee.xpl</source>
-    <source>data-access/find-all-employees.xpl</source>
-    <source>data-access/find-employee-query.rng</source>
-    <source>data-access/find-employee-reports.xpl</source>
-    <source>data-access/find-employee.xpl</source>
-    <source>data-access/list-employees-query.rng</source>
-    <source>data-access/list-employees.xpl</source>
-    <source>data-access/update-employee.xpl</source>
-    <source>edit-employee/edit-employee-view.xsl</source>
-    <source>edit-employee/edit-employee-xforms-model.xml</source>
-    <source>edit-employee/form-schema.xsd</source>
-    <source>edit-employee/save-employee.xpl</source>
-    <source>export-csv/export-csv-model.xpl</source>
-    <source>export-excel/employees.xls</source>
-    <source>export-excel/export-excel-action.xpl</source>
-    <source>home/home-view.xsl</source>
-    <source>import/import-employees.xpl</source>
-    <source>import/create-hierarchy.xpl</source>
-<!--    <source>import/ParseLines.java</source>-->
-<!--    <source>import/people.txt</source>-->
-    <source>import-excel/import-excel-action.xpl</source>
-    <source>import-excel/import-excel-view.xsl</source>
-    <source>import-excel/import-excel-xforms-model.xml</source>
-    <source>import-ws/import-ws.xpl</source>
-    <source>import-ws/import.wsdl</source>
-    <source>import-ws/view-wsdl.xpl</source>
-    <source>list-employees/delete-employee-action.xpl</source>
-    <source>list-employees/find-employee-action.xpl</source>
-    <source>list-employees/list-employees-model.xpl</source>
-    <source>list-employees/list-employees-view.xsl</source>
-    <source>list-employees/list-employees-xforms-model.xml</source>
-    <source>login/login-error.xsl</source>
-    <source>login/login-view.xsl</source>
-    <source>login/logout.xpl</source>
-    <source>schema/employee-schema.xsd</source>
-    <source>show-reports/show-reports-model.xpl</source>
-    <source>show-reports/show-reports-view.xsl</source>
-    <source>show-reports/show-reports-xforms-model.xml</source>
-    <source>ldap-config.xml</source>
-    <source>page-flow.xml</source>
-    <source>page-flow.xpl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <p>
             This is a sample application for <a href="http://www.orbeon.com/software/">Orbeon
-            PresentationServer</a>. For more information, please refer to the home page of the
-            example application.
+            PresentationServer (OPS)</a>. For more information, please refer to the home page of
+            the example application.
         </p>
     </description>
 </example-descriptor>

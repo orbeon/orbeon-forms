@@ -1,9 +1,6 @@
 <example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting" >
     <title>Instant Messaging and WebServices</title>
-    <source>form.xml</source>
-    <source>view.xsl</source>
-    <source>register.xpl</source>
-    <source>send.xpl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             This page illustrates how the <a href="/doc/processors-messaging-im">Instant Messenger

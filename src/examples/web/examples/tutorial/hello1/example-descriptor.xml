@@ -13,12 +13,11 @@
 -->
 <example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting">
     <title>Hello World Classic</title>
-    <source>page-flow.xml</source>
-    <source>view.xhtml</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
-            Please refer to the <a href="/doc/pages/Tutorial.pdf" f:url-type="resource">Orbeon
-            PresentationServer Tutorial</a> for the complete documentation of this example.
+            Please refer to the <a href="/doc/pages/Tutorial.pdf" f:url-type="resource">OPS
+            Tutorial</a> for the complete documentation of this example.
 		</p>
     </description>
 </example-descriptor>

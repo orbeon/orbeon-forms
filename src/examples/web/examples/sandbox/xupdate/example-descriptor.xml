@@ -13,10 +13,7 @@
 -->
 <example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting" >
     <title>XUpdate Sandbox</title>
-    <source>view.xml</source>
-    <source>run-xupdate.xpl</source>
-    <source>initial-xupdate.xml</source>
-    <source>page-flow.xml</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             This example demonstrates the XUpdate processor. In many cases, XUpdate can be used

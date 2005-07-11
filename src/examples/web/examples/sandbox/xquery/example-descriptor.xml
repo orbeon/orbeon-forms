@@ -13,10 +13,7 @@
 -->
 <example-descriptor>
     <title>XQuery Sandbox</title>
-    <source>view.xml</source>
-    <source>run-xquery.xpl</source>
-    <source>initial-xquery.xml</source>
-    <source>page-flow.xml</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             XQuery is an XML query language being developed by the W3C.

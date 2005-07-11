@@ -13,15 +13,7 @@
 -->
 <example-descriptor>
     <title>XForms Upload Control</title>
-    <source>page-flow.xml</source>
-    <source>main-xforms-model.xml</source>
-    <source>main-model.xml</source>
-    <source>main-view.xml</source>
-    <source>do-db-upload.xpl</source>
-    <source>do-ws-upload.xpl</source>
-    <source>read-uri.xpl</source>
-    <source>uploaded-image-xforms-model.xml</source>
-    <source>uploaded-image-model.xpl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             You can upload JPEG images with the form. The uploaded images are received in the

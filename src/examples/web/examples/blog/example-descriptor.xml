@@ -12,12 +12,13 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>Hello World Page Flow</title>
+    <title>Blog Example</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <p>
-            Please refer to the <a href="/doc/pages/Tutorial.pdf" f:url-type="resource">OPS
-            Tutorial</a> for the complete documentation of this example.
-		</p>
+            This is a sample application for <a href="http://www.orbeon.com/software/">Orbeon
+            PresentationServer (OPS)</a>. For more information, please refer to the home page of
+            the example application.
+        </p>
     </description>
 </example-descriptor>

@@ -13,11 +13,7 @@
 -->
 <example-descriptor>
     <title>XML:DB</title>
-    <source>page-flow.xml</source>
-    <source>form.xml</source>
-    <source>input-document.xml</source>
-    <source>model.xpl</source>
-    <source>view.xsl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             This example illustrates the use of native XML databases through the XML:DB API.

@@ -89,7 +89,7 @@
     <body>
         <div class="maincontent">
             <xforms:group ref="instance('main-instance')">
-                <xi:include href="../summary/view-logo.xml"/>
+                <xi:include href="../view-logo.xml"/>
 
                 <h2 style="margin-top: 0">Document Information</h2>
                 <p>

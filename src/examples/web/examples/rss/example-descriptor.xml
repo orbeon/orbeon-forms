@@ -13,9 +13,7 @@
 -->
 <example-descriptor>
     <title>Create Your Own RSS Feeds</title>
-    <source>form.xml</source>
-    <source>view.xml</source>
-    <source>model.xpl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             With this page you can create an RSS feed from any Web page, by just specifying the URL

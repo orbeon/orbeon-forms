@@ -13,9 +13,7 @@
 -->
 <example-descriptor>
     <title>Image Server</title>
-    <source>form.xml</source>
-    <source>view.xpl</source>
-    <source>image.xpl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         This example illustrates the use of the Image server. You can enable and configure
         different transformations.

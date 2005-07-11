@@ -13,9 +13,7 @@
 -->
 <example-descriptor>
     <title>Counter Page Flow</title>
-    <source>form.xml</source>
-    <source>increment.xsl</source>
-    <source>view.xml</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             This example shows how you can propagate a state from page to page with XForms. Here

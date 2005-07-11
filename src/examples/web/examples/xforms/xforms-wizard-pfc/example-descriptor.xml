@@ -13,11 +13,7 @@
 -->
 <example-descriptor>
     <title>XForms Multi-Screen Wizard</title>
-    <source>form.xml</source>
-    <source>step1-firstname.xml</source>
-    <source>step2-lastname.xml</source>
-    <source>step3-ssn.xml</source>
-    <source>step4-summary.xsl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
          <p>
             In some cases, it makes sense to create a multiple-pages interface to fill out a single

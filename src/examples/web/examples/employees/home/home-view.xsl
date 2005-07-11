@@ -36,8 +36,8 @@
             <h2>What is it?</h2>
             <p>
                 This is a sample application for <a
-                href="http://www.orbeon.com/software/presentation-server">Orbeon
-                PresentationServer</a>. It illustrates the following functionality:
+                href="http://www.orbeon.com/software/presentation-server">Orbeon PresentationServer
+                (OPS)</a>. It illustrates the following functionality:
             </p>
             <ul>
                 <li>CRUD operations, paging and sorting with a SQL backend</li>

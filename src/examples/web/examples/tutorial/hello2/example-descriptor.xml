@@ -13,12 +13,10 @@
 -->
 <example-descriptor>
     <title>Hello World MVC</title>
-    <source>page-flow.xml</source>
-    <source>view.xsl</source>
-    <source>model.xml</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <p>
-            Please refer to the <a href="/doc/pages/Tutorial.pdf" f:url-type="resource">OXF
+            Please refer to the <a href="/doc/pages/Tutorial.pdf" f:url-type="resource">OPS
             Tutorial</a> for the complete documentation of this example.
 		</p>
     </description>

@@ -13,12 +13,7 @@
 -->
 <example-descriptor>
     <title>HTML, PDF, and Excel Reports</title>
-    <source>model.xpl</source>
-    <source>generic-table.xsl</source>
-    <source>pdf.xpl</source>
-    <source>pdf.xsl</source>
-    <source>initialization/init-database.xpl</source>
-    <source>initialization/init-script.xpl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p>
             <img src="/examples/reports/process.png"/>

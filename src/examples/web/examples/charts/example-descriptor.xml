@@ -13,10 +13,7 @@
 -->
 <example-descriptor>
     <title>Charts</title>
-    <source>page-flow.xml</source>
-    <source>xforms-model.xml</source>
-    <source>model.xpl</source>
-    <source>view.xsl</source>
+    <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         This example uses the Chart processor. You can change the values and set chart options to
         produce several types of charts..

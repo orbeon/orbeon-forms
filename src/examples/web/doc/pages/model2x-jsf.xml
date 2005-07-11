@@ -346,7 +346,7 @@
                     RenderKit for JavaServer Faces. It is also available online:
                 </p>
                 <p>
-                    <a href="../examples/source?src=jsf%2Fthemes%2Fjsf-theme.xsl">jsf-theme.xsl</a>
+                    <a href="/goto-source/jsf/themes/jsf-theme.xsl">jsf-theme.xsl</a>
                 </p>
             </section>
             <section>

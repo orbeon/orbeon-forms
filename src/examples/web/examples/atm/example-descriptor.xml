@@ -11,10 +11,10 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting" >
+<example-descriptor>
     <title>ATM Page Flow</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
-    <description>
+    <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
                 This example shows how to declare the site navigation logic in the Page Flow
@@ -27,8 +27,8 @@
                 part lies in the navigation logic between pages.
             </p>
             <p>
-                See the <a href="source?src=atm/page-flow.xml">Page Flow
-                Controller configuration</a> of this application.
+                See the <a href="/goto-source/address-book/page-flow.xml" f:url-type="resource">Page
+                Flow Controller configuration</a> for this example.
             </p>
             <table border="0" cellspacing="0" cellpadding="0">
                 <tr>

@@ -14,14 +14,15 @@
 <example-descriptor>
     <title>XSLT Knight Tour</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
-    <description>
+    <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
                 This example illustrates the use of XSLT 2.0. It shows the <a
-                href="source?src=xslt2%2Ftour.xsl">original <i>Knight's tour</i> example </a> written by
-                Michael Kay. In addition, we pass the start case as a stylesheet parameter and we style
-                the resulting output. <a href="source?src=xslt2%2Fview.xsl">This page view</a> also uses
-                some XSLT 2.0 features, such as sequences and new XPath 2.0 functions.
+                href="/goto-source/knight/tour.xsl" f:url-type="resource">original <i>Knight's
+                tour</i> example </a> written by Michael Kay. In addition, we pass the start case as
+                a stylesheet parameter and we style the resulting output. <a
+                href="/goto-source/knight/view.xsl" f:url-type="resource">This page view</a> also
+                uses some XSLT 2.0 features, such as sequences and new XPath 2.0 functions.
             </p>
             <p>
                 You can find more information on the Saxon Web site: <a

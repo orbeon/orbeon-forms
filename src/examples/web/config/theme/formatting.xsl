@@ -61,7 +61,7 @@
                                 <a href="/{.}"><xsl:value-of select="."/></a>
                             </xsl:when>
                             <xsl:otherwise>
-                                <a href="/examples/source?src={$page/path}/{escape-uri(string(.), true())}">
+                                <a href="/goto-source/{$page/path}/{escape-uri(string(.), true())}">
                                     <xsl:value-of select="string(.)"/>
                                 </a>
                             </xsl:otherwise>

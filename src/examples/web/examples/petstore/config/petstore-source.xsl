@@ -13,11 +13,12 @@
 -->
 <xsl:stylesheet version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:java="http://xml.apache.org/xslt/java">
 
     <!-- Create link to source -->
     <xsl:template match="view-source">
-        <nobr><a href="source?src={java:java.net.URLEncoder.encode(@src)}"><xsl:value-of select="@src"/></a></nobr><br/>
+        <nobr><a href="/goto-source/petstore/{java:java.net.URLEncoder.encode(@src)}" f:url-type="resource"><xsl:value-of select="@src"/></a></nobr><br/>
     </xsl:template>
 
     <!-- Copy other tags -->

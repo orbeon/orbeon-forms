@@ -1,7 +1,7 @@
-<example-descriptor xmlns:f="http://orbeon.org/oxf/xml/formatting" >
+<example-descriptor>
     <title>Instant Messaging and WebServices</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
-    <description>
+    <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
                 This page illustrates how the <a href="/doc/processors-messaging-im">Instant Messenger
@@ -36,26 +36,28 @@
             <h2>How does it Work?</h2>
             <ol>
                 <li>
-                    When you click on <i>register</i>, <a
-                    href="/examples/source?src=im%2Fregister.xpl">register.xpl</a> is executed. It will
-                    use the <a href="/doc/processors-messaging-im">IM processor</a> to send the "OXF
-                    Google is ready" message and to trigger the execution of the pipeline created by <a
-                    href="/examples/source?src=im%2Fresponse-pipeline.xsl">response-pipeline.xsl</a>
-                    when a message is received.
+                    When you click on <i>register</i>, <a href="/goto-source/im/register.xpl"
+                    f:url-type="resource">register.xpl</a> is executed. It will use the <a
+                    href="/doc/processors-messaging-im" f:url-type="resource">IM processor</a> to
+                    send the "OXF Google is ready" message and to trigger the execution of the
+                    pipeline created by <a href="/goto-source/im/response-pipeline.xsl"
+                    f:url-type="resource">response-pipeline.xsl</a> when a message is received.
                 </li>
                 <li>
                     When a message is sent, the pipeline created by <a
-                    href="/examples/source?src=im%2Fresponse-pipeline.xsl">response-pipeline.xsl</a>
-                    calls the <a href="http://www.google.com/apis/">Google Web service</a> with the <a
-                    href="/doc/processors-delegation">delegation processor</a> and sends the result to
-                    the Yahoo! Messenger client with the <a href="../doc/processors-messaging-im">IM
-                    processor</a>.
+                    href="/goto-source/im/response-pipeline.xsl"
+                    f:url-type="resource">response-pipeline.xsl</a> calls the <a
+                    href="http://www.google.com/apis/" f:url-type="resource">Google Web service</a>
+                    with the <a href="/doc/processors-delegation" f:url-type="resource">delegation
+                    processor</a> and sends the result to the Yahoo! Messenger client with the <a
+                    href="/doc/processors-messaging-im" f:url-type="resource">IM processor</a>.
                 </li>
                 <li>
                     After you fill the second form at the bottom of the page and hit the <i>send</i>
-                    button, <a href="/examples/source?src=im%2Fsend.xpl">send.xpl</a> is executed. This
-                    will send a message through the Web service declared in <a
-                    href="/examples/source?src=im%2Fyim-webservice.xpl">yim-webservice.xpl</a>.
+                    button, <a href="/goto-source/im/send.xpl" f:url-type="resource">send.xpl</a> is
+                    executed. This will send a message through the Web service declared in <a
+                    href="/goto-source/im/yim-webservice.xpl"
+                    f:url-type="resource">yim-webservice.xpl</a>.
                 </li>
             </ol>
         </div>

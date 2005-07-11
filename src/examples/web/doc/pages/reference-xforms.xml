@@ -236,11 +236,11 @@
                 </p>
                 <ul>
                     <li>
-                        <a href="../examples/source?src=examples/xforms/xforms-credit-card/xforms-model.xml">xforms-model.xml</a>: the XForms model</li>
+                        <a href="/goto-source/xforms-credit-card/xforms-model.xml">xforms-model.xml</a>: the XForms model</li>
                     <li>
-                        <a href="../examples/source?src=examples/xforms/xforms-credit-card/view.xml">view.xml</a>: the XHTML view using XForms controls</li>
+                        <a href="/goto-source/xforms-credit-card/view.xml">view.xml</a>: the XHTML view using XForms controls</li>
                     <li>
-                        <a href="../examples/source?src=examples/xforms/xforms-credit-card/page-flow.xml">page-flow.xml</a>: declared the page and references the two files above</li>
+                        <a href="/goto-source/xforms-credit-card/page-flow.xml">page-flow.xml</a>: declared the page and references the two files above</li>
                 </ul>
                 <p>
                     We focus here on the XForms model (xforms-model.xml) which is the most interesting
@@ -377,7 +377,8 @@
                         <code>&lt;xforms:bind nodeset="/credit-card/valid" calculate="..."/></code>.
                         <p>
                             The XPath expression checking that the credit card number is valid has
-                            not been included here but you can see it in the <a href="../examples/source?src=examples/xforms/xforms-credit-card/xforms-model.xml">xforms-model.xml</a>.
+                            not been included here but you can see it in the <a
+                            href="/goto-source/xforms-credit-card/xforms-model.xml">xforms-model.xml</a>.
                         </p>
                     </li>
                 </ol>

@@ -93,16 +93,18 @@
             <h4>Inserting and Deleting Records</h4>
             <p>
                 To insert or delete a record, you need to provide an <a
-                href="../examples/source?src=sql%2Fxforms.xml">XForms model</a>. In this case, the model
-                contains four database fields <code>id</code>, <code>first</code>, <code>last</code>,
-                and <code>phone</code>. Additionally, it contains an action field indicating which
-                action is going to take place. You also need to add the necessary XForms controls to the
-                <a href="../examples/source?src=sql%2Fview.xpl">view</a>, including the four text fields
-                and buttons. Modify the <a href="../examples/source?src=sql%2Fmodel.xpl">model
-                pipeline</a> to act depending upon the value of the <code>action</code> form field. This
-                choice is made with the <a href="reference-xpl-pipelines#choose"> <code>p:choose</code>
-                </a> construct. The status information is sent to the view through the
-                <code>status</code> element.
+                href="/goto-source/address-book/xforms-model.xml" f:url-type="resource">XForms
+                model</a>. In this case, the model contains four database fields <code>id</code>,
+                <code>first</code>, <code>last</code>, and <code>phone</code>. Additionally, it
+                contains an action field indicating which action is going to take place. You also
+                need to add the necessary XForms controls to the <a
+                href="/goto-source/address-book/view.vsl" f:url-type="resource">page view</a>,
+                including the four text fields and buttons. Modify the <a
+                href="/goto-source/address-book/model.xpl" f:url-type="resource">page model
+                pipeline</a> to act depending upon the value of the <code>action</code> form field.
+                This choice is made with the <a href="/doc/reference-xpl-pipelines#choose"
+                f:url-type="resource"> <code>p:choose</code> </a> construct. The status information
+                is sent to the view through the <code>status</code> element.
             </p>
             <f:xml-source>
                 <p:choose href="#instance" xmlns:p="http://www.orbeon.com/oxf/pipeline">

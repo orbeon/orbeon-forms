@@ -67,6 +67,7 @@
             <menu-item label="SQL" href="processors-sql"/>
             <menu-item label="XML Databases" href="processors-xmldb"/>
             <menu-item label="LDAP" href="processors-ldap"/>
+            <menu-item label="Directory Scanner" href="processors-directory-scanner"/>
         </menu>
         <menu label="Interoperability">
             <menu-item label="Delegation" href="processors-delegation"/>

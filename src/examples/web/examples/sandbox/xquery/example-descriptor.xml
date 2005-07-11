@@ -21,8 +21,8 @@
             </p>
             <p>
                 This page lets you experiment with the XQuery processor by writing your own XQuery
-                program, and running on a given input document. XQuery support in PresentationServer
-                uses the <a href="http://saxon.sourceforge.net/">Saxon</a> XQuery engine.
+                program, and running on a given input document. XQuery support in OPS uses the <a
+                href="http://saxon.sourceforge.net/">Saxon</a> XQuery engine.
             </p>
             <p>
                 For more information about XQuery, visit the <a

@@ -24,9 +24,9 @@
             <h4>Database Initialization</h4>
             <p>
                 This example necessitates a working database. By default, the test database embedded
-                with PresentationServer is used. A special pipeline, <code>init-database.xpl</code>,
-                creates tables and inserts sample data if the tables don't exist in the database yet.
-                Here is the database schema, containing only one table: <code>create cached table
+                with OPS is used. A special pipeline, <code>init-database.xpl</code>, creates
+                tables and inserts sample data if the tables don't exist in the database yet. Here
+                is the database schema, containing only one table: <code>create cached table
                 oxf_address_book (id identity, first varchar, last varchar, phone varchar)</code>
             </p>
             <h4>Displaying All Records</h4>

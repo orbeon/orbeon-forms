@@ -606,8 +606,18 @@
                 </li>
                 <li>
                     <p>
-                        In order to improve performance URL rewriting has been re-implemented in 
-                        Java.  The new implemetation is accessed through the new rewrite processors 
+                        <b>PDF Processors.</b> TODO
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Directory Scanner Processor.</b> TODO
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        In order to improve performance URL rewriting has been re-implemented in
+                        Java. The new implemetation is accessed through the new rewrite processors
                         <code>oxf:xhtml-rewrite</code> and <code>oxf:html-rewrite</code>.
                     </p>
                 </li>

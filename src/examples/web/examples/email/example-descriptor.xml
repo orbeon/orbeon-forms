@@ -15,12 +15,14 @@
     <title>Email</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
-            This example illustrates the use of the Email processor.
-        </p>
-        <p>
-            The resulting email will look as follows:
-        </p>
-        <img src="/examples/email/result.png"/>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                This example illustrates the use of the Email processor.
+            </p>
+            <p>
+                The resulting email will look as follows:
+            </p>
+            <img src="/examples/email/result.png"/>
+        </div>
     </description>
 </example-descriptor>

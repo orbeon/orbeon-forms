@@ -36,7 +36,16 @@
         <!-- Show a single file -->
         <h2>Source File</h2>
         <p class="source">
-            <xsl:copy-of select="$source"/>
+            <xsl:choose>
+                <xsl:when test="$source/@content-type = 'text/plain'">
+                    <pre>
+                        <xsl:copy-of select="$source/text()"/>
+                    </pre>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:copy-of select="$source"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </p>
     </body>
 </html>

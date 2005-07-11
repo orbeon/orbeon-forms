@@ -15,7 +15,7 @@
     <title>Hello World Page Flow</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
-        <p>
+        <p xmlns="http://www.w3.org/1999/xhtml">
             Please refer to the <a href="/doc/pages/Tutorial.pdf" f:url-type="resource">OPS
             Tutorial</a> for the complete documentation of this example.
 		</p>

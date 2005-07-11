@@ -15,7 +15,7 @@
     <title>XForms Credit Card Verifier</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
+        <p xmlns="http://www.w3.org/1999/xhtml">
             This examples implements a simple XForms credit card verifier that illustrates the use
             of XForms <code>relevant</code> and <code>calculate</code> attributes of the XForms
             model.

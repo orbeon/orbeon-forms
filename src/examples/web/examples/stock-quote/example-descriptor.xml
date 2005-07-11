@@ -15,7 +15,7 @@
     <title>Stock Quote</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
+        <p xmlns="http://www.w3.org/1999/xhtml">
             This example asks a user to enter a company stock symbol and gets the current price for
             that stock calling a document-style Web service.
         </p>

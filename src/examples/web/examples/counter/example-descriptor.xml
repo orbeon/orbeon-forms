@@ -15,26 +15,28 @@
     <title>Counter Page Flow</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
-            This example shows how you can propagate a state from page to page with XForms. Here
-            the state is a number. This number is displayed and you can either:
-        </p>
-        <ul>
-            <li>increment it</li>
-            <li>or set its value to zero.</li>
-        </ul>
-        <p>
-            The state is stored in the instance. The instance is declared as follows in the XForms
-            model. The HTML form is generated in the view. The initial value of the counter is set
-            to zero in the XForms model (see the <code>counter</code> element where the instance is
-            declared). The value of the counter is also displayed in the view with
-            <code>&lt;xforms:output ref="counter"/&gt;</code>.
-        </p>
-        <p>
-            The value of the instance is changed in the model. To make the change, the model needs
-            to know if the user pressed the "reset" or the "increment" button. This is done by
-            looking at the content of the <code>action</code> element in the instance document. The
-            value of this element is set to the <code>id</code> of the button that was pressed.
-        </p>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                This example shows how you can propagate a state from page to page with XForms. Here
+                the state is a number. This number is displayed and you can either:
+            </p>
+            <ul>
+                <li>increment it</li>
+                <li>or set its value to zero.</li>
+            </ul>
+            <p>
+                The state is stored in the instance. The instance is declared as follows in the XForms
+                model. The HTML form is generated in the view. The initial value of the counter is set
+                to zero in the XForms model (see the <code>counter</code> element where the instance is
+                declared). The value of the counter is also displayed in the view with
+                <code>&lt;xforms:output ref="counter"/&gt;</code>.
+            </p>
+            <p>
+                The value of the instance is changed in the model. To make the change, the model needs
+                to know if the user pressed the "reset" or the "increment" button. This is done by
+                looking at the content of the <code>action</code> element in the instance document. The
+                value of this element is set to the <code>id</code> of the button that was pressed.
+            </p>
+        </div>
     </description>
 </example-descriptor>

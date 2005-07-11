@@ -15,7 +15,7 @@
     <title>XForms Calculator</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
+        <p xmlns="http://www.w3.org/1999/xhtml">
             This is an example showing a simple calculator written entirely with standard XForms.
         </p>
     </description>

@@ -45,7 +45,10 @@
                     <base-directory><xsl:value-of select="concat('../../web/', string-join(remove($path, count($path)), '/'))"/></base-directory>
                     <include>**/*.x?l</include>
                     <include>**/*.xhtml</include>
+                    <include>**/*.java</include>
+                    <include>**/*.txt</include>
                     <exclude>example-descriptor.xml</exclude>
+                    <exclude>example-descriptor-files.xml</exclude>
                     <case-sensitive>false</case-sensitive>
                 </config>
             </p:input>
@@ -63,7 +66,7 @@
             <p:input name="config">
                 <source-files xsl:version="2.0">
                     <xsl:for-each select="//file">
-                        <file><xsl:value-of select="replace(@path, '\\', '/')"/></file>
+                        <file size="{@size}"><xsl:value-of select="replace(@path, '\\', '/')"/></file>
                     </xsl:for-each>
                 </source-files>
             </p:input>

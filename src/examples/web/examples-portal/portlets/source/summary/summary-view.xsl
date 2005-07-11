@@ -28,11 +28,14 @@
         <title><xsl:value-of select="$example-descriptor/title"/> - Example Source Code</title>
     </head>
     <body>
-        <h2>Sources Files For This Example</h2>
+        <p>
+            Follow the links to view the files:
+        </p>
         <ul>
             <xsl:for-each select="$example-descriptor/source-files/file">
                 <li>
                     <a href="/{$instance/example-id}/{.}"><xsl:value-of select="."/></a>
+                    (<xsl:value-of select="format-number(@size, '###,##0')"/> bytes)
                 </li>
             </xsl:for-each>
         </ul>

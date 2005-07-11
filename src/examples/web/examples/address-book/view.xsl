@@ -19,7 +19,7 @@
         <xhtml:title>Address Book</xhtml:title>
     </xhtml:head>
     <xhtml:body>
-        <xforms:group>
+        <xforms:group ref="/form">
             <xhtml:table class="gridtable">
                 <xhtml:tr>
                     <xhtml:th>First Name</xhtml:th>
@@ -41,25 +41,25 @@
                         <xhtml:td>
                             <xforms:submit>
                                 <xforms:label>Remove</xforms:label>
-                                <xforms:setvalue ref="form/action">del-<xsl:value-of select="id"/></xforms:setvalue>
+                                <xforms:setvalue ref="action">del-<xsl:value-of select="id"/></xforms:setvalue>
                             </xforms:submit>
                         </xhtml:td>
                     </xhtml:tr>
                 </xsl:for-each>
                 <xhtml:tr>
                     <xhtml:td>
-                        <xforms:input ref="form/first"/>
+                        <xforms:input ref="first"/>
                     </xhtml:td>
                     <xhtml:td>
-                        <xforms:input ref="form/last"/>
+                        <xforms:input ref="last"/>
                     </xhtml:td>
                     <xhtml:td>
-                        <xforms:input ref="form/phone"/>
+                        <xforms:input ref="phone"/>
                     </xhtml:td>
                     <xhtml:td>
                         <xforms:submit>
                             <xforms:label>Add</xforms:label>
-                            <xforms:setvalue ref="form/action">add</xforms:setvalue>
+                            <xforms:setvalue ref="action">add</xforms:setvalue>
                         </xforms:submit>
                     </xhtml:td>
                 </xhtml:tr>

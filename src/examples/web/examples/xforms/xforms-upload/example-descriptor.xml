@@ -15,27 +15,29 @@
     <title>XForms Upload Control</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
-            You can upload JPEG images with the form. The uploaded images are received in the
-            XForms instance as an <code>xs:anyURI</code> type, and then either sent directly to the
-            Web browser, to an external Web service, or as a BLOB to a relational database (the
-            latter requires some configuration).
-        </p>
-        <p>
-            In the case of the simple file upload, the first image is sent directly to the Web
-            browser. The model makes sure that the Binary serializer is used, and no page view is
-            called.
-        </p>
-        <p>
-            The external Web Service stores the images on a public server and returns for each image
-            an URL that points to the image data. The URL is then used to refer to the uploaded
-            image from this page.
-        </p>
-        <p>
-            When uploading the result to a database, images are streamed to the database and stored
-            as BLOBs. An URL is generated to identify the first image in the database. When reading
-            the image, a separate model is used to retrieve the image from the BLOB and send it to
-            the Binary serializer.
-        </p>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                You can upload JPEG images with the form. The uploaded images are received in the
+                XForms instance as an <code>xs:anyURI</code> type, and then either sent directly to the
+                Web browser, to an external Web service, or as a BLOB to a relational database (the
+                latter requires some configuration).
+            </p>
+            <p>
+                In the case of the simple file upload, the first image is sent directly to the Web
+                browser. The model makes sure that the Binary serializer is used, and no page view is
+                called.
+            </p>
+            <p>
+                The external Web Service stores the images on a public server and returns for each image
+                an URL that points to the image data. The URL is then used to refer to the uploaded
+                image from this page.
+            </p>
+            <p>
+                When uploading the result to a database, images are streamed to the database and stored
+                as BLOBs. An URL is generated to identify the first image in the database. When reading
+                the image, a separate model is used to retrieve the image from the BLOB and send it to
+                the Binary serializer.
+            </p>
+        </div>
     </description>
 </example-descriptor>

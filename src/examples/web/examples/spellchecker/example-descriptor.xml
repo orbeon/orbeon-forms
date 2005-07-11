@@ -15,10 +15,13 @@
     <title>Google Spell Checker</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        When you perform a search on Google, sometimes Google will <a
-        href="http://www.google.com/help/features.html#spell">suggest a more common spelling</a> for
-        some of the word you searched. On this page, we use this feature to "spell check" some text
-        you provide. Since Google has a limit on the number of words that can be searched, this page
-        will send a query to Google for each block of 5 words in the text you provide.
+        <p xmlns="http://www.w3.org/1999/xhtml">
+            When you perform a search on Google, sometimes Google will <a
+            href="http://www.google.com/help/features.html#spell">suggest a more common spelling</a>
+            for some of the word you searched. On this page, we use this feature to "spell check"
+            some text you provide. Since Google has a limit on the number of words that can be
+            searched, this page will send a query to Google for each block of 5 words in the text
+            you provide.
+        </p>
     </description>
 </example-descriptor>

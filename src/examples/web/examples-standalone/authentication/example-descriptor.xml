@@ -21,21 +21,23 @@
     <source>login-form.xml</source>
     <source>logout.xpl</source>
     <description>
-        <p>
-            This example shows how:
-        </p>
-        <ul>
-            <li>You can restrict the access to a page with the standard mechanism provided in your application server</li>
-            <li>You can programmatically obtain the name of the currently logged in user, as well as other security related information</li>
-            <li>You can implement a "logout" feature</li>
-        </ul>
-        <p>
-            If you are not logged in (e.g. the first time you access this page), you will be
-            redirected to a login page. After you have successfully logged in, a page will display
-            your user name and other authentication information.
-        </p>
-        <p>
-            Use admin/password as username and password.
-        </p>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                This example shows how:
+            </p>
+            <ul>
+                <li>You can restrict the access to a page with the standard mechanism provided in your application server</li>
+                <li>You can programmatically obtain the name of the currently logged in user, as well as other security related information</li>
+                <li>You can implement a "logout" feature</li>
+            </ul>
+            <p>
+                If you are not logged in (e.g. the first time you access this page), you will be
+                redirected to a login page. After you have successfully logged in, a page will display
+                your user name and other authentication information.
+            </p>
+            <p>
+                Use admin/password as username and password.
+            </p>
+        </div>
     </description>
 </example-descriptor>

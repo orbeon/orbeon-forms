@@ -15,9 +15,12 @@
     <title>Integrating with Java</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        This example shows how to create a custom processor, and how to use it in a pipeline through
-        the Java processor. Here the custom processor (<a
-        href="/javaprocessor/SystemProperties.java.html">view source</a>) generates an XML document
-        with the Java system properties. The properties are then displayed in a table by the view.
+        <p xmlns="http://www.w3.org/1999/xhtml">
+            This example shows how to create a custom processor, and how to use it in a pipeline
+            through the Java processor. Here the custom processor (<a
+            href="/javaprocessor/SystemProperties.java.html">view source</a>) generates an XML
+            document with the Java system properties. The properties are then displayed in a table
+            by the view.
+        </p>
     </description>
 </example-descriptor>

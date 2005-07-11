@@ -15,16 +15,18 @@
     <title>XUpdate Sandbox</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
-            This example demonstrates the XUpdate processor. In many cases, XUpdate can be used
-            instead of XSLT to transform documents. This example demonstrates the XUpdate processor,
-            which implements XUpdate as well as some extensions.
-        </p>
-        <p>
-            For more information about XUpdate, visit the <a
-            href="http://www.xmldb.org/xupdate/">XUpdate Web site</a>. For more information about
-            the XUpdate processor, see the <a href="/doc/processors-xupdate"
-            f:url-type="resource">documentation</a>.
-        </p>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                This example demonstrates the XUpdate processor. In many cases, XUpdate can be used
+                instead of XSLT to transform documents. This example demonstrates the XUpdate
+                processor, which implements XUpdate as well as some extensions.
+            </p>
+            <p>
+                For more information about XUpdate, visit the <a
+                href="http://www.xmldb.org/xupdate/">XUpdate Web site</a>. For more information
+                about the XUpdate processor, see the <a href="/doc/processors-xupdate"
+                f:url-type="resource">documentation</a>.
+            </p>
+        </div>
     </description>
 </example-descriptor>

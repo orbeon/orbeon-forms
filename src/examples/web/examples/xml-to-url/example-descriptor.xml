@@ -15,7 +15,7 @@
     <title>XML to URL</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
+        <p xmlns="http://www.w3.org/1999/xhtml">
             This example illustrates the use of <a href="http://tinyurl.com/">TinyURL.com</a> to
             create short URLs referring to XML documents. It also shows how to call Java libraries
             from XSLT.

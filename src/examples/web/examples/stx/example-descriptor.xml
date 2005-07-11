@@ -15,13 +15,15 @@
     <title>Streaming Transformations</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
-            This example illustrates the use of the Streaming Transformations for XML (STX)
-            processor. It simply sorts a list of numbers using the STX transformation language.
-        </p>
-        <p>
-            For more information on Joost, the STX implementation used, please refer to <a
-            href="http://joost.sourceforge.net/">http://joost.sourceforge.net/</a>.
-        </p>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                This example illustrates the use of the Streaming Transformations for XML (STX)
+                processor. It simply sorts a list of numbers using the STX transformation language.
+            </p>
+            <p>
+                For more information on Joost, the STX implementation used, please refer to <a
+                href="http://joost.sourceforge.net/">http://joost.sourceforge.net/</a>.
+            </p>
+        </div>
     </description>
 </example-descriptor>

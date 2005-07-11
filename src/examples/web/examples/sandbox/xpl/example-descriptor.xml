@@ -15,9 +15,9 @@
     <title>XPL Sandbox</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
-            This examples illustrates the use of XPL, the PresentationServer XML Pipeline
-            Definition Language, to transform XML documents.
+        <p xmlns="http://www.w3.org/1999/xhtml">
+            This examples illustrates the use of XPL, the OPS XML Pipeline Definition Language, to
+            transform XML documents.
         </p>
     </description>
 </example-descriptor>

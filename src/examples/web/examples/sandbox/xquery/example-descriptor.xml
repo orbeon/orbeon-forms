@@ -15,17 +15,19 @@
     <title>XQuery Sandbox</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
-            XQuery is an XML query language being developed by the W3C.
-        </p>
-        <p>
-            This page lets you experiment with the XQuery processor by writing your own XQuery
-            program, and running on a given input document. XQuery support in PresentationServer
-            uses the <a href="http://saxon.sourceforge.net/">Saxon</a> XQuery engine.
-        </p>
-        <p>
-            For more information about XQuery, visit the <a
-            href="http://www.w3.org/TR/xquery/">XQuery Web site</a>.
-        </p>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                XQuery is an XML query language being developed by the W3C.
+            </p>
+            <p>
+                This page lets you experiment with the XQuery processor by writing your own XQuery
+                program, and running on a given input document. XQuery support in PresentationServer
+                uses the <a href="http://saxon.sourceforge.net/">Saxon</a> XQuery engine.
+            </p>
+            <p>
+                For more information about XQuery, visit the <a
+                href="http://www.w3.org/TR/xquery/">XQuery Web site</a>.
+            </p>
+        </div>
     </description>
 </example-descriptor>

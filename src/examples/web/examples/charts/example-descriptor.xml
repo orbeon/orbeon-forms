@@ -15,7 +15,9 @@
     <title>Charts</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        This example uses the Chart processor. You can change the values and set chart options to
-        produce several types of charts..
+        <p xmlns="http://www.w3.org/1999/xhtml">
+            This example uses the Chart processor. You can change the values and set chart options
+            to produce several types of charts.
+        </p>
     </description>
 </example-descriptor>

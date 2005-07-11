@@ -15,106 +15,108 @@
     <title>Address Book</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
-            This example demonstrates a basic use of the <a href="/doc/processors-sql"
-            f:url-type="resource">SQL processor</a>. It implements a simple address book, allowing
-            the user to add and remove entries to a SQL database.
-        </p>
-        <h4>Database Initialization</h4>
-        <p>
-            This example necessitates a working database. By default, the test database embedded
-            with PresentationServer is used. A special pipeline, <code>init-database.xpl</code>,
-            creates tables and inserts sample data if the tables don't exist in the database yet.
-            Here is the database schema, containing only one table: <code>create cached table
-            oxf_address_book (id identity, first varchar, last varchar, phone varchar)</code>
-        </p>
-        <h4>Displaying All Records</h4>
-        <p>
-            This example displays the content of the table in the database. <code>model.xpl</code>
-            generates data in the XML syntax shown below:
-        </p>
-        <f:xml-source>
-            <friends>
-                <friend>
-                    <id>0</id>
-                    <first>John</first>
-                    <last>Smith</last>
-                    <phone>555-1234</phone>
-                </friend>
-                <friend>
-                    <id>1</id>
-                    <first>Terry</first>
-                    <last>Moore</last>
-                    <phone>555-5678</phone>
-                </friend>
-            </friends>
-        </f:xml-source>
-        <p>
-            The snippet below shows the SQL Processor configuration. The <code>sql:query</code>
-            element contains the SQL statement, selecting all rows from the <code>friends</code>
-            table. The <code>sql:results</code> and <code>sql:row-result</code> elements construct
-            the document one row at a time.
-        </p>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                This example demonstrates a basic use of the <a href="/doc/processors-sql"
+                f:url-type="resource">SQL processor</a>. It implements a simple address book, allowing
+                the user to add and remove entries to a SQL database.
+            </p>
+            <h4>Database Initialization</h4>
+            <p>
+                This example necessitates a working database. By default, the test database embedded
+                with PresentationServer is used. A special pipeline, <code>init-database.xpl</code>,
+                creates tables and inserts sample data if the tables don't exist in the database yet.
+                Here is the database schema, containing only one table: <code>create cached table
+                oxf_address_book (id identity, first varchar, last varchar, phone varchar)</code>
+            </p>
+            <h4>Displaying All Records</h4>
+            <p>
+                This example displays the content of the table in the database. <code>model.xpl</code>
+                generates data in the XML syntax shown below:
+            </p>
+            <f:xml-source>
+                <friends>
+                    <friend>
+                        <id>0</id>
+                        <first>John</first>
+                        <last>Smith</last>
+                        <phone>555-1234</phone>
+                    </friend>
+                    <friend>
+                        <id>1</id>
+                        <first>Terry</first>
+                        <last>Moore</last>
+                        <phone>555-5678</phone>
+                    </friend>
+                </friends>
+            </f:xml-source>
+            <p>
+                The snippet below shows the SQL Processor configuration. The <code>sql:query</code>
+                element contains the SQL statement, selecting all rows from the <code>friends</code>
+                table. The <code>sql:results</code> and <code>sql:row-result</code> elements construct
+                the document one row at a time.
+            </p>
 
-        <f:xml-source>
-            <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
-                <sql:connection>
-                    <sql:execute>
-                        <sql:query>select * from friends</sql:query>
-                        <sql:results>
-                            <friends>
-                                <sql:row-results>
-                                    <friend>
-                                        <id>
-                                            <sql:get-column type="xs:string" column="id"/>
-                                        </id>
-                                        <first>
-                                            <sql:get-column type="xs:string" column="first"/>
-                                        </first>
-                                        <last>
-                                            <sql:get-column type="xs:string" column="last"/>
-                                        </last>
-                                        <phone>
-                                            <sql:get-column type="xs:string" column="phone"/>
-                                        </phone>
-                                    </friend>
-                                </sql:row-results>
-                            </friends>
-                        </sql:results>
-                    </sql:execute>
-                </sql:connection>
-            </sql:config>
-        </f:xml-source>
-        <p>
-            Finally, <code>view.xsl</code> transforms the result document into HTML with a simple
-            XSLT stylesheet.
-        </p>
-        <h4>Inserting and Deleting Records</h4>
-        <p>
-            To insert or delete a record, you need to provide an <a
-            href="../examples/source?src=sql%2Fxforms.xml">XForms model</a>. In this case, the model
-            contains four database fields <code>id</code>, <code>first</code>, <code>last</code>,
-            and <code>phone</code>. Additionally, it contains an action field indicating which
-            action is going to take place. You also need to add the necessary XForms controls to the
-            <a href="../examples/source?src=sql%2Fview.xpl">view</a>, including the four text fields
-            and buttons. Modify the <a href="../examples/source?src=sql%2Fmodel.xpl">model
-            pipeline</a> to act depending upon the value of the <code>action</code> form field. This
-            choice is made with the <a href="reference-xpl-pipelines#choose"> <code>p:choose</code>
-            </a> construct. The status information is sent to the view through the
-            <code>status</code> element.
-        </p>
-        <f:xml-source>
-            <p:choose href="#instance" xmlns:p="http://www.orbeon.com/oxf/pipeline">
-                <p:when test="/form/action='add'">
-                    <status>Inserted record</status>
-                </p:when>
-                <p:when test="starts-with(/form/action, 'del-')">
-                    <status>Deleted record</status>
-                </p:when>
-                <p:otherwise>
-                    <status>Read data</status>
-                </p:otherwise>
-            </p:choose>
-        </f:xml-source>
+            <f:xml-source>
+                <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
+                    <sql:connection>
+                        <sql:execute>
+                            <sql:query>select * from friends</sql:query>
+                            <sql:results>
+                                <friends>
+                                    <sql:row-results>
+                                        <friend>
+                                            <id>
+                                                <sql:get-column type="xs:string" column="id"/>
+                                            </id>
+                                            <first>
+                                                <sql:get-column type="xs:string" column="first"/>
+                                            </first>
+                                            <last>
+                                                <sql:get-column type="xs:string" column="last"/>
+                                            </last>
+                                            <phone>
+                                                <sql:get-column type="xs:string" column="phone"/>
+                                            </phone>
+                                        </friend>
+                                    </sql:row-results>
+                                </friends>
+                            </sql:results>
+                        </sql:execute>
+                    </sql:connection>
+                </sql:config>
+            </f:xml-source>
+            <p>
+                Finally, <code>view.xsl</code> transforms the result document into HTML with a simple
+                XSLT stylesheet.
+            </p>
+            <h4>Inserting and Deleting Records</h4>
+            <p>
+                To insert or delete a record, you need to provide an <a
+                href="../examples/source?src=sql%2Fxforms.xml">XForms model</a>. In this case, the model
+                contains four database fields <code>id</code>, <code>first</code>, <code>last</code>,
+                and <code>phone</code>. Additionally, it contains an action field indicating which
+                action is going to take place. You also need to add the necessary XForms controls to the
+                <a href="../examples/source?src=sql%2Fview.xpl">view</a>, including the four text fields
+                and buttons. Modify the <a href="../examples/source?src=sql%2Fmodel.xpl">model
+                pipeline</a> to act depending upon the value of the <code>action</code> form field. This
+                choice is made with the <a href="reference-xpl-pipelines#choose"> <code>p:choose</code>
+                </a> construct. The status information is sent to the view through the
+                <code>status</code> element.
+            </p>
+            <f:xml-source>
+                <p:choose href="#instance" xmlns:p="http://www.orbeon.com/oxf/pipeline">
+                    <p:when test="/form/action='add'">
+                        <status>Inserted record</status>
+                    </p:when>
+                    <p:when test="starts-with(/form/action, 'del-')">
+                        <status>Deleted record</status>
+                    </p:when>
+                    <p:otherwise>
+                        <status>Read data</status>
+                    </p:otherwise>
+                </p:choose>
+            </f:xml-source>
+        </div>
     </description>
 </example-descriptor>

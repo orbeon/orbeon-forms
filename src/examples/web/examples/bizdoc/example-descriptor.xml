@@ -15,7 +15,7 @@
     <title>BizDoc Example</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
-        <p>
+        <p xmlns="http://www.w3.org/1999/xhtml">
             BizDoc is a sample application that illustrates basic business document manipulation.
             Fictitious claim documents are created, read, updated, and deleted from a database. It
             is the basis for the Orbeon PresentationServer Tutorial - please refer to the <a

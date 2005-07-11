@@ -33,7 +33,9 @@
                 <xsl:variable name="examples-list" select="document('oxf:/examples/examples-list.xml')" as="document-node()"/>
                 <xsl:variable name="example-id" select="/*/example-id" as="xs:string"/>
                 <xsl:variable name="example" select="$examples-list//example[@id = $example-id]" as="element()"/>
-                <url><xsl:value-of select="concat('oxf:/examples/', if ($example/@path) then $example/@path else $example/@id, '/', string(/*/source-url))"/></url>
+                <xsl:variable name="url" select="concat('oxf:/examples/', if ($example/@path) then $example/@path else $example/@id, '/', string(/*/source-url))" as="xs:string"/>
+                <url><xsl:value-of select="$url"/></url>
+                <content-type><xsl:value-of select="if (ends-with($url, '.txt') or ends-with($url, '.java')) then 'text/plain' else 'application/xml'"/></content-type>
             </config>
         </p:input>
         <p:output name="data" id="url-config"/>
@@ -44,23 +46,33 @@
         <p:output name="data" id="source-file"/>
     </p:processor>
 
-    <p:processor name="oxf:xslt">
-        <p:input name="data" href="#source-file"/>
-        <p:input name="config">
-            <xsl:stylesheet version="2.0">
-                <xsl:include href="oxf:/config/theme/xml-formatting.xsl"/>
-                <xsl:template match="/">
-                    <source>
-                        <xsl:apply-templates mode="xml-formatting"/>
-                    </source>
-                </xsl:template>
-            </xsl:stylesheet>
-        </p:input>
-        <p:output name="data" id="source" debug="xxxsource"/>
-    </p:processor>
+    <p:choose href="#url-config">
+        <p:when test="/*/content-type = 'application/xml'">
+            <p:processor name="oxf:xslt">
+                <p:input name="data" href="#source-file"/>
+                <p:input name="config">
+                    <xsl:stylesheet version="2.0">
+                        <xsl:include href="oxf:/config/theme/xml-formatting.xsl"/>
+                        <xsl:template match="/">
+                            <document content-type="application/xml">
+                                <xsl:apply-templates mode="xml-formatting"/>
+                            </document>
+                        </xsl:template>
+                    </xsl:stylesheet>
+                </p:input>
+                <p:output name="data" id="formatted-source" debug="xxxsource1"/>
+            </p:processor>
+        </p:when>
+        <p:otherwise>
+            <p:processor name="oxf:identity">
+                <p:input name="data" href="#source-file"/>
+                <p:output name="data" id="formatted-source" debug="xxxsource2"/>
+            </p:processor>
+        </p:otherwise>
+    </p:choose>
 
     <p:processor name="oxf:identity">
-        <p:input name="data" href="aggregate('root', #example-descriptor, #source)"/>
+        <p:input name="data" href="aggregate('root', #example-descriptor, #formatted-source)"/>
         <p:output name="data" ref="data"/>
     </p:processor>
 

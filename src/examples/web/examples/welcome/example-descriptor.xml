@@ -15,7 +15,7 @@
     <title>Welcome</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
+        <p xmlns="http://www.w3.org/1999/xhtml">
             This is a welcome page for the OPS examples. Please refer to the main page of the
             example for more information.
 		</p>

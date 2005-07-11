@@ -15,31 +15,33 @@
     <title>ATM Page Flow</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
-        <p>
-            This example shows how to declare the site navigation logic in the Page Flow
-            Controller configuration. This way the site navigation logic is kept separate from the
-            pages themselves, thus achieving a better separation of concerns.
-        </p>
-        <p>
-            This example emulates a very simple ATM machine. The diagram on the right exposes the
-            logic of the ATM. Each page in this application is extremely simple and the interesting
-            part lies in the navigation logic between pages.
-        </p>
-        <p>
-            See the <a href="source?src=atm/page-flow.xml">Page Flow
-            Controller configuration</a> of this application.
-        </p>
-        <table border="0" cellspacing="0" cellpadding="0">
-            <tr>
-                <td style="text-align: center">
-                    <img src="/examples/atm/site-navigation.png" style="padding: 0.5em 1em" width="366" height="439"/>
-                </td>
-            </tr>
-            <tr>
-                <td style="font-style: italic; text-align: center">
-                    Navigation logic in the ATM application
-                </td>
-            </tr>
-        </table>
+        <div xmlns="http://www.w3.org/1999/xhtml">
+            <p>
+                This example shows how to declare the site navigation logic in the Page Flow
+                Controller configuration. This way the site navigation logic is kept separate from the
+                pages themselves, thus achieving a better separation of concerns.
+            </p>
+            <p>
+                This example emulates a very simple ATM machine. The diagram on the right exposes the
+                logic of the ATM. Each page in this application is extremely simple and the interesting
+                part lies in the navigation logic between pages.
+            </p>
+            <p>
+                See the <a href="source?src=atm/page-flow.xml">Page Flow
+                Controller configuration</a> of this application.
+            </p>
+            <table border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td style="text-align: center">
+                        <img src="/examples/atm/site-navigation.png" style="padding: 0.5em 1em" width="366" height="439"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-style: italic; text-align: center">
+                        Navigation logic in the ATM application
+                    </td>
+                </tr>
+            </table>
+        </div>
     </description>
 </example-descriptor>

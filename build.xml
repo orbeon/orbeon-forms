@@ -108,8 +108,9 @@
 
         <property name="src.dir" value="src"/>
         <property name="java-src.dir" value="${src.dir}/java"/>
-        <property name="web-examples-src.dir" value="${src.dir}/examples/web"/>
-        <property name="cli-examples-src.dir" value="${src.dir}/examples/cli"/>
+        <property name="examples-src.dir" value="${src.dir}/examples"/>
+        <property name="web-examples-src.dir" value="${examples-src.dir}/web"/>
+        <property name="cli-examples-src.dir" value="${examples-src.dir}/cli"/>
         <property name="resources.dir" value="${src.dir}/resources"/>
         <property name="test-src.dir" value="test/src"/>
 
@@ -333,6 +334,12 @@
             </fileset>
         </javadoc>
     </target>
+    
+    <target name="orbeon-source-files-list" depends="prepare">
+        <java classname="org.orbeon.oxf.main.OXF" classpathref="class.path" fork="true">
+            <arg line="-r ${examples-src.dir} oxf:/cli/examples-sources/generate-examples-sources.xpl"/>
+        </java>
+    </target>
 
     <target name="debug-enabled" if="is.debug">
         <property name="debug.arg1" value="-Xdebug"/>
@@ -501,7 +508,7 @@
         <copy todir="${build.doc.dir}" file="doc/Tutorial/Tutorial.pdf"/>
     </target>
 
-    <target name="orbeon-dist-war" depends="prepare">
+    <target name="orbeon-dist-war" depends="orbeon-source-files-list">
         <mkdir dir="${build.distrib.dir}"/>
 
         <antcall target="war">
@@ -520,10 +527,7 @@
                 <exclude name="**/*.jsp"/>
                 <exclude name="**/*.cdr"/>
                 <exclude name="**/*.cpl"/>
-                <exclude name="flow/**"/>
-                <exclude name="oracle/**"/>
-                <exclude name="oracle-xmldb/**"/>
-                <exclude name="other-examples/**"/>
+                <exclude name="doc/xtech-2005/**"/>
                 <exclude name="ops/unit-tests/**"/>
             </zipfileset>
             <zipfileset dir="doc/Tutorial" prefix="WEB-INF/resources/doc/pages">

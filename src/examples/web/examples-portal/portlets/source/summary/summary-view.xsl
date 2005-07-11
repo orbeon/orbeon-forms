@@ -31,13 +31,21 @@
         <p>
             Follow the links to view the files:
         </p>
-        <ul>
+        <table class="gridtable">
+            <tr>
+                <th>File Name</th>
+                <th>Size (Bytes)</th>
+            </tr>
             <xsl:for-each select="$example-descriptor/source-files/file">
-                <li>
-                    <a href="/{$instance/example-id}/{.}"><xsl:value-of select="."/></a>
-                    (<xsl:value-of select="format-number(@size, '###,##0')"/> bytes)
-                </li>
+                <tr>
+                    <td>
+                        <a href="/{$instance/example-id}/{.}"><xsl:value-of select="."/></a>
+                    </td>
+                    <td style="text-align: right">
+                        <xsl:value-of select="format-number(@size, '###,##0')"/>
+                    </td>
+                </tr>
             </xsl:for-each>
-        </ul>
+        </table>
     </body>
 </html>

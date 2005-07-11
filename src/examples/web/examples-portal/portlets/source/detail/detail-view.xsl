@@ -26,31 +26,17 @@
     <xsl:variable name="source" select="/*/*[2]"/>
 
     <head>
-        <title><xsl:value-of select="$example-descriptor/title"/> Example Source Code</title>
-<!--        <xforms:model>-->
-<!--            <xforms:instance>-->
-<!--                <xi:include href="default-submission.xml"/>-->
-<!--            </xforms:instance>-->
-<!--            <xforms:submission id="main" method="post" action="/{$instance/example-id}/{$instance/source-url}"/>-->
-<!--        </xforms:model>-->
+        <title><xsl:value-of select="$example-descriptor/title"/> - Example Source Code</title>
     </head>
     <body>
-<!--        <xforms:group ref="/form">-->
-            <!-- Back link -->
-            <p>
-                <a href="/{$instance/example-id}">Back to file list</a>
-<!--                <xforms:trigger xxforms:appearance="link" submission="main">-->
-<!--                    <xforms:label>Back to file list</xforms:label>-->
-<!--                    <xforms:action ev:event="DOMActivate">-->
-<!--                        <xforms:setvalue ref="action">back</xforms:setvalue>-->
-<!--                        <xforms:send submission="main"/>-->
-<!--                    </xforms:action>-->
-<!--                </xforms:trigger>-->
-            </p>
-            <!-- Show a single file -->
-            <p>
-                <xsl:copy-of select="$source"/>
-            </p>
-<!--        </xforms:group>-->
+        <h2>Summary</h2>
+        <p>
+            <a href="/{$instance/example-id}">Back to file list</a>
+        </p>
+        <!-- Show a single file -->
+        <h2>Source File</h2>
+        <p class="source">
+            <xsl:copy-of select="$source"/>
+        </p>
     </body>
 </html>

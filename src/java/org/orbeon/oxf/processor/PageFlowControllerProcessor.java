@@ -52,7 +52,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             = "/*/*[local-name() = 'instance' and namespace-uri() = '" + XFormsConstants.XFORMS_NAMESPACE_URI + "']/*[1]";
 
     // External resources
-    private final static String REVERSE_PARAMS_XSL = "oxf:/ops/pfc/reverse-params.xsl";
+    private final static String REVERSE_SETVALUES_XSL = "oxf:/ops/pfc/setvalue-reverse.xsl";
     private final static String REWRITE_XSL = "oxf:/ops/pfc/rewrite.xsl";
     private final static String XFORMS_XML_SUBMISSION_XPL = "oxf:/ops/pfc/xforms-xml-submission.xpl";
 
@@ -143,7 +143,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 final Map pageIdToPageElement = new HashMap();
                 final Map pageIdToPathInfo = new HashMap();
                 final Map pageIdToXFormsModel = new HashMap();
-                final Map pageIdToParamsDocument = new HashMap();
+                final Map pageIdToSetvaluesDocument = new HashMap();
                 final int pageCount = controllerDocument.getRootElement().elements("page").size();
 
                 for (Iterator i = controllerDocument.getRootElement().elements("page").iterator(); i.hasNext();) {
@@ -157,14 +157,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         if (xformsModel != null)
                             pageIdToXFormsModel.put(id, xformsModel);
 
-                        List params = pageElement.elements("param");
-                        if (!params.isEmpty()) {
-                            Document paramsDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("params"));
-                            for (Iterator j = params.iterator(); j.hasNext();) {
-                                Node node = (Node) j.next();
-                                paramsDocument.getRootElement().add((Node) node.clone());
-                            }
-                            pageIdToParamsDocument.put(id, paramsDocument);
+                        final Document setvaluesDocument = getSetValuesDocument(pageElement);
+                        if (setvaluesDocument != null) {
+                            pageIdToSetvaluesDocument.put(id, setvaluesDocument);
                         }
                     }
                 }
@@ -332,7 +327,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                     int pageNumber = element.getParent().elements().indexOf(element);
                                     handlePage(stepProcessorContext, controllerContext, when.getStatements(), element,
                                             pageNumber, requestWithParameters, matcherOutput, html,
-                                            epilogueInstance, epilogueXFormsModel, pageIdToPathInfo, pageIdToXFormsModel, pageIdToParamsDocument,
+                                            epilogueInstance, epilogueXFormsModel, pageIdToPathInfo, pageIdToXFormsModel, pageIdToSetvaluesDocument,
                                             instancePassing);
                                 }
                             }
@@ -361,7 +356,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             // Create an artificial page number (must be different from the other page numbers)
                             handlePage(stepProcessorContext, controllerContext, statementsList, notFoundPageElement,
                                     pageCount, requestWithParameters, dummyMatcherOutput, html,
-                                    epilogueInstance, epilogueXFormsModel, pageIdToPathInfo, pageIdToXFormsModel, pageIdToParamsDocument,
+                                    epilogueInstance, epilogueXFormsModel, pageIdToPathInfo, pageIdToXFormsModel, pageIdToSetvaluesDocument,
                                     instancePassing);
                         } else {
                             // [BACKWARD COMPATIBILITY] - Execute simple "not-found" page
@@ -460,6 +455,33 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         }});
     }
 
+    private Document getSetValuesDocument(final Element pageElement) {
+        final List paramElements = pageElement.elements("param");
+        final List setValueElements = pageElement.elements("setvalue");
+        final Document setvaluesDocument;
+        if (!paramElements.isEmpty() || !setValueElements.isEmpty()) {
+            // Create document with setvalues
+            setvaluesDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("params"));
+            // Deprecated <param> elements
+            if (!paramElements.isEmpty()) {
+                for (Iterator j = paramElements.iterator(); j.hasNext();) {
+                    final Element paramElement = (Element) j.next();
+                    setvaluesDocument.getRootElement().add((Element) paramElement.clone());
+                }
+            }
+            // New <setvalue> elements
+            if (!setValueElements.isEmpty()) {
+                for (Iterator j = setValueElements.iterator(); j.hasNext();) {
+                    final Element setValueElement = (Element) j.next();
+                    setvaluesDocument.getRootElement().add((Element) setValueElement.clone());
+                }
+            }
+        } else {
+            setvaluesDocument = null;
+        }
+        return setvaluesDocument;
+    }
+
     /**
      * Handle &lt;page&gt;
      */
@@ -469,7 +491,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             final ASTOutput html, final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel,
                             final Map pageIdToPathInfo,
                             final Map pageIdToXFormsModel,
-                            final Map pageIdToParamsDocument,
+                            final Map pageIdToSetvaluesDocument,
                             final String instancePassing) {
 
         // Get page attributes
@@ -478,30 +500,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         final String viewAttribute = pageElement.attributeValue("view");
         final String defaultSubmissionAttribute = pageElement.attributeValue("default-submission");
 
-        // Get params
-        final List paramElements = pageElement.elements("param");
-        final List setValueElements = pageElement.elements("setvalue");
-        final Document setValueDocument;
-        if (!paramElements.isEmpty() || !setValueElements.isEmpty()) {
-            // Create document with params
-            setValueDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("params"));
-            // Deprecated <param> elements
-            if (!paramElements.isEmpty()) {
-                for (Iterator j = paramElements.iterator(); j.hasNext();) {
-                    final Element paramElement = (Element) j.next();
-                    setValueDocument.getRootElement().add((Element) paramElement.clone());
-                }
-            }
-            // New <setvalue> elements
-            if (!setValueElements.isEmpty()) {
-                for (Iterator j = setValueElements.iterator(); j.hasNext();) {
-                    final Element setValueElement = (Element) j.next();
-                    setValueDocument.getRootElement().add((Element) setValueElement.clone());
-                }
-            }
-        } else {
-            setValueDocument = null;
-        }
+        // Get setvalues document
+        final Document setvaluesDocument = getSetValuesDocument(pageElement);
 
         // Get actions
         final List actionElements = pageElement.elements("action");
@@ -555,8 +555,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             // Use backward compatility XForms Input processor
             statementsList.add(new ASTProcessorCall(XMLConstants.XFORMS_INPUT_PROCESSOR_QNAME) {{
                 addInput(new ASTInput("model", new ASTHrefId(xformsModel)));
-                if(setValueDocument != null) {
-                    addInput(new ASTInput("filter", setValueDocument));
+                if(setvaluesDocument != null) {
+                    addInput(new ASTInput("filter", setvaluesDocument));
                     addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));
                 } else {
                     addInput(new ASTInput("filter", Dom4jUtils.NULL_DOCUMENT));
@@ -575,8 +575,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             // Use XML Submission pipeline
             statementsList.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
                 addInput(new ASTInput("config", new ASTHrefURL(XFORMS_XML_SUBMISSION_XPL)));
-                if (setValueDocument != null) {
-                    addInput(new ASTInput("setvalues", setValueDocument));
+                if (setvaluesDocument != null) {
+                    addInput(new ASTInput("setvalues", setvaluesDocument));
                     addInput(new ASTInput("matcher-result", new ASTHrefId(matcherOutput)));
                 } else {
                     addInput(new ASTInput("setvalues", Dom4jUtils.NULL_DOCUMENT));
@@ -686,7 +686,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                         setLocationData((LocationData) resultElement.getData());
                                     }
                                     executeResult(stepProcessorContext, controllerContext, this, pageIdToXFormsModel,
-                                            pageIdToPathInfo, pageIdToParamsDocument,
+                                            pageIdToPathInfo, pageIdToSetvaluesDocument,
                                             xformedInstance, resultElement, internalActionData,
                                             isRedirect, xupdatedInstance, instancePassing);
                                 }});
@@ -711,7 +711,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         // If we are not performing tests on the result from the action
                         final Element resultElement = actionElement.element("result");
                         executeResult(stepProcessorContext, controllerContext, this, pageIdToXFormsModel,
-                                pageIdToPathInfo, pageIdToParamsDocument, xformedInstance, resultElement,
+                                pageIdToPathInfo, pageIdToSetvaluesDocument, xformedInstance, resultElement,
                                 internalActionData, isRedirect, xupdatedInstance, instancePassing);
                     }
                 }});
@@ -862,7 +862,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     }
 
     private void executeResult(StepProcessorContext stepProcessorContext, final String controllerContext, ASTWhen when,
-                               final Map pageIdToXFormsModel, final Map pageIdToPathInfo, final Map pageIdToParamsDocument,
+                               final Map pageIdToXFormsModel, final Map pageIdToPathInfo, final Map pageIdToSetvaluesDocument,
                                final ASTOutput paramedInstance, final Element resultElement,
                                final ASTOutput actionData, final ASTOutput redirect, final ASTOutput xupdatedInstance,
                                String instancePassing) {
@@ -950,7 +950,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             if (forwardPathInfo == null)
                 throw new OXFException("Cannot find page with id '" + resultPageId + "'");
 
-            final Document paramsDocument = (Document) pageIdToParamsDocument.get(resultPageId);
+            final Document setvaluesDocument = (Document) pageIdToSetvaluesDocument.get(resultPageId);
             final boolean doServerSideRedirect = _instancePassing != null && _instancePassing.equals(INSTANCE_PASSING_FORWARD);
             final boolean doRedirectExitPortal = _instancePassing != null && _instancePassing.equals(INSTANCE_PASSING_REDIRECT_PORTAL);
 
@@ -962,7 +962,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // Pass parameters only if needed
                     when.addStatement(new ASTProcessorCall(XMLConstants.INSTANCE_TO_PARAMETERS_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
-                        addInput(new ASTInput("filter", (paramsDocument != null) ? paramsDocument : Dom4jUtils.NULL_DOCUMENT));
+                        addInput(new ASTInput("filter", (setvaluesDocument != null) ? setvaluesDocument : Dom4jUtils.NULL_DOCUMENT));
                         addOutput(new ASTOutput("data", parametersOutput));
                     }});
                 } else {
@@ -1006,8 +1006,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 }
                 // Aggregate redirect-url config
                 final ASTHref redirectURLData;
-                if (paramsDocument != null) {
-                    // Params document - things are little more complicated, so we delegate
+                if (setvaluesDocument != null && isTransformedInstance) {
+                    // Setvalues document - things are little more complicated, so we delegate
                     final ASTOutput redirectDataOutput = new ASTOutput(null, "redirect-data");
 
                     final ASTHrefAggregate redirectDataAggregate = new ASTHrefAggregate("redirect-url", new ASTHrefId(forwardPathInfoOutput),
@@ -1015,15 +1015,15 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     redirectDataAggregate.getHrefs().add(new ASTHrefId(parametersOutput));
 
                     when.addStatement(new ASTProcessorCall(XMLConstants.UNSAFE_XSLT_PROCESSOR_QNAME) {{
-                        addInput(new ASTInput("config", new ASTHrefURL(REVERSE_PARAMS_XSL)));
+                        addInput(new ASTInput("config", new ASTHrefURL(REVERSE_SETVALUES_XSL)));
                         addInput(new ASTInput("data", redirectDataAggregate));
                         addInput(new ASTInput("instance", new ASTHrefId(internalXUpdatedInstance)));
-                        addInput(new ASTInput("params", paramsDocument));
+                        addInput(new ASTInput("setvalues", setvaluesDocument));
                         addOutput(new ASTOutput("data", redirectDataOutput));
                     }});
                     redirectURLData = new ASTHrefId(redirectDataOutput);
                 } else {
-                    // No params document, we can simply aggregate with XPL
+                    // No setvalues document, we can simply aggregate with XPL
                     final ASTHrefAggregate redirectDataAggregate = new ASTHrefAggregate("redirect-url", new ASTHrefId(forwardPathInfoOutput),
                             new ASTHrefId(isServerSideRedirectOutput), new ASTHrefId(isRedirectExitPortal));
                     if (isTransformedInstance) // Pass parameters only if needed

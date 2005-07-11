@@ -71,7 +71,7 @@
                         <p:input name="setvalues" href="#setvalues"/>
                         <p:input name="matcher-result" href="#matcher-result"/>
                         <p:input name="request-info" href="#request-info"/>
-                        <p:input name="config" href="request-params.xsl"/>
+                        <p:input name="config" href="setvalue-extract.xsl"/>
                         <p:output name="data" ref="instance"/>
                     </p:processor>
                 </p:otherwise>
@@ -110,7 +110,7 @@
                         <p:input name="setvalues" href="#setvalues"/>
                         <p:input name="matcher-result" href="#matcher-result"/>
                         <p:input name="request-info" href="#request-info"/>
-                        <p:input name="config" href="request-params.xsl"/>
+                        <p:input name="config" href="setvalue-extract.xsl"/>
                         <p:output name="data" ref="instance"/>
                     </p:processor>
                 </p:otherwise>
@@ -136,7 +136,7 @@
                         <p:input name="setvalues" href="#setvalues"/>
                         <p:input name="matcher-result" href="#matcher-result"/>
                         <p:input name="request-info" href="#request-info"/>
-                        <p:input name="config" href="request-params.xsl"/>
+                        <p:input name="config" href="setvalue-extract.xsl"/>
                         <p:output name="data" ref="instance"/>
                     </p:processor>
                 </p:otherwise>

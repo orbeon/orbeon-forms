@@ -22,14 +22,6 @@
             view="detail/detail-view.xsl">
         <setvalue ref="/form/example-id" matcher-group="1"/>
         <setvalue ref="/form/source-url" matcher-group="2"/>
-        <action when="/form/action = 'back'">
-            <result page="summary" transform="oxf:xslt">
-                <form xmlns="" xsl:version="2.0">
-                    <xsl:copy-of select="/*/example-id"/>
-                    <source-url/>
-                </form>
-            </result>
-        </action>
     </page>
 
     <!-- Produce the list of source files -->
@@ -38,14 +30,6 @@
             model="summary/summary-model.xpl"
             view="summary/summary-view.xsl">
         <setvalue ref="/form/example-id" matcher-group="1"/>
-        <action when="/form/source-url != ''">
-            <result page="detail" transform="oxf:xslt">
-                <form xmlns="" xsl:version="2.0">
-                    <action/>
-                    <xsl:copy-of select="/*/(example-id | source-url)"/>
-                </form>
-            </result>
-        </action>
     </page>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>

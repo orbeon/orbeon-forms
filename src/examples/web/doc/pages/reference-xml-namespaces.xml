@@ -109,6 +109,28 @@
                         <td></td>
                     </tr>
                     <tr>
+                        <td>http://www.orbeon.com/xslt-function</td>
+                        <td>function</td>
+                        <td>
+                            OPS XSLT functions
+                        </td>
+                        <td>
+                            <code>function:evaluate</code>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>http://orbeon.org/oxf/xml/local</td>
+                        <td>local</td>
+                        <td>
+                            User-defined XSLT functions
+                        </td>
+                        <td>
+                            <code>local:my-function</code>
+                        </td>
+                        <td></td>
+                    </tr>
+                    <tr>
                         <td>http://orbeon.org/oxf/xml/xmldb</td>
                         <td>xdb</td>
                         <td>
@@ -252,6 +274,19 @@
                         <td style="white-space: nowrap">
                             <a href="http://www.w3.org/TR/2003/REC-xforms-20031014/">XForms 1.0</a>
                             <br/>
+                            <a href="/doc/reference-xforms">OPS XForms Reference</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>http://www.w3.org/2001/xml-events</td>
+                        <td>ev</td>
+                        <td>
+                            XML Events (used by XForms)
+                        </td>
+                        <td>
+                            <code>ev:event</code>
+                        </td>
+                        <td style="white-space: nowrap">
                             <a href="/doc/reference-xforms">OPS XForms Reference</a>
                         </td>
                     </tr>

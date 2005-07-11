@@ -616,7 +616,7 @@ public class PortletExternalContext extends PortletWebAppExternalContext impleme
     private ActionRequest actionRequest;
     private RenderResponse renderResponse;
 
-    PortletExternalContext(ProcessorService processorService, PortletContext portletContext, Map initAttributesMap) {
+    private PortletExternalContext(ProcessorService processorService, PortletContext portletContext, Map initAttributesMap) {
         super(portletContext, initAttributesMap);
         this.processorService = processorService;
     }

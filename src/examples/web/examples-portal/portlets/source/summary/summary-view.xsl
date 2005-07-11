@@ -25,31 +25,16 @@
     <xsl:variable name="instance" select="doc('input:instance')/*" as="element()"/>
 
     <head>
-        <title><xsl:value-of select="$example-descriptor/title"/> Example Source Code</title>
-<!--        <xforms:model>-->
-<!--            <xforms:instance>-->
-<!--                <xi:include href="default-submission.xml"/>-->
-<!--            </xforms:instance>-->
-<!--            <xforms:submission id="main" method="post" action="/{$instance/example-id}"/>-->
-<!--        </xforms:model>-->
+        <title><xsl:value-of select="$example-descriptor/title"/> - Example Source Code</title>
     </head>
     <body>
-<!--        <xforms:group ref="/form">-->
-            <ul>
-                <xsl:for-each select="$example-descriptor/source-files/file">
-                    <li>
-                        <a href="/{$instance/example-id}/{.}"><xsl:value-of select="."/></a>
-
-<!--                        <xforms:trigger xxforms:appearance="link" submission="main">-->
-<!--                            <xforms:label><xsl:value-of select="."/></xforms:label>-->
-<!--                            <xforms:action ev:event="DOMActivate">-->
-<!--                                <xforms:setvalue ref="source-url"><xsl:value-of select="."/></xforms:setvalue>-->
-<!--                                <xforms:send submission="main"/>-->
-<!--                            </xforms:action>-->
-<!--                        </xforms:trigger>-->
-                    </li>
-                </xsl:for-each>
-            </ul>
-<!--        </xforms:group>-->
+        <h2>Sources Files For This Example</h2>
+        <ul>
+            <xsl:for-each select="$example-descriptor/source-files/file">
+                <li>
+                    <a href="/{$instance/example-id}/{.}"><xsl:value-of select="."/></a>
+                </li>
+            </xsl:for-each>
+        </ul>
     </body>
 </html>

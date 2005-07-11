@@ -1,5 +1,5 @@
 <!--
-    Copyright (C) 2004 Orbeon, Inc.
+    Copyright (C) 2005 Orbeon, Inc.
   
     This program is free software; you can redistribute it and/or modify it under the terms of the
     GNU Lesser General Public License as published by the Free Software Foundation; either version
@@ -12,15 +12,40 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:oxf="http://www.orbeon.com/oxf/processors">
+        xmlns:oxf="http://www.orbeon.com/oxf/processors"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-    <page path-info="/([^/]+)/(.+)" matcher="oxf:perl5-matcher" xforms="form.xml" model="model.xpl" view="view.xsl">
-        <param ref="/form/example-id"/>
-        <param ref="/form/source-url"/>
+    <!-- Display the source for an individual file -->
+    <page id="detail" path-info="/([^/]+)/(.+)" matcher="oxf:perl5-matcher"
+            default-submission="detail/default-submission.xml"
+            model="detail/detail-model.xpl"
+            view="detail/detail-view.xsl">
+        <setvalue ref="/form/example-id" matcher-group="1"/>
+        <setvalue ref="/form/source-url" matcher-group="2"/>
+        <action when="/form/action = 'back'">
+            <result page="summary" transform="oxf:xslt">
+                <form xmlns="" xsl:version="2.0">
+                    <xsl:copy-of select="/*/example-id"/>
+                    <source-url/>
+                </form>
+            </result>
+        </action>
     </page>
 
-    <page id="home" path-info="/(.+)" matcher="oxf:perl5-matcher" xforms="form.xml" model="model.xpl" view="view.xsl">
-        <param ref="/form/example-id"/>
+    <!-- Produce the list of source files -->
+    <page id="summary" path-info="/(.+)" matcher="oxf:perl5-matcher"
+            default-submission="summary/default-submission.xml"
+            model="summary/summary-model.xpl"
+            view="summary/summary-view.xsl">
+        <setvalue ref="/form/example-id" matcher-group="1"/>
+        <action when="/form/source-url != ''">
+            <result page="detail" transform="oxf:xslt">
+                <form xmlns="" xsl:version="2.0">
+                    <action/>
+                    <xsl:copy-of select="/*/(example-id | source-url)"/>
+                </form>
+            </result>
+        </action>
     </page>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>

@@ -884,8 +884,8 @@ abstract class AbstractRewrite extends ProcessorImpl {
             } else {
                 flushCharacters();
                 scriptDepthOnStart( ns, lnam );
+                depth++;
             	if ( rewriteURI.equals( ns ) ) {
-                    depth++;
                 	ret = handleA( ns, lnam, qnam, atts );
                     if ( ret != null ) break done;
                     

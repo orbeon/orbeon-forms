@@ -13,10 +13,10 @@
 -->
 <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <xhtml:head>
-        <xhtml:title>OXF PetStore - Sources</xhtml:title>
+        <xhtml:title>OPS PetStore - Sources</xhtml:title>
     </xhtml:head>
     <xhtml:body>
-        <xhtml:h1>The OXF Pet Store Source Code</xhtml:h1>
+        <xhtml:h1>The OPS Pet Store Source Code</xhtml:h1>
 
         <xhtml:table class="gridtable" align="center">
             <xhtml:tr>

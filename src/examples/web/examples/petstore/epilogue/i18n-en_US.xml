@@ -12,7 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <i18n locale="en_US">
-    <text key="welcome">Welcome to the OXF Petstore</text>
+    <text key="welcome">Welcome to the OPS Petstore</text>
     <text key="pets">Pets</text>
     <text key="fish">Fish</text>
     <text key="dogs">Dogs</text>

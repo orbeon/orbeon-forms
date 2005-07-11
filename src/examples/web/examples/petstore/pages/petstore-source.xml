@@ -13,10 +13,10 @@
 -->
 <xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <xhtml:head>
-        <xhtml:title>OXF PetStore - Sources</xhtml:title>
+        <xhtml:title>OPS PetStore - Sources</xhtml:title>
     </xhtml:head>
     <xhtml:body>
-        <h2>The OXF Pet Store Source Code</h2>
+        <h2>The OPS Pet Store Source Code</h2>
 
         <xhtml:table class="gridtable" cellspacing="5">
             <xhtml:tr>
@@ -40,7 +40,7 @@
                 <xhtml:td>
                     <a href="/petstore/source/config/properties.xml">config/properties.xml</a>
                 </xhtml:td>
-                <xhtml:td>OXF Core</xhtml:td>
+                <xhtml:td>OPS Core</xhtml:td>
             </xhtml:tr>
             <xhtml:tr>
                 <xhtml:td>

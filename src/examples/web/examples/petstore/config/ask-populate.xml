@@ -16,7 +16,7 @@
     xmlns:d="http://orbeon.org/oxf/xml/document">
 
     <xhtml:head>
-        <xhtml:title>OXF PetStore</xhtml:title>
+        <xhtml:title>OPS PetStore</xhtml:title>
     </xhtml:head>
     <xhtml:body>
         <xhtml:p>

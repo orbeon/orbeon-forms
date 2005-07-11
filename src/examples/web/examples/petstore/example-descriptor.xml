@@ -8,24 +8,24 @@
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
     without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU Lesser General Public License for more details.
-  
+
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>OXF Pet Store</title>
+    <title>OPS Pet Store</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <requires-setup>true</requires-setup>
     <description>
-        <h4>About the OXF Pet Store</h4>
+        <h4>About the OPS Pet Store</h4>
         <p>
-            The OXF Pet Store is an implementation of <a
+            The OPS Pet Store is an implementation of <a
             href="http://java.sun.com/blueprints/code/jps131/docs/index.html">Sun's Java Pet Store
-            Demo</a> entirely built with OXF. We provide below a standalone WAR file for the OXF Pet
+            Demo</a> entirely built with OPS. We provide below a standalone WAR file for the OPS Pet
             Store. This WAR file can be deployed on an application server (or servlet container).
-            Instructions on how to download and install the OXF Pet Store are provided below.
+            Instructions on how to download and install the OPS Pet Store are provided below.
         </p>
         <p>
-            We explore below some of the key advantages that the architecture of the OXF Pet Store
+            We explore below some of the key advantages that the architecture of the OPS Pet Store
             provides over Sun's version.
         </p>
         <p align="center">
@@ -33,10 +33,10 @@
         </p>
         <h4>Look &amp; Feel</h4>
         <p>
-            In addition to the Web browser look &amp; feel provided by Sun's Pet Store, the OXF Pet
+            In addition to the Web browser look &amp; feel provided by Sun's Pet Store, the OPS Pet
             Store features a look &amp; feel for PDAs. The screenshot at the top of this page shows
             the Web look &amp; feel; the two screenshots below have been taken while browsing the
-            OXF Pet Store on a Palm with the PDA look &amp; feel.
+            OPS Pet Store on a Palm with the PDA look &amp; feel.
         </p>
         <p align="center">
             <img print-format="jpg" src="doc/pages/petstore-pda-home-small.jpg" width="130" height="182"/>
@@ -44,15 +44,15 @@
         <p>
             Using plain old JSP, the natural way to implement multiple look &amp; feels is to copy
             all the JSP files used for the Web look &amp; feel in an other directory and to modify
-            each file to suit a PDA screen. With OXF, we just have to make sure that a page view
-            (the equivalent of a JSP in the OXF world) generates tags representing a structural
+            each file to suit a PDA screen. With OPS, we just have to make sure that a page view
+            (the equivalent of a JSP in the OPS world) generates tags representing a structural
             version of the page that does not include any look &amp; feel information (for instance,
             one would put the title of the page in a simple <code>&lt;title&gt;</code> tag, instead
             of using HTML / CSS). This structural version is then converted appropriately for a
             specific look &amp; feel with a stylesheet.
         </p>
         <p>
-            In the OXF Pet Store source code, <code>pages/category-view.xsl</code> implements the
+            In the OPS Pet Store source code, <code>pages/category-view.xsl</code> implements the
             view for the page listing all the products for a category. Note that this page uses
             structural tags like <code>&lt;title&gt;</code> and <code>&lt;box-table&gt;</code>. All
             the views use the same set of tags. Those tags are converted to actual HTML targeted at
@@ -63,7 +63,7 @@
         <p>
             The Pet Store is available in both English and Japanese. In Sun's version,
             internationalization is performed by copying all the JSP files and changing the English
-            strings to Japanese. This leads to a huge duplication of code. Instead, with OXF we can
+            strings to Japanese. This leads to a huge duplication of code. Instead, with OPS we can
             use in the view tags like: <code>&lt;i18n:text key="welcome"/&gt;</code>. Then those
             tags are replaced by the actual text corresponding to "welcome" in the user's locale in
             a single stylesheet.
@@ -79,7 +79,7 @@
         </p>
         <h4>Backend</h4>
         <p>
-            The OXF Pet Store can use two different data stores: either a SQL database or an XML
+            The OPS Pet Store can use two different data stores: either a SQL database or an XML
             file. The type of store to be used is specified in <code>database/type.xml</code> and
             can be changed dynamically. By default, the content of this file is
             <code>&lt;type&gt;db&lt;/type&gt;</code> and the database is used. This can be changed
@@ -95,7 +95,7 @@
         </p>
 
         <p>
-            You can read the OXF PetStore <a href="/petstore-sources">source files</a>.
+            You can read the OPS PetStore <a href="/petstore-sources">source files</a>.
         </p>
     </description>
 </example-descriptor>

@@ -4,60 +4,74 @@
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
-                This page illustrates how the <a href="/doc/processors-messaging-im">Instant Messenger
-                processor</a> can be used, and shows some capabilities of the <a
-                href="/doc/integration-webservices">Web services support</a> provided by Presentation
-                Server.
+                This page illustrates how the <a href="/doc/processors-messaging-im"
+                f:url-type="resource">Instant Messenger processor</a> can be used, and shows some
+                capabilities of the <a href="/doc/integration-webservices"
+                f:url-type="resource">web services support</a> provided by Presentation Server.
             </p>
             <h2>How to Use This Page?</h2>
             <ol>
                 <li>
-                    With the regular Yahoo! Messenger client connect yourself using a first Yahoo!
-                    account (the <i>user</i> account).
+                    <p>
+                        With the regular Yahoo! Messenger client connect yourself using a first
+                        Yahoo! account (the <i>user</i> account).
+                    </p>
                 </li>
                 <li>
-                    Enter the Yahoo! ID and password of a second account on the first line of the form
-                    below. Also enter the Yahoo! ID of the user account on the second line and click on
-                    the <i>register</i> button.
+                    <p>
+                        Enter the Yahoo! ID and password of a second account on the first line of
+                        the form below. Also enter the Yahoo! ID of the user account on the second
+                        line and click on the <i>register</i> button.
+                    </p>
                 </li>
                 <li>
-                    Now, click on the <i>register</i> button you will receive a message on your Yahoo!
-                    Messenger client. Try to type some text in the Yahoo! Messenger window and you will
-                    receive a response with the top three pages that match your query according to
-                    Google.
+                    <p>
+                        Now, click on the <i>register</i> button you will receive a message on your
+                        Yahoo! Messenger client. Try to type some text in the Yahoo! Messenger
+                        window and you will receive a response with the top three pages that match
+                        your query according to Google.
+                    </p>
                 </li>
             </ol>
             <p>
-                With the second form at the bottom of this page, you can send a message to an arbitrary
-                user. This will go through a Web service that you can also access using any Web service
-                client that understands the <a f:url-type="resource"
+                With the second form at the bottom of this page, you can send a message to an
+                arbitrary user. This will go through a Web service that you can also access using
+                any Web service client that understands the <a f:url-type="resource"
                 href="/direct/yim/view-wsdl">WDSL for this service</a>.
             </p>
             <h2>How does it Work?</h2>
             <ol>
                 <li>
-                    When you click on <i>register</i>, <a href="/goto-source/im/register.xpl"
-                    f:url-type="resource">register.xpl</a> is executed. It will use the <a
-                    href="/doc/processors-messaging-im" f:url-type="resource">IM processor</a> to
-                    send the "OXF Google is ready" message and to trigger the execution of the
-                    pipeline created by <a href="/goto-source/im/response-pipeline.xsl"
-                    f:url-type="resource">response-pipeline.xsl</a> when a message is received.
+                    <p>
+                        When you click on <i>register</i>, <a href="/goto-source/yim/register.xpl"
+                        f:url-type="resource">register.xpl</a> is executed. It will use the <a
+                        href="/doc/processors-messaging-im" f:url-type="resource">IM processor</a>
+                        to send the "OXF Google is ready" message and to trigger the execution of
+                        the pipeline created by <a href="/goto-source/yim/response-pipeline.xsl"
+                        f:url-type="resource">response-pipeline.xsl</a> when a message is received.
+                    </p>
                 </li>
                 <li>
-                    When a message is sent, the pipeline created by <a
-                    href="/goto-source/im/response-pipeline.xsl"
-                    f:url-type="resource">response-pipeline.xsl</a> calls the <a
-                    href="http://www.google.com/apis/" f:url-type="resource">Google Web service</a>
-                    with the <a href="/doc/processors-delegation" f:url-type="resource">delegation
-                    processor</a> and sends the result to the Yahoo! Messenger client with the <a
-                    href="/doc/processors-messaging-im" f:url-type="resource">IM processor</a>.
+                    <p>
+                        When a message is sent, the pipeline created by <a
+                        href="/goto-source/yim/response-pipeline.xsl"
+                        f:url-type="resource">response-pipeline.xsl</a> calls the <a
+                        href="http://www.google.com/apis/" f:url-type="resource">Google Web
+                        service</a> with the <a href="/doc/processors-delegation"
+                        f:url-type="resource">delegation processor</a> and sends the result to the
+                        Yahoo! Messenger client with the <a href="/doc/processors-messaging-im"
+                        f:url-type="resource">IM processor</a>.
+                    </p>
                 </li>
                 <li>
-                    After you fill the second form at the bottom of the page and hit the <i>send</i>
-                    button, <a href="/goto-source/im/send.xpl" f:url-type="resource">send.xpl</a> is
-                    executed. This will send a message through the Web service declared in <a
-                    href="/goto-source/im/yim-webservice.xpl"
-                    f:url-type="resource">yim-webservice.xpl</a>.
+                    <p>
+                        After you fill the second form at the bottom of the page and hit the
+                        <i>send</i> button, <a href="/goto-source/yim/send.xpl"
+                        f:url-type="resource">send.xpl</a> is executed. This will send a message
+                        through the Web service declared in <a
+                        href="/goto-source/yim/yim-webservice.xpl"
+                        f:url-type="resource">yim-webservice.xpl</a>.
+                    </p>
                 </li>
             </ol>
         </div>

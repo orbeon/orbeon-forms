@@ -18,8 +18,8 @@
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
                 This example demonstrates a basic use of the <a href="/doc/processors-sql"
-                f:url-type="resource">SQL processor</a>. It implements a simple address book, allowing
-                the user to add and remove entries to a SQL database.
+                f:url-type="resource">SQL processor</a>. It implements a simple address book,
+                allowing the user to add and remove entries to a SQL database.
             </p>
             <h4>Database Initialization</h4>
             <p>

@@ -784,7 +784,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
         /**
          * <!-- ignorableWhitespace -->
-         * Just calls flushCharacters and super.endElement( ... )
+         * Just calls flushCharacters and super.ignorableWhitespace( ... )
          * @see State#ignorableWhitespace(char[], int, int)
          * @author dsmall d
          */
@@ -795,7 +795,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
         /**
          * <!-- processingInstruction -->
-         * Just calls flushCharacters and super.endElement( ... )
+         * Just calls flushCharacters and super.processingInstruction( ... )
          * @see State#processingInstruction(String, String)
          * @author dsmall d
          */
@@ -806,7 +806,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
         /**
          * <!-- skippedEntity -->
-         * Just calls flushCharacters and super.endElement( ... )
+         * Just calls flushCharacters and super.skippedEntity( ... )
          * @see State#skippedEntity(String)
          * @author dsmall d
          */
@@ -861,12 +861,12 @@ abstract class AbstractRewrite extends ProcessorImpl {
         throws SAXException {
             final String no_urlrewrite = atts.getValue( FORMATTING_URI, NOREWRITE_ATT );
             State ret = null;
+            flushCharacters();
             done : if ( "true".equals( no_urlrewrite ) ) {
             	final State stt = new NoRewriteState
             	    ( this, contentHandler, response, isPortlet, scriptDepth, rewriteURI );
             	ret = stt.startElement( ns, lnam, qnam, atts );
             } else if ( FORMATTING_URI.equals( ns ) && "rewrite".equals( lnam ) ) {
-                flushCharacters();
                 final String typ = atts.getValue( "", "type" );
                 final String url = atts.getValue( "", "url" );
                 if ( url != null ) {
@@ -882,7 +882,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     contentHandler.characters( chs, 0, chs.length );
                 }
             } else {
-                flushCharacters();
                 scriptDepthOnStart( ns, lnam );
                 depth++;
             	if ( rewriteURI.equals( ns ) ) {

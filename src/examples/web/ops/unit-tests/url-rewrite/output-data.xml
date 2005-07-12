@@ -18,6 +18,10 @@
     <p>
       <a/>c
     </p>
+    <p>
+      <a/>c
+      <a/>c
+    </p>
     <xhtml:body background="/oxf/images/body-background1.png">
         <xhtml:div>
             <xhtml:form action="/oxf/my-action">

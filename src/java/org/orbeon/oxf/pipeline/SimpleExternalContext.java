@@ -24,8 +24,7 @@ import java.util.*;
 
 /**
  * Simple implementation of the ExternalContext and related interfaces. When embedding
- * PresentationServer (e.g. in Eclipse), this class can be used directly be used directly or can
- * be subclassed.
+ * PresentationServer (e.g. in Eclipse), this class can be used directly or can be subclassed.
  */
 public class SimpleExternalContext implements ExternalContext {
 

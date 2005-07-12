@@ -22,13 +22,13 @@
         <section>
             <title>Rationale</title>
             <p>
-                When PresentationServer encounters an error, it throws two kinds of exceptions:
+                When OPS encounters an error, it throws two kinds of exceptions:
                 <code>OXFException</code> and its subclass, <code>ValidationException</code>. They
                 both contain a nested root cause, and <code>ValidationException</code> contains
                 document location information.
             </p>
             <p>
-                When an exception is thrown, PresentationServer displays a default error page
+                When an exception is thrown, OPS displays a default error page
                 containing the root cause and location information if available. However, the
                 application developer can display a different page by specifying a processor to be
                 executed upon error. This processor could be, for example, a pipeline logging the
@@ -86,7 +86,7 @@
                 <xsl:template match="/">
                     <html xmlns="http://www.w3.org/1999/xhtml">
                         <head>
-                            <title>PresentationServer - Custom Error Page</title>
+                            <title>OPS - Custom Error Page</title>
                         </head>
                         <body>
                             <h1>An error occured:</h1>

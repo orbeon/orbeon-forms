@@ -200,11 +200,11 @@
                 </table>
             </section>
         </section>
-        <a name="default-epilogue"/>
+        <a name="standard-epilogue"/>
         <section>
-            <title>The Default Epilogue: epilogue.xpl</title>
+            <title>The Standard Epilogue: epilogue.xpl</title>
             <p>
-                The default epilogue is found under <code>oxf:/config/epilogue.xpl</code>. It
+                The standard epilogue is found under <code>oxf:/config/epilogue.xpl</code>. It
                 performs the following tasks:
             </p>
             <ul>
@@ -315,7 +315,7 @@
                                 </p>
                                 <ol>
                                     <li>
-                                        <p>The default theme is applied.</p>
+                                        <p>The standard theme is applied.</p>
                                     </li>
                                     <li>
                                         <p>URLs are rewritten.</p>
@@ -347,7 +347,7 @@
                                 </p>
                                 <ol>
                                     <li>
-                                        <p>The default theme is applied.</p>
+                                        <p>The standard theme is applied.</p>
                                     </li>
                                     <li>
                                         <p>URLs are rewritten.</p>
@@ -535,7 +535,7 @@
                         <ol>
                             <li>
                                 <p>
-                                    The default theme is applied but an XHTML fragment enclosed in a
+                                    The standard theme is applied but an XHTML fragment enclosed in a
                                     <code>xhtml:div</code> element is produced instead of a
                                     full-fledged XHTML document.
                                 </p>
@@ -589,7 +589,7 @@
                 The OPS built-in <a href="reference-xforms">XForms engine</a> allows you to write
                 not only raw XHTML, but also supports XForms 1.0. To achieve this, the XForms engine
                 rewrites XHTML + XForms into XHTML + Javascript + CSS. This transformation also
-                occurs in the epilogue, as mentioned <a href="#default-epilogue">above</a>.
+                occurs in the epilogue, as mentioned <a href="#standard-epilogue">above</a>.
             </p>
             <p>
                 While it is not necessary to know in details the work performed by the XForms
@@ -618,26 +618,26 @@
                 </li>
                 <li>
                     <p>
-                        The default theme includes some default OPS CSS stylesheets and scripts
+                        The standard theme includes some default OPS CSS stylesheets and scripts
                         used by the XForms engine.
                     </p>
                 </li>
             </ul>
         </section>
         <section>
-            <title>The Default Theme</title>
+            <title>The Standard Theme</title>
             <p>
-                The default OPS theme is found under the <code>oxf:/config/theme</code> directory.
+                The standard OPS theme is found under the <code>oxf:/config/theme</code> directory.
                 The entry point of the theme is the <code>theme.xsl</code> stylesheet, called from
                 the epilogue XPL pipelines.
             </p>
             <p>
-                As documented above, the default theme is called only for views that generate XHTML
-                documents. The default theme does not run, for example, on pseudo-HTML, XSL-FO, or
+                As documented above, the standard theme is called only for views that generate XHTML
+                documents. The standard theme does not run, for example, on pseudo-HTML, XSL-FO, or
                 plain XML documents.
             </p>
             <p>
-                The default theme does the following:
+                The standard theme does the following:
             </p>
             <ul>
                 <li>
@@ -713,7 +713,7 @@
                 </li>
             </ul>
             <p>
-                You can configure the default theme at your leisure for your own application. You
+                You can configure the standard theme at your leisure for your own application. You
                 typically get started by modifying <code>theme.xsl</code>.
             </p>
         </section>

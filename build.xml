@@ -492,14 +492,20 @@
 
     <target name="orbeon-doc" depends="jars">
         <mkdir dir="${build.doc.dir}"/>
+        <mkdir dir="${build.doc.dir}/theme"/>
         <java classname="org.orbeon.oxf.main.OXF" classpathref="class.path" fork="true">
             <arg line="-r ${web-examples-src.dir} oxf:/doc/generate-html-view.xpl"/>
         </java>
         <copy todir="${build.doc.dir}">
-            <fileset dir="${web-examples-src.dir}/doc/">
-                <include name="skin/css/**"/>
-                <include name="skin/images/**"/>
-                <include name="skin/scripts/**"/>
+            <fileset dir="${web-examples-src.dir}/config">
+                <include name="theme/images/**"/>
+                <include name="theme/javascript/**"/>
+                <include name="theme/jscalendar/**"/>
+                <include name="theme/style/**"/>
+            </fileset>
+        </copy>
+        <copy todir="${build.doc.dir}">
+            <fileset dir="${web-examples-src.dir}/doc">
                 <include name="pages/*.png"/>
                 <include name="pages/*.gif"/>
                 <include name="pages/*.pdf"/>

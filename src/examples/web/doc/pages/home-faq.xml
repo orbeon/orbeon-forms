@@ -122,7 +122,7 @@
                         and then writes the result back to a another file on disk. For more details
                         about XPL, please see the <a href="/ops/doc/reference-xpl-pipelines">XPL and
                         Pipelines reference documentation</a>, or the <a
-                        href="/ops/doc/pages/Tutorial.pdf">OPS tutorial</a>.
+                        href="Tutorial.pdf">OPS tutorial</a>.
                     </p>
                     <div class="image">
                         <img width="482" height="310" src="pages/2-stage-pipeline.png"/>

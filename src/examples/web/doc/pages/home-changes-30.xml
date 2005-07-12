@@ -433,6 +433,13 @@
                 </li>
                 <li>
                     <p>
+                        <b>Standard Epilogue.</b> The standard epilogue has been restructured into
+                        three separate files so as to be easier to understand, modify, and extend.
+                        It is <a href="reference-epilogue">fully documented</a>.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         Tracing: TODO
                     </p>
                 </li>

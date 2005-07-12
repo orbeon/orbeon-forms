@@ -96,7 +96,7 @@
                         </p>
                         <note>
                             The <code>oxf:</code> protocol works only with <a
-                            href="reference-resource-manager">resource managers</a> that allow
+                            href="reference-resource-managers">resource managers</a> that allow
                             accessing the actual path of the file. These include the Filesystem and
                             WebApp resource manager.
                         </note>

@@ -175,7 +175,7 @@
         <p:when test="/html">
             <!-- Rewrite all URLs in HTML documents -->
             <p:processor name="oxf:html-rewrite" >
-                <p:input debug="xr3" name="rewrite-in" href="#xformed-data" />
+                <p:input name="rewrite-in" href="#xformed-data" />
                 <p:output name="rewrite-out" id="rewritten-data" />
             </p:processor>
             <!-- Output regular HTML doctype -->

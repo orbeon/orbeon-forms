@@ -31,20 +31,33 @@
     <menu label="Tutorial">
         <menu-item label="Tutorial" href="/doc/pages/Tutorial.pdf"/>
     </menu>
-    <menu label="Reference">
+    <menu label="Core Technologies Reference">
         <menu label="XForms">
             <menu-item label="XForms Reference" href="reference-xforms"/>
             <menu-item label="XForms Compliance" href="reference-xforms-compliance"/>
         </menu>
-        <menu-item label="Page Flow Controller" href="reference-page-flow"/>
-        <menu-item label="Page Flow Epilogue" href="reference-epilogue"/>
-        <menu-item label="XPL and XML Pipelines" href="reference-xpl-pipelines"/>
-        <menu-item label="Non-XML Documents" href="reference-formats"/>
-        <menu-item label="Properties" href="reference-properties"/>
+        <menu label="Page Flow">
+            <menu-item label="Page Flow Controller" href="reference-page-flow"/>
+            <menu-item label="Page Flow Epilogue" href="reference-epilogue"/>
+        </menu>
+        <menu label="XML Pipelines (XPL)">
+            <menu-item label="Introduction to XPL" href="reference-xpl-pipelines"/>
+            <menu-item label="XPL 1.0 W3C Submission" href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/"/>
+        </menu>
+        <!--
+        <menu label="Core XML Technologies">
+            <menu-item label="XML in OPS" href="reference-xml"/>
+            <menu-item label="XSLT in OPS" href="reference-xslt"/>
+        </menu>
+        -->
+    </menu>
+    <menu label="Reference">
         <menu-item label="Resource Managers" href="reference-resource-managers"/>
-        <menu-item label="Authentication" href="reference-authentication"/>
+        <menu-item label="Properties" href="reference-properties"/>
+        <menu-item label="Non-XML Documents" href="reference-formats"/>
         <menu-item label="Error Pipeline" href="reference-error-pipeline"/>
         <menu-item label="Listeners" href="reference-listeners"/>
+        <menu-item label="Authentication" href="reference-authentication"/>
         <menu-item label="URL Rewriting" href="reference-url-rewriting"/>
         <menu-item label="XML Namespaces" href="reference-xml-namespaces"/>
     </menu>
@@ -76,7 +89,7 @@
         <menu label="Document Formats">
             <menu-item label="Image Server" href="processors-image"/>
             <menu-item label="Charts and Spreadsheets" href="processors-charts-spreadsheets"/>
-            <menu-item label="PDF Extraction" href="processors-pdf-extraction"/> 
+            <menu-item label="PDF Extraction" href="processors-pdf-extraction"/>
         </menu>
         <menu label="Messaging">
             <menu-item label="Email" href="processors-messaging-email"/>
@@ -100,10 +113,12 @@
         <menu-item label="Struts Support" href="model2x-struts"/>
 
     </menu>
+    <!--
     <menu label="Internals">
     </menu>
+    -->
     <menu label="Obsolete">
-        <menu-item label="XForms" href="internals-xforms"/>
+        <menu-item label="XForms Internal" href="internals-xforms"/>
         <menu-item label="XUpdate JAXP Support" href="integration-xupdate"/>
 <!--        <menu-item label="PresentationServer with JSF" href="model2x-jsf"/>-->
     </menu>

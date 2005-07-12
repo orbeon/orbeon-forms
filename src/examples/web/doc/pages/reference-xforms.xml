@@ -36,6 +36,9 @@
                 provides an introduction to XForms concepts and explains how to use XForms in your
                 OPS application.
             </p>
+            <warning>
+                This section has not yet been updated for OPS 3.0 BETA.
+            </warning>
         </section>
         <a name="introduction"/>
         <section>

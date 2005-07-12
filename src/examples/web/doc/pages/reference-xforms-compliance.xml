@@ -29,12 +29,15 @@
         <section>
             <title>Scope</title>
             <p>
-                PresentationServer's form handling is based on the <a
+                Orbeon PresentationServer (OPS)'s form handling is based on the <a
                 href="http://www.w3.org/TR/xforms/">XForms 1.0 W3C Recommendation</a>. This section
                 describes in details the current level of compliance of each XForms 1.0 feature.
                 Please visit the <a href="reference-xforms">XForms reference documentation</a> for
-                more information about using XForms with PresentationServer.
+                more information about using XForms with OPS.
             </p>
+            <warning>
+                This section has not yet been updated for OPS 3.0 BETA.
+            </warning>
         </section>
         <section>
             <title>Compliance Matrix</title>
@@ -192,12 +195,11 @@
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#module-extension">3.5 The XForms Extension Module</a></td>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-extension">3.5.1 The extension Element</a></td>
                     <td>
-                        The <code>&lt;extension></code> element can be used by a host language.
-                        PresentationServer does not have any constraint on the host language
-                        and since no language leverages this element, its use is forbidden at
-                        this point. To adhere more closely to specification,
-                        the <code>&lt;extension></code> element should be authorized and just
-                        ignored.
+                        The <code>&lt;extension></code> element can be used by a host language. OPS
+                        does not have any constraint on the host language and since no language
+                        leverages this element, its use is forbidden at this point. To adhere more
+                        closely to specification, the <code>&lt;extension></code> element should be
+                        authorized and just ignored.
 
                         <p>[RFE <a href="http://tinyurl.com/4sxtp">1076393</a>]</p>
                     </td>
@@ -234,12 +236,11 @@
                             display the text field.
                         </p>
                         <p>
-                            Without events (in the current version of PresentationServer), you
-                            attach to the combo box JavaScript that submits the form when the
-                            selected value changes. On the server-side the instance gets updated,
-                            the <code>relevant</code> model item property evaluated and accordingly
-                            the text field is displayed or hidden. The two drawbacks in this case
-                            are:
+                            Without events (in the current version of OPS), you attach to the combo
+                            box JavaScript that submits the form when the selected value changes. On
+                            the server-side the instance gets updated, the <code>relevant</code>
+                            model item property evaluated and accordingly the text field is
+                            displayed or hidden. The two drawbacks in this case are:
                         </p>
                         <ul>
                             <li>a round-trip to the server is required</li>

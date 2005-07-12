@@ -86,6 +86,12 @@
                 </li>
                 <li>
                     <p>
+                        The OPS reference XForms compliance matrix has not yet been updated to
+                        reflect all the changes in OPS 3.0.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         Migration documentation from 2.8 to 3.0 is not complete yet.
                     </p>
                 </li>

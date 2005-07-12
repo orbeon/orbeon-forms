@@ -78,51 +78,128 @@
 </cache>
 </config>
             </xml-source>
-            <p>
-                The <code>image-directory</code> element specifies the root of the directory
-                containing all the images. Note that a protocol must be specified. If the
-                directory is local, use the <code>file</code> protocol. You can also use the
-                <code>http</code> or <code>oxf</code> protocols.
-            </p>
-            <p>
-                The <code>default-quality</code> element specifies the JPEG quality factor
-                (between 0.0 and 1.0) to use when encoding JPEG images. If not specified, it
-                defaults to 0.5.
-            </p>
-            <p>
-                The <code>use-sandbox</code> element is optional. If set to <code>false</code>,
-                it disables checking that the images served are strictly under the
-                <code>image-directory</code> hierarchy. It defaults to <code>true</code>.
-            </p>
-            <warning>
-                Disabling the sandbox can be a security hazard and should be used at your own
-                risk. If the image paths come from untrustworthy sources, for example the URL
-                entered by a user in a Web browser, you have to make sure that they do not
-                access protected content. Ideally, only paths coming from trusted sources, such
-                as your database or XML configuration files, should be used when the sandbox is
-                disabled.
-            </warning>
-            <p>
-                The <code>cache</code> element is optional. If it is not specified, no caching
-                of transformations takes place. If it is specified, at least the
-                <code>directory</code> element is required. This element specifies the local
-                directory that contains the cached transformed images.
-            </p>
-            <p>
-                The <code>cache</code> element can contain an optional
-                <code>path-encoding</code> element specifying how cache file names are computed.
-                By default, the <code>hierarchical</code> format is used. In this case, the
-                cache builds a hierarchy of directories. A directory is created for each part
-                of the image path separated by either a "/", a "\" or a ":". The benefit of this
-                encoding is that in most cases, the cache directory hierarchy will mirror the
-                hierarchy of the image directory. If different images can be accessed with paths
-                differing only by the "/", a "\" or a ":", this scheme should not be used.
-            </p>
-            <p>
-                If the <code>flat</code> cache path encoding scheme is selected, the cache will
-                store all files directly under the cache directory. File names will be
-                URL-encoded. This guaranties the uniqueness of the file names in the cache.
-            </p>
+            <table ca="|l|p{0.3\textwidth}|p{0.2\textwidth}|">
+                <tr>
+                    <th>Element</th>
+                    <th>Purpose</th>
+                    <th>Format</th>
+                    <th>Default</th>
+                </tr>
+                <tr>
+                    <td>
+                        <code>image-directory</code>
+                    </td>
+                    <td>
+                        Specifies the root of the directory containing all the images.
+                    </td>
+                    <td>
+                        URL with a protocol specified. If the directory is local, use the
+                        <code>file</code> protocol. You can also use the <code>http</code> or
+                        <code>oxf</code> protocols.
+                    </td>
+                    <td>
+                        None.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>default-quality</code>
+                    </td>
+                    <td>
+                        Specifies the JPEG quality factor to use when encoding JPEG images..
+                    </td>
+                    <td>
+                        Number between 0.0 and 1.0.
+                    </td>
+                    <td>
+                        0.5
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>use-sandbox</code>
+                    </td>
+                    <td>
+                        <p>
+                            If set to <code>false</code>, it disables checking that the images served
+                            are strictly under the <code>image-directory</code> hierarchy.
+                        </p>
+                        <warning>
+                            Disabling the sandbox can be a security hazard and should be used at
+                            your own risk. If the image paths come from untrustworthy sources, for
+                            example the URL entered by a user in a Web browser, you have to make
+                            sure that they do not access protected content. Ideally, only paths
+                            coming from trusted sources, such as your database or XML configuration
+                            files, should be used when the sandbox is disabled.
+                        </warning>
+                    </td>
+                    <td>
+                        <code>true</code> or <code>false</code>.
+                    </td>
+                    <td>
+                        <code>true</code>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>cache</code>
+                    </td>
+                    <td>
+                        Optional element. If it is not specified, no caching of transformations
+                        takes place. If it is specified, at least the <code>directory</code> child
+                        element is required.
+                    </td>
+                    <td>
+                        N/A
+                    </td>
+                    <td>
+                        None.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>cache/directory</code>
+                    </td>
+                    <td>
+                        Specifies the cache directory.
+                    </td>
+                    <td>
+                        Path specifying the local filesystem directory that contains the cached
+                        transformed images.
+                    </td>
+                    <td>
+                        None.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <code>cache/path-encoding</code>
+                    </td>
+                    <td>
+                        <p>
+                            Specifies how cache file names are computed. In this case, the cache
+                            builds a hierarchy of directories. A directory is created for each part
+                            of the image path separated by either a "/", a "\" or a ":". The benefit
+                            of this encoding is that in most cases, the cache directory hierarchy
+                            will mirror the hierarchy of the image directory. If different images
+                            can be accessed with paths differing only by the "/", a "\" or a ":",
+                            this scheme should not be used.
+                        </p>
+                        <p>
+                            If the <code>flat</code> cache path encoding scheme is selected, the
+                            cache will store all files directly under the cache directory. File
+                            names will be URL-encoded. This guaranties the uniqueness of the file
+                            names in the cache.
+                        </p>
+                    </td>
+                    <td>
+                        <code>hierarchical</code> or <code>flat</code>.
+                    </td>
+                    <td>
+                        <code>hierarchical</code>
+                    </td>
+                </tr>
+            </table>
         </section>
         <section>
             <title>Image Input</title>

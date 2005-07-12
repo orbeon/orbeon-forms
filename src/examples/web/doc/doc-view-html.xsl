@@ -24,7 +24,7 @@
     <xsl:template match="/">
         <html>
             <head>
-                <title>PresentationServer User Guide</title>
+                <title>Orbeon PresentationServer (OPS) User Guide - <xsl:value-of select="/document/header/title"/></title>
             </head>
             <body>
                 <table cellpadding="0" cellspacing="0" border="0" id="main">

@@ -20,7 +20,7 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xu="http://www.xmldb.org/xupdate">
     <header>
-        <title>PresentationServer and Studio FAQ</title>
+        <title>Orbeon PresentationServer and Orbeon Studio FAQ</title>
     </header>
     <body>
         <section>

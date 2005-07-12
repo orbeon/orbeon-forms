@@ -104,7 +104,7 @@ public class SchemaRepository {
 
         schemas.put(PageFlowControllerProcessor.CONTROLLER_NAMESPACE_URI, "schemas/page-flow-controller-runtime.xsd");
         schemas.put(MSVValidationProcessor.ORBEON_ERROR_NS, "schemas/validation-config.rng");
-        schemas.put(DirectoryGenerator.DIRECTORY_GENERATOR_NAMESPACE_URI, "schemas/directory-generator-config.rng");
+        schemas.put(DirectoryScannerProcessor.DIRECTORY_GENERATOR_NAMESPACE_URI, "schemas/directory-generator-config.rng");
         
         // SQL processor schemas
         schemas.put(SQLProcessor.SQL_NAMESPACE_URI, PROCESSORS_SCHEMA_PATH + "sql/sql-processor-config.rng");

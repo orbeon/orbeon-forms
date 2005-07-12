@@ -611,7 +611,14 @@
                 </li>
                 <li>
                     <p>
-                        <b>Directory Scanner Processor.</b> TODO
+                        <b>Directory Scanner Processor.</b> The purpose of the <a
+                        href="processors-directory-scanner">Directory Scanner</a> processor is to
+                        analyse a directory structure in a filesystem and to produce an XML document
+                        containing metadata about the files, such as name and size. It is possible
+                        to specify which files and directories to include and exclude in the
+                        scanning process. The Directory Scanner is also able to optionally retrieve
+                        image metadata. Two new command-line examples illustrate the use of this
+                        processor.
                     </p>
                 </li>
                 <li>

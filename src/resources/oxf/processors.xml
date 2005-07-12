@@ -296,6 +296,11 @@
         <class name="org.orbeon.oxf.processor.LDAPProcessor"/>
     </processor>
 
+    <!-- Directory Scanner processor -->
+    <processor name="oxf:directory-scanner">
+        <class name="org.orbeon.oxf.processor.generator.DirectoryScannerProcessor"/>
+    </processor>
+
     <!-- Converters -->
     <processor name="oxf:xml-converter">
         <class name="org.orbeon.oxf.processor.converter.XMLConverter"/>
@@ -503,6 +508,10 @@
         <class name="org.orbeon.oxf.processor.IMProcessor"/>
     </processor>
 
+    <processor name="oxf:bpel" uri="oxf/processor/bpel">
+        <class name="org.orbeon.oxf.processor.bpel.BPELProcessor"/>
+    </processor>
+
     <!-- Portlet processors -->
     <processor name="oxf:portlet-include" uri="oxf/processor/portlet-include">
         <class name="org.orbeon.oxf.portlet.processor.PortletIncludeGenerator"/>
@@ -514,14 +523,6 @@
 
     <processor name="oxf:portlet-preferences" uri="oxf/processor/portlet-preferences">
         <class name="org.orbeon.oxf.portlet.processor.PortletPreferencesGenerator"/>
-    </processor>
-
-    <processor name="oxf:directory-scanner" uri="oxf/processor/directory-scanner">
-        <class name="org.orbeon.oxf.processor.generator.DirectoryGenerator"/>
-    </processor>
-
-    <processor name="oxf:bpel" uri="oxf/processor/bpel">
-        <class name="org.orbeon.oxf.processor.bpel.BPELProcessor"/>
     </processor>
 
     <!-- Tamino processors -->

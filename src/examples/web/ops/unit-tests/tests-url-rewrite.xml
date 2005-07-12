@@ -14,15 +14,10 @@
 -->
 <group description="URL Rewrite">
     <!-- This test is a good start, but could probably be improved -->
-    <!-- TODO: Portlet URL rewriting testing; need a way to specify to the test what pseudo-External Context to use -->
-    <test description="url-rewrite" name="oxf:unsafe-xslt">
-        <input name="config" href="oxf:/ops/pfc/url-rewrite.xsl"/>
-        <input name="data" href="oxf:/ops/unit-tests/url-rewrite/input-data.xml"/>
-        <input name="container-type">
-            <request>
-                <container-type>servlet</container-type>
-            </request>
-        </input>
-        <output name="data" href="oxf:/ops/unit-tests/url-rewrite/output-data.xml"/>
+    <!-- TODO: Portlet URL rewriting testing; need a way to specify to the test what -->
+    <!-- pseudo-External Context to use -->
+    <test description="xhtml-rewrite" name="oxf:xhtml-rewrite" >
+        <input name="rewrite-in" href="oxf:/ops/unit-tests/url-rewrite/xhtml-input-data.xml"/>
+        <output name="rewrite-out" href="oxf:/ops/unit-tests/url-rewrite/xhtml-output-data.xml"/>
     </test>
-</group>
+</group> 

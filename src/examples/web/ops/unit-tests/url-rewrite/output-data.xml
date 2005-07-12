@@ -11,44 +11,50 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<html>
-    <body background="/oxf/images/body-background.png">
-        <div>
-            <form action="/oxf/my-action">
-                <a href="/oxf/path">Click Here!</a>
-                <img src="/oxf/my-image.png"/>
-                <a href="path">Click Here!</a>
-                <img src="my-image.png"/>
-                <img src="/oxf/some-path?a=1&amp;b=2"/>
-                <input type="image" src="/oxf/my-image.png"/>
-                <input type="text" src="/my-image.png"/>
-            </form>
-        </div>
-        <div>
-            <form action="/my-action">
-                <a href="/path">Click Here!</a>
-                <img src="/oxf/my-image.png"/>
-                <a href="path">Click Here!</a>
-                <img src="my-image.png"/>
-                <img src="?a=1&amp;b=2"/>
-            </form>
-        </div>
-        <div>
-            <p>123wsrp_rewritewsrp_rewrite456</p>
-            <script>
-                <p>123wsrp_rewrite456</p>
-            </script>
+<xhtml:html 
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xmlns:f="http://orbeon.org/oxf/xml/formatting" 
+ >
+    <p>
+      <a/>c
+    </p>
+    <xhtml:body background="/oxf/images/body-background1.png">
+        <xhtml:div>
+            <xhtml:form action="/oxf/my-action">
+                <xhtml:a href="/oxf/path">Click Here!</xhtml:a>
+                <xhtml:img src="/oxf/my-image1.png"/>
+                <xhtml:a href="path">Click Here!</xhtml:a>
+                <xhtml:img src="my-image2.png"/>
+                <xhtml:img src="/oxf/some-path?a=1&amp;b=1"/>
+                <xhtml:input type="image" src="/oxf/my-image3.png"/>
+                <xhtml:input type="text" src="/my-image4.png"/>
+            </xhtml:form>
+        </xhtml:div>
+        <xhtml:div>
+            <xhtml:form action="/my-action">
+                <xhtml:a href="/path">Click Here!</xhtml:a>
+                <xhtml:img src="/oxf/my-image5.png"/>
+                <xhtml:a href="path">Click Here!</xhtml:a>
+                <xhtml:img src="my-image6.png"/>
+                <xhtml:img src="?a=1&amp;b=2"/>
+            </xhtml:form>
+        </xhtml:div>
+        <xhtml:div>
+            <xhtml:p>123wsrp_rewritewsrp_rewrite456</xhtml:p>
+            <xhtml:script>
+                <xhtml:p>123wsrp_rewrite456</xhtml:p>
+            </xhtml:script>
             <SCRIPT>
-                <p>123wsrp_rewrite456</p>
+                <xhtml:p>123wsrp_rewritewsrp_rewrite456</xhtml:p>
             </SCRIPT>
-        </div>
-        <table>
-            <tr>
-                <td background="/oxf/images/td-background.png">
+        </xhtml:div>
+        <xhtml:table>
+            <xhtml:tr>
+                <xhtml:td background="/oxf/images/td-background.png">
                     Hello
-                </td>
-            </tr>
-        </table>
-    </body>
-    <brody background="/images/body-background.png"/>
-</html>
+                </xhtml:td>
+            </xhtml:tr>
+        </xhtml:table>
+    </xhtml:body>
+    <brody background="/images/body-background2.png"/>
+</xhtml:html>

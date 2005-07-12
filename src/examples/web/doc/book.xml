@@ -26,10 +26,10 @@
             <menu-item label="Version 2.2 and Earlier" href="home-changes-older" printed-book="false"/>
         </menu>
         <menu-item label="Installing" href="intro-install"/>
-        <menu-item label="Frequently Asked Questions" href="home-faq"/>
+        <menu-item label="Frequently Asked Questions" href="home-faq" printed-book="false"/>
     </menu>
     <menu label="Tutorial">
-        <menu-item label="Tutorial" href="/doc/pages/Tutorial.pdf"/>
+        <menu-item label="Tutorial" href="/doc/pages/Tutorial.pdf" printed-book="false"/>
     </menu>
     <menu label="Core Technologies Reference">
         <menu label="XForms">

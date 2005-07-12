@@ -732,7 +732,7 @@ ul {
 .xferrtable td { border: 0; margin: 0px; padding: 0px; }
 .xfhelptable   { margin: 0px }
 
-    @media print {
+@media print {
     #orbeon-logo { display: none }
     #main { border: none; }
     #leftcontent { display: none }
@@ -744,6 +744,44 @@ ul {
     #navigation { display: none}
     #xmaincontent { position: relative; top: -2cm; left: -3.5cm; width: 15cm;}
     #main .maincontent { margin: 0; border: none; }
+
+    .maincontent h1 {
+        color: black;
+        background-color: white;
+        border: none;
+        font-size: 14pt;
+        margin-left: 0px;
+        padding-left: 0px;
+    }
+
+    .maincontent h2 {
+        color: black;
+        background-color: white;
+        border: none;
+        page-break-before: always;
+        font-size: 12pt;
+        margin-left: 0px;
+        padding-left: 0px;
+    }
+
+    .maincontent h3 {
+        color: black;
+        border: none;
+        font-size: 10pt;
+        margin-left: 0px;
+        padding-left: 0px;
+    }
+
+    .maincontent h4 {
+        color: black;
+        border: none;
+        font-size: 9pt;
+        margin-left: 0px;
+        padding-left: 0px;
+    }
+
+    a :link { text-color: black }
+    a :visited { text-color: black }
 }
 
 </root>

@@ -78,6 +78,13 @@
                         <xsl:apply-templates/>
                     </xsl:copy>
                 </xsl:template>
+                <xsl:template match="xhtml:a[starts-with(@href, '#')]" priority="100">
+                    <xsl:copy>
+                        <xsl:copy-of select="@*"/>
+                        <xsl:attribute name="href" select="@href"/>
+                        <xsl:apply-templates/>
+                    </xsl:copy>
+                </xsl:template>
                 <xsl:template match="xhtml:a[not(contains(@href, '.'))]" priority="50">
                     <xsl:copy>
                         <xsl:copy-of select="@*"/>

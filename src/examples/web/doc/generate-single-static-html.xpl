@@ -16,41 +16,62 @@
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xhtml="http://www.w3.org/1999/xhtml">
 
-    <p:for-each href="book.xml" select="(//menu-item[@href and not (@printed-book='false') and not(ends-with(@href, '.pdf')) and not (starts-with(@href, 'http:'))])" id="aggregated-document" root="document">
+    <p:for-each href="book.xml" select="/*/menu[descendant::menu-item[not(@printed-book='false')]]" id="aggregated-document" root="document">
 
-        <p:processor name="oxf:identity">
-            <p:input name="data" href="current()"/>
-            <p:output name="data" id="url"/>
-        </p:processor>
+        <p:for-each href="current()" select="//menu-item[@href and not(@printed-book='false') and not(ends-with(@href, '.pdf')) and not (starts-with(@href, 'http:'))]" id="aggregated-document-1" root="document">
 
-        <!-- Create instance -->
+            <p:processor name="oxf:identity">
+                <p:input name="data" href="current()"/>
+                <p:output name="data" id="url"/>
+            </p:processor>
+
+            <!-- Create instance -->
+            <p:processor name="oxf:xslt">
+                <p:input name="data" href="#url"/>
+                <p:input name="config">
+                    <form xsl:version="2.0">
+                        <page><xsl:value-of select="/*/@href"/></page>
+                    </form>
+                </p:input>
+                <p:output name="data" id="instance"/>
+            </p:processor>
+
+            <!-- Call model -->
+            <p:processor name="oxf:pipeline">
+                <p:input name="config" href="doc-model.xpl"/>
+                <p:input name="instance" href="#instance"/>
+                <p:output name="data" id="source-document"/>
+            </p:processor>
+
+            <!-- Convert into section -->
+            <p:processor name="oxf:xslt">
+                <p:input name="data" href="#source-document"/>
+                <p:input name="config">
+                    <xsl:stylesheet version="2.0">
+                        <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                        <xsl:template match="/">
+                            <section>
+                                <title><xsl:value-of select="/document/header/title"/></title>
+                                <xsl:apply-templates select="/document/body/*"/>
+                            </section>
+                        </xsl:template>
+                    </xsl:stylesheet>
+                </p:input>
+                <p:output name="data" ref="aggregated-document-1"/>
+            </p:processor>
+
+        </p:for-each>
+
         <p:processor name="oxf:xslt">
-            <p:input name="data" href="#url"/>
-            <p:input name="config">
-                <form xsl:version="2.0">
-                    <page><xsl:value-of select="/*/@href"/></page>
-                </form>
-            </p:input>
-            <p:output name="data" id="instance"/>
-        </p:processor>
-
-        <!-- Call model -->
-        <p:processor name="oxf:pipeline">
-            <p:input name="config" href="doc-model.xpl"/>
-            <p:input name="instance" href="#instance"/>
-            <p:output name="data" id="source-document"/>
-        </p:processor>
-
-        <!-- Convert into section -->
-        <p:processor name="oxf:xslt">
-            <p:input name="data" href="#source-document"/>
+            <p:input name="data" href="#aggregated-document-1"/>
+            <p:input name="current-menu" href="current()"/>
             <p:input name="config">
                 <xsl:stylesheet version="2.0">
                     <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
                     <xsl:template match="/">
                         <section>
-                            <title><xsl:value-of select="/document/header/title"/></title>
-                            <xsl:apply-templates select="/document/body/*"/>
+                            <title><xsl:value-of select="doc('input:current-menu')/*/@label"/></title>
+                            <xsl:apply-templates select="/document/*"/>
                         </section>
                     </xsl:template>
                 </xsl:stylesheet>

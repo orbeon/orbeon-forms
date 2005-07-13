@@ -23,28 +23,33 @@ For more information, visit:
   http://www.orbeon.com/
 
 
-************************************
+****************************************
 1. About Orbeon PresentationServer
-************************************
+****************************************
 
-Orbeon PresentationServer is a J2EE-based MVC framework for building
-Web applications that present and capture XML using XForms, XSLT, and
-Web Services. PresentationServer benefits from standardized forms
-processing using XForms, rich controller semantics, and full-featured
-XML pipelines. PresentationServer is in fact built around Orbeon's
-optimized XML pipeline engine, a mature, high-performance engine for
-pipeline processing of XML. PresentationServer is ideal for building
-Composite Applications in a Service Oriented Architecture (SOA), an can
-be used on its own, or within the OIS suite.
+Orbeon PresentationServer (OPS) is an open source J2EE-based platform
+for XML-centric web applications. OPS is built around XHTML, XForms,
+XSLT, XML pipelines, and Web Services, which makes it ideal for
+applications that capture, process and present XML data.
+
+Unlike other popular web application frameworks like Struts or WebWork
+that are based on Java objects and JSP, OPS is based on XML documents
+and XML technologies. This leads to an architecture better suited for
+the tasks of capturing, processing, and presenting information in XML
+format, and often does not require writing any Java code at all to
+implement your presentation layer.
+
+OPS is built around Orbeon's optimized XPL engine, a mature,
+high-performance XML pipeline engine for processing XML data.
 
 
-************************************
+****************************************
 2. Licenses
-************************************
+****************************************
 
-The source code is distributed under the terms of the GNU Lesser General
-Public License (LGPL). The full text of the license is available at
-http://www.gnu.org/copyleft/lesser.html.
+The source code is distributed under the terms of the GNU Lesser
+General Public License (LGPL). The full text of the license is
+available at http://www.gnu.org/copyleft/lesser.html.
 
 Some examples are distributed under the terms of the Apache License,
 Version 2.0. The full text of the license is available at:
@@ -53,8 +58,8 @@ http://www.apache.org/licenses/LICENSE-2.0.
 Please refer to file headers to identify which license governs the
 distribution of a particular file.
 
-This software is OSI Certified Open Source Software.
-OSI Certified is a certification mark of the Open Source Initiative.
+This software is OSI Certified Open Source Software. OSI Certified is
+a certification mark of the Open Source Initiative.
 
 The documentation is subject to the following terms:
 
@@ -71,38 +76,37 @@ See section 9 for more details about the licenses of included
 third-party software.
 
 
-************************************
+****************************************
 3. New Features
-************************************
+****************************************
 
 A complete list of changes can be found online at:
 
-  http://www.orbeon.com/ois/doc/home-changes
+  http://www.orbeon.com/ops/doc/home-changes-30
 
 or in this distribution under:
 
-  doc/home-changes.html
+  doc/home-changes-30.html
 
 
-************************************
+****************************************
 4. Software Prerequisites
-************************************
+****************************************
 
-Orbeon PresentationServer is supported on the following
-application servers:
+OPS is supported on the following application servers:
 
-    * Apache Tomcat 4.1.30 with JDK 1.4.2
+    * Apache Tomcat 4.1.31 with JDK 1.4.2
     * Apache Tomcat 5.0.25 alpha with JDK 1.4.2
     * Apache Tomcat 5.5.4 with JDK 1.4.2 and JDK 1.5.0
     * BEA WebLogic Server 8.1
     * IBM WebSphere 5.1
 
 
-************************************
-5. Installing PresentationServer
-************************************
+****************************************
+5. Installing OPS
+****************************************
 
-    * Download the PresentationServer zip or tgz archive from
+    * Download the OPS zip or tgz archive from
       http://forge.objectweb.org/projects/ops
 
     * Extract the archive in a directory that we call below:
@@ -118,39 +122,40 @@ under the root directory OIS_HOME/:
 
     * orbeon-bizdoc.war: the Web Archive containing the BizDoc
       tutorial application.  For more information on the BizDoc
-      example application, please consult the tutorial, Tutorial.pdf.
+      example application, please consult the tutorial under
+      "doc/OPS Tutorial.pdf".
 
-    * doc: this directory contains the PresentationServer
-      documentation as static HTML files, as well as the tutorial,
-      Tutorial.pdf.
+    * doc: this directory contains the OPS documentation as static
+      HTML files, as well as the tutorial under "doc/OPS
+      Tutorial.pdf".
 
     * examples: this directory contains command line examples
 
     * licenses: this directory contains third-party software licenses
 
 You then need to deploy orbeon.war file to your servlet containers or
-application server of choice. In the PresentationServer
-documentation, you will find detailed installation instructions for
-several servlet containers / applications servers.
+application server of choice. In the OPS documentation, you will find
+detailed installation instructions for several servlet containers /
+applications servers.
 
-More detailed information on installing PresentationServer can be
-found in the documentation under OIS_HOME/doc/ in the "Installation
-Instructions" section, or directly online:
+More detailed information on installing OPS can be found in the
+documentation under OIS_HOME/doc/ in the "Installation Instructions"
+section, or directly online:
 
   http://www.orbeon.com/ois/doc/intro-install
 
 
-************************************
-6. Compiling PresentationServer
-************************************
+****************************************
+6. Compiling OPS
+****************************************
 
-For information about compiling PresentationServer, please visit:
+For information about compiling OPS, please visit:
 
   http://www.orbeon.com/community/getting-involved
 
-************************************
+****************************************
 7. More Information
-************************************
+****************************************
 
 Here are some pointers to useful information related to this release.
 
@@ -158,8 +163,8 @@ Here are some pointers to useful information related to this release.
 
         http://www.orbeon.com/software/presentation-server
 
-    * If you have questions, comments, or difficulties with the
-      PresentationServer, please subscribe to the ObjectWeb user mailing-list:
+    * If you have questions, comments, or difficulties with the OPS,
+      please subscribe to the ObjectWeb user mailing-list:
 
         http://www.objectweb.org/wws/info/ops-users
 
@@ -168,18 +173,18 @@ Here are some pointers to useful information related to this release.
         info@orbeon.com
 
 
-************************************
+****************************************
 8. Known Issues
-************************************
+****************************************
 
 For a list of known issues, consult the ObjectWeb issue tracking system:
 
   http://forge.objectweb.org/tracker/?atid=350207&group_id=168&func=browse
 
 
-************************************
+****************************************
 9. Third-Party Software
-************************************
+****************************************
 
 This product includes software developed by the Apache Software Foundation
 (http://www.apache.org/):
@@ -222,7 +227,7 @@ Software License. The schema is available at the following location:
 Please consult the third-party-licenses directory for more information
 about individual licenses.
 
-Last updated: January 2005
+Last updated: July 2005
 
 Copyright 1999-2005 (C) Orbeon, Inc. All rights reserved.
 

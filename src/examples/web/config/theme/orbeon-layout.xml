@@ -728,9 +728,9 @@ ul {
 }
 
 <!-- Styles used by xforms-to-xhtml.xsl -->
-.xferrtable    { border: 0; margin: 0px; padding: 0px; }
-.xferrtable td { border: 0; margin: 0px; padding: 0px; }
-.xfhelptable   { margin: 0px }
+.xforms-legacy-error-table { border: 0; margin: 0px; padding: 0px; }
+.xforms-legacy-error-table td { border: 0; margin: 0px; padding: 0px; }
+.xforms-legacy-help-table { margin: 0px }
 
 @media print {
     #orbeon-logo { display: none }
@@ -779,6 +779,9 @@ ul {
         margin-left: 0px;
         padding-left: 0px;
     }
+
+    .maincontent thead { display: table-header-group }
+    .maincontent tfoot { display: table-footer-group }
 
     a :link { text-color: black }
     a :visited { text-color: black }

@@ -49,7 +49,7 @@
             <p:output name="html" id="html-data"/>
         </p:processor>
 
-        <!-- Write out -->
+        <!-- Write out HTML -->
         <p:processor name="oxf:xslt">
             <p:input name="data" href="#url"/>
             <p:input name="config">
@@ -57,6 +57,9 @@
                     <content-type>text/html</content-type>
                     <directory>build/doc</directory>
                     <file><xsl:value-of select="/*/@href"/>.html</file>
+                    <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
+                    <version>4.01</version>
+                    <encoding>utf-8</encoding>
                 </config>
             </p:input>
             <p:output name="data" id="file-config"/>

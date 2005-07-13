@@ -29,7 +29,7 @@
         <menu-item label="Frequently Asked Questions" href="home-faq" printed-book="false"/>
     </menu>
     <menu label="Tutorial">
-        <menu-item label="Tutorial" href="/doc/pages/Tutorial.pdf" printed-book="false"/>
+        <menu-item label="Tutorial" href="/doc/pages/OPS Tutorial.pdf" printed-book="false"/>
     </menu>
     <menu label="Core Technologies Reference">
         <menu label="XForms">

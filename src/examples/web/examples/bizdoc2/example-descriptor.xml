@@ -18,7 +18,7 @@
         <p xmlns="http://www.w3.org/1999/xhtml">
             BizDoc is a sample application that illustrates basic business document manipulation.
             Fictitious claim documents are created, read, updated, and deleted from a database.
-            Please refer to the <a href="/doc/pages/Tutorial.pdf" f:url-type="resource">OPS
+            Please refer to the <a href="/doc/pages/OPS Tutorial.pdf" f:url-type="resource">OPS
             Tutorial</a> for the complete documentation of this example.
         </p>
     </description>

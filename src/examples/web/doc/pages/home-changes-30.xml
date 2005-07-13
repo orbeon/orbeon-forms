@@ -111,6 +111,11 @@
                         Microsoft Internet Explorer 6. Support for Opera and Safari is planned.
                     </p>
                 </li>
+                <li>
+                    <p>
+                        The PDF version of the User Guide does not have page numbers.
+                    </p>
+                </li>
             </ul>
         </section>
         <section>
@@ -589,9 +594,22 @@
         <section>
             <title>Other Changes</title>
             <p>
-
+                The following changes are new in OPS 3.0 BETA:
             </p>
             <ul>
+                <li>
+                    <p>
+                        <b>HTML Documentation.</b> The OPS User Guide in in static HTML was broken
+                        in the previous version of OPS. This allows you to consult the documentation
+                        without running OPS or without accessing the online documentation.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>PDF Documentation.</b> The OPS User Guide in PDF version is back! This is
+                        a book which you can print for reference.
+                    </p>
+                </li>
                 <li>
                     <p>
                         <b>OPS Blog example.</b> This <a href="/goto-example/blog">new example</a>

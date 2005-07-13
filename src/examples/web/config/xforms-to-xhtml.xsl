@@ -432,7 +432,7 @@
                 <xsl:next-match/>
             </xsl:when>
             <xsl:otherwise>
-                <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xferrtable">
+                <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xforms-legacy-error-table">
                     <xhtml:tr>
                         <xhtml:td><xsl:next-match/></xhtml:td>
                         <xhtml:td xxforms:error-cell='true'/>
@@ -470,7 +470,7 @@
 
     <!-- Help, Hint -->
     <xsl:template match="xforms:*[xforms:help]" priority="3">
-        <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xfhelptable">
+        <xhtml:table border="0" cellpadding="0" cellspacing="0" class="xforms-legacy-help-table">
             <xhtml:tr>
                 <!-- Display control -->
                 <xhtml:td><xsl:next-match/></xhtml:td>

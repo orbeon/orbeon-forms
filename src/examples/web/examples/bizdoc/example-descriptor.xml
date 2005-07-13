@@ -19,7 +19,7 @@
             BizDoc is a sample application that illustrates basic business document manipulation.
             Fictitious claim documents are created, read, updated, and deleted from a database. It
             is the basis for the OPS Tutorial - please refer to the <a
-            href="/doc/pages/Tutorial.pdf" f:url-type="resource">OPS Tutorial</a> for the complete
+            href="/doc/pages/OPS Tutorial.pdf" f:url-type="resource">OPS Tutorial</a> for the complete
             documentation of this example.
         </p>
     </description>

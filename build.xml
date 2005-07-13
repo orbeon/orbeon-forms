@@ -505,13 +505,18 @@
             </fileset>
         </copy>
         <copy todir="${build.doc.dir}">
+            <fileset dir="${web-examples-src.dir}">
+                <include name="images/*.*"/>
+            </fileset>
+        </copy>
+        <copy todir="${build.doc.dir}">
             <fileset dir="${web-examples-src.dir}/doc">
                 <include name="pages/*.png"/>
                 <include name="pages/*.gif"/>
                 <include name="pages/*.pdf"/>
             </fileset>
         </copy>
-        <copy todir="${build.doc.dir}" file="doc/Tutorial/Tutorial.pdf"/>
+        <copy todir="${build.doc.dir}" file="doc/OPS Tutorial.pdf"/>
     </target>
 
     <target name="orbeon-pdf-doc" depends="prepare">
@@ -543,8 +548,8 @@
                 <exclude name="doc/xtech-2005/**"/>
                 <exclude name="ops/unit-tests/**"/>
             </zipfileset>
-            <zipfileset dir="doc/Tutorial" prefix="WEB-INF/resources/doc/pages">
-                <include name="Tutorial.pdf"/>
+            <zipfileset dir="doc" prefix="WEB-INF/resources/doc/pages">
+                <include name="OPS Tutorial.pdf"/>
             </zipfileset>
         </zip>
     </target>

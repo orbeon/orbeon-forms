@@ -124,10 +124,12 @@
                 <title>New Features</title>
                 <img src="/images/xforms-powered-86x31.png" style="border: 0px; float: right"/>
                 <p>
-                    The OPS XForms engine introduces a big step towards supporting all of the XForms 1.0
-                    specification. The main changes are described below. Please also visit the new
-                    XForms examples, in particular the <a href="/goto-example/xforms-controls">XForms
-                    Controls</a> and <a href="/goto-example/bizdoc2">BizDoc NG</a> example.
+                    The OPS XForms engine introduces a big step towards supporting all of the XForms
+                    1.0 specification. The main changes are described below. Please also visit the
+                    new XForms examples, in particular the <a
+                    href="/goto-example/xforms-controls">XForms Controls</a>, the <a
+                    href="/goto-example/bizdoc2">BizDoc NG</a> example, and the <a
+                    href="/goto-example/xforms-sandbox">XForms Sandbox</a> example.
                 </p>
                 <ul>
                     <li>
@@ -209,6 +211,14 @@
                         <p>
                             <b>Simplified theme.</b> The default theme and XForms make more use of CSS
                             so that configuration of your own theme is easier.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>XForms sandbox.</b> The new <a
+                            href="/goto-example/xforms-sandbox">XForms Sandbox</a> example allows
+                            you to easily try your own XForms examples. Just write and XHTML +
+                            XForms example, upload it, and watch the results!
                         </p>
                     </li>
                     <li>

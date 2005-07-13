@@ -79,6 +79,7 @@
         <example id="xforms-calculator" path="xforms/xforms-calculator" label="Calculator" xforms-ng="true"/>
         <example id="xforms-tax" path="xforms/xforms-tax" label="Tax Form" xforms-ng="true"/>
         <example id="xforms-translate" path="xforms/xforms-translate" label="Translate This" xforms-ng="true"/>
+        <example id="xforms-sandbox" path="sandbox/xforms" label="XForms Sandbox" xforms-ng="true"/>
     </section>
     <section label="Presenting Data">
         <example id="reports" label="Data in multiple formats"/>

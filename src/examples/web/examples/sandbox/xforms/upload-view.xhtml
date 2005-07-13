@@ -1,0 +1,56 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<html xmlns:f="http://orbeon.org/oxf/xml/formatting"
+      xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xf="http://www.w3.org/2002/xforms"
+      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns="http://www.w3.org/1999/xhtml">
+    <head><title>XForms Sandbox</title></head>
+    <body>
+        <xf:group ref="/form">
+            <p>
+                This example allows you to easily try your own XForms examples. Just point to an
+                XHTML + XForms document below, press the "Upload" button, and check if it works with
+                OPS!
+            </p>
+            <p style="color: red">
+                Note that your document has to be in the XHTML namespace. Plain HTML won't work.
+            </p>
+            <table>
+                <tr>
+                    <td>
+                        <xf:upload ref="file">
+                            <xf:filename ref="@filename"/>
+                            <xf:mediatype ref="@mediatype"/>
+                            <xxf:size ref="@size"/>
+                        </xf:upload>
+                    </td>
+                    <td>
+                        <xf:submit>
+                            <xf:label>Upload</xf:label>
+                            <xf:setvalue ref="action">upload</xf:setvalue>
+                        </xf:submit>
+                    </td>
+                </tr>
+            </table>
+            <p style="font-style: italic">
+                Tip: Once the file is uploaded and displaying, you can do a "reload" in your browser
+                to update the page with modifications you have done to your local file. The browser
+                will re-upload the modified file.
+            </p>
+        </xf:group>
+    </body>
+</html>

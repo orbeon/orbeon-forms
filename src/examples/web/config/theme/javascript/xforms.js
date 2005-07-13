@@ -77,20 +77,37 @@ function xformsArrayContains(array, element) {
     return false;
 }
 
-function xformsArrayRemove(array, element) {
-    // Look for position of element to remove
-    var elementIndex = -1;
-    for (var i = 0; i < array.length; i++)
-        if (array[i] == element)
-            elementIndex = i;
-    // Remove element if found
-    if (elementIndex != -1) {
-        // If the element is not the last one, save the last one at the position of the element to remove
-        if (elementIndex < array.length - 1)
-            array[elementIndex] = array[array.length - 1];
-        array.pop();
+function xformsRemoveClass(element, classToRemove) {
+    var array = element.className.split(" ");
+    var newClassName = "";
+    for (var i in array) {
+        var currentClass = array[i];
+        if (currentClass != classToRemove) {
+            if (newClassName != "") newClassName += " ";
+            newClassName += currentClass;
+        }
     }
-    return array;
+    element.className = newClassName;
+}
+
+function xformsAddClass(element, classToAdd) {
+    var array = element.className.split(" ");
+    // Check if the class to add is already present
+    var classAlreadyThere = false;
+    for (var i in array) {
+        var currentClass = array[i];
+        if (currentClass == classToAdd) {
+            classAlreadyThere = true;
+            break;
+        }
+    }
+    // Add new class if necessary
+    if (!classAlreadyThere) {
+        var newClassName = element.className;
+        if (newClassName != "") newClassName += " ";
+        newClassName += classToAdd;
+        element.className = newClassName;
+    }
 }
 
 function xformsGetElementPosition(element) {
@@ -848,7 +865,6 @@ function xformsHandleResponse() {
                                             var controlId = controlElement.getAttribute("id");
                                             var relevant = controlElement.getAttribute("relevant");
                                             var documentElement = document.getElementById(controlId);
-                                            if (!documentElement) break; // We don't handle <xxf:control id="employeeSet-2" relevant="false"/>
                                             var documentElementClasses = documentElement.className.split(" ");
 
                                             // Check if this control was modified and we haven't even received the key event yet
@@ -911,33 +927,31 @@ function xformsHandleResponse() {
                                             if (newValid != null) documentElement.isValid = newValid != "false";
                                             // Store new hint message in control attribute
                                             var newLabel = controlElement.getAttribute("label");
-                                            if (newLabel && newLabel != documentElement.labelMessage) {
+                                            if (newLabel && newLabel != documentElement.labelMessage)
                                                 documentElement.labelMessage = newLabel;
-                                                // At this point we only support updating dynamically the label if
-                                                // there is a <label> is generated
-                                                if (documentElement.labelElement)
-                                                    xformsUpdateStyle(documentElement.labelElement);
-                                            }
                                             // Store new hint message in control attribute
                                             var newHint = controlElement.getAttribute("hint");
-                                            if (newHint && newHint != documentElement.hintMessage) {
+                                            if (newHint && newHint != documentElement.hintMessage)
                                                 documentElement.hintMessage = newHint;
-                                                xformsUpdateStyle(documentElement.hintElement);
-                                            }
                                             // Store new help message in control attribute
                                             var newHelp = controlElement.getAttribute("help");
-                                            if (newHelp && newHelp != documentElement.helpMessage) {
+                                            if (newHelp && newHelp != documentElement.helpMessage)
                                                 documentElement.helpMessage = newHelp;
-                                                xformsUpdateStyle(documentElement.helpElement);
-                                            }
-
                                             // Update relevant
-                                            if (relevant) {
+                                            if (relevant)
                                                 documentElement.isRelevant = relevant == "true";
-                                            }
 
                                             // Update style
                                             xformsUpdateStyle(documentElement);
+                                            if (documentElement.labelElement)
+                                                xformsUpdateStyle(documentElement.labelElement);
+                                            if (documentElement.hintElement)
+                                                xformsUpdateStyle(documentElement.hintElement);
+                                            if (documentElement.helpElement)
+                                                xformsUpdateStyle(documentElement.helpElement);
+                                            if (documentElement.alertElement)
+                                                xformsUpdateStyle(documentElement.alertElement);
+
                                             break;
                                         }
 
@@ -1060,6 +1074,26 @@ function xformsHandleResponse() {
                                             }
                                             break;
                                         }
+
+                                        // Model item properties on a repeat item
+                                        case "repeat-iteration": {
+                                            // Extract data from server response
+                                            var repeatIterationElement = controlValuesElement.childNodes[j];
+                                            var repeatId = repeatIterationElement.getAttribute("id");
+                                            var iteration = repeatIterationElement.getAttribute("iteration");
+                                            var relevant = repeatIterationElement.getAttribute("relevant") == "true";
+                                            // Remove or add xforms-disabled on elements after this delimiter
+                                            var cursor = xformsFindRepeatDelimiter(repeatId, iteration).nextSibling;
+                                            while (cursor.className != "xforms-repeat-delimiter"
+                                                        && cursor.className != "xforms-repeat-begin-end") {
+                                                if (cursor.nodeType == ELEMENT_TYPE) {
+                                                    if (relevant) xformsRemoveClass(cursor, "xforms-disabled");
+                                                    else xformsAddClass(cursor, "xforms-disabled");
+                                                }
+                                                cursor = cursor.nextSibling;
+                                            }
+                                            break;
+                                        }
                                     }
                                 }
                                 break;
@@ -1124,7 +1158,7 @@ function xformsHandleResponse() {
                                                (cursor.className != "xforms-repeat-delimiter"
                                                && cursor.className != "xforms-repeat-begin-end")) {
                                             if (cursor.nodeType == ELEMENT_TYPE)
-                                                cursor.className = xformsArrayRemove(cursor.className.split(" "), getClassForReapeatId(repeatId)).join(" ");
+                                                xformsRemoveClass(cursor, getClassForReapeatId(repeatId));
                                             cursor = cursor.nextSibling;
                                         }
                                     }

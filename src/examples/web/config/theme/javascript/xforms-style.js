@@ -27,18 +27,10 @@ function xformsUpdateStyle(element) {
         }
     }
 
-    function updateElementClasses(element, isRelevant) {
-        var classes = element.className.split(" ");
-        if (element.isRelevant) {
-            // Remove xforms-disabled if present
-            xformsArrayRemove(classes, "xforms-disabled");
-            element.className = classes.join(" ");
-        } else {
-            // Add xforms-disabled if not present
-            if (!xformsArrayContains(classes, "xforms-disabled")) {
-                classes.push("xforms-disabled");
-                element.className = classes.join(" ");
-            }
+    function updateRelevant(element, relevant) {
+        if (xformsIsDefined(relevant)) {
+            if (relevant) xformsRemoveClass(element, "xforms-disabled")
+            else xformsAddClass(element, "xforms-disabled");
         }
     }
 
@@ -66,6 +58,9 @@ function xformsUpdateStyle(element) {
                     while (element.firstChild) element.removeChild(element.firstChild);
                     element.appendChild(document.createTextNode(control.labelMessage));
                 }
+
+                // Disable or enable label depending if control is relevant
+                updateRelevant(element, control.isRelevant);
             }
 
             if (className == "xforms-hint") {
@@ -106,6 +101,9 @@ function xformsUpdateStyle(element) {
                         control.attachEvent("onblur", controlLoosesFocus);
             	    }
                 }
+
+                // Disable or enable hint depending if control is relevant
+                updateRelevant(element, control.isRelevant);
             }
             
             if (className == "xforms-help") {
@@ -154,8 +152,26 @@ function xformsUpdateStyle(element) {
                         tt_Hide();
                     });
                 }
+
+                // Disable or enable help depending if control is relevant
+                updateRelevant(element, control.isRelevant);
             }
-            
+
+            if (className == "xforms-alert-inactive" || className == "xforms-alert-active") {
+
+                // Initialize alert control when necessary
+                var control = document.getElementById(element.htmlFor);
+                if (control.alertElement != element)
+                    control.alertElement = element;
+
+                // Change alert status when necessary
+                if (xformsIsDefined(control.isValid))
+                    element.className = control.isValid ? "xforms-alert-inactive" : "xforms-alert-active";
+
+                // Disable or enable help depending if control is relevant
+                updateRelevant(element, control.isRelevant);
+            }
+
             if (className == "xforms-date") {
                 if (!element.setupDone) {
                     element.setupDone = true;
@@ -200,19 +216,10 @@ function xformsUpdateStyle(element) {
                     changeHeightHandler();
                     xformsAddEventListener(element, "keyup", changeHeightHandler);
                 }
-                
-            }
-
-            // Update validity
-            if (element.alertElement && typeof(element.isValid) != "undefined") {
-                element.alertElement.className = element.isValid ? "xforms-alert-inactive" 
-                    : "xforms-alert-active";
             }
 
             // Update relevant
-            if (xformsIsDefined(element.isRelevant)) {
-                updateElementClasses(element, element.isRelevant);
-            }
+            updateRelevant(element, element.isRelevant);
 
             // This is for widgets. Code for widgets should be modularized and moved out of this file
             

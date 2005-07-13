@@ -415,12 +415,24 @@
             <!-- Repeat content for the number of occurrences the XForms Server gives us -->
             <xsl:for-each select="(1 to $current-repeat-iteration/@occurs)">
                 <!-- Delimiter: between repeat entries -->
-                <xsl:if test="position() > 1">
+                <xsl:if test="current() > 1">
                     <xsl:copy-of select="xxforms:repeat-delimiter($delimiter-namespace-uri, $delimiter-local-name, ())"/>
                 </xsl:if>
                 <!-- Is the current iteration selected? -->
                 <xsl:variable name="current-repeat-selected" as="xs:boolean" select="$repeat-selected and current() = $current-repeat-index/@index"/>
-                <xsl:variable name="current-repeat-children" as="node()*">
+                <!-- Is the current iteration relevant? -->
+                <xsl:variable name="action-repeat-iteration" as="element()"
+                    select="$response/xxforms:action/xxforms:control-values/xxforms:repeat-iteration[@id = $id and @iteration = current()]"/>
+                <xsl:variable name="current-repeat-relevant" as="xs:boolean" select="$action-repeat-iteration/@relevant = 'true'"/>
+                <!-- Classes we add on the element in the current repeat iteration -->
+                <xsl:variable name="number-parent-repeat" as="xs:integer" select="count(tokenize($id-postfix, '-'))"/>
+                <xsl:variable name="added-classes" as="xs:string*"
+                    select="(if ($current-repeat-selected) then
+                        concat('xforms-repeat-selected-item-', if ($number-parent-repeat mod 2 = 1) then '1' else '2') else (),
+                        if ($current-repeat-relevant) then () else 'xforms-disabled')"/>
+                <xsl:message>Added classes: <xsl:value-of select="$added-classes"/></xsl:message>
+                <!-- Get children of current repeat iteration adding a span element around text nodes -->
+                <xsl:variable name="current-repeat-children-nodes" as="node()*">
                     <xsl:apply-templates select="$xforms-repeat/node()">
                         <xsl:with-param name="id-postfix" select="concat($id-postfix, '-', current())" tunnel="yes"/>
                         <xsl:with-param name="top-level-repeat" select="false()" tunnel="yes"/>
@@ -428,30 +440,42 @@
                         <xsl:with-param name="repeat-selected" select="$current-repeat-selected" tunnel="yes"/>
                     </xsl:apply-templates>
                 </xsl:variable>
-                <xsl:choose>
-                    <!-- If currently selected, add class xforms-repeat-selected-item -->
-                    <xsl:when test="$current-repeat-selected">
-                        <xsl:for-each select="$current-repeat-children">
-                            <xsl:choose>
-                                <xsl:when test=". instance of element()">
-                                    <xsl:copy>
-                                        <xsl:variable name="number-parent-repeat" as="xs:integer" select="count(tokenize($id-postfix, '-'))"/>
-                                        <xsl:attribute name="class" select="concat(if (@class) then concat(@class, ' ') else '',
-                                            'xforms-repeat-selected-item-', if ($number-parent-repeat mod 2 = 1) then '1' else '2')"/>
-                                        <xsl:copy-of select="@* except @class"/>
-                                        <xsl:copy-of select="node()"/>
-                                    </xsl:copy>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:copy-of select="."/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                        </xsl:for-each>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:copy-of select="$current-repeat-children"/>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <xsl:variable name="current-repeat-children-with-span" as="node()*">
+                    <xsl:for-each select="$current-repeat-children-nodes">
+                        <xsl:choose>
+                            <xsl:when test=". instance of element()">
+                                <xsl:copy-of select="."/>
+                            </xsl:when>
+                            <xsl:when test="normalize-space() != ''">
+                                <xhtml:span>
+                                    <xsl:message>Text length: |<xsl:value-of select="normalize-space(.)"/>|</xsl:message>
+                                    <xsl:value-of select="."/>
+                                </xhtml:span>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="."/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:for-each>
+                </xsl:variable>
+                <!-- Copy elements in current repeat iteration adding class if necessary -->
+                <xsl:for-each select="$current-repeat-children-with-span">
+                    <xsl:choose>
+                        <xsl:when test=". instance of element()">
+                            <xsl:copy>
+                                <xsl:variable name="classes-on-element" as="xs:string*" select="(@class, $added-classes)"/>
+                                <xsl:if test="count($classes-on-element) > 0">
+                                    <xsl:attribute name="class" select="string-join($classes-on-element, ' ')"/>
+                                </xsl:if>
+                                <xsl:copy-of select="@* except @class"/>
+                                <xsl:copy-of select="node()"/>
+                            </xsl:copy>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="."/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:for-each>
             </xsl:for-each>
         </xsl:if>
 

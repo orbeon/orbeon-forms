@@ -26,10 +26,10 @@
             <p>
                 <link href="http://www.w3.org/TR/xslt">XSLT 1.0</link> and <a
                 href="http://www.w3.org/TR/2005/WD-xslt20-20050404/">XSLT 2.0</a> are languages for
-                transforming XML documents into other XML documents. PresentationServer uses XSLT
+                transforming XML documents into other XML documents. OPS uses XSLT
                 extensively to process XML documents.
             </p>
-            <p>PresentationServer ships with multiple implementations of XSLT:</p>
+            <p>OPS ships with multiple implementations of XSLT:</p>
             <ul>
                 <li>Saxon 8.1.1 (supports XSLT 2.0 and XPath 2.0 in addition to XSLT 1.0 and XPath 1.0)</li>
                 <li>Saxon 6.5.2 (supports XSLT 1.0)</li>
@@ -37,7 +37,7 @@
                 <li>Xalan 2.5.1 Compiler (XSLTC) (supports XSLT 1.0)</li>
             </ul>
             <p>
-                Additionally, PresentationServer can use any Java API for XML Processing (JAXP)
+                Additionally, OPS can use any Java API for XML Processing (JAXP)
                 compliant transformer.
             </p>
         </section>
@@ -225,7 +225,7 @@
                     This input specifies a specific concrete subclass of <link
                     href="http://java.sun.com/j2se/1.4.2/docs/api/javax/xml/transform/TransformerFactory.html">
                     <code>TransformerFactory</code></link>. For example, you can use the TrAX
-                    transformer to interface PresentationServer with a new hypothetical transformer
+                    transformer to interface OPS with a new hypothetical transformer
                     (MyTrans):
                     <xml-source>
                         <p:processor name="oxf:trax">
@@ -420,7 +420,7 @@
             </p>
 
             <p>
-                PresentationServer uses <link href="http://joost.sourceforge.net/">Joost</link> to
+                OPS uses <link href="http://joost.sourceforge.net/">Joost</link> to
                 implement a STX transformer. Its usage is similar to an XSLT transformer, using the
                 processor URI <code>oxf:stx</code>. This <link href="../examples/stx">example</link>
                 demonstrates a simple STX transformation.

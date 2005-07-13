@@ -410,24 +410,30 @@ complète la grave harmonie.
             </section>
         </section>
         <note>
-            The HTTP serializer performs streaming. If its input data consists of a stream of
-            short character SAX events, such as those produced by the <a
-            href="processors-generators-request">Request generator</a> the <a
-            href="processors-generators-url">URL generator</a>, the <a
-            href="processors-sql#binary-data">SQL processor</a>, or converter processors, it is
-            possible to serialize an "infinitely" long document.
+            <p>
+                The HTTP serializer performs streaming. If its input data consists of a stream of
+                short character SAX events, such as those produced by the <a
+                href="processors-generators-request">Request generator</a> the <a
+                href="processors-generators-url">URL generator</a>, the <a
+                href="processors-sql#binary-data">SQL processor</a>, or converter processors, it is
+                possible to serialize an "infinitely" long document.
+            </p>
         </note>
         <note>
-            When using the command-line mode, instead of sending the output through HTTP, the
-            HTTP serializer sends its output to the standard console output. In such a case,
-            the parameters that do not affect the content of the data, such as content-type,
-            status-code, etc. are ignored.
+            <p>
+                When using the command-line mode, instead of sending the output through HTTP, the
+                HTTP serializer sends its output to the standard console output. In such a case, the
+                parameters that do not affect the content of the data, such as content-type,
+                status-code, etc. are ignored.
+            </p>
         </note>
         <note>
-            The HTTP serializer sends the cache control HTTP headers, including
-            <code>Last-Modified</code>, <code>Expires</code> and <code>Cache-Control</code>.
-            The <code>Content-Type</code> and <code>Content-Length</code> headers are also
-            supported.
+            <p>
+                The HTTP serializer sends the cache control HTTP headers, including
+                <code>Last-Modified</code>, <code>Expires</code> and <code>Cache-Control</code>.
+                The <code>Content-Type</code> and <code>Content-Length</code> headers are also
+                supported.
+            </p>
         </note>
     </body>
 </document>

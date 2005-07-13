@@ -22,20 +22,19 @@
         <section>
             <title>Introduction</title>
             <p>
-                The <i>resource manager</i> is the Orbeon PresentationServer (OPS) component
+                A <i>resource manager</i> is an Orbeon PresentationServer (OPS) component
                 responsible for reading and writing XML and other resources like binary and text
-                documents. The resource manager abstracts the actual mechanisms used to store
+                documents. A resource manager abstracts the actual mechanisms used to store
                 resources. An important benefit of using such an abstraction is that it is possible
-                to store all your application files in a sandbox which can be moved at will within
-                a filesystem or between storage mechanisms. For instance, resources can be
-                stored:</p>
+                to store all your application files in a sandbox which can be moved at will within a
+                filesystem or between storage mechanisms. For instance, resources can be stored:</p>
             <ul>
                 <li><p>As files on disk (using your operating system's file system)</p></li>
                 <li><p>As resources within a WAR file</p></li>
                 <li><p>As resources within one or more JAR files</p></li>
                 <li><p>In a WebDAV server</p></li>
             </ul>
-            <p>The resource manager is both used:</p>
+            <p>A resource manager is both used:</p>
             <ul>
                 <li><p>Internally by OPS</p></li>
                 <li><p>By your own OPS applications through URLs with the <code>oxf:</code> protocol</p></li>
@@ -48,9 +47,9 @@
         <section>
             <title>General Configuration</title>
             <p>
-                The resource manager is initialized in the OPS main servlet. Configuration is
-                handled in the web application descriptor (<code>web.xml</code>) by setting a
-                number of properties. The first property indicates the resource manager factory:
+                A single resource manager is initialized per OPS web application. Configuration is
+                handled in the web application descriptor (<code>web.xml</code>) by setting a number
+                of context parameters. The first parameter indicates the resource manager factory:
             </p>
             <xml-source>
                 <context-param>
@@ -493,15 +492,18 @@
             </p>
 
             <note>
-                To enable this Resource Manager, you must copy <code>CacheDB.jar</code> from
-                Cach&#233; distribution into OPS <code>WEB-INF/lib</code>
-                directory.
+                <p>
+                    To enable this Resource Manager, you must copy <code>CacheDB.jar</code> from
+                    Cach&#233; distribution into OPS <code>WEB-INF/lib</code> directory.
+                </p>
             </note>
 
             <warning>
-                The Cach&#233; Resource Manager only supports XML document. To serve other
-                document types (like text, images), you must cascade a second resource manager with
-                the help of the Priority Resource Manager.
+                <p>
+                    The Cach&#233; Resource Manager only supports XML document. To serve other
+                    document types (like text, images), you must cascade a second resource manager
+                    with the help of the Priority Resource Manager.
+                </p>
             </warning>
             <section>
                 <title>Importing XML Files into Cach&#233;</title>

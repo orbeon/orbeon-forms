@@ -37,7 +37,9 @@
                 OPS application.
             </p>
             <warning>
-                This section has not yet been updated for OPS 3.0 BETA.
+                <p>
+                    This section has not yet been updated for OPS 3.0 BETA.
+                </p>
             </warning>
         </section>
         <a name="introduction"/>
@@ -950,8 +952,10 @@
                     than the original binary data. For more information, please refer to the <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC</a>.</li>
                 </ul>
                 <note>
-                    It is mandatory to specify either one of <code>xs:anyURI</code> or
-                    <code>xs:base64Binary</code>.
+                    <p>
+                        It is mandatory to specify either one of <code>xs:anyURI</code> or
+                        <code>xs:base64Binary</code>.
+                    </p>
                 </note>
                 <p>
                     The optional <code>xforms:filename</code>, <code>xforms:mediatype</code>, and
@@ -990,9 +994,11 @@
                     file in Base64-encoded text.
                 </p>
                 <note>
-                    Using the <code>xs:anyURI</code> type allows OPS to make sure
-                    the uploaded file does not have to reside entirely in memory. This is the
-                    preferred method for uploading large files.
+                    <p>
+                        Using the <code>xs:anyURI</code> type allows OPS to make sure the uploaded
+                        file does not have to reside entirely in memory. This is the preferred
+                        method for uploading large files.
+                    </p>
                 </note>
                 <p>
                     The result of a file upload can look as follows when using
@@ -1311,8 +1317,11 @@
                     <code>if</code> and <code>choose/when/otherwise</code>.
                 </p>
                 <note>
-                    The <code>test</code> attribute must contain an XPath expression to be evaluated against the current instance.
-                    Expressions  not starting with a '/' are considered relative to the nearest <code>xforms:group</code>.
+                    <p>
+                        The <code>test</code> attribute must contain an XPath expression to be
+                        evaluated against the current instance. Expressions not starting with a '/'
+                        are considered relative to the nearest <code>xforms:group</code>.
+                    </p>
                 </note>
                 <p>
                     <ul>

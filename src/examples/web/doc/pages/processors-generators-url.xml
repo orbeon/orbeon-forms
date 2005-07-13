@@ -29,7 +29,7 @@
             <p>
                 The URL generator fetches a document from a URL and produces an XML output document.
                 Common protocols such as <code>http:</code>, <code>ftp:</code>, and
-                <code>file:</code> are supported as well as the PresentationServer resource
+                <code>file:</code> are supported as well as the OPS resource
                 protocol (<code>oxf:</code>). See <link href="reference-resource-managers">Resource
                 Managers</link> for more information about the <code>oxf:</code> protocol.
             </p>
@@ -91,8 +91,10 @@
                 </p:processor>
             </xml-source>
             <note>
-                The URL must point to a well-formed XML document. If it doesn't, an exception
-                will be raised.
+                <p>
+                    The URL must point to a well-formed XML document. If it doesn't, an exception
+                    will be raised.
+                </p>
             </note>
         </section>
         <section>
@@ -131,8 +133,10 @@
                 </p:processor>
             </xml-source>
             <note>
-                HTML Tidy has some tolerance for malformed HTML, but it is encouraged to access
-                well-formed HTML whenever possible.
+                <p>
+                    HTML Tidy has some tolerance for malformed HTML, but it is encouraged to access
+                    well-formed HTML whenever possible.
+                </p>
             </note>
         </section>
         <section>
@@ -181,13 +185,15 @@ This is line three of the input document!
 </document>
             </xml-source>
             <note>
-                The URL generator performs streaming. It generates a stream of short character
-                SAX events. It is therefore possible to generate an "infinitely" long document
-                with a constant amount of memory, assuming the generator is connected to other
-                processors that do not require storing the entire stream of data in memory, for
-                example the <a href="processors-sql#binary-data">SQL processor</a> (with an
-                appropriate configuration to stream BLOBs), or the <a
-                href="processors-serializers-http">HTTP serializer</a>.
+                <p>
+                    The URL generator performs streaming. It generates a stream of short character
+                    SAX events. It is therefore possible to generate an "infinitely" long document
+                    with a constant amount of memory, assuming the generator is connected to other
+                    processors that do not require storing the entire stream of data in memory, for
+                    example the <a href="processors-sql#binary-data">SQL processor</a> (with an
+                    appropriate configuration to stream BLOBs), or the <a
+                    href="processors-serializers-http">HTTP serializer</a>.
+                </p>
             </note>
         </section>
         <section>
@@ -223,13 +229,15 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
 </document>
             </xml-source>
             <note>
-                The URL generator performs streaming. It generates a stream of short character
-                SAX events. It is therefore possible to generate an "infinitely" long document
-                with a constant amount of memory, assuming the generator is connected to other
-                processors that do not require storing the entire stream of data in memory, for
-                example the <a href="processors-sql#binary-data">SQL processor</a> (with an
-                appropriate configuration to stream BLOBs), or the <a
-                href="processors-serializers-http">HTTP serializer</a>.
+                <p>
+                    The URL generator performs streaming. It generates a stream of short character
+                    SAX events. It is therefore possible to generate an "infinitely" long document
+                    with a constant amount of memory, assuming the generator is connected to other
+                    processors that do not require storing the entire stream of data in memory, for
+                    example the <a href="processors-sql#binary-data">SQL processor</a> (with an
+                    appropriate configuration to stream BLOBs), or the <a
+                    href="processors-serializers-http">HTTP serializer</a>.
+                </p>
             </note>
         </section>
         <section>
@@ -348,7 +356,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             <title>Cache Control</title>
             <p>
                 It is possible to configure whether the URL generator caches documents locally
-                in the PresentationServer cache. By default, it does. To disable caching, use
+                in the OPS cache. By default, it does. To disable caching, use
                 the <code>cache-control/use-local-cache</code> element, for example:
             </p>
             <xml-source>
@@ -367,7 +375,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
             </xml-source>
             <p>
                 Using the local cache causes the URL generator to check if the document is in
-                the PresentationServer cache first. If it is, its validity is checked with the
+                the OPS cache first. If it is, its validity is checked with the
                 protocol handler (looking at the last modified date for files, the
                 <code>last-modified</code> header for http, etc.). If the cached document is
                 valid, it is used. Otherwise, it is fetched and put in the cache.

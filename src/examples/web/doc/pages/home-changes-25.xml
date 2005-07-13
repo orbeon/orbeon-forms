@@ -480,11 +480,14 @@
                             </p>
                         </li>
                         <note>
-                            Using the name <code>page-flow.xml</code> is not mandatory, but is the
-                            recommended naming practice. If you are migrating from OXF 2.2, it is
-                            also recommended to rename your <code>controller.xml</code> files to
-                            <code>page-flow.xml</code>. If you do so, please update the reference to
-                            <code>controller.xml</code> in your <code>web.xml</code> as well.
+                            <p>
+                                Using the name <code>page-flow.xml</code> is not mandatory, but is
+                                the recommended naming practice. If you are migrating from OXF 2.2,
+                                it is also recommended to rename your <code>controller.xml</code>
+                                files to <code>page-flow.xml</code>. If you do so, please update the
+                                reference to <code>controller.xml</code> in your
+                                <code>web.xml</code> as well.
+                            </p>
                         </note>
                         <li>
                             <p>

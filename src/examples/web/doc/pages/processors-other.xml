@@ -37,13 +37,13 @@
                 <ul>
                     <li><code>file</code></li>
                     <li><code>http</code></li>
-                    <li><code>oxf</code> (to access PresentationServer resources)</li>
+                    <li><code>oxf</code> (to access OPS resources)</li>
                 </ul>
                 <p>
                     The Resource Server supports the deprecated use of a <code>config</code> input
                     containing a single <code>path</code> element representing the absolute Resource
                     Manager path of the file to serve. Since the <code>url</code> element also
-                    allows to access to PresentationServer resources, it is recommended to use it
+                    allows to access to OPS resources, it is recommended to use it
                     instead of <code>path</code>.
                 </p>
             </section>
@@ -53,7 +53,7 @@
                     The <code>mime-types</code> input contains a list of patterns and <link
                     href="http://www.iana.org/assignments/media-types/">MIME Media Types</link>.
                     This mapping list determines which <code>content-type</code> header to send to
-                    the browser. The patterns are case-insensitive. PresentationServer is bundled
+                    the browser. The patterns are case-insensitive. OPS is bundled
                     with a default mapping file under the URL <code>oxf:/oxf/mime-types.xml</code>.
                     You can create your own mapping to suit your needs. The RelaxNG schema is
                     provided below.
@@ -103,7 +103,7 @@
         <section>
             <title>Identity Processor</title>
             <p>
-                The Identity processor is one of the simplest processors of PresentationServer: it
+                The Identity processor is one of the simplest processors of OPS: it
                 simply copies the content of its <code>data</code> input to its <code>data</code>
                 output. While at first this doesn't seem like a very useful feature, it actually can
                 be very convenient, for example in the following scenarios.
@@ -220,7 +220,7 @@
                 own "Debug processor" and this processor will be called when you use
                 <code>debug</code> attributes in pipelines. If you decide to implement your own
                 debug processor, note that it must have the same interface as the default Debug
-                processor that comes with PresentationServer.
+                processor that comes with OPS.
             </p>
         </section>
         <anchor id="RedirectProcessor"/>
@@ -302,11 +302,13 @@
                 </p:processor>
             </xml-source>
             <note>
-                It is recommended, whenever possible, to use the <link
-                href="reference-page-flow">Page Flow Controller</link> to perform page
-                redirections within a PresentationServer application. The Page Flow Controller
-                provides a much higher-level abstraction of the notion of redirection than the
-                Redirect Processor.
+                <p>
+                    It is recommended, whenever possible, to use the <link
+                    href="reference-page-flow">Page Flow Controller</link> to perform page
+                    redirections within a OPS application. The Page Flow Controller
+                    provides a much higher-level abstraction of the notion of redirection than the
+                    Redirect Processor.
+                </p>
             </note>
         </section>
     </body>

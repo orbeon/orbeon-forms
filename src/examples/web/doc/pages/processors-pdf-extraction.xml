@@ -43,7 +43,9 @@
                 returns an empty &lt;PDFDocument /&gt; entry.
             </p>
             <note>
-                This processor is a contribution from TAO Consulting Pte Ltd.
+                <p>
+                    This processor is a contribution from TAO Consulting Pte Ltd.
+                </p>
             </note>
 		</section>
 		<section>

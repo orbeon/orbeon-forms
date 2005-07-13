@@ -24,7 +24,7 @@
             <p>
                 Generators are a special category of processors that have no XML data inputs, only
                 outputs. They are generally used at the top of an XML pipeline to generate XML data
-                from a Java object or other non-XML source. PresentationServer provides several
+                from a Java object or other non-XML source. OPS provides several
                 generators as described below. See also the <a
                 href="processors-generators-url">URL</a> and <a
                 href="processors-generators-request">Request</a> generators.
@@ -137,7 +137,7 @@
                                     <b>request</b> - The request scope starts when an HTTP request is
                                     sent to the server. It ends when the corresponding HTTP response is
                                     sent back to the client. The request scope can be used to integrate
-                                    a PresentationServer application with legacy J2EE servlets.
+                                    a OPS application with legacy J2EE servlets.
                                 </li>
                             </ul>
                         </td>
@@ -159,12 +159,16 @@
                 </xml-source>
             </section>
             <note>
-                The Session generator, previously used to retrieve documents from the session
-                scope, is now deprecated. Use the Scope generator with session scope instead.
+                <p>
+                    The Session generator, previously used to retrieve documents from the session
+                    scope, is now deprecated. Use the Scope generator with session scope instead.
+                </p>
             </note>
             <note>
-                The Bean generator, previously used to retrieve JavaBeans from the request and
-                session scopes, is now deprecated. Use the Scope generator instead.
+                <p>
+                    The Bean generator, previously used to retrieve JavaBeans from the request and
+                    session scopes, is now deprecated. Use the Scope generator instead.
+                </p>
             </note>
         </section>
         <anchor id="servletinclude"/>
@@ -178,7 +182,9 @@
                 detects HTML and uses HTMLTidy to clean and parse the stream as XML.
             </p>
             <note>
-                This generator works only in a servlet environment. It is not supported in portlets.
+                <p>
+                    This generator works only in a servlet environment. It is not supported in portlets.
+                </p>
             </note>
             <section>
                 <title>Configuration</title>
@@ -293,8 +299,10 @@
         <section>
             <title>Bean Generator</title>
             <note>
-                This processor is deprecated. Please refer to the <a href="#scope-generator">Scope
-                generator</a> instead.
+                <p>
+                    This processor is deprecated. Please refer to the <a
+                    href="#scope-generator">Scope generator</a> instead.
+                </p>
             </note>
             <p>
                 The Bean generator serializes objects in the request or session to XML. If an object

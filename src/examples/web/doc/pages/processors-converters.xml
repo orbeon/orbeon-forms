@@ -40,7 +40,7 @@
             <title>Standard Converters</title>
             <p>
                 The standard converters convert XML infosets (the XML documents that circulate in
-                PresentationServer pipelines) into text according to standard output methods
+                OPS pipelines) into text according to standard output methods
                 defined by the XSLT specification. They convert to the following formats:
             </p>
             <ul>
@@ -226,9 +226,11 @@
                     </document>
                 </xml-source>
                 <note>
-                    The <link href="http://www.w3.org/TR/2000/REC-xml-20001006">XML 1.0
-                    Specification</link> prohibits a DOCTYPE definition with a Public ID and no
-                    System ID.
+                    <p>
+                        The <link href="http://www.w3.org/TR/2000/REC-xml-20001006">XML 1.0
+                        Specification</link> prohibits a DOCTYPE definition with a Public ID and
+                        no System ID.
+                    </p>
                 </note>
             </section>
             <section>
@@ -293,9 +295,9 @@
         <section>
             <title>XLS Converters</title>
             <p>
-                PresentationServer ships with the <link
+                OPS ships with the <link
                 href="http://jakarta.apache.org/poi/">POI</link> library which allows import and
-                export of Microsoft Excel documents. PresentationServer uses an Excel file
+                export of Microsoft Excel documents. OPS uses an Excel file
                 template to define the layout of the spreadsheet. You define cells that will contain
                 the values with a special markup.
             </p>

@@ -36,14 +36,14 @@
                 XPL pipelines are built up from smaller components called XML processors or XML
                 components. An XML processor is a software component which consumes and produces
                 XML documents. New XML processors are most often written in Java. But most often
-                developers do not need to write their own processors because PresentationServer
+                developers do not need to write their own processors because OPS
                 comes standard with a comprehensive library. XPL orchestrates these to create
                 business logic, similar to the way Java code “orchestrates” method calls within a
                 Java object.
             </p>
             <p>
                 For a step-by-step introduction to pipelines, see <link href="OPS Tutorial.pdf">Orbeon
-                PresentationServer Tutorial</link>.
+                OPS Tutorial</link>.
             </p>
             <p>
                 Please also refer to the <a
@@ -183,7 +183,7 @@
                     </ul>
                     <p>
                         This mechanism allows grouping related processors in a namespace. For
-                        example, all the basic PresentationServer processors are grouped in the
+                        example, all the basic OPS processors are grouped in the
                         <code>http://www.orbeon.com/oxf/processors</code> namespace. This namespace
                         is typically mapped to the <code>oxf</code> prefix. Processors are then
                         referred to using names such as <code>oxf:xslt</code> or
@@ -195,7 +195,10 @@
                         href="integration-packaging">Packaging and Deployment</link>.
                     </p>
                     <note>
-                        For backward compatibility, the <code>uri</code> attribute is still supported.
+                        <p>
+                            For backward compatibility, the <code>uri</code> attribute is still
+                            supported.
+                        </p>
                     </note>
                 </li>
                 <li>
@@ -231,7 +234,7 @@
                     the corresponding input or output. <code>schema-href</code> references a
                     document using the <link href="#href-attribute"><code>href</code></link>
                     syntax. <code>schema-uri</code> specifies the URI of a schema that is mapped to
-                    a specific schema in the <link href="reference-properties">PresentationServer
+                    a specific schema in the <link href="reference-properties">OPS
                     properties file</link>.
                 </p></li>
                 <li><p>
@@ -793,7 +796,7 @@
                     configuration, to particular processor inputs and outputs. If you implement a
                     new processor, you should support the <code>input:</code> and
                     <code>output:</code> URI schemes for this purpose. On the other hand, if you are
-                    using a standard PresentationServer processor supporting such references to
+                    using a standard OPS processor supporting such references to
                     processor inputs and outputs, you can count on the <code>input:</code> and
                     <code>output:</code> URI schemes being used. For example:
                 </p>
@@ -804,7 +807,7 @@
                 <p>
                     While there is no requirement for processor configurations to follow this URI
                     convention, it is highly recommended to do so whenever possible to ensure
-                    consistency. In PresentationServer, several processors make use of it,
+                    consistency. In OPS, several processors make use of it,
                     including:
                 </p>
                 <ul>
@@ -819,7 +822,7 @@
                     documentation.
                 </p>
                 <p>
-                    Currently, no standard processor within PresentationServer makes uses of the
+                    Currently, no standard processor within OPS makes uses of the
                     <code>output:</code> scheme. The XSLT processor would be a good candidate for
                     this feature, with XSLT 2.0's support for multiple output documents.
                 </p>

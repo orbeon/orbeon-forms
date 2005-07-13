@@ -147,11 +147,13 @@
                         <td>
                             XInclude elements
                             <note>
-                                The official namespace to use for XInclude 1.0 is
-                                <code>http://www.w3.org/2001/XInclude</code> (that is, with a
-                                <code>2001</code> in it). However, currently in OPS this URI will
-                                generate warnings from Xerces (the XML parser), which incorrectly
-                                prefers using a URI with <code>2003</code>.
+                                <p>
+                                    The official namespace to use for XInclude 1.0 is
+                                    <code>http://www.w3.org/2001/XInclude</code> (that is, with a
+                                    <code>2001</code> in it). However, currently in OPS this URI
+                                    will generate warnings from Xerces (the XML parser), which
+                                    incorrectly prefers using a URI with <code>2003</code>.
+                                </p>
                             </note>
                         </td>
                         <td>
@@ -182,8 +184,11 @@
                         <td>
                             XPath 2.0 datatypes
                             <note>
-                                This URI changes with each release of the XPath 2.0 draft
-                                specification, and with each release of the Saxon XSLT processor.
+                                <p>
+                                    This URI changes with each release of the XPath 2.0 draft
+                                    specification, and with each release of the Saxon XSLT
+                                    processor.
+                                </p>
                             </note>
                         </td>
                         <td>

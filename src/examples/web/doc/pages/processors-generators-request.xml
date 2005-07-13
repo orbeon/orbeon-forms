@@ -34,11 +34,13 @@
             </p>
         </section>
         <note>
-            The Request generator can be used as the first component in a web application pipeline,
-            but it is recommended to use the <a href="reference-page-flow">Page Flow
-            Controller</a> and <a href="reference-xforms">XForms</a> whenever possible. There are
-            cases where additional data from the request may be required, however, and where the
-            Request generator must be used.
+            <p>
+                The Request generator can be used as the first component in a web application
+                pipeline, but it is recommended to use the <a href="reference-page-flow">Page Flow
+                Controller</a> and <a href="reference-xforms">XForms</a> whenever possible. There
+                are cases where additional data from the request may be required, however, and where
+                the Request generator must be used.
+            </p>
         </note>
         <section>
             <title>Configuration</title>
@@ -143,16 +145,20 @@
                 </request>
             </xml-source>
             <note>
-                PresentationServer adds a request attribute: the <code>request-path</code>. This
-                attribute is defined as a concatenation of the <code>servlet-path</code> and the
-                <code>path-info</code>. This is useful because both original attributes are
-                frequently mixed up and often change depending on the application server or its
-                configuration.
+                <p>
+                    OPS adds a request attribute: the <code>request-path</code>. This attribute is
+                    defined as a concatenation of the <code>servlet-path</code> and the
+                    <code>path-info</code>. This is useful because both original attributes are
+                    frequently mixed up and often change depending on the application server or its
+                    configuration.
+                </p>
             </note>
             <warning>
-                This generator excludes all attributes by default. To obtain the whole attributes
-                tree (as shown in the example above), you must explicitly include
-                <code>/request</code>:
+                <p>
+                    This generator excludes all attributes by default. To obtain the whole
+                    attributes tree (as shown in the example above), you must explicitly include
+                    <code>/request</code>:
+                </p>
                 <xml-source border="false">
                     <p:processor name="oxf:request">
                         <p:input name="config">
@@ -255,11 +261,11 @@
             </xml-source>
         </section>
         <warning>
-            The URL stored as the value of the upload or request body is temporary and only
-            valid for the duration of the current request. It is only accessible from the server
-            side, and will not be accessible from a client such as a web browser. It is not
-            guaranteed to be a <code>file:</code> URL, only that it can be read with
-            PresentationServer's <a href="#url-generator">URL generator</a>.
+            The URL stored as the value of the upload or request body is temporary and only valid
+            for the duration of the current request. It is only accessible from the server side, and
+            will not be accessible from a client such as a web browser. It is not guaranteed to be a
+            <code>file:</code> URL, only that it can be read with OPS's <a
+            href="#url-generator">URL generator</a>.
         </warning>
     </body>
 </document>

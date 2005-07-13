@@ -295,10 +295,12 @@
             <section>
                 <title>Migrating to the OPS 3.0 XForms Engine</title>
                 <warning>
-                    By default, your applications written against OPS 2.8 will use the legacy 2.8
-                    XForms engine in OPS 3.0. With OPS 3.0, you use XForms in the way you expect
-                    when combining XForms with XHTML, in that you do not declare an XForms model
-                    separately from your XHTML page.
+                    <p>
+                        By default, your applications written against OPS 2.8 will use the legacy
+                        2.8 XForms engine in OPS 3.0. With OPS 3.0, you use XForms in the way you
+                        expect when combining XForms with XHTML, in that you do not declare an
+                        XForms model separately from your XHTML page.
+                    </p>
                 </warning>
                 <p>
                     In order to leverage most of the new features of XForms 3.0, it is necessary to

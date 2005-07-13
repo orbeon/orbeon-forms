@@ -17,21 +17,21 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>PresentationServer Properties</title>
+        <title>Properties File</title>
     </header>
     <body>
         <section>
             <title>Overview</title>
             <ul>
                 <li><p>
-                    <b>Rationale</b> – The PresentationServer properties are used by some
-                    processors to configure or customize their behavior. This section describes how
-                    the system is configured, and lists all the customizable properties.
+                    <b>Rationale</b> – The OPS properties are used by some processors to configure
+                    or customize their behavior. This section describes how the system is
+                    configured, and lists all the customizable properties.
                 </p></li>
                 <li><p>
                     <b>Properties File Location</b> – The properties sub-system is initialized after
                     the <link href="reference-resource-managers">Resource Manager</link> (the
-                    properties being read like any other PresentationServer resources). By default
+                    properties being read like any other OPS resources). By default
                     it tries to load a file from the URL <code>oxf:/properties.xml</code>. This
                     value can be overridden in the Web application descriptor <code>web.xmxl</code>
                     with the <code>oxf.properties</code> initialization parameter:
@@ -98,7 +98,7 @@
                     </table>
                 </p>
                 <p>
-                    PresentationServer uses the <fork
+                    OPS uses the <fork
                     href="http://jakarta.apache.org/log4j/docs/index.html">Log4J</fork> logging
                     framework. Log4J is configured with an XML file conforming to the <link
                     href="log4j.dtd.html">Log4J DTD</link>. Here is a sample Log4J configuration:
@@ -123,7 +123,7 @@
                 <p>
                     If this property is not set, the Log4J initialization is skipped. This is
                     useful if another subsystem of your application has already initialized Log4J
-                    prior to the loading of PresentationServer.
+                    prior to the loading of OPS.
                 </p>
             </section>
 
@@ -134,7 +134,7 @@
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
                             <th>Purpose</th>
-                            <td>Setup the size of the PresentationServer cache</td>
+                            <td>Setup the size of the OPS cache</td>
                         </tr>
                         <tr>
                             <th>Type</th>
@@ -150,7 +150,7 @@
                 </p>
 
                 <p>
-                    PresentationServer uses an efficient caching system. PresentationServer
+                    OPS uses an efficient caching system. OPS
                     automatically determines what can be cached and when to expire objects. The
                     cache has a default size of 200, meaning that it can hold 200 objects. This size
                     is reasonable for most applications. A bigger cache tends to make the
@@ -161,7 +161,7 @@
 
                 <ul>
                     <li>How often full garbage collections happen</li>
-                    <li>The value of the "success rate" reported by PresentationServer after each page is generated</li>
+                    <li>The value of the "success rate" reported by OPS after each page is generated</li>
                 </ul>
 
                 <p>
@@ -242,7 +242,7 @@
                     <table ca="|l|p{0.5\textwidth}|">
                         <tr>
                             <th>Purpose</th>
-                            <td>Defines PresentationServer processors</td>
+                            <td>Defines OPS processors</td>
                         </tr>
                         <tr>
                             <th>Type</th>
@@ -255,8 +255,8 @@
                     </table>
                 </p>
                 <p>
-                    Loads a PresentationServer prologue file, where processors are declared.
-                    PresentationServer is bundled with a default prologue file containing all
+                    Loads a OPS prologue file, where processors are declared.
+                    OPS is bundled with a default prologue file containing all
                     processors. You can create processors (see the <link
                     href="reference-processor-api">processor API</link>) and declare them in a
                     custom prologue. The custom prologue doesn't replace, but completes the default
@@ -292,7 +292,7 @@
                     </table>
                 </p>
                 <p>
-                    SAX is the underlying mechanism in PresentationServer by which processors
+                    SAX is the underlying mechanism in OPS by which processors
                     receive and generate XML data. Given only the constraints of the SAX API, it is
                     possible for a processor to generate an invalid sequence of SAX events. Another
                     processor that receives that invalid sequence of events may or may not be able
@@ -540,7 +540,9 @@
                     </table>
                 </p>
                 <note>
-                    This property replaces the deprecated <code>smtp</code> property.
+                    <p>
+                        This property replaces the deprecated <code>smtp</code> property.
+                    </p>
                 </note>
             </section>
             <section>
@@ -574,7 +576,9 @@
                     </table>
                 </p>
                 <note>
-                    This property replaces the deprecated <code>forceto</code> property.
+                    <p>
+                        This property replaces the deprecated <code>forceto</code> property.
+                    </p>
                 </note>
             </section>
             <p>

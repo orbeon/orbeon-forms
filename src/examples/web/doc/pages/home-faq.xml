@@ -37,9 +37,9 @@
                 <title>How does Orbeon PresentationServer compare with Apache Cocoon?</title>
 
                     <p>
-                        PresentationServer is similar to Cocoon in many respects but also presents many
+                        OPS is similar to Cocoon in many respects but also presents many
                         differences. For more information, see our <a
-                        href="http://www.orbeon.com/community/cocoon">PresentationServer and
+                        href="http://www.orbeon.com/community/cocoon">OPS and
                         Cocoon</a> comparison matrix.
                     </p>
 
@@ -82,7 +82,7 @@
                 <title>What is XPL?</title>
 
                     <p>
-                        At the core of PresentationServer lies a powerful XML processing engine that
+                        At the core of OPS lies a powerful XML processing engine that
                         natively speaks the <a
                         href="http://www.w3.org/Submission/2005/SUBM-xpl-20050411/">XML Pipeline
                         Language (XPL)</a>. XPL is a declarative language for processing XML using a
@@ -93,7 +93,7 @@
                         validation, and sub-pipelines.
                     </p>
                     <p>
-                        The Orbeon XPL pipeline engine used in PresentationServer is designed for
+                        The Orbeon XPL pipeline engine used in OPS is designed for
                         low-memory consumption and supports transparent caching.
                     </p>
 
@@ -104,7 +104,7 @@
 
                     <p>
                         The term XML processor is commonly used to refer to XML parsers. In the context
-                        of PresentationServer, the term
+                        of OPS, the term
                         <i>XML processor</i> is used to refer to
                         any software component consuming and/or producing XML documents. An XML
                         processor can also simply be called an
@@ -152,7 +152,7 @@
             </section>
             <a name="compare-model2x"/>
             <section>
-                <title>How does Orbeon PresentationServer compare with Model 2X?</title>
+                <title>How does OPS compare with Model 2X?</title>
 
                     <p>
                         Model 2 defines how the Model-View-Controller (MVC) pattern can be applied to
@@ -160,7 +160,7 @@
                         with XML and XSLT. Model 2X was first described in an
                         <a
                             href="http://www.javaworld.com/javaworld/jw-02-2002/jw-0201-strutsxslt.html">article</a>
-                        published by JavaWorld in February 2002. PresentationServer can be used to
+                        published by JavaWorld in February 2002. OPS can be used to
                         implement Model 2X and much more. For more information, please refer to the
                         <a href="/ops/doc/">OPS User Guide</a>.
                     </p>
@@ -199,13 +199,13 @@
             </section>
 
             <section>
-                <title>How much of the XForms specification does PresentationServer support?</title>
+                <title>How much of the XForms specification does OPS support?</title>
                 <p>
                     The XForms specification assumes that XForms is implemented on the client-side.
                     Ideally an XForms implementation would be implemented in a web browser, and
                     until XForms becomes standard on mainstream browsers, XForms-based applications
                     need to use server-side implementations, such as the one implemented by the
-                    PresentationServer. It is believed that using server-side implementation is a
+                    OPS. It is believed that using server-side implementation is a
                     great migration path towards XForms.
                 </p>
                 <p>
@@ -220,10 +220,10 @@
                     <div class="legend">Server-Side XForms</div>
                 </div>
                 <p>
-                    The PresentationServer implementation is based on the <a
+                    The OPS implementation is based on the <a
                     href="http://www.w3.org/TR/xforms/">W3C XForms 1.0 Recommendation</a> (14
                     October 2003). For more detailed information on what features are supported in
-                    the latest version of PresentationServer, see the <a
+                    the latest version of OPS, see the <a
                     href="/ops/doc/reference-xforms-compliance">XForms conformance matrix</a>
                     section of the documentation.
                 </p>
@@ -243,7 +243,7 @@
                 <title>How much of the XPointer specification does XPL support?</title>
 
                     <p>
-                        PresentationServer supports a subset of <a
+                        OPS supports a subset of <a
                         href="http://www.w3.org/TR/xptr-xpointer/">XPointer</a>. You can use the
                         XPointer <code>document#xpointer(/xpath/expression)</code> syntax to extract a
                         nodeset from a document.
@@ -277,15 +277,15 @@
             </section>
             <a name="xslt-processor"/>
             <section>
-                <title>What is the recommended XSLT transformer for PresentationServer?</title>
+                <title>What is the recommended XSLT transformer for OPS?</title>
                 <p>
                     <a href="http://www.saxonica.com/">Saxon 8</a> is used by default within
-                    PresentationServer. It has proven reliable, and supports the latest <a
+                    OPS. It has proven reliable, and supports the latest <a
                     href="http://www.w3.org/TR/xslt20/">XSLT 2.0</a> and <a
                     href="http://www.w3.org/TR/xpath20/">XPath 2.0</a> drafts from the W3C.
                 </p>
                 <p>
-                    PresentationServer also ships with Saxon 6, Xalan 2.5 and XSLTC 2.5.
+                    OPS also ships with Saxon 6, Xalan 2.5 and XSLTC 2.5.
                 </p>
             </section>
             <a name="xslt-perf"/>
@@ -294,13 +294,13 @@
                 <p>
                     XSLT performance can vary greatly depending on the XSLT processor used. In
                     general, XSLT performance has shown perfectly adequate for all but the most
-                    performance-intensive applications. This being said, PresentationServer
+                    performance-intensive applications. This being said, OPS
                     minimizes the performance hit with its advanced cache, which for example caches
                     objects such as XSLT templates, therefore avoiding reparsing and revalidating
                     stylesheets unless absolutely necessary.
                 </p>
                 <p>
-                    PresentationServer also ships with XSLTC, an XSLT compiler now part of Apache
+                    OPS also ships with XSLTC, an XSLT compiler now part of Apache
                     Jakarta. XSLTC has shown significant performance improvements over the regular
                     Xalan implementation, at the cost of a lack of maturity.
                 </p>
@@ -319,14 +319,14 @@
             </section>
             <a name="caching"/>
             <section>
-                <title>How does caching work in PresentationServer?</title>
+                <title>How does caching work in OPS?</title>
 
                     <p>
                         Caching mechanisms should have no impact on the behavior of a system, except
                         for a gain in performance. This is also the principle followed by the
-                        PresentationServer cache: when you develop an application with
-                        PresentationServer, you should be able to ignore that caching takes place. This
-                        may be all you want to know about caching in PresentationServer!
+                        OPS cache: when you develop an application with
+                        OPS, you should be able to ignore that caching takes place. This
+                        may be all you want to know about caching in OPS!
                     </p>
                     <p>
                         To get a better understanding of the underlying mechanism,
@@ -366,7 +366,7 @@
                         time you generated that output, you wouldn't have to
                         actually run the transformation again: you could just reuse
                         the result you already have. This is the basic of caching in
-                        PresentationServer.
+                        OPS.
                     </p>
                     <p>
                         In this example, the result of the XSLT transformation is
@@ -384,23 +384,23 @@
                         Therefore, if neither the XSLT transformer's
                         <code>config</code> nor
                         <code>data</code> input has changed, the XUpdate processor can keep the
-                        same program in the PresentationServer object cache, saving an XSLT stylesheet
+                        same program in the OPS object cache, saving an XSLT stylesheet
                         compilation, an XSLT transformation, and an XUpdate program compilation.
                     </p>
                     <p>
                         The same mechanism applies to the XSLT transformer configuration: the compiled
-                        XSLT stylesheet can be kept in the PresentationServer object cache. And if the
+                        XSLT stylesheet can be kept in the OPS object cache. And if the
                         output of the XUpdate transformation is sent to an HTML serializer, the HTML
                         output could be cached as well.
                     </p>
                     <p>
-                        In general, PresentationServer does not unnecessarily cache the XML
+                        In general, OPS does not unnecessarily cache the XML
                         documents passed between processors. Instead, it caches the
                         result of time-consuming operations, as illustrated above.
                     </p>
                     <p>
                         Some cases are more complex than the example shown here. For
-                        example in the case of XSLT 1.0, PresentationServer handles caching and
+                        example in the case of XSLT 1.0, OPS handles caching and
                         dependencies related to imports, includes as well as the
                         XPath
                         <code>document()</code> function when the URL passed
@@ -415,7 +415,7 @@
                     Do debug attributes make my application slower?
                 </title>
                 <p>
-                    The PresentationServer cache avoids executing the parts of a pipeline that do
+                    The OPS cache avoids executing the parts of a pipeline that do
                     not need to be re-evaluated. However when the a debug attribute is set, the
                     point where the attribute is set needs to be evaluated so that meaningful data
                     can be displayed. This can cause the performance to degrade. Debug attributes
@@ -545,7 +545,7 @@
             <a name="parse-xml-string"/>
             <section>
                 <title>
-                    How can I parse a string containing XML into a document that PresentationServer can process?
+                    How can I parse a string containing XML into a document that OPS can process?
                 </title>
 
                     <p>
@@ -657,7 +657,7 @@
                 </p>
                 <p>
                     This being said, our XUpdate implementation is functional and of course anybody
-                    is free to use it or contribute to it. Like the rest of PresentationServer, it
+                    is free to use it or contribute to it. Like the rest of OPS, it
                     is available under the LGPL license.
                 </p>
             </section>
@@ -770,8 +770,7 @@
             <a name="out-of-memory"/>
             <section added="2005-05-21">
                 <title>
-                    I am getting frequent Out of Memory errors with Orbeon PresentationServer. What
-                    can I do?
+                    I am getting frequent Out of Memory errors with OPS. What can I do?
                 </title>
                 <p>
                     Often, this is due to too many threads doing processing within OPS at the same
@@ -840,7 +839,7 @@
                                 <code>Run | Run...</code>
                             </li>
                             <li>
-                                Either create a new J2EE Container Container for PresentationServer launch configuration
+                                Either create a new J2EE Container Container for OPS launch configuration
                                 or select an existing one.
                             </li>
                             <li>Select the Argguments tab.</li>
@@ -881,7 +880,7 @@
                     <li>
                         Make you don't have any "Address already in use" error in the Console view
                         when you start the application server. If you do, it means that you already
-                        have another application (other program, or other PresentationServer
+                        have another application (other program, or other OPS
                         application maybe deployed in the same application server) using the same
                         port. On Windows, you can use <a
                         href="http://www.sysinternals.com/ntw2k/source/tcpview.shtml">TCPView</a>

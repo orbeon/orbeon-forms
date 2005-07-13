@@ -95,10 +95,12 @@
                             the location of the containing XPL file.
                         </p>
                         <note>
-                            The <code>oxf:</code> protocol works only with <a
-                            href="reference-resource-managers">resource managers</a> that allow
-                            accessing the actual path of the file. These include the Filesystem and
-                            WebApp resource manager.
+                            <p>
+                                The <code>oxf:</code> protocol works only with <a
+                                href="reference-resource-managers">resource managers</a> that allow
+                                accessing the actual path of the file. These include the Filesystem
+                                and WebApp resource manager.
+                            </p>
                         </note>
                     </td>
                     <td>
@@ -308,9 +310,11 @@
                     </tr>
                 </table>
                 <note>
-                    The <code>path</code> attribute on the root element is an absolute path from a
-                    filesystem root. The <code>path</code> on child <code>directory</code> element are
-                    relative to their parent <code>directory</code> element.
+                    <p>
+                        The <code>path</code> attribute on the root element is an absolute path from
+                        a filesystem root. The <code>path</code> on child <code>directory</code>
+                        element are relative to their parent <code>directory</code> element.
+                    </p>
                 </note>
                 <p>
                     <code>file</code> elements contain basic information about a matched file:
@@ -369,9 +373,11 @@
                     metadata about images is extracted.
                 </p>
                 <note>
-                    Images are identified by reading the beginning of the files. This means that
-                    extracting image metadata is usually more expensive in time than just producing
-                    regular file metadata.
+                    <p>
+                        Images are identified by reading the beginning of the files. This means
+                        that extracting image metadata is usually more expensive in time than just
+                        producing regular file metadata.
+                    </p>
                 </note>
                 <p>
                     When an image is identified, an <code>image-metadata</code> element is
@@ -513,9 +519,11 @@
         <section>
             <title>Ant Patterns</title>
             <note>
-                This section of the documentation is reproduced from a section of the <a
-                href="http://ant.apache.org/manual/dirtasks.html#patterns">Apache Ant Manual</a>,
-                with minor adjustments.
+                <p>
+                    This section of the documentation is reproduced from a section of the <a
+                    href="http://ant.apache.org/manual/dirtasks.html#patterns">Apache Ant
+                    Manual</a>, with minor adjustments.
+                </p>
             </note>
             <p>
                 Patterns are used for the inclusion and exclusion of files. These patterns look

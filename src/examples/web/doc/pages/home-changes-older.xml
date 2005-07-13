@@ -540,7 +540,7 @@
                 <ul>
                     <li><b>Using the Java Security Manager</b> — The Java security manager can be
                     used to prevent OXF applications to perform unauthorized operations. The <link
-                    href="intro-install#security">Installing PresentationServer</link> section now
+                    href="intro-install#security">Installing OPS</link> section now
                     documents how to run OXF under a Security Manager.</li>
 
                     <li><b>Chart Processor</b> — Documentation for the Chart processor is now
@@ -1106,10 +1106,13 @@ select * from ps_book
                     <link href="model2x-struts">documentation</link> for
                     details.
                 </p>
-
-                <note>Castor 0.9.4.3 has been modified to use the built-in OXF
-                    version of Xerces. If you update the provided Castor JAR file,
-                    you will need to include a version of Xerces.</note>
+                <note>
+                    <p>
+                        Castor 0.9.4.3 has been modified to use the built-in OXF version of
+                        Xerces. If you update the provided Castor JAR file, you will need to
+                        include a version of Xerces.
+                    </p>
+                </note>
             </section>
 
             <section>

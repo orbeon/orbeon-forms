@@ -124,9 +124,11 @@
                     </datasource>
                 </xml-source>
                 <warning>
-                    External datasource definitions do not use connection pooling at the moment.
-                    Because creating database connections is usually an expensive operation, they
-                    should be used only for development or demo purposes.
+                    <p>
+                        External datasource definitions do not use connection pooling at the
+                        moment. Because creating database connections is usually an expensive
+                        operation, they should be used only for development or demo purposes.
+                    </p>
                 </warning>
                 <p>
                     The <code>sql:config</code> element can contain any number of user-defined
@@ -409,9 +411,12 @@ select first_name, last_name
                 </p>
 
                 <note>
-                    For compatibility with XPath 1.0, <code>xs:float</code> and
-                    <code>xs:double</code> do not return values in the exponential notation. For
-                    example, instead of <code>1.2E10</code>, <code>12000000000</code> is returned.
+                    <p>
+                        For compatibility with XPath 1.0, <code>xs:float</code> and
+                        <code>xs:double</code> do not return values in the exponential notation.
+                        For example, instead of <code>1.2E10</code>, <code>12000000000</code> is
+                        returned.
+                    </p>
                 </note>
 
                 <p>
@@ -516,7 +521,7 @@ select first_name, last_name
                     on <code>sql:param</code>: <code>sql-type</code>. By default, text is written
                     using the JDBC setString() method. In case the data must be stored in the
                     database as a Character Large OBject (CLOB) or other database-specific types,
-                    it is necessary to tell PresentationServer that a different API must be used. For example, to
+                    it is necessary to tell OPS that a different API must be used. For example, to
                     write a string into a CLOB:
                 </p>
 
@@ -558,11 +563,13 @@ select first_name, last_name
                 </xml-source>
 
                 <note>
-                    The disadvantage of using database columns of type <code>varchar</code> is that
-                    those are severely limited in size, for example 4000 bytes in the case of Oracle
-                    9. The maximum size of CLOB columns is usually much larger, for example up to 4
-                    GB with Oracle 9. In order to store large strings or large XML documents, it is
-                    therefore necessary to use the CLOB type.
+                    <p>
+                        The disadvantage of using database columns of type <code>varchar</code> is
+                        that those are severely limited in size, for example 4000 bytes in the case
+                        of Oracle 9. The maximum size of CLOB columns is usually much larger, for
+                        example up to 4 GB with Oracle 9. In order to store large strings or large
+                        XML documents, it is therefore necessary to use the CLOB type.
+                    </p>
                 </note>
 
                 <p>
@@ -581,12 +588,10 @@ select first_name, last_name
                         only supported with the following application server / database
                         combinations:
                     </p>
-
                     <ul>
                         <li>Tomcat 4.1 and Oracle 9</li>
                         <li>WebLogic 8.1 and Oracle 9</li>
                     </ul>
-
                     <p>
                         Please <a href="mailto:info@orbeon.com">contact Orbeon</a> to inquire about
                         supporting additional systems.
@@ -676,12 +681,14 @@ select first_name, last_name
                 </xml-source>
 
                 <note>
-                    The benefit of using the Oracle <code>XMLType</code> data type is that XML is
-                    stored in a structured way in the database. This allows creating indexes on XML
-                    data, doing partial document updates, etc. This however requires creating an XML
-                    schema. For more information, please refer to the <a
-                    href="http://download-west.oracle.com/docs/cd/B10501_01/appdev.920/a96620/toc.htm">Oracle
-                    XML DB Developer's Guide</a>.
+                    <p>
+                        The benefit of using the Oracle <code>XMLType</code> data type is that XML
+                        is stored in a structured way in the database. This allows creating indexes
+                        on XML data, doing partial document updates, etc. This however requires
+                        creating an XML schema. For more information, please refer to the <a
+                        href="http://download-west.oracle.com/docs/cd/B10501_01/appdev.920/a96620/toc.htm">Oracle
+                        XML DB Developer's Guide</a>.
+                    </p>
                 </note>
 
                 <p>
@@ -712,12 +719,10 @@ select first_name, last_name
                         <code>XMLType</code> columns, is currently only supported with the
                         following application server / database combinations:
                     </p>
-
                     <ul>
                         <li>Tomcat 4.1 and Oracle 9</li>
                         <li>WebLogic 8.1 and Oracle 9</li>
                     </ul>
-
                     <p>
                         Please <a href="mailto:info@orbeon.com">contact Orbeon</a> to inquire about
                         supporting additional systems.
@@ -785,10 +790,12 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
 </sql:execute>
                 </xml-source>
                 <note>
-                    XForms file uploads typically generate URLs in XForms instances if the type
-                    chosen for the uploaded file in the XForms model is <code>xs:anyURI</code>. The
-                    advantage of using <code>xs:anyURI</code> is that large resources do not have
-                    to reside entirely in memory.
+                    <p>
+                        XForms file uploads typically generate URLs in XForms instances if the type
+                        chosen for the uploaded file in the XForms model is <code>xs:anyURI</code>.
+                        The advantage of using <code>xs:anyURI</code> is that large resources do not
+                        have to reside entirely in memory.
+                    </p>
                 </note>
                 <p>
                     To read a BLOB or BINARY column, use the <code>xs:base64Binary</code> type as
@@ -825,7 +832,7 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                 </xml-source>
                 <note>
                     <p>
-                        Base64-encoded binary documents are widely used in PresentationServer, in
+                        Base64-encoded binary documents are widely used in OPS, in
                         particular in the following cases:
                     </p>
                     <ul>
@@ -876,12 +883,10 @@ KKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//2Q==
                         Writing to BLOB columns is currently only supported with the following
                         application server / database combinations:
                     </p>
-
                     <ul>
                         <li>Tomcat 4.1 and Oracle 9</li>
                         <li>WebLogic 8.1 and Oracle 9</li>
                     </ul>
-
                     <p>
                         Please <a href="mailto:info@orbeon.com">contact Orbeon</a> to inquire about
                         supporting additional systems.
@@ -1292,7 +1297,7 @@ select level1.value v1, level2.value v2, level3.value v3
         <section>
             <title>Transactions</title>
             <p>
-                PresentationServer executes each HTTP request in its own transaction. If a
+                OPS executes each HTTP request in its own transaction. If a
                 request fails for any reason, the SQL Processor rolls back the
                 transaction. The transaction is committed only when the pipeline
                 execution in complete.

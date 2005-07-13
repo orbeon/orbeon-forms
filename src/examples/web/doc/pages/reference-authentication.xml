@@ -23,7 +23,7 @@
             <title>Introduction</title>
             <p>
                 Most Web applications require some sort of authentication, either just to access an
-                "administrative" section, or for the whole application. PresentationServer Web
+                "administrative" section, or for the whole application. OPS Web
                 applications use the standard authentication mechanism provided by your J2EE
                 application server. This section provides an overview of the standard J2EE
                 authentication mechanism.
@@ -103,7 +103,7 @@
                 <code>/admin</code> the user needs to have the <code>administrator</code> role. But
                 how do you declare users and how are those users mapped to roles? This is
                 application server dependent, so you won't find an exact answer to this question in
-                the PresentationServer User Guide and you should refer to your application server
+                the OPS User Guide and you should refer to your application server
                 documentation.
             </p>
             <p>

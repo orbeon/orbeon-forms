@@ -24,12 +24,12 @@
             <title>Scope</title>
             <p>
                 This section provides an overview of the XUpdate language, the
-                PresentationServer XUpdate engine, and the extensions to the XUpdate language
-                supported by the PresentationServer XUpdate engine. It also features examples
+                OPS XUpdate engine, and the extensions to the XUpdate language
+                supported by the OPS XUpdate engine. It also features examples
                 programs written in XUpdate.
             </p>
             <p>
-                For more information on how to use the PresentationServer XUpdate engine
+                For more information on how to use the OPS XUpdate engine
                 directly from Java programs, see the <link
                 href="integration-xupdate">XUpdate section</link> in
                 <i>Integration</i>.
@@ -54,17 +54,17 @@
                 </p>
             </section>
             <section>
-                <title>The PresentationServer XUpdate Engine</title>
+                <title>The OPS XUpdate Engine</title>
                 <p>
                     XUpdate does not provide means to declare variables, iterate
                     over a node set, or declare functions. In addition to the
-                    XUpdate specification, the PresentationServer XUpdate engine implements a
+                    XUpdate specification, the OPS XUpdate engine implements a
                     set of extensions to allow all of the above.
                 </p><p>
                     The XUpdate language was designed to be consistent with
                     XSLT, so it would be natural for developers who are familiar
                     with XSLT to use XUpdate. The extensions to the XUpdate
-                    specification implemented in the PresentationServer XUpdate engine follow
+                    specification implemented in the OPS XUpdate engine follow
                     the same design principle as they closely mimic their XSLT
                     counterpart.
                 </p>
@@ -346,7 +346,7 @@
                         </p>
 
                         <p>
-                            For these reasons the PresentationServer XUpdate engine implements
+                            For these reasons the OPS XUpdate engine implements
                             both <code>&lt;xu:value-of&gt;</code> and
                             <code>&lt;xu:copy-of&gt;</code> as in XSLT.
                         </p>
@@ -620,7 +620,7 @@
             <section>
                 <title>Functions as First-Class Citizens</title>
                 <p>
-                    The PresentationServer XUpdate engine allows for top-level functions called
+                    The OPS XUpdate engine allows for top-level functions called
                     from XPath expressions, like XSLT 2. Additionally:
                 </p>
                 <ul>
@@ -667,7 +667,7 @@
                     </xu:modifications>
                 </xml-source>
                 <p>
-                    The example below uses the full power of the PresentationServer XUpdate
+                    The example below uses the full power of the OPS XUpdate
                     engine first-class citizen functions:
                 </p>
                 <xml-source>

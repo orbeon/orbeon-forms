@@ -23,8 +23,8 @@
         <section>
             <title>Scheduler</title>
             <p>
-                The PresentationServer Scheduler allows applications to start and stop periodic
-                tasks. A PresentationServer task is defined by a PresentationServer processor and
+                The OPS Scheduler allows applications to start and stop periodic
+                tasks. A OPS task is defined by a OPS processor and
                 its inputs. You can start or stop a task at any time. The <code>config</code> input
                 must conform to the following schema:
             </p>

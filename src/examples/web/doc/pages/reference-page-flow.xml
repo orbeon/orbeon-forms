@@ -69,11 +69,13 @@
                 </li>
             </ul>
             <note>
-                By default, the PFC is configured in <code>web.xml</code> as the main processor for
-                the OPS servlet and portlet. However, you are not required to use the PFC with OPS:
-                you can define your own main processor for servlets and portlets, as documented in
-                <a href="integration-packaging#main-processor">Packaging and Deployment</a>. For
-                most web applications, the PFC should be used.
+                <p>
+                    By default, the PFC is configured in <code>web.xml</code> as the main processor
+                    for the OPS servlet and portlet. However, you are not required to use the PFC
+                    with OPS: you can define your own main processor for servlets and portlets, as
+                    documented in <a href="integration-packaging#main-processor">Packaging and
+                    Deployment</a>. For most web applications, the PFC should be used.
+                </p>
             </note>
         </section>
         <section>
@@ -458,14 +460,17 @@
                     model and view.
                 </p>
                 <note>
-                    The <code>action</code> attribute on the <code>xforms:submission</code> element
-                    should not be confused with the <code>&lt;action&gt;</code> element of the page
-                    flow. The former specifies a URL to which the XForms submission must be
-                    performed, as per the XForms 1.0 recommendation; the latter specifies a PFC <a
-                    href="#action-element">action</a> executed when a specified boolean XPath
-                    expression operating on an XML submission evaluates to true. The XForms
-                    submission's <code>action</code> attribute instead matches a PFC
-                    <code>&lt;page&gt;</code> element's <code>path-info</code> attribute.
+                    <p>
+                        The <code>action</code> attribute on the <code>xforms:submission</code>
+                        element should not be confused with the <code>&lt;action&gt;</code> element
+                        of the page flow. The former specifies a URL to which the XForms submission
+                        must be performed, as per the XForms 1.0 recommendation; the latter
+                        specifies a PFC <a href="#action-element">action</a> executed when a
+                        specified boolean XPath expression operating on an XML submission evaluates
+                        to true. The XForms submission's <code>action</code> attribute instead
+                        matches a PFC <code>&lt;page&gt;</code> element's <code>path-info</code>
+                        attribute.
+                    </p>
                 </note>
 <!--                <note>-->
                     <p>
@@ -648,9 +653,11 @@
                     </submission>
                 </xml-source>
                 <note>
-                    The default submission document does not have to use element or attribute names
-                    identical to the URL parameter names. Doing so however may make the code
-                    clearer.
+                    <p>
+                        The default submission document does not have to use element or attribute
+                        names identical to the URL parameter names. Doing so however may make the
+                        code clearer.
+                    </p>
                 </note>
                 <p>
                     If there are multiple URL parameters with the same name, they will be stored in
@@ -680,10 +687,13 @@
                 </p>
             </section>
             <note>
-                If a page actually uses an XML submission, which means either having
-                <code>&lt;action&gt;</code> elements, or reading the instance in the page model or
-                page view, it must not expect to be able to read the HTTP request body separately
-                using the <a href="processors-generators-request">Request generator</a>.
+                <p>
+                    If a page actually uses an XML submission, which means either having
+                    <code>&lt;action&gt;</code> elements, or reading the instance in the page model
+                    or page view, it must not expect to be able to read the HTTP request body
+                    separately using the <a href="processors-generators-request">Request
+                    generator</a>.
+                </p>
             </note>
         </section>
         <a name="page-navigation"/>
@@ -873,11 +883,14 @@
                                 is forwarded to the corresponding page.
                             </p>
                             <note>
-                                In this case, a page model or page view specified on the enclosing
-                                <code>&lt;page&gt;</code> element does not execute! Instead, control
-                                is transferred to the page with the identifier specified. This also
-                                means that the <a href="#epilogue-element">page flow epilogue</a>
-                                does not execute.
+                                <p>
+                                    In this case, a page model or page view specified on the
+                                    enclosing <code>&lt;page&gt;</code> element does not execute!
+                                    Instead, control is transferred to the page with the identifier
+                                    specified. This also means that the <a
+                                    href="#epilogue-element">page flow epilogue</a> does not
+                                    execute.
+                                </p>
                             </note>
                         </li>
                         <li>
@@ -1040,9 +1053,11 @@
                     reduces the number of roundtrips with the server.
                 </p>
                 <note>
-                    A third instance passing option, <code>redirect-exit-portal</code>, behaves like
-                    the <code>redirect</code> method but sends a redirection which exits the portal,
-                    if any. This is mainly useful for the OPS examples portal.
+                    <p>
+                        A third instance passing option, <code>redirect-exit-portal</code>, behaves
+                        like the <code>redirect</code> method but sends a redirection which exits
+                        the portal, if any. This is mainly useful for the OPS examples portal.
+                    </p>
                 </note>
                 <p>
                     You can configure the method:
@@ -1260,10 +1275,12 @@
                     telling the user that the page requested cannot be found.
                 </p>
                 <note>
-                    The <code>&lt;not-found-handler&gt;</code> element is not used for resources
-                    served through the <code>&lt;files&gt;</code> element. In that case, the PFC
-                    returns instead a "not found" code to the user agent (code 404 in the case of
-                    HTTP).
+                    <p>
+                        The <code>&lt;not-found-handler&gt;</code> element is not used for resources
+                        served through the <code>&lt;files&gt;</code> element. In that case, the
+                        PFC returns instead a "not found" code to the user agent (code 404 in the
+                        case of HTTP).
+                    </p>
                 </note>
             </section>
         </section>

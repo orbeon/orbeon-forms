@@ -25,20 +25,19 @@
             <section>
                 <title>Servlet and Portlet Deployment</title>
                 <p>
-                    PresentationServer is typically used to create Web applications. In this case,
-                    PresentationServer relies on standard Java Servlet technology, and the Web
-                    application's <code>web.xml</code> file is configured to use the Presentation
-                    Server Servlet or PresentationServer Servlet Filter. PresentationServer
-                    conforms to the Java Servlet API and handles a Web client's entire real estate
-                    on the browser.
+                    OPS is typically used to create Web applications. In this case, OPS relies on
+                    standard Java Servlet technology, and the Web application's <code>web.xml</code>
+                    file is configured to use the Presentation Server Servlet or OPS Servlet Filter.
+                    OPS conforms to the Java Servlet API and handles a Web client's entire real
+                    estate on the browser.
                 </p>
                 <p>
-                    PresentationServer also provides the PresentationServer Portlet, which
-                    supports the implementation of standard Java portlets that can be deployed
-                    within any portal or portlet container compatible with the Java Portlet
-                    specification. This specification is also known as JSR-168. It is expected to be
-                    finalized around September or October 2003, and provides a standardization of
-                    the Portlet API. All major Portal vendors have announced support for JSR-168.
+                    OPS also provides the OPS Portlet, which supports the implementation of
+                    standard Java portlets that can be deployed within any portal or portlet
+                    container compatible with the Java Portlet specification. This specification is
+                    also known as JSR-168. It is expected to be finalized around September or
+                    October 2003, and provides a standardization of the Portlet API. All major
+                    Portal vendors have announced support for JSR-168.
                 </p>
             </section>
             <section>
@@ -89,10 +88,10 @@
             </section>
         </section>
         <section>
-            <title>PresentationServer and Portlets</title>
+            <title>OPS and Portlets</title>
             <warning>
                 <p>
-                    The current PresentationServer Portlet integration is based on the <a
+                    The current OPS Portlet integration is based on the <a
                     href="http://jcp.org/aboutJava/communityprocess/first/jsr168/index.html">Portlet
                     Specification Version 1.0 Public Final Draft of August 26, 2003 </a>. The
                     Portlet API will only be frozen as of the final 1.0 specification, due around
@@ -100,21 +99,21 @@
                 </p>
                 <p>
                     Make sure that you follow the <a href="intro-install">installation</a> notes
-                    and download the Portlet API JAR file before you use the PresentationServer
+                    and download the Portlet API JAR file before you use the OPS
                     Portlet functionality. This is necessary until the final version of the Portlet
                     API specification is available and redistributable.
                 </p>
             </warning>
             <p>
-                PresentationServer hides the complexity of the Portlet API to allow most
-                PresentationServer applications to work unmodified within portlet containers and to
+                OPS hides the complexity of the Portlet API to allow most
+                OPS applications to work unmodified within portlet containers and to
                 follow best practices allowed by the Web Application Controller. In particular,
                 the Portlet API requires:
             </p>
             <ul>
                 <li>
                     <p>
-                        <b>Separation of faceless actions from rendering.</b> PresentationServer
+                        <b>Separation of faceless actions from rendering.</b> OPS
                         allows actions to generate output while still adhering to the Java Portlet
                         specification. Developers are obviously free to only write faceless actions.
                         In the Page Flow Controller, such actions end with a <code>&lt;result
@@ -123,8 +122,8 @@
                 </li>
                 <li>
                     <p>
-                        <b>Getting rid of the familiar concept of URL path.</b> PresentationServer
-                        abstracts this behavior and provides PresentationServer Portlet developers
+                        <b>Getting rid of the familiar concept of URL path.</b> OPS
+                        abstracts this behavior and provides OPS Portlet developers
                         with the notion of a path, implicitly in the Web Application Controller, or
                         explicitly with the Request Generator, while still adhering to the Java
                         Portlet specification.
@@ -134,21 +133,21 @@
                     <p>
                         <b>Getting rid of the familiar concept of URL redirection.</b> Instead,
                         portlet actions can set parameters to use in subsequent portlet rendering.
-                        PresentationServer abstracts this behavior and provides, indirectly in the
+                        OPS abstracts this behavior and provides, indirectly in the
                         Page Flow Controller, or explicitly with the Redirect Processor, the notion
                         of redirecting to another page within the portlet.
                     </p>
                 </li>
                 <li>
                     <p>
-                        <b>Calling APIs to generate URLs.</b> PresentationServer handles this by
+                        <b>Calling APIs to generate URLs.</b> OPS handles this by
                         providing automatic <a href="reference-url-rewriting">URL rewriting</a>.
                     </p>
                 </li>
                  <li>
                     <p>
-                        <b>Generating Markup Fragments.</b> The default PresentationServer
-                        epilogue automatically extracts a fragment from a PresentationServer
+                        <b>Generating Markup Fragments.</b> The default OPS
+                        epilogue automatically extracts a fragment from a OPS
                         <code>&lt;d:document></code>. This allows pages to remain unmodified for
                         both servlet and portlet deployment. The default epilogue also makes sure
                         that no HTML or XML DOCTYPE is generated at the beginning of a fragment.
@@ -163,12 +162,12 @@
                 Configuration of portlets is done in a standard file called
                 <code>portlet.xml</code> that sits in the same directory <code>(WEB-INF)</code> as
                 your <code>web.xml</code>. The <code>portlet-class</code> element must always be
-                <code>org.orbeon.oxf.portlet.OXFPortlet</code> for PresentationServer Portlets (you
-                can also configure non-PresentationServer Portlets within the same
+                <code>org.orbeon.oxf.portlet.OXFPortlet</code> for OPS Portlets (you
+                can also configure non-OPS Portlets within the same
                 <code>portlet.xml</code>). The main processor URI and optional inputs are specified
                 with the <code>oxf.main-processor.uri</code> and
                 <code>oxf.main-processor.input.*</code> initialization parameters. For example, the
-                PresentationServer examples are configured to work within a portlet as follows:
+                OPS examples are configured to work within a portlet as follows:
             </p>
             <xml-source>
 <portlet-app>
@@ -187,24 +186,24 @@
             <mime-type>text/html</mime-type>
         </supports>
         <portlet-info>
-            <title>PresentationServer Example Application</title>
+            <title>OPS Example Application</title>
         </portlet-info>
     </portlet>
 </portlet-app>
             </xml-source>
             <p>
-                It is possible to configure several PresentationServer Portlets within the same
+                It is possible to configure several OPS Portlets within the same
                 <code>portlet.xml</code>, with the same or a different configuration. The
                 <code>portlet-name</code> element however must be different for each portlet, as per
                 the Java Portlet specification. For more examples, please consult the example
-                <code>portlet.xml</code> file in the PresentationServer examples.
+                <code>portlet.xml</code> file in the OPS examples.
             </p>
         </section>
         <section>
             <title>Portlet Output</title>
             <p>
                 The type of the portlet output is determined by the serializer. With the default
-                PresentationServer epilogue, the HTML serializer is used. The Simple Portlet
+                OPS epilogue, the HTML serializer is used. The Simple Portlet
                 example illustrates how to use the XML Serializer instead.
             </p>
         </section>
@@ -268,17 +267,17 @@
         <section>
             <title>Deployment</title>
             <p>
-                A PresentationServer portlet application is deployed like a regular Web
+                A OPS portlet application is deployed like a regular Web
                 application. You have to make sure that, in addition to the <code>web.xml</code>,
                 you have a valid <code>portlet.xml</code> configuration file as well.
             </p>
             <p>
                 You can deploy the application in any portlet container supporting the version of
                 the specification mentioned above. Alternatively, you can use the Presentation
-                Server Portal implementation, bundled with PresentationServer (see below).
+                Server Portal implementation, bundled with OPS (see below).
             </p>
             <p>
-                It is possible to deploy PresentationServer Servlets, Servlet Filters, Servlet
+                It is possible to deploy OPS Servlets, Servlet Filters, Servlet
                 Context Listeners, and Portlets within the same application:
             </p>
             <img print-format="pdf" src="pages/integration-portlets-deployment.png" width="522" height="234"/>
@@ -289,24 +288,26 @@
             </p>
         </section>
         <section>
-            <title>PresentationServer Portal (Alpha)</title>
+            <title>OPS Portal (Alpha)</title>
             <p>
-               PresentationServer ships with the PresentationServer Portlet Container and a
-               demonstration PresentationServer Portal.
+               OPS ships with the OPS Portlet Container and a
+               demonstration OPS Portal.
             </p>
             <note>
-                This software is currently in Alpha stage and is provided for demonstration and
-                evaluation purposes.
+                <p>
+                    This software is currently in Alpha stage and is provided for demonstration and
+                    evaluation purposes.
+                </p>
             </note>
             <p>
-                The PresentationServer Portlet Container is based on two processors, described in
+                The OPS Portlet Container is based on two processors, described in
                 the following two sections.
             </p>
             <section>
                 <title>Portlet Container Processor</title>
                 <p>
                     The Portlet Container Processor must be present in every pipeline that makes
-                    use of the PresentationServer Portal. It manages the PresentationServer
+                    use of the OPS Portal. It manages the OPS
                     Portlet Container and makes sure that the configured portlets are instantiated.
                     The processor takes the following inputs and outputs:
                 </p>
@@ -342,21 +343,21 @@
                                         <portlet-instance>
                                             <portlet-id>1</portlet-id>
                                             <portlet-name>OXFSimplePortlet</portlet-name>
-                                            <title>PresentationServer Simple Portlet</title>
+                                            <title>OPS Simple Portlet</title>
                                             <portlet-mode>view</portlet-mode>
                                             <window-state>normal</window-state>
                                         </portlet-instance>
                                         <portlet-instance>
                                             <portlet-id>2</portlet-id>
                                             <portlet-name>OXFRSSPortlet</portlet-name>
-                                            <title>PresentationServer RSS Portlet</title>
+                                            <title>OPS RSS Portlet</title>
                                             <portlet-mode>view</portlet-mode>
                                             <window-state>normal</window-state>
                                         </portlet-instance>
                                         <portlet-instance>
                                             <portlet-id>3</portlet-id>
                                             <portlet-name>OXFExamples</portlet-name>
-                                            <title>PresentationServer Example Application</title>
+                                            <title>OPS Example Application</title>
                                             <portlet-mode>view</portlet-mode>
                                             <window-state>normal</window-state>
                                         </portlet-instance>
@@ -414,7 +415,7 @@
                                                     <portlet:url>url4</portlet:url>
                                                 </portlet:portlet-mode>
                                             </portlet:portlet-modes>
-                                            <portlet:portlet-title>PresentationServer Simple Portlet</portlet:portlet-title>
+                                            <portlet:portlet-title>OPS Simple Portlet</portlet:portlet-title>
                                             <portlet:body>
                                                 <div>
                                                     <h2>This is a title</h2>
@@ -442,7 +443,7 @@
                     case, the HTML is transformed into XML before being included.
                 </p>
                 <p>
-                    Using PresentationServer to implement the portal user interface gives the
+                    Using OPS to implement the portal user interface gives the
                     portal implementer a lot of power, including:
                 </p>
                 <ul>
@@ -463,9 +464,9 @@
         <section>
             <title>Limitations</title>
             <section>
-                <title>PresentationServer Portlets</title>
+                <title>OPS Portlets</title>
                 <p>
-                    The PresentationServer Portlet developer should be aware of the following
+                    The OPS Portlet developer should be aware of the following
                     limitations:
                 </p>
                 <ul>
@@ -483,7 +484,7 @@
                         set a portlet mode or window state hint in a URL.
                     </li>
                     <li>
-                        <b>Content Type Hints.</b> It is not possible for an PresentationServer
+                        <b>Content Type Hints.</b> It is not possible for an OPS
                         Portlet to know which content types are supported by the portal.
                     </li>
                     <li>
@@ -491,7 +492,7 @@
                         preferences or store them from within a portlet.
                     </li>
                     <li>
-                        <b>XML Fragments.</b> The PresentationServer Portlet currently must
+                        <b>XML Fragments.</b> The OPS Portlet currently must
                         generate XML fragments containing a root node. This is rarely an issue, as a
                         fragment can for example be embedded within an XHTML <code>&lt;div></code>
                         element.
@@ -520,14 +521,14 @@
                     <li>Or any processor serving resources</li>
                 </ul>
                 <p>
-                    PresentationServer Portlets can however refer to resources served by the
-                    PresentationServer Servlet.
+                    OPS Portlets can however refer to resources served by the
+                    OPS Servlet.
                 </p>
             </section>
             <section>
-                <title>PresentationServer Portal (Alpha)</title>
+                <title>OPS Portal (Alpha)</title>
                 <p>
-                    This version of the PresentationServer Portal has the following known limitations:
+                    This version of the OPS Portal has the following known limitations:
                 </p>
                 <ul>
                     <li>PortletRequestDispatcher is only partially implemented.</li>

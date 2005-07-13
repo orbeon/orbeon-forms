@@ -42,8 +42,10 @@
 
             </p>
             <note>
-                The <link href="reference-resource-managers#filesystem">Filesystem</link> resource
-                manager is the only Resource Manager supporting write operations.
+                <p>
+                    The <link href="reference-resource-managers#filesystem">Filesystem</link>
+                    resource manager is the only Resource Manager supporting write operations.
+                </p>
             </note>
             <p>
                 The URL serializer takes a <code>config</code> input with a single <code>url</code>
@@ -155,7 +157,7 @@
                                 <b>request</b> - The request scope starts when an HTTP request is
                                 sent to the server. It ends when the corresponding HTTP response is
                                 sent back to the client. The request scope can be used to integrate
-                                a PresentationServer application with legacy J2EE servlets.
+                                a OPS application with legacy J2EE servlets.
                             </li>
                         </ul>
                     </td>
@@ -166,8 +168,10 @@
                 <code>data</code> input receiving the document to store.
             </p>
             <note>
-                The Session serializer, previously used, is now deprecated. Use the Scope
-                serializer with session scope instead.
+                <p>
+                    The Session serializer, previously used, is now deprecated. Use the Scope
+                    serializer with session scope instead.
+                </p>
             </note>
         </section>
         <section>
@@ -199,9 +203,11 @@
         <section>
             <title>Legacy HTTP Serializers</title>
             <note>
-                Use of these serializers should be replaced by <a
-                href="processors-converters">converters</a> connected to the <a
-                href="processors-serializers-http">HTTP serializer</a>.
+                <p>
+                    Use of these serializers should be replaced by <a
+                    href="processors-converters">converters</a> connected to the <a
+                    href="processors-serializers-http">HTTP serializer</a>.
+                </p>
             </note>
             <p>
                 These serializers share a common functionality: writing their data input to an HTTP
@@ -211,10 +217,12 @@
                 describes the common configuration, then the specifics for each serializer.
             </p>
             <note>
-                When using the command-line mode, instead of sending the output through HTTP, the
-                HTTP serializers send their output to the standard output. In such a case, the
-                parameters that do not affect the content of the data, such as content-type,
-                status-code, etc. are ignored.
+                <p>
+                    When using the command-line mode, instead of sending the output through HTTP,
+                    the HTTP serializers send their output to the standard output. In such a case,
+                    the parameters that do not affect the content of the data, such as
+                    content-type, status-code, etc. are ignored.
+                </p>
             </note>
             <p>
                 All serializers send the cache control HTTP headers, including
@@ -381,9 +389,11 @@
                     </p:processor>
                 </xml-source>
                 <note>
-                    The <link href="http://www.w3.org/TR/2000/REC-xml-20001006">XML 1.0
-                    Specification</link> prohibits a DOCTYPE definition with a Public ID and no
-                    System ID.
+                    <p>
+                        The <link href="http://www.w3.org/TR/2000/REC-xml-20001006">XML 1.0
+                        Specification</link> prohibits a DOCTYPE definition with a Public ID and
+                        no System ID.
+                    </p>
                 </note>
             </section>
 

@@ -219,12 +219,14 @@
                 example: <code>content-type="text/plain; charset=utf-8"</code>.
             </p>
             <note>
-                XML itself support Unicode, in other words it is designed to allow representing
-                all the characters specified by the Unicode specification. Those characters can
-                all be represented with the UTF-8 encoding. Because of this, the Email
-                processor could always encode text using the UTF-8 encoding. However, some mail
-                clients may not all support that encoding. It is therefore left to the user of
-                the Email processor to specify the appropriate encoding.
+                <p>
+                    XML itself support Unicode, in other words it is designed to allow representing
+                    all the characters specified by the Unicode specification. Those characters can
+                    all be represented with the UTF-8 encoding. Because of this, the Email
+                    processor could always encode text using the UTF-8 encoding. However, some mail
+                    clients may not all support that encoding. It is therefore left to the user of
+                    the Email processor to specify the appropriate encoding.
+                </p>
             </note>
         </section>
         <section>

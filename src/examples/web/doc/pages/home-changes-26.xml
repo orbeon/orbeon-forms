@@ -80,9 +80,9 @@
         <section>
             <title>Standard Representation of Binary and Text Documents</title>
             <p>
-                In PresentationServer <a href="reference-xpl-pipelines">XPL and pipelines</a>
+                In OPS <a href="reference-xpl-pipelines">XPL and pipelines</a>
                 only deal with XML documents. In order to handle non-XML data such as binary and
-                text documents in pipelines, PresentationServer defines <a
+                text documents in pipelines, OPS defines <a
                 href="reference-formats">two standard XML document formats</a> to embed binary
                 and text documents within an XML infoset. This solution has the benefit of
                 keeping XPL simple by limiting it to pure XML infosets, while allowing XPL to
@@ -110,7 +110,7 @@
                 href="processors-generators-url">URL generator</a>. In addition, the
                 body can now be read several times. This change brings consistency with the
                 handling of uploaded files, and the support for binary files thoughout
-                PresentationServer.
+                OPS.
             </p>
             <p>
                 In a related change, the <a
@@ -237,7 +237,7 @@
                 <title>New "Employees" Example</title>
                 <p>
                     The new <a href="/goto-example/employees">Employees example application</a>
-                    illustrates the following aspects of PresentationServer:
+                    illustrates the following aspects of OPS:
                 </p>
                 <ul>
                     <li>CRUD operations, paging and sorting with a SQL backend</li>
@@ -323,7 +323,7 @@
         <section>
             <title>J2SE 5.0 Support</title>
             <p>
-                The source code of PresentationServer now compiles with Java 5.
+                The source code of OPS now compiles with Java 5.
             </p>
         </section>
     </body>

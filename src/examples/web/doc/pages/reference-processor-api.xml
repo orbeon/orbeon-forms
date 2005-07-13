@@ -20,16 +20,16 @@
     </header>
     <body>
         <section>
-            <title>Scope</title> <p>This section documents the PresentationServer Processor API.
+            <title>Scope</title> <p>This section documents the OPS Processor API.
             This is a Java API that you can use to write custom processors. You can then use those
-            custom processors in your PresentationServer applications, just like the standard
-            processors bundled with PresentationServer.</p>
+            custom processors in your OPS applications, just like the standard
+            processors bundled with OPS.</p>
         </section>
         <section>
             <title>Why Write Custom Processors?</title>
 
             <p>
-                In general, PresentationServer processors encapsulate logic to perform generic tasks
+                In general, OPS processors encapsulate logic to perform generic tasks
                 such as executing an XSLT transformation, calling a web service or accessing a
                 database using SQL. With those processors, the developer describes the specifics of
                 a task at a high level in a declarative way.
@@ -45,15 +45,17 @@
                 Java. This section goes through the essential APIs used to write processors in Java.
             </p>
             <note>
-                You can compile your processor yourself, or you can use the convenient <a
-                href="processors-java">Java processor</a> which automatically compiles Java code on
-                the fly.
+                <p>
+                    You can compile your processor yourself, or you can use the convenient <a
+                    href="processors-java">Java processor</a> which automatically compiles Java code
+                    on the fly.
+                </p>
             </note>
         </section>
         <section>
             <title>Prerequisites</title>
             <p>
-                Writing PresentationServer processors is expected to be done by Java developers who
+                Writing OPS processors is expected to be done by Java developers who
                 are comfortable with the Java language as well as compiling and deploying onto
                 servlet containers or J2EE application servers. In addition, we assume that the
                 developer is comfortable with either:
@@ -146,15 +148,17 @@ public class MyProcessor extends SimpleProcessor {
 ]]></source>
                 <p>
                     In addition to the name of the input/output, one can pass an optional schema
-                    URI declared in the <link href="reference-properties">PresentationServer
+                    URI declared in the <link href="reference-properties">OPS
                     properties</link>. If a schema URI is specified, the corresponding input or
                     output can be <link href="processors-validation">validated</link>.
                 </p>
                 <note>
-                    Note that the processor may have optional inputs and outputs, and/or read
-                    dynamic inputs and generate dynamic outputs, in which case it doesn't need to
-                    declare such inputs with <code>addInputInfo</code> and
-                    <code>addOutputInfo</code>.
+                    <p>
+                        Note that the processor may have optional inputs and outputs, and/or read
+                        dynamic inputs and generate dynamic outputs, in which case it doesn't need
+                        to declare such inputs with <code>addInputInfo</code> and
+                        <code>addOutputInfo</code>.
+                    </p>
                 </note>
             </section>
             <section>
@@ -225,15 +229,18 @@ LocationSAXWriter saxWriter = new LocationSAXWriter();
 saxWriter.setContentHandler(contentHandler);
 saxWriter.write(doc);
 ]]></source>
-                    <note>Using the <code>LocationSAXWriter</code> provided with
-                    PresentationServer is the preferred way to write a DOM4J document to a SAX
-                    content handler. The standard JAXP API (calling <link href="http://java.sun.com/j2se/1.4/docs/api/javax/xml/transform/Transformer.html#transform(javax.xml.transform.Source,%20javax.xml.transform.Result)">
-                            <code>transform</code>
-                        </link>
-                    with a <link href="http://www.dom4j.org/apidocs/org/dom4j/io/DocumentSource.html">
-                            <code>org.dom4j.io.DocumentSource</code></link>)
-                    can also be used, but if it is used, the location information
-                    stored in the DOM4J document will be lost.</note>
+                <note>
+                    <p>
+                        Using the <code>LocationSAXWriter</code> provided with OPS
+                        is the preferred way to write a DOM4J document to a SAX content handler. The
+                        standard JAXP API (calling <link
+                        href="http://java.sun.com/j2se/1.4/docs/api/javax/xml/transform/Transformer.html#transform(javax.xml.transform.Source,%20javax.xml.transform.Result)">
+                        <code>transform</code> </link> with a <link
+                        href="http://www.dom4j.org/apidocs/org/dom4j/io/DocumentSource.html">
+                        <code>org.dom4j.io.DocumentSource</code></link>) can also be used, but if it
+                        is used, the location information stored in the DOM4J document will be lost.
+                    </p>
+                </note>
 
                 <ul>
                     <li>Create a W3C document and send it to the content
@@ -245,10 +252,12 @@ Transformer identity = TransformerUtils.getIdentityTransformer();
 transformer.transform(new DOMSource(doc), new SAXResult(contentHandler));
 ]]></source>
                     <note>
-                        <code>TransformerUtils</code> is a PresentationServer class (in package
-                        <code>org.orbeon.oxf.xml</code>). It will create and cache the appropriate
-                        transformer factory. The developer is of course free to create its own
-                        factory and transformer calling directly the JAXP API.
+                        <p>
+                            <code>TransformerUtils</code> is a OPS class (in package
+                            <code>org.orbeon.oxf.xml</code>). It will create and cache the
+                            appropriate transformer factory. The developer is of course free to
+                            create its own factory and transformer calling directly the JAXP API.
+                        </p>
                     </note>
             </section>
         </section>

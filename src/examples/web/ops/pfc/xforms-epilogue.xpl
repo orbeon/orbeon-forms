@@ -40,7 +40,8 @@
             <p:processor name="oxf:xforms-output">
                 <p:input name="model" href="#xforms-model"/>
                 <p:input name="instance" href="#instance"/>
-                <p:input name="data" href="#data"/>
+<!--                <p:input name="data" href="#data"  schema-uri="http://www.w3.org/2002/xforms/controls" />-->
+                <p:input name="data" href="#data" />
                 <p:output name="data" id="annotated-data"/>
             </p:processor>
             <!-- Transform annotated XForms to XHTML -->

@@ -643,6 +643,24 @@
                 </li>
                 <li>
                     <p>
+                        Previously the data <code>input</code> of the <code>oxf:xforms-output</code> 
+                        processor and the <code>config</code> input of the 
+                        <code>oxf:portlet-include</code> processor were validated unless one turned 
+                        off all input parameter validation in OPS. 
+                    </p> 
+                    <p>
+                        However we found that validation of these two inputs came with at 
+                        significant price and consequently these inputs are no longer validated by
+                        default.  To enable the validation one must specify the appropriate schema 
+                        URI with the <code>schema-uri</code> attribute.  For the <code>data</code>
+                        input of <code>oxf:xforms-output</code> the URI is 
+                        <code>http://www.w3.org/2002/xforms/controls</code> and for the 
+                        <code>config</code> input of <code>oxf:portlet-include</code> the URI is
+                        <code>http://orbeon.org/oxf/xml/portlet-include</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         TODO
                     </p>
                 </li>

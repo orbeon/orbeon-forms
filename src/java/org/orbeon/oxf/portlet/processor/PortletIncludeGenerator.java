@@ -45,7 +45,7 @@ public class PortletIncludeGenerator extends ProcessorImpl {
     public static final String PORTLET_NAMESPACE_URI = "http://orbeon.org/oxf/xml/portlet";
 
     public PortletIncludeGenerator() {
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, PORTLET_INCLUDE_NAMESPACE_URI));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 

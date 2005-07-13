@@ -32,7 +32,7 @@ public class XFormsOutput extends ProcessorImpl {
     public XFormsOutput() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_MODEL));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_INSTANCE));
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA, XFormsConstants.XFORMS_NAMESPACE_URI + "/controls"));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }

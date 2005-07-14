@@ -126,7 +126,7 @@
                 <xsl:template match="/">
                     <xhtml:html>
                         <xhtml:head>
-                            <xhtml:title>PresentationServer Examples</xhtml:title>
+                            <xhtml:title>Orbeon PresentationServer (OPS) Examples</xhtml:title>
                         </xhtml:head>
                         <xhtml:body>
                             <xhtml:table id="main" width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -176,7 +176,7 @@
                                 <xhtml:tr>
                                     <!-- List of examples -->
                                     <xhtml:td id="leftcontent" valign="top" width="1%">
-                                        <h1>PresentationServer Examples</h1>
+                                        <h1>OPS Examples</h1>
                                         <xf:group ref="/form">
                                             <xhtml:ul class="tree-sections">
                                                 <xsl:for-each select="$examples-list/*/section">

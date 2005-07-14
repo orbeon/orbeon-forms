@@ -27,7 +27,7 @@
                 part lies in the navigation logic between pages.
             </p>
             <p>
-                See the <a href="/goto-source/address-book/page-flow.xml" f:url-type="resource">Page
+                See the <a href="/goto-source/atm/page-flow.xml" f:url-type="resource">Page
                 Flow Controller configuration</a> for this example.
             </p>
             <table border="0" cellspacing="0" cellpadding="0">

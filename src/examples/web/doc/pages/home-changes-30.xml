@@ -332,11 +332,13 @@
                             from the <code>&lt;page&gt;</code> element.
                         </p>
                     </li>
+                    <!--
                     <li>
                         <p>
                             With OPS 2.8,
                         </p>
                     </li>
+                    -->
                     <li>
                         <p>
                             TODO: xforms:submission and xforms:submit (id, action, method).
@@ -375,18 +377,25 @@
         <section>
             <title>Page Flow</title>
             <p>
-                Several improvements have been added to the Page Flow Controller, in part motivated
-                by the new XForms engine. The PFC is now more generic and less tied to the built-in
-                OPS XForms implementation. At the same time it plays better than before with XForms.
-                The major PFC concepts found with OPS 2.8 have not changed and backward
-                compatibility is kept. The main changes are the following:
+                Several improvements have been added to the Page Flow Controller, some of them
+                motivated by the new XForms engine. The PFC is now more generic and less tied to
+                the built-in OPS XForms implementation. At the same time it plays better than before
+                with XForms, including client-side XForms engines. The major PFC concepts found
+                with OPS 2.8 have not changed and backward compatibility is kept. The main changes
+                are the following:
             </p>
             <ul>
                 <li>
                     <p>
                         <b>Documentation.</b> The <a href="reference-page-flow">PFC
-                        documentation</a> has been reworked and greatly improved. The page flow
-                        epilogue is now <a href="reference-epilogue">documented in depth</a>.
+                        documentation</a> has been reworked and greatly improved.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Standard Epilogue.</b> The standard epilogue has been restructured into
+                        three separate files so as to be easier to understand, modify, and extend.
+                        It is <a href="reference-epilogue">fully documented</a>.
                     </p>
                 </li>
                 <li>
@@ -452,13 +461,6 @@
                         to write. Compare for example the <a href="/goto-example/bizdoc">BizDoc
                         Classic</a> example with the <a href="/goto-example/bizdoc2">BizDoc NG</a>
                         example.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Standard Epilogue.</b> The standard epilogue has been restructured into
-                        three separate files so as to be easier to understand, modify, and extend.
-                        It is <a href="reference-epilogue">fully documented</a>.
                     </p>
                 </li>
                 <li>
@@ -611,15 +613,16 @@
             <ul>
                 <li>
                     <p>
-                        <b>HTML Documentation.</b> The OPS User Guide in in static HTML was broken
-                        in the previous version of OPS. This allows you to consult the documentation
-                        without running OPS or without accessing the online documentation.
+                        <b>HTML Documentation.</b> The OPS User Guide in static HTML format, broken
+                        OPS 2.8, is now working correctly. This format allows you to consult the
+                        documentation offline without running OPS or without accessing the online
+                        documentation.
                     </p>
                 </li>
                 <li>
                     <p>
-                        <b>PDF Documentation.</b> The OPS User Guide in PDF version is back! This is
-                        a book which you can print for reference.
+                        <b>PDF Documentation.</b> The OPS User Guide in PDF version is back! You can
+                        print this book for reference.
                     </p>
                 </li>
                 <li>
@@ -666,25 +669,24 @@
                 </li>
                 <li>
                     <p>
-                        In order to improve performance URL rewriting has been re-implemented in
-                        Java. The new implemetation is accessed through the new rewrite processors
-                        <code>oxf:xhtml-rewrite</code> and <code>oxf:html-rewrite</code>.
+                        <b>Faster URL Rewriting.</b> In order to improve performance URL rewriting
+                        has been re-implemented in Java. The new implemetation is accessed through
+                        the new rewrite processors <code>oxf:xhtml-rewrite</code> and
+                        <code>oxf:html-rewrite</code>.
                     </p>
                 </li>
                 <li>
                     <p>
-                        Previously the data <code>input</code> of the <code>oxf:xforms-output</code> 
-                        processor and the <code>config</code> input of the 
-                        <code>oxf:portlet-include</code> processor were validated unless one turned 
-                        off all input parameter validation in OPS. 
-                    </p> 
-                    <p>
-                        However we found that validation of these two inputs came with at 
-                        significant price and consequently these inputs are no longer validated by
-                        default.  To enable the validation one must specify the appropriate schema 
-                        URI with the <code>schema-uri</code> attribute.  For the <code>data</code>
-                        input of <code>oxf:xforms-output</code> the URI is 
-                        <code>http://www.w3.org/2002/xforms/controls</code> and for the 
+                        <b>Disabled Validation</b>. Previously the data <code>input</code> of the
+                        <code>oxf:xforms-output</code> processor and the <code>config</code> input
+                        of the <code>oxf:portlet-include</code> processor were validated unless one
+                        turned off all input parameter validation in OPS. However we found that
+                        validation of these two inputs came with at significant price and
+                        consequently these inputs are no longer validated by default. To enable the
+                        validation one must specify the appropriate schema URI with the
+                        <code>schema-uri</code> attribute. For the <code>data</code> input of
+                        <code>oxf:xforms-output</code> the URI is
+                        <code>http://www.w3.org/2002/xforms/controls</code> and for the
                         <code>config</code> input of <code>oxf:portlet-include</code> the URI is
                         <code>http://orbeon.org/oxf/xml/portlet-include</code>.
                     </p>

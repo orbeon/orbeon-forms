@@ -1,13 +1,13 @@
 <example-descriptor>
-    <title>Instant Messaging and WebServices</title>
+    <title>Instant Messaging and Web Services</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
                 This page illustrates how the <a href="/doc/processors-messaging-im"
                 f:url-type="resource">Instant Messenger processor</a> can be used, and shows some
-                capabilities of the <a href="/doc/integration-webservices"
-                f:url-type="resource">web services support</a> provided by Presentation Server.
+                capabilities of the <a href="/doc/integration-webservices" f:url-type="resource">web
+                services support</a> provided by OPS.
             </p>
             <h2>How to Use This Page?</h2>
             <ol>

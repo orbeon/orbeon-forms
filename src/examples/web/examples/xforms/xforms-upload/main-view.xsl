@@ -11,14 +11,16 @@
 
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+<html xmlns:f="http://orbeon.org/oxf/xml/formatting"
+            xmlns:xhtml="http://www.w3.org/1999/xhtml"
             xmlns:xf="http://www.w3.org/2002/xforms"
             xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://www.w3.org/1999/xhtml"
             xsl:version="2.0">
-    <xhtml:head><xhtml:title>XForms Upload</xhtml:title></xhtml:head>
-    <xhtml:body>
+    <head><title>XForms Upload</title></head>
+    <body>
         <xsl:variable name="uploaded" select="/result/urls/url != ''" as="xs:boolean"/>
         <xsl:variable name="in-portlet" select="/result/request/container-type = 'portlet'" as="xs:boolean"/>
         <xsl:if test="/result/message">
@@ -70,7 +72,7 @@
 
                         <xf:submit>
                             <xsl:if test="$in-portlet">
-                                <xsl:attribute name="xhtml:disabled">true</xsl:attribute>
+                                <xsl:attribute name="disabled">true</xsl:attribute>
                             </xsl:if>
                             <xf:label>Upload</xf:label>
                             <xf:setvalue ref="action">simple-upload</xf:setvalue>
@@ -123,19 +125,19 @@
                     </td>
                 </tr>
             </table>
-            <xhtml:p>
-            </xhtml:p>
+            <p>
+            </p>
             <!-- Display uploaded images (when uploaded with Web Service) -->
             <xsl:if test="$uploaded">
                 <xsl:for-each select="/result/urls/url">
                     <xsl:if test=". != ''">
-                        <xhtml:p>Uploaded image (<xf:output ref="files/file[{position()}]/@size"/> bytes):</xhtml:p>
-                        <xhtml:p>
+                        <p>Uploaded image (<xf:output ref="files/file[{position()}]/@size"/> bytes):</p>
+                        <p>
                             <img src="{.}"/>
-                        </xhtml:p>
+                        </p>
                     </xsl:if>
                 </xsl:for-each>
             </xsl:if>
         </xf:group>
-    </xhtml:body>
-</xhtml:html>
+    </body>
+</html>

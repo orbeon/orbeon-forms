@@ -17,7 +17,7 @@
     <description>
         <p xmlns="http://www.w3.org/1999/xhtml">
             This example asks a user to enter a company stock symbol and gets the current price for
-            that stock calling a document-style Web service.
+            that stock calling a document-style web service.
         </p>
     </description>
 </example-descriptor>

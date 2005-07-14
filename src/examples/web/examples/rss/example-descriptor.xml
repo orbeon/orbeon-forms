@@ -16,7 +16,7 @@
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
     <description>
         <p xmlns="http://www.w3.org/1999/xhtml">
-            With this page you can create an RSS feed from any Web page, by just specifying the URL
+            With this page you can create an RSS feed from any web page, by just specifying the URL
             of that page and a few XPath expressions pointing to the information you want to
             extract.
         </p>

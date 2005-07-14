@@ -18,7 +18,7 @@
         <p xmlns="http://www.w3.org/1999/xhtml">
             This example asks a user to enter a highway number and then displays the current traffic
             condition on that highway. The example shows you how to get user input using XForms and
-            call a Web service with the delegation processor.
+            call a web service with the delegation processor.
         </p>
     </description>
 </example-descriptor>

@@ -47,6 +47,7 @@
         <!--
         <menu label="Core XML Technologies">
             <menu-item label="XML in OPS" href="reference-xml"/>
+            <menu-item label="XHTML in OPS" href="reference-xhtml"/>
             <menu-item label="XSLT in OPS" href="reference-xslt"/>
         </menu>
         -->

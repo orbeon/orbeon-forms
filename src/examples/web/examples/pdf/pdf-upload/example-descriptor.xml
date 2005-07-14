@@ -17,30 +17,30 @@
 	<description>
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
-                You can upload PDF Files with the form.<br/> The uploaded PDF gets processed by the
-                fromPDF processor and Meta-Information and/or Text gets extracted.<br/>
-                The examples posts the information back to the browser. Typically you would
-                process that information in your database or fulltext search.
+                The uploaded PDF file gets processed by the PDF extraction processor and
+                meta-information and/or text gets extracted. The example sends the information back
+                to the browser. Typically you would process that information in your database or
+                fulltext search.
             </p>
             <p>
-                The PDF extraction processor will take an PDF file as input and extract meta
-                information and or text from the PDF. The extracted structure can be used by fulltext
-                search or a content management system to identify the exact location of content items.
-                The processor makes use of the PDFBox Library http://www.pdfbox.org.
+                The PDF extraction processor takes a PDF file as input and extract meta information
+                and or text from the PDF. The extracted structure can be used by fulltext search or
+                a content management system to identify the exact location of content items. The
+                processor makes use of the <a href="http://www.pdfbox.org">PDFBox library</a>.
             </p>
             <p>
-                The processor allows 5 modes of operation. In mode one only the meta data and the
-                bookmarks with title and page number but no text is extracted. In mode two meta data,
-                bookmarks and text is extracted. In mode three meta data and text broken down into pages
-                is extracted. In mode 4 only the meta data gets extracted (if any). In mode five first
-                an extraction of bookmarks with text is attempted. If there are no bookmarks a fallback
-                to pages is performed.
+                The processor has five modes of operation. In mode one only the meta data and the
+                bookmarks with title and page number but no text is extracted. In mode two meta
+                data, bookmarks and text is extracted. In mode three meta data and text broken down
+                into pages is extracted. In mode 4 only the meta data gets extracted (if any). In
+                mode five first an extraction of bookmarks with text is attempted. If there are no
+                bookmarks a fallback to pages is performed.
             </p>
             <p>
-                If the file containes errors, then the operation might not complete. Most errors are
-                captured and will lead to the insertion of an &lt;error&gt; tag. If the input file is
-                fundamentally broken no output will be displayed (however the processor returns an empty
-                &lt;PDFDocument /&gt; entry.
+                If the file containes errors, then the operation might not complete. Most errors
+                are captured and will lead to the insertion of an &lt;error&gt; tag. If the input
+                file is fundamentally broken no output will be displayed (however the processor
+                returns an empty &lt;PDFDocument /&gt; entry.
             </p>
         </div>
 	</description>

@@ -35,7 +35,7 @@
             </p>
         </section>
         <section>
-            <title>Compliance Matrix</title>
+            <title>Results</title>
             <table>
                 <tr>
                     <th colspan="3">XForms Specification Section</th>
@@ -56,14 +56,14 @@
                 <tr>
                     <td colspan="2"><a href="http://www.w3.org/TR/xforms/slice2.html#concepts-model">2.3 Constraining Values</a></td>
                     <td>
-
+                        No support for custom schema types at the moment.
                     </td>
                     &fail;
                 </tr>
                 <tr>
                     <td colspan="2"><a href="http://www.w3.org/TR/xforms/slice2.html#concepts-multiple">2.4 Multiple Forms per Document</a></td>
                     <td>
-
+                        No support for custom schema types at the moment.
                     </td>
                     &fail;
                 </tr>
@@ -71,7 +71,7 @@
                     <td rowspan="12"><a href="http://www.w3.org/TR/xforms/slice3.html">3. Document Structure</a></td>
                     <td colspan="2"><a href="http://www.w3.org/TR/xforms/slice3.html#structure-namespace">3.1 The XForms Namespace</a></td>
                     <td>
-                        a1 and a2
+                        a1, a2 ok
                     </td>
                     &pass;
                 </tr>
@@ -83,14 +83,17 @@
                 </tr>
                 <tr>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-attrs-link">3.2.2 Linking Attributes</a></td>
-                    <td></td>
+                    <td>
+                        No support for external instances at the moment.
+                    </td>
                     &fail;
                 </tr>
                 <tr>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-attrs-single-node">3.2.3 Single-Node Binding Attributes</a></td>
                     <td>
+                        a1 ok; a2 ok (negative test); b fails; c ok; d,e, f fail; g ok
                     </td>
-                    &untested;
+                    &fail;
                 </tr>
                 <tr>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-attrs-nodeset">3.2.4 Node-Set Binding Attributes</a></td>

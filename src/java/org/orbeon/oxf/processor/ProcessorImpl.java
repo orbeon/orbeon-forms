@@ -23,6 +23,8 @@ import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.debugger.api.BreakpointKey;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.pipeline.api.PipelineContext.Trace;
+import org.orbeon.oxf.pipeline.api.PipelineContext.TraceInfo;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
@@ -46,6 +48,10 @@ import java.util.*;
  * Helper class that implements default method of the Processor interface.
  */
 public abstract class ProcessorImpl implements Processor {
+	
+//	public ProcessorImpl() {
+//		System.out.println();
+//	}
     
     static private Logger logger = LoggerFactory.createLogger(ProcessorImpl.class);
 
@@ -63,13 +69,13 @@ public abstract class ProcessorImpl implements Processor {
     private QName name;
     private Map inputMap = new HashMap();
     private Map outputMap = new HashMap();
-    private List inputsInfo = new ArrayList();
-    private List outputsInfo = new ArrayList();
+    private List inputsInfo = new ArrayList( 0 );
+    private List outputsInfo = new ArrayList( 0 );
 
     private LocationData locationData;
     public static final String PROCESSOR_INPUT_SCHEME_OLD = "oxf:";
     public static final String PROCESSOR_INPUT_SCHEME = "input:";
-
+    
     /**
      * Return a property set for this processor.
      */
@@ -81,8 +87,8 @@ public abstract class ProcessorImpl implements Processor {
         return locationData;
     }
 
-    public void setLocationData(LocationData locationData) {
-        this.locationData = locationData;
+    public void setLocationData( final LocationData loc ) {
+        locationData = loc;
     }
 
     public void setId(String id) {
@@ -1124,10 +1130,31 @@ public abstract class ProcessorImpl implements Processor {
         }
 
         public final void read(PipelineContext context, ContentHandler contentHandler) {
+        	final Trace trc = context.getTrace();
+        	final TraceInfo tinf;
+        	if ( trc == null ) {
+        		tinf = null;
+        	} else {
+            	final String sysID;
+            	final int line;
+    			if ( breakpointKey == null ) {
+    				final Class cls = getClass();
+    				sysID = cls.getName() + " " + getName() + " " + getId();
+    				line = -1;
+    			}
+    			else {
+    				sysID = breakpointKey.getSystemId();
+    				line = breakpointKey.getLine();
+    			}
+            	tinf = new TraceInfo( sysID, line );
+            	trc.add( tinf );
+        	}
             try {
                 getFilter(context).read(context, contentHandler);
             } catch (AbstractMethodError e) {
                 e.printStackTrace();
+            } finally {
+            	if ( tinf != null ) tinf.end = System.currentTimeMillis();
             }
         }
 

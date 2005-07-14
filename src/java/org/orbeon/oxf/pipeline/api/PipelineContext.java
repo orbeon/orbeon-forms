@@ -15,11 +15,33 @@ package org.orbeon.oxf.pipeline.api;
 
 import java.util.*;
 
+import org.orbeon.oxf.common.OXFException;
+
 /**
  * PipelineContext represents a context object passed to all the processors running in a given
  * pipeline session.
  */
 public class PipelineContext {
+	
+	public static class TraceInfo {
+		public final long start;
+		public long end;
+		public final String systemID;
+		public final int line;
+		public TraceInfo( final long strt, final String sysID, final int ln ) {
+			start = strt;
+			systemID = sysID;
+			line = ln;
+		}
+		public TraceInfo( final String sysID, final int ln ) { 
+			systemID = sysID;
+			line = ln;
+			start = System.currentTimeMillis();
+		}
+		public String toString() {
+			return systemID + ":( " + start + " " + end + " )";
+		}
+	}
 
     /**
      * Key name for the EXTERNAL_CONTEXT attribute of type ExternalContext.
@@ -48,7 +70,7 @@ public class PipelineContext {
     public static final String DATASOURCE_CONTEXT = "datasource-context";
 
     public static final String REQUEST = "request";
-
+    
     /**
      * ContextListener interface to listen on PipelineContext events.
      */
@@ -59,8 +81,8 @@ public class PipelineContext {
          * @param success true if the pipeline execution was successful, false otherwise
          */
         public void contextDestroyed(boolean success);
+        
     }
-
     /**
      * ContextListener adapter class to faciliate implementations of the ContextListener
      * interface.
@@ -70,13 +92,49 @@ public class PipelineContext {
         }
     }
 
-    private Map attributes = new HashMap();;
+    public interface Trace extends ContextListener {
+    	void add( final TraceInfo tinf );
+    }
+
+    private Map attributes = new HashMap();
+
     private List listeners;
 
     private boolean destroyed;
-
+    
+    private final Trace trace;
+    
     public PipelineContext() {
+    	
+        final String trcCls = System.getProperty( "processor.trace" );
+        if ( trcCls == null ) {
+        	trace = null;
+        } else {
+        	Throwable t = null;
+        	Trace trc = null;
+			try {
+				final Class cls = Class.forName( trcCls );
+	        	trc = ( Trace )cls.newInstance();
+			} catch ( final ClassNotFoundException e ) {
+				t = e;
+			} catch ( final InstantiationException e ) {
+				t = e;
+			} catch ( final IllegalAccessException e ) {
+				t = e;
+			}
+			trace = trc;
+			if ( t != null ) {
+				throw new OXFException( t );
+			}
+        }
+        
     }
+    
+    public Trace getTrace() {
+    	return trace;
+    }
+    
+
 
     /**
      * Set an attribute in the context.
@@ -117,6 +175,7 @@ public class PipelineContext {
      */
     public void destroy(boolean success) {
         if (!destroyed) {
+        	if ( trace != null ) trace.contextDestroyed( success );
             if (listeners != null) {
                 for (Iterator i = listeners.iterator(); i.hasNext();) {
                     ContextListener contextListener = (ContextListener) i.next();

@@ -58,4 +58,7 @@ public class BreakpointKey {
     public void setSystemId(String systemId) {
         this.systemId = systemId;
     }
+    public String toString() {
+    	return systemId + " " + line + " " + column;
+    }
 }

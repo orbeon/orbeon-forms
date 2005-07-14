@@ -78,8 +78,8 @@
     <page path-info="/WEB-INF/*" view="/struts-view/model/struts.xpl"/>
 
     <!-- Documentation -->
-<!--    <page path-info="/examples/doc" view="/doc/stub-view.xml"/>-->
-<!--    <page path-info="/doc/book" model="/doc/book/model.xpl"/>-->
+    <!--<page path-info="/examples/doc" view="/doc/stub-view.xml"/>-->
+    <!--<page path-info="/doc/book" model="/doc/book/model.xpl"/>-->
 
     <page path-info="/doc/" matcher="oxf:perl5-matcher"
         default-submission="/doc/default-submission.xml" model="/doc/doc-model.xpl" view="/doc/doc-view.xpl">

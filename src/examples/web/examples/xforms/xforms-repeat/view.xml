@@ -69,7 +69,7 @@
                                 <xforms:trigger>
                                     <xforms:label>Add</xforms:label>
                                     <xforms:insert ev:event="DOMActivate" nodeset="/form/department"
-                                        at="index('departmentSet')" position="after"/>
+                                        at="min((count(/form/department), index('departmentSet') + 1))" position="before"/>
                                 </xforms:trigger>
                                 <xforms:trigger>
                                     <xforms:label>Remove</xforms:label>
@@ -82,7 +82,7 @@
                                 <xforms:trigger>
                                     <xforms:label>Add</xforms:label>
                                     <xforms:insert ev:event="DOMActivate" nodeset="/form/department[index('departmentSet')]/employee"
-                                        at="index('employeeSet')" position="after"/>
+                                        at="min((count(/form/department[index('departmentSet')]/employee), index('employeeSet') + 1))" position="before"/>
                                 </xforms:trigger>
                                 <xforms:trigger>
                                     <xforms:label>Remove</xforms:label>

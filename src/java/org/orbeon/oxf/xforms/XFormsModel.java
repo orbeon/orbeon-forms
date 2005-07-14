@@ -185,7 +185,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      * no instance in this model.
      */
     public XFormsInstance getDefaultInstance() {
-        return (XFormsInstance) ((instances.size() > 0) ? instances.get(0) : null);
+        return (XFormsInstance) ((instances != null && instances.size() > 0) ? instances.get(0) : null);
     }
 
     /**
@@ -215,10 +215,12 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
     public XFormsInstance getInstanceForNode(Node node) {
         final Document document = node.getDocument();
 
-        for (Iterator i = instances.iterator(); i.hasNext();) {
-            final XFormsInstance currentInstance = (XFormsInstance) i.next();
-            if (currentInstance.getDocument() == document)
-                return currentInstance;
+        if (instances != null) {
+            for (Iterator i = instances.iterator(); i.hasNext();) {
+                final XFormsInstance currentInstance = (XFormsInstance) i.next();
+                if (currentInstance.getDocument() == document)
+                    return currentInstance;
+            }
         }
 
         return null;
@@ -732,74 +734,76 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             final XFormsRecalculateEvent xformsRecalculateEvent = (XFormsRecalculateEvent) event;
 
-            // Clear all existing computed expression binds
-            for (Iterator i = instances.iterator(); i.hasNext();) {
-                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
-                    public void walk(Node node, InstanceData instanceData) {
-                        if (instanceData != null)
-                            instanceData.clearComputedExpressionBinds();
-                    }
-                });
-            }
-
-            applyBinds(new BindRunner() {
-                public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
-                    handleCalculateBind(pipelineContext, modelBind, documentWrapper, this);
-                }
-            });
-
-            // Here we assume that we update those after recaculate, because recalculate is always
-            // called after values are changed in the instance - may have to be changed...
-            applyComputedExpressionBinds(pipelineContext);
-
-            // Send events if needed
-            if (xformsRecalculateEvent.isSendEvents() && containingDocument.getXFormsControls() != null) {
-                final XFormsControls xformsControls = containingDocument.getXFormsControls();
+            if (instances != null) {
+                // Clear all existing computed expression binds
                 for (Iterator i = instances.iterator(); i.hasNext();) {
-                    XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new BoundNodeInstanceWalker(pipelineContext, xformsControls) {
-
+                    XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
                         public void walk(Node node, InstanceData instanceData) {
-
-                            setNode(node);
-
-                            // Dispatch xforms-optional/xforms-required
-                            {
-                                final boolean previousRequiredState = instanceData.getPreviousRequiredState();
-                                final boolean newRequiredState = instanceData.getRequired().get();
-                                if (previousRequiredState && !newRequiredState) {
-                                    for (Iterator i = getBoundControlsIterator(); i.hasNext();)
-                                        containingDocument.dispatchEvent(pipelineContext, new XFormsOptionalEvent((XFormsEventTarget) i.next()));
-                                } else if (!previousRequiredState && newRequiredState) {
-                                    for (Iterator i = getBoundControlsIterator(); i.hasNext();)
-                                        containingDocument.dispatchEvent(pipelineContext, new XFormsRequiredEvent((XFormsEventTarget) i.next()));
-                                }
-                            }
-                            // Dispatch xforms-enabled/xforms-disabled
-                            {
-                                final boolean previousRelevantState = instanceData.getPreviousRelevantState();
-                                final boolean newRelevantState = instanceData.getRelevant().get();
-                                if (previousRelevantState && !newRelevantState) {
-                                    for (Iterator i = getBoundControlsIterator(); i.hasNext();)
-                                        containingDocument.dispatchEvent(pipelineContext, new XFormsDisabledEvent((XFormsEventTarget) i.next()));
-                                } else if (!previousRelevantState && newRelevantState) {
-                                    for (Iterator i = getBoundControlsIterator(); i.hasNext();)
-                                        containingDocument.dispatchEvent(pipelineContext, new XFormsEnabledEvent((XFormsEventTarget) i.next()));
-                                }
-                            }
-                            // Dispatch xforms-readonly/xforms-readwrite
-                            {
-                                final boolean previousReadonlyState = instanceData.getPreviousReadonlyState();
-                                final boolean newReadonlyState = instanceData.getReadonly().get();
-                                if (previousReadonlyState && !newReadonlyState) {
-                                    for (Iterator i = getBoundControlsIterator(); i.hasNext();)
-                                        containingDocument.dispatchEvent(pipelineContext, new XFormsReadwriteEvent((XFormsEventTarget) i.next()));
-                                } else if (!previousReadonlyState && newReadonlyState) {
-                                    for (Iterator i = getBoundControlsIterator(); i.hasNext();)
-                                        containingDocument.dispatchEvent(pipelineContext, new XFormsReadonlyEvent((XFormsEventTarget) i.next()));
-                                }
-                            }
+                            if (instanceData != null)
+                                instanceData.clearComputedExpressionBinds();
                         }
                     });
+                }
+
+                applyBinds(new BindRunner() {
+                    public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
+                        handleCalculateBind(pipelineContext, modelBind, documentWrapper, this);
+                    }
+                });
+
+                // Here we assume that we update those after recaculate, because recalculate is always
+                // called after values are changed in the instance - may have to be changed...
+                applyComputedExpressionBinds(pipelineContext);
+
+                // Send events if needed
+                if (xformsRecalculateEvent.isSendEvents() && containingDocument.getXFormsControls() != null) {
+                    final XFormsControls xformsControls = containingDocument.getXFormsControls();
+                    for (Iterator i = instances.iterator(); i.hasNext();) {
+                        XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new BoundNodeInstanceWalker(pipelineContext, xformsControls) {
+
+                            public void walk(Node node, InstanceData instanceData) {
+
+                                setNode(node);
+
+                                // Dispatch xforms-optional/xforms-required
+                                {
+                                    final boolean previousRequiredState = instanceData.getPreviousRequiredState();
+                                    final boolean newRequiredState = instanceData.getRequired().get();
+                                    if (previousRequiredState && !newRequiredState) {
+                                        for (Iterator i = getBoundControlsIterator(); i.hasNext();)
+                                            containingDocument.dispatchEvent(pipelineContext, new XFormsOptionalEvent((XFormsEventTarget) i.next()));
+                                    } else if (!previousRequiredState && newRequiredState) {
+                                        for (Iterator i = getBoundControlsIterator(); i.hasNext();)
+                                            containingDocument.dispatchEvent(pipelineContext, new XFormsRequiredEvent((XFormsEventTarget) i.next()));
+                                    }
+                                }
+                                // Dispatch xforms-enabled/xforms-disabled
+                                {
+                                    final boolean previousRelevantState = instanceData.getPreviousRelevantState();
+                                    final boolean newRelevantState = instanceData.getRelevant().get();
+                                    if (previousRelevantState && !newRelevantState) {
+                                        for (Iterator i = getBoundControlsIterator(); i.hasNext();)
+                                            containingDocument.dispatchEvent(pipelineContext, new XFormsDisabledEvent((XFormsEventTarget) i.next()));
+                                    } else if (!previousRelevantState && newRelevantState) {
+                                        for (Iterator i = getBoundControlsIterator(); i.hasNext();)
+                                            containingDocument.dispatchEvent(pipelineContext, new XFormsEnabledEvent((XFormsEventTarget) i.next()));
+                                    }
+                                }
+                                // Dispatch xforms-readonly/xforms-readwrite
+                                {
+                                    final boolean previousReadonlyState = instanceData.getPreviousReadonlyState();
+                                    final boolean newReadonlyState = instanceData.getReadonly().get();
+                                    if (previousReadonlyState && !newReadonlyState) {
+                                        for (Iterator i = getBoundControlsIterator(); i.hasNext();)
+                                            containingDocument.dispatchEvent(pipelineContext, new XFormsReadwriteEvent((XFormsEventTarget) i.next()));
+                                    } else if (!previousReadonlyState && newReadonlyState) {
+                                        for (Iterator i = getBoundControlsIterator(); i.hasNext();)
+                                            containingDocument.dispatchEvent(pipelineContext, new XFormsReadonlyEvent((XFormsEventTarget) i.next()));
+                                    }
+                                }
+                            }
+                        });
+                    }
                 }
             }
 
@@ -809,46 +813,48 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
             final XFormsRevalidateEvent xformsRevalidateEvent = (XFormsRevalidateEvent) event;
 
-            // Clear all existing validation binds
-            for (Iterator i = instances.iterator(); i.hasNext();) {
-                XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
-                    public void walk(Node node, InstanceData instanceData) {
-                        if (instanceData != null)
-                            instanceData.clearValidationBinds();
-                    }
-                });
-            }
-
-            // Run validation
-            applySchemasIfNeeded();
-            applyBinds(new BindRunner() {
-                public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
-                    handleValidationBind(pipelineContext, modelBind, documentWrapper, this);
-                }
-            });
-
-            // Send events if needed
-            if (xformsRevalidateEvent.isSendEvents() && containingDocument.getXFormsControls() != null) {
-                final XFormsControls xformsControls = containingDocument.getXFormsControls();
+            if (instances != null) {
+                // Clear all existing validation binds
                 for (Iterator i = instances.iterator(); i.hasNext();) {
-                    XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new BoundNodeInstanceWalker(pipelineContext, xformsControls) {
+                    XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new XFormsUtils.InstanceWalker() {
                         public void walk(Node node, InstanceData instanceData) {
-                            // Remember current node
-                            setNode(node);
-                            // Dispatch xforms-valid/xforms-invalid
-                            {
-                                final boolean previousValidState = instanceData.getPreviousValidState();
-                                final boolean newValidState = instanceData.getValid().get();
-                                if (previousValidState && !newValidState) {
-                                    for (Iterator i = getBoundControlsIterator(); i.hasNext();)
-                                        containingDocument.dispatchEvent(pipelineContext, new XFormsInvalidEvent((XFormsEventTarget) i.next()));
-                                } else if (!previousValidState && newValidState) {
-                                    for (Iterator i = getBoundControlsIterator(); i.hasNext();)
-                                        containingDocument.dispatchEvent(pipelineContext, new XFormsValidEvent((XFormsEventTarget) i.next()));
-                                }
-                            }
+                            if (instanceData != null)
+                                instanceData.clearValidationBinds();
                         }
                     });
+                }
+
+                // Run validation
+                applySchemasIfNeeded();
+                applyBinds(new BindRunner() {
+                    public void applyBind(ModelBind modelBind, DocumentWrapper documentWrapper) {
+                        handleValidationBind(pipelineContext, modelBind, documentWrapper, this);
+                    }
+                });
+
+                // Send events if needed
+                if (xformsRevalidateEvent.isSendEvents() && containingDocument.getXFormsControls() != null) {
+                    final XFormsControls xformsControls = containingDocument.getXFormsControls();
+                    for (Iterator i = instances.iterator(); i.hasNext();) {
+                        XFormsUtils.iterateInstanceData(((XFormsInstance) i.next()).getDocument(), new BoundNodeInstanceWalker(pipelineContext, xformsControls) {
+                            public void walk(Node node, InstanceData instanceData) {
+                                // Remember current node
+                                setNode(node);
+                                // Dispatch xforms-valid/xforms-invalid
+                                {
+                                    final boolean previousValidState = instanceData.getPreviousValidState();
+                                    final boolean newValidState = instanceData.getValid().get();
+                                    if (previousValidState && !newValidState) {
+                                        for (Iterator i = getBoundControlsIterator(); i.hasNext();)
+                                            containingDocument.dispatchEvent(pipelineContext, new XFormsInvalidEvent((XFormsEventTarget) i.next()));
+                                    } else if (!previousValidState && newValidState) {
+                                        for (Iterator i = getBoundControlsIterator(); i.hasNext();)
+                                            containingDocument.dispatchEvent(pipelineContext, new XFormsValidEvent((XFormsEventTarget) i.next()));
+                                    }
+                                }
+                            }
+                        });
+                    }
                 }
             }
 

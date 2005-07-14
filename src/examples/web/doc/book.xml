@@ -53,7 +53,7 @@
     </menu>
     <menu label="Reference">
         <menu-item label="Resource Managers" href="reference-resource-managers"/>
-        <menu-item label="Properties File" href="reference-properties"/>
+        <menu-item label="Properties" href="reference-properties"/>
         <menu-item label="Non-XML Documents" href="reference-formats"/>
         <menu-item label="Error Pipeline" href="reference-error-pipeline"/>
         <menu-item label="Listeners" href="reference-listeners"/>

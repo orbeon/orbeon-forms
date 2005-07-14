@@ -25,7 +25,6 @@
         <p:output name="data" id="example-descriptor"/>
     </p:processor>
 
-    <!-- Read example descriptor from the particular example's directory -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#instance"/>
         <p:input name="config">
@@ -33,7 +32,7 @@
                 <xsl:variable name="examples-list" select="document('oxf:/examples/examples-list.xml')" as="document-node()"/>
                 <xsl:variable name="example-id" select="/*/example-id" as="xs:string"/>
                 <xsl:variable name="example" select="$examples-list//example[@id = $example-id]" as="element()"/>
-                <xsl:variable name="url" select="concat('oxf:/examples/', if ($example/@path) then $example/@path else $example/@id, '/', string(/*/source-url))" as="xs:string"/>
+                <xsl:variable name="url" select="concat('oxf:/', if ($example/@standalone = 'true') then 'examples-standalone/' else 'examples/', if ($example/@path) then $example/@path else $example/@id, '/', string(/*/source-url))" as="xs:string"/>
                 <url><xsl:value-of select="$url"/></url>
                 <content-type><xsl:value-of select="if (ends-with($url, '.txt') or ends-with($url, '.java')) then 'text/plain' else 'application/xml'"/></content-type>
             </config>

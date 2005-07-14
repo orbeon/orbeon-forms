@@ -51,7 +51,7 @@
                 <xhtml:p>
                     You are not logged in. This means that you have not yet configured the
                     authentication in your application server. Please read the <xhtml:a
-                    href="doc/intro-install">documentation</xhtml:a> for more information.
+                    href="/doc/intro-install">documentation</xhtml:a> for more information.
                 </xhtml:p>
             </xsl:otherwise>
         </xsl:choose>

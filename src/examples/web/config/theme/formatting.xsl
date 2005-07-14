@@ -51,7 +51,7 @@
         </h1>
         <table border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 2em"><tr><td class="dashedbox">
             <div class="rightbox" style="float: right">
-                <xsl:for-each select="$page/source">
+                <xsl:for-each select="$page/source-files/file">
                     <nobr>
                         <xsl:choose>
                             <xsl:when test="@html = 'true'">

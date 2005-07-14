@@ -27,7 +27,7 @@
                 <xsl:variable name="examples-list" select="document('oxf:/examples/examples-list.xml')" as="document-node()"/>
                 <xsl:variable name="example-id" select="/*/example-id" as="xs:string"/>
                 <xsl:variable name="example" select="$examples-list//example[@id = $example-id]" as="element()"/>
-                <url><xsl:value-of select="concat('oxf:/examples/', if ($example/@path) then $example/@path else $example/@id, '/example-descriptor.xml')"/></url>
+                <url><xsl:value-of select="concat('oxf:/', if ($example/@standalone = 'true') then 'examples-standalone/' else 'examples/', if ($example/@path) then $example/@path else $example/@id, '/example-descriptor.xml')"/></url>
             </config>
         </p:input>
         <p:output name="data" id="url-config"/>

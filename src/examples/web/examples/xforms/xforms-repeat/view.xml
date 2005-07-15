@@ -18,79 +18,103 @@
     <xhtml:head>
         <xhtml:title>XForms Repeating Elements</xhtml:title>
         <xforms:model>
-            <xforms:instance>
-                <form>
-                    <department name="Finance">
-                        <employee firstname="John" lastname="Smith"/>
-                        <employee firstname="Peter" lastname="Strain"/>
-                        <employee firstname="Carl" lastname="Thompson"/>
-                        <employee firstname="" lastname=""/>
-                    </department>
-                    <department name="Engineering">
-                        <employee firstname="Letticia" lastname="Vallejo"/>
-                        <employee firstname="Bruce" lastname="Wilson"/>
-                        <employee firstname="David" lastname="Williams"/>
-                        <employee firstname="" lastname=""/>
-                    </department>
-                    <department name="">
-                        <employee firstname="" lastname=""/>
-                    </department>
-                </form>
+            <xforms:instance id="todo-list">
+                <todo-list>
+                    <todo description="Bills to pay">
+                        <task description="Mobile phone" done=""/>
+                        <task description="Internet service provider" done=""/>
+                        <task description="Lease" done="true"/>
+                        <task description="" done=""/>
+                    </todo>
+                    <todo description="Buy groceries">
+                        <task description="Milk" done=""/>
+                        <task description="Bread" done=""/>
+                        <task description="Watermelon" done=""/>
+                        <task description="Cereals" done=""/>
+                        <task description="Jam" done=""/>
+                        <task description="" done=""/>
+                    </todo>
+                    <todo description="">
+                        <task description="" done=""/>
+                    </todo>
+                </todo-list>
+            </xforms:instance>
+            <xforms:instance id="triggers">
+                <triggers>
+                    <remove-todo/>
+                    <remove-todo-item/>
+                </triggers>
             </xforms:instance>
             <xforms:submission method="post"/>
-            <xforms:bind nodeset="/form/department" relevant="count(following-sibling::department) > 0"/>
-            <xforms:bind nodeset="/form/department/employee" relevant="count(following-sibling::employee) > 0"/>
+            <xforms:bind nodeset="/todo-list/todo" relevant="count(following-sibling::todo) > 0"/>
+            <xforms:bind nodeset="/todo-list/todo/@description" readonly="count(../task) > 1 and count(../task[@done = '']) = 1"/>
+            <xforms:bind nodeset="/todo-list/todo/task" relevant="count(following-sibling::task) > 0"/>
+            <xforms:bind nodeset="/todo-list/todo/task/@description" readonly="../@done = 'true'"/>
+            <xforms:bind nodeset="instance('triggers')/remove-todo" relevant="count(instance('todo-list')/todo) > 1"/>
+            <!--<xforms:bind nodeset="instance('triggers')/remodve-todo-item" relevant="count(instance('todo-list')/todo[index('todoSet')]/task) > 1"/>-->
+            <xforms:bind nodeset="instance('triggers')/remove-todo-item" relevant="count(instance('todo-list')/todo[1]/task) > 1"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:group ref="/form">
-            <table border="0" cellpadding="10" cellspacing="0">
+        <xforms:group ref="/todo-list">
+            <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td colspan="2">
-                        <xforms:repeat nodeset="department" id="departmentSet">
-                            <div style="margin-bottom: 1em; padding-left: 1em">
-                                <p>
-                                    <xforms:input ref="@name" xhtml:size="10">
-                                        <xforms:label class="fixed-width">Department:</xforms:label>
-                                    </xforms:input>
-                                </p>
-                                <xforms:repeat nodeset="employee" id="employeeSet">
-                                    <p style="margin-left: 2em; margin: 0.5em; white-space: nowrap">
-                                        <xhtml:span class="fixed-width">Employee:</xhtml:span>
-                                        <xforms:input ref="@firstname" xhtml:size="10"/>
-                                        <xforms:input ref="@lastname" xhtml:size="10"/>
-                                    </p>
-                                </xforms:repeat>
-                            </div>
-                        </xforms:repeat>
+                    <td>
                         <xhtml:fieldset>
+                            <xhtml:legend>To-do List Actions</xhtml:legend>
                             <xhtml:p>
-                                <xhtml:span class="fixed-width">Department:</xhtml:span>
+                                <xhtml:span class="fixed-width">Todo:</xhtml:span>
                                 <xforms:trigger>
                                     <xforms:label>Add</xforms:label>
-                                    <xforms:insert ev:event="DOMActivate" nodeset="/form/department"
-                                        at="min((count(/form/department), index('departmentSet') + 1))" position="before"/>
+                                    <xforms:insert ev:event="DOMActivate" nodeset="/todo-list/todo"
+                                        at="min((last(), index('todoSet') + 1))" position="before"/>
                                 </xforms:trigger>
-                                <xforms:trigger>
+                                <xforms:trigger ref="instance('triggers')/remove-todo">
                                     <xforms:label>Remove</xforms:label>
-                                    <xforms:delete ev:event="DOMActivate" nodeset="/form/department"
-                                        at="index('departmentSet')"/>
+                                    <xforms:delete ev:event="DOMActivate" nodeset="/todo-list/todo"
+                                        at="index('todoSet')"/>
                                 </xforms:trigger>
                             </xhtml:p>
                             <xhtml:p>
-                                <xhtml:span class="fixed-width">Employee:</xhtml:span>
+                                <xhtml:span class="fixed-width">Todo item:</xhtml:span>
                                 <xforms:trigger>
                                     <xforms:label>Add</xforms:label>
-                                    <xforms:insert ev:event="DOMActivate" nodeset="/form/department[index('departmentSet')]/employee"
-                                        at="min((count(/form/department[index('departmentSet')]/employee), index('employeeSet') + 1))" position="before"/>
+                                    <xforms:insert ev:event="DOMActivate" nodeset="/todo-list/todo[index('todoSet')]/task"
+                                        at="min((last(), index('taskSet') + 1))" position="before"/>
                                 </xforms:trigger>
-                                <xforms:trigger>
+                                <xforms:trigger ref="instance('triggers')/remove-todo-item">
                                     <xforms:label>Remove</xforms:label>
-                                    <xforms:delete ev:event="DOMActivate" nodeset="/form/department[index('departmentSet')]/employee"
-                                        at="index('employeeSet')"/>
+                                    <xforms:delete ev:event="DOMActivate" nodeset="/todo-list/todo[index('todoSet')]/task"
+                                        at="index('taskSet')"/>
                                 </xforms:trigger>
                             </xhtml:p>
                         </xhtml:fieldset>
+                        <xhtml:div style="margin-top: 3em; padding-left: 1em">
+                            <xforms:repeat nodeset="todo" id="todoSet">
+                                <xhtml:div style="padding: .5em 1em .5em 1em">
+                                    <p>
+                                        <xforms:input ref="@description" xhtml:size="30"/>
+                                        <xforms:output value="if (count(task) = 1) then ''
+                                            else if (count(task[@done = '']) = 1) then 'Done'
+                                            else concat(count(task[@done = '']) - 1, ' left')"/>
+                                    </p>
+                                    <xforms:repeat nodeset="task" id="taskSet">
+                                        <p>
+                                            <xforms:output value="if (@done = '') then
+                                                concat(count(preceding-sibling::task[@done = '']) + 1, '.') else '-'"
+                                                style="width: 2em; display: -moz-inline-box"/>
+                                            <xforms:input ref="@description" xhtml:size="30"/>
+                                            <xforms:select ref="@done" appearance="full">
+                                                <xforms:item>
+                                                    <xforms:label>Done</xforms:label>
+                                                    <xforms:value>true</xforms:value>
+                                                </xforms:item>
+                                            </xforms:select>
+                                        </p>
+                                    </xforms:repeat>
+                                </xhtml:div>
+                            </xforms:repeat>
+                        </xhtml:div>
                     </td>
                 </tr>
             </table>

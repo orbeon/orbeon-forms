@@ -144,7 +144,7 @@
             </xsl:choose>
         </xhtml:span>
     </xsl:template>
-    
+
     <xsl:template match="xforms:trigger">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
@@ -224,7 +224,9 @@
     <!-- Display as list of checkboxes / radio buttons -->
     <xsl:template match="xforms:select[@appearance = 'full'] | xforms:select1[@appearance = 'full']">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xsl:message>select id: <xsl:value-of select="$id"/></xsl:message>
         <xsl:variable name="many" as="xs:boolean" select="local-name() = 'select'"/>
         <xsl:variable name="type" as="xs:string"
             select="if ($many) then 'checkbox' else 'radio'"/>
@@ -246,6 +248,7 @@
                             <xsl:with-param name="attributes-element" select="$itemset-element"/>
                             <xsl:with-param name="label" select="@label"/>
                             <xsl:with-param name="value" select="@value"/>
+                            <xsl:with-param name="generate-template" select="$generate-template"/>
                         </xsl:call-template>
                     </xsl:for-each>
                 </xsl:when>
@@ -258,6 +261,7 @@
                             <xsl:with-param name="attributes-element" select="."/>
                             <xsl:with-param name="label" select="xforms:label"/>
                             <xsl:with-param name="value" select="xforms:value"/>
+                            <xsl:with-param name="generate-template" select="$generate-template"/>
                         </xsl:call-template>
                     </xsl:for-each>
                 </xsl:otherwise>
@@ -284,12 +288,15 @@
         <xsl:param name="attributes-element" as="element()"/>
         <xsl:param name="label" as="xs:string"/>
         <xsl:param name="value" as="xs:string"/>
+        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
         <xhtml:span>
             <xhtml:input type="{$type}" name="{$id}" value="{$value}">
                 <xsl:copy-of select="xxforms:copy-attributes($attributes-element, (), ())"/>
-                <xsl:if test="$value = tokenize(xxforms:control($id), ' ')">
-                    <xsl:attribute name="checked">checked</xsl:attribute>
+                <xsl:if test="not($generate-template)">
+                    <xsl:if test="$value = tokenize(xxforms:control($id), ' ')">
+                        <xsl:attribute name="checked">checked</xsl:attribute>
+                    </xsl:if>
                 </xsl:if>
             </xhtml:input>
             <xsl:value-of select="$label"/>
@@ -300,6 +307,7 @@
     <xsl:template match="xforms:select1[@appearance = ('minimal', 'compact')] 
             | xforms:select[@appearance = 'compact']">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xsl:variable name="many" as="xs:boolean" select="local-name() = 'select'"/>
         <xsl:variable name="class" as="xs:string"
@@ -327,6 +335,7 @@
                             <xsl:with-param name="attributes-element" select="$itemset-element"/>
                             <xsl:with-param name="label" select="@label"/>
                             <xsl:with-param name="value" select="@value"/>
+                            <xsl:with-param name="generate-template" select="$generate-template"/>
                         </xsl:call-template>
                     </xsl:for-each>
 
@@ -340,6 +349,7 @@
                             <xsl:with-param name="attributes-element" select="."/>
                             <xsl:with-param name="label" select="xforms:label"/>
                             <xsl:with-param name="value" select="xforms:value"/>
+                            <xsl:with-param name="generate-template" select="$generate-template"/>
                         </xsl:call-template>
                     </xsl:for-each>
                 </xsl:otherwise>
@@ -353,11 +363,14 @@
         <xsl:param name="attributes-element" as="element()"/>
         <xsl:param name="label" as="xs:string"/>
         <xsl:param name="value" as="xs:string"/>
+        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
         <xhtml:option value="{$value}">
             <xsl:copy-of select="xxforms:copy-attributes($attributes-element, (), ())"/>
-            <xsl:if test="$value = (if ($many) then tokenize(xxforms:control($id), ' ') else xxforms:control($id))">
-                <xsl:attribute name="selected">selected</xsl:attribute>
+            <xsl:if test="$generate-template">
+                <xsl:if test="$value = (if ($many) then tokenize(xxforms:control($id), ' ') else xxforms:control($id))">
+                    <xsl:attribute name="selected">selected</xsl:attribute>
+                </xsl:if>
             </xsl:if>
             <xsl:value-of select="$label"/>
         </xhtml:option>
@@ -430,7 +443,6 @@
                     select="(if ($current-repeat-selected) then
                         concat('xforms-repeat-selected-item-', if ($number-parent-repeat mod 2 = 1) then '1' else '2') else (),
                         if ($current-repeat-relevant) then () else 'xforms-disabled')"/>
-                <xsl:message>Added classes: <xsl:value-of select="$added-classes"/></xsl:message>
                 <!-- Get children of current repeat iteration adding a span element around text nodes -->
                 <xsl:variable name="current-repeat-children-nodes" as="node()*">
                     <xsl:apply-templates select="$xforms-repeat/node()">
@@ -448,7 +460,6 @@
                             </xsl:when>
                             <xsl:when test="normalize-space() != ''">
                                 <xhtml:span>
-                                    <xsl:message>Text length: |<xsl:value-of select="normalize-space(.)"/>|</xsl:message>
                                     <xsl:value-of select="."/>
                                 </xhtml:span>
                             </xsl:when>
@@ -593,6 +604,7 @@
     
     <xsl:function name="xxforms:control" as="element()">
         <xsl:param name="id" as="xs:string"/>
+        <xsl:message>id: <xsl:value-of select="$id"/></xsl:message>
         <xsl:variable name="control" 
             select="$response/xxforms:action/xxforms:control-values/xxforms:control[@id = $id]"/>
         <xsl:if test="not($control)">

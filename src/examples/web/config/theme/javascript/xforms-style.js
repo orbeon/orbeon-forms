@@ -27,10 +27,14 @@ function xformsUpdateStyle(element) {
         }
     }
 
-    function updateRelevant(element, relevant) {
+    function updateRelevantReadonly(element, relevant, readonly) {
         if (xformsIsDefined(relevant)) {
             if (relevant) xformsRemoveClass(element, "xforms-disabled")
             else xformsAddClass(element, "xforms-disabled");
+        }
+        if (xformsIsDefined(readonly)) {
+            if (readonly) element.disabled = true;
+            else element.disabled = false;
         }
     }
 
@@ -60,7 +64,7 @@ function xformsUpdateStyle(element) {
                 }
 
                 // Disable or enable label depending if control is relevant
-                updateRelevant(element, control.isRelevant);
+                updateRelevantReadonly(element, control.isRelevant, control.isReadonly);
             }
 
             if (className == "xforms-hint") {
@@ -103,7 +107,7 @@ function xformsUpdateStyle(element) {
                 }
 
                 // Disable or enable hint depending if control is relevant
-                updateRelevant(element, control.isRelevant);
+                updateRelevantReadonly(element, control.isRelevant, control.isReadonly);
             }
             
             if (className == "xforms-help") {
@@ -154,7 +158,7 @@ function xformsUpdateStyle(element) {
                 }
 
                 // Disable or enable help depending if control is relevant
-                updateRelevant(element, control.isRelevant);
+                updateRelevantReadonly(element, control.isRelevant, control.isReadonly);
             }
 
             if (className == "xforms-alert-inactive" || className == "xforms-alert-active") {
@@ -169,7 +173,7 @@ function xformsUpdateStyle(element) {
                     element.className = control.isValid ? "xforms-alert-inactive" : "xforms-alert-active";
 
                 // Disable or enable help depending if control is relevant
-                updateRelevant(element, control.isRelevant);
+                updateRelevantReadonly(element, control.isRelevant, control.isReadonly);
             }
 
             if (className == "xforms-date") {
@@ -219,7 +223,7 @@ function xformsUpdateStyle(element) {
             }
 
             // Update relevant
-            updateRelevant(element, element.isRelevant);
+            updateRelevantReadonly(element, element.isRelevant, element.isReadonly);
 
             // This is for widgets. Code for widgets should be modularized and moved out of this file
             

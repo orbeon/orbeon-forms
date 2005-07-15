@@ -536,7 +536,7 @@ function xformsInitializeControlsUnder(root) {
                     xformsAddEventListener(document, "mouseup", rangeMouseUp);
                 }
             
-            } else if (control.tagName == "SPAN") {
+            } else if (control.tagName == "SPAN" || control.tagName == "DIV") {
                 // Don't add listeners on spans
             } else {
                 // Handle value change and incremental modification
@@ -864,6 +864,7 @@ function xformsHandleResponse() {
                                             var newControlValue = xformsStringValue(controlElement);
                                             var controlId = controlElement.getAttribute("id");
                                             var relevant = controlElement.getAttribute("relevant");
+                                            var readonly = controlElement.getAttribute("readonly");
                                             var documentElement = document.getElementById(controlId);
                                             var documentElementClasses = documentElement.className.split(" ");
 
@@ -937,9 +938,11 @@ function xformsHandleResponse() {
                                             var newHelp = controlElement.getAttribute("help");
                                             if (newHelp && newHelp != documentElement.helpMessage)
                                                 documentElement.helpMessage = newHelp;
-                                            // Update relevant
+                                            // Update relevant and readonly
                                             if (relevant)
                                                 documentElement.isRelevant = relevant == "true";
+                                            if (readonly)
+                                                documentElement.isReadonly = readonly == "true";
 
                                             // Update style
                                             xformsUpdateStyle(documentElement);
@@ -1150,8 +1153,8 @@ function xformsHandleResponse() {
                                 }
                                 // Unhighlight items at old indexes
                                 for (var repeatId in newRepeatIndexes) {
-                                    var newIndex = newRepeatIndexes[repeatId];
-                                    var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, document.xformsRepeatIndexes[repeatId]);
+                                    var oldIndex = document.xformsRepeatIndexes[repeatId];
+                                    var oldItemDelimiter = xformsFindRepeatDelimiter(repeatId, oldIndex);
                                     if (oldItemDelimiter != null) {
                                         cursor = oldItemDelimiter.nextSibling;
                                         while (cursor.nodeType != ELEMENT_TYPE ||
@@ -1163,10 +1166,14 @@ function xformsHandleResponse() {
                                         }
                                     }
                                 }
-                                // Highlight item a new index
+                                // Store new indexes
                                 for (var repeatId in newRepeatIndexes) {
                                     var newIndex = newRepeatIndexes[repeatId];
                                     document.xformsRepeatIndexes[repeatId] = newIndex;
+                                }
+                                // Highlight item a new index
+                                for (var repeatId in newRepeatIndexes) {
+                                    var newIndex = newRepeatIndexes[repeatId];
                                     var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
                                     cursor = newItemDelimiter.nextSibling;
                                     while (cursor.nodeType != ELEMENT_TYPE ||

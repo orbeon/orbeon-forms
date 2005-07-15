@@ -226,7 +226,6 @@
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xsl:message>select id: <xsl:value-of select="$id"/></xsl:message>
         <xsl:variable name="many" as="xs:boolean" select="local-name() = 'select'"/>
         <xsl:variable name="type" as="xs:string"
             select="if ($many) then 'checkbox' else 'radio'"/>
@@ -604,8 +603,7 @@
     
     <xsl:function name="xxforms:control" as="element()">
         <xsl:param name="id" as="xs:string"/>
-        <xsl:message>id: <xsl:value-of select="$id"/></xsl:message>
-        <xsl:variable name="control" 
+        <xsl:variable name="control"
             select="$response/xxforms:action/xxforms:control-values/xxforms:control[@id = $id]"/>
         <xsl:if test="not($control)">
             <xsl:message terminate="yes">Can't find control with id = '<xsl:value-of select="$id"/>'</xsl:message>

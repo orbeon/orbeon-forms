@@ -29,6 +29,7 @@ import java.util.List;
 public abstract class ASTNodeContainer {
 
     private Node node;
+    private LocationData locationData;
 
     public Node getNode() {
         return node;
@@ -37,13 +38,20 @@ public abstract class ASTNodeContainer {
     public void setNode(Node node) {
         this.node = node;
     }
+    
+    public void setLocationData( final LocationData locDat ) {
+        locationData = locDat;
+    }
 
     /**
-     * Return the location data for this node, or null.
+     * Use specified location if there is one.  Otherwise if a node has been provided use the
+     * location of the node.  If no node and no location then return hull.
      */
     public LocationData getLocationData() {
     	final LocationData ret;
-    	if ( node == null ) {
+        if ( locationData != null ) {
+            ret = locationData;
+        } else if ( node == null ) {
     	    ret = null;
     	} else if ( node.getNodeType() == org.dom4j.Node.ELEMENT_NODE ) {
             ret = ( LocationData )( ( org.dom4j.Element )node ).getData();    

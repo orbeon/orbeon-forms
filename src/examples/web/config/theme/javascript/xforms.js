@@ -920,6 +920,7 @@ function xformsHandleResponse() {
                                                 // Other controls that have a value (textfield, etc)
                                                 if (documentElement.value != newControlValue) {
                                                     documentElement.value = newControlValue;
+                                                    documentElement.previousValue = newControlValue;
                                                 }
                                             }
 

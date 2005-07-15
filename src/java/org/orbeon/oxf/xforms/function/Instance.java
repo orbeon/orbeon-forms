@@ -47,7 +47,7 @@ public class Instance extends XFormsFunction {
         String instanceId = instanceIdExpression.evaluateAsString(xpathContext);
 
         // Get model and instance with given id for that model only
-        XFormsModel model = (getXFormsControls() != null) ? getXFormsControls().getCurrentModel() : getXFormsModel();
+        XFormsModel model = (getXFormsModel() != null) ? getXFormsModel() : getXFormsControls().getCurrentModel();
         XFormsInstance instance = model.getInstance(instanceId);
 
         // Return instance document

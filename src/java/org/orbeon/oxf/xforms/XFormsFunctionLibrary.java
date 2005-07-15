@@ -115,16 +115,17 @@ public class XFormsFunctionLibrary implements FunctionLibrary {
     }
 
     /**
-     * This constructor is used when the function context is an XForms model.
+     * This constructor is used when the function context includes an XForms model.
      *
      * @param xFormsModel
      */
-    public XFormsFunctionLibrary(XFormsModel xFormsModel) {
+    public XFormsFunctionLibrary(XFormsModel xFormsModel, XFormsControls xFormsControls) {
         this.xFormsModel = xFormsModel;
+        this.xFormsControls = xFormsControls;
     }
 
     /**
-     * This constructor is used when the function context is XForms controls.
+     * This constructor is used when the function context includes XForms controls only.
      *
      * @param xFormsControls
      */

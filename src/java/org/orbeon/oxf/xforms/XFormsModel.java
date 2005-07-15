@@ -65,7 +65,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     // Binds
     private List binds;
-    private FunctionLibrary xformsFunctionLibrary = new XFormsFunctionLibrary(this);
+    private FunctionLibrary xformsFunctionLibrary;
 
     // Schema validation
     private XFormsModelSchemaValidator schemaValidator;
@@ -126,6 +126,9 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
         // Extract event handlers
         eventHandlers = XFormsEventHandlerImpl.extractEventHandlers(containingDocument, this, modelElement);
+
+        // Create XForms function library
+         xformsFunctionLibrary = new XFormsFunctionLibrary(this, getContainingDocument().getXFormsControls());
     }
 
     public XFormsContainingDocument getContainingDocument() {

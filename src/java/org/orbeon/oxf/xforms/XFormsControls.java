@@ -126,6 +126,39 @@ public class XFormsControls {
     public XFormsControls(XFormsContainingDocument containingDocument, Document controlsDocument) {
         this.containingDocument = containingDocument;
         this.controlsDocument = controlsDocument;
+
+        // Build minimal state with repeat indexes so that index() function works in XForms models
+        // initialization
+        initializeMinimal();
+    }
+
+    private void initializeMinimal() {
+        if (controlsDocument != null) {
+            final ControlsState result = new ControlsState();
+            visitAllControlStatic(new ControlElementVisitorListener() {
+                public boolean startVisitControl(Element controlElement, String controlId) {
+                    if (controlElement.getName().equals("repeat")) {
+
+                        final String startIndexString = controlElement.attributeValue("startindex");
+                        final int startIndex = (startIndexString != null) ? Integer.parseInt(startIndexString) : 1;
+
+                        result.setInitialRepeatIndex(controlId, startIndex);
+                    }
+                    return true;
+                }
+
+                public boolean endVisitControl(Element controlElement, String controlId) {
+                    return true;
+                }
+
+                public void startRepeatIteration(int iteration) {
+                }
+
+                public void endRepeatIteration(int iteration) {
+                }
+            });
+            this.currentControlsState = result;
+        }
     }
 
     public void initialize(PipelineContext pipelineContext, Element divsElement, Element repeatIndexesElement) {
@@ -856,6 +889,38 @@ public class XFormsControls {
                 } finally {
                     popBinding();
                 }
+            }
+            if (!doContinue)
+                break;
+        }
+        return doContinue;
+    }
+
+    /**
+     * Visit all the control elements without handling repeats or looking at the binding contexts.
+     */
+    public void visitAllControlStatic(ControlElementVisitorListener controlElementVisitorListener) {
+        handleControlsStatic(controlElementVisitorListener, controlsDocument.getRootElement());
+    }
+
+    private boolean handleControlsStatic(ControlElementVisitorListener controlElementVisitorListener, Element container) {
+        boolean doContinue = true;
+        for (Iterator i = container.elements().iterator(); i.hasNext();) {
+            final Element controlElement = (Element) i.next();
+            final String controlName = controlElement.getName();
+
+            final String controlId = controlElement.attributeValue("id");
+
+            if (isGroupingControl(controlName)) {
+                // Handle XForms grouping controls
+                doContinue = controlElementVisitorListener.startVisitControl(controlElement, controlId);
+                if (doContinue)
+                    doContinue = handleControlsStatic(controlElementVisitorListener, controlElement);
+                doContinue = doContinue && controlElementVisitorListener.endVisitControl(controlElement, controlId);
+            } else if (isLeafControl(controlName)) {
+                // Handle leaf control
+                doContinue = controlElementVisitorListener.startVisitControl(controlElement, controlId);
+                doContinue = doContinue && controlElementVisitorListener.endVisitControl(controlElement, controlId);
             }
             if (!doContinue)
                 break;

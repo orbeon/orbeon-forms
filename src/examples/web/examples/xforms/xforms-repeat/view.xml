@@ -51,12 +51,12 @@
             <xforms:bind nodeset="/todo-list/todo/task" relevant="count(following-sibling::task) > 0"/>
             <xforms:bind nodeset="/todo-list/todo/task/@description" readonly="../@done = 'true'"/>
             <xforms:bind nodeset="instance('triggers')/remove-todo" relevant="count(instance('todo-list')/todo) > 1"/>
-            <!--<xforms:bind nodeset="instance('triggers')/remodve-todo-item" relevant="count(instance('todo-list')/todo[index('todoSet')]/task) > 1"/>-->
-            <xforms:bind nodeset="instance('triggers')/remove-todo-item" relevant="count(instance('todo-list')/todo[1]/task) > 1"/>
+            <xforms:bind nodeset="instance('triggers')/remove-todo-item" relevant="count(instance('todo-list')/todo[index('todoSet')]/task) > 1"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
         <xforms:group ref="/todo-list">
+            <xforms:recalculate ev:event="DOMFocusIn"/> <!-- Doesn't seem to have an effect -->
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td>

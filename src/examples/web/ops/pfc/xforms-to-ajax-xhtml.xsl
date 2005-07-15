@@ -366,7 +366,7 @@
 
         <xhtml:option value="{$value}">
             <xsl:copy-of select="xxforms:copy-attributes($attributes-element, (), ())"/>
-            <xsl:if test="$generate-template">
+            <xsl:if test="not($generate-template)">
                 <xsl:if test="$value = (if ($many) then tokenize(xxforms:control($id), ' ') else xxforms:control($id))">
                     <xsl:attribute name="selected">selected</xsl:attribute>
                 </xsl:if>

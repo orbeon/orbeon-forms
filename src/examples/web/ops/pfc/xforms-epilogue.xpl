@@ -15,9 +15,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:oxf="http://www.orbeon.com/oxf/processors"
     xmlns:xforms="http://www.w3.org/2002/xforms"
-    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xhtml="http://www.w3.org/1999/xhtml"
->
+    xmlns:xxforms="http://orbeon.org/oxf/xml/xforms">
 
     <p:param type="input" name="data"/>
     <p:param type="input" name="instance"/>
@@ -40,8 +38,7 @@
             <p:processor name="oxf:xforms-output">
                 <p:input name="model" href="#xforms-model"/>
                 <p:input name="instance" href="#instance"/>
-<!--                <p:input name="data" href="#data"  schema-uri="http://www.w3.org/2002/xforms/controls" />-->
-                <p:input name="data" href="#data" />
+                <p:input name="data" href="#data"/>
                 <p:output name="data" id="annotated-data"/>
             </p:processor>
             <!-- Transform annotated XForms to XHTML -->
@@ -72,7 +69,7 @@
         </p:when>
         <p:otherwise>
             <p:choose href="#data">
-                <p:when test="/xhtml:html/xhtml:head/xforms:model"> 
+                <p:when test="//xforms:model">
                     <!-- Handle widgets -->
                     <p:processor name="oxf:xslt">
                         <p:input name="data" href="#data"/>
@@ -117,7 +114,7 @@
                     <!-- Get initial instances -->
                     <p:processor name="oxf:xforms-server">
                         <p:input name="request" href="#xforms-request"/>
-                        <p:output name="response" id="response" debug="xxxresponse"/>
+                        <p:output name="response" id="response"/>
                     </p:processor>
                     <p:processor name="oxf:xslt">
                         <p:input name="config" href="xforms-to-ajax-xhtml.xsl"/>

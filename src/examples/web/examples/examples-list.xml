@@ -117,12 +117,14 @@
     <section label="Messaging">
         <example id="email" label="Sending Email"/>
     </section>
+    <!--
     <section label="Integrating with Struts">
         <example id="struts-hello" label="Hello World" href="/struts/hello"/>
         <example id="struts-pdf" label="Struts PDF Generation" href="/struts/pdf-intro"/>
         <example id="struts-guess" label="Struts Number Guess" href="/struts/guess"/>
         <example id="struts-validation" label="Struts Client-Side Validation" href="/struts/jsType"/>
     </section>
+    -->
     <section label="Cool Stuff">
         <example id="xquery-the-web" label="XQuery The Web"/>
         <example id="url" label="HTML Screen-Scraping"/>

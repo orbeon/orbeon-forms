@@ -113,6 +113,11 @@
                 </li>
                 <li>
                     <p>
+                        This release has only been tested with Tomcat.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         The PDF version of the User Guide does not have page numbers.
                     </p>
                 </li>

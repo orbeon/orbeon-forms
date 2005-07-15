@@ -1174,17 +1174,19 @@ function xformsHandleResponse() {
                                 // Highlight item a new index
                                 for (var repeatId in newRepeatIndexes) {
                                     var newIndex = newRepeatIndexes[repeatId];
-                                    var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
-                                    cursor = newItemDelimiter.nextSibling;
-                                    while (cursor.nodeType != ELEMENT_TYPE ||
-                                           (cursor.className != "xforms-repeat-delimiter"
-                                           && cursor.className != "xforms-repeat-begin-end")) {
-                                        if (cursor.nodeType == ELEMENT_TYPE) {
-                                            var classNameArray = cursor.className.split(" ");
-                                            classNameArray.push(getClassForReapeatId(repeatId));
-                                            cursor.className = classNameArray.join(" ");
+                                    if (newIndex != 0) {
+                                        var newItemDelimiter = xformsFindRepeatDelimiter(repeatId, newIndex);
+                                        cursor = newItemDelimiter.nextSibling;
+                                        while (cursor.nodeType != ELEMENT_TYPE ||
+                                               (cursor.className != "xforms-repeat-delimiter"
+                                               && cursor.className != "xforms-repeat-begin-end")) {
+                                            if (cursor.nodeType == ELEMENT_TYPE) {
+                                                var classNameArray = cursor.className.split(" ");
+                                                classNameArray.push(getClassForReapeatId(repeatId));
+                                                cursor.className = classNameArray.join(" ");
+                                            }
+                                            cursor = cursor.nextSibling;
                                         }
-                                        cursor = cursor.nextSibling;
                                     }
                                 }
                                 break;

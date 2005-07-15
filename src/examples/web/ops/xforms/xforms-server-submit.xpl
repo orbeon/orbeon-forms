@@ -45,7 +45,7 @@
 
     <!-- Run XForms Server -->
     <p:processor name="oxf:xforms-server">
-        <p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng" debug="xxxsubmitrequest"/>
+        <p:input name="request" href="#xml-request" schema-href="xforms-server-request.rng"/>
     </p:processor>
 
 </p:config>

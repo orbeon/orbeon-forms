@@ -42,10 +42,17 @@ public abstract class ASTNodeContainer {
      * Return the location data for this node, or null.
      */
     public LocationData getLocationData() {
-        return (node == null) ? null
-                : (node instanceof Element) ? (LocationData) ((Element) node).getData()
-                : (node instanceof Attribute) ? (LocationData) ((Attribute) node).getData()
-                : null;
+    	final LocationData ret;
+    	if ( node == null ) {
+    	    ret = null;
+    	} else if ( node.getNodeType() == org.dom4j.Node.ELEMENT_NODE ) {
+            ret = ( LocationData )( ( org.dom4j.Element )node ).getData();    
+        } else if ( node.getNodeType() == org.dom4j.Node.ATTRIBUTE_NODE ) {
+            ret = ( LocationData )( ( org.dom4j.Attribute )node ).getData();    
+        } else {
+            ret = null;
+        }
+    	return ret;
     }
 
     public abstract void walk(ASTHandler handler);

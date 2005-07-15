@@ -48,6 +48,11 @@
                     <xsl:copy-of select="doc('input:instance')/*/(document-id | document)"/>
                 </form>
             </xforms:instance>
+            <xforms:instance id="triggers">
+                <triggers>
+                    <remove-child/>
+                </triggers>
+            </xforms:instance>
             <xforms:bind nodeset="/form/document/claim:claim">
                 
                 <!-- Add some required elements -->
@@ -68,7 +73,8 @@
 
                 <!-- This bind element handles the empty repeat entry necessary to add new entries with xforms:repeat -->
                 <xforms:bind nodeset="claim:insured-info/claim:family-info/claim:children">
-<!--                    <xforms:bind nodeset="claim:child[position() = 1]/claim:birth-date" relevant="false()"/>-->
+                    <xforms:bind nodeset="claim:child[last()]/claim:birth-date" relevant="false()"/>
+                    <xforms:bind nodeset="claim:child[last()]/claim:first-name" relevant="false()"/>
                     <xforms:bind nodeset="claim:child[position() lt last()]/claim:birth-date" required="true()"/>
                     <xforms:bind nodeset="claim:child[position() lt last()]/claim:first-name" required="true()"/>
                 </xforms:bind>
@@ -82,6 +88,8 @@
                 <!-- Date -->
                 <xforms:bind nodeset="claim:insured-info/claim:claim-info/claim:accident-date" type="xs:date"/>
             </xforms:bind>
+            <xforms:bind nodeset="instance('triggers')/remove-child"
+                relevant="count(instance('main-instance')/form/document/claim:claim/claim:insured-info/claim:family-info/claim:children) > 1"/>
             <xforms:submission id="main" method="post" action="/bizdoc2/detail"/>
             <xforms:submission id="save" method="post" replace="none" action="/bizdoc2/save"/>
         </xforms:model>
@@ -421,9 +429,9 @@
                                                         <xforms:setvalue ref="claim:children/claim:child[index('children')]/claim:first-name" value="''"/>
                                                     </xforms:action>
                                                 </xforms:trigger>
-                                                <xforms:trigger>
+                                                <xforms:trigger ref="instance('triggers')/remove-child">
                                                     <xforms:label>Remove Child</xforms:label>
-                                                    <xforms:delete ev:event="DOMActivate" nodeset="claim:children/claim:child" at="index('children')"/>
+                                                    <!--<xforms:delete ev:event="DOMActivate" nodeset="claim:children/claim:child" at="index('children')"/>-->
                                                 </xforms:trigger>
                                             </td>
                                         </tr>

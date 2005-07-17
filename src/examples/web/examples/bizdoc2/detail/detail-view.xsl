@@ -49,7 +49,7 @@
                 </form>
             </xforms:instance>
             <xforms:instance id="triggers">
-                <triggers>
+                <triggers xmlns="">
                     <remove-child/>
                 </triggers>
             </xforms:instance>

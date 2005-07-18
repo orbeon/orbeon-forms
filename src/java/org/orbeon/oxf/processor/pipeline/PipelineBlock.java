@@ -17,6 +17,7 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Node;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.debugger.api.BreakpointKey;
 import org.orbeon.oxf.processor.Processor;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInput;
@@ -84,7 +85,10 @@ public class PipelineBlock {
             } else if (outputIdToTeeProcessor.containsKey(referencedId)) {
                 // ASTInput already shared: just add ourselves to the tee
                 Processor tee = (TeeProcessor) outputIdToTeeProcessor.get(referencedId);
+                final LocationData locDat = Dom4jUtils.getLocationData();
+                final BreakpointKey bptKey = new BreakpointKey( locDat );
                 ProcessorOutput teeOutput = tee.createOutput(ProcessorImpl.OUTPUT_DATA);
+                teeOutput.setBreakpointKey( bptKey );
                 teeOutput.setInput(processorInput);
                 processorInput.setOutput(teeOutput);
             } else {
@@ -94,13 +98,19 @@ public class PipelineBlock {
                 outputIdToTeeProcessor.put(referencedId, tee);
 
                 // Reconnect the "other guy" to the tee output
+                final LocationData frstLocDat = Dom4jUtils.getLocationData();
+                final BreakpointKey frstBptKey = new BreakpointKey( frstLocDat );
                 ProcessorOutput firstTeeOutput = tee.createOutput(ProcessorImpl.OUTPUT_DATA);
+                firstTeeOutput.setBreakpointKey( frstBptKey );
                 ProcessorInput otherGuyInput = referencedOutput.getInput();
                 firstTeeOutput.setInput(otherGuyInput);
                 otherGuyInput.setOutput(firstTeeOutput);
 
                 // Connect tee to processor
+                final LocationData scndLocDat = Dom4jUtils.getLocationData();
+                final BreakpointKey scndBptKey = new BreakpointKey( scndLocDat );
                 ProcessorOutput secondTeeOutput = tee.createOutput(ProcessorImpl.OUTPUT_DATA);
+                secondTeeOutput.setBreakpointKey( scndBptKey );
                 secondTeeOutput.setInput(processorInput);
                 processorInput.setOutput(secondTeeOutput);
 

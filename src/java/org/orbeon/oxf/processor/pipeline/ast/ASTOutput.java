@@ -28,13 +28,12 @@ public class ASTOutput extends ASTInputOutput {
     }
 
     public ASTOutput(String name, ASTParam param) {
-        setName(name);
-        this.ref = param.getName();
+        this( name, ( String )null );
+        ref = param.getName();
     }
 
     public ASTOutput(String name, ASTOutput output) {
-        setName(name);
-        this.id = output.getId();
+        this( name, output.id );
     }
 
     public String getId() {

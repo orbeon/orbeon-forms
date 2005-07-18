@@ -25,14 +25,14 @@
 
   Each example's page flow must support pages with paths starting with the example id. For example,
   if the example id is "xforms-submit", the initial path will be "/xforms-submit", and other page
-  paths must start with "/xforms-submit", for example "/xforms-submit/page2". If an example has only
-  one page, it can simply use "*" as path for that page. Note that the example id is used, NOT the
-  example path.
+  paths must start with "/xforms-submit", for example "/xforms-submit/page2". If an example has
+  only one page, it can simply use "*" as path for that page. Note that the example id is used, NOT
+  the example path.
 
   Portlets cannot serve resources directly. Examples that want to serve dynamic resources must
-  prepend "/direct/" to the paths in the page flow. The examples framework will
-  automatically dispatch the requests for such resources. For example, the Image Server example
-  serves dynamic images with the following:
+  prepend "/direct/" to the paths in the page flow. The examples framework will automatically
+  dispatch the requests for such resources. For example, the Image Transformations example serves
+  dynamic images with the following:
 
   <page path-info="/direct/imageserver/image" xforms="form.xml" model="image.xpl"/>
 
@@ -84,7 +84,7 @@
     <section label="Presenting Data">
         <example id="reports" label="Data in multiple formats"/>
         <example id="charts" label="Charts &amp; Graphs"/>
-        <example id="imageserver" label="Image Server"/>
+        <example id="imageserver" label="Image Transformations"/>
         <!--<example id="excel" label="Excel Import / Export"/>-->
     </section>
     <section label="Database Access">

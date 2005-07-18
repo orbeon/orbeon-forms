@@ -26,8 +26,8 @@
                     <enable>false</enable>
                     <quality>high</quality>
                     <scale-up>true</scale-up>
-                    <width>100</width>
-                    <height>100</height>
+                    <width>384</width>
+                    <height>255</height>
                 </scale>
                 <crop>
                     <enable>false</enable>

@@ -14,9 +14,9 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <page path-info="/imageserver" xforms="form.xml" view="view.xpl"/>
+    <page path-info="/imageserver" xforms="form.xml" model="main-model.xpl" view="main-view.xsl"/>
 
-    <page path-info="/direct/imageserver/image" xforms="form.xml" model="image.xpl"/>
+    <page path-info="/direct/imageserver/image" model="image-model.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

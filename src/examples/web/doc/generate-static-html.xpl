@@ -55,7 +55,7 @@
             <p:input name="config">
                 <config xsl:version="2.0">
                     <content-type>text/html</content-type>
-                    <directory>build/doc</directory>
+                    <directory>build/doc/reference</directory>
                     <file><xsl:value-of select="/*/@href"/>.html</file>
                     <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
                     <version>4.01</version>
@@ -77,7 +77,7 @@
         <p:input name="config">
             <config>
                 <content-type>text/plain</content-type>
-                <directory>build/doc/theme</directory>
+                <directory>build/doc/reference/theme</directory>
                 <file>orbeon-layout.cssd</file>
             </config>
         </p:input>

@@ -98,7 +98,7 @@
         <property name="project.name" value="orbeon"/>
 
         <tstamp/>
-        <property name="version.number" value="2.8.1"/>
+        <property name="version.number" value="3.0b1"/>
         <tstamp>
             <format property='time' pattern='yyyyMMddHHmm' timezone='GMT'/>
         </tstamp>
@@ -138,7 +138,6 @@
     <!-- Create build dir and web application dir -->
     <target name="prepare" depends="init">
         <mkdir dir="${build.classes.dir}"/>
-        <mkdir dir="${build.doc.dir}"/>
         <mkdir dir="${build.lib.dir}"/>
         <condition property="is.debug">
             <equals arg1="${debug.enabled}" arg2="true"/>
@@ -314,7 +313,8 @@
 
     <target name="orbeon-javadoc" depends="classpath">
         <!-- packagenames="org.orbeon.*" sourcepath="${src.dir}" -->
-        <javadoc destdir="${build.doc.dir}" classpathref="class.path">
+        <mkdir dir="${build.doc.dir}/javadoc"/>
+        <javadoc destdir="${build.doc.dir}/javadoc" classpathref="class.path">
             <link href="http://java.sun.com/j2se/1.3/docs/api/"/>
             <link href="http://xml.apache.org/xalan-j/apidocs/"/>
             <link href="http://xml.apache.org/xerces2-j/javadocs/api/"/>
@@ -491,12 +491,12 @@
     </target>
 
     <target name="orbeon-doc" depends="jars">
-        <mkdir dir="${build.doc.dir}"/>
-        <mkdir dir="${build.doc.dir}/theme"/>
+        <mkdir dir="${build.doc.dir}/reference"/>
+        <mkdir dir="${build.doc.dir}/reference/theme"/>
         <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true">
             <arg line="-r ${web-examples-src.dir} oxf:/doc/generate-static-html.xpl"/>
         </java>
-        <copy todir="${build.doc.dir}">
+        <copy todir="${build.doc.dir}/reference">
             <fileset dir="${web-examples-src.dir}/config">
                 <include name="theme/images/**"/>
                 <include name="theme/javascript/**"/>
@@ -504,12 +504,12 @@
                 <include name="theme/style/**"/>
             </fileset>
         </copy>
-        <copy todir="${build.doc.dir}">
+        <copy todir="${build.doc.dir}/reference">
             <fileset dir="${web-examples-src.dir}">
                 <include name="images/*.*"/>
             </fileset>
         </copy>
-        <copy todir="${build.doc.dir}">
+        <copy todir="${build.doc.dir}/reference">
             <fileset dir="${web-examples-src.dir}/doc">
                 <include name="pages/*.png"/>
                 <include name="pages/*.gif"/>
@@ -520,7 +520,7 @@
     </target>
 
     <target name="orbeon-pdf-doc" depends="prepare">
-        <mkdir dir="${build.doc.dir}"/>
+        <mkdir dir="${build.doc.dir}/reference"/>
         <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true">
             <arg line="-r ${web-examples-src.dir} oxf:/doc/generate-single-static-html.xpl"/>
         </java>
@@ -603,16 +603,16 @@
     <target name="example-applications" depends="bizdoc-example, orbeon-com-example"/>
 
     <target name="orbeon-dist-packages" depends="orbeon-dist-war, orbeon-doc, orbeon-javadoc">
-        <property name="prefix" value="orbeon-${release.number}"/>
+        <property name="prefix" value="ops-${release.number}"/>
         <!-- Create temporary zip file -->
-        <property name="tmp-zip" value="${build.distrib.dir}/orbeon-${release.number}-tmp.zip"/>
+        <property name="tmp-zip" value="${build.distrib.dir}/ops-${release.number}-tmp.zip"/>
         <zip zipfile="${tmp-zip}">
             <zipfileset dir="${build.distrib.dir}" prefix="${prefix}">
                 <include name="orbeon.war"/>
             </zipfileset>
             <zipfileset dir="${build.doc.dir}" prefix="${prefix}/doc"/>
             <zipfileset dir="doc/dist" prefix="${prefix}"/>
-            <zipfileset dir="${cli-examples-src.dir}" prefix="${prefix}/examples/cli/"/>
+            <zipfileset dir="${cli-examples-src.dir}" prefix="${prefix}/cli-examples"/>
         </zip>
         <!-- Fix EOL for Windows platform -->
         <delete dir="${build.temp.dir}/distrib"/>
@@ -630,7 +630,7 @@
             <include name="**/*.css"/>
             <include name="**/*.java"/>
         </fixcrlf>
-        <zip zipfile="${build.distrib.dir}/orbeon-presentation-server-${release.number}.zip" basedir="${build.temp.dir}/distrib"/>
+        <zip zipfile="${build.distrib.dir}/ops-${release.number}.zip" basedir="${build.temp.dir}/distrib"/>
         <!-- Fix EOL for Unix platform -->
         <fixcrlf srcDir="${build.temp.dir}/distrib" eol="lf">
             <include name="**/*.txt"/>
@@ -644,7 +644,7 @@
             <include name="**/*.css"/>
             <include name="**/*.java"/>
         </fixcrlf>
-        <tar tarfile="${build.distrib.dir}/orbeon-presentation-server-${release.number}.tar.gz" compression="gzip" basedir="${build.temp.dir}/distrib"/>
+        <tar tarfile="${build.distrib.dir}/ops-${release.number}.tar.gz" compression="gzip" basedir="${build.temp.dir}/distrib"/>
         <delete file="${tmp-zip}"/>
     </target>
 
@@ -652,7 +652,7 @@
 
         <!-- Create directories -->
         <mkdir dir="${build.dir}/install"/>
-        <mkdir dir="${build.dir}/install/orbeon-${release.number}"/>
+        <mkdir dir="${build.dir}/install/ops-${release.number}"/>
         <mkdir dir="${build.dir}/install/${install.tomcat}"/>
         <mkdir dir="${build.dir}/install/${install.jdk}"/>
 
@@ -672,11 +672,11 @@
         <copy file="lib/hsqldb-1_7_1.jar" todir="${build.dir}/install/${install.tomcat}/common/lib"/>
 
         <!-- Prepare Orbeon -->
-        <unzip src="build/distrib/orbeon.war" dest="${build.dir}/install/orbeon-${release.number}"/>
-        <copy file="lib/portlet-api_1.0.jar" todir="${build.dir}/install/orbeon-${release.number}/WEB-INF/lib"/>
-        <delete file="${build.dir}/install/orbeon-${release.number}/WEB-INF/web.xml"/>
+        <unzip src="build/distrib/orbeon.war" dest="${build.dir}/install/ops-${release.number}"/>
+        <copy file="lib/portlet-api_1.0.jar" todir="${build.dir}/install/ops-${release.number}/WEB-INF/lib"/>
+        <delete file="${build.dir}/install/ops-${release.number}/WEB-INF/web.xml"/>
         <xslt in="build.xml" style="${descriptors.dir}/web.xsl"
-            out="${build.dir}/install/orbeon-${release.number}/WEB-INF/web.xml">
+            out="${build.dir}/install/ops-${release.number}/WEB-INF/web.xml">
             <param name="target" expression="install"/>
             <param name="build-root" expression="${build.root}"/>
         </xslt>
@@ -706,7 +706,7 @@
     <target name="copy-distrib" depends="orbeon-dist">
         <copy todir="/home/httpd/html/public/oxf/secret">
             <fileset dir="${build.distrib.dir}">
-                <include name="orbeon-${release.number}.*"/>
+                <include name="ops-${release.number}.*"/>
             </fileset>
         </copy>
     </target>

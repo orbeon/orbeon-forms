@@ -110,39 +110,34 @@ OPS is supported on the following application servers:
       http://forge.objectweb.org/projects/ops
 
     * Extract the archive in a directory that we call below:
-      OIS_HOME/
+      OPS_HOME/
 
 After extraction, you will find the following files and directories
-under the root directory OIS_HOME/:
+under the root directory OPS_HOME/:
 
     * README.txt: this document.
 
     * orbeon.war: the Web Archive where the software, required
       resources, and demo samples reside.
 
-    * orbeon-bizdoc.war: the Web Archive containing the BizDoc
-      tutorial application.  For more information on the BizDoc
-      example application, please consult the tutorial under
-      "doc/OPS Tutorial.pdf".
-
     * doc: this directory contains the OPS documentation as static
-      HTML files, as well as the tutorial under "doc/OPS
-      Tutorial.pdf".
+      HTML files, as well as the tutorial in PDF format
+      ("doc/OPS Tutorial.pdf").
 
-    * examples: this directory contains command line examples
+    * cli-examples: this directory contains command line examples.
 
-    * licenses: this directory contains third-party software licenses
+    * licenses: this directory contains third-party software licenses.
 
-You then need to deploy orbeon.war file to your servlet containers or
+You then need to deploy orbeon.war file to your servlet container or
 application server of choice. In the OPS documentation, you will find
 detailed installation instructions for several servlet containers /
 applications servers.
 
 More detailed information on installing OPS can be found in the
-documentation under OIS_HOME/doc/ in the "Installation Instructions"
-section, or directly online:
+documentation under OPS_HOME/doc/ in the "Installing" section, or
+directly online:
 
-  http://www.orbeon.com/ois/doc/intro-install
+  http://www.orbeon.com/ops/doc/intro-install
 
 
 ****************************************
@@ -161,10 +156,10 @@ Here are some pointers to useful information related to this release.
 
     * For more information and updates, go to:
 
-        http://www.orbeon.com/software/presentation-server
+        http://www.orbeon.com/software/
 
-    * If you have questions, comments, or difficulties with the OPS,
-      please subscribe to the ObjectWeb user mailing-list:
+    * If you have questions, comments, or difficulties with OPS,
+      please subscribe to the ops-users mailing-list at ObjectWeb:
 
         http://www.objectweb.org/wws/info/ops-users
 

@@ -73,8 +73,12 @@
                                 </xforms:trigger>
                                 <xforms:trigger ref="instance('triggers')/remove-todo">
                                     <xforms:label>Remove</xforms:label>
-                                    <xforms:delete ev:event="DOMActivate" nodeset="/todo-list/todo"
-                                        at="index('todoSet')"/>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:delete nodeset="/todo-list/todo"
+                                            at="index('todoSet')"/>
+                                        <xforms:setindex repeat="todoSet"
+                                            index="max((min((index('todoSet'), count(/todo-list/todo) - 1)), 1))"/>
+                                    </xforms:action>
                                 </xforms:trigger>
                             </xhtml:p>
                             <!-- Add/remove current task -->
@@ -87,8 +91,12 @@
                                 </xforms:trigger>
                                 <xforms:trigger ref="instance('triggers')/remove-todo-item">
                                     <xforms:label>Remove</xforms:label>
-                                    <xforms:delete ev:event="DOMActivate" nodeset="/todo-list/todo[index('todoSet')]/task"
-                                        at="index('taskSet')"/>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:delete nodeset="/todo-list/todo[index('todoSet')]/task"
+                                            at="index('taskSet')"/>
+                                        <xforms:setindex repeat="taskSet"
+                                            index="max((min((index('taskSet'), count(/todo-list/todo[index('todoSet')]/task) - 1)), 1))"/>
+                                    </xforms:action>
                                 </xforms:trigger>
                             </xhtml:p>
                         </xhtml:fieldset>

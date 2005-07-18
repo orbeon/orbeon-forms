@@ -89,7 +89,7 @@
                 <xforms:bind nodeset="claim:insured-info/claim:claim-info/claim:accident-date" type="xs:date"/>
             </xforms:bind>
             <xforms:bind nodeset="instance('triggers')/remove-child"
-                relevant="count(instance('main-instance')/form/document/claim:claim/claim:insured-info/claim:family-info/claim:children) > 1"/>
+                relevant="count(instance('main-instance')/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child) > 1"/>
             <xforms:submission id="main" method="post" action="/bizdoc2/detail"/>
             <xforms:submission id="save" method="post" replace="none" action="/bizdoc2/save"/>
         </xforms:model>
@@ -431,7 +431,9 @@
                                                 </xforms:trigger>
                                                 <xforms:trigger ref="instance('triggers')/remove-child">
                                                     <xforms:label>Remove Child</xforms:label>
-                                                    <!--<xforms:delete ev:event="DOMActivate" nodeset="claim:children/claim:child" at="index('children')"/>-->
+                                                    <xforms:delete ev:event="DOMActivate"
+                                                        nodeset="instance('main-instance')/document/claim:claim/claim:insured-info/claim:family-info/claim:children/claim:child"
+                                                        at="index('children')"/>
                                                 </xforms:trigger>
                                             </td>
                                         </tr>

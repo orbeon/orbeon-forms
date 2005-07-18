@@ -513,4 +513,20 @@ public class Dom4jUtils {
         final Document ret = fctry.createDocument();
         return ret;
     }
+    /**
+     * <!-- getFileAndLine -->
+     * Workaround for Java's lack of an equivalent to C's __FILE__ and __LINE__ macros.  Use 
+     * carefully as it is not fast.  
+     * 
+     * Perhaps in 1.5 we will find a better way.
+     * 
+     * @return LocationData of caller.
+     */
+    public static LocationData getLocationData() {
+        final Exception e = new Exception();
+        final StackTraceElement[] stkTrc = e.getStackTrace();
+        final String sysID = stkTrc[ 1 ].getFileName();
+        final int line = stkTrc[ 1 ].getLineNumber();
+        return new LocationData( sysID, line, -1 );
+    }
 }

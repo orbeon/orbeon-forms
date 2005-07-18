@@ -40,7 +40,7 @@ public class XFormsElementContext extends XFormsControls {
 
     public XFormsElementContext(PipelineContext pipelineContext, XFormsContainingDocument containingDocument, ContentHandler contentHandler) {
 
-        super(containingDocument, null);
+        super(containingDocument, null, null);
         super.initialize(pipelineContext, null, null);
 
         this.pipelineContext = pipelineContext;

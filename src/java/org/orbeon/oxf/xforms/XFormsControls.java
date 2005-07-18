@@ -24,6 +24,8 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
+import org.orbeon.oxf.xforms.event.events.XFormsRecalculateEvent;
+import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -123,16 +125,17 @@ public class XFormsControls {
         noNodesetControls.putAll(noSingleNodeControls);
     }
 
-    public XFormsControls(XFormsContainingDocument containingDocument, Document controlsDocument) {
+    public XFormsControls(XFormsContainingDocument containingDocument, Document controlsDocument, Element repeatIndexesElement) {
         this.containingDocument = containingDocument;
         this.controlsDocument = controlsDocument;
 
         // Build minimal state with repeat indexes so that index() function works in XForms models
         // initialization
-        initializeMinimal();
+        initializeMinimal(repeatIndexesElement);
     }
 
-    private void initializeMinimal() {
+    private void initializeMinimal(Element repeatIndexesElement) {
+        // Set initial repeat index
         if (controlsDocument != null) {
             final ControlsState result = new ControlsState();
             visitAllControlStatic(new ControlElementVisitorListener() {
@@ -157,8 +160,12 @@ public class XFormsControls {
                 public void endRepeatIteration(int iteration) {
                 }
             });
-            this.currentControlsState = result;
+            initialControlsState = result;
+            currentControlsState = initialControlsState;
         }
+
+        // Set repeat index state if any
+        setRepeatIndexState(repeatIndexesElement);
     }
 
     public void initialize(PipelineContext pipelineContext, Element divsElement, Element repeatIndexesElement) {
@@ -183,16 +190,7 @@ public class XFormsControls {
             }
 
             // Set repeat index state if any
-            if (repeatIndexesElement != null) {
-                for (Iterator i = repeatIndexesElement.elements().iterator(); i.hasNext();) {
-                    final Element repeatIndexElement = (Element) i.next();
-
-                    final String repeatId = repeatIndexElement.attributeValue("id");
-                    final String index = repeatIndexElement.attributeValue("index");
-
-                    initialControlsState.updateRepeatIndex(repeatId, Integer.parseInt(index));
-                }
-            }
+            setRepeatIndexState(repeatIndexesElement);
 
             // Evaluate values after index state has been computed
             initialControlsState.evaluateValueControls(pipelineContext);
@@ -200,6 +198,20 @@ public class XFormsControls {
 
         resetBindingContext();
     }
+
+    private void setRepeatIndexState(Element repeatIndexesElement) {
+        if (repeatIndexesElement != null) {
+            for (Iterator i = repeatIndexesElement.elements().iterator(); i.hasNext();) {
+                final Element repeatIndexElement = (Element) i.next();
+
+                final String repeatId = repeatIndexElement.attributeValue("id");
+                final String index = repeatIndexElement.attributeValue("index");
+
+                initialControlsState.updateRepeatIndex(repeatId, Integer.parseInt(index));
+            }
+        }
+    }
+
 
     /**
      * Reset the binding context to the root of the containing document.
@@ -1554,6 +1566,7 @@ public class XFormsControls {
                             final String repeatId = (String) i.next();
                             final Integer iteration = (Integer) ancestorRepeatsIterationMap.get(repeatId);
 
+//                            XFormsActionInterpreter.executeSetindexAction(pipelineContext, containingDocument, repeatId, iteration.toString());
                             currentControlsState.updateRepeatIndex(repeatId, iteration.intValue());
                         }
 
@@ -1569,6 +1582,19 @@ public class XFormsControls {
                             public void endVisitControl(ControlInfo controlInfo) {
                             }
                         }, firstAncestorRepeatControlInfo);
+
+                        // After changing indexes, must recalculate
+                        // NOTE: The <setindex> action is supposed to "The implementation data
+                        // structures for tracking computational dependencies are rebuilt or
+                        // updated as a result of this action."
+                        // What should we do here? We run the computed expression binds so that
+                        // those are updated, but is that what we should do?
+                        for (Iterator i = getContainingDocument().getModels().iterator(); i.hasNext();) {
+                            XFormsModel currentModel = (XFormsModel) i.next();
+                            currentModel.applyComputedExpressionBinds(pipelineContext);
+                            //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
+                        }
+                        // TODO: Should try to use the code of the <setindex> action
                     }
                 }
             }

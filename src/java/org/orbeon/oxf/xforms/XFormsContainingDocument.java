@@ -43,8 +43,12 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private XFormsActionInterpreter actionInterpreter;
 
     public XFormsContainingDocument(List models, Document controlsDocument) {
+        this(models, controlsDocument, null);
+    }
+
+    public XFormsContainingDocument(List models, Document controlsDocument, Element repeatIndexesElement) {
         this.models = models;
-        this.xformsControls = new XFormsControls(this, controlsDocument);
+        this.xformsControls = new XFormsControls(this, controlsDocument, repeatIndexesElement);
 
         for (Iterator i = models.iterator(); i.hasNext();) {
             XFormsModel model = (XFormsModel) i.next();

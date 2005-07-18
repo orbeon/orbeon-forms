@@ -110,24 +110,23 @@ public class PipelineContext {
         if ( trcCls == null ) {
         	trace = null;
         } else {
-        	Throwable t = null;
-        	Trace trc = null;
-			try {
-				final Class cls = Class.forName( trcCls );
-	        	trc = ( Trace )cls.newInstance();
-			} catch ( final ClassNotFoundException e ) {
-				t = e;
-			} catch ( final InstantiationException e ) {
-				t = e;
-			} catch ( final IllegalAccessException e ) {
-				t = e;
-			}
-			trace = trc;
-			if ( t != null ) {
-				throw new OXFException( t );
-			}
+            Throwable t = null;
+            Trace trc = null;
+            try {
+		final Class cls = Class.forName( trcCls );
+		trc = ( Trace )cls.newInstance();
+            } catch ( final ClassNotFoundException e ) {
+                t = e;
+            } catch ( final InstantiationException e ) {
+                t = e;
+            } catch ( final IllegalAccessException e ) {
+                t = e;
+            }
+            trace = trc;
+            if ( t != null ) {
+                throw new OXFException( t );
+            }
         }
-        
     }
     
     public Trace getTrace() {

@@ -420,7 +420,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                        final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel,
                                        final int defaultStatusCode) {
         // Send result through epilogue
-        final ASTOutput epilogueOutput = epilogue == null ? html : new ASTOutput("data", "epilogue");
+        final ASTOutput epilogueOutput;
+        if (epilogue == null) {
+            epilogueOutput = html;
+        } else {
+            final LocationData locDat = Dom4jUtils.getLocationData();
+            epilogueOutput = new ASTOutput("data", "epilogue");
+            epilogueOutput.setLocationData( locDat );
+        }
         if (epilogue != null) {
             statements.add(new StepProcessorCall(stepProcessorContext, controllerContext, epilogue) {{
                 addInput(new ASTInput("data", new ASTHrefId(html)));
@@ -550,6 +557,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
         // Always hook up XForms or XML submission
         final ASTOutput xformedInstance = new ASTOutput("instance", "xformed-instance");
+        {
+            final LocationData locDat = Dom4jUtils.getLocationData();
+            xformedInstance.setLocationData( locDat );
+        }
 
         if (xformsAttribute != null) {
             // Use backward compatility XForms Input processor
@@ -1150,8 +1161,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
-                            addOutput(new ASTOutput("data", resultData));
-                            addOutput(new ASTOutput("instance", resultInstance));
+                            final LocationData datLocDat = Dom4jUtils.getLocationData();
+                            final ASTOutput datOut = new ASTOutput( "data", resultData );
+                            datOut.setLocationData( datLocDat );
+                            addOutput( datOut );
+                            final LocationData instLocDat = Dom4jUtils.getLocationData();
+                            final ASTOutput instOut = new ASTOutput( "instance", resultInstance );
+                            instOut.setLocationData( instLocDat );
+                            addOutput( instOut );
                         }});
                     }});
 
@@ -1163,11 +1180,17 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
-                            addOutput(new ASTOutput("data", resultData));
+                            final LocationData locDat = Dom4jUtils.getLocationData();
+                            final ASTOutput datOut = new ASTOutput( "data", resultData );
+                            datOut.setLocationData( locDat );
+                            addOutput( datOut );
                         }});
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
-                            addOutput(new ASTOutput("data", resultInstance));
+                            final LocationData locDat = Dom4jUtils.getLocationData();
+                            final ASTOutput datOut = new ASTOutput( "data", resultInstance );
+                            datOut.setLocationData( locDat );
+                            addOutput( datOut );
                         }});
                     }});
 
@@ -1179,9 +1202,13 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
-                            addOutput(new ASTOutput("instance", resultInstance));
+                            final LocationData locDat = Dom4jUtils.getLocationData();
+                            final ASTOutput instOut = new ASTOutput( "instance", resultInstance );
+                            instOut.setLocationData( locDat );
+                            addOutput( instOut );
                         }});
-                        outputNullIfStepCanBeSerializer(getStatements(), canBeSerializerInput, resultData, dataInput);
+                        final LocationData locDat = Dom4jUtils.getLocationData();
+                        outputNullIfStepCanBeSerializer(getStatements(), canBeSerializerInput, resultData, dataInput, locDat );
                     }});
 
                     // XPL file with no output
@@ -1192,10 +1219,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
                         }});
-                        outputNullIfStepCanBeSerializer(getStatements(), canBeSerializerInput, resultData, dataInput);
+                        final LocationData resDatLocDat = Dom4jUtils.getLocationData();
+                        outputNullIfStepCanBeSerializer(getStatements(), canBeSerializerInput, resultData, dataInput, resDatLocDat );
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
-                            addOutput(new ASTOutput("data", resultInstance));
+                            final LocationData resInstLocDat = Dom4jUtils.getLocationData();
+                            final ASTOutput resInstOut = new ASTOutput( "data", resultInstance );
+                            resInstOut.setLocationData( resInstLocDat );
+                            addOutput( resInstOut );
                         }});
                     }});
 
@@ -1206,7 +1237,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         // Copy the instance as is
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
-                            addOutput(new ASTOutput("data", resultInstance));
+                            final LocationData resInstLocDat = Dom4jUtils.getLocationData();
+                            final ASTOutput resInstOut = new ASTOutput( "data", resultInstance );
+                            resInstOut.setLocationData( resInstLocDat );
+                            addOutput( resInstOut );;
                         }});
 
                         addStatement(new ASTChoose(new ASTHrefId(content)) {
@@ -1220,7 +1254,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                         addInput(new ASTInput("config", new ASTHrefId(content)));
                                         addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                                         addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
-                                        addOutput(new ASTOutput("data", resultData));
+                                        final LocationData resDatLocDat 
+                                            = Dom4jUtils.getLocationData();
+                                        final ASTOutput resDatOut 
+                                            = new ASTOutput( "data", resultData );
+                                        resDatOut.setLocationData( resDatLocDat );
+                                        addOutput( resDatOut );
                                     }});
                                 }});
                             }
@@ -1243,13 +1282,19 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         // Copy the instance as is
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
-                            addOutput(new ASTOutput("data", resultInstance));
+                            final LocationData locDat = Dom4jUtils.getLocationData();
+                            final ASTOutput resInstOut = new ASTOutput( "data", resultInstance );
+                            resInstOut.setLocationData( locDat );
+                            addOutput( resInstOut );
                         }});
 
                         // Copy XML file as is
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(content)));
-                            addOutput(new ASTOutput("data", resultData));
+                            final LocationData locDat = Dom4jUtils.getLocationData();
+                            final ASTOutput resDatOut = new ASTOutput( "data", resultData );
+                            resDatOut.setLocationData( locDat );
+                            addOutput( resDatOut );
                         }});
                     }});
                 }});
@@ -1261,7 +1306,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 }});
                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                     addInput(new ASTInput("data", new ASTHrefId(resultInstance)));
-                    addOutput(new ASTOutput("data", instanceOutput));
+                    final LocationData locDat = Dom4jUtils.getLocationData();
+                    final ASTOutput resDatOut = new ASTOutput( "data", instanceOutput );
+                    resDatOut.setLocationData( locDat );
+                    addOutput( resDatOut );
                 }});
             }});
         }
@@ -1269,18 +1317,22 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         /**
          * Send null in data output is step can be a serializer
          */
-        private void outputNullIfStepCanBeSerializer(List statements, final ASTParam canBeSerializerInput, final ASTOutput resultData, final ASTParam dataInput) {
+        private void outputNullIfStepCanBeSerializer(List statements, final ASTParam canBeSerializerInput, final ASTOutput resultData, final ASTParam dataInput, final LocationData locDat ) {
             statements.add(new ASTChoose(new ASTHrefId(canBeSerializerInput)) {{
                 addWhen(new ASTWhen("/config = 'true'") {{
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                        addOutput(new ASTOutput("data", resultData));
+                        final ASTOutput resDatOut = new ASTOutput( "data", resultData );
+                        resDatOut.setLocationData( locDat );
+                        addOutput( resDatOut );
                     }});
                 }});
                 addWhen(new ASTWhen() {{
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("data", new ASTHrefId(dataInput)));
-                        addOutput(new ASTOutput("data", resultData));
+                        final ASTOutput resDatOut = new ASTOutput( "data", resultData );
+                        resDatOut.setLocationData( locDat );
+                        addOutput( resDatOut );
                     }});
                 }});
             }});

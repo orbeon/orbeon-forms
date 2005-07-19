@@ -15,7 +15,7 @@
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <p:param name="data" type="input" debug="xxx"/>
+    <p:param name="data" type="input"/>
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
 

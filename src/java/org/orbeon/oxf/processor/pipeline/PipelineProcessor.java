@@ -81,12 +81,11 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
     public PipelineProcessor(ASTPipeline astPipeline) {
         this(createConfigFromAST(astPipeline));
     }
-
+    
     public ProcessorOutput createOutput(final String name) {
-        final String _name = name;
 
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
-
+            
             public void readImpl(final PipelineContext context, final ContentHandler contentHandler) {
                 final ProcessorInput bottomInput = getInput(context);
                 if (bottomInput.getOutput() == null)
@@ -140,15 +139,20 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 State state = (State) getState(context);
                 if (!state.started)
                     start(context);
-                final ProcessorInput bottomInput = (ProcessorInput) state.nameToBottomInputMap.get(_name);
+                final ProcessorInput bottomInput = (ProcessorInput) state.nameToBottomInputMap.get( name );
                 if (bottomInput == null) {
                     throw new ValidationException("There is no <param type=\"output\" name=\""
-                            + _name + "\"/>", getLocationData());
+                            + name + "\"/>", getLocationData());
                 }
                 return bottomInput;
             }
         };
         addOutput(name, output);
+        final BreakpointKey bptKey 
+            = configFromAST == null ? null : configFromAST.getOutputBreakpointKey( name );
+        if ( bptKey != null ) {
+            output.setBreakpointKey( bptKey );
+        } 
         return output;
     }
 
@@ -228,17 +232,25 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 for (Iterator j = processorCall.getOutputs().iterator(); j.hasNext();) {
                     foundOutput = true;
                     ASTOutput output = (ASTOutput) j.next();
-                    if (output.getName() == null)
+                    final String nm = output.getName();
+                    if ( nm == null )
                         throw new OXFException("Name attribute is mandatory on output");
-                    if (output.getId() == null && output.getRef() == null)
-                        throw new OXFException("Either one of id or ref must be specified on output " + output.getName());
-
-                    ProcessorOutput pout = processor.createOutput(output.getName());
-                    if (output.getId() != null)
-                        block.declareOutput(output.getNode(), output.getId(), pout);
-                    if (output.getRef() != null)
+                    final String id = output.getId();
+                    final String ref = output.getRef();
+                    if ( id == null && ref == null )
+                        throw new OXFException("Either one of id or ref must be specified on output " + nm );
+                    
+                    final LocationData locDat = output.getLocationData();
+                    final BreakpointKey bptKey 
+                        = locDat == null ? null : new BreakpointKey( locDat );
+                    if ( bptKey != null ) config.setOutputBreakpointKey( id == null ? ref : id, bptKey );
+                  
+                    ProcessorOutput pout = processor.createOutput( nm );
+                    if ( id != null)
+                        block.declareOutput(output.getNode(), id, pout);
+                    if ( ref != null)
                         block.connectProcessorToBottomInput
-                                (output.getNode(), output.getName(), output.getRef(), pout);
+                                (output.getNode(), nm, ref, pout);
                     setDebugAndSchema(pout, output);
                     setBreakpointKey(pout, output);
                 }
@@ -502,7 +514,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
         LocationData locationData = nodeContainer.getLocationData();
 
         // Only set if there is a chance we can match on it later
-        if (locationData != null && locationData.getSystemID() != null && locationData.getLine() != -1 && locationData.getCol() != -1)
+        if (locationData != null && locationData.getSystemID() != null && locationData.getLine() != -1 )
             processorInputOutput.setBreakpointKey(new BreakpointKey(locationData));
     }
 

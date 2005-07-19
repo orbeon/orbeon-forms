@@ -15,6 +15,7 @@ package org.orbeon.oxf.processor.pipeline;
 
 
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.debugger.api.BreakpointKey;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +37,15 @@ public class PipelineConfig {
     private List processors = new ArrayList();
     // List of Processor objects: we have to call their start() method
     private List processorsToStart = new ArrayList();
+    
+    private java.util.TreeMap outnameToBreakpointKey = new java.util.TreeMap();
+    
+    void setOutputBreakpointKey( final String nm, final BreakpointKey bptKey ) {
+        outnameToBreakpointKey.put( nm, bptKey );
+    }
+    BreakpointKey getOutputBreakpointKey( final String nm ) {
+        return ( BreakpointKey )outnameToBreakpointKey.get( nm );
+    }
 
     public void declareTopOutput(String name, PipelineProcessor.InternalTopOutput topOutput) {
         List outputsForName = (List) nameToTopOuputMap.get(name);
@@ -52,7 +62,7 @@ public class PipelineConfig {
 
     public void declareBottomInput(String name, org.orbeon.oxf.processor.ProcessorInput bottomInput) {
         if (nameToBottomInputMap.containsKey(name))
-            throw new OXFException("Dupplicate output parameter with name \"" + name + "\"");
+            throw new OXFException("Duplicate output parameter with name \"" + name + "\"");
         nameToBottomInputMap.put(name, bottomInput);
     }
 

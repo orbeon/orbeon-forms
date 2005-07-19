@@ -106,7 +106,7 @@ public interface Processor {
      * to the input of an other processor. This method cannnot be called twice
      * on the same processor with the same name.
      *
-     * @param   name  Name of the output to create
+     * @param   name  Name of the output to create.  null is allowed.
      * @return  The newly created output
      */
     public ProcessorOutput createOutput(String name);

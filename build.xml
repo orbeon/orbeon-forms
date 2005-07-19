@@ -98,7 +98,7 @@
         <property name="project.name" value="orbeon"/>
 
         <tstamp/>
-        <property name="version.number" value="3.0.beta1"/>
+        <property name="version.number" value="3.0.beta2"/>
         <tstamp>
             <format property='time' pattern='yyyyMMddHHmm' timezone='GMT'/>
         </tstamp>
@@ -203,7 +203,7 @@
       <pathconvert dirsep='/' pathsep=' ' property='jar.mf.cp' refid='war.libs.private' >
         <map from='${lib.dir}' to='private' />
       </pathconvert>
-        
+
       <jar destfile='${jar.file}' compress='false' >
           <manifest>
             <attribute name='Class-Path' value='${jar.mf.cp}' />
@@ -227,7 +227,7 @@
               <include name="*.tld"/>
           </zipfileset>
         </jar>
-        
+
         <pathconvert dirsep='/' pathsep=' ' property='cli.jar.mf.cp' refid='war.libs' >
           <map from='${lib.dir}' to='lib' />
         </pathconvert>
@@ -254,17 +254,17 @@
             <fileset dir="${web-examples-src.dir}/examples-standalone/struts-view/src/" includes="**/*.properties"/>
             <fileset dir="descriptors/examples/web/jboss-security" includes="*.properties"/>
         </copy>
-        
+
         <copy todir="${war.dir}/WEB-INF/lib">
           <fileset refid='war.libs' />
         </copy>
-        
+
         <copy file='${jar.file}' todir='${war.dir}/WEB-INF/lib' />
-        
+
         <copy todir='${war.dir}/WEB-INF/lib/private' >
           <fileset refid='war.libs.private' />
         </copy>
-        
+
         <copy todir="${war.dir}/WEB-INF">
             <fileset dir="${lib.dir}">
                 <include name="commons-cli-1_0.jar"/>
@@ -334,7 +334,7 @@
             </fileset>
         </javadoc>
     </target>
-    
+
     <target name="orbeon-source-files-list" depends="jars">
         <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true">
             <arg line="-r ${examples-src.dir} oxf:/cli/examples-sources/generate-examples-sources.xpl"/>
@@ -356,11 +356,11 @@
     </target>
 
     <target name="test" depends="jars, test-classes, debug-enabled, debug-disabled">
-    	<!-- 11/14/2004 d : Found Processor was sorta invalid cause once it ran successully 
+    	<!-- 11/14/2004 d : Found Processor was sorta invalid cause once it ran successully
     	     				it would leave behind .class files in java.io.tmpdir.  This
     	     				meant that on subsequent runs of the test it wouldn't try to
-    	     				compile anything.  
-    	     				
+    	     				compile anything.
+
     	     				So now we delete,create,and specify a specific dir as the temp
     	     				dir so that compiles always occur.
     	 -->
@@ -394,11 +394,11 @@
     </target>
 
     <target name="anthill-release" depends="clean, orbeon-dist, test-classes, debug-enabled, debug-disabled">
-    	<!-- 11/14/2004 d : Found Processor was sorta invalid cause once it ran successully 
+    	<!-- 11/14/2004 d : Found Processor was sorta invalid cause once it ran successully
     	     				it would leave behind .class files in java.io.tmpdir.  This
     	     				meant that on subsequent runs of the test it wouldn't try to
-    	     				compile anything.  
-    	     				
+    	     				compile anything.
+
     	     				So now we delete,create,and specify a specific dir as the temp
     	     				dir so that compiles always occur.
     	 -->
@@ -413,7 +413,7 @@
                     <include name="org/orbeon/oxf/test/*Test*.java"/>
                 </fileset>
             </batchtest>
-            
+
             <formatter type="plain" usefile="false"/>
             <sysproperty key="oxf.resources.factory" value="org.orbeon.oxf.resources.PriorityResourceManagerFactory"/>
             <sysproperty key="oxf.resources.filesystem.sandbox-directory" value="/usr/local/anthill/work/orbeon/${web-examples-src.dir}"/>
@@ -463,9 +463,9 @@
         <!-- 2/27/2005 d : This triggers the taginfo synch script. -->
         <cvs command='tag -d TAG_Dummy_For_OW_Sync'
             cvsRoot='${local-repos}' failonerror='true'/>
-        
+
         <copy file='${deployDir}/buildLogs/oxf-${version}-build.log' tofile='${deployDir}/${release.number}/build.log'/>
-    	
+
         <!-- Post the unstable build -->
         <exec executable='rsync' failonerror='true' dir='${deployDir}/${release.number}' >
           <arg value='--stats' />

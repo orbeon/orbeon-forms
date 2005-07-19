@@ -52,7 +52,7 @@
         <h2>List of blogs configured</h2>
         <ul>
             <li>
-                <a href="/blog/ebruchez/500001">Erik's Blog</a>
+                <a href="/blog/ebruchez/500001">My Blog</a>
             </li>
         </ul>
     </body>

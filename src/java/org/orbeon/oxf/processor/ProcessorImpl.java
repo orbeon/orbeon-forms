@@ -212,15 +212,10 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     public ProcessorOutput getOutputByName(String name) {
-        List l = (List) outputMap.get(name);
-        if (l == null || l.size() != 1)
+        ProcessorOutput ret = (ProcessorOutput) outputMap.get(name);
+        if (ret == null )
             throw new ValidationException("Exactly one output " + name + " is required", getLocationData());
-        return (ProcessorOutput) l.iterator().next();
-    }
-
-    public List getOutputsByName(String name) {
-        List result = (List) outputMap.get(name);
-        return result == null ? Collections.EMPTY_LIST : result;
+        return ret;
     }
 
     public ProcessorOutput createOutput(String name) {
@@ -228,16 +223,14 @@ public abstract class ProcessorImpl implements Processor {
     }
 
     public void addOutput(String name, ProcessorOutput output) {
-        List outputs = (List) outputMap.get(name);
-        if (outputs == null) {
-            outputs = new ArrayList();
-            outputMap.put(name, outputs);
-        }
-        outputs.add(output);
+        ProcessorOutput po = (ProcessorOutput) outputMap.get(name);
+        if ( po != null ) new ValidationException("Exactly one output " + name + " is required", getLocationData());
+        outputMap.put( name, output );
     }
 
     public void deleteOutput(ProcessorOutput output) {
-        deleteFromListMap(outputMap, output);
+        final java.util.Collection outs = outputMap.values();
+        outs.remove( output );
     }
 
     protected void addInputInfo(ProcessorInputOutputInfo inputInfo) {
@@ -1130,25 +1123,24 @@ public abstract class ProcessorImpl implements Processor {
         }
 
         public final void read(PipelineContext context, ContentHandler contentHandler) {
-        	final Trace trc = context.getTrace();
-        	final TraceInfo tinf;
-        	if ( trc == null ) {
-        		tinf = null;
-        	} else {
-            	final String sysID;
-            	final int line;
-    			if ( breakpointKey == null ) {
-    				final Class cls = getClass();
-    				sysID = cls.getName() + " " + getName() + " " + getId();
-    				line = -1;
-    			}
-    			else {
-    				sysID = breakpointKey.getSystemId();
-    				line = breakpointKey.getLine();
-    			}
+            final Trace trc = context.getTrace();
+            final TraceInfo tinf;
+            if ( trc == null ) {
+                tinf = null;
+            } else {
+                final String sysID;
+                final int line;
+                if ( breakpointKey == null ) {
+                    final Class cls = getClass();
+            	    sysID = cls.getName() + " " + this  + " " + getName() + " " + getId();
+            	    line = -1;
+            	} else {
+            	    sysID = breakpointKey.getSystemId();
+            	    line = breakpointKey.getLine();
+            	}
             	tinf = new TraceInfo( sysID, line );
             	trc.add( tinf );
-        	}
+            }
             try {
                 getFilter(context).read(context, contentHandler);
             } catch (AbstractMethodError e) {

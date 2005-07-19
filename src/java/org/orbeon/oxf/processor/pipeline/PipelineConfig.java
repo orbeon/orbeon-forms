@@ -16,6 +16,7 @@ package org.orbeon.oxf.processor.pipeline;
 
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.debugger.api.BreakpointKey;
+import org.orbeon.oxf.util.NullFriendlyStringComparator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +39,8 @@ public class PipelineConfig {
     // List of Processor objects: we have to call their start() method
     private List processorsToStart = new ArrayList();
     
-    private java.util.TreeMap outnameToBreakpointKey = new java.util.TreeMap();
+    private java.util.TreeMap outnameToBreakpointKey 
+        = new java.util.TreeMap( NullFriendlyStringComparator.instance );
     
     void setOutputBreakpointKey( final String nm, final BreakpointKey bptKey ) {
         outnameToBreakpointKey.put( nm, bptKey );

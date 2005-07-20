@@ -45,6 +45,8 @@ public class NetworkTrace implements Trace {
 				final java.net.Socket sckt = new java.net.Socket( host, port );
 				final java.io.OutputStream os = sckt.getOutputStream();
 				oos = new java.io.ObjectOutputStream( os );
+                                oos.writeShort( 2501 ); // magic
+                                oos.writeShort( 1 ); // version
 				while ( itr.hasNext() ) {
 					final TraceInfo tinf = ( TraceInfo )itr.next();
 					oos.writeObject( tinf.systemID );

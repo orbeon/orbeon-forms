@@ -698,6 +698,14 @@
                 </li>
                 <li>
                     <p>
+                        <b>Request Generator</b>. The Request Generator used to return a constructed
+                        path for the <code>path-info</code> parameter. It now correctly returns the
+                        Servlet API's path info. To get a complete path, use
+                        <code>request-path</code> instead.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         TODO
                     </p>
                 </li>

@@ -23,8 +23,8 @@
 <!--    <property name='unstbl-bld-dst' value='/var/tmp/tomcat/ops-unstable/' /> -->
     <property name='local-repos' value=':local:/home/cvs/objectweb-src' />
     <property name="build.dir" value="build"/>
-    <property name='application.name' value='orbeon-presentation-server' />
-    <property name="war.dir" value="${build.dir}/${application.name}-war"/>
+    <property name="project.name" value="ops"/>
+    <property name="war.dir" value="${build.dir}/${project.name}-war"/>
 
     <fileset id='war.libs' dir="${lib.dir}">
         <include name="dom4j-1_4_orbeon.jar"/>
@@ -95,7 +95,6 @@
     </fileset>
 
     <target name="init">
-        <property name="project.name" value="orbeon"/>
 
         <tstamp/>
         <property name="version.number" value="3.0.beta2"/>
@@ -473,7 +472,7 @@
           <arg value='-c' />
           <arg value='--rsh=/usr/bin/ssh' />
           <arg value='build.log' />
-          <arg value='orbeon.war' />
+          <arg value='ops.war' />
           <arg value='orbeonbld2@forge.objectweb.org:/var/lib/gforge/chroot/home/groups/ops/htdocs/unstable/ops' />
         </exec>
 
@@ -537,7 +536,7 @@
             <param name="target" value="war"/>
             <param name="build.root" value="${build.root}"/>
         </antcall>
-        <zip zipfile="${build.distrib.dir}/orbeon.war">
+        <zip zipfile="${build.distrib.dir}/${project.name}.war">
             <fileset dir="${war.dir}"/>
             <zipfileset dir="${web-examples-src.dir}" prefix="WEB-INF/resources">
                 <exclude name="**/*.eps"/>
@@ -610,7 +609,7 @@
         <property name="tmp-zip" value="${build.distrib.dir}/ops-${release.number}-tmp.zip"/>
         <zip zipfile="${tmp-zip}">
             <zipfileset dir="${build.distrib.dir}" prefix="${prefix}">
-                <include name="orbeon.war"/>
+                <include name="${project.name}.war"/>
             </zipfileset>
             <zipfileset dir="${build.doc.dir}" prefix="${prefix}/doc"/>
             <zipfileset dir="doc/dist" prefix="${prefix}"/>
@@ -674,7 +673,7 @@
         <copy file="lib/hsqldb-1_7_1.jar" todir="${build.dir}/install/${install.tomcat}/common/lib"/>
 
         <!-- Prepare Orbeon -->
-        <unzip src="build/distrib/orbeon.war" dest="${build.dir}/install/ops-${release.number}"/>
+        <unzip src="build/distrib/${project.name}.war" dest="${build.dir}/install/ops-${release.number}"/>
         <copy file="lib/portlet-api_1.0.jar" todir="${build.dir}/install/ops-${release.number}/WEB-INF/lib"/>
         <delete file="${build.dir}/install/ops-${release.number}/WEB-INF/web.xml"/>
         <xslt in="build.xml" style="${descriptors.dir}/web.xsl"

@@ -117,7 +117,7 @@ under the root directory OPS_HOME/:
 
     * README.txt: this document.
 
-    * orbeon.war: the Web Archive where the software, required
+    * ops.war: the Web Archive where the software, required
       resources, and demo samples reside.
 
     * doc: this directory contains the OPS documentation as static
@@ -128,7 +128,7 @@ under the root directory OPS_HOME/:
 
     * licenses: this directory contains third-party software licenses.
 
-You then need to deploy orbeon.war file to your servlet container or
+You then need to deploy ops.war file to your servlet container or
 application server of choice. In the OPS documentation, you will find
 detailed installation instructions for several servlet containers /
 applications servers.
@@ -217,7 +217,7 @@ In addition, this product includes the following software:
 This software makes use of a schema for XSLT 2.0 provided under W3C
 Software License. The schema is available at the following location:
 
-    jar:orbeon.jar!/org/orbeon/oxf/xml/schemas/xslt-2_0.xsd
+    jar:ops.jar!/org/orbeon/oxf/xml/schemas/xslt-2_0.xsd
 
 Please consult the third-party-licenses directory for more information
 about individual licenses.

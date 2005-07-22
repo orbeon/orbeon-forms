@@ -516,7 +516,7 @@
 
                 <p>
                     <ul>
-                        <li>orbeon.jar</li>
+                        <li>ops.jar</li>
                         <li>CacheDB.jar</li>
                         <li>commons-cli.jar</li>
                         <li>xercesImpl-2_2_1_orbeon.jar</li>

@@ -12,7 +12,7 @@
 
   <class-loading java2ClassLoadingCompliance='false'>
   <loader-repository >
-     orbeon.war:loader=orbeon.war
+     ops.war:loader=ops.war
      <loader-repository-config >
         java2ParentDelegaton=false
      </loader-repository-config>

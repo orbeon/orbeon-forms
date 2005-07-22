@@ -39,7 +39,7 @@
 				</tr>
 				<tr>
 					<td>
-						<code>WEB-INF/lib/orbeon.jar</code>
+						<code>WEB-INF/lib/ops.jar</code>
 					</td>
 					<td>JAR file with all the OPS classes.</td>
 				</tr>
@@ -126,7 +126,7 @@
 						<li>Declares a Servlet named <code>oxf</code>
                         implemented by the class
                         <code>org.orbeon.oxf.servlet.OXFServlet</code>
-                        (loaded from <code>lib/orbeon.jar</code>)</li>
+                        (loaded from <code>lib/ops.jar</code>)</li>
 						<li>Defines <code>oxf</code> as the default Servlet
                         (i.e. the Servlet handling all the requests).</li>
 					</ul>
@@ -156,8 +156,8 @@
                             distribution, OPS loads resources from the
                             <code>WEB-INF/resources</code> directory inside the WAR. If it can't
                             find a resource in this directory, it will try to look for it inside
-                            <code>orbeon.jar</code>. Only static resources that are part of
-                            OPS are stored in <code>orbeon.jar</code> (as opposed to
+                            <code>ops.jar</code>. Only static resources that are part of
+                            OPS are stored in <code>ops.jar</code> (as opposed to
                             OPS applications). The <link
                             href="reference-resource-managers">Resource Managers</link> section
                             explains in detail how resource managers work.

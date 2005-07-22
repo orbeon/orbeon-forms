@@ -65,7 +65,7 @@ public class TomcatClasspathFix {
      * been around for some time now. )
      *
      * FWIW, we need this to work because we want META-INF/services in
-     * orbeon.jar to be found before META-INF/services in xerces.*Impl.*.jar.
+     * ops.jar to be found before META-INF/services in xerces.*Impl.*.jar.
      *
      * And we want that to happen because we want to specify our own parser
      * config.  ( As opposed to the re-rooted one ).  The diff being that
@@ -98,7 +98,7 @@ public class TomcatClasspathFix {
                     processManifest( mf, base );
                 } else if ( "file".equalsIgnoreCase( proto ) ) {
                     // Assume InitUtils was found in WEB-INF/classes and that in WEB-INF/lib
-                    // there is a jar ( e.g. orbeon.jar ) that will have a manifest we
+                    // there is a jar ( e.g. ops.jar ) that will have a manifest we
                     // care about.  ( So yes in this case we process many more manifests
                     // than in the above case.
                     final String sPth = url.getPath();

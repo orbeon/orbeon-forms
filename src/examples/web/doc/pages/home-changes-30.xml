@@ -706,6 +706,13 @@
                 </li>
                 <li>
                     <p>
+                        <b>JAR and WAR Names</b>. <code>orbeon.jar</code> has been renamed to
+                        <code>ops.jar</code> and <code>orbeon.war</code> has been renamed to
+                        <code>ops.war</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         TODO
                     </p>
                 </li>

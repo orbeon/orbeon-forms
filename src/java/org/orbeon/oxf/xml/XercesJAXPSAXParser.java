@@ -95,7 +95,7 @@ import orbeon.apache.xerces.jaxp.JAXPConstants;
  *                    
  *                Now since XercesJAXPSAXParserFactoryImpl.&lt;clinit&gt; hasn't run at the prior
  *                to the load of JAXPConstants we get NoClassDefFoundException.  ( &lt;clinit&gt;
- *                adds jars in Class-Path of orbeon.jar manifest to TC's class loader since it
+ *                adds jars in Class-Path of ops.jar manifest to TC's class loader since it
  *                incorrectly ignores the Class-Path. )
  */
 public class XercesJAXPSAXParser extends javax.xml.parsers.SAXParser /* implements JAXPConstants */ {

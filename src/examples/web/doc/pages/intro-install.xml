@@ -61,7 +61,7 @@
                 Tomcat installation: create a new <code>TOMCAT_HOME/webapps/orbeon</code>
                 directory.</p></li>
 
-                <li><p>Unzip <code>orbeon.war</code> in the <code>orbeon</code> directory you just
+                <li><p>Unzip <code>ops.war</code> in the <code>orbeon</code> directory you just
                 created.</p></li>
 
                 <li><p>With Tomcat 5, move <code>xercesImpl.jar</code> and
@@ -247,7 +247,7 @@
                 (typically <code>c:\bea\user_projects</code>). Create a new directory:
                 <code>DOMAIN\applications\orbeon</code>.</li></p>
 
-                <p><li>Unzip <code>orbeon.war</code> in the <code>orbeon</code>
+                <p><li>Unzip <code>ops.war</code> in the <code>orbeon</code>
                 directory you just created.</li></p>
 
                 <p><li>Edit the <code>startWeblogic.cmd</code> (in
@@ -439,11 +439,11 @@
                 </li>
                 <li>
                     <p>
-                        Install and deploy OPS (<code>orbeon.war</code>).
+                        Install and deploy OPS (<code>ops.war</code>).
                         <ul>
                             <li>Click on Applications / Install New Application.</li>
                             <li>
-                                Upload <code>orbeon.war</code> and follow the wizard. We will
+                                Upload <code>ops.war</code> and follow the wizard. We will
                                 assume that you chose <code>/ops</code> as context root.
                             </li>
                             <li>Save the configuration.</li>
@@ -466,7 +466,7 @@
                                 running and see the results of your modifications on the fly. The
                                 resources are stored under
                                 <code>WSAS_HOME/profiles/default/installedApps/yourmachineNode01Cell/
-                                orbeon_war.ear/orbeon.war/WEB-INF/resources</code>. For instance,
+                                orbeon_war.ear/ops.war/WEB-INF/resources</code>. For instance,
                                 try to modify <code>examples/tutorial/hello1/view.xhtml</code>:
                                 replace "Hello World!" by your own message, and reload the page in
                                 the browser to see the result.
@@ -664,10 +664,10 @@
             <title>Installing OPS on &jboss-vers;</title>
             <ol>
                 <li>Assuming that <code>JBOSS_HOME</code> represents the location of your JBoss
-                installation: create a new <code>JBOSS_HOME/server/default/deploy/orbeon.war</code>
+                installation: create a new <code>JBOSS_HOME/server/default/deploy/ops.war</code>
                 directory.</li>
 
-                <li>Unzip <code>orbeon.war</code> in the <code>orbeon.war</code> directory you just
+                <li>Unzip <code>ops.war</code> in the <code>ops.war</code> directory you just
                 created.</li>
 
                 <li>If you are using JBoss 4.0.0, edit
@@ -682,13 +682,13 @@
                     <ol>
                         <li>
                             Open
-                            <code>JBOSS_HOME/server/default/deploy/orbeon.war/WEB-INF/web.xml</code>
+                            <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/web.xml</code>
                             and uncomment the <code>security-constraint</code>,
                            <code>login-config</code> and <code>security-role</code>
                            declarations at the end of the file.
                         </li>
                         <li>
-                            Open <code>JBOSS_HOME/server/default/deploy/orbeon.war/WEB-INF/jboss-web.xml</code>
+                            Open <code>JBOSS_HOME/server/default/deploy/ops.war/WEB-INF/jboss-web.xml</code>
                             and uncomment the <code>security-domain</code> element near the end of 
                             bottom of the file.
                         </li>

@@ -415,8 +415,8 @@
         <xsl:variable name="current-repeat-index" select="$repeat-indexes[@id = $xforms-repeat/@id]" as="element()"/>
         <xsl:variable name="current-repeat-iteration" select="$repeat-iterations[@id = $id]" as="element()?"/>
 
-        <xsl:variable name="delimiter-local-name" as="xs:string" select="local-name(*[1])"/>
-        <xsl:variable name="delimiter-namespace-uri" as="xs:string" select="namespace-uri(*[1])"/>
+        <xsl:variable name="delimiter-local-name" as="xs:string" select="if (not(namespace-uri(*[1]) = 'http://www.w3.org/2002/xforms')) then local-name(*[1]) else 'div'"/>
+        <xsl:variable name="delimiter-namespace-uri" as="xs:string" select="if (not(namespace-uri(*[1]) = 'http://www.w3.org/2002/xforms')) then namespace-uri(*[1]) else 'http://www.w3.org/1999/xhtml'"/>
 
         <!-- Delimiter: begin repeat -->
         <xsl:copy-of select="xxforms:repeat-delimiter($delimiter-namespace-uri,
@@ -497,24 +497,35 @@
             <xsl:for-each select="$xforms-repeat/node()">
                 <xsl:choose>
                     <xsl:when test=". instance of element()">
-                        <xsl:copy>
-                            <xsl:copy-of select="@* except (@xhtml:class, @class)"/>
-                            <xsl:choose>
-                                <xsl:when test="$top-level-repeat">
-                                    <xsl:attribute name="class" select="string-join
-                                        ((@xhtml:class, @class, 'xforms-repeat-template'), ' ')"/>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    <xsl:copy-of select="@class"/>
-                                </xsl:otherwise>
-                            </xsl:choose>
-                            <xsl:apply-templates select="node()">
+                        <xsl:variable name="template" as="element()*">
+                            <xsl:apply-templates select=".">
                                 <xsl:with-param name="id-postfix" select="$id-postfix" tunnel="yes"/>
                                 <xsl:with-param name="top-level-repeat" select="false()" tunnel="yes"/>
                                 <xsl:with-param name="generate-template" select="true()" tunnel="yes"/>
                                 <xsl:with-param name="selected" select="false()" tunnel="yes"/>
                             </xsl:apply-templates>
-                        </xsl:copy>
+                        </xsl:variable>
+                        <xsl:for-each select="$template">
+                            <xsl:copy>
+                                <xsl:copy-of select="@* except (@xhtml:class, @class)"/>
+                                <xsl:choose>
+                                    <xsl:when test="$top-level-repeat">
+                                        <xsl:attribute name="class" select="string-join
+                                            ((@xhtml:class, @class, 'xforms-repeat-template'), ' ')"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:copy-of select="@class"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                                <xsl:copy-of select="node()"/>
+<!--                                <xsl:apply-templates select="node()">-->
+<!--                                    <xsl:with-param name="id-postfix" select="$id-postfix" tunnel="yes"/>-->
+<!--                                    <xsl:with-param name="top-level-repeat" select="false()" tunnel="yes"/>-->
+<!--                                    <xsl:with-param name="generate-template" select="true()" tunnel="yes"/>-->
+<!--                                    <xsl:with-param name="selected" select="false()" tunnel="yes"/>-->
+<!--                                </xsl:apply-templates>-->
+                            </xsl:copy>
+                        </xsl:for-each>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:copy-of select="."/>

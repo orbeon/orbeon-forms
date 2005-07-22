@@ -707,7 +707,8 @@
                 <li>
                     <p>
                         <b>JAR and WAR Names</b>. <code>orbeon.jar</code> has been renamed to
-                        <code>ops.jar</code> and <code>orbeon.war</code> has been renamed to
+                        <code>ops.jar</code>, <code>cli-orbeon.jar</code> has been renamed to
+                        <code>cli-ops.jar</code> and <code>orbeon.war</code> has been renamed to
                         <code>ops.war</code>.
                     </p>
                 </li>

@@ -69,6 +69,9 @@
     <!-- Standalone XForms Upload example -->
     <page path-info="/xforms-upload*" model="/examples/xforms/xforms-upload/page-flow.xpl"/>
 
+    <!-- Standalone XForms Sandbox example -->
+    <page path-info="/xforms-sandbox*" model="/examples/sandbox/xforms/page-flow.xpl"/>
+
     <!-- Standalone PDF Upload example (contribution) -->
     <page path-info="/pdf-upload*" model="/examples/pdf/pdf-upload/page-flow.xpl"/>
 

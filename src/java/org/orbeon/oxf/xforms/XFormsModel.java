@@ -20,9 +20,14 @@ import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.processor.DOMSerializer;
+import org.orbeon.oxf.processor.ProcessorImpl;
+import org.orbeon.oxf.processor.ProcessorUtils;
+import org.orbeon.oxf.processor.generator.URLGenerator;
+import org.orbeon.oxf.util.EmptyIterator;
+import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.util.PooledXPathExpression;
 import org.orbeon.oxf.util.XPathCache;
-import org.orbeon.oxf.util.EmptyIterator;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
@@ -38,6 +43,7 @@ import org.orbeon.saxon.xpath.StandaloneContext;
 import org.orbeon.saxon.xpath.XPathEvaluator;
 import org.orbeon.saxon.xpath.XPathException;
 
+import java.net.URL;
 import java.util.*;
 
 /**
@@ -684,7 +690,6 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // 2. Create XPath data model from instance (inline or external) (throws xforms-link-exception)
             //    Instance may not be specified.
 
-            // TODO: support external instance
             if (instances == null) {
                 // Build initial instance document
                 List instanceContainers = modelElement.elements(new QName("instance", XFormsConstants.XFORMS_NAMESPACE));
@@ -692,8 +697,23 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     // Support multiple instances
                     int instancePosition = 0;
                     for (Iterator i = instanceContainers.iterator(); i.hasNext(); instancePosition++) {
-                        Element instanceContainer = (Element) i.next();
-                        Document instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) instanceContainer.elements().get(0));
+                        final Element instanceContainer = (Element) i.next();
+                        final String srcAttribute = instanceContainer.attributeValue("src");
+                        final Document instanceDocument;
+                        //= ProcessorUtils.createDocumentFromEmbeddedOrHref(Element element, String urlString) {
+                        if (srcAttribute == null) {
+                            // Inline instance
+                            instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) instanceContainer.elements().get(0));
+                        } else {
+                            // External instance
+                            final LocationData locationData = (LocationData) instanceContainer.getData();
+                            final URL srcURL = ProcessorUtils.createRelativeURL(locationData, srcAttribute);
+                            final URLGenerator urlGenerator = new URLGenerator(srcURL);
+                            final DOMSerializer domSerializer = new DOMSerializer();
+                            PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, domSerializer, ProcessorImpl.INPUT_DATA);
+                            domSerializer.start(pipelineContext);
+                            instanceDocument = domSerializer.getDocument(pipelineContext);
+                        }
                         setInstanceDocument(pipelineContext, instancePosition, instanceDocument);
                     }
                 }

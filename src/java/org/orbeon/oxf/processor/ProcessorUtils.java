@@ -120,7 +120,7 @@ public class ProcessorUtils {
     }
 
     public static Document createDocumentFromEmbeddedOrHref(Element element, String urlString) {
-        Document result;
+        final Document result;
         if (urlString == null) {
             // Case of embedded XML
             Element originalElement = (Element) ((Element) element).elementIterator().next();
@@ -131,7 +131,7 @@ public class ProcessorUtils {
             result = new NonLazyUserDataDocument();
             result.add(copiedElement);
         } else {
-            // Href
+            // Etxernal URI
             LocationData locationData = (LocationData) element.getData();
             URL url = createRelativeURL(locationData, urlString);
 

@@ -70,6 +70,9 @@ structural elements
     <xsd:annotation>
       <xsd:documentation>Attributes for _every_ element in XForms</xsd:documentation>
     </xsd:annotation>
+    <xsd:attribute name="id" type="xsd:ID" use="optional"/>
+    <xsd:attribute name="tabindex" type="xsd:integer" use="optional"/>
+    <xsd:attribute name="class" type="xsd:string" use="optional"/>
     <xsd:anyAttribute namespace="##other"/>
   </xsd:attributeGroup>
 
@@ -844,6 +847,7 @@ Advanced User Interface
             <xsd:element ref="xforms:switch"/>
             <xsd:element ref="xforms:repeat"/>
             <!-- containing document language to add additional allowed content here -->
+            <xsd:any namespace="##other" processContents="lax"/>
           </xsd:choice>
 
         </xsd:sequence>

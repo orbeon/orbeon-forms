@@ -55,7 +55,7 @@ public abstract class TaminoProcessor extends ProcessorImpl {
     }
 
     protected TConnection getConnection(PipelineContext context, Config config) {
-        String attributeName = TAMINO_CONNECTION + config.toString();
+        String attributeName = TAMINO_CONNECTION + config.getUrl() + config.getUsername();
         TConnection connection = (TConnection) context.getAttribute(attributeName);
         if (connection != null && !connection.isClosed()) {
             return connection;

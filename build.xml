@@ -334,7 +334,7 @@
         </javadoc>
     </target>
 
-    <target name="orbeon-source-files-list" depends="jars">
+    <target name="orbeon-source-files-list" depends="init">
         <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true">
             <arg line="-r ${examples-src.dir} oxf:/cli/examples-sources/generate-examples-sources.xpl"/>
         </java>
@@ -525,7 +525,7 @@
         </java>
     </target>
 
-    <target name="orbeon-dist-war" depends="orbeon-source-files-list">
+    <target name="orbeon-dist-war" depends="jars,orbeon-source-files-list">
         <mkdir dir="${build.distrib.dir}"/>
 
         <antcall target="war">
@@ -703,6 +703,10 @@
     </target>
 
     <target name="orbeon-dist" depends="orbeon-dist-packages"/>
+    
+    <target name="post-update" depends="orbeon-source-files-list">
+        <chmod dir="${war.dir}/WEB-INF/exist-data" perm="a+rw"/>
+    </target>
 
     <target name="copy-distrib" depends="orbeon-dist">
         <copy todir="/home/httpd/html/public/oxf/secret">

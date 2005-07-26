@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
-<definitions xmlns:tns="http://www.orbeon.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.orbeon.org/" name="YIM Service">
+<definitions xmlns:tns="http://www.orbeon.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        xmlns="http://schemas.xmlsoap.org/wsdl/"
+        targetNamespace="http://www.orbeon.org/" name="YIM-Service">
     <message name="null"/>
     <message name="message">
         <part name="login" type="xsd:string"/>

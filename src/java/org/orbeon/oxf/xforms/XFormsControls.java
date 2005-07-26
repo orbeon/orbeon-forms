@@ -718,7 +718,7 @@ public class XFormsControls {
                     final Element itemsetElement = controlElement.element(XFormsConstants.XFORMS_ITEMSET_QNAME);
 
                     if (itemsetElement != null) {
-                        final String selectControlId = controlElement.attributeValue("id");
+                        final String selectControlId = effectiveControlId;
 
                         // Iterate through the collection
                         pushBinding(pipelineContext, itemsetElement);
@@ -788,7 +788,7 @@ public class XFormsControls {
         if (itemsetIdToItemsetInfoUpdateMap == null) {
             itemsetIdToItemsetInfoUpdateMap = result;
         } else {
-            itemsetIdToItemsetInfoUpdateMap.putAll(result);// FIXME: Why do we do this? Can't we just to as above?
+            itemsetIdToItemsetInfoUpdateMap.putAll(result);
         }
     }
 

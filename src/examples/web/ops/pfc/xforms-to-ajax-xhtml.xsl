@@ -75,7 +75,7 @@
             </xhtml:form>
         </xsl:copy>
     </xsl:template>
-    
+
     <!-- - - - - - - XForms controls - - - - - - -->
 
     <!-- Add classes to control elements reflecting model item properties -->
@@ -108,7 +108,7 @@
     </xsl:template>
 
     <xsl:template match="xforms:output | xforms:input
-            | xforms:secret | xforms:textarea | xforms:select | xforms:select1 
+            | xforms:secret | xforms:textarea | xforms:select | xforms:select1
             | xforms:range | xforms:upload" priority="2">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
@@ -129,7 +129,7 @@
         </xsl:if>
         <xsl:apply-templates select="xforms:hint"/>
     </xsl:template>
-    
+
     <xsl:template match="xforms:output">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
@@ -240,7 +240,7 @@
     <xsl:template match="xforms:textarea">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xhtml:textarea name="{$id}">
+        <xhtml:textarea name="{$id}" rows="5" cols="40">
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
             <xsl:value-of select="xxforms:control($id)"/>
         </xhtml:textarea>
@@ -619,7 +619,7 @@
             <xsl:attribute name="id" select="$id"/>
         </xsl:if>
         <!-- Copy attributes with no namespaces -->
-        <xsl:copy-of select="$element/@accesskey | $element/@tabindex | $element/@style"/>
+        <xsl:copy-of select="$element/@accesskey | $element/@tabindex | $element/@style | $element/@onchange"/>
         <!-- Convert navindex to tabindex -->
         <xsl:if test="$element/@navindex">
             <xsl:attribute name="tabindex" select="$element/@navindex"/>

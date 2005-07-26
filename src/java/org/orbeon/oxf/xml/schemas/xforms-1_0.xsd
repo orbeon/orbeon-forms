@@ -250,6 +250,7 @@ User Interface form controls
   </xsd:attributeGroup>
   <xsd:attributeGroup name="UI.Common.Attrs">
     <xsd:attribute name="appearance" type="xforms:appearanceType" use="optional"/>
+    <xsd:attribute name="style" type="xsd:string" use="optional"/>
   </xsd:attributeGroup>
   <xsd:group name="UI.Inline">
     <xsd:sequence>
@@ -790,6 +791,7 @@ Advanced User Interface
             <xsd:element ref="xforms:group"/>
 
             <xsd:element ref="xforms:repeat"/>
+            <xsd:any namespace="##other" processContents="lax"/>
             <!-- containing document language to add additional allowed content here -->
           </xsd:choice>
         </xsd:sequence>
@@ -814,6 +816,7 @@ Advanced User Interface
             <xsd:element ref="xforms:group"/>
             <xsd:element ref="xforms:switch"/>
             <xsd:element ref="xforms:repeat"/>
+            <xsd:any namespace="##other" processContents="lax"/>
             <!-- containing document language to add additional allowed content here -->
           </xsd:choice>
         </xsd:sequence>

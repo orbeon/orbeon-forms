@@ -23,10 +23,7 @@ import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.event.*;
-import org.orbeon.oxf.xforms.event.events.XFormsRevalidateEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
-import org.orbeon.oxf.xforms.event.events.XXFormsSubmissionEvent;
+import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -71,6 +68,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     private String cdatasectionelements;
 
     private String replace = XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL;
+    private String replaceInstanceId;
     private String separator = ";";
     private String includenamespaceprefixes;
 
@@ -110,6 +108,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             cdatasectionelements = submissionElement.attributeValue("cdata-section-elements");
             if (submissionElement.attributeValue("replace") != null) {
                 replace = submissionElement.attributeValue("replace");
+
+                if (replace.equals("instance")) {
+                    replaceInstanceId = submissionElement.attributeValue("instance");
+                }
             }
             if (submissionElement.attributeValue("separator") != null) {
                 separator = submissionElement.attributeValue("separator");
@@ -139,13 +141,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // 11.1 The xforms-submit Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
-            final boolean isDeferredSubmission = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
-            final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
-            final boolean isDeferredSubmissionSecondPass = isDeferredSubmission && !XFormsEvents.XFORMS_SUBMIT.equals(eventName);
-
             try {
                 // Make sure submission element info is extracted
                 extractSubmissionElement();
+
+                final boolean isDeferredSubmission = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
+                final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
+                final boolean isDeferredSubmissionSecondPass = isDeferredSubmission && !XFormsEvents.XFORMS_SUBMIT.equals(eventName);
 
                 // Select node based on ref or bind
                 final XFormsControls xformsControls = containingDocument.getXFormsControls();
@@ -188,52 +190,54 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 }
 
                 // Handle uploaded files if any
-                final Element filesElement = ((XXFormsSubmissionEvent) event).getFilesElement();
-                if (filesElement != null) {
-                    for (Iterator i = filesElement.elements().iterator(); i.hasNext();) {
-                        final Element parameterElement = (Element) i.next();
-                        final String name = parameterElement.element("name").getTextTrim();
+                if (isDeferredSubmissionSecondPass) {
+                    final Element filesElement = ((XXFormsSubmissionEvent) event).getFilesElement();
+                    if (filesElement != null) {
+                        for (Iterator i = filesElement.elements().iterator(); i.hasNext();) {
+                            final Element parameterElement = (Element) i.next();
+                            final String name = parameterElement.element("name").getTextTrim();
 
-                        final Element valueElement = parameterElement.element("value");
-                        final String value = valueElement.getTextTrim();
-                        final String paramValueType = valueElement.attributeValue(XMLConstants.XSI_TYPE_QNAME);//TODO: get actual QName for attribute value
+                            final Element valueElement = parameterElement.element("value");
+                            final String value = valueElement.getTextTrim();
+                            final String paramValueType = valueElement.attributeValue(XMLConstants.XSI_TYPE_QNAME);//TODO: get actual QName for attribute value
 
-                        final String filename = parameterElement.element("filename").getTextTrim();
-                        final String mediatype = parameterElement.element("content-type").getTextTrim();
-                        final String size = parameterElement.element("content-length").getTextTrim();
+                            final String filename = parameterElement.element("filename").getTextTrim();
+                            final String mediatype = parameterElement.element("content-type").getTextTrim();
+                            final String size = parameterElement.element("content-length").getTextTrim();
 
-                        final XFormsControls.UploadControlInfo uploadControl
-                                = (XFormsControls.UploadControlInfo) containingDocument.getObjectById(pipelineContext, name);
+                            final XFormsControls.UploadControlInfo uploadControl
+                                    = (XFormsControls.UploadControlInfo) containingDocument.getObjectById(pipelineContext, name);
 
-                        // Set value into the instance
-                        xformsControls.setBinding(pipelineContext, uploadControl);
-                        {
-                            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
-                            XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, value, paramValueType);
-                        }
+                            // Set value into the instance
+                            xformsControls.setBinding(pipelineContext, uploadControl);
+                            {
+                                final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+                                XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, value, paramValueType);
+                            }
 
-                        // Handle filename if any
-                        if (uploadControl.getFilenameElement() != null) {
-                            xformsControls.pushBinding(pipelineContext, uploadControl.getFilenameElement());
-                            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
-                            XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, filename, null);
-                            xformsControls.popBinding();
-                        }
+                            // Handle filename if any
+                            if (uploadControl.getFilenameElement() != null) {
+                                xformsControls.pushBinding(pipelineContext, uploadControl.getFilenameElement());
+                                final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+                                XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, filename, null);
+                                xformsControls.popBinding();
+                            }
 
-                        // Handle mediatype if any
-                        if (uploadControl.getMediatypeElement() != null) {
-                            xformsControls.pushBinding(pipelineContext, uploadControl.getMediatypeElement());
-                            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
-                            XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, mediatype, null);
-                            xformsControls.popBinding();
-                        }
-                        
-                        // Handle file size if any
-                        if (uploadControl.getSizeElement() != null) {
-                            xformsControls.pushBinding(pipelineContext, uploadControl.getSizeElement());
-                            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
-                            XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, size, null);
-                            xformsControls.popBinding();
+                            // Handle mediatype if any
+                            if (uploadControl.getMediatypeElement() != null) {
+                                xformsControls.pushBinding(pipelineContext, uploadControl.getMediatypeElement());
+                                final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+                                XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, mediatype, null);
+                                xformsControls.popBinding();
+                            }
+
+                            // Handle file size if any
+                            if (uploadControl.getSizeElement() != null) {
+                                xformsControls.pushBinding(pipelineContext, uploadControl.getSizeElement());
+                                final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+                                XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, size, null);
+                                xformsControls.popBinding();
+                            }
                         }
                     }
                 }
@@ -511,11 +515,16 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             final Document resultingInstanceDocument = documentResult.getDocument();
 
                                             // Set new instance document to replace the one submitted
-                                            currentInstance.setInstanceDocument(resultingInstanceDocument);
+                                            final XFormsInstance replaceInstance = (replaceInstanceId == null) ? currentInstance : model.getInstance(replaceInstanceId);
+                                            if (replaceInstance == null) {
+                                                containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
+                                            } else {
+                                                replaceInstance.setInstanceDocument(resultingInstanceDocument);
 
-                                            // Dispatch events
-                                            containingDocument.dispatchEvent(pipelineContext, new org.orbeon.oxf.xforms.event.events.XFormsModelConstructEvent(model));
-                                            containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                                // Dispatch events
+                                                containingDocument.dispatchEvent(pipelineContext, new org.orbeon.oxf.xforms.event.events.XFormsModelConstructEvent(model));
+                                                containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
+                                            }
                                         } catch (Exception e) {
                                             throw new OXFException("xforms:submission: exception while serializing XML to instance.", e);
                                         }
@@ -587,6 +596,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitErrorEvent(XFormsModelSubmission.this, action, e));
             }
 
+        } else if (XFormsEvents.XFORMS_BINDING_EXCEPTION.equals(eventName)) {
+            // The default action for this event results in the following: Fatal error.
+            throw new OXFException("Binding exception.");
         }
     }
 

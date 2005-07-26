@@ -37,12 +37,7 @@ public class XFormsEventFactory {
     private static XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable,
                                           String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
 
-        // TODO
-        // XFORMS_MODEL_DESTRUCT
-        // XFORMS_RESET
-
         // TODO: more efficient way to switch!
-
         if (eventName.equals(XFormsEvents.XFORMS_DOM_ACTIVATE)) {
             return new XFormsDOMActivateEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_COMPUTE_EXCEPTION)) {
@@ -57,6 +52,8 @@ public class XFormsEventFactory {
             return new XFormsLinkErrorEvent(targetObject, contextString, contextElement, contextThrowable);
         } else if (eventName.equals(XFormsEvents.XFORMS_LINK_EXCEPTION)) {
             return new XFormsLinkExceptionEvent(targetObject, contextString, contextElement, contextThrowable);
+        } else if (eventName.equals(XFormsEvents.XFORMS_BINDING_EXCEPTION)) {
+            return new XFormsBindingExceptionEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_REFRESH)) {
             return new XFormsRefreshEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_SELECT)) {
@@ -73,10 +70,10 @@ public class XFormsEventFactory {
             return new XXFormsSubmissionEvent(targetObject, filesElement);
         } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_CONSTRUCT)) {
             return new XFormsModelConstructEvent(targetObject);
-//        } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_DESTRUCT)) {
-//            return new XFormsModelDestructEvent(targetObject);
-//        } else if (eventName.equals(XFormsEvents.XFORMS_RESET)) {
-//            return new XFormsResetEvent(targetObject);
+        } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_DESTRUCT)) {
+            return new XFormsModelDestructEvent(targetObject);
+        } else if (eventName.equals(XFormsEvents.XFORMS_RESET)) {
+            return new XFormsResetEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_CONSTRUCT_DONE)) {
             return new XFormsModelConstructDoneEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_READY)) {

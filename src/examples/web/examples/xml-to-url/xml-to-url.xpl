@@ -20,10 +20,11 @@
     xmlns:byte-array-output-stream="java:java.io.ByteArrayOutputStream"
     xmlns:array="java:java.lang.reflect.Array"
     xmlns:string="java:java.lang.String"
-    xmlns:base64="java:org.orbeon.oxf.util.Base64">
+    xmlns:base64="java:org.orbeon.oxf.util.Base64"
+    xmlns:env="http://www.w3.org/2003/05/soap-envelope"
+    xmlns:orbeon="http://www.orbeon.com/">
 
-    <p:param name="xml" type="input"/>
-    <p:param name="urls" type="output"/>
+    <p:param name="instance" type="input"/>
 
     <p:processor name="oxf:request">
         <p:input name="config">
@@ -36,31 +37,28 @@
     </p:processor>
 
     <p:processor name="oxf:unsafe-xslt">
-        <p:input name="data" href="#xml"/>
+        <p:input name="data" href="soap-response.xml"/>
+        <p:input name="instance" href="#instance"/>
         <p:input name="request" href="#request"/>
         <p:input name="config">
-            <urls xsl:version="2.0">
-                <xsl:variable name="xml-string" select="saxon:serialize(/*, '')"/>
+            <xsl:stylesheet version="2.0">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:variable name="xml-string" select="doc('input:instance')"/>
                 <xsl:variable name="xml-array" select="string:get-bytes($xml-string)"/>
                 <xsl:variable name="output-stream" select="byte-array-output-stream:new()"/>
                 <xsl:variable name="gzip" select="gzip-output-stream:new($output-stream)"/>
-                <xsl:value-of select="gzip-output-stream:write($gzip, $xml-array, 0, string:length($xml-string))"/>
-                <xsl:value-of select="gzip-output-stream:finish($gzip)"/>
                 <xsl:variable name="base64-string-multi-line" select="base64:encode(byte-array-output-stream:to-byte-array($output-stream))"/>
                 <xsl:variable name="base64-string" select="replace(replace($base64-string-multi-line, '&#xa;', ''), '&#xd;', '')"/>
                 <xsl:variable name="parameter-length" select="string-length($base64-string)"/>
-                <xsl:choose>
-                    <xsl:when test="$parameter-length > 2048">
-                        <!-- Error message in attribute -->
-                        <xsl:attribute name="error">
-                            Document is too large.
-                            Generated URL would have a length of <xsl:value-of select="$parameter-length"/>.
-                            The maximum supporte URL length is 2048.
-                        </xsl:attribute>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <!-- Generate URL -->
-                        <original>
+                <xsl:template match="/">
+                    <xsl:value-of select="gzip-output-stream:write($gzip, $xml-array, 0, string:length($xml-string))"/>
+                    <xsl:value-of select="gzip-output-stream:finish($gzip)"/>
+                    <xsl:apply-templates/>
+                </xsl:template>
+                <!-- Output URL -->
+                <xsl:template match="orbeon:original-url">
+                    <xsl:copy>
+                        <xsl:if test="2048 >= $parameter-length">
                             <xsl:variable name="request" as="element()" select="doc('input:request')/request"/>
                             <xsl:value-of select="concat(
                                 'http://',
@@ -69,24 +67,34 @@
                                 $request/context-path,
                                 '/direct/xml-to-url/doc?xml=',
                                 escape-uri($base64-string, true()))"/>
-                        </original>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </urls>
+                        </xsl:if>
+                    </xsl:copy>
+                </xsl:template>
+                <!-- Output error if necessary -->
+                <xsl:template match="orbeon:error">
+                    <xsl:copy>
+                        <xsl:if test="$parameter-length > 2048">
+                            <xsl:text>Document is too large. Generated URL would have a length of </xsl:text>
+                            <xsl:value-of select="$parameter-length"/>
+                            <xsl:text>. The maximum supported URL length is 2048.</xsl:text>
+                        </xsl:if>
+                    </xsl:copy>
+                </xsl:template>
+            </xsl:stylesheet>
         </p:input>
         <p:output name="data" id="urls"/>
     </p:processor>
 
     <p:choose href="#urls">
 
-        <!-- Compute tiny URL if there are error -->
-        <p:when test="not(/urls/@error)">
+        <!-- Compute tiny URL if there are no error -->
+        <p:when test="/env:Envelope/env:Body/orbeon:urls/orbeon:error = ''">
             <!-- Get HTML for page -->
             <p:processor name="oxf:xslt">
                 <p:input name="data" href="#urls"/>
                 <p:input name="config">
                     <config xsl:version="2.0">
-                        <url>http://tinyurl.com/create.php?url=<xsl:value-of select="/urls/original"/></url>
+                        <url>http://tinyurl.com/create.php?url=<xsl:value-of select="/env:Envelope/env:Body/orbeon:urls/orbeon:original-url"/></url>
                         <content-type>text/xml</content-type>
                         <validating>true</validating>
                     </config>
@@ -103,20 +111,34 @@
                 <p:input name="data" href="#urls"/>
                 <p:input name="html" href="#html"/>
                 <p:input name="config">
-                    <urls xsl:version="2.0">
-                        <xsl:copy-of select="/urls/original"/>
-                        <tinyurl><xsl:value-of select="doc('input:html')//blockquote/b[starts-with(., 'http://tinyurl.com/')]"/></tinyurl>
-                    </urls>
+                    <xsl:stylesheet version="2.0">
+                        <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                        <xsl:template match="orbeon:tiny-url">
+                            <xsl:copy>
+                                <xsl:value-of select="doc('input:html')//blockquote/b[starts-with(., 'http://tinyurl.com/')]"/>
+                            </xsl:copy>
+                        </xsl:template>
+                    </xsl:stylesheet>
                 </p:input>
-                <p:output name="data" ref="urls"/>
+                <p:output name="data" id="response"/>
             </p:processor>
         </p:when>
         <p:otherwise>
             <p:processor name="oxf:identity">
-                <p:input name="data" href="urls"/>
-                <p:output name="data" ref="urls"/>
+                <p:input name="data" href="#urls"/>
+                <p:output name="data" id="response"/>
             </p:processor>
         </p:otherwise>
     </p:choose>
+
+    <!-- Send response -->
+    <p:processor name="oxf:xml-serializer">
+        <p:input name="data" href="#response"/>
+        <p:input name="config">
+            <config>
+                <content-type>application/xml</content-type>
+            </config>
+        </p:input>
+    </p:processor>
 
 </p:config>

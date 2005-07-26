@@ -1,0 +1,66 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<xhtml:html xmlns:xforms="http://www.w3.org/2002/xforms"
+        xmlns:f="http://orbeon.org/oxf/xml/formatting"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        xmlns:ev="http://www.w3.org/2001/xml-events"
+        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+        xmlns:env="http://www.w3.org/2003/05/soap-envelope"
+        xmlns:orbeon="http://www.orbeon.com/">
+
+    <xhtml:head>
+        <xhtml:title>XML to URL</xhtml:title>
+        <xforms:model>
+            <xforms:instance id="xml" src="oxf:/examples/xml-to-url/sample.xml"/>
+            <xforms:instance id="soap" src="oxf:/examples/xml-to-url/soap-response.xml"/>
+            <xforms:submission ref="instance('soap')" id="get-request"
+                method="post" action="/direct/xml-to-url/request" replace="instance"/>
+            <xforms:submission ref="instance('soap')" id="send-request"
+                method="post" action="/direct/xml-to-url/url" replace="instance"/>
+            <xforms:bind nodeset="instance('soap')/env:Body/orbeon:urls/*" relevant=". != ''"/>
+        </xforms:model>
+    </xhtml:head>
+    <xhtml:body>
+        <xforms:group>
+            <xhtml:p>
+                <xforms:textarea ref="instance('xml')" class="wide-textarea">
+                    <xforms:label>XML:</xforms:label>
+                </xforms:textarea>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:trigger>
+                    <xforms:label>Create URL</xforms:label>
+                    <xforms:action ev:event="DOMActivate">
+                        <xforms:send submission="get-request"/>
+                        <xforms:setvalue ref="instance('soap')/env:Body/orbeon:xml" value="instance('xml')"/>
+                        <xforms:send submission="send-request"/>
+                    </xforms:action>
+                </xforms:trigger>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:input ref="instance('soap')/env:Body/orbeon:urls/orbeon:tiny-url" style="width: 15em">
+                    <xforms:label class="fixed-width">Tiny URL:</xforms:label>
+                </xforms:input>
+            </xhtml:p>
+            <xhtml:p>
+                <xforms:input ref="instance('soap')/env:Body/orbeon:urls/orbeon:original-url" style="width: 15em">
+                    <xforms:label class="fixed-width">Direct URL:</xforms:label>
+                </xforms:input>
+            </xhtml:p>
+            <xhtml:p style="color: red">
+                <xforms:output ref="instance('soap')/env:Body/orbeon:urls/orbeon:error"/>
+            </xhtml:p>
+        </xforms:group>
+    </xhtml:body>
+</xhtml:html>

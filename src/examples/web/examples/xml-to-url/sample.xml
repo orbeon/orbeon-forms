@@ -1,0 +1,33 @@
+<xml>&lt;cat:OrderLine xmlns:cat="urn:oasis:names:tc:ubl:CommonAggregateTypes:1.0:0.70">
+    &lt;cat:BuyersID>1&lt;/cat:BuyersID>
+    &lt;cat:SellersID/>
+    &lt;cat:LineExtensionAmount currencyID="USD">12.50&lt;/cat:LineExtensionAmount>
+    &lt;cat:Quantity unitCode="PKG">5&lt;/cat:Quantity>
+    &lt;cat:Item>
+        &lt;cat:ID/>
+        &lt;cat:Description>Pencils, box #2 red&lt;/cat:Description>
+        &lt;cat:SellersItemIdentification>
+            &lt;cat:ID>32145-12&lt;/cat:ID>
+        &lt;/cat:SellersItemIdentification>
+        &lt;cat:BasePrice>
+            &lt;cat:PriceAmount currencyID="USD">2.50&lt;/cat:PriceAmount>
+        &lt;/cat:BasePrice>
+    &lt;/cat:Item>
+    &lt;cat:DeliveryRequirement>
+        &lt;cat:ID/>
+        &lt;cat:DeliverToAddress>
+            &lt;cat:ID/>
+            &lt;cat:Street>413 N Spring St&lt;/cat:Street>
+            &lt;cat:CityName>Elgin&lt;/cat:CityName>
+            &lt;cat:PostalZone>60123&lt;/cat:PostalZone>
+            &lt;cat:CountrySub-Entity>IL&lt;/cat:CountrySub-Entity>
+        &lt;/cat:DeliverToAddress>
+        &lt;cat:DeliverySchedule>
+            &lt;cat:ID/>
+            &lt;cat:RequestedDeliveryDate>2003-02-14&lt;/cat:RequestedDeliveryDate>
+            &lt;cat:DeliveryRequirement>
+                &lt;cat:ID/>
+            &lt;/cat:DeliveryRequirement>
+        &lt;/cat:DeliverySchedule>
+    &lt;/cat:DeliveryRequirement>
+&lt;/cat:OrderLine></xml>

@@ -130,7 +130,7 @@
         <example id="url" label="HTML Screen-Scraping"/>
         <example id="rss" label="Create Your Own RSS Feeds"/>
         <example id="spellchecker" label="Google Spell Checker"/>
-        <example id="xml-to-url" label="XML to URL"/>
+        <example id="xml-to-url" label="XML to URL" xforms-ng="true"/>
         <example id="yim" label="Instant Messaging"/>
     </section>
 </examples-list>

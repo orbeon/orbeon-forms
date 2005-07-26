@@ -1,0 +1,5 @@
+<env:Envelope xmlns:env="http://www.w3.org/2003/05/soap-envelope" xmlns:orbeon="http://www.orbeon.com/">
+    <env:Body>
+        <orbeon:xml/>
+    </env:Body>
+</env:Envelope>

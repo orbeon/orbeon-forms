@@ -1,0 +1,49 @@
+<definitions xmlns:orbeon="http://www.orbeon.com/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+        xmlns="http://schemas.xmlsoap.org/wsdl/"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://www.orbeon.com/" name="xml-to-url">
+    <types>
+        <xs:schema elementFormDefault="qualified" targetNamespace="http://www.orbeon.com/">
+            <xs:element name="xml" type="xs:string"/>
+            <xs:element name="urls">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="error"/>
+                        <xs:element name="original-url"/>
+                        <xs:element name="tiny-url"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+    </types>
+    <message name="xml">
+		<part name="xml" element="orbeon:xml"/>
+	</message>
+    <message name="urls">
+		<part name="login" element="orbeon:urls"/>
+	</message>
+	<portType name="orbeonPortType">
+		<operation name="xmlToUrl">
+			<input message="orbeon:xml"/>
+			<output message="orbeon:urls"/>
+		</operation>
+	</portType>
+	<binding name="orbeonBinding" type="orbeon:orbeonPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+		<operation name="xmlToUrl">
+			<soap:operation/>
+			<input>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:orbeon.com"/>
+			</input>
+			<output>
+				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:orbeon.com"/>
+			</output>
+		</operation>
+	</binding>
+	<service name="orbeonService">
+		<port name="orbeonPort" binding="orbeon:orbeonBinding">
+			<soap:address location="http://www.orbeon.com/ops/direct/xml-to-url/url"/>
+		</port>
+	</service>
+</definitions>

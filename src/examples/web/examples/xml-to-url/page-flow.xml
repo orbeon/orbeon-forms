@@ -15,8 +15,10 @@
         xmlns:xu="http://www.xmldb.org/xupdate">
 
     <page path-info="/direct/xml-to-url/doc" model="url-to-xml.xpl"/>
+    <page path-info="/direct/xml-to-url/url" model="xml-to-url.xpl"/>
+    <page path-info="/direct/xml-to-url/request" view="soap-request.xml"/>
 
-    <page path-info="*" xforms="xforms-model.xml" model="model.xpl" view="view.xsl"/>
+    <page path-info="*" view="view.xhtml"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

@@ -44,7 +44,7 @@
         </xsl:copy>
     </xsl:template>
     
-    <xsl:template match="xforms:*" priority="2" mode="controls">
+    <xsl:template match="xforms:*|xxforms:*" priority="2" mode="controls">
         <xsl:copy>
             <xsl:copy-of select="@*"/>
             <xsl:apply-templates mode="#current"/>

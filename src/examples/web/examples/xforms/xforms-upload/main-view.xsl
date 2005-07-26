@@ -13,13 +13,34 @@
 -->
 <html xmlns:f="http://orbeon.org/oxf/xml/formatting"
             xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xf="http://www.w3.org/2002/xforms"
-            xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+            xmlns:xforms="http://www.w3.org/2002/xforms"
+            xmlns:ev="http://www.w3.org/2001/xml-events"
+            xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
             xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xmlns="http://www.w3.org/1999/xhtml"
             xsl:version="2.0">
-    <head><title>XForms Upload</title></head>
+    <head>
+        <title>XForms Upload</title>
+        <xforms:model>
+            <xforms:instance>
+                <form xmlns="">
+                    <action/>
+                    <!-- Using xs:anyURI will cause the XForms engine to store a reference to
+                         a URI instead of inlinig the content of the file -->
+                    <files>
+                        <file filename="" mediatype="" size=""/>
+                        <file filename="" mediatype="" size=""/>
+                        <file filename="" mediatype="" size=""/>
+                    </files>
+                </form>
+            </xforms:instance>
+            <xforms:bind nodeset="/form/files/file" type="xs:anyURI"/>
+<!--            <xforms:submission method="post" encoding="multipart/form-data"/>-->
+            <xforms:submission id="main" method="post" replace="all" action="/xforms-upload"/>
+        </xforms:model>
+    </head>
     <body>
         <xsl:variable name="uploaded" select="/result/urls/url != ''" as="xs:boolean"/>
         <xsl:variable name="in-portlet" select="/result/request/container-type = 'portlet'" as="xs:boolean"/>
@@ -28,38 +49,52 @@
                 <xsl:value-of select="/result/message"/>
             </p>
         </xsl:if>
-        <xf:group ref="/form">
+        <xforms:group ref="/form">
             <table>
                 <tr>
-                    <td rowspan="3">
-                        <xsl:text>Please select up to three</xsl:text>
+                    <td>
+                        <xsl:text>Please select up to </xsl:text>
+                        <xforms:output value="count(files/file)"/>
                         <xsl:if test="$uploaded"> other</xsl:if>
                         <xsl:text> JPEG images to upload:</xsl:text>
                     </td>
+                </tr>
+<!--                <xforms:repeat nodeset="files/file">-->
+<!--                    <tr>-->
+<!--                        <td>-->
+<!--                            <xforms:upload ref=".">-->
+<!--                                <xforms:filename ref="@filename"/>-->
+<!--                                <xforms:mediatype ref="@mediatype"/>-->
+<!--                                <xxforms:size ref="@size"/>-->
+<!--                            </xforms:upload>-->
+<!--                        </td>-->
+<!--                    </tr>-->
+<!--                </xforms:repeat>-->
+                <tr>
                     <td>
-                        <xf:upload ref="files/file[1]">
-                            <xf:filename ref="@filename"/>
-                            <xf:mediatype ref="@mediatype"/>
-                            <xxf:size ref="@size"/>
-                        </xf:upload>
+                        <xforms:upload ref="files/file[1]">
+                            <xforms:filename ref="@filename"/>
+                            <xforms:mediatype ref="@mediatype"/>
+                            <xxforms:size ref="@size"/>
+                        </xforms:upload>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <xf:upload ref="files/file[2]">
-                            <xf:filename ref="@filename"/>
-                            <xf:mediatype ref="@mediatype"/>
-                            <xxf:size ref="@size"/>
-                        </xf:upload>
+                        <xforms:upload ref="files/file[2]">
+                            <xforms:filename ref="@filename"/>
+                            <xforms:mediatype ref="@mediatype"/>
+                            <xxforms:size ref="@size"/>
+                        </xforms:upload>
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <xf:upload ref="files/file[3]">
-                            <xf:filename ref="@filename"/>
-                            <xf:mediatype ref="@mediatype"/>
-                            <xxf:size ref="@size"/>
-                        </xf:upload>
+                        <xforms:upload ref="files/file[3]">
+                            <xforms:filename ref="@filename"/>
+                            <xforms:mediatype ref="@mediatype"/>
+                            <xxforms:size ref="@size"/>
+                        </xforms:upload>
                     </td>
                 </tr>
             </table>
@@ -70,23 +105,29 @@
                     </th>
                     <td>
 
-                        <xf:submit>
+                        <xforms:trigger>
                             <xsl:if test="$in-portlet">
-                                <xsl:attribute name="disabled">true</xsl:attribute>
+                                <xsl:attribute name="xhtml:disabled">true</xsl:attribute>
                             </xsl:if>
-                            <xf:label>Upload</xf:label>
-                            <xf:setvalue ref="action">simple-upload</xf:setvalue>
-                        </xf:submit>
+                            <xforms:label>Upload</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="action">simple-upload</xforms:setvalue>
+                                <xforms:send submission="main"/>
+                            </xforms:action>
+                        </xforms:trigger>
                     </td>
                     <td>
                         This works only outside of the portal.
                         <xsl:choose>
                             <xsl:when test="$in-portlet">
                                 Click
-                                <xf:submit xxf:appearance="link">
-                                    <xf:label>here</xf:label>
-                                    <xf:setvalue ref="action">goto-simple-upload</xf:setvalue>
-                                </xf:submit>
+                                <xforms:trigger xxforms:appearance="link">
+                                    <xforms:label>here</xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:setvalue ref="action">goto-simple-upload</xforms:setvalue>
+                                        <xforms:send submission="main"/>
+                                    </xforms:action>
+                                </xforms:trigger>
                                 to try.
                             </xsl:when>
                             <xsl:otherwise>
@@ -100,10 +141,13 @@
                         Database file upload
                     </th>
                     <td>
-                        <xf:submit>
-                            <xf:label>Upload</xf:label>
-                            <xf:setvalue ref="action">db-upload</xf:setvalue>
-                        </xf:submit>
+                        <xforms:trigger>
+                            <xforms:label>Upload</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="action">db-upload</xforms:setvalue>
+                                <xforms:send submission="main"/>
+                            </xforms:action>
+                        </xforms:trigger>
                     </td>
                     <td>
                         This uses the internal SQL database. The uploaded images must be smaller
@@ -115,29 +159,38 @@
                         Web Service file upload
                     </th>
                     <td>
-                        <xf:submit>
-                            <xf:label>Upload</xf:label>
-                            <xf:setvalue ref="action">ws-upload</xf:setvalue>
-                        </xf:submit>
+                        <xforms:trigger>
+                            <xforms:label>Upload</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="action">ws-upload</xforms:setvalue>
+                                <xforms:send submission="main"/>
+                            </xforms:action>
+                        </xforms:trigger>
                     </td>
                     <td>
                         The uploaded images must be smaller than 150K.
                     </td>
                 </tr>
             </table>
-            <p>
-            </p>
-            <!-- Display uploaded images (when uploaded with Web Service) -->
             <xsl:if test="$uploaded">
+                <h2>Submitted XForms Instance</h2>
+                <f:box>
+                    <f:xml-source>
+                        <xsl:copy-of select="doc('input:instance')"/>
+                    </f:xml-source>
+                </f:box>
+                <!-- Display uploaded images (when uploaded to Web Service or database) -->
+                <h2>Uploaded Images</h2>
                 <xsl:for-each select="/result/urls/url">
+                    <xsl:variable name="position" select="position()"/>
                     <xsl:if test=". != ''">
-                        <p>Uploaded image (<xf:output ref="files/file[{position()}]/@size"/> bytes):</p>
+                        <p>Uploaded image (<xsl:value-of select="doc('input:instance')/form/files/file[$position]/@size"/> bytes):</p>
                         <p>
                             <img src="{.}"/>
                         </p>
                     </xsl:if>
                 </xsl:for-each>
             </xsl:if>
-        </xf:group>
+        </xforms:group>
     </body>
 </html>

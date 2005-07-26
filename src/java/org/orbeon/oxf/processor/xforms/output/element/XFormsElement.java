@@ -108,10 +108,9 @@ public class XFormsElement {
                 {
                     final InstanceData currentNodeInstanceData = XFormsUtils.getInheritedInstanceData(context.getCurrentSingleNode());
                     if (currentNodeInstanceData != null) { // will be null for /
-                        final int typeCode = currentNodeInstanceData.getType().get();
-                        if (typeCode != 0)
-                            addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME,
-                                    StandardNames.getPrefix(typeCode) + ":" + StandardNames.getLocalName(typeCode));
+                        final String typeAsString = currentNodeInstanceData.getType().getAsString();
+                        if (typeAsString != null)
+                            addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME, typeAsString);
                         addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_READONLY_ATTRIBUTE_NAME,
                                 Boolean.toString(currentNodeInstanceData.getReadonly().get()));
                         addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_RELEVANT_ATTRIBUTE_NAME,

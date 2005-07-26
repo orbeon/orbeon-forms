@@ -43,7 +43,7 @@
             </p>
         </section>
         <section>
-            <title>Known Limitations of OPS 3.0 BETA</title>
+            <title>Known Limitations of OPS 3.0 BETA+</title>
             <p>
                 The following limitations are known:
             </p>
@@ -51,13 +51,6 @@
                 <li>
                     <p>
                         Initial generation of an XForms page may have poor performance.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <code>xforms:upload</code> is not yet implemented in the OPS 3.0 XForms
-                        engine. <code>xforms:upload</code> remains implemented when the legacy OPS
-                        2.8 compatibility mode is enabled.
                     </p>
                 </li>
                 <li>
@@ -119,6 +112,22 @@
                 <li>
                     <p>
                         The PDF version of the User Guide does not have page numbers.
+                    </p>
+                </li>
+            </ul>
+        </section>
+        <section>
+            <title>Known Limitations of OPS 3.0</title>
+            <p>
+                The following limitations are known:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        XForms upload controls only work within forms that are submitted with a
+                        reference to a submission element with <code>replace="all"</code>. The value
+                        of XForms upload controls is ignored when forms are submitted with
+                        <code>replace="instance"</code> or <code>replace="none"</code>.
                     </p>
                 </li>
             </ul>

@@ -24,12 +24,9 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsLinkErrorEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
-import org.orbeon.oxf.xforms.event.events.XFormsRecalculateEvent;
-import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
-import org.orbeon.saxon.style.StandardNames;
 import org.xml.sax.Locator;
 
 import java.io.IOException;
@@ -531,6 +528,8 @@ public class XFormsControls {
                         controlInfo = new SubmitControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else if (controlName.equals("output")) {
                         controlInfo = new OutputControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
+                    } else if (controlName.equals("upload")) {
+                        controlInfo = new UploadControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else {
                         controlInfo = new ControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     }
@@ -571,9 +570,9 @@ public class XFormsControls {
                         controlInfo.setRequired(instanceData.getRequired().get());
                         controlInfo.setRelevant(instanceData.getRelevant().get());
                         controlInfo.setValid(instanceData.getValid().get());
-                        final int typeCode = instanceData.getType().get();
-                        if (typeCode != 0) {
-                            controlInfo.setType(StandardNames.getPrefix(typeCode) + ":" + StandardNames.getLocalName(typeCode));
+                        final String typeAsString = instanceData.getType().getAsString();
+                        if (typeAsString != null) {
+                            controlInfo.setType(typeAsString);
                         }
                     }
 
@@ -1622,6 +1621,35 @@ public class XFormsControls {
 
                 super.setValue(value);
             }
+        }
+    }
+
+    /**
+     * Represents an xforms:upload control.
+     */
+    public class UploadControlInfo extends ControlInfo {
+
+        private Element mediatypeElement;
+        private Element filenameElement;
+        private Element sizeElement;
+
+        public UploadControlInfo(ControlInfo parent, Element element, String name, String id) {
+            super(parent, element, name, id);
+            mediatypeElement = element.element(XFormsConstants.XFORMS_MEDIATYPE_ELEMENT_QNAME);
+            filenameElement = element.element(XFormsConstants.XFORMS_FILENAME_ELEMENT_QNAME);
+            sizeElement = element.element(XFormsConstants.XXFORMS_SIZE_ELEMENT_QNAME);
+        }
+
+        public Element getMediatypeElement() {
+            return mediatypeElement;
+        }
+
+        public Element getFilenameElement() {
+            return filenameElement;
+        }
+
+        public Element getSizeElement() {
+            return sizeElement;
         }
     }
 

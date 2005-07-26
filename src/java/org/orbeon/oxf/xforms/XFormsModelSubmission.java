@@ -26,7 +26,10 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.XFormsRevalidateEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitDoneEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitErrorEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsSubmissionEvent;
+import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
@@ -136,6 +139,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // 11.1 The xforms-submit Event
             // Bubbles: Yes / Cancelable: Yes / Context Info: None
 
+            final boolean isDeferredSubmission = replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL);
+            final boolean isDeferredSubmissionFirstPass = isDeferredSubmission && XFormsEvents.XFORMS_SUBMIT.equals(eventName);
+            final boolean isDeferredSubmissionSecondPass = isDeferredSubmission && !XFormsEvents.XFORMS_SUBMIT.equals(eventName);
+
             try {
                 // Make sure submission element info is extracted
                 extractSubmissionElement();
@@ -156,51 +163,96 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // TODO: we should only revalidate relevant parts
                 containingDocument.dispatchEvent(pipelineContext,  new XFormsRevalidateEvent(model, false));
 
-                final Document documentToSubmit;
-                {
-                    if (currentNode instanceof Element) {
-                        // Create subset of document
-                        documentToSubmit = Dom4jUtils.createDocument((Element) currentNode);
-                    } else {
-                        // Use entire instance document
-                        documentToSubmit = currentInstance.getDocument();
+                final Document initialDocumentToSubmit;
+                if (!isDeferredSubmissionSecondPass) {
+                    // Create document to submit
+                    initialDocumentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
+
+                    // Check that there are no validation errors
+                    final boolean instanceValid = isDocumentValid(initialDocumentToSubmit);
+                    if (!instanceValid) {
+                        LocationSAXContentHandler ch = new LocationSAXContentHandler();
+                        currentInstance.read(ch);
+                        System.out.println(Dom4jUtils.domToString(ch.getDocument()));
+                        throw new OXFException("xforms:submission: instance is not valid.");
                     }
-                    // TODO: handle includenamespaceprefixes + handle non-relevant nodes
-                }
-
-                // Check that there are no validation errors
-                final boolean[] instanceValid = new boolean[] { true } ;
-                documentToSubmit.accept(new VisitorSupport() {
-
-                    public void visit(Element element) {
-                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
-                        checkInstanceData(instanceData);
-                    }
-
-                    public void visit(Attribute attribute) {
-                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(attribute);
-                        checkInstanceData(instanceData);
-                    }
-
-                    private void checkInstanceData(InstanceData instanceData) {
-                        final org.orbeon.oxf.xforms.mip.BooleanModelItemProperty validMIP = instanceData.getValid();
-                        if (validMIP != null)
-                            instanceValid[0] &= validMIP.get();
-                    }
-                });
-
-                if (!instanceValid[0]) {
-                    LocationSAXContentHandler ch = new LocationSAXContentHandler();
-                    currentInstance.read(ch);
-                    System.out.println(Dom4jUtils.domToString(ch.getDocument()));
-                    throw new OXFException("xforms:submission: instance is not valid.");
+                } else {
+                    initialDocumentToSubmit = null;
                 }
 
                 // Deferred submission
-                // NOTE: When replace="all", we don't actually do the submission here when we are called from the XForms Server
-                if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL) && XFormsEvents.XFORMS_SUBMIT.equals(eventName)) {
+                if (isDeferredSubmissionFirstPass) {
+                    // When replace="all", we wait for the submission of an XXFormsSubmissionEvent from the client
                     containingDocument.setActiveSubmission(this);
                     return;
+                }
+
+                // Handle uploaded files if any
+                final Element filesElement = ((XXFormsSubmissionEvent) event).getFilesElement();
+                if (filesElement != null) {
+                    for (Iterator i = filesElement.elements().iterator(); i.hasNext();) {
+                        final Element parameterElement = (Element) i.next();
+                        final String name = parameterElement.element("name").getTextTrim();
+
+                        final Element valueElement = parameterElement.element("value");
+                        final String value = valueElement.getTextTrim();
+                        final String paramValueType = valueElement.attributeValue(XMLConstants.XSI_TYPE_QNAME);//TODO: get actual QName for attribute value
+
+                        final String filename = parameterElement.element("filename").getTextTrim();
+                        final String mediatype = parameterElement.element("content-type").getTextTrim();
+                        final String size = parameterElement.element("content-length").getTextTrim();
+
+                        final XFormsControls.UploadControlInfo uploadControl
+                                = (XFormsControls.UploadControlInfo) containingDocument.getObjectById(pipelineContext, name);
+
+                        // Set value into the instance
+                        xformsControls.setBinding(pipelineContext, uploadControl);
+                        {
+                            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+                            XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, value, paramValueType);
+                        }
+
+                        // Handle filename if any
+                        if (uploadControl.getFilenameElement() != null) {
+                            xformsControls.pushBinding(pipelineContext, uploadControl.getFilenameElement());
+                            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+                            XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, filename, null);
+                            xformsControls.popBinding();
+                        }
+
+                        // Handle mediatype if any
+                        if (uploadControl.getMediatypeElement() != null) {
+                            xformsControls.pushBinding(pipelineContext, uploadControl.getMediatypeElement());
+                            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+                            XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, mediatype, null);
+                            xformsControls.popBinding();
+                        }
+                        
+                        // Handle file size if any
+                        if (uploadControl.getSizeElement() != null) {
+                            xformsControls.pushBinding(pipelineContext, uploadControl.getSizeElement());
+                            final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+                            XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, size, null);
+                            xformsControls.popBinding();
+                        }
+                    }
+                }
+
+                final Document documentToSubmit;
+                if (isDeferredSubmissionSecondPass) {
+                    // Create document to submit
+                    documentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
+
+                    // Check that there are no validation errors
+                    final boolean instanceValid = isDocumentValid(documentToSubmit);
+                    if (!instanceValid) {
+                        LocationSAXContentHandler ch = new LocationSAXContentHandler();
+                        currentInstance.read(ch);
+                        System.out.println(Dom4jUtils.domToString(ch.getDocument()));
+                        throw new OXFException("xforms:submission: instance is not valid.");
+                    }
+                } else {
+                    documentToSubmit = initialDocumentToSubmit;
                 }
 
                 // Serialize
@@ -536,6 +588,42 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             }
 
         }
+    }
+
+    private Document createDocumentToSubmit(final Node currentNode, final XFormsInstance currentInstance) {
+        Document documentToSubmit;
+        if (currentNode instanceof Element) {
+            // Create subset of document
+            documentToSubmit = Dom4jUtils.createDocument((Element) currentNode);
+        } else {
+            // Use entire instance document
+            documentToSubmit = currentInstance.getDocument();
+        }
+        // TODO: handle includenamespaceprefixes + handle non-relevant nodes
+        return documentToSubmit;
+    }
+
+    private boolean isDocumentValid(final Document documentToSubmit) {
+        final boolean[] instanceValid = new boolean[] { true } ;
+        documentToSubmit.accept(new VisitorSupport() {
+
+            public void visit(Element element) {
+                final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
+                checkInstanceData(instanceData);
+            }
+
+            public void visit(Attribute attribute) {
+                final InstanceData instanceData = XFormsUtils.getLocalInstanceData(attribute);
+                checkInstanceData(instanceData);
+            }
+
+            private void checkInstanceData(InstanceData instanceData) {
+                final BooleanModelItemProperty validMIP = instanceData.getValid();
+                if (validMIP != null)
+                    instanceValid[0] &= validMIP.get();
+            }
+        });
+        return instanceValid[0];
     }
 }
 

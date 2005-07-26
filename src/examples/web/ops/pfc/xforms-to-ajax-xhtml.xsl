@@ -43,6 +43,9 @@
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
             <xhtml:form id="xforms-form" class="xforms-form" action="/xforms-server-submit" method="POST">
+                <xsl:if test="descendant::xforms:upload">
+                    <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
+                </xsl:if>
                 <!-- Store private information used by the client-side JavaScript -->
                 <xhtml:input type="hidden" name="$static-state" value="{$request/xxforms:static-state}"/>
                 <xhtml:input type="hidden" name="$dynamic-state" value="{$response/xxforms:dynamic-state}"/>
@@ -78,7 +81,7 @@
     <!-- Add classes to control elements reflecting model item properties -->
     <xsl:template match="xforms:output | xforms:input
             | xforms:secret | xforms:textarea | xforms:select | xforms:select1
-            | xforms:range | xforms:trigger | xforms:submit" priority="3">
+            | xforms:range | xforms:trigger | xforms:submit | xforms:upload" priority="3">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
@@ -106,7 +109,7 @@
 
     <xsl:template match="xforms:output | xforms:input
             | xforms:secret | xforms:textarea | xforms:select | xforms:select1 
-            | xforms:range" priority="2">
+            | xforms:range | xforms:upload" priority="2">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
@@ -195,6 +198,28 @@
             </xsl:when>
             <xsl:otherwise>
                 <xhtml:input type="text" name="{$id}" value="{xxforms:control($id)}">
+                    <xsl:if test="xxforms:control($id)/@readonly = 'true'">
+                        <xsl:attribute name="disabled">disabled</xsl:attribute>
+                    </xsl:if>
+                    <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
+                </xhtml:input>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xsl:template match="xforms:upload">
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
+
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xsl:choose>
+            <xsl:when test="$generate-template">
+                <xhtml:input type="file" name="{$id}">
+                    <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
+                </xhtml:input>
+            </xsl:when>
+            <xsl:otherwise>
+                <xhtml:input type="file" name="{$id}" value="{xxforms:control($id)}">
                     <xsl:if test="xxforms:control($id)/@readonly = 'true'">
                         <xsl:attribute name="disabled">disabled</xsl:attribute>
                     </xsl:if>

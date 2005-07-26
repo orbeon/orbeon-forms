@@ -36,18 +36,18 @@ public class SetValue implements Action {
         content = (String) parameters.get("content");
     }
 
-    public void run(PipelineContext context, FunctionContext functionContext, String encryptionPassword, Document instance) {
+    public void run(PipelineContext pipelineContext, FunctionContext functionContext, String encryptionPassword, Document instance) {
 
         // Fill the instance
         String[] ids = nodeset.split(" ");
         try {
             String id = ids[0];
             if (XFormsUtils.isNameEncryptionEnabled())
-                id = SecureUtils.decrypt(context, encryptionPassword, id);
+                id = SecureUtils.decrypt(pipelineContext, encryptionPassword, id);
             Integer idInteger = new Integer(Integer.parseInt(id));
             Node node = (Node) ((InstanceData) instance.getRootElement().getData()).getIdToNodeMap().get(idInteger);
             String newValue = value != null ? value : content == null ? "" : content;
-            XFormsUtils.fillNode(node, newValue);
+            XFormsUtils.fillNode(pipelineContext, node, newValue, null);
         } catch (NumberFormatException e) {
             throw new OXFException("Invalid node-id in setvalue action", e);
         }

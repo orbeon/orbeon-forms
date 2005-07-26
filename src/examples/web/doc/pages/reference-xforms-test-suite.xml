@@ -84,9 +84,9 @@
                 <tr>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-attrs-link">3.2.2 Linking Attributes</a></td>
                     <td>
-                        No support for external instances at the moment.
+                        For a2, we just throw a Java exception. Should we throw an XML event instead? 
                     </td>
-                    &fail;
+                    &pass;
                 </tr>
                 <tr>
                     <td><a href="http://www.w3.org/TR/xforms/slice3.html#structure-attrs-single-node">3.2.3 Single-Node Binding Attributes</a></td>

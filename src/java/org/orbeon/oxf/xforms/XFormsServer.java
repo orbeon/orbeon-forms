@@ -96,9 +96,12 @@ public class XFormsServer extends ProcessorImpl {
         // Get action
         final Element actionElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_ACTION_QNAME);
 
+        // Get files if any
+        final Element filesElement = requestDocument.getRootElement().element(XFormsConstants.XXFORMS_FILES_QNAME);
+
         // Create and initialize XForms engine from encoded data
         XFormsContainingDocument containingDocument
-                = createXFormsEngine(pipelineContext, staticStateString, dynamicStateString);
+                = createXFormsEngine(pipelineContext, staticStateString, dynamicStateString, filesElement);
 
         // Run event if any
         boolean isInitializationRun = true;
@@ -114,7 +117,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (sourceControlId != null && eventName != null) {
                         // An event is passed
-                        containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value);
+                        containingDocument.executeExternalEvent(pipelineContext, eventName, sourceControlId, otherControlId, value, null);
                         isInitializationRun = false;
                     } else if (!(sourceControlId == null && eventName == null)) {
                         throw new OXFException("<event> element must either have source-control-id and name attributes, or no attribute.");
@@ -621,8 +624,8 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    public static XFormsContainingDocument createXFormsEngine(PipelineContext pipelineContext, String staticStateString,
-                                                              String dynamicStateString) {
+    private static XFormsContainingDocument createXFormsEngine(PipelineContext pipelineContext, String staticStateString,
+                                                              String dynamicStateString, Element filesElement) {
 
         final Document staticStateDocument = XFormsUtils.decodeXML(pipelineContext, staticStateString);
         final Document dynamicStateDocument = (dynamicStateString == null || "".equals(dynamicStateString)) ? null : XFormsUtils.decodeXML(pipelineContext, dynamicStateString);
@@ -721,7 +724,8 @@ public class XFormsServer extends ProcessorImpl {
         if (eventElement != null) {
             final String controlId = eventElement.attributeValue("source-control-id");
             final String eventName = eventElement.attributeValue("name");
-            containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, null, null);
+
+            containingDocument.executeExternalEvent(pipelineContext, eventName, controlId, null, null, filesElement);
         }
 
         return containingDocument;

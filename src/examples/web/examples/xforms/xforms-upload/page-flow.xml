@@ -17,7 +17,6 @@
 
     <page id="main"
           path-info="/xforms-upload"
-          xforms="main-xforms-model.xml"
           model="main-model.xpl"
           view="main-view.xsl">
         <action when="/form/action = 'ws-upload' and /form/files/file != ''" action="do-ws-upload.xpl"/>

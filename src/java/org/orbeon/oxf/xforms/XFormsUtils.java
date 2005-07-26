@@ -25,9 +25,11 @@ import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
+import org.orbeon.oxf.processor.ProcessorUtils;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -44,6 +46,7 @@ import java.util.zip.GZIPOutputStream;
 public class XFormsUtils {
 
     private static final int BUFFER_SIZE = 1024;
+    public static final String DEFAULT_UPLOAD_TYPE = "xs:anyURI";
 
     /**
      * Adds to <code>target</code> all the attributes in <code>source</code>
@@ -60,15 +63,32 @@ public class XFormsUtils {
         }
     }
 
-    public static void fillNode(Node node, String value) {
+    public static void fillNode(PipelineContext pipelineContext, Node node, String value, String type) {
+
+        // Convert value based on types if possible
+        if (type != null) {
+            final InstanceData instanceData = getInheritedInstanceData(node);
+            final String nodeType = instanceData.getType().getAsString();
+
+            if (nodeType != null && !nodeType.equals(type)) { // FIXME: prefixes of type name could be different!
+                // There is a different type already, do a conversion
+                value = convertUploadTypes(pipelineContext, value, type, nodeType);
+            } else if (nodeType == null) {
+                // There is no type, convert to default type
+                if (!DEFAULT_UPLOAD_TYPE.equals(type)) // FIXME: prefixes of type name could be different!
+                    value = convertUploadTypes(pipelineContext, value, type, DEFAULT_UPLOAD_TYPE);
+            }
+        }
+
+        // Set value
         if (node instanceof Element) {
-            Element elementnode = (Element) node;
+            final Element elementnode = (Element) node;
             // Remove current content
             Dom4jUtils.clearElementContent(elementnode);
             // Put text node with value
             elementnode.add(Dom4jUtils.createText(value));
         } else if (node instanceof Attribute) {
-            Attribute attributenode = (Attribute) node;
+            final Attribute attributenode = (Attribute) node;
             attributenode.setValue(value);
         }
     }
@@ -371,6 +391,23 @@ public class XFormsUtils {
         } finally {
             if (reader != null)
                 reader.close();
+        }
+    }
+
+    public static String convertUploadTypes(PipelineContext pipelineContext, String value, String currentType, String newType) {
+        if (currentType.equals(newType))
+            return value;
+        if (ProcessorUtils.supportedBinaryTypes.get(currentType) == null)
+            throw new UnsupportedOperationException("Unsupported type: " + currentType);
+        if (ProcessorUtils.supportedBinaryTypes.get(newType) == null)
+            throw new UnsupportedOperationException("Unsupported type: " + newType);
+
+        if (currentType.equals(XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName())) {
+            // Convert from xs:base64Binary to xs:anyURI
+            return XMLUtils.base64BinaryToAnyURI(pipelineContext, value);
+        } else {
+            // Convert from xs:anyURI to xs:base64Binary
+            return XMLUtils.anyURIToBase64Binary(value);
         }
     }
 

@@ -37,6 +37,12 @@
                 <xxforms:dynamic-state>
                     <xsl:value-of select="/*/parameters/parameter[name = '$dynamic-state']/value"/>
                 </xxforms:dynamic-state>
+                <xsl:variable name="files" select="/*/parameters/parameter[filename]"/>
+                <xsl:if test="$files">
+                    <xxforms:files>
+                        <xsl:copy-of select="$files"/>
+                    </xxforms:files>
+                </xsl:if>
                 <xxforms:action/>
             </xxforms:event-request>
         </p:input>

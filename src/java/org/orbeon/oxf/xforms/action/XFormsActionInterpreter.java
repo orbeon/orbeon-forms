@@ -84,7 +84,7 @@ public class XFormsActionInterpreter {
 
             // Set value on current node
             final Node currentNode = xformsControls.getCurrentSingleNode();
-            XFormsInstance.setValueForNode(currentNode, valueToSet);
+            XFormsInstance.setValueForNode(pipelineContext, currentNode, valueToSet);
 
             if (actionContext != null) {
                 // "XForms Actions that change only the value of an instance node results in setting

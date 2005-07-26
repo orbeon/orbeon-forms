@@ -16,13 +16,22 @@ package org.orbeon.oxf.xforms.event.events;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.XFormsEvents;
+import org.dom4j.Element;
 
 
 /**
  * Internal XXFORMS_SUBMIT event.
  */
 public class XXFormsSubmissionEvent extends XFormsEvent {
-    public XXFormsSubmissionEvent(XFormsEventTarget targetObject) {
+
+    private Element filesElement;
+
+    public XXFormsSubmissionEvent(XFormsEventTarget targetObject, Element filesElement) {
         super(XFormsEvents.XXFORMS_SUBMIT, targetObject, false, false);
+        this.filesElement= filesElement;
+    }
+
+    public Element getFilesElement() {
+        return filesElement;
     }
 }

@@ -13,6 +13,8 @@
  */
 package org.orbeon.oxf.xforms.mip;
 
+import org.orbeon.saxon.style.StandardNames;
+
 public class TypeModelItemProperty implements Cloneable {
 
     private boolean isSet = false;
@@ -32,6 +34,11 @@ public class TypeModelItemProperty implements Cloneable {
 
     public boolean isSet() {
         return isSet;
+    }
+
+    public String getAsString() {
+        final int typeCode = get();
+        return (typeCode != 0) ? (StandardNames.getPrefix(typeCode) + ":" + StandardNames.getLocalName(typeCode)) : null;
     }
 
     public Object clone() throws CloneNotSupportedException {

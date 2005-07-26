@@ -43,6 +43,13 @@ public class XFormsConstants {
     public static final QName XML_EVENTS_PROPAGATE_ATTRIBUTE_QNAME = new QName("propagate", XFormsConstants.XML_EVENTS_NAMESPACE);
     public static final QName XML_EVENTS_DEFAULT_ACTION_ATTRIBUTE_QNAME = new QName("defaultAction", XFormsConstants.XML_EVENTS_NAMESPACE);
 
+    public static final String XFORMS_FILENAME_ELEMENT_NAME = "filename";
+    public static final QName XFORMS_FILENAME_ELEMENT_QNAME = new QName(XFORMS_FILENAME_ELEMENT_NAME, XFORMS_NAMESPACE);
+    public static final String XFORMS_MEDIATYPE_ELEMENT_NAME = "mediatype";
+    public static final QName XFORMS_MEDIATYPE_ELEMENT_QNAME = new QName(XFORMS_MEDIATYPE_ELEMENT_NAME, XFORMS_NAMESPACE);
+    public static final String XXFORMS_SIZE_ELEMENT_NAME = "size";
+    public static final QName XXFORMS_SIZE_ELEMENT_QNAME = new QName(XXFORMS_SIZE_ELEMENT_NAME, XXFORMS_NAMESPACE);
+
     public static final String XXFORMS_VALID_ATTRIBUTE_NAME = "valid";
     public static final QName XXFORMS_VALID_ATTRIBUTE_QNAME = new QName(XXFORMS_VALID_ATTRIBUTE_NAME, XXFORMS_NAMESPACE);
     public static final String XXFORMS_INVALID_BIND_IDS_ATTRIBUTE_NAME = "invalid-bind-ids";
@@ -61,6 +68,7 @@ public class XFormsConstants {
     public static final QName XXFORMS_STATIC_STATE_QNAME = new QName("static-state", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_DYNAMIC_STATE_QNAME = new QName("dynamic-state", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_ACTION_QNAME = new QName("action", XFormsConstants.XXFORMS_NAMESPACE);
+    public static final QName XXFORMS_FILES_QNAME = new QName("files", XFormsConstants.XXFORMS_NAMESPACE);
 
     public static final QName XXFORMS_CONTROLS_QNAME = new QName("controls", XFormsConstants.XXFORMS_NAMESPACE);
     public static final QName XXFORMS_MODELS_QNAME = new QName("models", XFormsConstants.XXFORMS_NAMESPACE);

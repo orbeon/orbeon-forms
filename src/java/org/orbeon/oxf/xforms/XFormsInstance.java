@@ -20,14 +20,12 @@ import org.dom4j.Node;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorUtils;
 import org.orbeon.oxf.processor.scope.ScopeStore;
 import org.orbeon.oxf.xforms.event.XFormsEvent;
 import org.orbeon.oxf.xforms.event.XFormsEventHandlerContainer;
 import org.orbeon.oxf.xforms.event.XFormsEventTarget;
-import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.TransformerUtils;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -45,7 +43,6 @@ import java.util.Map;
 public class XFormsInstance implements XFormsEventTarget {
 
     public static final String REQUEST_INSTANCE_DOCUMENT = "org.orbeon.oxf.request.xforms-instance-document";
-    public static final String DEFAULT_UPLOAD_TYPE = "xs:anyURI";
 
     private PipelineContext pipelineContext;
     private String id;
@@ -82,6 +79,8 @@ public class XFormsInstance implements XFormsEventTarget {
      *
      * If a type is specified, it means that the Request generator set it, which, for now, means
      * that it was a file upload.
+     *
+     * @deprecated legacy XForms engine
      */
     public void setValueForId(int id, String value, String type) {
         InstanceData rootInstanceData = XFormsUtils.getLocalInstanceData(instanceDocument.getRootElement());
@@ -99,8 +98,19 @@ public class XFormsInstance implements XFormsEventTarget {
      * @param currentNode
      * @param valueToSet
      */
-    public static void setValueForNode(Node currentNode, String valueToSet) {
-        XFormsUtils.fillNode(currentNode, valueToSet);
+    public static void setValueForNode(PipelineContext pipelineContext, Node currentNode, String valueToSet) {
+        XFormsUtils.fillNode(pipelineContext, currentNode, valueToSet, null);
+    }
+
+    /**
+     * Set a value on the instance using a node and a value.
+     *
+     * @param currentNode
+     * @param valueToSet
+     * @param type          type of the value to set (xs:anyURI or xs:base64Binary)
+     */
+    public static void setValueForNode(PipelineContext pipelineContext, Node currentNode, String valueToSet, String type) {
+        XFormsUtils.fillNode(pipelineContext, currentNode, valueToSet, type);
     }
 
     public static String getValueForNode(Node currentNode) {
@@ -122,6 +132,8 @@ public class XFormsInstance implements XFormsEventTarget {
      * @param refXPath
      * @param prefixToURIMap
      * @param value
+     *
+     * @deprecated legacy XForms engine
      */
     public void setValueForParam(PipelineContext pipelineContext, String refXPath, Map prefixToURIMap, String value) {
 
@@ -172,7 +184,7 @@ public class XFormsInstance implements XFormsEventTarget {
             String currentType = attribute.getParent().attributeValue(XMLConstants.XSI_TYPE_QNAME);
             if (currentType != null && !currentType.equals(value)) { // FIXME: prefixes of type name could be different!
                 // Convert element value
-                String newValue = convertUploadTypes(attribute.getParent().getText(), currentType, value);
+                String newValue = XFormsUtils.convertUploadTypes(pipelineContext, attribute.getParent().getText(), currentType, value);
                 attribute.getParent().clearContent();
                 attribute.getParent().addText(newValue);
             }
@@ -188,13 +200,13 @@ public class XFormsInstance implements XFormsEventTarget {
             String currentType = element.attributeValue(XMLConstants.XSI_TYPE_QNAME);
             if (currentType != null && !currentType.equals(type)) { // FIXME: prefixes of type name could be different!
                 // There is a different type already, do a conversion
-                value = convertUploadTypes(value, type, currentType);
+                value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, currentType);
                 Dom4jUtils.clearElementContent(element);
             } else if (currentType == null) {
                 // There is no type, convert to default type
-                if (!DEFAULT_UPLOAD_TYPE.equals(type)) // FIXME: prefixes of type name could be different!
-                    value = convertUploadTypes(value, type, DEFAULT_UPLOAD_TYPE);
-                element.add(Dom4jUtils.createAttribute(element, XMLConstants.XSI_TYPE_QNAME, DEFAULT_UPLOAD_TYPE));
+                if (!XFormsUtils.DEFAULT_UPLOAD_TYPE.equals(type)) // FIXME: prefixes of type name could be different!
+                    value = XFormsUtils.convertUploadTypes(pipelineContext, value, type, XFormsUtils.DEFAULT_UPLOAD_TYPE);
+                element.add(Dom4jUtils.createAttribute(element, XMLConstants.XSI_TYPE_QNAME, XFormsUtils.DEFAULT_UPLOAD_TYPE));
             }
             element.setText(value);
         } else {
@@ -223,23 +235,6 @@ public class XFormsInstance implements XFormsEventTarget {
         final TransformerHandler  th = TransformerUtils.getIdentityTransformerHandler();
         th.setResult(new StreamResult(System.out));
         read(th);
-    }
-
-    private String convertUploadTypes(String value, String currentType, String newType) {
-        if (currentType.equals("newType"))
-            return value;
-        if (ProcessorUtils.supportedBinaryTypes.get(currentType) == null)
-            throw new UnsupportedOperationException("Unsupported type: " + currentType);
-        if (ProcessorUtils.supportedBinaryTypes.get(newType) == null)
-            throw new UnsupportedOperationException("Unsupported type: " + newType);
-
-        if (currentType.equals(XMLConstants.XS_BASE64BINARY_QNAME.getQualifiedName())) {
-            // Convert from xs:base64Binary to xs:anyURI
-            return XMLUtils.base64BinaryToAnyURI(pipelineContext, value); 
-        } else {
-            // Convert from xs:anyURI to xs:base64Binary
-            return XMLUtils.anyURIToBase64Binary(value);
-        }
     }
 
     public static XFormsInstance createInstanceFromContext(PipelineContext pipelineContext) {

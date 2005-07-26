@@ -69,7 +69,7 @@
     </section>
     <section label="Form Handling w/XForms">
         <example id="xforms-controls" path="xforms/xforms-controls" label="Controls" xforms-ng="true"/>
-        <example id="xforms-upload" path="xforms/xforms-upload" label="Upload Control"/>
+        <example id="xforms-upload" path="xforms/xforms-upload" label="Upload Control" xforms-ng="true"/>
         <example id="xforms-repeat" path="xforms/xforms-repeat" label="Repeating Elements" xforms-ng="true"/>
         <example id="xforms-credit-card" path="xforms/xforms-credit-card" label="Credit Card Verifier"/>
         <example id="xforms-report" path="xforms/xforms-report" label="Sortable Table"/>

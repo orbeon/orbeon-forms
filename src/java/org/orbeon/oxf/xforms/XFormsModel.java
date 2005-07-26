@@ -506,7 +506,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                                 xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
                         try {
                             String value = (String) expr.evaluateSingle();
-                            XFormsInstance.setValueForNode(node, value);
+                            XFormsInstance.setValueForNode(pipelineContext, node, value);
                         } catch (XPathException e) {
                             throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
                         } finally {

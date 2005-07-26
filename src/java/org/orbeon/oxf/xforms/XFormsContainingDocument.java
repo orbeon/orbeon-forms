@@ -125,7 +125,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     /**
      * Execute an external event on element with id targetElementId and event eventName.
      */
-    public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String controlId, String otherControlId, String contextString) {
+    public void executeExternalEvent(PipelineContext pipelineContext, String eventName, String controlId, String otherControlId, String contextString, Element filesElement) {
 
         // Get event target object
         final XFormsEventTarget eventTarget;
@@ -150,7 +150,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         }
 
         // Create event
-        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget, contextString, null, null);
+        final XFormsEvent xformsEvent = XFormsEventFactory.createEvent(eventName, eventTarget, otherEventTarget, contextString, null, null, filesElement);
 
         // Interpret event
         interpretEvent(pipelineContext, xformsEvent);
@@ -185,7 +185,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             xformsControls.setBinding(pipelineContext, (XFormsControls.ControlInfo) concreteEvent.getTargetObject());
 
             // Set value into the instance
-            XFormsInstance.setValueForNode(xformsControls.getCurrentSingleNode(), concreteEvent.getNewValue());
+            XFormsInstance.setValueForNode(pipelineContext, xformsControls.getCurrentSingleNode(), concreteEvent.getNewValue());
 
             // Dispatch events
             final XFormsModel model = xformsControls.getCurrentModel();

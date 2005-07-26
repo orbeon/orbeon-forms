@@ -23,19 +23,19 @@ import org.orbeon.oxf.xforms.event.events.*;
 public class XFormsEventFactory {
 
     public static XFormsEvent createEvent(String newEventName, XFormsEventTarget targetObject) {
-        return createEvent(newEventName, targetObject, null, false, true, true, null, null, null);
+        return createEvent(newEventName, targetObject, null, false, true, true, null, null, null, null);
     }
 
-    public static XFormsEvent createEvent(String newEventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, String contextString, Element contextElement, Throwable contextThrowable) {
-        return createEvent(newEventName, targetObject, otherTargetObject, false, true, true, contextString, contextElement, contextThrowable);
+    public static XFormsEvent createEvent(String newEventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
+        return createEvent(newEventName, targetObject, otherTargetObject, false, true, true, contextString, contextElement, contextThrowable, filesElement);
     }
 
     public static XFormsEvent createEvent(String newEventName, XFormsEventTarget targetObject, boolean bubbles, boolean cancelable) {
-        return createEvent(newEventName, targetObject, null, true, bubbles, cancelable, null, null, null);
+        return createEvent(newEventName, targetObject, null, true, bubbles, cancelable, null, null, null, null);
     }
 
     private static XFormsEvent createEvent(String eventName, XFormsEventTarget targetObject, XFormsEventTarget otherTargetObject, boolean allowCustomEvents, boolean bubbles, boolean cancelable,
-                                          String contextString, Element contextElement, Throwable contextThrowable) {
+                                          String contextString, Element contextElement, Throwable contextThrowable, Element filesElement) {
 
         // TODO
         // XFORMS_MODEL_DESTRUCT
@@ -70,7 +70,7 @@ public class XFormsEventFactory {
         } else if (eventName.equals(XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE)) {
             return new XXFormsValueChangeWithFocusChangeEvent(targetObject, otherTargetObject, contextString);
         } else if (eventName.equals(XFormsEvents.XXFORMS_SUBMIT)) {
-            return new XXFormsSubmissionEvent(targetObject);
+            return new XXFormsSubmissionEvent(targetObject, filesElement);
         } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_CONSTRUCT)) {
             return new XFormsModelConstructEvent(targetObject);
 //        } else if (eventName.equals(XFormsEvents.XFORMS_MODEL_DESTRUCT)) {

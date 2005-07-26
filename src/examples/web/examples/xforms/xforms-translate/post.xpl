@@ -42,7 +42,7 @@
         <p:output name="data" id="xml-response"/>
     </p:processor>
 
-    <!-- Generate response -->
+    <!-- Send response -->
     <p:processor name="oxf:xml-serializer">
         <p:input name="data" href="#xml-response"/>
         <p:input name="config">

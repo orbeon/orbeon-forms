@@ -457,13 +457,15 @@ public class XFormsActionInterpreter {
             // Optional attributes
             final boolean newEventBubbles; {
                 final String newEventBubblesString = actionElement.attributeValue("bubbles");
-                // FIXME: "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
-                newEventBubbles = Boolean.getBoolean((newEventBubblesString == null) ? "true" : newEventBubblesString);
+                // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
+                // The event factory makes sure that those values are ignored for predefined events
+                newEventBubbles = Boolean.valueOf((newEventBubblesString == null) ? "true" : newEventBubblesString).booleanValue();
             }
             final boolean newEventCancelable; {
-                // FIXME: "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
+                // "The default value depends on the definition of a custom event. For predefined events, this attribute has no effect."
+                // The event factory makes sure that those values are ignored for predefined events
                 final String newEventCancelableString = actionElement.attributeValue("cancelable");
-                newEventCancelable = Boolean.getBoolean((newEventCancelableString == null) ? "true" : newEventCancelableString);
+                newEventCancelable = Boolean.valueOf((newEventCancelableString == null) ? "true" : newEventCancelableString).booleanValue();
             }
 
             final Object newTargetObject = containingDocument.getObjectById(pipelineContext, newEventTargetId);

@@ -96,12 +96,12 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             version = submissionElement.attributeValue("version");
 
             if (submissionElement.attributeValue("indent") != null) {
-                indent = Boolean.getBoolean(submissionElement.attributeValue("indent"));
+                indent = Boolean.valueOf(submissionElement.attributeValue("indent")).booleanValue();
             }
             mediatype = submissionElement.attributeValue("mediatype");
             encoding = submissionElement.attributeValue("encoding");
             if (submissionElement.attributeValue("omitxmldeclaration") != null) {
-                omitxmldeclaration = Boolean.getBoolean(submissionElement.attributeValue("omit-xml-declaration"));
+                omitxmldeclaration = Boolean.valueOf(submissionElement.attributeValue("omit-xml-declaration")).booleanValue();
             }
             if (submissionElement.attributeValue("standalone") != null) {
                 standalone = new Boolean(submissionElement.attributeValue("standalone"));

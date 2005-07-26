@@ -84,9 +84,9 @@ public class XFormsEventFactory {
         } else if (eventName.equals(XFormsEvents.XFORMS_REBUILD)) {
             return new XFormsRebuildEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_RECALCULATE)) {
-            return new XFormsRecalculateEvent(targetObject, Boolean.getBoolean(contextString));
+            return new XFormsRecalculateEvent(targetObject, Boolean.valueOf(contextString).booleanValue());
         } else if (eventName.equals(XFormsEvents.XFORMS_REVALIDATE)) {
-            return new XFormsRevalidateEvent(targetObject, Boolean.getBoolean(contextString));
+            return new XFormsRevalidateEvent(targetObject, Boolean.valueOf(contextString).booleanValue());
         } else if (eventName.equals(XFormsEvents.XFORMS_VALUE_CHANGED)) {
             return new XFormsValueChangeEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_DOM_FOCUS_OUT)) {

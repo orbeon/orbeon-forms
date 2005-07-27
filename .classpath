@@ -36,7 +36,6 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/metadata-extractor-2_1.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/mondrian-0_5_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/msv-20031020.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/lib/orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/portlet-api_1.0.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/relaxngDatatype-20031020.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/resolver-xerces_2_6_2_orbeon.jar"/>
@@ -75,9 +74,10 @@
 	<classpathentry kind="lib" path="WEB-INF/lib/antlr-2_7_4_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/antlr-2_7_4.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/private/xercesImpl_2_6_2_orbeon.jar"/>
-	<classpathentry kind="lib" path="WEB-INF/cli-orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/commons-cli-1_0.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/saxon-8_1_1_orbeon.jar"/>
 	<classpathentry kind="lib" path="WEB-INF/lib/pdfbox-0_7_1.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/cli-ops.jar"/>
+	<classpathentry kind="lib" path="WEB-INF/lib/ops.jar"/>
 	<classpathentry kind="output" path="WEB-INF/classes"/>
 </classpath>

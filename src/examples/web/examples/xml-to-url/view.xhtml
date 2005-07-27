@@ -23,12 +23,12 @@
         <xhtml:title>XML to URL</xhtml:title>
         <xforms:model>
             <xforms:instance id="xml" src="oxf:/examples/xml-to-url/sample.xml"/>
-            <xforms:instance id="soap" src="oxf:/examples/xml-to-url/soap-response.xml"/>
-            <xforms:submission ref="instance('soap')" id="get-request"
-                method="post" action="/direct/xml-to-url/request" replace="instance"/>
-            <xforms:submission ref="instance('soap')" id="send-request"
-                method="post" action="/direct/xml-to-url/url" replace="instance"/>
-            <xforms:bind nodeset="instance('soap')/env:Body/orbeon:urls/*" relevant=". != ''"/>
+            <xforms:instance id="soap-request" src="oxf:/examples/xml-to-url/soap-request.xml"/>
+            <xforms:instance id="soap-response" src="oxf:/examples/xml-to-url/soap-response.xml"/>
+            <xforms:submission ref="instance('soap-request')" id="send-request"
+                method="post" action="/direct/xml-to-url/url" replace="instance" instance="soap-response"/>
+            <xforms:bind nodeset="instance('soap-request')/env:Body/orbeon:xml" calculate="instance('xml')"/>
+            <xforms:bind nodeset="instance('soap-response')/env:Body/orbeon:urls/*" relevant=". != ''"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -52,24 +52,22 @@
                 <xforms:trigger>
                     <xforms:label>Create URL</xforms:label>
                     <xforms:action ev:event="DOMActivate">
-                        <xforms:send submission="get-request"/>
-                        <xforms:setvalue ref="instance('soap')/env:Body/orbeon:xml" value="instance('xml')"/>
                         <xforms:send submission="send-request"/>
                     </xforms:action>
                 </xforms:trigger>
             </xhtml:p>
             <xhtml:p>
-                <xforms:input ref="instance('soap')/env:Body/orbeon:urls/orbeon:tiny-url" style="width: 15em">
+                <xforms:input ref="instance('soap-response')/env:Body/orbeon:urls/orbeon:tiny-url" style="width: 15em">
                     <xforms:label class="fixed-width">Tiny URL:</xforms:label>
                 </xforms:input>
             </xhtml:p>
             <xhtml:p>
-                <xforms:input ref="instance('soap')/env:Body/orbeon:urls/orbeon:original-url" style="width: 15em">
+                <xforms:input ref="instance('soap-response')/env:Body/orbeon:urls/orbeon:original-url" style="width: 15em">
                     <xforms:label class="fixed-width">Direct URL:</xforms:label>
                 </xforms:input>
             </xhtml:p>
             <xhtml:p style="color: red">
-                <xforms:output ref="instance('soap')/env:Body/orbeon:urls/orbeon:error"/>
+                <xforms:output ref="instance('soap-response')/env:Body/orbeon:urls/orbeon:error"/>
             </xhtml:p>
         </xforms:group>
     </xhtml:body>

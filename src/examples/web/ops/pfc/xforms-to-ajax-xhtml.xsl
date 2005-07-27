@@ -240,7 +240,7 @@
     <xsl:template match="xforms:textarea">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xhtml:textarea name="{$id}" rows="5" cols="40">
+        <xhtml:textarea name="{$id}">
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
             <xsl:value-of select="xxforms:control($id)"/>
         </xhtml:textarea>

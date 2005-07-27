@@ -72,8 +72,6 @@ public class ProcessorTest extends TestCase {
             LoggerFactory.initBasicLogger();
 
             jndiContext = new InitialContext();
-            pipelineContext = new PipelineContext();
-            pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
 
             // Setup resource manager
             Map props = new HashMap();
@@ -86,6 +84,8 @@ public class ProcessorTest extends TestCase {
             ResourceManagerWrapper.init(props);
             resourceManager = ResourceManagerWrapper.instance();
 
+            pipelineContext = new PipelineContext();
+            pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
             OXFProperties.init("oxf:/ops/unit-tests/properties.xml");
 
             // Initialize log4j with a DOMConfiguration

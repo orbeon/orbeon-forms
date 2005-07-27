@@ -13,23 +13,14 @@
  */
 package org.orbeon.oxf.resources;
 
-import org.dom4j.Element;
-import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.OXFPropertiesSerializer;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.generator.URLGenerator;
 import org.orbeon.oxf.util.ISODateUtils;
-import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.*;
+import org.xml.sax.SAXException;
 
 /**
  * This class provides access to global, configurable properties, as well as to processor-specific
@@ -53,30 +44,11 @@ public class OXFProperties {
     private static String key = DEFAULT_PROPERTIES_URI;
     private static boolean initializing = false;
 
-    private URLGenerator urlGenerator = null;
-    private OXFPropertiesSerializer propsSerializer = null;
-    private PipelineContext context = null;
     private OXFPropertiesSerializer.PropertyStore propertyStore = null;
-    private long lastUpdate;
+    private long lastUpdate = Long.MIN_VALUE;
 
     private OXFProperties() {
-        if (!initializing) {
-            try {
-                initializing = true;
-                context = new PipelineContext();
-                urlGenerator = (URLGenerator) PipelineUtils.createURLGenerator(key);
-                propsSerializer = new OXFPropertiesSerializer();
-                PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, propsSerializer, ProcessorImpl.INPUT_DATA);
-
-                propsSerializer.reset(context);
-                propsSerializer.start(context);
-                this.propertyStore = propsSerializer.getPropertyStore(context);
-            } catch (Exception e) {
-                throw new OXFException("Failure to initialize PresentationServer properties", e);
-            } finally {
-                initializing = false;
-            }
-        }
+        update();
     }
 
     /**
@@ -98,17 +70,37 @@ public class OXFProperties {
      */
     private void update() {
         if (!initializing) {
-            initializing = true;
-            try {
-                long current = System.currentTimeMillis();
-                if(lastUpdate + RELOAD_DELAY  < current) {
-                    propsSerializer.reset(context);
-                    propsSerializer.start(context);
-                    this.propertyStore = propsSerializer.getPropertyStore(context);
-                    lastUpdate = current;
-                }
+            Throwable thrwn = null;
+            done : try {
+            
+                initializing = true;
+                final long current = System.currentTimeMillis();
+
+                if( lastUpdate + RELOAD_DELAY  >= current ) break done;
+                
+                final java.net.URL url = URLFactory.createURL( key );
+                final java.net.URLConnection uc = url.openConnection();
+
+                if ( propertyStore != null && uc.getLastModified() <= lastUpdate ) break done;
+
+                final java.io.InputStream in = uc.getInputStream();
+                final org.dom4j.Document doc = Dom4jUtils.read( in );
+                propertyStore = OXFPropertiesSerializer.createPropertyStore( doc );
+
+                lastUpdate = current;
+            
+            } catch ( final java.io.IOException e ) {
+                thrwn = e;
+            } catch ( final SAXException e ) {
+                thrwn = e;
+            } catch ( final org.dom4j.DocumentException e ) {
+                thrwn = e;
             } finally {
                 initializing = false;
+            }
+            if ( thrwn != null ) {
+                throw new OXFException
+                    ("Failure to initialize PresentationServer properties", thrwn );
             }
         }
     }
@@ -120,14 +112,14 @@ public class OXFProperties {
         return propertyStore.getGlobalPropertySet();
     }
 
-    public PropertySet getPropertySet(QName processorName) {
+    public PropertySet getPropertySet( final org.dom4j.QName processorName ) {
         if (propertyStore == null)
             return null;
         update();
         return propertyStore.getProcessorPropertySet(processorName);
     }
 
-    public Set keySet() {
+    public java.util.Set keySet() {
         if (propertyStore == null)
             return null;
 
@@ -137,18 +129,18 @@ public class OXFProperties {
     public static class PropertySet {
 
         private static class TypeValue {
-            public QName type;
+            public final org.dom4j.QName type;
             public Object value;
 
-            public TypeValue(QName type, Object value) {
-                this.type = type;
-                this.value = value;
+            public TypeValue( final org.dom4j.QName typ, final Object val ) {
+                type = typ;
+                value = val;
             }
         }
 
-        private Map properties = new HashMap();
+        private java.util.Map properties = new java.util.HashMap();
 
-        public Set keySet() {
+        public java.util.Set keySet() {
             return properties.keySet();
         }
 
@@ -156,10 +148,10 @@ public class OXFProperties {
             return properties.size();
         }
 
-        public Map getObjectMap() {
+        public java.util.Map getObjectMap() {
             if (size() > 0) {
-                Map result = new HashMap();
-                for (Iterator i = keySet().iterator(); i.hasNext();) {
+                final java.util.Map result = new java.util.HashMap();
+                for ( final java.util.Iterator i = keySet().iterator(); i.hasNext();) {
                     String key = (String) i.next();
                     result.put(key, getObject(key));
                 }
@@ -169,31 +161,32 @@ public class OXFProperties {
             }
         }
 
-        public void setProperty(Element element, String name, QName type, String value) {
-            properties.put(name, new TypeValue(type, getObject(element, type.getName(), value)));
+        public void setProperty
+        ( final org.dom4j.Element elt, String name, final org.dom4j.QName typ, String value) {
+            properties.put(name, new TypeValue( typ, getObject(elt, typ.getName(), value)));
         }
 
-        public Object getProperty(String name, QName type) {
+        public Object getProperty(String name, final org.dom4j.QName typ ) {
             TypeValue typeValue = (TypeValue) properties.get(name);
             if (typeValue == null)
                 return null;
-            if (type != null && !type.equals(typeValue.type))
+            if (typ != null && !typ.equals(typeValue.type))
                 throw new OXFException("Invalid attribute type requested for property '" + name + "': expected "
-                        + type.getQualifiedName() + ", found " + typeValue.type.getQualifiedName());
+                        + typ.getQualifiedName() + ", found " + typeValue.type.getQualifiedName());
             return typeValue.value;
         }
 
-        private Object getObject(Element element, String type, String value) {
+        private Object getObject( final org.dom4j.Element elt, String type, String value) {
             try {
                 return "string".equals(type) ? (Object) value :
                        "boolean".equals(type) ? (Object) new Boolean(value) :
                        "integer".equals(type) ? (Object) new Integer(value) :
                        ("date".equals(type) || "dateTime".equals(type)) ? (Object) ISODateUtils.parseDate(value) :
-                       "QName".equals(type) ? (Object) Dom4jUtils.extractAttributeValueQName(element, "value") :
+                       "QName".equals(type) ? (Object) Dom4jUtils.extractAttributeValueQName(elt, "value") :
                        "anyURI".equals(type) ? (Object) URLFactory.createURL(value) :
                        null;
-            } catch (MalformedURLException e) {
-                throw new ValidationException(e, (LocationData) element.getData());
+            } catch ( final java.net.MalformedURLException e ) {
+                throw new ValidationException(e, (LocationData) elt.getData());
             }
         }
 
@@ -208,7 +201,7 @@ public class OXFProperties {
 
             if (property instanceof String) {
                 return getString(name);
-            } else if (property instanceof URL) {
+            } else if (property instanceof java.net.URL ) {
                 return getURL(name).toExternalForm();
             } else {
                 throw new OXFException("Invalid attribute type requested for property '" + name + "': expected "
@@ -217,13 +210,13 @@ public class OXFProperties {
             }
         }
 
-        public URL getStringOrURIAsURL(String name) {
+        public java.net.URL getStringOrURIAsURL(String name) {
             String result = getStringOrURIAsString(name);
             if (result == null)
                 return null;
             try {
                 return URLFactory.createURL(name);
-            } catch (MalformedURLException e) {
+            } catch ( final java.net.MalformedURLException e ) {
                 throw new OXFException(e);
             }
         }
@@ -254,23 +247,23 @@ public class OXFProperties {
             return (result == null) ? new Boolean(defaultValue) : result;
         }
 
-        public Date getDate(String name) {
-            return (Date) getProperty(name, XMLConstants.XS_DATE_QNAME);
+        public java.util.Date getDate(String name) {
+            return ( java.util.Date ) getProperty(name, XMLConstants.XS_DATE_QNAME);
         }
 
-        public Date getDateTime(String name) {
-            return (Date) getProperty(name, XMLConstants.XS_DATETIME_QNAME);
+        public java.util.Date getDateTime(String name) {
+            return ( java.util.Date ) getProperty(name, XMLConstants.XS_DATETIME_QNAME);
         }
 
-        public QName getQName(String name) {
-            return (QName) getProperty(name, XMLConstants.XS_QNAME_QNAME);
+        public org.dom4j.QName getQName(String name) {
+            return (org.dom4j.QName) getProperty(name, XMLConstants.XS_QNAME_QNAME);
         }
 
         /**
          * For now, the type xs:anyURI is used, but we really expect URLs.
          */
-        public URL getURL(String name) {
-            return (URL) getProperty(name, XMLConstants.XS_ANYURI_QNAME);
+        public java.net.URL getURL(String name) {
+            return ( java.net.URL ) getProperty(name, XMLConstants.XS_ANYURI_QNAME);
         }
     }
 }

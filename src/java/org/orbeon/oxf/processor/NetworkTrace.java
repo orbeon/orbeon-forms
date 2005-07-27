@@ -16,6 +16,8 @@ package org.orbeon.oxf.processor;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext.Trace;
 import org.orbeon.oxf.pipeline.api.PipelineContext.TraceInfo;
+import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.resources.OXFProperties.PropertySet;
 
 public class NetworkTrace implements Trace {
 	
@@ -23,9 +25,11 @@ public class NetworkTrace implements Trace {
 	private static final int port;
 	
 	static {
-		final String hst = System.getProperty( "processor.trace.host" );
+                final OXFProperties prps = OXFProperties.instance();
+                final PropertySet prpSet = prps.getPropertySet();
+                final String hst = prpSet.getString( "processor.trace.host" ); 
 		host = hst == null ? "localhost" : hst;
-		final String sprt = System.getProperty( "processor.trace.port" );
+		final String sprt = prpSet.getString( "processor.trace.port" );
 		port = sprt == null ? 9191 : Integer.parseInt( sprt );
 	}
 

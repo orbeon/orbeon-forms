@@ -1,8 +1,10 @@
-<definitions xmlns:orbeon="http://www.orbeon.com/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:orbeon="http://www.orbeon.com/"
         xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
         xmlns="http://schemas.xmlsoap.org/wsdl/"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        targetNamespace="http://www.orbeon.com/" name="xml-to-url">
+        targetNamespace="http://www.orbeon.com/"
+        name="xml-to-url">
     <types>
         <xs:schema elementFormDefault="qualified" targetNamespace="http://www.orbeon.com/">
             <xs:element name="xml" type="xs:string"/>
@@ -32,12 +34,12 @@
 	<binding name="orbeonBinding" type="orbeon:orbeonPortType">
 		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
 		<operation name="xmlToUrl">
-			<soap:operation/>
+			<soap:operation soapAction=""/>
 			<input>
-				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:orbeon.com"/>
+				<soap:body use="literal"/>
 			</input>
 			<output>
-				<soap:body use="encoded" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" namespace="urn:orbeon.com"/>
+				<soap:body use="literal"/>
 			</output>
 		</operation>
 	</binding>

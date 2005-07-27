@@ -19,6 +19,7 @@ import org.apache.axis.message.MessageElement;
 import org.apache.axis.message.PrefixedQName;
 import org.apache.axis.message.SOAPBodyElement;
 import org.apache.axis.message.SOAPEnvelope;
+import org.apache.axis.soap.SOAPConstants;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.Text;
@@ -36,11 +37,7 @@ import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
-import org.orbeon.oxf.xml.dom4j.NonLazySAXContentHandler;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocumentFactory;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.w3c.dom.Node;
 import org.xml.sax.Attributes;
@@ -60,12 +57,9 @@ public class DelegationProcessor extends ProcessorImpl {
 
     private static final org.dom4j.QName xsiType = new org.dom4j.QName
             ("type", new org.dom4j.Namespace("xsi", "http://www.w3.org/1999/XMLSchema-instance"));
-    private static final String DEFAULT_SELECT_WEB_SERVICE = "/SOAP-ENV:Envelope/SOAP-ENV:Body/*[1]/node()";
+    private static final String DEFAULT_SELECT_WEB_SERVICE_RPC = "/SOAP-ENV:Envelope/SOAP-ENV:Body/*[1]/node()";
+    private static final String DEFAULT_SELECT_WEB_SERVICE_DOCUMENT = "/SOAP-ENV:Envelope/SOAP-ENV:Body/node()";
     private static final String DEFAULT_SELECT_BUS = "/SOAP-ENV:Envelope/SOAP-ENV:Body/*";
-    private static final java.util.Map DEFAULT_SELECT_NAMESPACE_CONTEXT = new java.util.HashMap();
-    static {
-        DEFAULT_SELECT_NAMESPACE_CONTEXT.put("SOAP-ENV", "http://schemas.xmlsoap.org/soap/envelope/");
-    }
 
     public final String INPUT_INTERFACE = "interface";
     public final String INPUT_CALL = "call";
@@ -79,7 +73,6 @@ public class DelegationProcessor extends ProcessorImpl {
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(final org.orbeon.oxf.pipeline.api.PipelineContext context, final ContentHandler contentHandler) {
-                final org.orbeon.oxf.pipeline.api.PipelineContext _context = context;
                 final java.util.List services = readServices(readInputAsDOM4J(context, INPUT_INTERFACE));
 
                 readInputAsSAX(context, INPUT_CALL, new ForwardingContentHandler(contentHandler) {
@@ -165,7 +158,12 @@ public class DelegationProcessor extends ProcessorImpl {
                                         }
 
                                         // Populate envelope
-                                        SOAPEnvelope requestEnvelope = new SOAPEnvelope();
+                                        SOAPEnvelope requestEnvelope = service.soapVersion.equals("1.2")
+                                                ? new SOAPEnvelope(SOAPConstants.SOAP12_CONSTANTS)
+                                                : new SOAPEnvelope();
+                                        SOAPConstants soapConstants  = requestEnvelope.getSOAPConstants();
+                                        final java.util.Map selectNamespaceContext = new java.util.HashMap();
+                                        selectNamespaceContext.put("SOAP-ENV", soapConstants.getEnvelopeURI());
                                         if (service.type == ServiceDefinition.BUS_SERVICE_TYPE || "document".equals(service.style)) {
                                             // Add elements to directly to body
                                             for (int i = 0; i < rootNode.getChildNodes().getLength(); i++) {
@@ -272,13 +270,13 @@ public class DelegationProcessor extends ProcessorImpl {
                                                     operation != null && operation.select != null
                                                     ? operation.select
                                                     : service.type == ServiceDefinition.WEB_SERVICE_TYPE
-                                                    ? DEFAULT_SELECT_WEB_SERVICE
+                                                    ? ("document".equals(service.style) ? DEFAULT_SELECT_WEB_SERVICE_DOCUMENT : DEFAULT_SELECT_WEB_SERVICE_RPC)
                                                     : DEFAULT_SELECT_BUS;
                                             PooledXPathExpression expr = XPathCache.getXPathExpression(context,
                                                     new DocumentWrapper(resultEnvelopeDOM4j, null),
                                                     xpath,
-                                                    operation != null && operation.select != null ? operation.selectNamespaceContext : DEFAULT_SELECT_NAMESPACE_CONTEXT);
-
+                                                    operation != null && operation.select != null
+                                                            ? operation.selectNamespaceContext : selectNamespaceContext);
                                             for (java.util.Iterator i = expr.evaluate().iterator(); i.hasNext();) {
 
                                                 // Create document with node from SOAP envelope
@@ -334,7 +332,7 @@ public class DelegationProcessor extends ProcessorImpl {
 
                                         if (service.type == ServiceDefinition.STATELESS_EJB_TYPE) {
                                             // Call EJB method
-                                            Context jndiContext = (Context) _context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.JNDI_CONTEXT);
+                                            Context jndiContext = (Context) context.getAttribute(org.orbeon.oxf.pipeline.api.PipelineContext.JNDI_CONTEXT);
                                             Object home = jndiContext.lookup(service.jndiName);
                                             Method create = home.getClass().getDeclaredMethod("create", new Class[]{});
                                             Object instance = create.invoke(home, new Object[]{});
@@ -422,6 +420,7 @@ public class DelegationProcessor extends ProcessorImpl {
             service.name = serviceElement.attributeValue("name");
             service.clazz = serviceElement.attributeValue("class");
             service.style = serviceElement.attributeValue("style");
+            service.soapVersion = serviceElement.attributeValue("soap-version");
 
             // Create operations
             for (java.util.Iterator j = XPathUtils.selectIterator(serviceElement, "operation"); j.hasNext();) {
@@ -457,6 +456,7 @@ public class DelegationProcessor extends ProcessorImpl {
         public String name;
         public String clazz;
         public String style;
+        public String soapVersion;
         public java.util.List operations = new java.util.ArrayList();
     }
 

@@ -199,7 +199,15 @@
 								(<code>encodingStyle</code> attribute) and SOAP action
 								(<code>soap-action</code> attribute).
 							</li>
-        				</ul>
+                            <li>
+                                Optionally you can declare what part of the SOAP result document is returned by
+                                specifying an XPath expression in the optional <code>select</code> attribute on the
+                                <code>operation</code> element.
+                                If you don't specify an expression, by default when the style is RPC the
+                                content of the first child element under the SOAP body is returned, and when the
+                                style is document the content of the SOAP body is returned.
+                            </li>
+                        </ul>
     				</li>
     				<li>
     					In the <code>call</code> input:

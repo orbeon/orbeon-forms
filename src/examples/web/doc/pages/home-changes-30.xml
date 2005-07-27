@@ -723,6 +723,15 @@
                 </li>
                 <li>
                     <p>
+                        <b>Delegation processor</b>. The <code>select</code> attribute on the
+                        <code>operation</code> element is now documented. The default behavior when
+                        <code>select</code> is not present has changed when calling document-style
+                        web services. In that case, now the content of the SOAP body element is returned,
+                        instead of the content of the first element contained by the SOAP body.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         TODO
                     </p>
                 </li>

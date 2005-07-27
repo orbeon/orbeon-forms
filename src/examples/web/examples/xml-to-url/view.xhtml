@@ -32,6 +32,16 @@
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
+        <xhtml:ul>
+            <xhtml:li>
+                Paste an XML document in the text field and click on the "Create URL" button to
+                get a URL that will return the XML document you posted.
+            </xhtml:li>
+            <xhtml:li>
+                This page is a front-end for a web service that you can also call directly programmatically.
+                See the WSDL file: <xhtml:a f:url-type="resource" href="/direct/xml-to-url/url.wsdl">url.wsdl</xhtml:a>.
+            </xhtml:li>
+        </xhtml:ul>
         <xforms:group>
             <xhtml:p>
                 <xforms:textarea ref="instance('xml')" class="wide-textarea">

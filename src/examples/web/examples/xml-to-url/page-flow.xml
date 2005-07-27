@@ -17,6 +17,7 @@
     <page path-info="/direct/xml-to-url/doc" model="url-to-xml.xpl"/>
     <page path-info="/direct/xml-to-url/url" model="xml-to-url.xpl"/>
     <page path-info="/direct/xml-to-url/request" view="soap-request.xml"/>
+    <page path-info="/direct/xml-to-url/url.wsdl" view="xml-to-url.wsdl"/>
 
     <page path-info="*" view="view.xhtml"/>
 

@@ -81,7 +81,7 @@
     <!-- Add classes to control elements reflecting model item properties -->
     <xsl:template match="xforms:output | xforms:input
             | xforms:secret | xforms:textarea | xforms:select | xforms:select1
-            | xforms:range | xforms:trigger | xforms:submit | xforms:upload" priority="3">
+            | xforms:range | xforms:trigger | xforms:submit" priority="3"><!-- | xforms:upload -->
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
@@ -109,7 +109,7 @@
 
     <xsl:template match="xforms:output | xforms:input
             | xforms:secret | xforms:textarea | xforms:select | xforms:select1
-            | xforms:range | xforms:upload" priority="2">
+            | xforms:range" priority="2"><!-- | xforms:upload -->
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 

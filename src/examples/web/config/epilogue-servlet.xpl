@@ -244,6 +244,7 @@
                             <name>Cache-Control</name>
                             <value>post-check=0, pre-check=0</value>
                         </header>
+                        <content-type>application/xml</content-type>
                     </config>
                 </p:input>
                 <p:input name="data" href="#converted"/>

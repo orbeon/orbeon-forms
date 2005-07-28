@@ -59,6 +59,10 @@ public class XMLConstants {
     public final static QName XS_QNAME_QNAME = new QName("QName", XSD_NAMESPACE);
     public final static QName XS_ANYURI_QNAME = new QName("anyURI", XSD_NAMESPACE);
     public final static QName XS_BASE64BINARY_QNAME = new QName("base64Binary", XSD_NAMESPACE);
+    public final static QName XS_NCNAME_QNAME = new QName("NCName", XSD_NAMESPACE);
+    public final static QName XS_NMTOKEN_QNAME = new QName("NMTOKEN", XSD_NAMESPACE);
+    public final static QName XS_NONNEGATIVEiNTEGER_QNAME 
+        = new QName("nonNegativeInteger", XSD_NAMESPACE);
     
     public static final String XSI_NIL_ATTRIBUTE = "nil";
 

@@ -38,13 +38,16 @@ public class OXFPropertiesSerializer extends ProcessorImpl {
     private static final Map supportedTypes = new HashMap();
 
     static {
-        supportedTypes.put("string", "");
-        supportedTypes.put("integer", "");
-        supportedTypes.put("boolean", "");
-        supportedTypes.put("date", "");
-        supportedTypes.put("dateTime", "");
-        supportedTypes.put("QName", "");
-        supportedTypes.put("anyURI", "");
+        supportedTypes.put( XMLConstants.XS_STRING_QNAME, "" );
+        supportedTypes.put( XMLConstants.XS_INTEGER_QNAME, "" );
+        supportedTypes.put( XMLConstants.XS_BOOLEAN_QNAME, "" );
+        supportedTypes.put( XMLConstants.XS_DATE_QNAME, "" );
+        supportedTypes.put( XMLConstants.XS_DATETIME_QNAME, "" );
+        supportedTypes.put( XMLConstants.XS_QNAME_QNAME, "" );
+        supportedTypes.put( XMLConstants.XS_ANYURI_QNAME, "" );
+        supportedTypes.put( XMLConstants.XS_NCNAME_QNAME, "" );
+        supportedTypes.put( XMLConstants.XS_NMTOKEN_QNAME, "" );
+        supportedTypes.put( XMLConstants.XS_NONNEGATIVEiNTEGER_QNAME, "" );
     }
 
     public OXFPropertiesSerializer() {
@@ -80,10 +83,8 @@ public class OXFPropertiesSerializer extends ProcessorImpl {
             if (as != null) {
                 // We only support one namespace for types for now
                 QName typeQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "as");
-                if (!typeQName.getNamespaceURI().equals(SUPPORTED_TYPES_URI))
-                    throw new ValidationException("Invalid as attribute: " + typeQName.getQualifiedName(), (LocationData) propertyElement.getData());
 
-                if (supportedTypes.get(typeQName.getName()) == null)
+                if (supportedTypes.get( typeQName ) == null)
                     throw new ValidationException("Invalid as attribute: " + typeQName.getQualifiedName(), (LocationData) propertyElement.getData());
 
                 if (processorName != null) {

@@ -42,7 +42,7 @@
     <xsl:template match="xhtml:body">
         <xsl:copy>
             <xsl:apply-templates select="@*"/>
-            <xhtml:form id="xforms-form" class="xforms-form" action="/xforms-server-submit" method="POST">
+            <xhtml:form id="xforms-form" class="xforms-form" action="/xforms-server-submit" method="POST" onsubmit="return false">
                 <xsl:if test="descendant::xforms:upload">
                     <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
                 </xsl:if>

@@ -163,7 +163,7 @@ public class OXFProperties {
 
         public void setProperty
         ( final org.dom4j.Element elt, String name, final org.dom4j.QName typ, String value) {
-            properties.put(name, new TypeValue( typ, getObject(elt, typ.getName(), value)));
+            properties.put(name, new TypeValue( typ, getObject(elt, typ, value)));
         }
 
         public Object getProperty(String name, final org.dom4j.QName typ ) {
@@ -176,14 +176,15 @@ public class OXFProperties {
             return typeValue.value;
         }
 
-        private Object getObject( final org.dom4j.Element elt, String type, String value) {
+        private Object getObject
+        ( final org.dom4j.Element elt, final org.dom4j.QName typ, String value ) {
             try {
-                return "string".equals(type) ? (Object) value :
-                       "boolean".equals(type) ? (Object) new Boolean(value) :
-                       "integer".equals(type) ? (Object) new Integer(value) :
-                       ("date".equals(type) || "dateTime".equals(type)) ? (Object) ISODateUtils.parseDate(value) :
-                       "QName".equals(type) ? (Object) Dom4jUtils.extractAttributeValueQName(elt, "value") :
-                       "anyURI".equals(type) ? (Object) URLFactory.createURL(value) :
+                return XMLConstants.XS_STRING_QNAME.equals(typ) ? (Object) value :
+                       XMLConstants.XS_BOOLEAN_QNAME.equals(typ) ? (Object) new Boolean(value) :
+                       XMLConstants.XS_INTEGER_QNAME.equals(typ) ? (Object) new Integer(value) :
+                       (XMLConstants.XS_DATE_QNAME.equals(typ) || XMLConstants.XS_DATETIME_QNAME.equals(typ)) ? (Object) ISODateUtils.parseDate(value) :
+                       XMLConstants.XS_QNAME_QNAME.equals(typ) ? (Object) Dom4jUtils.extractAttributeValueQName(elt, "value") :
+                       XMLConstants.XS_ANYURI_QNAME.equals(typ) ? (Object) URLFactory.createURL(value) :
                        null;
             } catch ( final java.net.MalformedURLException e ) {
                 throw new ValidationException(e, (LocationData) elt.getData());

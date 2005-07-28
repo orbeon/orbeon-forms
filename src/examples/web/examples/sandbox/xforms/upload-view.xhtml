@@ -13,14 +13,28 @@
 -->
 <html xmlns:f="http://orbeon.org/oxf/xml/formatting"
       xmlns:xhtml="http://www.w3.org/1999/xhtml"
-      xmlns:xf="http://www.w3.org/2002/xforms"
-      xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:ev="http://www.w3.org/2001/xml-events"
+      xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
       xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xmlns="http://www.w3.org/1999/xhtml">
-    <head><title>XForms Sandbox</title></head>
+    <head>
+        <title>XForms Sandbox</title>
+        <xforms:model>
+            <xforms:instance>
+                <form xmlns="">
+                    <action/>
+                    <file filename="" mediatype="" size=""/>
+                </form>
+            </xforms:instance>
+            <xforms:bind nodeset="/form/file" type="xs:anyURI"/>
+            <xforms:submission id="main" method="post" replace="all" action="/xforms-sandbox"/>
+        </xforms:model>
+    </head>
     <body>
-        <xf:group ref="/form">
+        <xforms:group ref="/form">
             <p>
                 This example allows you to easily try your own XForms examples. Just point to an
                 XHTML + XForms document below, press the "Upload" button, and check if it works with
@@ -32,17 +46,20 @@
             <table>
                 <tr>
                     <td>
-                        <xf:upload ref="file">
-                            <xf:filename ref="@filename"/>
-                            <xf:mediatype ref="@mediatype"/>
-                            <xxf:size ref="@size"/>
-                        </xf:upload>
+                        <xforms:upload ref="file">
+                            <xforms:filename ref="@filename"/>
+                            <xforms:mediatype ref="@mediatype"/>
+                            <xxforms:size ref="@size"/>
+                        </xforms:upload>
                     </td>
                     <td>
-                        <xf:submit>
-                            <xf:label>Upload</xf:label>
-                            <xf:setvalue ref="action">upload</xf:setvalue>
-                        </xf:submit>
+                        <xforms:trigger>
+                            <xforms:label>Upload</xforms:label>
+                            <xforms:action ev:event="DOMActivate">
+                                <xforms:setvalue ref="action">upload</xforms:setvalue>
+                                <xforms:send submission="main"/>
+                            </xforms:action>
+                        </xforms:trigger>
                     </td>
                 </tr>
             </table>
@@ -51,6 +68,6 @@
                 to update the page with modifications you have done to your local file. The browser
                 will re-upload the modified file.
             </p>
-        </xf:group>
+        </xforms:group>
     </body>
 </html>

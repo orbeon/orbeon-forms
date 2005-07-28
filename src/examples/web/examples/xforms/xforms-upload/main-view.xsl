@@ -27,8 +27,6 @@
             <xforms:instance>
                 <form xmlns="">
                     <action/>
-                    <!-- Using xs:anyURI will cause the XForms engine to store a reference to
-                         a URI instead of inlinig the content of the file -->
                     <files>
                         <file filename="" mediatype="" size=""/>
                         <file filename="" mediatype="" size=""/>
@@ -36,6 +34,8 @@
                     </files>
                 </form>
             </xforms:instance>
+            <!-- Using xs:anyURI will cause the XForms engine to store a reference to
+                 a URI instead of inlinig the content of the file -->
             <xforms:bind nodeset="/form/files/file" type="xs:anyURI"/>
 <!--            <xforms:submission method="post" encoding="multipart/form-data"/>-->
             <xforms:submission id="main" method="post" replace="all" action="/xforms-upload"/>
@@ -59,44 +59,44 @@
                         <xsl:text> JPEG images to upload:</xsl:text>
                     </td>
                 </tr>
-<!--                <xforms:repeat nodeset="files/file">-->
-<!--                    <tr>-->
-<!--                        <td>-->
-<!--                            <xforms:upload ref=".">-->
-<!--                                <xforms:filename ref="@filename"/>-->
-<!--                                <xforms:mediatype ref="@mediatype"/>-->
-<!--                                <xxforms:size ref="@size"/>-->
-<!--                            </xforms:upload>-->
-<!--                        </td>-->
-<!--                    </tr>-->
-<!--                </xforms:repeat>-->
-                <tr>
-                    <td>
-                        <xforms:upload ref="files/file[1]">
-                            <xforms:filename ref="@filename"/>
-                            <xforms:mediatype ref="@mediatype"/>
-                            <xxforms:size ref="@size"/>
-                        </xforms:upload>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <xforms:upload ref="files/file[2]">
-                            <xforms:filename ref="@filename"/>
-                            <xforms:mediatype ref="@mediatype"/>
-                            <xxforms:size ref="@size"/>
-                        </xforms:upload>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <xforms:upload ref="files/file[3]">
-                            <xforms:filename ref="@filename"/>
-                            <xforms:mediatype ref="@mediatype"/>
-                            <xxforms:size ref="@size"/>
-                        </xforms:upload>
-                    </td>
-                </tr>
+                <xforms:repeat nodeset="files/file">
+                    <tr>
+                        <td>
+                            <xforms:upload ref=".">
+                                <xforms:filename ref="@filename"/>
+                                <xforms:mediatype ref="@mediatype"/>
+                                <xxforms:size ref="@size"/>
+                            </xforms:upload>
+                        </td>
+                    </tr>
+                </xforms:repeat>
+<!--                <tr>-->
+<!--                    <td>-->
+<!--                        <xforms:upload ref="files/file[1]">-->
+<!--                            <xforms:filename ref="@filename"/>-->
+<!--                            <xforms:mediatype ref="@mediatype"/>-->
+<!--                            <xxforms:size ref="@size"/>-->
+<!--                        </xforms:upload>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>-->
+<!--                        <xforms:upload ref="files/file[2]">-->
+<!--                            <xforms:filename ref="@filename"/>-->
+<!--                            <xforms:mediatype ref="@mediatype"/>-->
+<!--                            <xxforms:size ref="@size"/>-->
+<!--                        </xforms:upload>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>-->
+<!--                        <xforms:upload ref="files/file[3]">-->
+<!--                            <xforms:filename ref="@filename"/>-->
+<!--                            <xforms:mediatype ref="@mediatype"/>-->
+<!--                            <xxforms:size ref="@size"/>-->
+<!--                        </xforms:upload>-->
+<!--                    </td>-->
+<!--                </tr>-->
             </table>
             <table class="gridtable">
                 <tr>

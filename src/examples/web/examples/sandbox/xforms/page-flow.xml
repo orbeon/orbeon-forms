@@ -16,8 +16,7 @@
         xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
         instance-passing="forward">
 
-    <!-- TODO: Update his to new XForms when upload works with XForms NG -->
-    <page id="upload" path-info="/xforms-sandbox" xforms="upload-xforms-model.xml" view="upload-view.xhtml">
+    <page id="upload" path-info="/xforms-sandbox" view="upload-view.xhtml">
         <action when="/*/action = 'upload' and /*/file != ''"  action="upload-action.xpl">
             <result page="sandbox" transform="oxf:xslt">
                 <xsl:transform version="2.0">

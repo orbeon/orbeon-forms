@@ -37,6 +37,7 @@ public class InstanceData implements Cloneable {
     private ValidModelItemProperty valueValid = new ValidModelItemProperty();
     private ValidModelItemProperty constraint = new ValidModelItemProperty();
 
+    private boolean valueChanged;
     private boolean previousRequiredState;
     private boolean previousValidState;
     private boolean previousRelevantState;
@@ -155,6 +156,12 @@ public class InstanceData implements Cloneable {
         return ret;
     }
 
+//    public void clearSchemaError() {
+//        valueValid = new ValidModelItemProperty();
+//        if (schemaErrors != null)
+//            schemaErrors.clear();
+//    }
+
     public void addSchemaError(final String msg, final String stringValue) {
         valueValid.set(false, stringValue);
         if (schemaErrors == null) {
@@ -163,23 +170,20 @@ public class InstanceData implements Cloneable {
         schemaErrors.add(msg);
     }
 
-    public void clearComputedExpressionBinds() {
-
-        // Save required state
-        previousRequiredState = getRequired().get();
-        previousRelevantState = getRelevant().get();
-        previousReadonlyState = getReadonly().get();
-
-        // clear required MIPs
-        required = new RequiredModelItemProperty();
-        relevant = new RelevantModelItemProperty();
-        readonly = new ReadonlyModelItemProperty();
-    }
-
-    public void clearValidationBinds() {
-
-        // Save valid state
-        previousValidState = getValid().get();
+//    private void clearComputedExpressionState() {
+//
+//        // Save required state
+//        previousRequiredState = getRequired().get();
+//        previousRelevantState = getRelevant().get();
+//        previousReadonlyState = getReadonly().get();
+//
+//        // clear required MIPs
+//        required = new RequiredModelItemProperty();
+//        relevant = new RelevantModelItemProperty();
+//        readonly = new ReadonlyModelItemProperty();
+//    }
+//
+    public void clearValidationState() {
 
         // Clear everything related to validity (except required)
         valueValid = new ValidModelItemProperty();
@@ -187,6 +191,14 @@ public class InstanceData implements Cloneable {
         type = new TypeModelItemProperty();
         if (schemaErrors != null)
             schemaErrors.clear();
+    }
+
+    public void clearInstanceDataEventState() {
+        previousRequiredState = getRequired().get();
+        previousRelevantState = getRelevant().get();
+        previousReadonlyState = getReadonly().get();
+        previousValidState = getValid().get();
+        valueChanged = false;
     }
 
     public boolean getPreviousRequiredState() {
@@ -222,6 +234,14 @@ public class InstanceData implements Cloneable {
         }
     }
 
+    public boolean isValueChanged() {
+        return valueChanged;
+    }
+
+    public void markValueChanged() {
+        this.valueChanged = true;
+    }
+
     public Object clone() throws CloneNotSupportedException {
         final InstanceData result = (InstanceData) super.clone();
 
@@ -237,6 +257,7 @@ public class InstanceData implements Cloneable {
             throw new OXFException(e);
         }
 
+        result.valueChanged = this.valueChanged;
         result.idToNodeMap = (this.idToNodeMap == null) ? null : new HashMap(this.idToNodeMap);
         result.schemaErrors = (this.schemaErrors == null) ? null : new ArrayList(this.schemaErrors);
 

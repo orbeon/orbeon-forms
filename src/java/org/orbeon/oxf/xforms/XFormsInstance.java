@@ -95,22 +95,49 @@ public class XFormsInstance implements XFormsEventTarget {
     /**
      * Set a value on the instance using a node and a value.
      *
-     * @param currentNode
-     * @param valueToSet
+     * @param pipelineContext   current PipelineContext
+     * @param node              element or attribute node to update
+     * @param newValue          value to set
+     * @param type              type of the value to set (xs:anyURI or xs:base64Binary), null if none
      */
-    public static void setValueForNode(PipelineContext pipelineContext, Node currentNode, String valueToSet) {
-        XFormsUtils.fillNode(pipelineContext, currentNode, valueToSet, null);
-    }
+    public static void setValueForNode(PipelineContext pipelineContext, Node node, String newValue, String type) {
+        // Get local instance data as we are not using any inheritance here AND we are doing an update
+        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
 
-    /**
-     * Set a value on the instance using a node and a value.
-     *
-     * @param currentNode
-     * @param valueToSet
-     * @param type          type of the value to set (xs:anyURI or xs:base64Binary)
-     */
-    public static void setValueForNode(PipelineContext pipelineContext, Node currentNode, String valueToSet, String type) {
-        XFormsUtils.fillNode(pipelineContext, currentNode, valueToSet, type);
+        // Convert value based on types if possible
+        if (type != null) {
+            final String nodeType = instanceData.getType().getAsString();
+
+            if (nodeType != null && !nodeType.equals(type)) { // FIXME: prefixes of type name could be different!
+                // There is a different type already, do a conversion
+                newValue = XFormsUtils.convertUploadTypes(pipelineContext, newValue, type, nodeType);
+            } else if (nodeType == null) {
+                // There is no type, convert to default type
+                if (!XFormsUtils.DEFAULT_UPLOAD_TYPE.equals(type)) // FIXME: prefixes of type name could be different!
+                    newValue = XFormsUtils.convertUploadTypes(pipelineContext, newValue, type, XFormsUtils.DEFAULT_UPLOAD_TYPE);
+            }
+        }
+
+        // Set value
+        final String currentValue;
+        if (node instanceof Element) {
+            final Element elementnode = (Element) node;
+            currentValue = elementnode.getText();
+            // Remove current content
+            Dom4jUtils.clearElementContent(elementnode);
+            // Put text node with value
+            elementnode.add(Dom4jUtils.createText(newValue));
+        } else if (node instanceof Attribute) {
+            final Attribute attributenode = (Attribute) node;
+            currentValue = attributenode.getValue();
+            attributenode.setValue(newValue);
+        } else {
+            throw new OXFException("Node is not an element or attribute.");
+        }
+
+        // Remember that the value has changed for this node if it has actually changed
+        if (!newValue.equals(currentValue))
+            instanceData.markValueChanged();
     }
 
     public static String getValueForNode(Node currentNode) {
@@ -231,6 +258,9 @@ public class XFormsInstance implements XFormsEventTarget {
         }
     }
 
+    /**
+     * This prints the instance with extra annotation attributes to System.out. For debug only.
+     */
     public void readOut() {
         final TransformerHandler  th = TransformerUtils.getIdentityTransformerHandler();
         th.setResult(new StreamResult(System.out));

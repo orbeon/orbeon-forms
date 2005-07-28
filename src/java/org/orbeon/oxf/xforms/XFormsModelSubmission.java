@@ -164,6 +164,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // Revalidate instance
                 // TODO: we should only revalidate relevant parts
                 containingDocument.dispatchEvent(pipelineContext,  new XFormsRevalidateEvent(model, false));
+                // TODO: The "false" attribute is no longer used. The above will cause events to be
+                // sent out. Check if the validation state can really change. If so, find a
+                // solution.
 
                 final Document initialDocumentToSubmit;
                 if (!isDeferredSubmissionSecondPass) {
@@ -208,35 +211,37 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final XFormsControls.UploadControlInfo uploadControl
                                     = (XFormsControls.UploadControlInfo) containingDocument.getObjectById(pipelineContext, name);
 
-                            // Set value into the instance
-                            xformsControls.setBinding(pipelineContext, uploadControl);
-                            {
-                                final Node currentSingleNode = xformsControls.getCurrentSingleNode();
-                                XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, value, paramValueType);
-                            }
+                            if (uploadControl != null) { // in case of xforms:repeat, the name of the template will not match an existing control 
+                                // Set value into the instance
+                                xformsControls.setBinding(pipelineContext, uploadControl);
+                                {
+                                    final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+                                    XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, value, paramValueType);
+                                }
 
-                            // Handle filename if any
-                            if (uploadControl.getFilenameElement() != null) {
-                                xformsControls.pushBinding(pipelineContext, uploadControl.getFilenameElement());
-                                final Node currentSingleNode = xformsControls.getCurrentSingleNode();
-                                XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, filename, null);
-                                xformsControls.popBinding();
-                            }
+                                // Handle filename if any
+                                if (uploadControl.getFilenameElement() != null) {
+                                    xformsControls.pushBinding(pipelineContext, uploadControl.getFilenameElement());
+                                    final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+                                    XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, filename, null);
+                                    xformsControls.popBinding();
+                                }
 
-                            // Handle mediatype if any
-                            if (uploadControl.getMediatypeElement() != null) {
-                                xformsControls.pushBinding(pipelineContext, uploadControl.getMediatypeElement());
-                                final Node currentSingleNode = xformsControls.getCurrentSingleNode();
-                                XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, mediatype, null);
-                                xformsControls.popBinding();
-                            }
+                                // Handle mediatype if any
+                                if (uploadControl.getMediatypeElement() != null) {
+                                    xformsControls.pushBinding(pipelineContext, uploadControl.getMediatypeElement());
+                                    final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+                                    XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, mediatype, null);
+                                    xformsControls.popBinding();
+                                }
 
-                            // Handle file size if any
-                            if (uploadControl.getSizeElement() != null) {
-                                xformsControls.pushBinding(pipelineContext, uploadControl.getSizeElement());
-                                final Node currentSingleNode = xformsControls.getCurrentSingleNode();
-                                XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, size, null);
-                                xformsControls.popBinding();
+                                // Handle file size if any
+                                if (uploadControl.getSizeElement() != null) {
+                                    xformsControls.pushBinding(pipelineContext, uploadControl.getSizeElement());
+                                    final Node currentSingleNode = xformsControls.getCurrentSingleNode();
+                                    XFormsInstance.setValueForNode(pipelineContext, currentSingleNode, size, null);
+                                    xformsControls.popBinding();
+                                }
                             }
                         }
                     }

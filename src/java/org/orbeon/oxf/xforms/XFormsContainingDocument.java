@@ -20,6 +20,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
+import org.orbeon.oxf.util.LoggerFactory;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 
@@ -33,6 +35,8 @@ import java.util.*;
  * o Event handlers hierarchy
  */
 public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventHandlerContainer {
+
+    private static Logger logger = LoggerFactory.createLogger(XFormsContainingDocument.class);
 
     private List models;
     private Map modelsMap = new HashMap();
@@ -168,37 +172,38 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             dispatchEvent(pipelineContext, xformsEvent);
 
         } else if (XFormsEvents.XXFORMS_VALUE_CHANGE_WITH_FOCUS_CHANGE.equals(eventName)) {
-            // 4.6.7 Sequence: Value Change with Focus Change
+            // 4.6.7 Sequence: Value Change
 
             final XXFormsValueChangeWithFocusChangeEvent concreteEvent = (XXFormsValueChangeWithFocusChangeEvent) xformsEvent;
 
             // 1. xforms-recalculate
             // 2. xforms-revalidate
-            // 3. [n] xforms-valid/xforms-invalid; xforms-enabled/xforms-disabled; xforms-optional/xforms-required; xforms-readonly/xforms-readwrite
-            // 4. xforms-value-changed
-            // 5. DOMFocusOut
-            // 6. DOMFocusIn
-            // 7. xforms-refresh
-            // Reevaluation of binding expressions must occur before step 3 above.
+            // 3. xforms-refresh performs reevaluation of UI binding expressions then dispatches
+            // these events according to value changes, model item property changes and validity
+            // changes
+            // [n] xforms-value-changed, [n] xforms-valid or xforms-invalid, [n] xforms-enabled or
+            // xforms-disabled, [n] xforms-optional or xforms-required, [n] xforms-readonly or
+            // xforms-readwrite, [n] xforms-out-of-range or xforms-in-range
 
             // Set current context to control
             xformsControls.setBinding(pipelineContext, (XFormsControls.ControlInfo) concreteEvent.getTargetObject());
 
             // Set value into the instance
-            XFormsInstance.setValueForNode(pipelineContext, xformsControls.getCurrentSingleNode(), concreteEvent.getNewValue());
+            XFormsInstance.setValueForNode(pipelineContext, xformsControls.getCurrentSingleNode(), concreteEvent.getNewValue(), null);
 
-            // Dispatch events
+            // Recalculate and revalidate
             final XFormsModel model = xformsControls.getCurrentModel();
             dispatchEvent(pipelineContext, new XFormsRecalculateEvent(model, true));
             dispatchEvent(pipelineContext, new XFormsRevalidateEvent(model, true));
 
-            dispatchEvent(pipelineContext, new XFormsValueChangeEvent(concreteEvent.getTargetObject()));
+            // Handle focus change DOMFocusOut / DOMFocusIn
             if (concreteEvent.getOtherTargetObject() != null) {
                 // We have a focus change (otherwise, the focus is assumed to remain the same)
                 dispatchEvent(pipelineContext, new XFormsDOMFocusOutEvent(concreteEvent.getTargetObject()));
                 dispatchEvent(pipelineContext, new XFormsDOMFocusInEvent(concreteEvent.getOtherTargetObject()));
             }
 
+            // Refresh (this will send update events)
             dispatchEvent(pipelineContext, new XFormsRefreshEvent(model));
 
         } else if (XFormsEvents.XXFORMS_SUBMIT.equals(eventName)) {
@@ -266,6 +271,10 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      * Main event dispatching entry.
      */
     public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event) {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Dispatching XForms event: " + event.getEventName() + " - " + event.getTargetObject().getId());
+        }
 
         final XFormsEventTarget targetObject = (XFormsEventTarget) event.getTargetObject();
 

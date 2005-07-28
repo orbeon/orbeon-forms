@@ -24,9 +24,9 @@ public abstract class BooleanModelItemProperty implements Cloneable {
         value = getDefaultValue();
     }
 
-    public void unSet() {
-        isSet = false;
-    }
+//    public void unSet() {
+//        isSet = false;
+//    }
 
     public void set(boolean value) {
         this.value = value;
@@ -41,11 +41,11 @@ public abstract class BooleanModelItemProperty implements Cloneable {
         return get() != getDefaultValue();
     }
 
-    public boolean isSet() {
-        // FIXME: This should tell whether the MIP has been modified by a bind, but currently this
-        // may not always be correct.
-        return isSet;
-    }
+//    public boolean isSet() {
+//        // FIXME: This should tell whether the MIP has been modified by a bind, but currently this
+//        // may not always be correct.
+//        return isSet;
+//    }
 
     protected abstract boolean getDefaultValue();
 

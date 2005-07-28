@@ -21,6 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.util.SecureUtils;
 import org.orbeon.oxf.xforms.InstanceData;
 import org.orbeon.oxf.xforms.XFormsUtils;
+import org.orbeon.oxf.xforms.XFormsInstance;
 
 import java.util.Map;
 
@@ -47,7 +48,7 @@ public class SetValue implements Action {
             Integer idInteger = new Integer(Integer.parseInt(id));
             Node node = (Node) ((InstanceData) instance.getRootElement().getData()).getIdToNodeMap().get(idInteger);
             String newValue = value != null ? value : content == null ? "" : content;
-            XFormsUtils.fillNode(pipelineContext, node, newValue, null);
+            XFormsInstance.setValueForNode(pipelineContext, node, newValue, null);
         } catch (NumberFormatException e) {
             throw new OXFException("Invalid node-id in setvalue action", e);
         }

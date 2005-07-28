@@ -52,46 +52,16 @@ public class XFormsUtils {
      * Adds to <code>target</code> all the attributes in <code>source</code>
      * that are not in the XForms namespace.
      */
-    public static void addNonXFormsAttributes(AttributesImpl target, Attributes source) {
-        for (Iterator i = new XMLUtils.AttributesIterator(source); i.hasNext();) {
-            XMLUtils.Attribute attribute = (XMLUtils.Attribute) i.next();
-            if (!"".equals(attribute.getURI()) &&
-                    !XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attribute.getURI())) {
-                target.addAttribute(attribute.getURI(), attribute.getLocalName(),
-                        attribute.getQName(), ContentHandlerHelper.CDATA, attribute.getValue());
-            }
-        }
-    }
-
-    public static void fillNode(PipelineContext pipelineContext, Node node, String value, String type) {
-
-        // Convert value based on types if possible
-        if (type != null) {
-            final InstanceData instanceData = getInheritedInstanceData(node);
-            final String nodeType = instanceData.getType().getAsString();
-
-            if (nodeType != null && !nodeType.equals(type)) { // FIXME: prefixes of type name could be different!
-                // There is a different type already, do a conversion
-                value = convertUploadTypes(pipelineContext, value, type, nodeType);
-            } else if (nodeType == null) {
-                // There is no type, convert to default type
-                if (!DEFAULT_UPLOAD_TYPE.equals(type)) // FIXME: prefixes of type name could be different!
-                    value = convertUploadTypes(pipelineContext, value, type, DEFAULT_UPLOAD_TYPE);
-            }
-        }
-
-        // Set value
-        if (node instanceof Element) {
-            final Element elementnode = (Element) node;
-            // Remove current content
-            Dom4jUtils.clearElementContent(elementnode);
-            // Put text node with value
-            elementnode.add(Dom4jUtils.createText(value));
-        } else if (node instanceof Attribute) {
-            final Attribute attributenode = (Attribute) node;
-            attributenode.setValue(value);
-        }
-    }
+//    public static void addNonXFormsAttributes(AttributesImpl target, Attributes source) {
+//        for (Iterator i = new XMLUtils.AttributesIterator(source); i.hasNext();) {
+//            XMLUtils.Attribute attribute = (XMLUtils.Attribute) i.next();
+//            if (!"".equals(attribute.getURI()) &&
+//                    !XFormsConstants.XXFORMS_NAMESPACE_URI.equals(attribute.getURI())) {
+//                target.addAttribute(attribute.getURI(), attribute.getLocalName(),
+//                        attribute.getQName(), ContentHandlerHelper.CDATA, attribute.getValue());
+//            }
+//        }
+//    }
 
     /**
      * Return the local XForms instance data for the given node, null if not available.
@@ -111,7 +81,7 @@ public class XFormsUtils {
         if (localInstanceData == null)
             return null;
 
-        InstanceData resultInstanceData;
+        final InstanceData resultInstanceData;
         try {
             resultInstanceData = (InstanceData) localInstanceData.clone();
         } catch (CloneNotSupportedException e) {
@@ -120,7 +90,7 @@ public class XFormsUtils {
         }
 
         for (Element currentElement = node.getParent(); currentElement != null; currentElement = currentElement.getParent()) {
-            InstanceData currentInstanceData = getLocalInstanceData(currentElement);
+            final InstanceData currentInstanceData = getLocalInstanceData(currentElement);
 
             // Handle readonly inheritance
             if (currentInstanceData.getReadonly().get())
@@ -292,10 +262,11 @@ public class XFormsUtils {
     }
 
     private static void iterateInstanceData(Element element, InstanceWalker instanceWalker) {
-        instanceWalker.walk(element, (InstanceData) element.getData());
+        instanceWalker.walk(element, getLocalInstanceData(element), getInheritedInstanceData(element));
+
         for (Iterator i = element.attributes().iterator(); i.hasNext();) {
             final Attribute attribute = (Attribute) i.next();
-            instanceWalker.walk(attribute, (InstanceData) element.getData());
+            instanceWalker.walk(attribute, getLocalInstanceData(attribute), getInheritedInstanceData(attribute));
         }
         for (Iterator i = element.elements().iterator(); i.hasNext();) {
             final Element child = (Element) i.next();
@@ -412,6 +383,6 @@ public class XFormsUtils {
     }
 
     public static interface InstanceWalker {
-        public void walk(Node node, InstanceData instanceData);
+        public void walk(Node node, InstanceData localInstanceData, InstanceData inheritedInstanceData);
     }
 }

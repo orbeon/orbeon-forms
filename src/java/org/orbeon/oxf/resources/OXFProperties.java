@@ -178,17 +178,28 @@ public class OXFProperties {
 
         private Object getObject
         ( final org.dom4j.Element elt, final org.dom4j.QName typ, String value ) {
+            final Object ret;
             try {
-                return XMLConstants.XS_STRING_QNAME.equals(typ) ? (Object) value :
-                       XMLConstants.XS_BOOLEAN_QNAME.equals(typ) ? (Object) new Boolean(value) :
-                       XMLConstants.XS_INTEGER_QNAME.equals(typ) ? (Object) new Integer(value) :
-                       (XMLConstants.XS_DATE_QNAME.equals(typ) || XMLConstants.XS_DATETIME_QNAME.equals(typ)) ? (Object) ISODateUtils.parseDate(value) :
-                       XMLConstants.XS_QNAME_QNAME.equals(typ) ? (Object) Dom4jUtils.extractAttributeValueQName(elt, "value") :
-                       XMLConstants.XS_ANYURI_QNAME.equals(typ) ? (Object) URLFactory.createURL(value) :
-                       null;
+                if ( XMLConstants.XS_STRING_QNAME.equals( typ ) ) {
+                    ret = value;
+                } else if ( XMLConstants.XS_BOOLEAN_QNAME.equals( typ ) ) {
+                    ret = new Boolean( value );
+                } else if ( XMLConstants.XS_INTEGER_QNAME.equals( typ ) ) {
+                    ret = new Integer( value );
+                } else if ( XMLConstants.XS_DATE_QNAME.equals( typ ) 
+                            || XMLConstants.XS_DATETIME_QNAME.equals( typ ) ) {
+                    ret = ISODateUtils.parseDate( value );
+                } else if ( XMLConstants.XS_QNAME_QNAME.equals( typ ) ) {
+                    ret = Dom4jUtils.extractAttributeValueQName(elt, "value");
+                } else if ( XMLConstants.XS_ANYURI_QNAME.equals( typ ) ) {
+                    ret = URLFactory.createURL( value );
+                } else {
+                    ret = null;
+                }
             } catch ( final java.net.MalformedURLException e ) {
                 throw new ValidationException(e, (LocationData) elt.getData());
             }
+            return ret;
         }
 
         public Object getObject(String name) {

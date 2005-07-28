@@ -13,41 +13,104 @@
  */
 package org.orbeon.oxf.processor;
 
-import org.dom4j.*;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import org.orbeon.saxon.om.XMLChar;
 
 /**
  * OXFPropertiesSerializer is a special internal processor that reads a properties file and allows
  * for retrieveing a resulting PropertyStore class.
  */
 public class OXFPropertiesSerializer extends ProcessorImpl {
-
+    
+    public interface Converter {
+        public Object convert( final String val, final org.dom4j.Element elt );
+    }
+    private static class StringConverter implements Converter {
+        public Object convert( final String val, final org.dom4j.Element elt ) {
+            return val;
+        }
+    }
+    private static class IntegerConverter implements Converter {
+        public Object convert( final String val, final org.dom4j.Element elt ) {
+            return new Integer( val );
+        }
+    }
+    private static class BooleanConverter implements Converter {
+        public Object convert( final String val, final org.dom4j.Element elt ) {
+            return Boolean.valueOf( val );
+        }
+    }
+    private static class DateConverter implements Converter {
+        public Object convert( final String val, final org.dom4j.Element elt ) {
+            return ISODateUtils.parseDate( val );
+        }
+    }
+    private static class QNameConverter implements Converter {
+        public Object convert( final String val, final org.dom4j.Element elt ) {
+            return Dom4jUtils.extractAttributeValueQName( elt, "value" );
+        }
+    }
+    private static class URIConverter implements Converter {
+        public Object convert( final String val, final org.dom4j.Element elt ) {
+            final Object ret;
+            try {
+                ret = URLFactory.createURL( val );
+            } catch ( final java.net.MalformedURLException e ) {
+                throw new ValidationException( e, null );
+            }
+            return ret;
+        }
+    }
+    private static class NCNameConverter implements Converter {
+        public Object convert( final String val, final org.dom4j.Element elt ) {
+            if ( !XMLChar.isValidNCName( val ) ) {
+                throw new ValidationException( "Not an NCName: " + val, null );
+            }
+            return val;
+        }
+    }
+    private static class NMTOKENConverter implements Converter {
+        public Object convert( final String val, final org.dom4j.Element elt ) {
+            if ( !XMLChar.isValidNmtoken( val ) ) {
+                throw new ValidationException( "Not an NMTOKEN: " + val, null );
+            }
+            return val;
+        }
+    }
+    private static class NonNegativeIntegerConverter extends IntegerConverter {
+        public Object convert( final String val, final org.dom4j.Element elt ) {
+            final Integer ret = ( Integer )super.convert( val, elt );
+            if ( ret.intValue() < 0 ) {
+                throw new ValidationException( "Not a nonnegatvie integer: " + val, null );
+            }
+            return ret;
+        }
+    }
     public static final String PROPERTIES_SCHEMA_URI = "http://www.orbeon.com/oxf/properties";
 
     private static final String SUPPORTED_TYPES_URI = XMLConstants.XSD_URI;
-    private static final Map supportedTypes = new HashMap();
+    private static final java.util.Map supportedTypes = new java.util.HashMap();
 
     static {
-        supportedTypes.put( XMLConstants.XS_STRING_QNAME, "" );
-        supportedTypes.put( XMLConstants.XS_INTEGER_QNAME, "" );
-        supportedTypes.put( XMLConstants.XS_BOOLEAN_QNAME, "" );
-        supportedTypes.put( XMLConstants.XS_DATE_QNAME, "" );
-        supportedTypes.put( XMLConstants.XS_DATETIME_QNAME, "" );
-        supportedTypes.put( XMLConstants.XS_QNAME_QNAME, "" );
-        supportedTypes.put( XMLConstants.XS_ANYURI_QNAME, "" );
-        supportedTypes.put( XMLConstants.XS_NCNAME_QNAME, "" );
-        supportedTypes.put( XMLConstants.XS_NMTOKEN_QNAME, "" );
-        supportedTypes.put( XMLConstants.XS_NONNEGATIVEiNTEGER_QNAME, "" );
+        supportedTypes.put( XMLConstants.XS_STRING_QNAME, new StringConverter() );
+        supportedTypes.put( XMLConstants.XS_INTEGER_QNAME, new IntegerConverter() );
+        supportedTypes.put( XMLConstants.XS_BOOLEAN_QNAME, new BooleanConverter() );
+        supportedTypes.put( XMLConstants.XS_DATE_QNAME, new DateConverter() );
+        supportedTypes.put( XMLConstants.XS_DATETIME_QNAME, new DateConverter() );
+        supportedTypes.put( XMLConstants.XS_QNAME_QNAME, new QNameConverter() );
+        supportedTypes.put( XMLConstants.XS_ANYURI_QNAME, new URIConverter() );
+        supportedTypes.put( XMLConstants.XS_NCNAME_QNAME, new NCNameConverter() );
+        supportedTypes.put( XMLConstants.XS_NMTOKEN_QNAME, new NMTOKENConverter() );
+        supportedTypes.put
+            ( XMLConstants.XS_NONNEGATIVEiNTEGER_QNAME, new NonNegativeIntegerConverter() );
     }
 
     public OXFPropertiesSerializer() {
@@ -62,17 +125,17 @@ public class OXFPropertiesSerializer extends ProcessorImpl {
         PropertyStore propertyStore = (PropertyStore) readCacheInputAsObject(context, getInputByName(INPUT_DATA),
                 new CacheableInputReader() {
                     public Object read(PipelineContext context, ProcessorInput input) {
-                        Document propertiesDocument = readInputAsDOM4J(context, input);
+                        final org.dom4j.Document propertiesDocument = readInputAsDOM4J(context, input);
                         return createPropertyStore(propertiesDocument);
                     }
                 });
         context.setAttribute(this, propertyStore);
     }
 
-    public static PropertyStore createPropertyStore(Document propertiesNode) {
+    public static PropertyStore createPropertyStore( final org.dom4j.Document propertiesNode) {
         PropertyStore propertyStore = new PropertyStore();
-        for (Iterator i = XPathUtils.selectIterator(propertiesNode, "/properties/property | /attributes/attribute"); i.hasNext();) {
-            Element propertyElement = (Element) i.next();
+        for ( final java.util.Iterator i = XPathUtils.selectIterator(propertiesNode, "/properties/property | /attributes/attribute"); i.hasNext();) {
+            final org.dom4j.Element propertyElement = ( org.dom4j.Element )i.next();
 
             // Extract attributes
             String processorName = propertyElement.attributeValue("processor-name");
@@ -82,14 +145,14 @@ public class OXFPropertiesSerializer extends ProcessorImpl {
 
             if (as != null) {
                 // We only support one namespace for types for now
-                QName typeQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "as");
+                final org.dom4j.QName typeQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "as");
 
                 if (supportedTypes.get( typeQName ) == null)
                     throw new ValidationException("Invalid as attribute: " + typeQName.getQualifiedName(), (LocationData) propertyElement.getData());
 
                 if (processorName != null) {
                     // Processor-specific property
-                    QName processorQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "processor-name");
+                    final org.dom4j.QName processorQName = Dom4jUtils.extractAttributeValueQName(propertyElement, "processor-name");
                     propertyStore.setProperty(propertyElement, processorQName, name, typeQName, value);
                 } else {
                     // Global property
@@ -100,7 +163,9 @@ public class OXFPropertiesSerializer extends ProcessorImpl {
                 String type = propertyElement.attributeValue("type");
                 if (supportedTypes.get(type) == null)
                     throw new ValidationException("Invalid type attribute: " + type, (LocationData) propertyElement.getData());
-                propertyStore.setProperty(propertyElement, name, new QName(type, new Namespace("xs", SUPPORTED_TYPES_URI)), value);
+                propertyStore.setProperty
+                    ( propertyElement, name, new org.dom4j.QName(type
+                      , new org.dom4j.Namespace("xs", SUPPORTED_TYPES_URI)), value);
             }
         }
         return propertyStore;
@@ -108,14 +173,17 @@ public class OXFPropertiesSerializer extends ProcessorImpl {
 
     public static class PropertyStore {
 
-        private OXFProperties.PropertySet globalPropertySet = new OXFProperties.PropertySet();
-        private Map processorPropertySets = new HashMap();
+        private final OXFProperties.PropertySet globalPropertySet = new OXFProperties.PropertySet();
+        private final java.util.Map processorPropertySets = new java.util.HashMap();
 
-        public void setProperty(Element element, String name, QName type, String value) {
+        public void setProperty
+        ( final org.dom4j.Element element, String name, final org.dom4j.QName type, String value ) {
             globalPropertySet.setProperty(element, name, type, value);
         }
 
-        public void setProperty(Element element, QName processorName, String name, QName type, String value) {
+        public void setProperty
+        ( final org.dom4j.Element element, final org.dom4j.QName processorName, String name
+          , final org.dom4j.QName type, String value ) {
             getProcessorPropertySet(processorName).setProperty(element, name, type, value);
         }
 
@@ -124,7 +192,8 @@ public class OXFPropertiesSerializer extends ProcessorImpl {
             return globalPropertySet;
         }
 
-        public OXFProperties.PropertySet getProcessorPropertySet(QName processorName) {
+        public OXFProperties.PropertySet getProcessorPropertySet
+        ( final org.dom4j.QName processorName ) {
             OXFProperties.PropertySet propertySet = (OXFProperties.PropertySet) processorPropertySets.get(processorName);
             if (propertySet == null) {
                 propertySet = new OXFProperties.PropertySet();

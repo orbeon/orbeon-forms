@@ -163,7 +163,8 @@ public class OXFProperties {
 
         public void setProperty
         ( final org.dom4j.Element elt, String name, final org.dom4j.QName typ, String value) {
-            properties.put(name, new TypeValue( typ, getObject(elt, typ, value)));
+            final Object o = OXFPropertiesSerializer.getObject( value, typ, elt );
+            properties.put(name, new TypeValue( typ, o ) );
         }
 
         public Object getProperty(String name, final org.dom4j.QName typ ) {
@@ -174,32 +175,6 @@ public class OXFProperties {
                 throw new OXFException("Invalid attribute type requested for property '" + name + "': expected "
                         + typ.getQualifiedName() + ", found " + typeValue.type.getQualifiedName());
             return typeValue.value;
-        }
-
-        private Object getObject
-        ( final org.dom4j.Element elt, final org.dom4j.QName typ, String value ) {
-            final Object ret;
-            try {
-                if ( XMLConstants.XS_STRING_QNAME.equals( typ ) ) {
-                    ret = value;
-                } else if ( XMLConstants.XS_BOOLEAN_QNAME.equals( typ ) ) {
-                    ret = new Boolean( value );
-                } else if ( XMLConstants.XS_INTEGER_QNAME.equals( typ ) ) {
-                    ret = new Integer( value );
-                } else if ( XMLConstants.XS_DATE_QNAME.equals( typ ) 
-                            || XMLConstants.XS_DATETIME_QNAME.equals( typ ) ) {
-                    ret = ISODateUtils.parseDate( value );
-                } else if ( XMLConstants.XS_QNAME_QNAME.equals( typ ) ) {
-                    ret = Dom4jUtils.extractAttributeValueQName(elt, "value");
-                } else if ( XMLConstants.XS_ANYURI_QNAME.equals( typ ) ) {
-                    ret = URLFactory.createURL( value );
-                } else {
-                    ret = null;
-                }
-            } catch ( final java.net.MalformedURLException e ) {
-                throw new ValidationException(e, (LocationData) elt.getData());
-            }
-            return ret;
         }
 
         public Object getObject(String name) {

@@ -131,6 +131,13 @@ public class OXFPropertiesSerializer extends ProcessorImpl {
                 });
         context.setAttribute(this, propertyStore);
     }
+    
+    public static Object getObject
+    ( final String val, final org.dom4j.QName typ, final org.dom4j.Element elt ) {
+        final Converter cvrtr = ( Converter )supportedTypes.get( typ );
+        final Object ret = cvrtr == null ? null : cvrtr.convert( val, elt );
+        return ret;
+    }
 
     public static PropertyStore createPropertyStore( final org.dom4j.Document propertiesNode) {
         PropertyStore propertyStore = new PropertyStore();

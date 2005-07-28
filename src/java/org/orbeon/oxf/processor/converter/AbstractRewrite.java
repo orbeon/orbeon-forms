@@ -67,12 +67,12 @@ import org.xml.sax.helpers.AttributesImpl;
  *   @author d
  */
 abstract class AbstractRewrite extends ProcessorImpl {
-	/**
-	 * <!-- REWRITE_IN -->
-	 * Name of the input that receives the content that is to be rewritten.
-	 * @author d
-	 */
-	private static final String REWRITE_IN = "rewrite-in";
+    /**
+     * <!-- REWRITE_IN -->
+     * Name of the input that receives the content that is to be rewritten.
+     * @author d
+     */
+    private static final String REWRITE_IN = "rewrite-in";
     /**
      * <!-- FORMATTING_URI -->
      * What you think.
@@ -1120,9 +1120,13 @@ abstract class AbstractRewrite extends ProcessorImpl {
             readInputAsSAX( ctxt, REWRITE_IN, stFlHndlr );
         }
     }
-
+    /**
+     * <!-- rewriteURI -->
+     * Namespace of the elements that are to be rewritten. 
+     * @author d 
+     * @see #AbstractRewrite(String)
+     */
     final String rewriteURI;
-    
     /**
      * <!-- AbstractRewrite -->
      * Just declares input 'rewrite-in' and output 'rewrite-out'.

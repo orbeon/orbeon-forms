@@ -109,7 +109,7 @@ public class PipelineContext {
     public PipelineContext() {
         final OXFProperties prps = OXFProperties.instance();
         final PropertySet prpSet = prps.getPropertySet();
-        final String trcCls = prpSet.getString( "processor.trace" ); 
+        final String trcCls = prpSet.getNCName( "processor.trace" ); 
         if ( trcCls == null ) {
         	trace = null;
         } else {

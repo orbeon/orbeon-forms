@@ -14,12 +14,9 @@
 package org.orbeon.oxf.resources;
 
 import org.orbeon.oxf.common.OXFException;
-import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.OXFPropertiesSerializer;
-import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.SAXException;
 
 /**
@@ -251,6 +248,15 @@ public class OXFProperties {
          */
         public java.net.URL getURL(String name) {
             return ( java.net.URL ) getProperty(name, XMLConstants.XS_ANYURI_QNAME);
+        }
+        public Integer getNonNegativeInteger( final String nm ) {
+            return ( Integer )getProperty( nm, XMLConstants.XS_NONNEGATIVEiNTEGER_QNAME );
+        }
+        public String getNCName( final String nm ) {
+            return ( String )getProperty( nm, XMLConstants.XS_NCNAME_QNAME );
+        }
+        public String getNMTOKEN( final String nm ) {
+            return ( String )getProperty( nm, XMLConstants.XS_NMTOKEN_QNAME );
         }
     }
 }

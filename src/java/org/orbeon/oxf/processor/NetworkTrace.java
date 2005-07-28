@@ -27,10 +27,10 @@ public class NetworkTrace implements Trace {
 	static {
                 final OXFProperties prps = OXFProperties.instance();
                 final PropertySet prpSet = prps.getPropertySet();
-                final String hst = prpSet.getString( "processor.trace.host" ); 
+                final String hst = prpSet.getNMTOKEN( "processor.trace.host" ); 
 		host = hst == null ? "localhost" : hst;
-		final String sprt = prpSet.getString( "processor.trace.port" );
-		port = sprt == null ? 9191 : Integer.parseInt( sprt );
+		final Integer prtInt = prpSet.getNonNegativeInteger( "processor.trace.port" );
+		port = prtInt == null ? 9191 : prtInt.intValue();
 	}
 
 	final java.util.ArrayList traceInfs = new java.util.ArrayList( 0 );

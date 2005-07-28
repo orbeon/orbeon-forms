@@ -620,6 +620,30 @@
             </note>
         </section>
         <section>
+            <title>XPL Profiling Support</title>
+            <ul>
+                <li>
+                    A 'trace' API has been added.  The interface is 
+                    <code>org.orbeon.oxf.pipeline.api.PipelineContext.Trace</code>
+                </li>
+                <li>
+                    OPS ships with two implementations of <code>Trace</code>, 
+                    <code>org.orbeon.oxf.processor.NetworkTrace</code> and 
+                    <code>org.orbeon.oxf.processor.StdOutTrace</code>.  
+                    <code>NetworkTrace</code> sends profiling information to Studio which the 
+                    displays the data in the trace views.  <code>StdOutTrace</code> simply 
+                    dumps profiling information to standard out.
+                </li>
+                <li>
+                    <a href='reference-properties'>Properties</a> for configuring the tracing have 
+                    been added.
+                </li>
+                <li>
+                    Views for viewing profiling data have been added to Orbeon Studio.
+                </li>
+            </ul>
+        </section>
+        <section>
             <title>Other Changes</title>
             <p>
                 The following changes are new in OPS 3.0 BETA:

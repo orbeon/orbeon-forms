@@ -121,6 +121,7 @@ structural elements
       <xsd:attribute name="ref" type="xforms:XPathExpression"/>
       <xsd:attribute name="bind" type="xsd:IDREF"/>
       <xsd:attribute name="action" type="xsd:anyURI" use="optional"/>
+      <xsd:attribute name="instance" type="xsd:string" use="optional"/>
       <xsd:attribute name="method" use="required">
         <xsd:simpleType>
 

@@ -126,8 +126,8 @@
                                                     <xs:element name="child">
                                                         <xs:complexType>
                                                             <xs:sequence>
-                                                                <xs:element type="xs:date" name="birth-date"/>
-                                                                <xs:element type="claim:requiredNonEmptyString" name="first-name"/>
+                                                                <xs:element type="claim:optionalDate" name="birth-date"/>
+                                                                <xs:element type="xs:string" name="first-name"/>
                                                             </xs:sequence>
                                                         </xs:complexType>
                                                     </xs:element>
@@ -168,6 +168,19 @@
 			<xs:minLength value="1" />
             <xs:whiteSpace value="collapse"/>
 		</xs:restriction>
+	</xs:simpleType>
+
+    <xs:simpleType name="optionalDate">
+		<xs:union>
+            <xs:simpleType>
+                <xs:restriction base="xs:date"/>
+            </xs:simpleType>
+            <xs:simpleType>
+                <xs:restriction base="xs:string">
+                    <xs:maxLength value="0"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:union>
 	</xs:simpleType>
 
 </xs:schema>

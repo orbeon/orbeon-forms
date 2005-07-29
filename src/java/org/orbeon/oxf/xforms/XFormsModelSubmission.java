@@ -25,11 +25,11 @@ import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xforms.mip.BooleanModelItemProperty;
+import org.orbeon.oxf.xforms.mip.ValidModelItemProperty;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
-import org.orbeon.oxf.xml.dom4j.LocationSAXContentHandler;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
@@ -161,25 +161,23 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                 final XFormsInstance currentInstance = xformsControls.getCurrentInstance();
 
-                // Revalidate instance
-                // TODO: we should only revalidate relevant parts
-                containingDocument.dispatchEvent(pipelineContext,  new XFormsRevalidateEvent(model, false));
-                // TODO: The "false" attribute is no longer used. The above will cause events to be
-                // sent out. Check if the validation state can really change. If so, find a
-                // solution.
-
                 final Document initialDocumentToSubmit;
                 if (!isDeferredSubmissionSecondPass) {
                     // Create document to submit
                     initialDocumentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
 
+                    // Revalidate instance
+                    containingDocument.dispatchEvent(pipelineContext,  new XFormsRevalidateEvent(model, false));
+                    // TODO: The "false" attribute is no longer used. The above will cause events to be
+                    // sent out. Check if the validation state can really change. If so, find a
+                    // solution.
+                    // "no notification events are marked for dispatching due to this operation"
+
                     // Check that there are no validation errors
-                    final boolean instanceValid = isDocumentValid(initialDocumentToSubmit);
-                    if (!instanceValid) {
-                        LocationSAXContentHandler ch = new LocationSAXContentHandler();
-                        currentInstance.read(ch);
-                        System.out.println(Dom4jUtils.domToString(ch.getDocument()));
-                        throw new OXFException("xforms:submission: instance is not valid.");
+                    final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(initialDocumentToSubmit);
+                    if (!instanceSatisfiesValidRequired) {
+                        currentInstance.readOut();// FIXME: DEBUG
+                        throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
                     }
                 } else {
                     initialDocumentToSubmit = null;
@@ -192,8 +190,9 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                     return;
                 }
 
-                // Handle uploaded files if any
+                final Document documentToSubmit;
                 if (isDeferredSubmissionSecondPass) {
+                    // Handle uploaded files if any
                     final Element filesElement = ((XXFormsSubmissionEvent) event).getFilesElement();
                     if (filesElement != null) {
                         for (Iterator i = filesElement.elements().iterator(); i.hasNext();) {
@@ -211,7 +210,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             final XFormsControls.UploadControlInfo uploadControl
                                     = (XFormsControls.UploadControlInfo) containingDocument.getObjectById(pipelineContext, name);
 
-                            if (uploadControl != null) { // in case of xforms:repeat, the name of the template will not match an existing control 
+                            if (uploadControl != null) { // in case of xforms:repeat, the name of the template will not match an existing control
                                 // Set value into the instance
                                 xformsControls.setBinding(pipelineContext, uploadControl);
                                 {
@@ -245,22 +244,25 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                             }
                         }
                     }
-                }
 
-                final Document documentToSubmit;
-                if (isDeferredSubmissionSecondPass) {
                     // Create document to submit
                     documentToSubmit = createDocumentToSubmit(currentNode, currentInstance);
 
+                    // Revalidate instance
+                    containingDocument.dispatchEvent(pipelineContext,  new XFormsRevalidateEvent(model, false));
+                    // TODO: The "false" attribute is no longer used. The above will cause events to be
+                    // sent out. Check if the validation state can really change. If so, find a
+                    // solution.
+                    // "no notification events are marked for dispatching due to this operation"
+
                     // Check that there are no validation errors
-                    final boolean instanceValid = isDocumentValid(documentToSubmit);
-                    if (!instanceValid) {
-                        LocationSAXContentHandler ch = new LocationSAXContentHandler();
-                        currentInstance.read(ch);
-                        System.out.println(Dom4jUtils.domToString(ch.getDocument()));
-                        throw new OXFException("xforms:submission: instance is not valid.");
+                    final boolean instanceSatisfiesValidRequired = isDocumentSatisfiesValidRequired(documentToSubmit);
+                    if (!instanceSatisfiesValidRequired) {
+                        currentInstance.readOut();// FIXME: DEBUG
+                        throw new OXFException("xforms:submission: instance to submit does not satisfy valid and/or required model item properties.");
                     }
                 } else {
+                    // Don't recreate document
                     documentToSubmit = initialDocumentToSubmit;
                 }
 
@@ -608,7 +610,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
     }
 
     private Document createDocumentToSubmit(final Node currentNode, final XFormsInstance currentInstance) {
-        Document documentToSubmit;
+
+        // "A node from the instance data is selected, based on attributes on the submission
+        // element. The indicated node and all nodes for which it is an ancestor are considered for
+        // the remainder of the submit process. "
+        final Document documentToSubmit;
         if (currentNode instanceof Element) {
             // Create subset of document
             documentToSubmit = Dom4jUtils.createDocument((Element) currentNode);
@@ -616,31 +622,77 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
             // Use entire instance document
             documentToSubmit = currentInstance.getDocument();
         }
-        // TODO: handle includenamespaceprefixes + handle non-relevant nodes
+
+        // "Any node which is considered not relevant as defined in 6.1.4 is removed."
+        final Node[] nodeToDetach = new Node[1];
+        do {
+            // NOTE: This is not very efficient, but at least we avoid NPEs that we would get by
+            // detaching elements within accept(). Should implement a more efficient algorithm to
+            // prune non-relevant nodes.
+            nodeToDetach[0] = null;
+            documentToSubmit.accept(new VisitorSupport() {
+
+                public final void visit(Element element) {
+                    checkInstanceData(element);
+                }
+
+                public final void visit(Attribute attribute) {
+                    checkInstanceData(attribute);
+                }
+
+                private final void checkInstanceData(Node node) {
+                    if (nodeToDetach[0] == null) {
+                        final InstanceData instanceData = XFormsUtils.getLocalInstanceData(node);
+                        // Check "relevant" MIP and remove non-relevant nodes
+                        {
+                            final BooleanModelItemProperty relevantMIP = instanceData.getRelevant();
+                            if (relevantMIP != null && !relevantMIP.get())
+                                nodeToDetach[0] = node;
+                        }
+                    }
+                }
+            });
+            if (nodeToDetach[0] != null)
+                nodeToDetach[0].detach();
+
+        } while(nodeToDetach[0] != null);
+
+        // TODO: handle includenamespaceprefixes
         return documentToSubmit;
     }
 
-    private boolean isDocumentValid(final Document documentToSubmit) {
-        final boolean[] instanceValid = new boolean[] { true } ;
+    private boolean isDocumentSatisfiesValidRequired(final Document documentToSubmit) {
+        final boolean[] instanceSatisfiesValidRequired = new boolean[] { true } ;
         documentToSubmit.accept(new VisitorSupport() {
 
-            public void visit(Element element) {
+            public final void visit(Element element) {
                 final InstanceData instanceData = XFormsUtils.getLocalInstanceData(element);
                 checkInstanceData(instanceData);
             }
 
-            public void visit(Attribute attribute) {
+            public final void visit(Attribute attribute) {
                 final InstanceData instanceData = XFormsUtils.getLocalInstanceData(attribute);
                 checkInstanceData(instanceData);
             }
 
-            private void checkInstanceData(InstanceData instanceData) {
-                final BooleanModelItemProperty validMIP = instanceData.getValid();
-                if (validMIP != null)
-                    instanceValid[0] &= validMIP.get();
+            private final void checkInstanceData(InstanceData instanceData) {
+                // Check "valid" MIP
+                {
+                    final BooleanModelItemProperty validMIP = instanceData.getValid();
+                    if (validMIP != null && !validMIP.get())
+                        instanceSatisfiesValidRequired[0] = false;
+                }
+                // Check "required" MIP
+                {
+                    final ValidModelItemProperty requiredMIP = instanceData.getRequired();
+                    if (requiredMIP != null && requiredMIP.get() && requiredMIP.getStringValue().length() == 0) {
+                        // Required and empty
+                        instanceSatisfiesValidRequired[0] = false;
+                    }
+                }
             }
         });
-        return instanceValid[0];
+        return instanceSatisfiesValidRequired[0];
     }
 }
 

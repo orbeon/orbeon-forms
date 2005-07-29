@@ -43,7 +43,7 @@
             </p>
         </section>
         <section>
-            <title>Known Limitations of OPS 3.0 BETA+</title>
+            <title>Known Limitations of OPS 3.0 BETA (nightly build)</title>
             <p>
                 The following limitations are known:
             </p>
@@ -128,6 +128,11 @@
                         reference to a submission element with <code>replace="all"</code>. The value
                         of XForms upload controls is ignored when forms are submitted with
                         <code>replace="instance"</code> or <code>replace="none"</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        At most one XML schema is allowed on a particular XForms model.
                     </p>
                 </li>
             </ul>
@@ -304,14 +309,12 @@
                     </li>
                     <li>
                         <p>
-                            With OPS 2.8, the "required" model item property did not apply to
+                            With OPS 2.8, the "required" model item property did not apply at all to
                             elements validated with XML schemas. If for example a value was of type
-                            <code>xs:integer</code> but missing, it was marked as invalid. With OPS
-                            3.0, the default value for the "required" model item property is "false"
-                            for values validated with XML schemas as well. This means that with OPS
-                            3.0, some values invalid with OSP 2.8 are now valid. In order to fix
-                            this, explicitly set the "required" model item properties on values you
-                            would like to be required.
+                            <code>xs:string</code> but missing and required, it was marked as valid
+                            (which was correct) but submission would pass. With OPS 3.0, nodes
+                            which are "valid", "required" and empty will cause submission to fail.
+                            Be sure to check your types and "required" model item properties.
                         </p>
                     </li>
                 </ul>

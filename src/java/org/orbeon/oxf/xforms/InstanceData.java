@@ -82,20 +82,33 @@ public class InstanceData implements Cloneable {
             valid = new ValidModelItemProperty() {
 
                 public boolean get() {
-                    // If the constraint make the node invalid, the node is really invalid!
+                    // "An instance node is valid if and only if the following conditions hold:"
+
+
+                    // "* the constraint model item property is true"
                     if (!constraint.get())
                         return false;
 
+                    // NOTE: The commented-out code below assumed that the valid MIP was depending
+                    // on the required MIP. The latest errata clarifies that this is not the case.
+                    // In OPS, the UI will specially mark fields that are required but empty. Also,
+                    // upon submission, an empty but required node will prevent submission from
+                    // happening.
+
                     // Handle type and required constraints
-                    if (valueValid.get() && getRequired().get()) {
-                        // Valid and required, check that the value is actually non-empty
-                        return !(getRequired().getStringValue().length() == 0);
-                    } else if (!valueValid.get() && !getRequired().get()) {
-                        // Not valid and not required, checked that the value is actually empty
-                        return valueValid.getStringValue().length() == 0;
-                    } else {
-                        return valueValid.get();
-                    }
+//                    if (valueValid.get() && getRequired().get()) {
+//                        // Valid and required, check that the value is actually non-empty
+//                        return !(getRequired().getStringValue().length() == 0);
+//                    } else if (!valueValid.get() && !getRequired().get()) {
+//                        // Not valid and not required, checked that the value is actually empty
+//                        return valueValid.getStringValue().length() == 0;
+//                    } else {
+//                        return valueValid.get();
+//                    }
+                    // "* the node satisfies any applicable XML schema definitions (including those
+                    // associated by the type model item property) NOTE: A node that satifies the
+                    // above conditions is valid even if it is required but empty."
+                    return valueValid.get();
                 }
 
                 public void set(boolean value) {
@@ -156,12 +169,6 @@ public class InstanceData implements Cloneable {
         return ret;
     }
 
-//    public void clearSchemaError() {
-//        valueValid = new ValidModelItemProperty();
-//        if (schemaErrors != null)
-//            schemaErrors.clear();
-//    }
-
     public void addSchemaError(final String msg, final String stringValue) {
         valueValid.set(false, stringValue);
         if (schemaErrors == null) {
@@ -170,19 +177,6 @@ public class InstanceData implements Cloneable {
         schemaErrors.add(msg);
     }
 
-//    private void clearComputedExpressionState() {
-//
-//        // Save required state
-//        previousRequiredState = getRequired().get();
-//        previousRelevantState = getRelevant().get();
-//        previousReadonlyState = getReadonly().get();
-//
-//        // clear required MIPs
-//        required = new RequiredModelItemProperty();
-//        relevant = new RelevantModelItemProperty();
-//        readonly = new ReadonlyModelItemProperty();
-//    }
-//
     public void clearValidationState() {
 
         // Clear everything related to validity (except required)

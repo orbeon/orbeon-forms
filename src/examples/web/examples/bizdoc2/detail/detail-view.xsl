@@ -24,13 +24,15 @@
 
     <head>
         <title>BizDoc Detail</title>
-        <xforms:model schema="oxf:/examples/bizdoc/detail/form-schema.xsd">
+        <xforms:model id="main-model" schema="oxf:/examples/bizdoc/detail/form-schema.xsd">
             <xforms:action ev:event="xforms-submit-done">
+                <xforms:setvalue ref="instance('repeats')/submitting">false</xforms:setvalue>
                 <xforms:setvalue ref="instance('main-instance')/message">Submission successful!</xforms:setvalue>
                 <xforms:toggle case="message"/>
                 <xforms:toggle case="ok-message"/>
             </xforms:action>
             <xforms:action ev:event="xforms-submit-error">
+                <xforms:setvalue ref="instance('repeats')/submitting">false</xforms:setvalue>
                 <xforms:setvalue ref="instance('main-instance')/message">Submission failed! Please correct errors first.</xforms:setvalue>
                 <xforms:toggle case="message"/>
                 <xforms:toggle case="error-message"/>
@@ -53,6 +55,11 @@
                     <remove-child/>
                 </triggers>
             </xforms:instance>
+            <xforms:instance id="repeats">
+                <repeats xmlns="">
+                    <submitting>false</submitting>
+                </repeats>
+            </xforms:instance>
             <xforms:bind nodeset="/form/document/claim:claim">
                 
                 <!-- Add some required elements -->
@@ -73,8 +80,7 @@
 
                 <!-- This bind element handles the empty repeat entry necessary to add new entries with xforms:repeat -->
                 <xforms:bind nodeset="claim:insured-info/claim:family-info/claim:children">
-                    <xforms:bind nodeset="claim:child[last()]/claim:birth-date" relevant="false()"/>
-                    <xforms:bind nodeset="claim:child[last()]/claim:first-name" relevant="false()"/>
+                    <xforms:bind nodeset="claim:child[last()]" relevant="instance('repeats')/submitting = 'true'"/>
                     <xforms:bind nodeset="claim:child[position() lt last()]/claim:birth-date" required="true()"/>
                     <xforms:bind nodeset="claim:child[position() lt last()]/claim:first-name" required="true()"/>
                 </xforms:bind>
@@ -273,6 +279,8 @@
                                         <xforms:trigger>
                                             <xforms:label>Save</xforms:label>
                                             <xforms:action ev:event="DOMActivate">
+                                                <xforms:setvalue ref="instance('repeats')/submitting">true</xforms:setvalue>
+                                                <xforms:recalculate model="main-model"/>
                                                 <xforms:send submission="save"/>
                                             </xforms:action>
                                         </xforms:trigger>
@@ -504,6 +512,8 @@
                                         <xforms:trigger>
                                             <xforms:label>Save</xforms:label>
                                             <xforms:action ev:event="DOMActivate">
+                                                <xforms:setvalue ref="instance('repeats')/submitting">true</xforms:setvalue>
+                                                <xforms:recalculate model="main-model"/>
                                                 <xforms:send submission="save"/>
                                             </xforms:action>
                                         </xforms:trigger>

@@ -14,7 +14,7 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <page path-info="/xforms-controls" view="view.xml"/>
+    <page path-info="/xforms-controls" view="view.xhtml"/>
     <page path-info="/direct/xforms-controls/update-countries" model="update-countries.xpl"/>
     <page path-info="/direct/xforms-controls/update-country-details" model="update-country-details.xpl"/>
 

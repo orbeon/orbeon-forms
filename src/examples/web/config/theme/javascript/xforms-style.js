@@ -137,7 +137,7 @@ function xformsUpdateStyle(element) {
 
                 // Create new div when necessary
                 if (needToCreateDiv) {
-                    element.divId = element.id + "-div";
+                    element.divId = control.id + "-div";
                     var divHTML = tt_Htm(this, element.divId, control.helpMessage);
                     var container = element.cloneNode(true);
                     container.innerHTML = divHTML;

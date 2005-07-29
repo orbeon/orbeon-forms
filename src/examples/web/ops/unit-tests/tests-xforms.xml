@@ -1023,7 +1023,7 @@
             <instance>
                 <a xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true">Orbeon</a>
                 <b/>
-                <c xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:required="true" xxforms:valid="false"></c>
+                <c xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:required="true"></c>
                 <d xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xxforms:readonly="true"></d>
                 <e/>
             </instance>

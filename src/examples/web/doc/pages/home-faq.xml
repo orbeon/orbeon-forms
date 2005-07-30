@@ -603,15 +603,46 @@
                 <p>
                     <ul>
                         <li>
-                            Some versions of Chainsaw have a bug where Chainsaw stops responding
-                            in certain situations, which blocks the application server. If you are
-                            using Chainsaw, this might be the problem: use the FileAppender
-                            instead, or use <a href="http://www.orbeon.com/software/studio">Orbeon
-                            Studio</a> instead of Chainsaw to view log messages.
+                            <p>
+                                If your JVM is running but is not responding to HTTP requests, you
+                                might first want to see where in the Java code threads are blocked. To do so, on
+                                Windows hit ctrl-break in the command prompt window where your application
+                                server is running; on Linux identify the process id of the JVM running
+                                your application server and issue a <code>kill -3 pid</code>.
+                            </p>
+                            <p>
+                                If you are using Tomcat and the threads are blocked in database code
+                                (e.g. SQLProcessor, PoolingDataSource) open your <code>server.xml</code>,
+                                locate the element configuring the Coyote HTTP 1.1 Connector. Make sure
+                                that the <code>maxProcessors</code> attribute on Tomcat 4.1 or the <code>maxThreads</code>
+                                attribute on Tomcat 5 is set to a value that is much lower than the value of
+                                the <code>acceptCount</code> attribute. Typically values for <code>maxProcessor</code>
+                                or <code>maxThreads</code> are 3 for a single-CPU server or 4 for a dual-CPU server,
+                                while the value of <code>acceptCount</code> can be much higher, typically between
+                                50 and 100.
+                            </p>
+                            <p>
+                                For more information on those and other attributes configuring the Coyote HTTP
+                                1.1 Connector in general, see the
+                                <a href="http://jakarta.apache.org/tomcat/tomcat-4.1-doc/config/coyote.html">Tomcat 4.1</a>
+                                or <a href="http://jakarta.apache.org/tomcat/tomcat-5.0-doc/config/http.html">Tomcat 5</a>
+                                documentation.
+                            </p>
                         </li>
                         <li>
-                            If you are running RedHat 9, set the environment variable
-                            LD_ASSUME_KERNEL=2.4.1 and restart the application server.
+                            <p>
+                                Some versions of Chainsaw have a bug where Chainsaw stops responding
+                                in certain situations, which blocks the application server. If you are
+                                using Chainsaw, this might be the problem: use the FileAppender
+                                instead, or use <a href="http://www.orbeon.com/software/studio">Orbeon
+                                Studio</a> instead of Chainsaw to view log messages.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                If you are running RedHat 9, set the environment variable
+                                LD_ASSUME_KERNEL=2.4.1 and restart the application server.
+                            </p>
                         </li>
                     </ul>
                 </p>

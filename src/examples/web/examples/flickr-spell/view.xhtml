@@ -23,16 +23,19 @@
     <xhtml:head>
         <xhtml:title>Flickr Spell</xhtml:title>
         <xforms:model>
-            <xforms:instance id="text">
-                <text/>
+            <xforms:instance id="input">
+                <input>
+                    <text/>
+                    <seed>1</seed>
+                </input>
             </xforms:instance>
             <xforms:instance id="images">
                 <images/>
             </xforms:instance>
-            <xforms:submission ref="instance('text')" id="spell"
+            <xforms:submission ref="instance('input')" id="spell"
                 method="post" action="/direct/flickr-spell/spell"
                 replace="instance" instance="images"/>
-            <xforms:bind nodeset="instance('images')" relevant="instance('text') != ''"/>
+            <xforms:bind nodeset="instance('images')" relevant="instance('input')/text != ''"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -59,7 +62,7 @@
         <xforms:group>
             <xforms:send submission="spell" ev:event="xforms-value-changed"/>
             <xhtml:p>
-                <xforms:input ref="instance('text')" incremental="true">
+                <xforms:input ref="instance('input')/text" incremental="true">
                     <xforms:label>Type here: </xforms:label>
                 </xforms:input>
             </xhtml:p>
@@ -68,8 +71,11 @@
             </xhtml:p>
             <xhtml:p>
                 <xforms:trigger ref="instance('images')">
-                    <xforms:label>Shuffle!</xforms:label>
-                    <xforms:send submission="spell" ev:event="DOMActivate"/>
+                    <xforms:label>Change letters!</xforms:label>
+                    <xforms:action  ev:event="DOMActivate">
+                        <xforms:setvalue ref="instance('input')/seed" value="instance('input')/seed + 1"/>
+                        <xforms:send submission="spell"/>
+                    </xforms:action>
                 </xforms:trigger>
             </xhtml:p>
         </xforms:group>

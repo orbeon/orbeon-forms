@@ -21,7 +21,8 @@
     xmlns:flickr="urn:flickr"
     xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:math="java:java.lang.Math">
+    xmlns:math="java:java.lang.Math"
+    xmlns:random="java:java.util.Random">
 
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>
@@ -31,7 +32,7 @@
         <p:input name="data" href="#instance"/>
         <p:input name="config">
             <letters xsl:version="2.0">
-                <xsl:variable name="text" as="xs:string" select="upper-case(/text)"/>
+                <xsl:variable name="text" as="xs:string" select="upper-case(/input/text)"/>
                 <xsl:for-each select="1 to string-length($text)">
                     <letter>
                         <xsl:variable name="letter" select="substring($text, current(), 1)"/>
@@ -143,11 +144,14 @@
 
                 <!-- Pick a random picture and link to it -->
                 <p:processor name="oxf:unsafe-xslt">
+                    <p:input name="instance" href="#instance"/>
                     <p:input name="data" href="#photos"/>
                     <p:input name="config">
                         <img xsl:version="2.0">
+                            <xsl:message><xsl:value-of select="doc('input:instance')/input/seed"/></xsl:message>
+                            <xsl:variable name="random" select="random:new(4242 * doc('input:instance')/input/seed cast as xs:double)"/>
                             <xsl:variable name="position" as="xs:double"
-                                select="floor(math:random() * count(/flickr:FlickrResponse/photos/photo)) + 1"/>
+                                select="floor(random:nextDouble($random) * count(/flickr:FlickrResponse/photos/photo)) + 1"/>
                             <xsl:variable name="photo" as="element()"
                                 select="/flickr:FlickrResponse/photos/photo[$position]"/>
                             <xsl:attribute name="src">

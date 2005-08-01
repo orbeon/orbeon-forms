@@ -158,6 +158,15 @@ public class EmailProcessor extends ProcessorImpl {
                 message.addRecipient(Message.RecipientType.BCC, address);
             }
 
+            // Set headers if any
+            for (Iterator i = messageElement.elements("header").iterator(); i.hasNext();) {
+                final Element headerElement = (Element) i.next();
+                final String headerName = headerElement.element("name").getTextTrim();
+                final String headerValue = headerElement.element("value").getTextTrim();
+
+                message.addHeader(headerName, headerValue);
+            }
+
             // Set subject
             message.setSubject(messageElement.element("subject").getStringValue());
 

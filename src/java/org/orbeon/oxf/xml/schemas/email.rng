@@ -41,6 +41,16 @@
             <element name="subject">
                 <data type="string"/>
             </element>
+            <zeroOrMore>
+                <element name="header">
+                    <element name="name">
+                        <data type="string"/>
+                    </element>
+                    <element name="value">
+                        <data type="string"/>
+                    </element>
+                </element>
+            </zeroOrMore>
             <ref name="body"/>
         </element>
     </start>

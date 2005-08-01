@@ -30,6 +30,11 @@
                     <name/>
                 </cc>
                 <subject/>
+                <!-- Test for headers -->
+<!--                <header>-->
+<!--                    <name>X-no-archive</name>-->
+<!--                    <value>yes</value>-->
+<!--                </header>-->
                 <body mime-multipart="alternative">
                     <!-- Provide simple text alternative -->
                     <part name="text" content-type="text/plain">Your email client does not support displaying HTML messages.</part>

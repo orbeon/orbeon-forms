@@ -96,6 +96,14 @@
                     <td>Subject of the message</td>
                 </tr>
                 <tr>
+                    <td>message/header</td>
+                    <td>0..n</td>
+                    <td>
+                        Optional extra email header to add. Contains a <code>name</code> element
+                        and a <code>value</code> element.
+                    </td>
+                </tr>
+                <tr>
                     <td>message/body</td>
                     <td>1</td>
                     <td>Indicates a message body optionally containing multiple parts</td>

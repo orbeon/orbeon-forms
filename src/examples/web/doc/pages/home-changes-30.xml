@@ -759,6 +759,13 @@
                 </li>
                 <li>
                     <p>
+                        <b>Email processor</b>. The <a href="processors-messaging-email">Email
+                        processor</a> now supports setting custom email headers with the new
+                        <code>header</code> configuration element.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         TODO
                     </p>
                 </li>

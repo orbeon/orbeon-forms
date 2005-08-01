@@ -148,7 +148,6 @@
                     <p:input name="data" href="#photos"/>
                     <p:input name="config">
                         <img xsl:version="2.0">
-                            <xsl:message><xsl:value-of select="doc('input:instance')/input/seed"/></xsl:message>
                             <xsl:variable name="random" select="random:new(4242 * doc('input:instance')/input/seed cast as xs:double)"/>
                             <xsl:variable name="position" as="xs:double"
                                 select="floor(random:nextDouble($random) * count(/flickr:FlickrResponse/photos/photo)) + 1"/>

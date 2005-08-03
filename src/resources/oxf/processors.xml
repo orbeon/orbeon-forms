@@ -493,11 +493,7 @@
     </processor>
 
     <processor name="oxf:mdx" uri="oxf/processor/mdx">
-        <class name="org.orbeon.oxf.processor.sql.MDXProcessor"/>
-    </processor>
-
-    <processor name="oxf:mdx-hierarchy" uri="oxf/processor/mdx-hierarchy">
-        <class name="org.orbeon.oxf.pipeline.processors.MDXHierarchy"/>
+        <class name="org.orbeon.oxf.processor.mdx.MDXProcessor"/>
     </processor>
 
     <processor name="oxf:scheduler" uri="oxf/processor/scheduler">

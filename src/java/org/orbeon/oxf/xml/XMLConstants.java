@@ -26,7 +26,8 @@ public class XMLConstants {
     public static final String XSD_URI = "http://www.w3.org/2001/XMLSchema";
     public static final Namespace XSD_NAMESPACE = new Namespace(XSD_PREFIX, XSD_URI);
 
-    public static final Namespace OXF_PROCESSORS_NAMESPACE = new Namespace("oxf", "http://www.orbeon.com/oxf/processors");
+    public static final String OXF_PROCESSORS_URI = "http://www.orbeon.com/oxf/processors";
+    public static final Namespace OXF_PROCESSORS_NAMESPACE = new Namespace("oxf", OXF_PROCESSORS_URI);
 
     public final static QName IDENTITY_PROCESSOR_QNAME = new QName("identity", OXF_PROCESSORS_NAMESPACE);
     public final static QName REQUEST_PROCESSOR_QNAME = new QName("request", OXF_PROCESSORS_NAMESPACE);

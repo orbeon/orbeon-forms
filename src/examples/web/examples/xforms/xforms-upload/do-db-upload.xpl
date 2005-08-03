@@ -14,7 +14,8 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:delegation="http://orbeon.org/oxf/xml/delegation"
           xmlns:sql="http://orbeon.org/oxf/xml/sql"
-          xmlns:oxf="http://www.orbeon.com/oxf/processors">
+          xmlns:oxf="http://www.orbeon.com/oxf/processors"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <p:param name="instance" type="input"/>
     <p:param name="data" type="output"/>

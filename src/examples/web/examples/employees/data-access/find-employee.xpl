@@ -15,6 +15,7 @@
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:employee="http://orbeon.org/ops/examples/employee-demo/employee">
 

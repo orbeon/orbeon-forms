@@ -623,6 +623,48 @@
             </note>
         </section>
         <section>
+            <title>SQL Processor</title>
+            <p>
+                TODO
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>SQL processor</b>. TODO
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Support for legacy types.</b> Backward compatibility with
+                        <code>int</code> and <code>string</code> types has been removed. Use
+                        <code>xs:int</code> and <code>xs:string</code> instead.
+                    </p>
+                    <p>
+                        Legacy support for implicit type prefixes (<code>xs</code> and
+                        <code>oxf</code>) is deprecated. Backward compability is enabled with the
+                        <code>legacy-implicit-prefixes</code> property as follows:
+                    </p>
+                    <xml-source>
+                        <property as="xs:boolean" processor-name="oxf:sql" name="legacy-implicit-prefixes" value="true"/>
+                    </xml-source>
+                    <p>
+                        When this property is missing or set to <code>false</code>, type prefixes
+                        must be mapped as is customary for XML vocabularies. Add the following
+                        namespace declarations:
+                        <code>xmlns:xs="http://www.w3.org/2001/XMLSchema"</code> and
+                        <code>xmlns:odt="http://orbeon.org/oxf/xml/datatypes"</code>. Doing so then
+                        allows using data types as before, for example <code>xs:string</code> or
+                        <code>odt:xmlFragment</code>.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b></b>. TODO
+                    </p>
+                </li>
+            </ul>
+        </section>
+        <section>
             <title>XPL Profiling Support</title>
             <ul>
                 <li>

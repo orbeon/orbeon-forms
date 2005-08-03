@@ -14,7 +14,8 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:sql="http://orbeon.org/oxf/xml/sql"
-          xmlns:oxf="http://www.orbeon.com/oxf/processors">
+          xmlns:oxf="http://www.orbeon.com/oxf/processors"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <p:processor name="oxf:sql">
         <p:input name="data" href="/examples/petstore/database/database.xml"/>

@@ -13,7 +13,8 @@
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-          xmlns:oxf="http://www.orbeon.com/oxf/processors">
+          xmlns:oxf="http://www.orbeon.com/oxf/processors"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <p:param type="output" name="data"/>
 

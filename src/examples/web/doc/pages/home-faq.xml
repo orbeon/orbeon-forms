@@ -437,6 +437,22 @@
                     the <a href="/ops/goto-example/xforms-upload">XForms upload example</a>
                 </p>
             </section>
+            <a name="xforms-upload-trouble"/>
+            <section added="2005-05-21">
+                <title>My XForms upload doesn't work. What can I do?</title>
+                <p>
+                    With OPS 2.8 or earlier, make sure that you have the correct submission method
+                    and encoding in your XForms model:
+                </p>
+                <p>
+                    <xml-source>
+                        <xforms:submission method="post" encoding="multipart/form-data"/>
+                    </xml-source>
+                </p>
+                <p>
+                    With OPS 3.0 [TODO].
+                </p>
+            </section>
             <a name="xpl-name-id"/>
             <section>
                 <title>
@@ -840,19 +856,6 @@
                 <p>
                     Note that it is typical for Java virtual machines to have maximum heap sizes of
                     256 MB to 1 GB in production.
-                </p>
-            </section>
-            <a name="xforms-upload-trouble"/>
-            <section added="2005-05-21">
-                <title>My XForms upload doesn't work. What can I do?</title>
-                <p>
-                    Make sure, in your XForms model, that you have the correct submission method and
-                    encoding:
-                </p>
-                <p>
-                    <xml-source>
-                        <xforms:submission method="post" encoding="multipart/form-data"/>
-                    </xml-source>
                 </p>
             </section>
         </section>

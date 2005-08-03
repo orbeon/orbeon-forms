@@ -139,7 +139,35 @@
                         <td>
                             <code>xdb:query</code>
                         </td>
-                        <td></td>
+                        <td>
+                            TODO
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>http://orbeon.org/oxf/xml/sql</td>
+                        <td>sql</td>
+                        <td>
+                            SQL procesor configuration
+                        </td>
+                        <td>
+                            <code>sql:get-column</code>
+                        </td>
+                        <td style="white-space: nowrap">
+                            <a href="/doc/processors-sql">SQL Processor</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>http://orbeon.org/oxf/xml/datatypes</td>
+                        <td>odt</td>
+                        <td>
+                            SQL procesor XML data types.
+                        </td>
+                        <td>
+                            <code>odt:xmlFragment</code>
+                        </td>
+                        <td style="white-space: nowrap">
+                            <a href="/doc/processors-sql">SQL Processor</a>
+                        </td>
                     </tr>
                     <tr>
                         <td>http://www.w3.org/2003/XInclude</td>

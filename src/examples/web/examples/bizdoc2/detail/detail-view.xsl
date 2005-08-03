@@ -106,42 +106,40 @@
                 <xi:include href="../view-logo.xml"/>
 
                 <h2 style="margin-top: 0">Document Information</h2>
-                <p>
-                    <table>
-                        <tr>
-                            <th>Identifier</th>
-                            <td>
-                                <xforms:output ref="document-id"/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th align="right">Action</th>
-                            <td>
-                                <xforms:switch>
-                                    <xforms:case id="no-message">
-                                        -
-                                    </xforms:case>
-                                    <xforms:case id="message">
-                                        <div>
-                                            <xforms:switch>
-                                                <xforms:case id="ok-message">
-                                                    <span style="color: green">
-                                                        <xforms:output ref="message"/>
-                                                    </span>
-                                                </xforms:case>
-                                                <xforms:case id="error-message">
-                                                    <span style="color: red">
-                                                        <xforms:output ref="message"/>
-                                                    </span>
-                                                </xforms:case>
-                                            </xforms:switch>
-                                        </div>
-                                    </xforms:case>
-                                </xforms:switch>
-                            </td>
-                        </tr>
-                    </table>
-                </p>
+                <table>
+                    <tr>
+                        <th>Identifier</th>
+                        <td>
+                            <xforms:output ref="document-id"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th align="right">Action</th>
+                        <td>
+                            <xforms:switch>
+                                <xforms:case id="no-message">
+                                    -
+                                </xforms:case>
+                                <xforms:case id="message">
+                                    <div>
+                                        <xforms:switch>
+                                            <xforms:case id="ok-message">
+                                                <span style="color: green">
+                                                    <xforms:output ref="message"/>
+                                                </span>
+                                            </xforms:case>
+                                            <xforms:case id="error-message">
+                                                <span style="color: red">
+                                                    <xforms:output ref="message"/>
+                                                </span>
+                                            </xforms:case>
+                                        </xforms:switch>
+                                    </div>
+                                </xforms:case>
+                            </xforms:switch>
+                        </td>
+                    </tr>
+                </table>
 
                 <xforms:group ref="document">
 

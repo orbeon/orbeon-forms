@@ -12,7 +12,8 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-          xmlns:oxf="http://www.orbeon.com/oxf/processors">
+          xmlns:oxf="http://www.orbeon.com/oxf/processors"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
     <p:param name="data" type="output"/>
 
@@ -56,7 +57,7 @@
                                                               <sql:member>
                                                                   <item>
                                                                       <name><sql:get-column type="xs:string" column="item_name"/></name>
-                                                                      <listprice><sql:get-column type="xs:string" column="listprice"/></listprice>
+                                                                      <listprice><sql:get-column type="xs:decimal" column="listprice"/></listprice>
                                                                   </item>
                                                               </sql:member>
                                                           </sql:group>

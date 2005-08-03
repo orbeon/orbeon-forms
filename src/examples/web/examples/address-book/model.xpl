@@ -12,9 +12,10 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
-    xmlns:sql="http://orbeon.org/oxf/xml/sql"
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns:oxf="http://www.orbeon.com/oxf/processors">
+          xmlns:sql="http://orbeon.org/oxf/xml/sql"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+          xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <p:param type="input" name="instance"/>
     <p:param type="output" name="data"/>
@@ -94,7 +95,7 @@
                                 <sql:row-results>
                                     <friend>
                                         <id>
-                                            <sql:get-column type="xs:string" column="id"/>
+                                            <sql:get-column type="xs:int" column="id"/>
                                         </id>
                                         <first>
                                             <sql:get-column type="xs:string" column="first"/>

@@ -23,7 +23,7 @@
                 <include>/request/parameters</include>
             </config>
         </p:input>
-        <p:output name="data" id="request-params"/>
+        <p:output name="data" id="request-params" debug="xxxrequest-params"/>
     </p:processor>
 
     <!-- Create XForms Server request -->
@@ -46,7 +46,7 @@
                 <xxforms:action/>
             </xxforms:event-request>
         </p:input>
-        <p:output name="data" id="xml-request"/>
+        <p:output name="data" id="xml-request" debug="xxxsubmit-request"/>
     </p:processor>
 
     <!-- Run XForms Server -->

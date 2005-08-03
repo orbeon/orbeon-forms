@@ -22,6 +22,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.DatabaseContext;
 import org.orbeon.oxf.processor.Datasource;
+import org.orbeon.oxf.processor.sql.delegates.SQLProcessorGenericDelegate;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xml.XPathContentHandler;
 import org.orbeon.oxf.xml.dom4j.LocationData;
@@ -38,7 +39,7 @@ import java.util.*;
 /**
  * Interpreter context for the SQL processor.
  */
-class SQLProcessorInterpreterContext extends DatabaseContext {
+public class SQLProcessorInterpreterContext extends DatabaseContext {
 
     private OXFProperties.PropertySet propertySet;
 
@@ -67,19 +68,48 @@ class SQLProcessorInterpreterContext extends DatabaseContext {
         return propertySet;
     }
 
-    private static class ExecutionContext {
+    private static class ExecutionContext implements Cloneable {
         public ResultSet resultSet;
         public PreparedStatement preparedStatement;
         public String statementString;
         public boolean emptyResultSet;
         public int rowPosition;
         public int updateCount;
+
+        public int columnIndex;
+        public String columnName;
+        public String columnType;
+        public String columnValue;
+
+        protected Object clone() throws CloneNotSupportedException {
+            return super.clone();
+        }
     }
 
-    public void pushResultSet() {
+    public void pushContext() {
         if (executionContextStack == null)
             executionContextStack = new ArrayList();
-        executionContextStack.add(new ExecutionContext());
+
+        try {
+            if (executionContextStack.size() == 0) {
+                // Start with empty context
+                executionContextStack.add(new ExecutionContext());
+            } else {
+                // Clone context data
+                executionContextStack.add(getExecutionContext(0).clone());
+            }
+        } catch (CloneNotSupportedException e) {
+            // Should not happen
+            throw new OXFException(e);
+        }
+    }
+
+    private ExecutionContext getExecutionContext(int level) {
+        return (ExecutionContext) executionContextStack.get(executionContextStack.size() - 1 - level);
+    }
+
+    public void popContext() {
+        executionContextStack.remove(executionContextStack.size() - 1);
     }
 
     public PipelineContext getPipelineContext() {
@@ -109,7 +139,7 @@ class SQLProcessorInterpreterContext extends DatabaseContext {
                 if ("oracle".equalsIgnoreCase(productName)) {
                     // First try Tomcat (4.1 or greater)
                     try {
-                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.SQLProcessorOracleTomcatDelegate");
+                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleTomcatDelegate");
                         SQLProcessor.logger.info("Using Oracle Tomcat delegate.");
                     } catch (Throwable t) {
                         // Ignore
@@ -117,7 +147,7 @@ class SQLProcessorInterpreterContext extends DatabaseContext {
                     // Then try WebLogic (8.1 or greater)
                     if (clazz == null) {
                         try {
-                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.SQLProcessorOracleWebLogic81Delegate");
+                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleWebLogic81Delegate");
                             SQLProcessor.logger.info("Using Oracle WebLogic delegate.");
                         } catch (Throwable t) {
                             // Ignore
@@ -126,7 +156,7 @@ class SQLProcessorInterpreterContext extends DatabaseContext {
                     // Then try the generic delegate
                     if (clazz == null) {
                         try {
-                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.SQLProcessorOracleGenericDelegate");
+                            clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorOracleGenericDelegate");
                             SQLProcessor.logger.info("Using Oracle generic delegate.");
                         } catch (Throwable t) {
                             clazz = SQLProcessorGenericDelegate.class;
@@ -136,7 +166,7 @@ class SQLProcessorInterpreterContext extends DatabaseContext {
                 } else if ("HSQL Database Engine".equalsIgnoreCase(productName)) {
                     // HSQLDB
                     try {
-                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.SQLProcessorHSQLDBDelegate");
+                        clazz = getClass().getClassLoader().loadClass("org.orbeon.oxf.processor.sql.delegates.SQLProcessorHSQLDBDelegate");
                         SQLProcessor.logger.info("Using HSQLDB delegate.");
                     } catch (Throwable t) {
                         clazz = SQLProcessorGenericDelegate.class;
@@ -152,10 +182,6 @@ class SQLProcessorInterpreterContext extends DatabaseContext {
             }
         }
         return databaseDelegate;
-    }
-
-    public void popResultSet() {
-        executionContextStack.remove(executionContextStack.size() - 1);
     }
 
     public void pushCurrentNode(Node node) {
@@ -205,37 +231,61 @@ class SQLProcessorInterpreterContext extends DatabaseContext {
         return functionContext;
     }
 
-    private ExecutionContext getExecutionContext(int level) {
-        return (ExecutionContext) executionContextStack.get(executionContextStack.size() - 1 - level);
-    }
-
     public void setResultSet(ResultSet resultSet) {
-        ExecutionContext executionContext = getExecutionContext(0);
+        final ExecutionContext executionContext = getExecutionContext(0);
         executionContext.resultSet = resultSet;
     }
 
     public void setStatement(PreparedStatement stmt) {
-        ExecutionContext executionContext = getExecutionContext(0);
+        final ExecutionContext executionContext = getExecutionContext(0);
         executionContext.preparedStatement = stmt;
     }
 
     public void setStatementString(String statementString) {
-        ExecutionContext executionContext = getExecutionContext(0);
+        final ExecutionContext executionContext = getExecutionContext(0);
         executionContext.statementString = statementString;
     }
 
+    public void setColumnContext(int index, String name, String type, String value) {
+        final ExecutionContext executionContext = getExecutionContext(0);
+        executionContext.columnIndex = index;
+        executionContext.columnName = name;
+        executionContext.columnType = type;
+        executionContext.columnValue = value;
+    }
+
+    public int getColumnIndex() {
+        final ExecutionContext executionContext = getExecutionContext(0);
+        return executionContext.columnIndex;
+    }
+
+    public String getColumnName() {
+        final ExecutionContext executionContext = getExecutionContext(0);
+        return executionContext.columnName;
+    }
+
+    public String getColumnType() {
+        final ExecutionContext executionContext = getExecutionContext(0);
+        return executionContext.columnType;
+    }
+
+    public String getColumnValue() {
+        final ExecutionContext executionContext = getExecutionContext(0);
+        return executionContext.columnValue;
+    }
+
     public ResultSet getResultSet(int level) {
-        ExecutionContext executionContext = getExecutionContext(level);
+        final ExecutionContext executionContext = getExecutionContext(level);
         return executionContext.resultSet;
     }
 
     public PreparedStatement getStatement(int level) {
-        ExecutionContext executionContext = getExecutionContext(level);
+        final ExecutionContext executionContext = getExecutionContext(level);
         return executionContext.preparedStatement;
     }
 
     public String getStatementString(int level) {
-        ExecutionContext executionContext = getExecutionContext(level);
+        final ExecutionContext executionContext = getExecutionContext(level);
         return executionContext.statementString;
     }
 
@@ -303,32 +353,32 @@ class SQLProcessorInterpreterContext extends DatabaseContext {
     }
 
     public boolean isEmptyResultSet() {
-        ExecutionContext executionContext = getExecutionContext(0);
+        final ExecutionContext executionContext = getExecutionContext(0);
         return executionContext.emptyResultSet;
     }
 
     public void setEmptyResultSet(boolean emptyResultSet) {
-        ExecutionContext executionContext = getExecutionContext(0);
+        final ExecutionContext executionContext = getExecutionContext(0);
         executionContext.emptyResultSet = emptyResultSet;
     }
 
     public int getUpdateCount() {
-        ExecutionContext executionContext = getExecutionContext(0);
+        final ExecutionContext executionContext = getExecutionContext(0);
         return executionContext.updateCount;
     }
 
     public void setUpdateCount(int updateCount) {
-        ExecutionContext executionContext = getExecutionContext(0);
+        final ExecutionContext executionContext = getExecutionContext(0);
         executionContext.updateCount = updateCount;
     }
 
     public int getRowPosition() {
-        ExecutionContext executionContext = getExecutionContext(0);
+        final ExecutionContext executionContext = getExecutionContext(0);
         return executionContext.rowPosition;
     }
 
     public void setRowPosition(int rowPosition) {
-        ExecutionContext executionContext = getExecutionContext(0);
+        final ExecutionContext executionContext = getExecutionContext(0);
         executionContext.rowPosition = rowPosition;
     }
 

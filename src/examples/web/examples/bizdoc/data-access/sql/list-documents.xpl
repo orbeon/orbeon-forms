@@ -13,6 +13,8 @@
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:odt="http://orbeon.org/oxf/xml/datatypes"
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:sql="http://orbeon.org/oxf/xml/sql">
 
@@ -33,7 +35,7 @@
                                 <sql:row-results>
                                     <document-id>
                                         <sql:get-column type="xs:string" column="document_id"/>
-<!--                                        <sql:get-column type="oxf:xmlFragment" column="document"/>-->
+<!--                                        <sql:get-column type="odt:xmlFragment" column="document"/>-->
                                     </document-id>
                                 </sql:row-results>
                             </sql:results>

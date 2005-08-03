@@ -250,11 +250,28 @@
                 </oneOrMore>
             </element>
             <interleave>
-                <optional>
-                    <element name="sql:results">
-                        <ref name="element-or-row-results"/>
-                    </element>
-                </optional>
+                <choice>
+                    <!-- Legacy name -->
+                    <optional>
+                        <element name="sql:results">
+                            <ref name="element-or-row-iterator"/>
+                        </element>
+                    </optional>
+                    <!-- New name -->
+                    <optional>
+                        <element name="sql:result-set">
+                            <optional>
+                                <attribute name="max-result-sets">
+                                    <choice>
+                                        <data type="positiveInteger"/>
+                                        <value>unbounded</value>
+                                    </choice>
+                                </attribute>
+                            </optional>
+                            <ref name="element-or-row-iterator"/>
+                        </element>
+                    </optional>
+                </choice>
                 <optional>
                     <element name="sql:no-results">
                         <ref name="element-or-execute"/>
@@ -275,13 +292,22 @@
         </element>
     </define>
 
-    <define name="element-or-row-results">
+    <define name="element-or-row-iterator">
         <choice>
-            <element name="sql:row-results">
-                <zeroOrMore>
-                    <ref name="element-or-group-or-getter"/>
-                </zeroOrMore>
-            </element>
+            <choice>
+                <!-- Legacy name -->
+                <element name="sql:row-results">
+                    <zeroOrMore>
+                        <ref name="element-or-group-or-getter"/>
+                    </zeroOrMore>
+                </element>
+                <!-- New name -->
+                <element name="sql:row-iterator">
+                    <zeroOrMore>
+                        <ref name="element-or-group-or-getter"/>
+                    </zeroOrMore>
+                </element>
+            </choice>
             <element name="sql:value-of">
                 <attribute name="select"/>
             </element>
@@ -291,8 +317,8 @@
             <element name="sql:for-each">
                 <attribute name="select"/>
                 <zeroOrMore>
-                    <ref name="element-or-row-results"/>
-                    <!-- FIXME: We must not allow a nested sql:row-results here -->
+                    <ref name="element-or-row-iterator"/>
+                    <!-- FIXME: We must not allow a nested sql:row-iterator here -->
                 </zeroOrMore>
             </element>
             <element>
@@ -310,7 +336,7 @@
                         <element name="sql:text">
                             <text/>
                         </element>
-                        <ref name="element-or-row-results"/>
+                        <ref name="element-or-row-iterator"/>
                     </choice>
                 </zeroOrMore>
             </element>
@@ -320,7 +346,12 @@
     <define name="element-or-group-or-getter">
         <choice>
             <element name="sql:group">
-                <attribute name="column"/>
+                <choice>
+                    <!-- Legacy name -->
+                    <attribute name="column"/>
+                    <!-- New name -->
+                    <attribute name="column-name"/>
+                </choice>
                 <zeroOrMore>
                     <ref name="element-or-member-or-getter"/>
                 </zeroOrMore>
@@ -405,6 +436,52 @@
                     </element>
                 </zeroOrMore>
             </element>
+            <element>
+                <choice>
+                    <name>get-column-index</name>
+                    <name>get-column-name</name>
+                    <name>get-column-type</name>
+                </choice>
+                <optional>
+                    <choice>
+                        <attribute name="column-name"/>
+                        <attribute name="column-index"/>
+                    </choice>
+                </optional>
+            </element>
+            <element name="sql:get-column-value">
+                <optional>
+                    <attribute name="type">
+                        <choice>
+                            <value>xs:string</value>
+                            <value>xs:int</value>
+                            <value>xs:boolean</value>
+                            <value>xs:decimal</value>
+                            <value>xs:float</value>
+                            <value>xs:double</value>
+                            <value>xs:dateTime</value>
+                            <value>xs:date</value>
+                            <value>xs:base64Binary</value>
+                            <value>oxf:xmlFragment</value>
+                        </choice>
+                    </attribute>
+                </optional>
+                <optional>
+                    <choice>
+                        <!-- Legacy name -->
+                        <attribute name="column"/>
+                        <!-- New name -->
+                        <attribute name="column-name"/>
+                    </choice>
+                </optional>
+<!--                <optional>-->
+<!--                    <attribute name="ancestor">-->
+<!--                        <data type="integer">-->
+<!--                            <param name="minInclusive">0</param>-->
+<!--                        </data>-->
+<!--                    </attribute>-->
+<!--                </optional>-->
+            </element>
             <element name="sql:value-of">
                 <attribute name="select"/>
             </element>
@@ -434,7 +511,12 @@
                     <name>sql:get-date</name>
                     <name>sql:get-timestamp</name>
                 </choice>
-                <attribute name="column"/>
+                <choice>
+                    <!-- Legacy name -->
+                    <attribute name="column"/>
+                    <!-- New name -->
+                    <attribute name="column-name"/>
+                </choice>
                 <optional>
                     <attribute name="ancestor">
                         <data type="integer">
@@ -462,7 +544,12 @@
                     <value>oxf:xmlFragment</value>
                 </choice>
             </attribute>
-            <attribute name="column"/>
+            <choice>
+                <!-- Legacy name -->
+                <attribute name="column"/>
+                <!-- New name -->
+                <attribute name="column-name"/>
+            </choice>
             <optional>
                 <attribute name="ancestor">
                     <data type="integer">

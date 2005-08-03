@@ -1,6 +1,6 @@
 #! /bin/sh
 
-#   Copyright 2001-2004 The Apache Software Foundation
+#   Copyright 2001-2005 The Apache Software Foundation
 #
 #   Licensed under the Apache License, Version 2.0 (the "License");
 #   you may not use this file except in compliance with the License.
@@ -87,15 +87,6 @@ case "`uname`" in
 esac
 
 if [ -z "$ANT_HOME" -o ! -d "$ANT_HOME" ] ; then
-  # try to find ANT
-  if [ -d /opt/ant ] ; then
-    ANT_HOME=/opt/ant
-  fi
-
-  if [ -d "${HOME}/opt/ant" ] ; then
-    ANT_HOME="${HOME}/opt/ant"
-  fi
-
   ## resolve links - $0 may be a link to ant's home
   PRG="$0"
   progname=`basename "$0"`
@@ -192,7 +183,7 @@ if $rpm_mode && [ -f /usr/bin/build-classpath ] ; then
       LOCALCLASSPATH="$LOCALCLASSPATH:$CLASSPATH"
     fi
 
-    # remove class path from launcher -lib option
+    # remove class path from launcher -cp option
     CLASSPATH=""
   fi
 else
@@ -223,6 +214,10 @@ if $usejikes; then
 fi
 
 # For Cygwin, switch paths to appropriate format before running java
+# For PATHs convert to unix format first, then to windows format to ensure
+# both formats are supported. Probably this will fail on directories with ;
+# in the name in the path. Let's assume that paths containing ; are more
+# rare than windows style paths on cygwin.
 if $cygwin; then
   if [ "$OS" = "Windows_NT" ] && cygpath -m .>/dev/null 2>/dev/null ; then
     format=mixed
@@ -232,9 +227,11 @@ if $cygwin; then
   ANT_HOME=`cygpath --$format "$ANT_HOME"`
   ANT_LIB=`cygpath --$format "$ANT_LIB"`
   JAVA_HOME=`cygpath --$format "$JAVA_HOME"`
-  LOCALCLASSPATH=`cygpath --path --$format "$LOCALCLASSPATH"`
+  LCP_TEMP=`cygpath --path --unix "$LOCALCLASSPATH"`
+  LOCALCLASSPATH=`cygpath --path --$format "$LCP_TEMP"`
   if [ -n "$CLASSPATH" ] ; then
-    CLASSPATH=`cygpath --path --$format "$CLASSPATH"`
+    CP_TEMP=`cygpath --path --unix "$CLASSPATH"`
+    CLASSPATH=`cygpath --path --$format "$CP_TEMP"`
   fi
   CYGHOME=`cygpath --$format "$HOME"`
 fi
@@ -295,7 +292,7 @@ else
     ant_sys_opts="-Djikes.class.path=\"$JIKESPATH\""
   fi
 fi
-ant_exec_command="exec \"$JAVACMD\" $ANT_OPTS -classpath \"$LOCALCLASSPATH\" -Dant.home=\"$ANT_HOME\" -Dant.library.dir=\"$ANT_LIB\" $ant_sys_opts org.apache.tools.ant.launch.Launcher $ANT_ARGS -lib \"$CLASSPATH\" $ant_exec_args"
+ant_exec_command="exec \"$JAVACMD\" $ANT_OPTS -classpath \"$LOCALCLASSPATH\" -Dant.home=\"$ANT_HOME\" -Dant.library.dir=\"$ANT_LIB\" $ant_sys_opts org.apache.tools.ant.launch.Launcher $ANT_ARGS -cp \"$CLASSPATH\" $ant_exec_args"
 if $ant_exec_debug ; then
     echo $ant_exec_command
 fi

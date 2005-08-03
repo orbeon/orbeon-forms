@@ -1,7 +1,7 @@
 @echo off
 
 REM
-REM Copyright  2001-2002,2004 The Apache Software Foundation
+REM Copyright  2001-2002,2004-2005 The Apache Software Foundation
 REM
 REM  Licensed under the Apache License, Version 2.0 (the "License");
 REM  you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ REM
 REM
 
 if "%OS%"=="Windows_NT" @setlocal
+if "%OS%"=="WINNT" @setlocal
 
 if ""%1""=="""" goto runCommand
 
@@ -42,4 +43,5 @@ rem echo %ANT_RUN_CMD%
 %ANT_RUN_CMD%
 
 if "%OS%"=="Windows_NT" @endlocal
+if "%OS%"=="WINNT" @endlocal
 

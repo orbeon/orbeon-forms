@@ -526,10 +526,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             if (replaceInstance == null) {
                                                 containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
                                             } else {
+                                                // Reconstruct model
                                                 replaceInstance.setInstanceDocument(resultingInstanceDocument);
+                                                containingDocument.dispatchEvent(pipelineContext, new XFormsModelConstructEvent(model));
 
-                                                // Dispatch events
-                                                containingDocument.dispatchEvent(pipelineContext, new org.orbeon.oxf.xforms.event.events.XFormsModelConstructEvent(model));
+                                                // Rebuild ControlsState
+                                                xformsControls.rebuildCurrentControlsState(pipelineContext);
+
+                                                // Notify that submission is done
                                                 containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));
                                             }
                                         } catch (Exception e) {

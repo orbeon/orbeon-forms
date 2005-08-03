@@ -820,8 +820,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             // specify an ordering for the events."
 
             final XFormsControls xformsControls = containingDocument.getXFormsControls();
-
-            if (containingDocument.getXFormsControls() != null) {
+            if (xformsControls != null) {
 
                 // Build list of events to send
                 final List eventsToDispatch = new ArrayList();
@@ -908,7 +907,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
                 // "5. The user interface reflects the state of the model, which means that all forms
                 // controls reflect for their corresponding bound instance data:"
-                if (containingDocument.getXFormsControls() != null) {
+                if (xformsControls != null) {
                     containingDocument.getXFormsControls().refreshForModel(pipelineContext, this);
                 }
             }

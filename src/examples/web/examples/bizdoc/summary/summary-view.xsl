@@ -16,6 +16,7 @@
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:xi="http://www.w3.org/2003/XInclude"
       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:claim="http://orbeon.org/oxf/examples/bizdoc/claim"
       xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>Summary</title>
@@ -27,30 +28,38 @@
                 <h2 style="margin-top: 0">Available Documents</h2>
                 <table class="gridtable">
                     <tr>
+                        <th>Last Name</th>
+                        <th>First Name</th>
                         <th>Document Identifier</th>
                         <th>Edit</th>
                         <th>XML</th>
                         <th>Delete</th>
                     </tr>
                     <xsl:choose>
-                        <xsl:when test="count(/result/document-id) > 0">
-                            <xsl:for-each select="/result/document-id">
+                        <xsl:when test="count(/result/document-info) > 0">
+                            <xsl:for-each select="/result/document-info">
                                 <tr>
                                     <td>
-                                        <xsl:value-of select="."/>
+                                        <xsl:value-of select="claim:last-name"/>
+                                    </td>
+                                    <td>
+                                        <xsl:value-of select="claim:first-name"/>
+                                    </td>
+                                    <td>
+                                        <xsl:value-of select="document-id"/>
                                     </td>
                                     <td>
                                         <xforms:submit>
                                             <xforms:label>Edit</xforms:label>
                                             <xforms:setvalue ref="action">show-detail</xforms:setvalue>
-                                            <xforms:setvalue ref="document-id"><xsl:value-of select="."/></xforms:setvalue>
+                                            <xforms:setvalue ref="document-id"><xsl:value-of select="document-id"/></xforms:setvalue>
                                         </xforms:submit>
                                     </td>
                                     <td>
                                         <xforms:submit>
                                             <xforms:label>XML</xforms:label>
                                             <xforms:setvalue ref="action">show-xml</xforms:setvalue>
-                                            <xforms:setvalue ref="document-id"><xsl:value-of select="."/></xforms:setvalue>
+                                            <xforms:setvalue ref="document-id"><xsl:value-of select="document-id"/></xforms:setvalue>
                                         </xforms:submit>
                                     </td>
                                     <td align="center">
@@ -58,7 +67,7 @@
                                             <xxforms:img src="/images/remove.png"/>
                                             <xforms:label/>
                                             <xforms:setvalue ref="action">delete-documents</xforms:setvalue>
-                                            <xforms:setvalue ref="document-id"><xsl:value-of select="."/></xforms:setvalue>
+                                            <xforms:setvalue ref="document-id"><xsl:value-of select="document-id"/></xforms:setvalue>
                                         </xforms:submit>
                                     </td>
                                 </tr>
@@ -66,7 +75,7 @@
                         </xsl:when>
                         <xsl:otherwise>
                             <tr>
-                                <td colspan="4"><i>No document found.<br/>Please press the "Import
+                                <td colspan="6"><i>No document found.<br/>Please press the "Import
                                 Documents" button to get started.</i></td>
                             </tr>
                         </xsl:otherwise>

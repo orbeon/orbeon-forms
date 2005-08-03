@@ -50,10 +50,6 @@
                 </form>
             </result>
         </action>
-        <!-- Delete documents -->
-        <action when="/form/action = 'delete-documents'" action="../bizdoc/summary/delete-documents-action.xpl">
-            <result page="summary"/>
-        </action>
         <!-- View XML -->
         <action when="/form/action = 'show-xml'" action="../bizdoc/summary/find-document-action.xpl">
             <result page="xml-detail" transform="oxf:xslt" instance-passing="redirect-exit-portal">
@@ -74,8 +70,12 @@
         </action>
     </page>
     
-    <page path-info="/bizdoc2/save">
-        <action action="../bizdoc/detail/save-document-action.xpl"/>
+    <page path-info="/bizdoc2/save" model="../bizdoc/detail/save-document-action.xpl"/>
+    <page path-info="/bizdoc2/delete" view="summary/list-documents-response.xpl">
+        <action action="../bizdoc/summary/delete-documents-action.xpl"/>
+    </page>
+    <page path-info="/bizdoc2/import" view="summary/list-documents-response.xpl">
+        <action action="../bizdoc/summary/import-documents-action.xpl"/>
     </page>
     
     <!-- Home (for standalone operation) -->

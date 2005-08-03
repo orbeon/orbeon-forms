@@ -15,7 +15,7 @@
 <?xml-stylesheet type="text/xsl" href="ant2html.xsl"?>
 <project name="orbeon" default="orbeon-war" basedir=".">
 
-    <echoproperties/>
+<!--    <echoproperties/> -->
 
     <!-- set global build.root to be dir containing this file. -->
     <dirname property='build.root' file='${ant.file}'/>
@@ -25,6 +25,13 @@
     <property name="build.dir" value="build"/>
     <property name="project.name" value="ops"/>
     <property name="war.dir" value="${build.dir}/${project.name}-war"/>
+    <property name="war.inf" value="${war.dir}/WEB-INF"/>
+    <property name="war.classes" value="${war.inf}/classes"/>
+    <property name="war.lib" value="${war.inf}/lib"/>
+	
+    <property name="src.dir" location="src"/>
+    <property name="examples-src.dir" location="${src.dir}/examples"/>
+    <property name="web-examples-src.dir" location="${examples-src.dir}/web"/>
 
     <fileset id='war.libs' dir="${lib.dir}">
         <include name="dom4j-1_4_orbeon.jar"/>
@@ -105,10 +112,7 @@
 
         <echo message="Building Orbeon PresentationServer ${release.number}"/>
 
-        <property name="src.dir" value="src"/>
         <property name="java-src.dir" value="${src.dir}/java"/>
-        <property name="examples-src.dir" value="${src.dir}/examples"/>
-        <property name="web-examples-src.dir" value="${examples-src.dir}/web"/>
         <property name="cli-examples-src.dir" value="${examples-src.dir}/cli"/>
         <property name="resources.dir" value="${src.dir}/resources"/>
         <property name="test-src.dir" value="test/src"/>
@@ -242,54 +246,53 @@
     </target>
 
     <!-- WAR -->
-    <target name="war" depends="jars">
+	
+    <target name="war" depends="jars,orbeon-source-files-lists">
         <echo message="war.dir: ${war.dir}"/>
-        <mkdir dir="${war.dir}"/>
-        <mkdir dir="${war.dir}/WEB-INF"/>
-        <mkdir dir="${war.dir}/WEB-INF/classes"/>
+        <mkdir dir="${war.classes}"/>
         <!--<javac destdir="${war.dir}/WEB-INF/classes"-->
             <!--classpathref="class.path" debug="${build.debug}" optimize="off" target="1.3" source="1.3" srcdir="${web-examples-src.dir}/examples-standalone/struts-view/src"/>-->
-        <copy todir="${war.dir}/WEB-INF/classes">
+        <copy todir="${war.classes}">
             <!--<fileset dir="${web-examples-src.dir}/examples-standalone/struts-view/src/" includes="**/*.properties"/>-->
             <fileset dir="descriptors/examples/web/jboss-security" includes="*.properties"/>
         </copy>
 
-        <copy todir="${war.dir}/WEB-INF/lib">
+        <copy todir="${war.lib}">
           <fileset refid='war.libs' />
         </copy>
 
-        <copy file='${jar.file}' todir='${war.dir}/WEB-INF/lib' />
+        <copy file='${jar.file}' todir='${war.lib}' />
 
-        <copy todir='${war.dir}/WEB-INF/lib/private' >
+        <copy todir='${war.lib}/private' >
           <fileset refid='war.libs.private' />
         </copy>
 
-        <copy todir="${war.dir}/WEB-INF">
+        <copy todir="${war.inf}">
             <fileset dir="${lib.dir}">
                 <include name="commons-cli-1_0.jar"/>
             </fileset>
         </copy>
-        <copy file='${cli.jar.file}' todir='${war.dir}/WEB-INF' />
+        <copy file='${cli.jar.file}' todir='${war.inf}' />
     </target>
 
     <target name="war-copy-descriptors" depends="prepare">
-        <copy todir="${war.dir}/WEB-INF">
+        <copy todir="${war.inf}">
             <fileset dir="${descriptors.dir}" includes="*.xml"/>
         </copy>
         <!-- eXist database -->
-        <mkdir dir="${war.dir}/WEB-INF/exist-data"/>
-        <copy todir="${war.dir}/WEB-INF/exist-data">
+        <mkdir dir="${war.inf}/exist-data"/>
+        <copy todir="${war.inf}/exist-data">
             <fileset dir="${descriptors.dir}/exist-data" includes="README.txt"/>
         </copy>
         <echo message="Target: ${target}"/>
-        <xslt in="build.xml" style="${descriptors.dir}/web.xsl" out="${war.dir}/WEB-INF/web.xml" force="true">
+        <xslt in="build.xml" style="${descriptors.dir}/web.xsl" out="${war.inf}/web.xml" force="true">
             <param name="target" expression="${target}"/>
             <param name="build-root" expression="${build.root}"/>
             <param name="build-root" expression="${build.root}"/>
             <param name="version-number" expression="${version.number}"/>
         </xslt>
         <!-- Override web.xml with local-web.xml when present -->
-        <copy file="${descriptors.dir}/devel/local-web.xml" tofile="${war.dir}/WEB-INF/web.xml"
+        <copy file="${descriptors.dir}/devel/local-web.xml" tofile="${war.inf}/web.xml"
             filtering="true" overwrite="true" failonerror="false">
             <filterset>
                 <filter token="BUILD_ROOT" value="${build.root}"/>
@@ -334,10 +337,71 @@
         </javadoc>
     </target>
 
-    <target name="orbeon-source-files-list" depends="init">
-        <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true">
-            <arg line="-r ${examples-src.dir} oxf:/cli/examples-sources/generate-examples-sources.xpl"/>
-        </java>
+    <target name="orbeon-source-files-lists" depends="init">
+        <fileset dir='${ant.library.dir}' id='ant-jars' >
+            <include name='*.jar'/>
+        </fileset>
+        
+      <pathconvert property='ant.class.path' refid='ant-jars' />
+      
+      <apply executable='${java.home}/bin/java' addsourcefile='false' relative='true'  >
+        <arg value="-classpath"/>
+        <arg value='${ant.class.path}' />
+        <arg value='-Dwar.dir=${war.dir}' />
+      	<fileset dir='${examples-src.dir}' >
+            <include name='**/example-descriptor.xml' />
+        </fileset>
+
+      	<mapper type='glob' from='*' to='-Dexample-descriptor=${examples-src.dir}${file.separator}*' /> 
+
+      	<targetfile/>
+
+      	<arg value='org.apache.tools.ant.launch.Launcher' />
+        <arg value='-f' />
+        <arg value='${ant.file}' />
+        <arg value='make-one-source-list' />
+      </apply>
+
+    </target>
+
+    <target name='make-one-source-list' >
+        <dirname file='${example-descriptor}' property='dir' />
+
+	<length property='files' mode='each' >
+            <fileset dir='${dir}' >
+                <include name='**/*.x?l' />
+                <include name='**/*.xhtml' />
+                <include name='**/*.java' />
+                <include name='**/*.txt' />
+                <exclude name='example-descriptor.xml' />
+                <exclude name='example-descriptor-files.xml' />
+            </fileset>
+        </length>
+
+        <tempfile property='file-list-temp' />
+
+        <echo file='${file-list-temp}' >&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;source-files&gt;
+${files}
+&lt;/source-files&gt;
+        </echo>
+        
+        <pathconvert property='file-list' >
+            <path path='${example-descriptor}' />
+            <globmapper from='${web-examples-src.dir}${file.separator}*${file.separator}example-descriptor.xml' to='${war.inf}/resources/*/example-descriptor-files.xml' />
+        </pathconvert>
+        
+        <move file='${file-list-temp}' tofile='${file-list}' >
+            <filterchain>
+                <tokenfilter>
+                    <linetokenizer/>
+                    <replacestring from='${dir}${file.separator}' to='    &lt;file name=&apos;' />
+                    <replaceregex pattern='\s:\s' replace='&apos; size=&apos;' />
+                    <replaceregex pattern='(?&lt;=\d)\z' replace='&apos;/&gt;' />
+                </tokenfilter>
+            </filterchain>
+        </move>
+        
     </target>
 
     <target name="debug-enabled" if="is.debug">
@@ -525,7 +589,7 @@
         </java>
     </target>
 
-    <target name="orbeon-dist-war" depends="jars,orbeon-source-files-list">
+    <target name="orbeon-dist-war" >
         <mkdir dir="${build.distrib.dir}"/>
 
         <antcall target="war">
@@ -704,7 +768,7 @@
 
     <target name="orbeon-dist" depends="orbeon-dist-packages"/>
     
-    <target name="post-update" depends="orbeon-source-files-list">
+    <target name="post-update" >
         <chmod dir="${war.dir}/WEB-INF/exist-data" perm="a+rw"/>
     </target>
 

@@ -55,14 +55,14 @@
                     <nobr>
                         <xsl:choose>
                             <xsl:when test="@html = 'true'">
-                                <a href="/{.}.html"><xsl:value-of select="."/></a>
+                                <a href="/{@name}.html"><xsl:value-of select="@name"/></a>
                             </xsl:when>
                             <xsl:when test="@html = 'false'">
-                                <a href="/{.}"><xsl:value-of select="."/></a>
+                                <a href="/{@name}"><xsl:value-of select="@name"/></a>
                             </xsl:when>
                             <xsl:otherwise>
-                                <a href="/goto-source/{$page/path}/{escape-uri(string(.), true())}">
-                                    <xsl:value-of select="string(.)"/>
+                                <a href="/goto-source/{$page/path}/{escape-uri(string(@name), true())}">
+                                    <xsl:value-of select="string(@name)"/>
                                 </a>
                             </xsl:otherwise>
                         </xsl:choose>

@@ -338,32 +338,22 @@
     </target>
 
     <target name="orbeon-source-files-lists" depends="init">
-        <!-- On anthill this isn't set, so line below is only relevant under anthill -->
-        <property name='ant.library.dir' location='${basedir}/tools/ant/lib' />
-        <fileset dir='${ant.library.dir}' id='ant-jars' >
-            <include name='*.jar'/>
-        </fileset>
-        
-      <pathconvert property='ant.class.path' refid='ant-jars' />
-      
-      <apply executable='${java.home}/bin/java' addsourcefile='false' relative='true'  >
-        <arg value="-classpath"/>
-        <arg value='${ant.class.path}' />
-        <arg value='-Dwar.dir=${war.dir}' />
-      	<fileset dir='${examples-src.dir}' >
-            <include name='**/example-descriptor.xml' />
-        </fileset>
 
-      	<mapper type='glob' from='*' to='-Dexample-descriptor=${examples-src.dir}${file.separator}*' /> 
+      <taskdef resource="net/sf/antcontrib/antlib.xml">
+          <classpath>
+            <fileset dir='${basedir}/tools/ant/lib' >
+                <include name='*.jar'/>
+            </fileset>
+          </classpath>
+      </taskdef>
 
-      	<targetfile/>
-
-      	<arg value='org.apache.tools.ant.launch.Launcher' />
-        <arg value='-f' />
-        <arg value='${ant.file}' />
-        <arg value='make-one-source-list' />
-      </apply>
-
+      <foreach target='make-one-source-list' param='example-descriptor' >
+        <path>
+          <fileset dir='${examples-src.dir}' >
+              <include name='**/example-descriptor.xml' />
+          </fileset>
+        </path>
+      </foreach>
     </target>
 
     <target name='make-one-source-list' >

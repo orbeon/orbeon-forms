@@ -15,7 +15,7 @@
 <?xml-stylesheet type="text/xsl" href="ant2html.xsl"?>
 <project name="orbeon" default="orbeon-war" basedir=".">
 
-    <echoproperties/> 
+<!--    <echoproperties/> -->
 
     <!-- set global build.root to be dir containing this file. -->
     <dirname property='build.root' file='${ant.file}'/>

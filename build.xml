@@ -338,6 +338,8 @@
     </target>
 
     <target name="orbeon-source-files-lists" depends="init">
+        <!-- On anthill this isn't set, so line below is only relevant under anthill -->
+        <property name='ant.library.dir' location='${basedir}/tools/ant/lib' />
         <fileset dir='${ant.library.dir}' id='ant-jars' >
             <include name='*.jar'/>
         </fileset>

@@ -23,9 +23,10 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.saxrewrite.State;
+import org.orbeon.oxf.xml.saxrewrite.StatefullHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
@@ -122,26 +123,14 @@ abstract class AbstractRewrite extends ProcessorImpl {
      */
     static final String NOREWRITE_ATT = "url-norewrite";
     /**
-     * <!-- State -->
+     * <!-- State2 -->
      * Base state.  Simply forwards data to the destination content handler and returns itself.
      * That is unless the ( element ) depth becomes negative after an end element event.  In this
      * case the previous state is returned.  This means btw that we are really only considering
      * state changes on start and end element events.
      * @author d
      */
-    protected static abstract class State {
-        /**
-         * <!-- contentHandler -->
-         * The destination of the rewrite transformation.
-         * @author d
-         */
-        protected final ContentHandler contentHandler;
-        /**
-         * <!-- State -->
-         * What you think.
-         * @author d
-         */
-        protected final State previous;
+    protected static abstract class State2 extends State {
         /**
          * <!-- response -->
          * Performs the URL rewrites.
@@ -167,125 +156,43 @@ abstract class AbstractRewrite extends ProcessorImpl {
          */
         protected int scriptDepth;
         /**
-         * <!-- depth -->
-         * At the moment are state transitions only happen on start element and end element events.
-         * Therefore we track element depth and by default when the depth becomes negative we switch
-         * to the previous state. 
+         * <!-- rewriteURI -->
+         * @see 
          * @author d 
          */
-        protected int depth = 0;
-		protected final String rewriteURI;
+	protected final String rewriteURI;
         /**
          * <!-- State -->
          * @param stt           The previous state.
          * @param cntntHndlr    The destination for the rewrite transformation.
          * @param rspns         Used to perform URL rewrites.
          * @param isPrtlt       Whether or not the context is a portlet context.
-         * @param scrptAncstr   Whether content ( SAX events ) processed by this state are a 
-         *                      descendent of a script element.
+         * @param scrptDpth     How below script elt we are.
+         * @param rwrtURI       uri of elements ( i.e. xhtml uri or "" ) of elements that need 
+         *                      rewriting.
          * @see #previous
          * @see #contentHandler
          * @see #response
          * @see #isPortlet
-         * @see #haveScriptAncestor
          * @author d
          */
-        State( final State stt, final ContentHandler cntntHndlr, final Response rspns
+        State2( final State2 stt, final ContentHandler cntntHndlr, final Response rspns
                , final boolean isPrtlt, final int scrptDpth, final String rwrtURI ) {
-            previous = stt;
-            contentHandler = cntntHndlr;
+            super( stt, cntntHndlr );
             response = rspns;
             isPortlet = isPrtlt;
             scriptDepth = scrptDpth;
             rewriteURI = rwrtURI;
         }
         /**
-         * <!-- characters -->
-         * @see State
-         * @author d
-         */        
-        State characters( final char[] ch, final int strt, final int len ) 
-        throws SAXException {
-            contentHandler.characters( ch, strt, len );
-            return this;
-        }
-        /**
-         * <!-- endDocument -->
-         * @see State
-         * @author d
-         */        
-        State endDocument() throws SAXException {
-            contentHandler.endDocument();
-            return this;
-        }
-        /**
          * <!-- endElement -->
-         * @see State
+         * @see State2
          * @author d
          */        
-        State endElement( final String ns, final String lnam, final String qnam ) 
+        public State endElement( final String ns, final String lnam, final String qnam ) 
         throws SAXException {
-            depth--;
             scriptDepthOnEnd( ns, lnam );
-            contentHandler.endElement( ns, lnam, qnam );
-            final State ret = depth == 0 ? previous : this;
-            return ret;
-        }
-        /**
-         * <!-- endPrefixMapping-->
-         * @see State
-         * @author d
-         */        
-        State endPrefixMapping( final String pfx ) throws SAXException {
-            contentHandler.endPrefixMapping( pfx );
-            return this;
-        }
-        /**
-         * <!-- ignorableWhitespace -->
-         * @see State
-         * @author d
-         */        
-        State ignorableWhitespace( final char[] ch, final int strt, final int len ) 
-        throws SAXException {
-            contentHandler.ignorableWhitespace( ch, strt, len );
-            return this;
-        }
-        /**
-         * <!-- processingInstructions -->
-         * @see State
-         * @author d
-         */        
-        State processingInstruction( final String trgt, final String dat ) 
-        throws SAXException {
-            contentHandler.processingInstruction( trgt, dat );
-            return this;
-        }
-        /**
-         * <!-- setDocumentLocator -->
-         * @see State
-         * @author d
-         */        
-        State setDocumentLocator( final Locator lctr ) {
-            contentHandler.setDocumentLocator( lctr );
-            return this;
-        }
-        /**
-         * <!-- skippedEntity -->
-         * @see State
-         * @author d
-         */        
-        State skippedEntity( final String nam ) throws SAXException {
-            contentHandler.skippedEntity( nam );
-            return this;
-        }
-        /**
-         * <!-- startDocument -->
-         * @see State
-         * @author d
-         */        
-        State startDocument() throws SAXException {
-            contentHandler.startDocument();
-            return this;
+            return super.endElement( ns, lnam, qnam );
         }
         final void scriptDepthOnStart( final String ns, final String lnam ) {
         	if ( rewriteURI.equals( ns ) && SCRIPT_ELT.equals( lnam ) ) {
@@ -297,22 +204,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
         		scriptDepth--;
         	}
         }
-        /**
-         * <!-- startElement -->
-         * @see State
-         * @author d
-         */
-        abstract State startElement( final String ns, final String lnam, final String qnam, final Attributes atts ) 
-        throws SAXException;
-        /**
-         * <!-- startPrefixMapping -->
-         * @see State
-         * @author d
-         */        
-        State startPrefixMapping( final String pfx, final String uri ) throws SAXException {
-            contentHandler.startPrefixMapping( pfx, uri );
-            return this;
-        }
     }
     /**
      * <!-- RootFilter -->
@@ -321,15 +212,15 @@ abstract class AbstractRewrite extends ProcessorImpl {
      * are ignored while the root element is passed to the next state.
      * @author d
      */
-    static class RootFilter extends State {
+    static class RootFilter extends State2 {
         /**
          * <!-- RootFilter -->
          * Simple calls super(...)
-         * @see State#State(State, ContentHandler, Response, boolean, boolean)
+         * @see State2#State(State2, ContentHandler, Response, boolean, boolean)
          * @author d
          * @param rwrtURI 
          */
-        RootFilter( final State stt, final ContentHandler cntntHnder, final Response rspns
+        RootFilter( final State2 stt, final ContentHandler cntntHnder, final Response rspns
                     , final boolean isPrtlt, final int scrptDpth, final String rwrtURI ) {
             super( stt, cntntHnder, rspns, isPrtlt, scrptDpth, rwrtURI );
         }
@@ -339,7 +230,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * @see RewriteState
          * @author d
          */
-        State startElement
+        public State startElement
         ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
         throws SAXException {
             final State ret = new RewriteState
@@ -350,14 +241,15 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * <!-- characters -->
          * @return this.  Does nothing else.
          */
-        State characters( final char[] ch, final int strt, final int len ) throws SAXException {
+        public State characters( final char[] ch, final int strt, final int len ) 
+        throws SAXException {
             return this;
         }
         /**
          * <!-- ignorableWhitespace -->
          * @return this.  Does nothing else.
          */
-        State ignorableWhitespace( final char[] ch, final int strt, final int len ) 
+        public State ignorableWhitespace( final char[] ch, final int strt, final int len ) 
         throws SAXException {
             return this;
         }
@@ -365,7 +257,8 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * <!-- processingInstruction -->
          * @return this.  Does nothing else.
          */
-        State processingInstruction( final String trgt, final String dat ) throws SAXException {
+        public State processingInstruction( final String trgt, final String dat ) 
+        throws SAXException {
             return this;
         }
     }
@@ -384,7 +277,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
      * </ul>
      * @author dsmall
      */
-    static class RewriteState extends State {
+    static class RewriteState extends State2 {
         /**
          * <!-- WSRP_REWRITE_REPLACMENT_CHARS -->
          * Chars useD to replace "wsrp_rewrite" in text.
@@ -427,9 +320,9 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * Calls super( ... ) and initializes wsrprewriteMatcher with "wsrp_rewrite" 
          * @author d
          * @param rwrtURI 
-         * @see State#State(State, ContentHandler, Response, boolean, boolean)
+         * @see State2#State(State2, ContentHandler, Response, boolean, boolean)
          */
-        RewriteState( final State stt, final ContentHandler cntntHndlr, final Response rspns
+        RewriteState( final State2 stt, final ContentHandler cntntHndlr, final Response rspns
                       , final boolean isPrtlt, final int scrptDpth, final String rwrtURI ) {
             super( stt, cntntHndlr, rspns, isPrtlt, scrptDpth, rwrtURI );
             final Pattern ptrn = Pattern.compile( "wsrp_rewrite" );
@@ -458,11 +351,11 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * @see AbstractRewrite
          * @author d
          */
-        private State handleEltWithResource
+        private State2 handleEltWithResource
         ( final String elt, final String resAtt, final String ns, final String lnam
           , final String qnam, final Attributes atts ) 
         throws SAXException {
-            State ret = null;
+            State2 ret = null;
             done : if ( elt.equals( lnam ) ) {
 
                 final String res = atts.getValue( "", resAtt );
@@ -510,10 +403,10 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * @see AbstractRewrite
          * @author d
          */
-        private State handleA
+        private State2 handleA
         ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
         throws SAXException {
-            State ret = null;
+            State2 ret = null;
             done : if ( "a".equals( lnam ) ) {
 
                 final String href = atts.getValue( "", HREF_ATT );
@@ -566,10 +459,10 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * @see AbstractRewrite
          * @author d
          */
-        private State handleArea
+        private State2 handleArea
         ( final String ns, final String lnam, final String qnam, final Attributes atts )
         throws SAXException {
-            State ret = null;
+            State2 ret = null;
             done : if ( "area".equals( lnam ) ) {
 
                 final String href = atts.getValue( "", HREF_ATT );
@@ -608,10 +501,10 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * @see AbstractRewrite
          * @author d
          */
-        private State handleInput
+        private State2 handleInput
         ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
         throws SAXException {
-            final State ret;
+            final State2 ret;
             final String typ = atts.getValue( "", "type" );
             if ( "image".equals( typ ) ) {
                 ret = handleEltWithResource( "input", SRC_ATT, ns, lnam, qnam, atts );
@@ -666,10 +559,10 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * @see AbstractRewrite
          * @author d
          */
-        private State handleForm
+        private State2 handleForm
         ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
         throws SAXException {
-            final State ret;
+            final State2 ret;
             if ( "form".equals( lnam ) ) {
 
                 final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace( atts );
@@ -774,7 +667,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         /**
          * <!-- endElement -->
          * Just calls flushCharacters and super.endElement( ... )
-         * @see State#endElement(String, String, String)
+         * @see State2#endElement(String, String, String)
          * @author dsmall d
          */
         public State endElement( final String ns, final String lnam, final String qnam ) 
@@ -785,7 +678,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         /**
          * <!-- ignorableWhitespace -->
          * Just calls flushCharacters and super.ignorableWhitespace( ... )
-         * @see State#ignorableWhitespace(char[], int, int)
+         * @see State2#ignorableWhitespace(char[], int, int)
          * @author dsmall d
          */
         public State ignorableWhitespace( final char[] ch, final int strt, final int len ) 
@@ -796,7 +689,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         /**
          * <!-- processingInstruction -->
          * Just calls flushCharacters and super.processingInstruction( ... )
-         * @see State#processingInstruction(String, String)
+         * @see State2#processingInstruction(String, String)
          * @author dsmall d
          */
         public State processingInstruction( final String trgt, final String dat ) 
@@ -807,7 +700,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
         /**
          * <!-- skippedEntity -->
          * Just calls flushCharacters and super.skippedEntity( ... )
-         * @see State#skippedEntity(String)
+         * @see State2#skippedEntity(String)
          * @author dsmall d
          */
         public State skippedEntity( final String nam ) throws SAXException {
@@ -853,7 +746,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
          *     simply forward the event as is to the destination content handler and return this.
          *   </li>
          * </ul>
-         * @see State#skippedEntity(String)
+         * @see State2#skippedEntity(String)
          * @author dsmall d
          */
         public State startElement
@@ -930,8 +823,8 @@ abstract class AbstractRewrite extends ProcessorImpl {
      * new RewriteState( this, contentHandler, response, isPortlet, haveScriptAncestor ).
      * @author dsmall
      */
-    static class NoRewriteState extends State {
-        NoRewriteState( final State stt, final ContentHandler cntntHndlr, final Response rspns
+    static class NoRewriteState extends State2 {
+        NoRewriteState( final State2 stt, final ContentHandler cntntHndlr, final Response rspns
                         , final boolean isPrtlt, final int scrptDpth, final String rwrtURI ) {
             super( stt, cntntHndlr, rspns, isPrtlt, scrptDpth, rwrtURI );
         }
@@ -960,142 +853,22 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
     }
     /**
-     * <!-- StatefullHandler -->
-     * Driver for our state machine.  Just forwards SAX events to a State which in turn returns the
-     * next State.  The initial state is RootFilter
-     * @see AbstractRewrite
-     * @see State 
-     * @see RootFilter
-     * @author d
-     */
-    static final class StatefullHandler implements ContentHandler {
-        /**
-         * <!-- state -->
-         * The current state.
-         * @see State
-         * @see StatefullHandler
-         * @author d
-         */
-        private State state;
-        /**
-         * <!-- StatefullHandler -->
-         * @see StatefullHandler
-         * @author d
-         * @param rwrtURI 
-         */
-        StatefullHandler
-        ( final ContentHandler dst, final Response rspns, final boolean isPrtlt
-          , final String rwrtURI ) {
-            state = new RootFilter( null, dst, rspns, isPrtlt, 0, rwrtURI );    
-        }
-        /**
-         * <!-- characters -->
-         * @see StatefullHandler
-         * @author d
-         */
-        public void characters( final char[] ch, final int strt, final int len ) 
-        throws SAXException {
-            state = state.characters( ch, strt, len );
-        }
-        /**
-         * <!-- endDocument -->
-         * @see StatefullHandler
-         * @author d
-         */
-        public void endDocument() throws SAXException {
-            state = state.endDocument();
-        }
-        /**
-         * <!-- endElement -->
-         * @see StatefullHandler
-         * @author d
-         */
-        public void endElement( final String ns, final String lnam, final String qnam ) 
-        throws SAXException {
-            state = state.endElement( ns, lnam, qnam );
-        }
-        /**
-         * <!-- endPrefixMapping -->
-         * @see StatefullHandler
-         * @author d
-         */
-        public void endPrefixMapping( final String pfx ) throws SAXException {
-            state = state.endPrefixMapping(pfx);
-        }
-        /**
-         * <!-- ignorableWhitespace -->
-         * @see StatefullHandler
-         * @author d
-         */
-        public void ignorableWhitespace( final char[] ch, final int strt, final int len ) 
-        throws SAXException {
-            state = state.ignorableWhitespace( ch, strt, len );
-        }
-        /**
-         * <!-- processingInstruction -->
-         * @see StatefullHandler
-         * @author d
-         */
-        public void processingInstruction( final String trgt, final String dat ) 
-        throws SAXException {
-            state = state.processingInstruction( trgt, dat );
-        }
-        /**
-         * <!-- setDocumentLocator -->
-         * @see StatefullHandler
-         * @author d
-         */
-        public void setDocumentLocator( final Locator loc ) {
-            state = state.setDocumentLocator( loc );
-        }
-        /**
-         * <!-- skippedEntity -->
-         * @see StatefullHandler
-         * @author d
-         */
-        public void skippedEntity( final String nam ) throws SAXException {
-            state = state.skippedEntity( nam );
-        }
-        /**
-         * <!-- startDocument -->
-         * @see StatefullHandler
-         * @author d
-         */
-        public void startDocument() throws SAXException {
-            state = state.startDocument();
-        }
-        /**
-         * <!-- startElement -->
-         * @see StatefullHandler
-         * @author d
-         */
-        public void startElement
-        ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
-        throws SAXException {
-            state = state.startElement( ns, lnam, qnam, atts );
-        }
-        /**
-         * <!-- startPrefixMapping -->
-         * @see StatefullHandler
-         * @author d
-         */
-        public void startPrefixMapping( final String pfx, final String uri ) throws SAXException {
-            state = state.startPrefixMapping( pfx, uri );
-        }
-    }
-    /**
      * <!-- RewriteOutput -->
      * @see #readImpl(PipelineContext, ContentHandler)
      * @author dsmall
      */
     private final class RewriteOutput extends ProcessorImpl.CacheableTransformerOutputImpl {
+
+        final String rewriteURI;
+        
         /**
          * <!-- RewriteOutput -->
          * Just calls super( ... )
          * @author d
          */
-        private RewriteOutput( final Class cls, final String nam ) {
+        private RewriteOutput( final Class cls, final String nam, final String rwrtURI ) {
             super( cls, nam );
+            rewriteURI = rwrtURI;
         }
         /**
          * <!-- readImpl -->
@@ -1113,9 +886,11 @@ abstract class AbstractRewrite extends ProcessorImpl {
             
             // Do the conversion
             final boolean isPrtlt = extrnlCtxt instanceof PortletExternalContext;
+            final State2 initStt = new RootFilter( null, cntntHndlr, rspns, isPrtlt, 0, rewriteURI );    
+         
 
             final StatefullHandler stFlHndlr
-                = new StatefullHandler( cntntHndlr, rspns, isPrtlt, rewriteURI );
+                = new StatefullHandler( initStt, cntntHndlr );
             
             readInputAsSAX( ctxt, REWRITE_IN, stFlHndlr );
         }
@@ -1147,7 +922,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
      */
     public ProcessorOutput createOutput( final String nam ) {
         final Class cls = getClass();
-        final ProcessorOutput ret = new RewriteOutput( cls, nam );
+        final ProcessorOutput ret = new RewriteOutput( cls, nam, rewriteURI );
         addOutput( nam, ret );
         return ret;
     }

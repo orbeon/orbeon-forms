@@ -93,11 +93,11 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                         columnName = interpreterContext.getColumnName();
                 }
                 final int columnIndex = resultSet.findColumn(columnName);
+                final int columnType = metadata.getColumnType(columnIndex);
 
-                final String xmlType = getXMLTypeFromAttributeStringHandleDefault(getDocumentLocator(), interpreterContext.getPropertySet(), attributes.getValue("type"), interpreterContext.getPrefixesMap(), columnIndex);
+                final String xmlType = getXMLTypeFromAttributeStringHandleDefault(getDocumentLocator(), interpreterContext.getPropertySet(), attributes.getValue("type"), interpreterContext.getPrefixesMap(), columnType);
                 if (Dom4jUtils.qNameToexplodedQName(SQLProcessor.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
                     // XML fragment requested
-                    int columnType = metadata.getColumnType(columnIndex);
                     String columnTypeName = metadata.getColumnTypeName(columnIndex);
                     if (columnType == Types.CLOB) {
                         // The fragment is stored as a Clob
@@ -492,14 +492,14 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
         return (String) getterToXMLType.get(getterName);
     }
 
-    public static String getXMLTypeFromAttributeStringHandleDefault(Locator locator, OXFProperties.PropertySet propertySet, String typeAttribute, Map prefixesMap, int columnIndex) {
+    public static String getXMLTypeFromAttributeStringHandleDefault(Locator locator, OXFProperties.PropertySet propertySet, String typeAttribute, Map prefixesMap, int columnType) {
         String xmlType;
         if (typeAttribute != null) {
             // User specified an XML type
             xmlType = getXMLTypeFromAttributeString(locator, propertySet, typeAttribute, prefixesMap);
         } else {
             // Get default XML type for SQL type
-            xmlType = getDefaultXMLTypeFromSQLType(columnIndex);
+            xmlType = getDefaultXMLTypeFromSQLType(columnType);
         }
         return xmlType;
     }

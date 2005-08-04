@@ -35,14 +35,12 @@ import java.util.Map;
  */
 public class ForEachInterpreter extends SQLProcessor.InterpreterContentHandler {
 
-    private Map elementHandlers;
     private SAXStore saxStore;
     private ContentHandler savedOutput;
     private String select;
 
-    public ForEachInterpreter(SQLProcessorInterpreterContext interpreterContext, Map elementHandlers) {
+    public ForEachInterpreter(SQLProcessorInterpreterContext interpreterContext) {
         super(interpreterContext, false);
-        this.elementHandlers = elementHandlers;
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -65,7 +63,7 @@ public class ForEachInterpreter extends SQLProcessor.InterpreterContentHandler {
             try {
                 // Create a new InterpreterContentHandler with the same handlers as our parent
                 SQLProcessor.InterpreterContentHandler contentHandler = new SQLProcessor.InterpreterContentHandler(interpreterContext, true);
-                contentHandler.setElementHandlers(elementHandlers);
+                contentHandler.addAllDefaultElementHandlers();
 
                 // Scope functions
                 final Node[] currentNode = new Node[1];

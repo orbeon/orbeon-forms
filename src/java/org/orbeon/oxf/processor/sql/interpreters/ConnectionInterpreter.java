@@ -27,13 +27,15 @@ public class ConnectionInterpreter extends SQLProcessor.InterpreterContentHandle
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) {
-        addElementHandler(new DatasourceInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "datasource");
+
+        addAllDefaultElementHandlers();
+
         addElementHandler(new ExecuteInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "execute");
         final ValueOfCopyOfInterpreter valueOfCopyOfInterpreter = new ValueOfCopyOfInterpreter(getInterpreterContext());
         addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "value-of");
         addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "copy-of");
         addElementHandler(new TextInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "text");
-        addElementHandler(new ForEachInterpreter(getInterpreterContext(), getElementHandlers()), SQLProcessor.SQL_NAMESPACE_URI, "for-each");
+        addElementHandler(new ForEachInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "for-each");
     }
 
     public void end(String uri, String localname, String qName) {

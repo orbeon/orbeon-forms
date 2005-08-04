@@ -31,12 +31,7 @@ public class NoResultsInterpreter extends SQLProcessor.InterpreterContentHandler
         // Only forward if the result set is empty
         if (getInterpreterContext().isEmptyResultSet()) {
             setForward(true);
-            addElementHandler(new ExecuteInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "execute");
-            ValueOfCopyOfInterpreter valueOfCopyOfInterpreter = new ValueOfCopyOfInterpreter(getInterpreterContext());
-            addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "value-of");
-            addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "copy-of");
-            addElementHandler(new TextInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "text");
-            addElementHandler(new ForEachInterpreter(getInterpreterContext(), getElementHandlers()), SQLProcessor.SQL_NAMESPACE_URI, "for-each");
+            addAllDefaultElementHandlers();
         }
     }
 }

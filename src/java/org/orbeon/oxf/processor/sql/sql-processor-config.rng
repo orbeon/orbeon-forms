@@ -311,6 +311,11 @@
             <element name="sql:value-of">
                 <attribute name="select"/>
             </element>
+            <element name="sql:column-iterator">
+                <zeroOrMore>
+                    <ref name="element-or-new-getter"/>
+                </zeroOrMore>
+            </element>
             <element name="sql:copy-of">
                 <attribute name="select"/>
             </element>
@@ -411,6 +416,64 @@
         </choice>
     </define>
 
+    <define name="element-or-getter">
+        <choice>
+            <ref name="getter"/>
+            <ref name="execute"/>
+            <element>
+                <anyName>
+                    <except>
+                        <nsName ns="http://orbeon.org/oxf/xml/sql"/>
+                    </except>
+                </anyName>
+                <zeroOrMore>
+                    <choice>
+                        <attribute>
+                            <anyName/>
+                        </attribute>
+                        <text/>
+                        <element name="sql:text">
+                            <text/>
+                        </element>
+                        <ref name="element-or-getter"/>
+                    </choice>
+                </zeroOrMore>
+            </element>
+        </choice>
+    </define>
+
+    <define name="element-or-new-getter">
+        <choice>
+            <element>
+                <choice>
+                    <name>sql:get-column-index</name>
+                    <name>sql:get-column-name</name>
+                    <name>sql:get-column-type</name>
+                    <name>sql:get-column-value</name>
+                </choice>
+            </element>
+            <element>
+                <anyName>
+                    <except>
+                        <nsName ns="http://orbeon.org/oxf/xml/sql"/>
+                    </except>
+                </anyName>
+                <zeroOrMore>
+                    <choice>
+                        <attribute>
+                            <anyName/>
+                        </attribute>
+                        <text/>
+                        <element name="sql:text">
+                            <text/>
+                        </element>
+                        <ref name="element-or-new-getter"/>
+                    </choice>
+                </zeroOrMore>
+            </element>
+        </choice>
+    </define>
+
     <define name="getter">
         <choice>
             <ref name="simple-getter"/>
@@ -438,9 +501,9 @@
             </element>
             <element>
                 <choice>
-                    <name>get-column-index</name>
-                    <name>get-column-name</name>
-                    <name>get-column-type</name>
+                    <name>sql:get-column-index</name>
+                    <name>sql:get-column-name</name>
+                    <name>sql:get-column-type</name>
                 </choice>
                 <optional>
                     <choice>
@@ -487,6 +550,11 @@
             </element>
             <element name="sql:copy-of">
                 <attribute name="select"/>
+            </element>
+            <element name="sql:column-iterator">
+                <zeroOrMore>
+                    <ref name="element-or-getter"/>
+                </zeroOrMore>
             </element>
             <element name="sql:for-each">
                 <attribute name="select"/>

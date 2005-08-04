@@ -86,7 +86,8 @@ public class SQLProcessor extends ProcessorImpl {
 
     public SQLProcessor() {
         // Mandatory config input
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SQL_NAMESPACE_URI));
+        //addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SQL_NAMESPACE_URI));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
 
         // Optional datasource input
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATASOURCE, SQL_DATASOURCE_URI));
@@ -426,12 +427,44 @@ public class SQLProcessor extends ProcessorImpl {
             elementHandlers.put("{" + uri + "}" + localname, handler);
         }
 
-        public Map getElementHandlers() {
-            return elementHandlers;
-        }
+        public void addAllDefaultElementHandlers() {
+            addElementHandler(new ExecuteInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "execute");
+            GetterInterpreter getterInterpreter = new GetterInterpreter(interpreterContext);
+            // Legacy getters
+            addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-string");
+            addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-int");
+            addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-double");
+            addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-decimal");
+            addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-date");
+            addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-timestamp");
 
-        public void setElementHandlers(Map elementHandlers) {
-            this.elementHandlers = elementHandlers;
+            addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-column-value");
+            addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-column-type");
+            addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-column-name");
+            addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-column-index");
+            addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-column");
+            addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-columns");
+
+            addElementHandler(new TextInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "text");
+            addElementHandler(new ColumnIteratorInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "column-iterator");
+            addElementHandler(new ForEachInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "for-each");
+
+            addElementHandler(new ExecuteInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "execute");
+            addElementHandler(new QueryInterpreter(interpreterContext, QueryInterpreter.QUERY), SQLProcessor.SQL_NAMESPACE_URI, "query");
+            addElementHandler(new QueryInterpreter(interpreterContext, QueryInterpreter.UPDATE), SQLProcessor.SQL_NAMESPACE_URI, "update");
+
+            final ResultSetInterpreter resultSetInterpreter = new ResultSetInterpreter(interpreterContext);
+            addElementHandler(resultSetInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "results");
+            addElementHandler(resultSetInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "result-set");
+            addElementHandler(new NoResultsInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "no-results");
+
+            final RowIteratorInterpreter rowIteratorInterpreter = new RowIteratorInterpreter(getInterpreterContext());
+            addElementHandler(rowIteratorInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "row-results");
+            addElementHandler(rowIteratorInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "row-iterator");
+
+            final ValueOfCopyOfInterpreter valueOfCopyOfInterpreter = new ValueOfCopyOfInterpreter(interpreterContext);
+            addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "value-of");
+            addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "copy-of");
         }
 
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {

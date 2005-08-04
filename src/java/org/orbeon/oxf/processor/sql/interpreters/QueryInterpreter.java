@@ -111,14 +111,14 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                 try {
                     final ResultSet rs = getInterpreterContext().getResultSet(level);
                     final int columnIndex = rs.findColumn(columnName);
+                    final ResultSetMetaData metadata = rs.getMetaData();
+                    final int columnType = metadata.getColumnType(rs.findColumn(columnName));
 
                     final Object value;
                     if (isGetColumn) {
                         // Generic getter
-                        final String xmlType = GetterInterpreter.getXMLTypeFromAttributeStringHandleDefault(getDocumentLocator(), getInterpreterContext().getPropertySet(), attributes.getValue("type"), getInterpreterContext().getPrefixesMap(), columnIndex);
+                        final String xmlType = GetterInterpreter.getXMLTypeFromAttributeStringHandleDefault(getDocumentLocator(), getInterpreterContext().getPropertySet(), attributes.getValue("type"), getInterpreterContext().getPrefixesMap(), columnType);
                         if (Dom4jUtils.qNameToexplodedQName(SQLProcessor.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
-                            final ResultSetMetaData metadata = rs.getMetaData();
-                            final int columnType = metadata.getColumnType(rs.findColumn(columnName));
                             if (columnType == Types.CLOB) {
                                 value = rs.getClob(columnName);
                             } else if (columnType == Types.BLOB) {

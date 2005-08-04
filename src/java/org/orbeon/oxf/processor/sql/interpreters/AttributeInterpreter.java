@@ -28,7 +28,6 @@ import java.util.Map;
  */
 public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler {
 
-    private Map elementHandlers;
     private ContentHandler savedOutput;
 
     private String attributeName;
@@ -36,12 +35,10 @@ public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler
 
     public AttributeInterpreter(SQLProcessorInterpreterContext interpreterContext, Map elementHandlers) {
         super(interpreterContext, false);
-        this.elementHandlers = elementHandlers;
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        // Use same handlers as parent
-        setElementHandlers(elementHandlers);
+        addAllDefaultElementHandlers();
         // Everything will be intercepted here and saved as text
         savedOutput = getInterpreterContext().getOutput();
         getInterpreterContext().setOutput(new ContentHandlerAdapter() {

@@ -183,24 +183,7 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
                 };
 
                 // Initialize the content handler
-                contentHandler.addElementHandler(new ExecuteInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "execute");
-                GetterInterpreter getterInterpreter = new GetterInterpreter(interpreterContext);
-                contentHandler.addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-string");
-                contentHandler.addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-int");
-                contentHandler.addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-double");
-                contentHandler.addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-decimal");
-                contentHandler.addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-date");
-                contentHandler.addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-timestamp");
-                contentHandler.addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-column");
-                contentHandler.addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-columns");
-
-                final ValueOfCopyOfInterpreter valueOfCopyOfInterpreter = new ValueOfCopyOfInterpreter(interpreterContext);
-                contentHandler.addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "value-of");
-                contentHandler.addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "copy-of");
-
-                contentHandler.addElementHandler(new TextInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "text");
-                contentHandler.addElementHandler(new ForEachInterpreter(getInterpreterContext(), contentHandler.getElementHandlers()), SQLProcessor.SQL_NAMESPACE_URI, "for-each");
-                contentHandler.addElementHandler(new RowIteratorInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "column-iterator");
+                contentHandler.addAllDefaultElementHandlers();
 
                 // Functions in this context
                 Map functions = new HashMap();

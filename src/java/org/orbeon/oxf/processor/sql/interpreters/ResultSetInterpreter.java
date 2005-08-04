@@ -35,16 +35,7 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         if (!getInterpreterContext().isEmptyResultSet()) {
             setForward(true);
-            final RowIteratorInterpreter rowIteratorInterpreter = new RowIteratorInterpreter(getInterpreterContext());
-            addElementHandler(rowIteratorInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "row-results");
-            addElementHandler(rowIteratorInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "row-iterator");
-            final ValueOfCopyOfInterpreter valueOfCopyOfInterpreter = new ValueOfCopyOfInterpreter(getInterpreterContext());
-            addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "value-of");
-            addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "copy-of");
-            addElementHandler(new TextInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "text");
-            // We must not be able to have a RowResultsInterpreter within the for-each
-            // This must be checked in the schema
-            addElementHandler(new ForEachInterpreter(getInterpreterContext(), getElementHandlers()), SQLProcessor.SQL_NAMESPACE_URI, "for-each");
+            addAllDefaultElementHandlers();
         }
     }
 

@@ -37,24 +37,7 @@ public class ExecuteInterpreter extends SQLProcessor.InterpreterContentHandler {
 
         // Push context
         interpreterContext.pushContext();
-
-        addElementHandler(new QueryInterpreter(interpreterContext, QueryInterpreter.QUERY), SQLProcessor.SQL_NAMESPACE_URI, "query");
-        addElementHandler(new QueryInterpreter(interpreterContext, QueryInterpreter.UPDATE), SQLProcessor.SQL_NAMESPACE_URI, "update");
-
-        final ResultSetInterpreter resultSetInterpreter = new ResultSetInterpreter(interpreterContext);
-        addElementHandler(resultSetInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "results");
-        addElementHandler(resultSetInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "result-set");
-
-        addElementHandler(new NoResultsInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "no-results");
-
-        final ValueOfCopyOfInterpreter valueOfCopyOfInterpreter = new ValueOfCopyOfInterpreter(interpreterContext);
-        addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "value-of");
-        addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "copy-of");
-
-        addElementHandler(new TextInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "text");
-        addElementHandler(new ForEachInterpreter(getInterpreterContext(), getElementHandlers()), SQLProcessor.SQL_NAMESPACE_URI, "for-each");
-
-        addElementHandler(new RowIteratorInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "column-iterator");
+        addAllDefaultElementHandlers();
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {

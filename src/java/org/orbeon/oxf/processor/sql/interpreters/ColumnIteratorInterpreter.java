@@ -31,13 +31,11 @@ import java.util.Map;
  */
 public class ColumnIteratorInterpreter extends SQLProcessor.InterpreterContentHandler {
 
-    private Map elementHandlers;
     private SAXStore saxStore;
     private ContentHandler savedOutput;
 
-    public ColumnIteratorInterpreter(SQLProcessorInterpreterContext interpreterContext, Map elementHandlers) {
+    public ColumnIteratorInterpreter(SQLProcessorInterpreterContext interpreterContext) {
         super(interpreterContext, false);
-        this.elementHandlers = elementHandlers;
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -58,7 +56,7 @@ public class ColumnIteratorInterpreter extends SQLProcessor.InterpreterContentHa
             try {
                 // Create a new InterpreterContentHandler with the same handlers as our parent
                 final SQLProcessor.InterpreterContentHandler contentHandler = new SQLProcessor.InterpreterContentHandler(interpreterContext, true);
-                contentHandler.setElementHandlers(elementHandlers);
+                contentHandler.addAllDefaultElementHandlers();
 
                 final ResultSet resultSet = interpreterContext.getResultSet(0);
                 final ResultSetMetaData metadata = resultSet.getMetaData();

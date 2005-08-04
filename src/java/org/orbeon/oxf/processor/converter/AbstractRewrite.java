@@ -23,6 +23,7 @@ import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.XMLUtils;
+import org.orbeon.oxf.xml.saxrewrite.RootFilter;
 import org.orbeon.oxf.xml.saxrewrite.State;
 import org.orbeon.oxf.xml.saxrewrite.StatefullHandler;
 import org.xml.sax.Attributes;
@@ -206,63 +207,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
         }
     }
     /**
-     * <!-- RootFilter -->
-     * Ignores everything before start element.  On startElement switches to RewriteState.
-     * So if this is used as the initial state then the result is that the prologue and epilogue
-     * are ignored while the root element is passed to the next state.
-     * @author d
-     */
-    static class RootFilter extends State2 {
-        /**
-         * <!-- RootFilter -->
-         * Simple calls super(...)
-         * @see State2#State(State2, ContentHandler, Response, boolean, boolean)
-         * @author d
-         * @param rwrtURI 
-         */
-        RootFilter( final State stt, final ContentHandler cntntHnder, final Response rspns
-                    , final boolean isPrtlt, final int scrptDpth, final String rwrtURI ) {
-            super( stt, cntntHnder, rspns, isPrtlt, scrptDpth, rwrtURI );
-        }
-        /**
-         * <!-- startElement -->
-         * @return new RewriteState( ... )
-         * @see RewriteState
-         * @author d
-         */
-        public State startElement
-        ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
-        throws SAXException {
-            final State ret = new RewriteState
-                ( this, contentHandler, response, isPortlet, scriptDepth, rewriteURI );
-            return ret.startElement( ns, lnam, qnam, atts );
-        }
-        /**
-         * <!-- characters -->
-         * @return this.  Does nothing else.
-         */
-        public State characters( final char[] ch, final int strt, final int len ) 
-        throws SAXException {
-            return this;
-        }
-        /**
-         * <!-- ignorableWhitespace -->
-         * @return this.  Does nothing else.
-         */
-        public State ignorableWhitespace( final char[] ch, final int strt, final int len ) 
-        throws SAXException {
-            return this;
-        }
-        /**
-         * <!-- processingInstruction -->
-         * @return this.  Does nothing else.
-         */
-        public State processingInstruction( final String trgt, final String dat ) 
-        throws SAXException {
-            return this;
-        }
-    }
-    /**
      * <!-- RewriteState -->
      * The rewrite state.  Essentially this corresponds to the default mode of oxf-rewrite.xsl.
      * Basically this :
@@ -322,7 +266,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * @param rwrtURI 
          * @see State2#State(State2, ContentHandler, Response, boolean, boolean)
          */
-        RewriteState( final State2 stt, final ContentHandler cntntHndlr, final Response rspns
+        RewriteState( final State stt, final ContentHandler cntntHndlr, final Response rspns
                       , final boolean isPrtlt, final int scrptDpth, final String rwrtURI ) {
             super( stt, cntntHndlr, rspns, isPrtlt, scrptDpth, rwrtURI );
             final Pattern ptrn = Pattern.compile( "wsrp_rewrite" );
@@ -886,8 +830,10 @@ abstract class AbstractRewrite extends ProcessorImpl {
             
             // Do the conversion
             final boolean isPrtlt = extrnlCtxt instanceof PortletExternalContext;
-            final State2 initStt = new RootFilter( null, cntntHndlr, rspns, isPrtlt, 0, rewriteURI );    
-         
+            final RootFilter initStt = new RootFilter( null, cntntHndlr );    
+            final State aftRt = new RewriteState
+            ( initStt, cntntHndlr, rspns, isPrtlt, 0, rewriteURI );
+            initStt.setNextState( aftRt );
 
             final StatefullHandler stFlHndlr
                 = new StatefullHandler( initStt, cntntHndlr );

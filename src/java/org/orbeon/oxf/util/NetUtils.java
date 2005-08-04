@@ -25,10 +25,25 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class NetUtils {
 
     private static Logger logger = LoggerFactory.createLogger(NetUtils.class);
+
+    /**
+     * <!-- PATTERN_NO_AMP -->
+     * @see #decodeQueryString(CharSequence, boolean)
+     * @author d
+     */
+    private static final Pattern PATTERN_NO_AMP;
+    /**
+     * <!-- PATTERN_AMP -->
+     * @see #decodeQueryString(CharSequence, boolean)
+     * @author d
+     */
+    private static final Pattern PATTERN_AMP;
 
     public static final String DEFAULT_URL_ENCODING = "utf-8";
 
@@ -44,6 +59,12 @@ public class NetUtils {
         // Set timezone to GMT as required for HTTP headers
         for (int i = 0; i < dateHeaderFormats.length; i++)
             dateHeaderFormats[i].setTimeZone(gmtZone);
+
+        final String notEqNorAmpChar = "[^=&]";
+        final String token = notEqNorAmpChar+ "+";
+        PATTERN_NO_AMP = Pattern.compile( "(" + token + ")=(" + token + ")(?:&|(?<!&)\\z)" );
+        PATTERN_AMP 
+            = Pattern.compile( "(" + token + ")=(" + token + ")(?:&amp;|&|(?<!&amp;|&)\\z)" );
     }
 
     public static long getDateHeader(String stringValue) throws ParseException {
@@ -199,33 +220,51 @@ public class NetUtils {
     }
 
     /**
-     * Decode a query string of the form n1=v1&n2=v2&...
-     *
+     * @param a query string of the form n1=v1&n2=v2&... to decode.  May be null.
+     * @param true if both &amp; and '&' should be accepted as delimiters and false if only & 
+     *              should be considered as a delimiter.
      * @return a Map of String[] indexed by name, an empty Map if the query string was null
      */
-    public static Map decodeQueryString(String query, boolean acceptAmp) {
-        final Map parameters = new HashMap();
-        if (query == null)
-            return parameters;
-        final StringTokenizer st = new StringTokenizer(query, "&");
-        try {
-            while (st.hasMoreTokens()) {
-                String token = st.nextToken();
-                // Check if &amp; is also supported as delimiter
-                if (acceptAmp && token.startsWith("amp;"))
-                    token = token.substring(4);
-                final int equalIndex = token.indexOf('=');
-                if (equalIndex == -1)
-                    throw new OXFException("Malformed URL: " + query);
-                final String name = URLDecoder.decode(token.substring(0, equalIndex), NetUtils.DEFAULT_URL_ENCODING);
-                final String value = URLDecoder.decode(token.substring(equalIndex + 1), NetUtils.DEFAULT_URL_ENCODING);
-                NetUtils.addValueToStringArrayMap(parameters, name, value);
+    public static java.util.Map decodeQueryString
+    ( final CharSequence qry, final boolean accptAmp ) {
+
+        final java.util.Map ret = new java.util.TreeMap();
+
+        if ( qry != null ) {
+
+            final Matcher m = accptAmp ? PATTERN_AMP.matcher( qry ) : PATTERN_NO_AMP.matcher( qry );
+            int mtchEnd = 0;
+            while ( m.find() )
+            {
+                if ( m.start() != mtchEnd ) {
+                    //  We have detected something like a=b=c=d.  That is we noticed that the last
+                    //  match ended on 'b' and that this match starts on 'c'.  Since we skipped
+                    //  something there must be a problem.
+                    throw new OXFException( "Malformed URL: " + qry );
+                }
+                mtchEnd = m.end();
+
+                try {
+                    // Group 0 is the whole match, e.g. a=b, while group 1 is the first group
+                    // denoted ( with parens ) in the expression.  Hence we start with group 1.
+                    String nam = m.group( 1 );
+                    nam = URLDecoder.decode( nam, NetUtils.DEFAULT_URL_ENCODING );
+
+                    String val = m.group( 2 );
+                    val= URLDecoder.decode( val, NetUtils.DEFAULT_URL_ENCODING );
+
+                    NetUtils.addValueToStringArrayMap( ret, nam, val );
+                } catch ( final java.io.UnsupportedEncodingException e ) {
+                    // Should not happen as we are using a required encoding
+                    throw new OXFException( e );
+                }
             }
-        } catch (UnsupportedEncodingException e) {
-            // Should not happen as we are using a required encoding
-            throw new OXFException(e);
+            if ( qry.length() != mtchEnd ) {
+                // There was garbage at the end of the query.
+                throw new OXFException( "Malformed URL: " + qry );
+            }
         }
-        return parameters;
+        return ret;
     }
 
     /**

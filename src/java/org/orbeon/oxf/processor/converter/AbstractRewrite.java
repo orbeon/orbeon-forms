@@ -176,7 +176,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * @see #isPortlet
          * @author d
          */
-        State2( final State2 stt, final ContentHandler cntntHndlr, final Response rspns
+        State2( final State stt, final ContentHandler cntntHndlr, final Response rspns
                , final boolean isPrtlt, final int scrptDpth, final String rwrtURI ) {
             super( stt, cntntHndlr );
             response = rspns;
@@ -220,7 +220,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * @author d
          * @param rwrtURI 
          */
-        RootFilter( final State2 stt, final ContentHandler cntntHnder, final Response rspns
+        RootFilter( final State stt, final ContentHandler cntntHnder, final Response rspns
                     , final boolean isPrtlt, final int scrptDpth, final String rwrtURI ) {
             super( stt, cntntHnder, rspns, isPrtlt, scrptDpth, rwrtURI );
         }

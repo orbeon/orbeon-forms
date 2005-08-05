@@ -15,10 +15,10 @@ package org.orbeon.oxf.processor.sql.interpreters;
 
 import org.jaxen.Function;
 import org.orbeon.oxf.common.ValidationException;
-import org.orbeon.oxf.xml.SAXStore;
-import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
+import org.orbeon.oxf.xml.SAXStore;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -35,8 +35,168 @@ import java.util.Map;
  */
 public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandler {
 
-    private SAXStore saxStore;
     private ContentHandler savedOutput;
+
+    private boolean hiding;
+    private int[] rowNum = {1};
+    private int[] groupCount = {0};
+    private List groups = new ArrayList();
+
+    public RowIteratorInterpreter(SQLProcessorInterpreterContext interpreterContext) {
+        // Repeating interpreter
+        super(interpreterContext, true);
+        setForward(true);
+    }
+
+    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
+        addAllDefaultElementHandlers();
+
+        final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
+
+        final ResultSet resultSet = interpreterContext.getResultSet(0);
+        try {
+            boolean hasNext = true;
+
+            // Functions in this context
+            Map functions = new HashMap();
+            functions.put("{" + SQLProcessor.SQL_NAMESPACE_URI + "}" + "row-position", new Function() {
+                public Object call(org.jaxen.Context context, List args) {
+                    return new Integer(interpreterContext.getRowPosition());
+                }
+            });
+
+            interpreterContext.pushFunctions(functions);
+            try {
+
+                // Iterate through the result set
+                while (hasNext) {
+                    // Output footers that need it
+                    if (groups != null) {
+                        for (int i = groups.size() - 1; i >= 0; i--) {
+                            Group g1 = (Group) groups.get(i);
+                            if (columnChanged(resultSet, groups, i)) {
+                                g1.getFooter().replay(interpreterContext.getOutput());
+                                g1.getFooter().clear();
+                            }
+                        }
+                        groupCount[0] = 0;
+                    }
+                    // Set variables
+                    interpreterContext.setRowPosition(rowNum[0]);
+                    // Interpret row
+                    repeatBody();
+                    // Go to following row
+                    hasNext = resultSet.next();
+                    rowNum[0]++;
+                }
+                // Output last footers
+                for (int i = groups.size() - 1; i >= 0; i--) {
+                    Group group = (Group) groups.get(i);
+                    group.getFooter().replay(interpreterContext.getOutput());
+                    group.getFooter().clear();
+                }
+            } finally {
+                interpreterContext.popFunctions();
+            }
+        } catch (Exception e) {
+            throw new ValidationException(e, new LocationData(getDocumentLocator()));
+        }
+    }
+
+    public void end(String uri, String localname, String qName) throws SAXException {
+    }
+
+    public void startPrefixMapping(String prefix, String uri) throws SAXException {
+        super.startPrefixMapping(prefix, uri);
+        getInterpreterContext().declarePrefix(prefix, uri);
+    }
+
+    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+//        if (!isInElementHandler() && SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
+        if (SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
+            if (localname.equals("group")) {
+                try {
+                    ResultSet resultSet = getInterpreterContext().getResultSet(0);
+                    // Save group information if first row
+                    if (rowNum[0] == 1) {
+                        groups.add(new Group(attributes.getValue("column"), resultSet));
+                    }
+
+                    // Get current group information
+                    Group currentGroup = (Group) groups.get(groupCount[0]);
+
+                    if (rowNum[0] == 1 || columnChanged(resultSet, groups, groupCount[0])) {
+                        // Need to display group's header and footer
+                        currentGroup.setShowHeader(true);
+                        hiding = false;
+                        currentGroup.setColumnValue(resultSet);
+                    } else {
+                        // Hide group's header
+                        currentGroup.setShowHeader(false);
+                        hiding = true;
+                    }
+
+                    groupCount[0]++;
+
+                } catch (SQLException e) {
+                    throw new ValidationException(e, new LocationData(getDocumentLocator()));
+                }
+
+            } else if (localname.equals("member")) {
+                hiding = false;
+            } else if (!hiding) {
+                super.startElement(uri, localname, qName, attributes);
+            }
+        } else if (!hiding) {
+            super.startElement(uri, localname, qName, attributes);
+        }
+    }
+
+    public void endElement(String uri, String localname, String qName) throws SAXException {
+//        if (!isInElementHandler() && SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
+        if (SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
+            final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
+            if (localname.equals("group")) {
+                groupCount[0]--;
+                // Restore sending to the regular output
+                Group currentGroup = (Group) groups.get(groupCount[0]);
+                if (currentGroup.isShowHeader())
+                    interpreterContext.setOutput(savedOutput);
+            } else if (localname.equals("member")) {
+                Group currentGroup = (Group) groups.get(groupCount[0] - 1);
+                // The first time, everything is sent to the footer SAXStore
+                if (currentGroup.isShowHeader()) {
+                    savedOutput = interpreterContext.getOutput();
+                    interpreterContext.setOutput(currentGroup.getFooter());
+                    hiding = false;
+                } else
+                    hiding = true;
+            } else if (!hiding) {
+                super.endElement(uri, localname, qName);
+            }
+        } else if (!hiding) {
+            super.endElement(uri, localname, qName);
+        }
+    }
+
+    public void characters(char[] chars, int start, int length) throws SAXException {
+        if (!hiding) {
+            // Output only if the string is non-blank [FIXME: Incorrect white space handling!]
+//                                String s = new String(chars, start, length);
+//                                if (!s.trim().equals(""))
+            super.characters(chars, start, length);
+        }
+    }
+
+    private boolean columnChanged(ResultSet resultSet, List groups, int level) throws SQLException {
+        for (int i = level; i >= 0; i--) {
+            Group group = (Group) groups.get(i);
+            if (group.columnChanged(resultSet))
+                return true;
+        }
+        return false;
+    }
 
     private class Group {
         private String columnName;
@@ -69,175 +229,5 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
         public SAXStore getFooter() {
             return footer;
         }
-    }
-
-    public RowIteratorInterpreter(SQLProcessorInterpreterContext interpreterContext) {
-        super(interpreterContext, false);
-    }
-
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        // Only forward if the result set is not empty
-        if (!getInterpreterContext().isEmptyResultSet()) {
-            saxStore = new SAXStore();
-            saxStore.setDocumentLocator(getDocumentLocator());
-            savedOutput = getInterpreterContext().getOutput();
-            getInterpreterContext().setOutput(saxStore);
-            setForward(true);
-        }
-    }
-
-    public void end(String uri, String localname, String qName) throws SAXException {
-        if (saxStore != null) {
-            final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
-            interpreterContext.setOutput(savedOutput);
-
-            final ResultSet resultSet = interpreterContext.getResultSet(0);
-            try {
-                boolean hasNext = true;
-                final int[] rowNum = {1};
-                final int[] groupCount = {0};
-                final List groups = new ArrayList();
-
-                // Interpret row-results for each result-set row
-                SQLProcessor.InterpreterContentHandler contentHandler = new SQLProcessor.InterpreterContentHandler(interpreterContext, true) {
-                    public void startPrefixMapping(String prefix, String uri) throws SAXException {
-                        super.startPrefixMapping(prefix, uri);
-                        interpreterContext.declarePrefix(prefix, uri);
-                    }
-
-                    private boolean hiding;
-
-                    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-                        if (!isInElementHandler() && SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
-                            if (localname.equals("group")) {
-                                try {
-                                    ResultSet resultSet = interpreterContext.getResultSet(0);
-                                    // Save group information if first row
-                                    if (rowNum[0] == 1) {
-                                        groups.add(new Group(attributes.getValue("column"), resultSet));
-                                    }
-
-                                    // Get current group information
-                                    Group currentGroup = (Group) groups.get(groupCount[0]);
-
-                                    if (rowNum[0] == 1 || columnChanged(resultSet, groups, groupCount[0])) {
-                                        // Need to display group's header and footer
-                                        currentGroup.setShowHeader(true);
-                                        hiding = false;
-                                        currentGroup.setColumnValue(resultSet);
-                                    } else {
-                                        // Hide group's header
-                                        currentGroup.setShowHeader(false);
-                                        hiding = true;
-                                    }
-
-                                    groupCount[0]++;
-
-                                } catch (SQLException e) {
-                                    throw new ValidationException(e, new LocationData(getDocumentLocator()));
-                                }
-
-                            } else if (localname.equals("member")) {
-                                hiding = false;
-                            } else if (!hiding) {
-                                super.startElement(uri, localname, qName, attributes);
-                            }
-                        } else if (!hiding) {
-                            super.startElement(uri, localname, qName, attributes);
-                        }
-                    }
-
-                    public void endElement(String uri, String localname, String qName) throws SAXException {
-                        if (!isInElementHandler() && SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
-                            if (localname.equals("group")) {
-                                groupCount[0]--;
-                                // Restore sending to the regular output
-                                Group currentGroup = (Group) groups.get(groupCount[0]);
-                                if (currentGroup.isShowHeader())
-                                    interpreterContext.setOutput(savedOutput);
-                            } else if (localname.equals("member")) {
-                                Group currentGroup = (Group) groups.get(groupCount[0] - 1);
-                                // The first time, everything is sent to the footer SAXStore
-                                if (currentGroup.isShowHeader()) {
-                                    savedOutput = interpreterContext.getOutput();
-                                    interpreterContext.setOutput(currentGroup.getFooter());
-                                    hiding = false;
-                                } else
-                                    hiding = true;
-                            } else if (!hiding) {
-                                super.endElement(uri, localname, qName);
-                            }
-                        } else if (!hiding) {
-                            super.endElement(uri, localname, qName);
-                        }
-                    }
-
-                    public void characters(char[] chars, int start, int length) throws SAXException {
-                        if (!hiding) {
-                            // Output only if the string is non-blank [FIXME: Incorrect white space handling!]
-//                                String s = new String(chars, start, length);
-//                                if (!s.trim().equals(""))
-                            super.characters(chars, start, length);
-                        }
-                    }
-                };
-
-                // Initialize the content handler
-                contentHandler.addAllDefaultElementHandlers();
-
-                // Functions in this context
-                Map functions = new HashMap();
-                functions.put("{" + SQLProcessor.SQL_NAMESPACE_URI + "}" + "row-position", new Function() {
-                    public Object call(org.jaxen.Context context, List args) {
-                        return new Integer(interpreterContext.getRowPosition());
-                    }
-                });
-
-                interpreterContext.pushFunctions(functions);
-                try {
-
-                    // Iterate through the result set
-                    while (hasNext) {
-                        // Output footers that need it
-                        if (groups != null) {
-                            for (int i = groups.size() - 1; i >= 0; i--) {
-                                Group g1 = (Group) groups.get(i);
-                                if (columnChanged(resultSet, groups, i)) {
-                                    g1.getFooter().replay(interpreterContext.getOutput());
-                                    g1.getFooter().clear();
-                                }
-                            }
-                            groupCount[0] = 0;
-                        }
-                        // Set variables
-                        interpreterContext.setRowPosition(rowNum[0]);
-                        // Interpret row
-                        saxStore.replay(contentHandler);
-                        // Go to following row
-                        hasNext = resultSet.next();
-                        rowNum[0]++;
-                    }
-                    // Output last footers
-                    for (int i = groups.size() - 1; i >= 0; i--) {
-                        Group group = (Group) groups.get(i);
-                        group.getFooter().replay(interpreterContext.getOutput());
-                        group.getFooter().clear();
-                    }
-                } finally {
-                    interpreterContext.popFunctions();
-                }
-            } catch (Exception e) {
-                throw new ValidationException(e, new LocationData(getDocumentLocator()));
-            }
-        }
-    }
-
-    private boolean columnChanged(ResultSet resultSet, List groups, int level) throws SQLException {
-        for (int i = level; i >= 0; i--) {
-            Group group = (Group) groups.get(i);
-            if (group.columnChanged(resultSet))
-                return true;
-        }
-        return false;
     }
 }

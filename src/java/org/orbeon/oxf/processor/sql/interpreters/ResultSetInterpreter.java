@@ -33,9 +33,11 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
+        addAllDefaultElementHandlers();
+
         if (!getInterpreterContext().isEmptyResultSet()) {
             setForward(true);
-            addAllDefaultElementHandlers();
         }
     }
 

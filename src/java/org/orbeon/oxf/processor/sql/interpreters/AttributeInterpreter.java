@@ -16,7 +16,6 @@ package org.orbeon.oxf.processor.sql.interpreters;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
-import org.orbeon.oxf.common.OXFException;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -28,34 +27,25 @@ import java.util.Map;
  */
 public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler {
 
-    private ContentHandler savedOutput;
-
     private String attributeName;
     private StringBuffer content;
 
-    public AttributeInterpreter(SQLProcessorInterpreterContext interpreterContext, Map elementHandlers) {
+    public AttributeInterpreter(SQLProcessorInterpreterContext interpreterContext) {
         super(interpreterContext, false);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        addAllDefaultElementHandlers();
-        // Everything will be intercepted here and saved as text
-        savedOutput = getInterpreterContext().getOutput();
-        getInterpreterContext().setOutput(new ContentHandlerAdapter() {
-            public void characters(char ch[], int start, int length) {
-                if (content == null)
-                    content = new StringBuffer();
-                content.append(ch, start, length);
-            }
-        });
-        setForward(true);
         // Get attributes
         this.attributeName = attributes.getValue("name");
     }
 
+    public void characters(char ch[], int start, int length) {
+        if (content == null)
+            content = new StringBuffer();
+        content.append(ch, start, length);
+    }
+
     public void end(String uri, String localname, String qName) throws SAXException {
-        // Restore the regular output
-        getInterpreterContext().setOutput(savedOutput);
 
         // Output attribute
 //        if (content == null)

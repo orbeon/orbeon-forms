@@ -22,6 +22,8 @@ import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
+import javax.xml.transform.sax.TransformerHandler;
+import javax.xml.transform.stream.StreamResult;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -200,6 +202,21 @@ public class SAXStore extends ForwardingContentHandler implements Serializable {
                 lineBufferPos[0] += 2;
         }
 
+    }
+
+    /**
+     * This prints the instance with extra annotation attributes to System.out. For debug only.
+     */
+    public void readOut() {
+        try {
+            final TransformerHandler  th = TransformerUtils.getIdentityTransformerHandler();
+            th.setResult(new StreamResult(System.out));
+            th.startDocument();
+            replay(th);
+            th.endDocument();
+        } catch (SAXException e) {
+            throw new OXFException(e);
+        }
     }
 
     public void clear() {

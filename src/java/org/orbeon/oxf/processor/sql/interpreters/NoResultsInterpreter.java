@@ -28,10 +28,12 @@ public class NoResultsInterpreter extends SQLProcessor.InterpreterContentHandler
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
+        addAllDefaultElementHandlers();
+
         // Only forward if the result set is empty
         if (getInterpreterContext().isEmptyResultSet()) {
             setForward(true);
-            addAllDefaultElementHandlers();
         }
     }
 }

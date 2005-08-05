@@ -34,6 +34,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.NamespaceSupport;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.util.*;
 
@@ -405,8 +406,13 @@ public class SQLProcessor extends ProcessorImpl {
     public static class InterpreterContentHandler extends ForwardingContentHandler {
 
         private SQLProcessorInterpreterContext interpreterContext;
-        private boolean forward;
         private Locator documentLocator;
+
+        private boolean forward;
+        private boolean repeating;
+        private SAXStore saxStore;
+        private ContentHandler savedOutput;
+        private Attributes savedAttributes;
 
         private Map elementHandlers = new HashMap();
         private int forwardingLevel = -1;
@@ -414,13 +420,15 @@ public class SQLProcessor extends ProcessorImpl {
         private int level = 0;
         private String currentKey;
 
-        public InterpreterContentHandler() {
-            this(null, false);
-        }
-
-        public InterpreterContentHandler(SQLProcessorInterpreterContext interpreterContext, boolean forward) {
+        /**
+         *
+         *
+         * @param interpreterContext    current SQLProcessorInterpreterContext
+         * @param repeating             set this to true if the body of this handler will be repeated
+         */
+        public InterpreterContentHandler(SQLProcessorInterpreterContext interpreterContext, boolean repeating) {
             this.interpreterContext = interpreterContext;
-            this.forward = forward;
+            this.repeating = repeating;
         }
 
         public void addElementHandler(InterpreterContentHandler handler, String uri, String localname) {
@@ -428,8 +436,12 @@ public class SQLProcessor extends ProcessorImpl {
         }
 
         public void addAllDefaultElementHandlers() {
+
+            addElementHandler(new ConnectionInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "connection");
+            addElementHandler(new DatasourceInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "datasource");
+
             addElementHandler(new ExecuteInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "execute");
-            GetterInterpreter getterInterpreter = new GetterInterpreter(interpreterContext);
+            final GetterInterpreter getterInterpreter = new GetterInterpreter(interpreterContext);
             // Legacy getters
             addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-string");
             addElementHandler(getterInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "get-int");
@@ -465,18 +477,31 @@ public class SQLProcessor extends ProcessorImpl {
             final ValueOfCopyOfInterpreter valueOfCopyOfInterpreter = new ValueOfCopyOfInterpreter(interpreterContext);
             addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "value-of");
             addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "copy-of");
+
+            //addElementHandler(new AttributeInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "attribute");
         }
 
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
             if (forwardingLevel == -1 && elementHandlers.size() > 0) {
-                String key = "{" + uri + "}" + localname;
-                InterpreterContentHandler elementHandler = (InterpreterContentHandler) elementHandlers.get(key);
+                final String key = "{" + uri + "}" + localname;
+                final InterpreterContentHandler elementHandler = (InterpreterContentHandler) elementHandlers.get(key);
                 if (elementHandler != null) {
+                    // Found element handler
                     forwardingLevel = level;
                     currentKey = key;
-                    currentHandler = elementHandler;
-                    elementHandler.setDocumentLocator(documentLocator);
-                    elementHandler.start(uri, localname, qName, attributes);
+                    if (elementHandler.isRepeating()) {
+                        // Remember content
+                        savedOutput = getInterpreterContext().getOutput();
+                        savedAttributes = new AttributesImpl(attributes);
+                        elementHandler.saxStore = new SAXStore();
+                        elementHandler.saxStore.setDocumentLocator(documentLocator);
+                        getInterpreterContext().setOutput(elementHandler.saxStore);
+                    } else {
+                        // Notify start of element
+                        currentHandler = elementHandler;
+                        elementHandler.setDocumentLocator(documentLocator);
+                        elementHandler.start(uri, localname, qName, attributes);
+                    }
                 } else
                     super.startElement(uri, localname, qName, attributes);
             } else
@@ -487,17 +512,48 @@ public class SQLProcessor extends ProcessorImpl {
         public void endElement(String uri, String localname, String qName) throws SAXException {
             level--;
             if (forwardingLevel == level) {
-                String key = "{" + uri + "}" + localname;
+                final String key = "{" + uri + "}" + localname;
                 if (!currentKey.equals(key))
                     throw new ValidationException("Illegal document: expecting " + key + ", got " + currentKey, new LocationData(getDocumentLocator()));
-                InterpreterContentHandler elementHandler = (InterpreterContentHandler) elementHandlers.get(key);
 
+                final InterpreterContentHandler elementHandler = (InterpreterContentHandler) elementHandlers.get(key);
+                if (elementHandler.isRepeating()) {
+                    // Restore output
+                    interpreterContext.setOutput(savedOutput);
+                    savedOutput = null;
+
+                    // Notify start of element
+                    currentHandler = elementHandler;
+                    elementHandler.setDocumentLocator(documentLocator);
+                    elementHandler.start(uri, localname, qName, savedAttributes);
+
+                    // Restore state
+                    savedAttributes = null;
+                    elementHandler.saxStore = null;
+                }
+
+                // Notify end of element
                 forwardingLevel = -1;
                 currentKey = null;
                 currentHandler = null;
                 elementHandler.end(uri, localname, qName);
             } else
                 super.endElement(uri, localname, qName);
+        }
+
+        protected void repeatBody() throws SAXException {
+            if (!repeating)
+                throw new IllegalStateException("repeatBody() can only be called when repeating is true.");
+
+            saxStore.replay(this);
+        }
+
+        public boolean isRepeating() {
+            return repeating;
+        }
+
+        protected void setForward(boolean forward) {
+            this.forward = forward;
         }
 
         public void setDocumentLocator(Locator locator) {
@@ -546,14 +602,6 @@ public class SQLProcessor extends ProcessorImpl {
         public SQLProcessorInterpreterContext getInterpreterContext() {
             return interpreterContext;
         }
-
-        public boolean isForward() {
-            return forward;
-        }
-
-        public void setForward(boolean forward) {
-            this.forward = forward;
-        }
     }
 
     public static abstract class ForwardingContentHandler implements ContentHandler {
@@ -564,67 +612,67 @@ public class SQLProcessor extends ProcessorImpl {
         protected abstract ContentHandler getContentHandler();
 
         public void characters(char[] chars, int start, int length) throws SAXException {
-            ContentHandler contentHandler = getContentHandler();
+            final ContentHandler contentHandler = getContentHandler();
             if (contentHandler != null)
                 contentHandler.characters(chars, start, length);
         }
 
         public void endDocument() throws SAXException {
-            ContentHandler contentHandler = getContentHandler();
+            final ContentHandler contentHandler = getContentHandler();
             if (contentHandler != null)
                 contentHandler.endDocument();
         }
 
         public void endElement(String uri, String localname, String qName) throws SAXException {
-            ContentHandler contentHandler = getContentHandler();
+            final ContentHandler contentHandler = getContentHandler();
             if (contentHandler != null)
                 contentHandler.endElement(uri, localname, qName);
         }
 
         public void endPrefixMapping(String s) throws SAXException {
-            ContentHandler contentHandler = getContentHandler();
+            final ContentHandler contentHandler = getContentHandler();
             if (contentHandler != null)
                 contentHandler.endPrefixMapping(s);
         }
 
         public void ignorableWhitespace(char[] chars, int start, int length) throws SAXException {
-            ContentHandler contentHandler = getContentHandler();
+            final ContentHandler contentHandler = getContentHandler();
             if (contentHandler != null)
                 contentHandler.ignorableWhitespace(chars, start, length);
         }
 
         public void processingInstruction(String s, String s1) throws SAXException {
-            ContentHandler contentHandler = getContentHandler();
+            final ContentHandler contentHandler = getContentHandler();
             if (contentHandler != null)
                 contentHandler.processingInstruction(s, s1);
         }
 
         public void setDocumentLocator(Locator locator) {
-            ContentHandler contentHandler = getContentHandler();
+            final ContentHandler contentHandler = getContentHandler();
             if (contentHandler != null)
                 contentHandler.setDocumentLocator(locator);
         }
 
         public void skippedEntity(String s) throws SAXException {
-            ContentHandler contentHandler = getContentHandler();
+            final ContentHandler contentHandler = getContentHandler();
             if (contentHandler != null)
                 contentHandler.skippedEntity(s);
         }
 
         public void startDocument() throws SAXException {
-            ContentHandler contentHandler = getContentHandler();
+            final ContentHandler contentHandler = getContentHandler();
             if (contentHandler != null)
                 contentHandler.startDocument();
         }
 
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-            ContentHandler contentHandler = getContentHandler();
+            final ContentHandler contentHandler = getContentHandler();
             if (contentHandler != null)
                 contentHandler.startElement(uri, localname, qName, attributes);
         }
 
         public void startPrefixMapping(String s, String s1) throws SAXException {
-            ContentHandler contentHandler = getContentHandler();
+            final ContentHandler contentHandler = getContentHandler();
             if (contentHandler != null)
                 contentHandler.startPrefixMapping(s, s1);
         }

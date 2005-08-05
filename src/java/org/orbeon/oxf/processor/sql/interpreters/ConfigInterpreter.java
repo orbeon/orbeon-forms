@@ -24,13 +24,12 @@ import org.xml.sax.SAXException;
 public class ConfigInterpreter extends SQLProcessor.InterpreterContentHandler {
 
     public ConfigInterpreter(SQLProcessorInterpreterContext interpreterContext) {
-        super(interpreterContext, true);
-
-        addElementHandler(new ConnectionInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "connection");
-        addElementHandler(new TextInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "text");
+        super(interpreterContext, false);
+        setForward(true);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+        addAllDefaultElementHandlers();
         getInterpreterContext().getOutput().startDocument();
     }
 

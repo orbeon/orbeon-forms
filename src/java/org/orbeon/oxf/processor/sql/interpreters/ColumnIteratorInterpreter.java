@@ -16,62 +16,48 @@ package org.orbeon.oxf.processor.sql.interpreters;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
-import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-import java.sql.ResultSetMetaData;
 import java.sql.ResultSet;
-import java.util.Map;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
 /**
  *
  */
 public class ColumnIteratorInterpreter extends SQLProcessor.InterpreterContentHandler {
 
-    private SAXStore saxStore;
-    private ContentHandler savedOutput;
-
     public ColumnIteratorInterpreter(SQLProcessorInterpreterContext interpreterContext) {
-        super(interpreterContext, false);
-    }
-
-    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        // Everything will be stored in a SAXStore
-        saxStore = new SAXStore();
-        saxStore.setDocumentLocator(getDocumentLocator());
-        savedOutput = getInterpreterContext().getOutput();
-        getInterpreterContext().setOutput(saxStore);
+        // Repeating interpreter
+        super(interpreterContext, true);
         setForward(true);
     }
 
-    public void end(String uri, String localname, String qName) throws SAXException {
-        if (saxStore != null) {
-            final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
-            // Restore the regular output
-            interpreterContext.setOutput(savedOutput);
+    public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
-            try {
-                // Create a new InterpreterContentHandler with the same handlers as our parent
-                final SQLProcessor.InterpreterContentHandler contentHandler = new SQLProcessor.InterpreterContentHandler(interpreterContext, true);
-                contentHandler.addAllDefaultElementHandlers();
+        addAllDefaultElementHandlers();
 
-                final ResultSet resultSet = interpreterContext.getResultSet(0);
-                final ResultSetMetaData metadata = resultSet.getMetaData();
+        final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
 
-                // Iterate through result set columns
-                for (int i = 1; i <= metadata.getColumnCount(); i++) {
-                    interpreterContext.pushContext();
-                    interpreterContext.setColumnContext(i, metadata.getColumnName(i), metadata.getColumnTypeName(i), GetterInterpreter.getColumnStringValue(resultSet, i, metadata.getColumnType(i)));
-                    saxStore.replay(contentHandler);
-                    interpreterContext.popContext();
-                }
+        try {
+            final ResultSet resultSet = interpreterContext.getResultSet(0);
+            final ResultSetMetaData metadata = resultSet.getMetaData();
 
-            } catch (Exception e) {
-                throw new ValidationException(e, new LocationData(getDocumentLocator()));
+            // Iterate through result set columns
+            for (int i = 1; i <= metadata.getColumnCount(); i++) {
+                interpreterContext.pushContext();
+                interpreterContext.setColumnContext(i, metadata.getColumnName(i), metadata.getColumnTypeName(i), GetterInterpreter.getColumnStringValue(resultSet, i, metadata.getColumnType(i)));
+                repeatBody();
+                interpreterContext.popContext();
             }
+
+        } catch (SQLException e) {
+            throw new ValidationException(e, new LocationData(getDocumentLocator()));
         }
+    }
+
+    public void end(String uri, String localname, String qName) throws SAXException {
     }
 }

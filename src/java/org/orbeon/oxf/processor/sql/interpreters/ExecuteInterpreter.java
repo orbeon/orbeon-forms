@@ -29,15 +29,16 @@ import java.sql.SQLException;
 public class ExecuteInterpreter extends SQLProcessor.InterpreterContentHandler {
 
     public ExecuteInterpreter(SQLProcessorInterpreterContext interpreterContext) {
-        super(interpreterContext, true);
+        super(interpreterContext, false);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
         final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
 
+        addAllDefaultElementHandlers();
+
         // Push context
         interpreterContext.pushContext();
-        addAllDefaultElementHandlers();
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {

@@ -23,19 +23,12 @@ import org.xml.sax.Attributes;
 public class ConnectionInterpreter extends SQLProcessor.InterpreterContentHandler {
 
     public ConnectionInterpreter(SQLProcessorInterpreterContext interpreterContext) {
-        super(interpreterContext, true);
+        super(interpreterContext, false);
+        setForward(true);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) {
-
         addAllDefaultElementHandlers();
-
-        addElementHandler(new ExecuteInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "execute");
-        final ValueOfCopyOfInterpreter valueOfCopyOfInterpreter = new ValueOfCopyOfInterpreter(getInterpreterContext());
-        addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "value-of");
-        addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "copy-of");
-        addElementHandler(new TextInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "text");
-        addElementHandler(new ForEachInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "for-each");
     }
 
     public void end(String uri, String localname, String qName) {

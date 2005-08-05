@@ -25,20 +25,22 @@
                 <param-name>oxf.resources.factory</param-name>
                 <param-value>org.orbeon.oxf.resources.PriorityResourceManagerFactory</param-value>
             </context-param>
-            <xsl:call-template name="comment">
-                <xsl:with-param name="caption" select="'Web app. resource manager'"/>
-                <xsl:with-param name="commented" select="$target = 'devel'"/>
-                <xsl:with-param name="content">
-                    <context-param>
-                        <param-name>oxf.resources.webapp.rootdir</param-name>
-                        <param-value>/WEB-INF/resources</param-value>
-                    </context-param>
-                    <context-param>
-                       <param-name>oxf.resources.priority.1</param-name>
-                       <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
-                    </context-param>
-                </xsl:with-param>
-            </xsl:call-template>
+            <xsl:comment>Web app. resource manager</xsl:comment>
+            <context-param>
+                <param-name>oxf.resources.webapp.rootdir</param-name>
+                <param-value>/WEB-INF/resources</param-value>
+            </context-param>
+            <context-param>
+                <xsl:choose>
+                    <xsl:when test="$target = 'devel'" >
+                        <param-name>oxf.resources.priority.3</param-name>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <param-name>oxf.resources.priority.1</param-name>
+                    </xsl:otherwise>
+                </xsl:choose>
+               <param-value>org.orbeon.oxf.resources.WebAppResourceManagerFactory</param-value>
+            </context-param>
             <xsl:call-template name="comment">
                 <xsl:with-param name="caption" select="'flat file resource manager'"/>
                 <xsl:with-param name="commented" select="$target != 'devel'"/>

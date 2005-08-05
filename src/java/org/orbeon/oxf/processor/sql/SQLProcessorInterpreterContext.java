@@ -53,7 +53,7 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
     private PipelineContext pipelineContext;
     private Node input;
     private XPathContentHandler xpathContentHandler;
-    private ContentHandler output;
+    private DeferredContentHandler output;
     private NamespaceSupport namespaceSupport;
 
     private List executionContextStack;
@@ -344,11 +344,11 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
         this.xpathContentHandler = xpathContentHandler;
     }
 
-    public ContentHandler getOutput() {
+    public DeferredContentHandler getOutput() {
         return output;
     }
 
-    public void setOutput(ContentHandler output) {
+    public void setOutput(DeferredContentHandler output) {
         this.output = output;
     }
 

@@ -13,45 +13,65 @@
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
+import org.orbeon.oxf.processor.sql.DeferredContentHandler;
+import org.orbeon.oxf.processor.sql.DeferredContentHandlerImpl;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-
-import java.util.Map;
 
 /**
  * Add an attribute to the last element output.
  */
 public class AttributeInterpreter extends SQLProcessor.InterpreterContentHandler {
 
+    private DeferredContentHandler savedOutput;
     private String attributeName;
     private StringBuffer content;
 
     public AttributeInterpreter(SQLProcessorInterpreterContext interpreterContext) {
         super(interpreterContext, false);
+        setForward(true);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        // Get attributes
+        // Attribute name
         this.attributeName = attributes.getValue("name");
-    }
 
-    public void characters(char ch[], int start, int length) {
-        if (content == null)
-            content = new StringBuffer();
-        content.append(ch, start, length);
+        // Remember output
+        savedOutput = getInterpreterContext().getOutput();
+        // New output just gather character data
+        getInterpreterContext().setOutput(new DeferredContentHandlerImpl(new ContentHandlerAdapter() {
+            public void characters(char ch[], int start, int length) {
+                if (content == null)
+                    content = new StringBuffer();
+                content.append(ch, start, length);
+            }
+        }));
+
+        addAllDefaultElementHandlers();
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {
 
+        // Restore output
+        getInterpreterContext().setOutput(savedOutput);
+
+        // Normalize
+        final String contentString;
+        if (content == null)
+            contentString = "";
+        else
+            contentString = content.toString().trim();
+
         // Output attribute
-//        if (content == null)
-//            throw new OXFException("sql:attribute content must not be empty");
+        // TODO: handle namespaces
+        getInterpreterContext().getOutput().addAttribute("", attributeName, attributeName, contentString);
 
-
-        // TODO: figure out a way of outputting attribute (attributeName, content)
+        // Clear state
+        savedOutput = null;
+        attributeName = null;
+        content = null;
     }
 }

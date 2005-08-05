@@ -15,12 +15,13 @@ package org.orbeon.oxf.processor.sql.interpreters;
 
 import org.jaxen.Function;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.processor.sql.DeferredContentHandler;
+import org.orbeon.oxf.processor.sql.DeferredContentHandlerImpl;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.xml.SAXStore;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
-import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.sql.ResultSet;
@@ -35,7 +36,7 @@ import java.util.Map;
  */
 public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandler {
 
-    private ContentHandler savedOutput;
+    private DeferredContentHandler savedOutput;
 
     private boolean hiding;
     private int[] rowNum = {1};
@@ -168,7 +169,7 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
                 // The first time, everything is sent to the footer SAXStore
                 if (currentGroup.isShowHeader()) {
                     savedOutput = interpreterContext.getOutput();
-                    interpreterContext.setOutput(currentGroup.getFooter());
+                    interpreterContext.setOutput(new DeferredContentHandlerImpl(currentGroup.getFooter()));
                     hiding = false;
                 } else
                     hiding = true;

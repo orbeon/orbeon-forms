@@ -282,7 +282,7 @@ public class SQLProcessor extends ProcessorImpl {
             interpreterContext.setInput(input);
             interpreterContext.setDatasource(datasource);
             interpreterContext.setXPathContentHandler(xpathContentHandler);
-            interpreterContext.setOutput(output);
+            interpreterContext.setOutput(new DeferredContentHandlerImpl(output));
             interpreterContext.setNamespaceSupport(namespaceSupport);
             addElementHandler(new ConfigInterpreter(interpreterContext), SQL_NAMESPACE_URI, "config");
         }
@@ -411,7 +411,7 @@ public class SQLProcessor extends ProcessorImpl {
         private boolean forward;
         private boolean repeating;
         private SAXStore saxStore;
-        private ContentHandler savedOutput;
+        private DeferredContentHandler savedOutput;
         private Attributes savedAttributes;
 
         private Map elementHandlers = new HashMap();
@@ -478,7 +478,7 @@ public class SQLProcessor extends ProcessorImpl {
             addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "value-of");
             addElementHandler(valueOfCopyOfInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "copy-of");
 
-            //addElementHandler(new AttributeInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "attribute");
+            addElementHandler(new AttributeInterpreter(interpreterContext), SQLProcessor.SQL_NAMESPACE_URI, "attribute");
         }
 
         public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
@@ -490,12 +490,12 @@ public class SQLProcessor extends ProcessorImpl {
                     forwardingLevel = level;
                     currentKey = key;
                     if (elementHandler.isRepeating()) {
-                        // Remember content
+                        // Remember SAX content of the element body
                         savedOutput = getInterpreterContext().getOutput();
                         savedAttributes = new AttributesImpl(attributes);
                         elementHandler.saxStore = new SAXStore();
                         elementHandler.saxStore.setDocumentLocator(documentLocator);
-                        getInterpreterContext().setOutput(elementHandler.saxStore);
+                        getInterpreterContext().setOutput(new DeferredContentHandlerImpl(elementHandler.saxStore));
                     } else {
                         // Notify start of element
                         currentHandler = elementHandler;
@@ -580,6 +580,8 @@ public class SQLProcessor extends ProcessorImpl {
         }
 
         protected ContentHandler getContentHandler() {
+            // The purpose of the code below is to determine whether SAX events are sent to an
+            // element handler or directly to the output
             if (currentHandler != null)
                 return currentHandler;
             else if (forward)

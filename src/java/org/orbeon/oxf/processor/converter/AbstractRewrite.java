@@ -22,6 +22,7 @@ import org.orbeon.oxf.portlet.PortletExternalContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.saxrewrite.RootFilter;
 import org.orbeon.oxf.xml.saxrewrite.State;
@@ -75,12 +76,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
      * @author d
      */
     private static final String REWRITE_IN = "rewrite-in";
-    /**
-     * <!-- FORMATTING_URI -->
-     * What you think.
-     * @author d
-     */
-    static final String FORMATTING_URI = "http://orbeon.org/oxf/xml/formatting";
     /**
      * <!-- SCRIPT_ELT -->
      * What you think.
@@ -370,7 +365,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
 
                 ret = this;
                 final AttributesImpl newAtts = XMLUtils.getAttribsFromDefaultNamespace( atts );
-                final String url_typ = atts.getValue( FORMATTING_URI, "url-type" );
+                final String url_typ = atts.getValue( XMLConstants.OPS_FORMATTING_URI, "url-type" );
 
                 final String newHref;
                 if ( url_typ == null || "render".equals( url_typ ) ) {
@@ -647,14 +642,15 @@ abstract class AbstractRewrite extends ProcessorImpl {
         protected State startElementStart
         ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
         throws SAXException {
-            final String no_urlrewrite = atts.getValue( FORMATTING_URI, NOREWRITE_ATT );
+            final String no_urlrewrite 
+                = atts.getValue( XMLConstants.OPS_FORMATTING_URI, NOREWRITE_ATT );
             State ret = null;
             flushCharacters();
             done : if ( "true".equals( no_urlrewrite ) ) {
                 final State stt = new NoRewriteState
                     ( this, contentHandler, response, isPortlet, scriptDepth, rewriteURI );
                 ret = stt.startElement( ns, lnam, qnam, atts );
-            } else if ( FORMATTING_URI.equals( ns ) && "rewrite".equals( lnam ) ) {
+            } else if ( XMLConstants.OPS_FORMATTING_URI.equals( ns ) && "rewrite".equals( lnam ) ) {
                 final String typ = atts.getValue( "", "type" );
                 final String url = atts.getValue( "", "url" );
                 if ( url != null ) {
@@ -790,7 +786,8 @@ abstract class AbstractRewrite extends ProcessorImpl {
         protected State startElementStart
         ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
         throws SAXException {
-            final String no_urlrewrite = atts.getValue( FORMATTING_URI, NOREWRITE_ATT );
+            final String no_urlrewrite 
+                = atts.getValue( XMLConstants.OPS_FORMATTING_URI, NOREWRITE_ATT );
             final State ret;
             if ( "false".equals( no_urlrewrite) ) {
                 final State stt = new RewriteState

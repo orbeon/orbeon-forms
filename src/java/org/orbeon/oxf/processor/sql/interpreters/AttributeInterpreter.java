@@ -13,11 +13,11 @@
  */
 package org.orbeon.oxf.processor.sql.interpreters;
 
-import org.orbeon.oxf.processor.sql.DeferredContentHandler;
-import org.orbeon.oxf.processor.sql.DeferredContentHandlerImpl;
 import org.orbeon.oxf.processor.sql.SQLProcessor;
 import org.orbeon.oxf.processor.sql.SQLProcessorInterpreterContext;
 import org.orbeon.oxf.xml.ContentHandlerAdapter;
+import org.orbeon.oxf.xml.DeferredContentHandler;
+import org.orbeon.oxf.xml.DeferredContentHandlerImpl;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 

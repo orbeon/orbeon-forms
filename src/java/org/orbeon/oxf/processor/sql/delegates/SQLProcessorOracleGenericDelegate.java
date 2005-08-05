@@ -15,12 +15,11 @@ package org.orbeon.oxf.processor.sql.delegates;
 
 import oracle.jdbc.OraclePreparedStatement;
 import oracle.jdbc.OracleResultSet;
+import org.orbeon.oxf.processor.sql.DatabaseDelegate;
+import org.orbeon.oxf.processor.sql.SQLProcessorOracleDelegateBase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-
-import org.orbeon.oxf.processor.sql.SQLProcessorOracleDelegateBase;
-import org.orbeon.oxf.processor.sql.DatabaseDelegate;
 
 /**
  * Version for Oracle.

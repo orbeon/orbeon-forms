@@ -13,9 +13,9 @@
  */
 package org.orbeon.oxf.processor.sql.delegates;
 
+import org.orbeon.oxf.processor.sql.DatabaseDelegate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.orbeon.oxf.processor.sql.DatabaseDelegate;
 
 import java.io.OutputStream;
 import java.io.StringReader;

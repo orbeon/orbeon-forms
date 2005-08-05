@@ -17,8 +17,8 @@ import oracle.jdbc.OraclePreparedStatement;
 import oracle.jdbc.OracleResultSet;
 import org.apache.commons.dbcp.DelegatingPreparedStatement;
 import org.apache.commons.dbcp.DelegatingResultSet;
-import org.orbeon.oxf.processor.sql.SQLProcessorOracleDelegateBase;
 import org.orbeon.oxf.processor.sql.DatabaseDelegate;
+import org.orbeon.oxf.processor.sql.SQLProcessorOracleDelegateBase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

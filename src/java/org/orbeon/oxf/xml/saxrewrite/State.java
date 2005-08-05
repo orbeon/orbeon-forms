@@ -28,6 +28,14 @@ import org.xml.sax.SAXException;
  */
 public abstract class State {
     /**
+     * <!-- depth -->
+     * At the moment are state transitions only happen on start element and end element events.
+     * Therefore we track element depth and by default when the depth becomes negative we switch
+     * to the previous state. 
+     * @author d 
+     */
+    private int depth = 0;
+    /**
      * <!-- contentHandler -->
      * The destination of the rewrite transformation.
      * @author d
@@ -39,16 +47,6 @@ public abstract class State {
      * @author d
      */
     protected final State previous;
-
-    /**
-     * <!-- depth -->
-     * At the moment are state transitions only happen on start element and end element events.
-     * Therefore we track element depth and by default when the depth becomes negative we switch
-     * to the previous state. 
-     * @author d 
-     */
-    protected int depth = 0;
-
     /**
      * <!-- State -->
      * @param stt           The previous state.
@@ -68,6 +66,31 @@ public abstract class State {
         previous = stt;
         contentHandler = cntntHndlr;
     }
+    /**
+     * <!-- endElementStart -->
+     * Just forwards the event to the content handler.
+     * @see #endElement( String, String, String )
+     * @author d
+     */        
+    protected void endElementStart( final String ns, final String lnam, final String qnam ) 
+    throws SAXException {
+        contentHandler.endElement( ns, lnam, qnam );
+    }
+    /**
+     * <!-- getDepth -->
+     * @return What you think
+     */
+    protected int getDepth() {
+        return depth;
+    }
+    /**
+     * <!-- startElementStart -->
+     * @see #startElement(String, String, String, Attributes)
+     * @author d
+     */
+    protected abstract State startElementStart
+    ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
+    throws SAXException;
     /**
      * <!-- characters -->
      * @see State
@@ -89,13 +112,15 @@ public abstract class State {
     }
     /**
      * <!-- endElement -->
+     * Template method.  Calls endElementStart and then decrements depth.  If the depth == 0
+     * then the previous state is returned.  Otherwise this state is returned.
      * @see State
      * @author d
      */        
-    public State endElement( final String ns, final String lnam, final String qnam ) 
+    public final State endElement( final String ns, final String lnam, final String qnam ) 
     throws SAXException {
+        endElementStart( ns, lnam, qnam );
         depth--;
-        contentHandler.endElement( ns, lnam, qnam );
         final State ret = depth == 0 ? previous : this;
         return ret;
     }
@@ -157,12 +182,18 @@ public abstract class State {
     }
     /**
      * <!-- startElement -->
+     * Template method.  Calls startElementStart.  If startElementStart returns this increments
+     * depth.  Lastly, returns the value returned by startElementStart.
      * @see State
      * @author d
      */
-    public abstract State startElement
+    public final State startElement
     ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
-    throws SAXException;
+    throws SAXException {
+        final State ret = startElementStart( ns, lnam, qnam, atts );
+        if ( ret == this ) depth++;
+        return ret;
+    }
     /**
      * <!-- startPrefixMapping -->
      * @see State

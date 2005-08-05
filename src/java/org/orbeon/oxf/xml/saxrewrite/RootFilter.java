@@ -39,19 +39,19 @@ public class RootFilter extends State {
     public RootFilter( final State stt, final ContentHandler cntntHnder ) {
         super( stt, cntntHnder );
     }
-    public void setNextState( final State stt ) {
-        nextState = stt;
-    }
     /**
-     * <!-- startElement -->
-     * @return new RewriteState( ... )
+     * <!-- startElementStart -->
+     * @return nextState
      * @see RewriteState
      * @author d
      */
-    public State startElement
+    protected State startElementStart
     ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
     throws SAXException {
-        return nextState.startElement( ns, lnam, qnam, atts );
+        return nextState == this ? this : nextState.startElement( ns, lnam, qnam, atts );
+    }
+    public void setNextState( final State stt ) {
+        nextState = stt;
     }
     /**
      * <!-- characters -->

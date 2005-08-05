@@ -186,24 +186,36 @@ abstract class AbstractRewrite extends ProcessorImpl {
             rewriteURI = rwrtURI;
         }
         /**
-         * <!-- endElement -->
+         * <!-- scriptDepthOnStart -->
+         * Adjusts scriptDepth
+         * @see #scriptDepth
+         * @author d 
+         */
+        final void scriptDepthOnStart( final String ns, final String lnam ) {
+            if ( rewriteURI.equals( ns ) && SCRIPT_ELT.equals( lnam ) ) {
+                scriptDepth++;
+            }
+        }
+        /**
+         * <!-- scriptDepthOnEnd -->
+         * Adjusts scriptDepth
+         * @see #scriptDepth
+         * @author d 
+         */
+        final void scriptDepthOnEnd( final String ns, final String lnam ) {
+            if ( rewriteURI.equals( ns ) && SCRIPT_ELT.equals( lnam ) ) {
+                scriptDepth--;
+            }
+        }
+        /**
+         * <!-- endElementStart -->
          * @see State2
          * @author d
          */        
-        public State endElement( final String ns, final String lnam, final String qnam ) 
+        protected void endElementStart( final String ns, final String lnam, final String qnam ) 
         throws SAXException {
             scriptDepthOnEnd( ns, lnam );
-            return super.endElement( ns, lnam, qnam );
-        }
-        final void scriptDepthOnStart( final String ns, final String lnam ) {
-        	if ( rewriteURI.equals( ns ) && SCRIPT_ELT.equals( lnam ) ) {
-        		scriptDepth++;
-        	}
-        }
-        final void scriptDepthOnEnd( final String ns, final String lnam ) {
-        	if ( rewriteURI.equals( ns ) && SCRIPT_ELT.equals( lnam ) ) {
-        		scriptDepth--;
-        	}
+            super.endElementStart( ns, lnam, qnam );
         }
     }
     /**
@@ -580,79 +592,18 @@ abstract class AbstractRewrite extends ProcessorImpl {
             }
         }
         /**
-         * <!-- characters -->
-         * If haveScriptAncestor then just forward data to destination contentHandler.  Otherwise
-         * store that data in the buffer and do not forward.  Also manages init'ing and growing
-         * charactersBuf as need be.
-         * @see #charactersBuf
-         * @see AbstractRewrite
-         * @see RewriteState
-         * @author d
-         */
-        public State characters( final char[] ch, final int strt, final int len ) 
-        throws SAXException {
-            if ( scriptDepth > 0 ) {
-                contentHandler.characters( ch, strt, len );
-            } else {
-                final int bufLen = charactersBuf == null ? 0 : charactersBuf.position();  
-                final int cpcty = bufLen + ( len * 2 );
-                if ( charactersBuf == null || charactersBuf.remaining() < cpcty ) {
-                    final java.nio.CharBuffer newBuf = java.nio.CharBuffer.allocate( cpcty );
-                    if ( charactersBuf != null ) {
-                        charactersBuf.flip();
-                        newBuf.put( charactersBuf );
-                    }
-                    charactersBuf = newBuf;
-                }
-                charactersBuf.put( ch, strt, len );
-            }
-            return this;
-        }
-        /**
          * <!-- endElement -->
          * Just calls flushCharacters and super.endElement( ... )
          * @see State2#endElement(String, String, String)
          * @author dsmall d
          */
-        public State endElement( final String ns, final String lnam, final String qnam ) 
+        protected void endElementStart( final String ns, final String lnam, final String qnam ) 
         throws SAXException {
             flushCharacters();
-            return super.endElement( ns, lnam, qnam );
+            super.endElementStart( ns, lnam, qnam );
         }
         /**
-         * <!-- ignorableWhitespace -->
-         * Just calls flushCharacters and super.ignorableWhitespace( ... )
-         * @see State2#ignorableWhitespace(char[], int, int)
-         * @author dsmall d
-         */
-        public State ignorableWhitespace( final char[] ch, final int strt, final int len ) 
-        throws SAXException {
-            flushCharacters();
-            return super.ignorableWhitespace(ch, strt, len);
-        }
-        /**
-         * <!-- processingInstruction -->
-         * Just calls flushCharacters and super.processingInstruction( ... )
-         * @see State2#processingInstruction(String, String)
-         * @author dsmall d
-         */
-        public State processingInstruction( final String trgt, final String dat ) 
-        throws SAXException {
-            flushCharacters();
-            return super.processingInstruction( trgt, dat );
-        }
-        /**
-         * <!-- skippedEntity -->
-         * Just calls flushCharacters and super.skippedEntity( ... )
-         * @see State2#skippedEntity(String)
-         * @author dsmall d
-         */
-        public State skippedEntity( final String nam ) throws SAXException {
-            flushCharacters();
-            return super.skippedEntity( nam );
-        }
-        /**
-         * <!-- startElement -->
+         * <!-- startElementStart -->
          * Just calls flushCharacters then tests the event data.  If
          * <ul>
          *   <li>
@@ -693,16 +644,16 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * @see State2#skippedEntity(String)
          * @author dsmall d
          */
-        public State startElement
+        protected State startElementStart
         ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
         throws SAXException {
             final String no_urlrewrite = atts.getValue( FORMATTING_URI, NOREWRITE_ATT );
             State ret = null;
             flushCharacters();
             done : if ( "true".equals( no_urlrewrite ) ) {
-            	final State stt = new NoRewriteState
-            	    ( this, contentHandler, response, isPortlet, scriptDepth, rewriteURI );
-            	ret = stt.startElement( ns, lnam, qnam, atts );
+                final State stt = new NoRewriteState
+                    ( this, contentHandler, response, isPortlet, scriptDepth, rewriteURI );
+                ret = stt.startElement( ns, lnam, qnam, atts );
             } else if ( FORMATTING_URI.equals( ns ) && "rewrite".equals( lnam ) ) {
                 final String typ = atts.getValue( "", "type" );
                 final String url = atts.getValue( "", "url" );
@@ -720,9 +671,8 @@ abstract class AbstractRewrite extends ProcessorImpl {
                 }
             } else {
                 scriptDepthOnStart( ns, lnam );
-                depth++;
-            	if ( rewriteURI.equals( ns ) ) {
-                	ret = handleA( ns, lnam, qnam, atts );
+                if ( rewriteURI.equals( ns ) ) {
+                        ret = handleA( ns, lnam, qnam, atts );
                     if ( ret != null ) break done;
                     
                     ret = handleForm( ns, lnam, qnam, atts );
@@ -739,7 +689,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     
                     ret = handleEltWithResource( SCRIPT_ELT, SRC_ATT, ns, lnam, qnam, atts );
                     if ( ret != null ) {
-                    	break done;
+                        break done;
                     }
                     
                     ret = handleInput( ns, lnam, qnam, atts );
@@ -750,13 +700,73 @@ abstract class AbstractRewrite extends ProcessorImpl {
                     
                     ret = handleEltWithResource( "body", BACKGROUND_ATT, ns, lnam, qnam, atts );
                     if ( ret != null ) break done;
-            	}
+                }
                 ret = this;
                 contentHandler.startElement( ns, lnam, qnam, atts  );
             }
             return ret;
         }
-
+        /**
+         * <!-- characters -->
+         * If haveScriptAncestor then just forward data to destination contentHandler.  Otherwise
+         * store that data in the buffer and do not forward.  Also manages init'ing and growing
+         * charactersBuf as need be.
+         * @see #charactersBuf
+         * @see AbstractRewrite
+         * @see RewriteState
+         * @author d
+         */
+        public State characters( final char[] ch, final int strt, final int len ) 
+        throws SAXException {
+            if ( scriptDepth > 0 ) {
+                contentHandler.characters( ch, strt, len );
+            } else {
+                final int bufLen = charactersBuf == null ? 0 : charactersBuf.position();  
+                final int cpcty = bufLen + ( len * 2 );
+                if ( charactersBuf == null || charactersBuf.remaining() < cpcty ) {
+                    final java.nio.CharBuffer newBuf = java.nio.CharBuffer.allocate( cpcty );
+                    if ( charactersBuf != null ) {
+                        charactersBuf.flip();
+                        newBuf.put( charactersBuf );
+                    }
+                    charactersBuf = newBuf;
+                }
+                charactersBuf.put( ch, strt, len );
+            }
+            return this;
+        }
+        /**
+         * <!-- ignorableWhitespace -->
+         * Just calls flushCharacters and super.ignorableWhitespace( ... )
+         * @see State2#ignorableWhitespace(char[], int, int)
+         * @author dsmall d
+         */
+        public State ignorableWhitespace( final char[] ch, final int strt, final int len ) 
+        throws SAXException {
+            flushCharacters();
+            return super.ignorableWhitespace(ch, strt, len);
+        }
+        /**
+         * <!-- processingInstruction -->
+         * Just calls flushCharacters and super.processingInstruction( ... )
+         * @see State2#processingInstruction(String, String)
+         * @author dsmall d
+         */
+        public State processingInstruction( final String trgt, final String dat ) 
+        throws SAXException {
+            flushCharacters();
+            return super.processingInstruction( trgt, dat );
+        }
+        /**
+         * <!-- skippedEntity -->
+         * Just calls flushCharacters and super.skippedEntity( ... )
+         * @see State2#skippedEntity(String)
+         * @author dsmall d
+         */
+        public State skippedEntity( final String nam ) throws SAXException {
+            flushCharacters();
+            return super.skippedEntity( nam );
+        }
     }
     /**
      * <!-- NoRewriteState -->
@@ -777,7 +787,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
          * @see NoRewriteState
          * @author d
          */
-        public State startElement
+        protected State startElementStart
         ( final String ns, final String lnam, final String qnam, final Attributes atts ) 
         throws SAXException {
             final String no_urlrewrite = atts.getValue( FORMATTING_URI, NOREWRITE_ATT );
@@ -790,7 +800,6 @@ abstract class AbstractRewrite extends ProcessorImpl {
             	scriptDepthOnStart( ns, lnam );
                 final Attributes newAtts = XMLUtils.getAttribsFromDefaultNamespace( atts );
                 contentHandler.startElement( ns, lnam, qnam, newAtts  );
-                depth++;            
                 ret = this; 
             }
             return ret;

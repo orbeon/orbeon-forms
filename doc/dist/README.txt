@@ -93,13 +93,15 @@ or in this distribution under:
 4. Software Prerequisites
 ****************************************
 
-OPS is supported on the following application servers:
+OPS has been tested on the following application servers:
 
     * Apache Tomcat 4.1.31 with JDK 1.4.2
     * Apache Tomcat 5.0.25 alpha with JDK 1.4.2
     * Apache Tomcat 5.5.4 with JDK 1.4.2 and JDK 1.5.0
     * BEA WebLogic Server 8.1
     * IBM WebSphere 5.1
+    * JOnAS 4.3.2
+    * JBoss 3.2.7 and 4.0.1sp1
 
 
 ****************************************

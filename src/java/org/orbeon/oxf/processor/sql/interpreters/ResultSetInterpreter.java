@@ -22,35 +22,86 @@ import org.xml.sax.SAXException;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 
 /**
  *
  */
 public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler {
 
+    private static final String UNBOUNDED = "unbounded";
+
     public ResultSetInterpreter(SQLProcessorInterpreterContext interpreterContext) {
-        super(interpreterContext, false);
+        super(interpreterContext, true);
+        setForward(true);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
 
         addAllDefaultElementHandlers();
 
-        if (!getInterpreterContext().isEmptyResultSet()) {
-            setForward(true);
+        // Optional result sets count
+        final int allowedResultSetCount;
+        {
+            final String resultSetsAttribute = attributes.getValue("result-sets");
+            allowedResultSetCount = (resultSetsAttribute == null) ? 1 : (resultSetsAttribute.equals(UNBOUNDED) ? -1 : Integer.parseInt(resultSetsAttribute));
         }
-    }
 
-    public void end(String uri, String localname, String qName) throws SAXException {
-        SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
-        PreparedStatement stmt = interpreterContext.getStatement(0);
-        if (stmt != null) {
+        final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
+
+        if (!getInterpreterContext().isEmptyResultSet()) {
+
             try {
-                stmt.close();
-                interpreterContext.setStatement(null);
+                final PreparedStatement stmt = interpreterContext.getStatement(0);
+
+                if (stmt != null) {
+                    int currentCount = 0;
+                    do {
+                        // NOTE: Initially, a result set has already been made available
+                        repeatBody();
+
+                        // One more result set has been processed
+                        currentCount++;
+
+                        // Try to go to next result set
+                        final boolean hasMoreResultSets = setResultSetInfo(interpreterContext, stmt, stmt.getMoreResults());
+                        if (!hasMoreResultSets || (allowedResultSetCount != -1 && currentCount >= allowedResultSetCount)) {
+                            // We have processed all the result sets we can process
+                            break;
+                        }
+
+                    } while (true);
+                }
             } catch (SQLException e) {
                 throw new ValidationException(e, new LocationData(getDocumentLocator()));
             }
         }
+    }
+
+    public void end(String uri, String localname, String qName) throws SAXException {
+
+    }
+
+    public static boolean setResultSetInfo(SQLProcessorInterpreterContext interpreterContext, PreparedStatement stmt, boolean hasResultSet) throws SQLException {
+        if (!hasResultSet) {
+            // There is no more result set, we can close everything
+            final int updateCount = stmt.getUpdateCount();
+            interpreterContext.setUpdateCount(updateCount);//FIXME: should add?
+            closeStatement(interpreterContext, stmt);
+            return false;
+        } else {
+            // There is one more result set
+            final ResultSet resultSet = stmt.getResultSet();
+            final boolean hasNext = resultSet.next();
+            interpreterContext.setEmptyResultSet(!hasNext);
+            interpreterContext.setResultSet(resultSet);
+            return true;
+        }
+    }
+
+    public static void closeStatement(SQLProcessorInterpreterContext interpreterContext, PreparedStatement stmt) throws SQLException {
+        stmt.close();
+        interpreterContext.setStatement(null);
+        interpreterContext.setResultSet(null);
     }
 }

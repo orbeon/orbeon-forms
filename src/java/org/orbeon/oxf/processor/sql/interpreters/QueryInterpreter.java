@@ -51,6 +51,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
 
     public static final int QUERY = 0;
     public static final int UPDATE = 1;
+    public static final int CALL = 2;
 
     private int type;
 
@@ -163,7 +164,10 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
             PreparedStatement stmt = null;
             if (!hasReplaceOrSeparator) {
                 String queryString = query.toString();
-                stmt = getInterpreterContext().getConnection().prepareStatement(queryString);
+                if (type != CALL)
+                    stmt = getInterpreterContext().getConnection().prepareStatement(queryString);
+                else
+                    stmt = getInterpreterContext().getConnection().prepareCall(queryString);
                 getInterpreterContext().setStatementString(queryString);
             }
             getInterpreterContext().setStatement(stmt);
@@ -579,23 +583,15 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                 } finally {
                     getInterpreterContext().popFunctions();
                 }
-                if (type == QUERY) {
+                if (type == QUERY || type == CALL) {
                     if (nodeCount > 1)
-                        throw new ValidationException("More than one iteration on query element", new LocationData(getDocumentLocator()));
-                    ResultSet resultSet = stmt.executeQuery();
-                    boolean hasNext = resultSet.next();
-                    getInterpreterContext().setEmptyResultSet(!hasNext);
-                    // Close result set and statement immediately if possible
-                    if (getInterpreterContext().isEmptyResultSet()) {
-                        stmt.close();
-                        resultSet = null;
-                        stmt = null;
-                        getInterpreterContext().setStatement(null);
-                    }
-                    // Remember result set and statement
-                    getInterpreterContext().setResultSet(resultSet);
+                        throw new ValidationException("More than one iteration on sql:query or sql:call element", new LocationData(getDocumentLocator()));
+                    // Execute
+                    final boolean hasResultSet = stmt.execute();
+                    ResultSetInterpreter.setResultSetInfo(getInterpreterContext(), stmt, hasResultSet);
                 } else if (type == UPDATE) {
-                    int updateCount = stmt.executeUpdate();
+                    // We know there is only a possible update count
+                    final int updateCount = stmt.executeUpdate();
                     getInterpreterContext().setUpdateCount(updateCount);//FIXME: should add?
                 }
             }

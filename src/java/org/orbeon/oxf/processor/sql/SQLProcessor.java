@@ -57,12 +57,6 @@ import java.util.*;
  * o $sql:results (?)
  * o $sql:column-count
  * o $sql:update-count
- * <p/>
- * o esql:error-results//esql:get-message
- * o esql:error-results//esql:to-string
- * o esql:error-results//esql:get-stacktrace
- * <p/>
- * o multiple results
  * o caching options
  */
 public class SQLProcessor extends ProcessorImpl {
@@ -461,6 +455,7 @@ public class SQLProcessor extends ProcessorImpl {
             addElementHandler(new ExecuteInterpreter(getInterpreterContext()), SQLProcessor.SQL_NAMESPACE_URI, "execute");
             addElementHandler(new QueryInterpreter(interpreterContext, QueryInterpreter.QUERY), SQLProcessor.SQL_NAMESPACE_URI, "query");
             addElementHandler(new QueryInterpreter(interpreterContext, QueryInterpreter.UPDATE), SQLProcessor.SQL_NAMESPACE_URI, "update");
+            addElementHandler(new QueryInterpreter(interpreterContext, QueryInterpreter.CALL), SQLProcessor.SQL_NAMESPACE_URI, "call");
 
             final ResultSetInterpreter resultSetInterpreter = new ResultSetInterpreter(interpreterContext);
             addElementHandler(resultSetInterpreter, SQLProcessor.SQL_NAMESPACE_URI, "results");

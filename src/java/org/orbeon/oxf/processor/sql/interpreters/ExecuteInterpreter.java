@@ -30,21 +30,23 @@ public class ExecuteInterpreter extends SQLProcessor.InterpreterContentHandler {
 
     public ExecuteInterpreter(SQLProcessorInterpreterContext interpreterContext) {
         super(interpreterContext, false);
+        setForward(true);
     }
 
     public void start(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-        final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
 
         addAllDefaultElementHandlers();
 
         // Push context
+        final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
         interpreterContext.pushContext();
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {
+        // This is the end of an execute block, we can close the statement associated with it
         final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
         final PreparedStatement stmt = interpreterContext.getStatement(0);
-        if (stmt != null) {
+        if (stmt != null) { // the statement may not exist or already have been closed
             try {
                 stmt.close();
             } catch (SQLException e) {

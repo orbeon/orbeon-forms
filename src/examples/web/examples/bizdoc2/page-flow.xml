@@ -28,10 +28,6 @@
     <files path-info="*.txt" mime-type="text/plain"/>
 
     <page id="summary" path-info="/bizdoc2" model="../bizdoc/summary/summary-model.xpl" view="summary/summary-view.xsl">
-        <!-- Import documents -->
-        <action when="/form/action = 'import-documents'" action="../bizdoc/summary/import-documents-action.xpl">
-            <result page="summary"/>
-        </action>
         <!-- View an existing document -->
         <action when="/form/action = 'show-detail'" action="../bizdoc/summary/find-document-action.xpl">
             <result page="detail" transform="oxf:xslt">

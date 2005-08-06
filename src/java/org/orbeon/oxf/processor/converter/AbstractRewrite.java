@@ -566,7 +566,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
             final int bfLen = charactersBuf == null ? 0 : charactersBuf.position();
             if ( bfLen > 0 ) {
                 charactersBuf.flip();
-                char[] chs = charactersBuf.array();
+                final char[] chs = charactersBuf.array();
                 final int chsStrt = charactersBuf.arrayOffset();
                 wsrprewriteMatcher.reset( charactersBuf );
                 int last = 0;
@@ -842,7 +842,7 @@ abstract class AbstractRewrite extends ProcessorImpl {
             initStt.setNextState( aftRt );
 
             final StatefullHandler stFlHndlr
-                = new StatefullHandler( initStt, cntntHndlr );
+                = new StatefullHandler( initStt );
             
             readInputAsSAX( ctxt, REWRITE_IN, stFlHndlr );
         }

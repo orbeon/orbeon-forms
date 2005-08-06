@@ -40,8 +40,7 @@ public final class StatefullHandler implements ContentHandler {
      * @author d
      * @param rwrtURI 
      */
-    public StatefullHandler
-    ( final State initStt, final ContentHandler dst ) {
+    public StatefullHandler( final State initStt ) {
         state = initStt;
     }
     /**

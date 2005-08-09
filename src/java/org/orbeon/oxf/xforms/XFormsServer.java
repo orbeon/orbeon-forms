@@ -303,7 +303,7 @@ public class XFormsServer extends ProcessorImpl {
 
             // 1: Check current control
             if (!(controlInfo2 instanceof XFormsControls.RepeatControlInfo)) {
-                // xforms:repeat which doesn't need to be handled independently, iterations do it
+                // xforms:repeat doesn't need to be handled independently, iterations do it
 
                 // Output diffs between controlInfo1 and controlInfo2\
                 if (!controlInfo2.equals(controlInfo1)) { // don't send anything if nothing has changed
@@ -487,6 +487,21 @@ public class XFormsServer extends ProcessorImpl {
                     // Copy template instructions
                     final int size2 = children2.size();
                     for (int k = 2; k <= size2; k++) { // don't copy the first template, which is already copied when the parent is copied
+                        outputCopyRepeatTemplate(ch, repeatControlInfo, k);
+                    }
+
+                    // Issue new values for the children
+                    diffControlsState(ch, null, children2);
+
+                } else if ((controlInfo2 instanceof XFormsControls.RepeatControlInfo) && children1 == null) {
+
+                    final XFormsControls.RepeatControlInfo repeatControlInfo = (XFormsControls.RepeatControlInfo) controlInfo2;
+
+                    // Handle repeat growing from size 0 (case of instance replacement, for example)
+
+                    // Copy template instructions
+                    final int size2 = children2.size();
+                    for (int k = 1; k <= size2; k++) {
                         outputCopyRepeatTemplate(ch, repeatControlInfo, k);
                     }
 

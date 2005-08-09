@@ -65,7 +65,8 @@
             <result page="summary"/>
         </action>
     </page>
-    
+
+    <!-- Services -->
     <page path-info="/bizdoc2/save" model="../bizdoc/detail/save-document-action.xpl"/>
     <page path-info="/bizdoc2/delete" view="summary/list-documents-response.xpl">
         <action action="../bizdoc/summary/delete-documents-action.xpl"/>

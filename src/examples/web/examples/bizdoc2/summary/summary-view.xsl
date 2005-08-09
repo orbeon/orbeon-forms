@@ -52,7 +52,7 @@
                 </tr>
                 <xsl:choose>
                     <xsl:when test="count(/result/document-info) > 0">
-                        <xforms:repeat id="document-info-repeat" nodeset="instance('document-infos-instance')/document-info">
+                        <xforms:repeat id="documentInfoRepeat" nodeset="instance('document-infos-instance')/document-info">
                             <tr>
                                 <td>
                                     <xforms:output ref="claim:last-name"/>
@@ -68,7 +68,7 @@
                                         <xforms:label>Edit</xforms:label>
                                         <xforms:action ev:event="DOMActivate">
                                             <xforms:setvalue ref="instance('request-instance')/action">show-detail</xforms:setvalue>
-                                            <xforms:setvalue ref="instance('request-instance')/document-id" value="instance('document-infos-instance')/document-info[index('document-info-repeat')]/document-id"/>
+                                            <xforms:setvalue ref="instance('request-instance')/document-id" value="instance('document-infos-instance')/document-info[index('documentInfoRepeat')]/document-id"/>
                                             <xforms:send submission="main-submission"/>
                                         </xforms:action>
                                     </xforms:trigger>
@@ -78,7 +78,7 @@
                                         <xforms:label>XML</xforms:label>
                                         <xforms:action ev:event="DOMActivate">
                                             <xforms:setvalue ref="instance('request-instance')/action">show-xml</xforms:setvalue>
-                                            <xforms:setvalue ref="instance('request-instance')/document-id" value="instance('document-infos-instance')/document-info[index('document-info-repeat')]/document-id"/>
+                                            <xforms:setvalue ref="instance('request-instance')/document-id" value="instance('document-infos-instance')/document-info[index('documentInfoRepeat')]/document-id"/>
                                             <xforms:send submission="main-submission"/>
                                         </xforms:action>
                                     </xforms:trigger>
@@ -89,7 +89,7 @@
                                         <xforms:label>Delete</xforms:label>
                                         <xforms:action ev:event="DOMActivate">
                                             <xforms:setvalue ref="instance('request-instance')/action">delete-documents</xforms:setvalue>
-                                            <xforms:setvalue ref="instance('request-instance')/document-id" value="instance('document-infos-instance')/document-info[index('document-info-repeat')]/document-id"/>
+                                            <xforms:setvalue ref="instance('request-instance')/document-id" value="instance('document-infos-instance')/document-info[index('documentInfoRepeat')]/document-id"/>
                                             <xforms:send submission="delete-submission"/>
                                         </xforms:action>
                                     </xforms:trigger>

@@ -245,6 +245,21 @@
         </jar>
     </target>
 
+    <target name="sql-patch-28-jar" depends="prepare">
+      <pathconvert dirsep='/' pathsep=' ' property='jar.mf.cp' refid='war.libs.private' >
+        <map from='${lib.dir}' to='private' />
+      </pathconvert>
+
+      <jar destfile='${build.lib.dir}/ops-2.8-sql_patch.jar' compress='false' >
+          <fileset dir="${build.classes.dir}">
+              <include name="org/orbeon/oxf/processor/sql/**/*.*"/>
+              <include name="org/orbeon/oxf/xml/XMLConstants.class"/>
+              <include name="org/orbeon/oxf/xml/DeferredContentHandler*.class"/>
+              <include name="org/orbeon/oxf/xml/dom4j/NonLazy*.class"/>
+          </fileset>
+        </jar>
+    </target>
+
     <!-- WAR -->
 	
     <target name="war" depends="jars,orbeon-source-files-lists">

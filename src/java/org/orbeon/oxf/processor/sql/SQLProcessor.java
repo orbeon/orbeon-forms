@@ -23,9 +23,7 @@ import org.orbeon.oxf.processor.sql.interpreters.*;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -67,14 +65,27 @@ public class SQLProcessor extends ProcessorImpl {
     private static final String INPUT_DATASOURCE = "datasource";
     public static final String SQL_DATASOURCE_URI = "http://www.orbeon.org/oxf/sql-datasource";
 
-    public static final String OPS_TYPES_URI = "http://orbeon.org/oxf/xml/datatypes";
+    public static final Document NULL_DOCUMENT;
 
-    // TODO: Move those to XMLConstants.java once 2.8 compatibliity is no longer required 
-    public static final QName XS_INT_QNAME = new QName("int", XMLConstants.XSD_NAMESPACE);
-    public static final QName XS_DECIMAL_QNAME = new QName("decimal", XMLConstants.XSD_NAMESPACE);
-    public static final QName XS_FLOAT_QNAME = new QName("float", XMLConstants.XSD_NAMESPACE);
-    public static final QName XS_DOUBLE_QNAME = new QName("double", XMLConstants.XSD_NAMESPACE);
-    public static final QName OPS_XMLFRAGMENT_QNAME = new QName("xmlFragment", new Namespace("ops", OPS_TYPES_URI));
+    // TODO: Remove this once binary 2.8 compatibliity is no longer required
+    public static final Namespace XSI_NAMESPACE = new Namespace(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
+    static {
+        NULL_DOCUMENT = new NonLazyUserDataDocument();
+        final NonLazyUserDataDocumentFactory fctry
+                = NonLazyUserDataDocumentFactory.getInstance(null);
+        Element nullElement = fctry.createElement("null");
+        final QName attNm = new QName
+                (XMLConstants.XSI_NIL_ATTRIBUTE, XSI_NAMESPACE);
+        nullElement.addAttribute(attNm, "true");
+        NULL_DOCUMENT.setRootElement(nullElement);
+    }
+
+    public static String qNameToexplodedQName(QName qName) {
+        if ("".equals(qName.getNamespaceURI()))
+            return qName.getName();
+        else
+            return "{" + qName.getNamespaceURI() + "}" + qName.getName();
+    }
 
     public SQLProcessor() {
         // Mandatory config input
@@ -210,7 +221,7 @@ public class SQLProcessor extends ProcessorImpl {
                 throw new OXFException("The data input must be connected when the configuration uses XPath expressions.");
             if (!hasDataInput || !config.useXPathExpressions) {
                 // Just use an empty document
-                data = Dom4jUtils.NULL_DOCUMENT;
+                data = NULL_DOCUMENT;
             } else {
                 // There is a data input connected and there are some XPath epxressions operating on it
                 boolean useXPathContentHandler = false;

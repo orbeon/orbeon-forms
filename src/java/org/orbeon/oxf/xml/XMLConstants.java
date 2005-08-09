@@ -63,9 +63,15 @@ public class XMLConstants {
     public final static QName XS_BASE64BINARY_QNAME = new QName("base64Binary", XSD_NAMESPACE);
     public final static QName XS_NCNAME_QNAME = new QName("NCName", XSD_NAMESPACE);
     public final static QName XS_NMTOKEN_QNAME = new QName("NMTOKEN", XSD_NAMESPACE);
-    public final static QName XS_NONNEGATIVEiNTEGER_QNAME 
-        = new QName("nonNegativeInteger", XSD_NAMESPACE);
-    
+    public final static QName XS_NONNEGATIVEINTEGER_QNAME = new QName("nonNegativeInteger", XSD_NAMESPACE);
+    public static final QName XS_INT_QNAME = new QName("int", XSD_NAMESPACE);
+    public static final QName XS_DECIMAL_QNAME = new QName("decimal", XSD_NAMESPACE);
+    public static final QName XS_FLOAT_QNAME = new QName("float", XSD_NAMESPACE);
+    public static final QName XS_DOUBLE_QNAME = new QName("double", XSD_NAMESPACE);
+
+    public static final String OPS_TYPES_URI = "http://orbeon.org/oxf/xml/datatypes";
+    public static final QName OPS_XMLFRAGMENT_QNAME = new QName("xmlFragment", new Namespace("ops", OPS_TYPES_URI));
+
     public static final String XSI_NIL_ATTRIBUTE = "nil";
 
     public static final String XSLT_PREFIX = "xsl";

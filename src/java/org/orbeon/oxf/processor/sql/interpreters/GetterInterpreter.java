@@ -22,7 +22,6 @@ import org.orbeon.oxf.util.ISODateUtils;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.XMLUtils;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -96,7 +95,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
                 final int columnType = metadata.getColumnType(columnIndex);
 
                 final String xmlType = getXMLTypeFromAttributeStringHandleDefault(getDocumentLocator(), interpreterContext.getPropertySet(), attributes.getValue("type"), interpreterContext.getPrefixesMap(), columnType);
-                if (Dom4jUtils.qNameToexplodedQName(SQLProcessor.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
+                if (SQLProcessor.qNameToexplodedQName(XMLConstants.OPS_XMLFRAGMENT_QNAME).equals(xmlType)) {
                     // XML fragment requested
                     String columnTypeName = metadata.getColumnTypeName(columnIndex);
                     if (columnType == Types.CLOB) {
@@ -525,7 +524,7 @@ public class GetterInterpreter extends SQLProcessor.InterpreterContentHandler {
             if (typePrefix.equals("xs"))
                 typeURI = XMLConstants.XSD_URI;
             else if (typePrefix.equals("oxf"))
-                typeURI = SQLProcessor.OPS_TYPES_URI;
+                typeURI = XMLConstants.OPS_TYPES_URI;
             else
                 throw new ValidationException("Invalid type prefix for type:" + typeAttribute, new LocationData(locator));
         } else {

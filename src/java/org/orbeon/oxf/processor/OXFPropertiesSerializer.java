@@ -110,7 +110,7 @@ public class OXFPropertiesSerializer extends ProcessorImpl {
         supportedTypes.put( XMLConstants.XS_NCNAME_QNAME, new NCNameConverter() );
         supportedTypes.put( XMLConstants.XS_NMTOKEN_QNAME, new NMTOKENConverter() );
         supportedTypes.put
-            ( XMLConstants.XS_NONNEGATIVEiNTEGER_QNAME, new NonNegativeIntegerConverter() );
+            ( XMLConstants.XS_NONNEGATIVEINTEGER_QNAME, new NonNegativeIntegerConverter() );
     }
 
     public OXFPropertiesSerializer() {

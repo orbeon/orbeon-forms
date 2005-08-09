@@ -250,7 +250,7 @@ public class OXFProperties {
             return ( java.net.URL ) getProperty(name, XMLConstants.XS_ANYURI_QNAME);
         }
         public Integer getNonNegativeInteger( final String nm ) {
-            return ( Integer )getProperty( nm, XMLConstants.XS_NONNEGATIVEiNTEGER_QNAME );
+            return ( Integer )getProperty( nm, XMLConstants.XS_NONNEGATIVEINTEGER_QNAME );
         }
         public String getNCName( final String nm ) {
             return ( String )getProperty( nm, XMLConstants.XS_NCNAME_QNAME );

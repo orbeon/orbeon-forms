@@ -50,8 +50,8 @@
                     <th>XML</th>
                     <th>Delete</th>
                 </tr>
-                <xsl:choose>
-                    <xsl:when test="count(/result/document-info) > 0">
+                <!--<xsl:choose>-->
+                    <!--<xsl:when test="count(/result/document-info) > 0">-->
                         <xforms:repeat id="documentInfoRepeat" nodeset="instance('document-infos-instance')/document-info">
                             <tr>
                                 <td>
@@ -110,14 +110,14 @@
                                 <!--</xforms:case>-->
                             <!--</xforms:switch>-->
                         </xforms:repeat>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <tr>
-                            <td colspan="6"><i>No document found.<br/>Please press the "Import
-                            Documents" button to get started.</i></td>
-                        </tr>
-                    </xsl:otherwise>
-                </xsl:choose>
+                    <!--</xsl:when>-->
+                    <!--<xsl:otherwise>-->
+                        <!--<tr>-->
+                            <!--<td colspan="6"><i>No document found.<br/>Please press the "Import-->
+                            <!--Documents" button to get started.</i></td>-->
+                        <!--</tr>-->
+                    <!--</xsl:otherwise>-->
+                <!--</xsl:choose>-->
             </table>
             <hr/>
             <xforms:group ref="instance('request-instance')">

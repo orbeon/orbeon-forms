@@ -48,15 +48,20 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
         }
 
         final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
+        final boolean hasNext = !getInterpreterContext().isEmptyResultSet();
 
-        if (!getInterpreterContext().isEmptyResultSet()) {
+        if (SQLProcessor.logger.isDebugEnabled())
+            SQLProcessor.logger.debug("Preparing to execute result set: hasNext = " + hasNext + ", statement = " + interpreterContext.getStatementString());
 
+        if (hasNext) {
             try {
                 final PreparedStatement stmt = interpreterContext.getStatement(0);
-
                 if (stmt != null) {
                     int currentCount = 0;
                     do {
+                        if (SQLProcessor.logger.isDebugEnabled())
+                            SQLProcessor.logger.debug("Executing result set: currentCount = " + currentCount);
+
                         // NOTE: Initially, a result set has already been made available
                         repeatBody();
 
@@ -88,6 +93,10 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
             final int updateCount = stmt.getUpdateCount();
             interpreterContext.setUpdateCount(updateCount);//FIXME: should add?
             closeStatement(interpreterContext, stmt);
+
+            if (SQLProcessor.logger.isDebugEnabled())
+                SQLProcessor.logger.debug("ResultSet info: no more result set, update count = " + updateCount);
+
             return false;
         } else {
             // There is one more result set
@@ -95,6 +104,10 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
             final boolean hasNext = resultSet.next();
             interpreterContext.setEmptyResultSet(!hasNext);
             interpreterContext.setResultSet(resultSet);
+
+            if (SQLProcessor.logger.isDebugEnabled())
+                SQLProcessor.logger.debug("ResultSet info: more result set, hasNext = " + hasNext);
+
             return true;
         }
     }
@@ -103,5 +116,6 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
         stmt.close();
         interpreterContext.setStatement(null);
         interpreterContext.setResultSet(null);
+        interpreterContext.setEmptyResultSet(true);
     }
 }

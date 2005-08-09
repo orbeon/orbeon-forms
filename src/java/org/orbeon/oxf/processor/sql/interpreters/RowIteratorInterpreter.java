@@ -39,9 +39,9 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
     private DeferredContentHandler savedOutput;
 
     private boolean hiding;
-    private int[] rowNum = {1};
-    private int[] groupCount = {0};
-    private List groups = new ArrayList();
+    private int rowNum = 1;
+    private int groupCount = 0;
+    private List groups;
 
     public RowIteratorInterpreter(SQLProcessorInterpreterContext interpreterContext) {
         // Repeating interpreter
@@ -57,7 +57,10 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
 
         final ResultSet resultSet = interpreterContext.getResultSet(0);
         try {
-            boolean hasNext = true;
+            boolean hasNext = !interpreterContext.isEmptyResultSet();
+
+            if (SQLProcessor.logger.isDebugEnabled())
+                SQLProcessor.logger.debug("Preparing to execute row: hasNext = " + hasNext + ", statement = " + interpreterContext.getStatementString());
 
             // Functions in this context
             Map functions = new HashMap();
@@ -69,7 +72,6 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
 
             interpreterContext.pushFunctions(functions);
             try {
-
                 // Iterate through the result set
                 while (hasNext) {
                     // Output footers that need it
@@ -81,21 +83,27 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
                                 g1.getFooter().clear();
                             }
                         }
-                        groupCount[0] = 0;
+                        groupCount = 0;
                     }
                     // Set variables
-                    interpreterContext.setRowPosition(rowNum[0]);
+                    interpreterContext.setRowPosition(rowNum);
+
+                    if (SQLProcessor.logger.isDebugEnabled())
+                        SQLProcessor.logger.debug("Execute row: rowNum = " + rowNum);
+
                     // Interpret row
                     repeatBody();
                     // Go to following row
                     hasNext = resultSet.next();
-                    rowNum[0]++;
+                    rowNum++;
                 }
                 // Output last footers
-                for (int i = groups.size() - 1; i >= 0; i--) {
-                    Group group = (Group) groups.get(i);
-                    group.getFooter().replay(interpreterContext.getOutput());
-                    group.getFooter().clear();
+                if (groups != null) {
+                    for (int i = groups.size() - 1; i >= 0; i--) {
+                        Group group = (Group) groups.get(i);
+                        group.getFooter().replay(interpreterContext.getOutput());
+                        group.getFooter().clear();
+                    }
                 }
             } finally {
                 interpreterContext.popFunctions();
@@ -106,6 +114,11 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
     }
 
     public void end(String uri, String localname, String qName) throws SAXException {
+        // Restore state
+        hiding = false;
+        rowNum = 1;
+        groupCount = 0;
+        groups = null;
     }
 
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
@@ -114,20 +127,22 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
     }
 
     public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-//        if (!isInElementHandler() && SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
-        if (SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
+        if (!isInElementHandler() && SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
+//        if (SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
             if (localname.equals("group")) {
+                if (groups == null)
+                    groups = new ArrayList();
                 try {
                     ResultSet resultSet = getInterpreterContext().getResultSet(0);
                     // Save group information if first row
-                    if (rowNum[0] == 1) {
+                    if (rowNum == 1) {
                         groups.add(new Group(attributes.getValue("column"), resultSet));
                     }
 
                     // Get current group information
-                    Group currentGroup = (Group) groups.get(groupCount[0]);
+                    Group currentGroup = (Group) groups.get(groupCount);
 
-                    if (rowNum[0] == 1 || columnChanged(resultSet, groups, groupCount[0])) {
+                    if (rowNum == 1 || columnChanged(resultSet, groups, groupCount)) {
                         // Need to display group's header and footer
                         currentGroup.setShowHeader(true);
                         hiding = false;
@@ -138,7 +153,7 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
                         hiding = true;
                     }
 
-                    groupCount[0]++;
+                    groupCount++;
 
                 } catch (SQLException e) {
                     throw new ValidationException(e, new LocationData(getDocumentLocator()));
@@ -155,17 +170,17 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
     }
 
     public void endElement(String uri, String localname, String qName) throws SAXException {
-//        if (!isInElementHandler() && SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
-        if (SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
+        if (!isInElementHandler() && SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
+//        if (SQLProcessor.SQL_NAMESPACE_URI.equals(uri)) {
             final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
             if (localname.equals("group")) {
-                groupCount[0]--;
+                groupCount--;
                 // Restore sending to the regular output
-                Group currentGroup = (Group) groups.get(groupCount[0]);
+                Group currentGroup = (Group) groups.get(groupCount);
                 if (currentGroup.isShowHeader())
                     interpreterContext.setOutput(savedOutput);
             } else if (localname.equals("member")) {
-                Group currentGroup = (Group) groups.get(groupCount[0] - 1);
+                Group currentGroup = (Group) groups.get(groupCount - 1);
                 // The first time, everything is sent to the footer SAXStore
                 if (currentGroup.isShowHeader()) {
                     savedOutput = interpreterContext.getOutput();

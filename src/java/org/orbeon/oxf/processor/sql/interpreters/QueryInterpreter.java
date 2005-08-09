@@ -163,7 +163,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
             // Create a single PreparedStatement if the query is not modified at each iteration
             PreparedStatement stmt = null;
             if (!hasReplaceOrSeparator) {
-                String queryString = query.toString();
+                final String queryString = query.toString();
                 if (type != CALL)
                     stmt = getInterpreterContext().getConnection().prepareStatement(queryString);
                 else
@@ -587,6 +587,8 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                     if (nodeCount > 1)
                         throw new ValidationException("More than one iteration on sql:query or sql:call element", new LocationData(getDocumentLocator()));
                     // Execute
+                    if (SQLProcessor.logger.isDebugEnabled())
+                        SQLProcessor.logger.debug("Executing query/call for statement: " + getInterpreterContext().getStatementString());
                     final boolean hasResultSet = stmt.execute();
                     ResultSetInterpreter.setResultSetInfo(getInterpreterContext(), stmt, hasResultSet);
                 } else if (type == UPDATE) {

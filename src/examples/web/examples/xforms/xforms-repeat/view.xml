@@ -50,8 +50,8 @@
             <xforms:bind nodeset="/todo-list/todo/@description" readonly="count(../task) > 1 and count(../task[@done = '']) = 1"/>
             <xforms:bind nodeset="/todo-list/todo/task" relevant="count(following-sibling::task) > 0"/>
             <xforms:bind nodeset="/todo-list/todo/task/@description" readonly="../@done = 'true'"/>
-            <xforms:bind nodeset="instance('triggers')/remove-todo" relevant="count(instance('todo-list')/todo) > 1"/>
-            <xforms:bind nodeset="instance('triggers')/remove-todo-item" relevant="count(instance('todo-list')/todo[index('todoSet')]/task) > 1"/>
+            <xforms:bind nodeset="instance('triggers')/remove-todo" readonly="count(instance('todo-list')/todo) = 1"/>
+            <xforms:bind nodeset="instance('triggers')/remove-todo-item" readonly="count(instance('todo-list')/todo[index('todoSet')]/task) = 1"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

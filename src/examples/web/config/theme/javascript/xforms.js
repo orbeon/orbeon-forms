@@ -998,6 +998,7 @@ function xformsHandleResponse() {
                                                             if (xformsIsDefined(element.hintElement)) element.hintElement = null;
                                                             if (xformsIsDefined(element.helpElement)) element.helpElement = null;
                                                             if (xformsIsDefined(element.alertElement)) element.alertElement = null;
+                                                            if (xformsIsDefined(element.divId)) element.divId = null;
                                                             element.styleListenerRegistered = false;
                                                             for (var childIndex = 0; childIndex < element.childNodes.length; childIndex++) {
                                                                 var childNode = element.childNodes[childIndex];

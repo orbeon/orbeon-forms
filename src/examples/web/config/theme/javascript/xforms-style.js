@@ -209,6 +209,12 @@ function xformsUpdateStyle(element) {
                 
                 xformsAddEventListener(element, "change", select1CompactChanged);
             }
+
+            if (className == "xforms-trigger") {
+                // Update label on trigger
+                if (element.labelMessage && element.labelMessage != element.value)
+                    element.value = element.labelMessage;
+            }
             
             if (className == "wide-textarea") {
                 if (!element.changeHeightHandlerRegistered) {

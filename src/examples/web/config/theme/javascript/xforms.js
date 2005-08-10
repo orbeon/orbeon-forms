@@ -929,7 +929,7 @@ function xformsHandleResponse() {
                                             if (newValid != null) documentElement.isValid = newValid != "false";
                                             // Store new hint message in control attribute
                                             var newLabel = controlElement.getAttribute("label");
-                                            if (newLabel && newLabel != documentElement.labelMessage)
+                                            if (newLabel && newLabel != documentElement.labelMessage) 
                                                 documentElement.labelMessage = newLabel;
                                             // Store new hint message in control attribute
                                             var newHint = controlElement.getAttribute("hint");

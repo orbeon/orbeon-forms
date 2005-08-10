@@ -743,7 +743,7 @@ function xformsHandleResponse() {
         var responseXML = document.xformsXMLHttpRequest.responseXML;
         if (responseXML && responseXML.documentElement
                 && responseXML.documentElement.tagName.indexOf("event-response") != -1) {
-                
+
             // Good: we received an XML document from the server
             var responseRoot = responseXML.documentElement;
             var newDynamicState = null;
@@ -929,7 +929,7 @@ function xformsHandleResponse() {
                                             if (newValid != null) documentElement.isValid = newValid != "false";
                                             // Store new hint message in control attribute
                                             var newLabel = controlElement.getAttribute("label");
-                                            if (newLabel && newLabel != documentElement.labelMessage) 
+                                            if (newLabel && newLabel != documentElement.labelMessage)
                                                 documentElement.labelMessage = newLabel;
                                             // Store new hint message in control attribute
                                             var newHint = controlElement.getAttribute("hint");
@@ -1213,7 +1213,7 @@ function xformsHandleResponse() {
             }
 
             xformsDisplayLoading("none");
-            
+
         } else if (responseXML && responseXML.documentElement 
                 && responseXML.documentElement.tagName.indexOf("exceptions") != -1) {
                 

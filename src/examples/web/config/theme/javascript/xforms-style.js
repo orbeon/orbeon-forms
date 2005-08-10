@@ -87,15 +87,15 @@ function xformsUpdateStyle(element) {
                 if (!element.styleListenerRegistered) {
                     element.styleListenerRegistered = true;
 
-                    // Compute class for active state
-                    var activeClass = new Array();
-                    activeClass.push("xforms-hint-active");
-                    for (var i = 0; i < classes.length; i++)
-                        if (classes[i] != "xforms-hint") activeClass.push(classes[i]);
-                        
                     // What happens when control gets/looses focus
-                    var controlGetsFocus = function() { element.className = activeClass.join(" "); };
-                    var controlLoosesFocus = function() { element.className = classes.join(" "); };
+                    function controlGetsFocus() {
+                        xformsRemoveClass(element, "xforms-hint");
+                        xformsAddClass(element, "xforms-hint-active");
+                    }
+                    function controlLoosesFocus() {
+                        xformsRemoveClass(element, "xforms-hint-active");
+                        xformsAddClass(element, "xforms-hint");
+                    }
 
                     // Add listeners on control
                     if (control.addEventListener) {

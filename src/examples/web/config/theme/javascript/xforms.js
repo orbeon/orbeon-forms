@@ -452,9 +452,12 @@ function xformsInitializeControlsUnder(root) {
 
             if (control.tagName == "BUTTON") {
                 // Handle click
-                xformsAddEventListener(control, "click", function(event) {
-                    xformsFireEvents(new Array(xformsCreateEventArray(getEventTarget(event), "DOMActivate", null)));
-                });
+                if (!control.xformsButtonListenerRegistered) {
+                    control.xformsButtonListenerRegistered = true;
+                    xformsAddEventListener(control, "click", function(event) {
+                        xformsFireEvents(new Array(xformsCreateEventArray(getEventTarget(event), "DOMActivate", null)));
+                    });
+                }
             } else if (isXFormsCheckboxRadio) {
 
                 xformsInitCheckesRadios(control);

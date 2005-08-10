@@ -625,206 +625,216 @@
         </section>
         <section>
             <title>SQL Processor</title>
-            <p>
-                The following changes have been made to the SQL processor.
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        <b>Stored Procedures.</b> The SQL processor now uses the JDBC
-                        <code>CallableStatement</code> interface when <code>sql:call</code> is
-                        used instead of <code>sql:query</code>. This allows for calling stored
-                        procedures using the JDBC escape syntax, for example:
-                    </p>
-                    <xml-source>
-                        <sql:call>
-                            { call SalesByCategory(<sql:param type="xs:string" select="/*/category"/>,
-                                                   <sql:param type="xs:int" select="/*/year"/>) }
-                        </sql:call>
-                    </xml-source>
-                    <note>
-                        <code>OUT</code> and <code>INOUT</code> parameters are not yet supported.
-                    </note>
-                </li>
-                <li>
-                    <p>
-                        <b>Multiple Result-Sets.</b> The SQL processor now supports multiple
-                        result-sets. It is possible to handle the result-sets returned by a query or
-                        call individually for each result-set, or globally for all result-sets,
-                        using the <code>sql:result-set</code> element. The optional
-                        <code>result-sets</code> attribute specifies how many result-sets are
-                        handled by a given <code>sql:result-set</code> element. If not specified,
-                        the default is one result-set. If the value is <code>unbounded</code>, the
-                        <code>sql:result-set</code> element handles all the remaining result-sets
-                        returned by the statement execution. Otherwise, a positive number of
-                        result-sets must be specified.
-                    </p>
-                    <xml-source>
-                        <comment>Handle the first two result-sets</comment>
-                        <sql:result-set result-sets="2">
-                            <my-first-result-sets>
-                                <sql:row-iterator>
-                                    <row>
-                                        <sql:get-columns format="xml"/>
-                                    </row>
-                                </sql:row-iterator>
-                            </my-first-result-sets>
-                        </sql:result-set>
-                        <comment>Handle All the remaining result-sets</comment>
-                        <sql:result-set result-sets="unbounded">
-                            <my-other-result-sets>
-                                <sql:row-iterator>
-                                    <row>
-                                        <sql:get-columns format="xml"/>
-                                    </row>
-                                </sql:row-iterator>
-                            </my-other-result-sets>
-                        </sql:result-set>
-                    </xml-source>
-                </li>
-                <li>
-                    <p>
-                        <b>Colunn Iterator.</b> The SQL processor is now able to explicitly iterate
-                        over all the columns returned by a result-set with the
-                        <code>sql:column-iterator</code> element. A column iterator can be used
-                        under the <code>sql:result-set</code> element, or under the
-                        <code>sql:row-iterator</code> element. This allows for example easily
-                        extracting column metadata:
-                    </p>
-                    <xml-source>
-                        <sql:result-set>
-                            <metadata>
-                                <sql:column-iterator>
-                                    <column>
-                                        <sql:attribute name="index">
-                                            <sql:get-column-index/>
-                                        </sql:attribute>
-                                        <sql:attribute name="name">
-                                            <sql:get-column-name/>
-                                        </sql:attribute>
-                                        <sql:attribute name="type">
-                                            <sql:get-column-type/>
-                                        </sql:attribute>
-                                        <index><sql:get-column-index/></index>
-                                        <name><sql:get-column-name/></name>
-                                        <type><sql:get-column-type/></type>
-                                    </column>
-                                </sql:column-iterator>
-                            </metadata>
-                        </sql:result-set>
-                    </xml-source>
-                </li>
-                <li>
-                    <p>
-                        <b>Result-Set Metadata.</b> The SQL processor is now able to retrieve
-                        result-set metadata, with the following new elements. The must be used
-                        within a <code>sql:column-iterator</code> element, unless an
-                        <code>column-name</code> or <code>column-index</code> attribute is
-                        explicitly specified:
-                    </p>
-                    <ul>
-                        <li>
-                            <code>sql:get-column-index</code>: retrieves the current column index.
-                        </li>
-                        <li>
-                            <code>sql:get-column-name</code>: retrieves the current column name.
-                        </li>
-                        <li>
-                            <code>sql:get-column-type</code>: retrieves the current column type name
-                            as returned by result-set metadata.
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <p>
-                        <b>Optional XML Type Information.</b> The XML type (specified with
-                        <code>type="xs:int"</code>, for example) is now optional on column getters.
-                        If not specified, a default type obtained from the result-set metadata is
-                        used to determine how to best get the value from the result-set.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>New Element and Attribute Names.</b> Some element and attributes have
-                        been renamed. The old names are still supported for backward compatibility:
-                    </p>
-                    <ul>
-                        <li>
-                            <code>sql:results</code> has been renamed to
-                            <code>sql:result-set</code>.
-                        </li>
-                        <li>
-                            <code>sql:row-results</code> has been renamed to
-                            <code>sql:row-iterator</code>.
-                        </li>
-                        <li>
-                            <code>sql:get-column</code> has been renamed to
-                            <code>sql:get-column-value</code>, for consistency with the new
-                            <code>sql:get-column-*</code> elements.
-                        </li>
-                        <li>
-                            <code>column-name</code> is now the standard attribute name for
-                            identifying a colunn name on all the <code>sql:get-column-*</code>,
-                            including <code>sql:get-column</code> and
-                            <code>sql:get-column-value</code>.
-                        </li>
-                    </ul>
-                </li>
-                <li>
-                    <p>
-                        <b>Outputting Attributes.</b> The SQL processor is now able to dynamically
-                        generate new attributes with the <code>sql:attribute</code> element, for
-                        example:
-                    </p>
-                    <xml-source>
-                        <sql:attribute name="index">
-                            <sql:get-column-index/>
-                        </sql:attribute>
-                    </xml-source>
-                </li>
-            </ul>
-            <p>
-                The following incompatible changes have been made:
-            </p>
-            <ul>
-                <li>
-                    <p>
-                        <b>Legacy Types.</b> Backward compatibility with pre-OPS 2.0
-                        <code>int</code> and <code>string</code> types has been removed. Use
-                        <code>xs:int</code> and <code>xs:string</code> instead, while declaring the
-                        <code>xs</code> prefix as explained below.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Implicit Type Prefixes.</b> Legacy support for implicit type prefixes
-                        (<code>xs</code> and <code>oxf</code>) is deprecated. Backward compability
-                        is enabled with the <code>legacy-implicit-prefixes</code> property as
-                        follows:
-                    </p>
-                    <xml-source>
-                        <property as="xs:boolean" processor-name="oxf:sql" name="legacy-implicit-prefixes" value="true"/>
-                    </xml-source>
-                    <p>
-                        When this property is missing or set to <code>false</code>, type prefixes
-                        must be mapped as is customary for XML vocabularies. Add the following
-                        namespace declarations:
-                        <code>xmlns:xs="http://www.w3.org/2001/XMLSchema"</code> and
-                        <code>xmlns:odt="http://orbeon.org/oxf/xml/datatypes"</code>. Doing so then
-                        allows using data types as before, for example <code>xs:string</code> or
-                        <code>odt:xmlFragment</code>.
-                    </p>
-                </li>
-                <li>
-                    <p>
-                        <b>Stricter Type Checking</b>. Column getters are now checked against
-                        result-set column metadata. In the past, using <code>xs:string</code> for a
-                        column of type <code>INTEGER</code> was allowed. Now if an XML type is
-                        specified, the XML type must match the SQL type. Alternatively, as mentioned
-                        above, it is possible to not specify an XML type at all.
-                    </p>
-                </li>
-            </ul>
+            <section>
+                <title>New Features</title>
+                <p>
+                    The following changes have been made to the SQL processor.
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>Stored Procedures.</b> The SQL processor now uses the JDBC
+                            <code>CallableStatement</code> interface when <code>sql:call</code> is
+                            used instead of <code>sql:query</code>. This allows for calling stored
+                            procedures using the JDBC escape syntax, for example:
+                        </p>
+                        <xml-source>
+                            <sql:call>
+                                { call SalesByCategory(<sql:param type="xs:string" select="/*/category"/>,
+                                                       <sql:param type="xs:int" select="/*/year"/>) }
+                            </sql:call>
+                        </xml-source>
+                        <note>
+                            <code>OUT</code> and <code>INOUT</code> parameters are not yet supported.
+                        </note>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Multiple Result-Sets.</b> The SQL processor now supports multiple
+                            result-sets. It is possible to handle the result-sets returned by a query or
+                            call individually for each result-set, or globally for all result-sets,
+                            using the <code>sql:result-set</code> element. The optional
+                            <code>result-sets</code> attribute specifies how many result-sets are
+                            handled by a given <code>sql:result-set</code> element. If not specified,
+                            the default is one result-set. If the value is <code>unbounded</code>, the
+                            <code>sql:result-set</code> element handles all the remaining result-sets
+                            returned by the statement execution. Otherwise, a positive number of
+                            result-sets must be specified.
+                        </p>
+                        <xml-source>
+                            <comment>Handle the first two result-sets</comment>
+                            <sql:result-set result-sets="2">
+                                <my-first-result-sets>
+                                    <sql:row-iterator>
+                                        <row>
+                                            <sql:get-columns format="xml"/>
+                                        </row>
+                                    </sql:row-iterator>
+                                </my-first-result-sets>
+                            </sql:result-set>
+                            <comment>Handle All the remaining result-sets</comment>
+                            <sql:result-set result-sets="unbounded">
+                                <my-other-result-sets>
+                                    <sql:row-iterator>
+                                        <row>
+                                            <sql:get-columns format="xml"/>
+                                        </row>
+                                    </sql:row-iterator>
+                                </my-other-result-sets>
+                            </sql:result-set>
+                        </xml-source>
+                        <p>
+                            <code>sql:no-results</code> has been updated to execute when none of the
+                            previous <code>sql:result-set</code> elements returned rows.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Colunn Iterator.</b> The SQL processor is now able to explicitly iterate
+                            over all the columns returned by a result-set with the
+                            <code>sql:column-iterator</code> element. A column iterator can be used
+                            under the <code>sql:result-set</code> element, or under the
+                            <code>sql:row-iterator</code> element. This allows for example easily
+                            extracting column metadata:
+                        </p>
+                        <xml-source>
+                            <sql:result-set>
+                                <metadata>
+                                    <sql:column-iterator>
+                                        <column>
+                                            <sql:attribute name="index">
+                                                <sql:get-column-index/>
+                                            </sql:attribute>
+                                            <sql:attribute name="name">
+                                                <sql:get-column-name/>
+                                            </sql:attribute>
+                                            <sql:attribute name="type">
+                                                <sql:get-column-type/>
+                                            </sql:attribute>
+                                            <index><sql:get-column-index/></index>
+                                            <name><sql:get-column-name/></name>
+                                            <type><sql:get-column-type/></type>
+                                        </column>
+                                    </sql:column-iterator>
+                                </metadata>
+                            </sql:result-set>
+                        </xml-source>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Result-Set Metadata.</b> The SQL processor is now able to retrieve
+                            result-set metadata, with the following new elements. The must be used
+                            within a <code>sql:column-iterator</code> element, unless an
+                            <code>column-name</code> or <code>column-index</code> attribute is
+                            explicitly specified:
+                        </p>
+                        <ul>
+                            <li>
+                                <code>sql:get-column-index</code>: retrieves the current column index.
+                            </li>
+                            <li>
+                                <code>sql:get-column-name</code>: retrieves the current column name.
+                            </li>
+                            <li>
+                                <code>sql:get-column-type</code>: retrieves the current column type name
+                                as returned by result-set metadata.
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Outputting Attributes.</b> The SQL processor is now able to dynamically
+                            generate new attributes with the <code>sql:attribute</code> element, for
+                            example:
+                        </p>
+                        <xml-source>
+                            <sql:attribute name="index">
+                                <sql:get-column-index/>
+                            </sql:attribute>
+                        </xml-source>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Optional XML Type Information.</b> The XML type (specified with
+                            <code>type="xs:int"</code>, for example) is now optional on column getters.
+                            If not specified, a default type obtained from the result-set metadata is
+                            used to determine how to best get the value from the result-set.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>New Element and Attribute Names.</b> Some element and attributes have
+                            been renamed. The old names are still supported for backward compatibility:
+                        </p>
+                        <ul>
+                            <li>
+                                <code>sql:results</code> has been renamed to
+                                <code>sql:result-set</code>.
+                            </li>
+                            <li>
+                                <code>sql:row-results</code> has been renamed to
+                                <code>sql:row-iterator</code>.
+                            </li>
+                            <li>
+                                <code>sql:get-column</code> has been renamed to
+                                <code>sql:get-column-value</code>, for consistency with the new
+                                <code>sql:get-column-*</code> elements.
+                            </li>
+                            <li>
+                                <code>column-name</code> is now the standard attribute name for
+                                identifying a colunn name on all the <code>sql:get-column-*</code>,
+                                including <code>sql:get-column</code> and
+                                <code>sql:get-column-value</code>.
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+            <section>
+                <title>Incompatible Changes</title>
+                <p>
+                    The following incompatible changes have been made:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>Legacy Types.</b> Backward compatibility with pre-OPS 2.0
+                            <code>int</code> and <code>string</code> types has been removed. Use
+                            <code>xs:int</code> and <code>xs:string</code> instead, while declaring the
+                            <code>xs</code> prefix as explained below.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Implicit Type Prefixes.</b> Legacy support for implicit type prefixes
+                            (<code>xs</code> and <code>oxf</code>) is deprecated. Backward compability
+                            is enabled with the <code>legacy-implicit-prefixes</code> property as
+                            follows:
+                        </p>
+                        <xml-source>
+                            <property as="xs:boolean" processor-name="oxf:sql" name="legacy-implicit-prefixes" value="true"/>
+                        </xml-source>
+                        <p>
+                            When this property is missing or set to <code>false</code>, type prefixes
+                            must be mapped as is customary for XML vocabularies. Add the following
+                            namespace declarations:
+                            <code>xmlns:xs="http://www.w3.org/2001/XMLSchema"</code> and
+                            <code>xmlns:odt="http://orbeon.org/oxf/xml/datatypes"</code>. Doing so then
+                            allows using data types as before, for example <code>xs:string</code> or
+                            <code>odt:xmlFragment</code>.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Stricter Type Checking</b>. Column getters are now checked against
+                            result-set column metadata. In the past, using <code>xs:string</code> for a
+                            column of type <code>INTEGER</code> was allowed. Now if an XML type is
+                            specified, the XML type must match the SQL type. Alternatively, as mentioned
+                            above, it is possible to not specify an XML type at all.
+                        </p>
+                    </li>
+                </ul>
+            </section>
         </section>
         <section>
             <title>XPL Profiling Support</title>

@@ -73,6 +73,7 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
         public PreparedStatement preparedStatement;
         public String statementString;
         public boolean emptyResultSet;
+        public boolean gotResults;
         public int rowPosition;
         public int updateCount;
 
@@ -360,6 +361,16 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
     public void setEmptyResultSet(boolean emptyResultSet) {
         final ExecutionContext executionContext = getExecutionContext(0);
         executionContext.emptyResultSet = emptyResultSet;
+    }
+
+    public boolean isGotResults() {
+        final ExecutionContext executionContext = getExecutionContext(0);
+        return executionContext.gotResults;
+    }
+
+    public void setGotResults(boolean gotResults) {
+        final ExecutionContext executionContext = getExecutionContext(0);
+        executionContext.gotResults = gotResults;
     }
 
     public int getUpdateCount() {

@@ -31,8 +31,8 @@ public class NoResultsInterpreter extends SQLProcessor.InterpreterContentHandler
 
         addAllDefaultElementHandlers();
 
-        // Only forward if the result set is empty
-        if (getInterpreterContext().isEmptyResultSet()) {
+        // Only forward if no result was found previously
+        if (!getInterpreterContext().isGotResults()) {
             setForward(true);
         }
     }

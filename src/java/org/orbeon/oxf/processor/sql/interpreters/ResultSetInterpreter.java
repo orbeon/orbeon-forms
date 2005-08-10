@@ -48,14 +48,16 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
         }
 
         final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
-        final boolean hasNext = !getInterpreterContext().isEmptyResultSet();
 
-        if (SQLProcessor.logger.isDebugEnabled())
-            SQLProcessor.logger.debug("Preparing to execute result set: hasNext = " + hasNext + ", statement = " + interpreterContext.getStatementString());
+        try {
+            final PreparedStatement stmt = interpreterContext.getStatement(0);
+            final boolean hasNext = !getInterpreterContext().isEmptyResultSet();
 
-        if (hasNext) {
-            try {
-                final PreparedStatement stmt = interpreterContext.getStatement(0);
+            if (SQLProcessor.logger.isDebugEnabled())
+                SQLProcessor.logger.debug("Preparing to execute result set: hasNext = " + hasNext + ", statement = " + interpreterContext.getStatementString());
+
+            if (hasNext) {
+                // There is a current non-empty result-set
                 if (stmt != null) {
                     int currentCount = 0;
                     do {
@@ -77,9 +79,12 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
 
                     } while (true);
                 }
-            } catch (SQLException e) {
-                throw new ValidationException(e, new LocationData(getDocumentLocator()));
+            } else {
+                // Prepare result set info for the next potential result-set interrpeter
+                setResultSetInfo(interpreterContext, stmt, stmt.getMoreResults());
             }
+        } catch (SQLException e) {
+            throw new ValidationException(e, new LocationData(getDocumentLocator()));
         }
     }
 
@@ -104,6 +109,7 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
             final boolean hasNext = resultSet.next();
             interpreterContext.setEmptyResultSet(!hasNext);
             interpreterContext.setResultSet(resultSet);
+            interpreterContext.setGotResults(hasNext || interpreterContext.isGotResults());
 
             if (SQLProcessor.logger.isDebugEnabled())
                 SQLProcessor.logger.debug("ResultSet info: more result set, hasNext = " + hasNext);

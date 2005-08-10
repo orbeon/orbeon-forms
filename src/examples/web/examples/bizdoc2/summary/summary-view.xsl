@@ -35,6 +35,7 @@
             <xforms:submission id="main-submission" ref="instance('request-instance')" method="post" action="/bizdoc2"/>
             <xforms:submission id="delete-submission" ref="instance('request-instance')" replace="instance" instance="document-infos-instance" method="post" action="/bizdoc2/delete"/>
             <xforms:submission id="import-submission" ref="instance('request-instance')" replace="instance" instance="document-infos-instance" method="post" action="/bizdoc2/import"/>
+            <xforms:submission id="refresh-submission" ref="instance('request-instance')" replace="instance" instance="document-infos-instance" method="post" action="/bizdoc2/refresh"/>
         </xforms:model>
     </head>
     <body>
@@ -124,6 +125,13 @@
                 <table>
                     <tr>
                         <td align="left" valign="bottom">
+                            <xforms:trigger>
+                                <xforms:label>Refresh</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue ref="action">refresh</xforms:setvalue>
+                                    <xforms:send submission="refresh-submission"/>
+                                </xforms:action>
+                            </xforms:trigger>
                             <xforms:trigger>
                                 <xforms:label>Import Documents</xforms:label>
                                 <xforms:action ev:event="DOMActivate">

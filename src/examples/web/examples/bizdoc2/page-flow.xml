@@ -74,6 +74,7 @@
     <page path-info="/bizdoc2/import" view="summary/list-documents-response.xpl">
         <action action="../bizdoc/summary/import-documents-action.xpl"/>
     </page>
+    <page path-info="/bizdoc2/refresh" view="summary/list-documents-response.xpl"/>
     
     <!-- Home (for standalone operation) -->
     <page id="home" path-info="/">

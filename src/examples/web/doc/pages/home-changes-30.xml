@@ -304,7 +304,7 @@
                             <xforms:group ref="."/>
                         </xml-source>
                         <p>
-                            If you already use absolute XPath expressions for your top-level XForms
+                            If you use absolute XPath expressions for your top-level XForms
                             controls, no change is necessary.
                         </p>
                     </li>
@@ -682,6 +682,10 @@
                                     </sql:row-iterator>
                                 </my-other-result-sets>
                             </sql:result-set>
+                            <comment>This will be executed if no row was returned by any result-set</comment>
+                            <sql:no-results>
+                                <there-are-no-results/>
+                            </sql:no-results>
                         </xml-source>
                         <p>
                             <code>sql:no-results</code> has been updated to execute when none of the
@@ -840,23 +844,31 @@
             <title>XPL Profiling Support</title>
             <ul>
                 <li>
-                    A 'trace' API has been added.  The interface is 
-                    <code>org.orbeon.oxf.pipeline.api.PipelineContext.Trace</code>
+                    <p>
+                        A trace API has been added. The interface is
+                        <code>org.orbeon.oxf.pipeline.api.PipelineContext.Trace</code>
+                    </p>
                 </li>
                 <li>
-                    OPS ships with two implementations of <code>Trace</code>, 
-                    <code>org.orbeon.oxf.processor.NetworkTrace</code> and 
-                    <code>org.orbeon.oxf.processor.StdOutTrace</code>.  
-                    <code>NetworkTrace</code> sends profiling information to Studio which the 
-                    displays the data in the trace views.  <code>StdOutTrace</code> simply 
-                    dumps profiling information to standard out.
+                    <p>
+                        OPS ships with two implementations of <code>Trace</code>,
+                        <code>org.orbeon.oxf.processor.NetworkTrace</code> and
+                        <code>org.orbeon.oxf.processor.StdOutTrace</code>.
+                        <code>NetworkTrace</code> sends profiling information to Studio which the
+                        displays the data in the trace views.  <code>StdOutTrace</code> simply
+                        dumps profiling information to standard out.
+                    </p>
                 </li>
                 <li>
-                    <a href='reference-properties'>Properties</a> for configuring the tracing have 
-                    been added.
+                    <p>
+                        <a href='reference-properties'>Properties</a> for configuring the tracing
+                        have been added.
+                    </p>
                 </li>
                 <li>
-                    Views for viewing profiling data have been added to Orbeon Studio.
+                    <p>
+                        Views for viewing profiling data have been added to Orbeon Studio.
+                    </p>
                 </li>
             </ul>
         </section>

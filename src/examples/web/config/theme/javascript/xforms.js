@@ -140,9 +140,18 @@ function xformsStringValue(element) {
     return result;
 }
 
+function xformsReplaceNodeText(node, text) {
+    // Remove content
+    while (node.childNodes.length > 0)
+        node.removeChild(node.firstChild);
+    // Add specified text
+    var textNode = node.ownerDocument.createTextNode(text);
+    node.appendChild(textNode);
+}
+
 /**
- * Replace in a tree a placeholder by some other string in text nodes and attribute values
- */
+* Replace in a tree a placeholder by some other string in text nodes and attribute values
+*/
 function xformsStringReplace(node, placeholder, replacement) {
 
     var placeholderRegExp = new RegExp(placeholder.replace(new RegExp("\\$", "g"), "\\$"), "g");

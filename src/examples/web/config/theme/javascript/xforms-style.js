@@ -212,8 +212,9 @@ function xformsUpdateStyle(element) {
 
             if (className == "xforms-trigger") {
                 // Update label on trigger
-                if (element.labelMessage && element.labelMessage != element.value)
-                    element.value = element.labelMessage;
+                if (element.labelMessage && element.labelMessage != xformsStringValue(element)) {
+                    xformsReplaceNodeText(element, element.labelMessage);
+                }
             }
             
             if (className == "wide-textarea") {

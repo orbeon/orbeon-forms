@@ -13,11 +13,12 @@
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
     <!-- Generate exception document -->
     <p:processor name="oxf:exception">
-        <p:output name="data" id="exception"/>
+        <p:output name="data" id="exception" debug="xxxexception"/>
     </p:processor>
 
     <!-- Format exception page -->
@@ -78,8 +79,7 @@
                                     <th>Line</th>
                                     <th>Column</th>
                                 </tr>
-                                <xsl:for-each select="/exceptions/exception[string(number(line)) != 'NaN' and line > 0]">
-                                    <xsl:sort select="position()" order="descending"/>
+                                <xsl:for-each select="/exceptions/exception/location[line castable as xs:positiveInteger]">
                                     <tr>
                                         <td><xsl:value-of select="system-id"/></td>
                                         <td><xsl:value-of select="line"/></td>
@@ -115,40 +115,42 @@
                                                 </xsl:call-template>
                                             </td>
                                         </tr>
+                                        <xsl:for-each select="location[1]">
+                                            <tr>
+                                                <th>Location</th>
+                                                <td>
+                                                    <xsl:value-of select="system-id"/>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Line</th>
+                                                <td>
+                                                    <xsl:choose>
+                                                        <xsl:when test="line castable as xs:positiveInteger">
+                                                            <xsl:value-of select="line"/>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            N/A
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Column</th>
+                                                <td>
+                                                    <xsl:choose>
+                                                        <xsl:when test="column castable as xs:positiveInteger">
+                                                            <xsl:value-of select="column"/>
+                                                        </xsl:when>
+                                                        <xsl:otherwise>
+                                                            N/A
+                                                        </xsl:otherwise>
+                                                    </xsl:choose>
+                                                </td>
+                                            </tr>
+                                        </xsl:for-each>
                                         <tr>
-                                            <th>Location</th>
-                                            <td>
-                                                <xsl:value-of select="system-id"/>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Line</th>
-                                            <td>
-                                                <xsl:choose>
-                                                    <xsl:when test="string(number(line)) != 'NaN' and line > 0">
-                                                        <xsl:value-of select="line"/>
-                                                    </xsl:when>
-                                                    <xsl:otherwise>
-                                                        N/A
-                                                    </xsl:otherwise>
-                                                </xsl:choose>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th>Column</th>
-                                            <td>
-                                                <xsl:choose>
-                                                    <xsl:when test="string(number(column)) != 'NaN' and column > 0">
-                                                        <xsl:value-of select="column"/>
-                                                    </xsl:when>
-                                                    <xsl:otherwise>
-                                                        N/A
-                                                    </xsl:otherwise>
-                                                </xsl:choose>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th valign="top">Stack Trace<br/>(<xsl:value-of select="count(stack-trace-elements/element)"/> elements)</th>
+                                            <th valign="top">Stack Trace<br/>(<xsl:value-of select="count(stack-trace-elements/element)"/> method calls)</th>
                                             <td>
                                                 <xsl:choose>
                                                     <xsl:when test="stack-trace-elements">
@@ -168,7 +170,7 @@
                                                                     <td><xsl:value-of select="file-name"/></td>
                                                                     <td>
                                                                         <xsl:choose>
-                                                                            <xsl:when test="string(number(line-number)) != 'NaN' and line-number > 0">
+                                                                            <xsl:when test="line-number castable as xs:positiveInteger">
                                                                                 <xsl:value-of select="line-number"/>
                                                                             </xsl:when>
                                                                             <xsl:otherwise>
@@ -196,7 +198,7 @@
                                                                         <td><xsl:value-of select="file-name"/></td>
                                                                         <td>
                                                                             <xsl:choose>
-                                                                                <xsl:when test="string(number(line-number)) != 'NaN' and line-number > 0">
+                                                                                <xsl:when test="line-number castable as xs:positiveInteger">
                                                                                     <xsl:value-of select="line-number"/>
                                                                                 </xsl:when>
                                                                                 <xsl:otherwise>

@@ -48,11 +48,13 @@ public interface ProcessorInputOutput {
 
     public String getName();
 
-    public void setDebug(String debugMessage, LocationData debugLocationData);
+    public void setDebug(String debugMessage);
+
+    public void setLocationData(LocationData locationData);
 
     public String getDebugMessage();
 
-    public LocationData getDebugLocationData();
+    public LocationData getLocationData();
 
     public void setBreakpointKey(BreakpointKey breakpointKey);
 }

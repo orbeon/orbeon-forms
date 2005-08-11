@@ -388,13 +388,12 @@ public class URLGenerator extends ProcessorImpl {
                 } catch (SAXParseException spe) {
                     throw new ValidationException(spe.getMessage(), new LocationData(spe));
                 } catch (ValidationException e) {
-                    LocationData locationData = e.getLocationData();
+                    final LocationData locationData = e.getLocationData();
                     // The system id may not be set
                     if (locationData == null || locationData.getSystemID() == null)
-                        e.setLocationData(new LocationData(configURIReferences.config.getURL().toExternalForm(), -1, -1));
-
-                    throw e;
-
+                        throw ValidationException.wrapException(e, new LocationData(configURIReferences.config.getURL().toExternalForm(), -1, -1));
+                    else
+                        throw e;
                 } catch (OXFException e) {
                     throw e;
                 } catch (Exception e) {

@@ -12,6 +12,7 @@
  *  The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
  */
 package org.orbeon.oxf.processor.transformer.xslt;
+
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -34,10 +35,10 @@ public class StringErrorListener implements ErrorListener {
     }
 
     public void warning(TransformerException exception)
-        throws TransformerException {
+            throws TransformerException {
 
         String message = "Warning: ";
-        if (exception.getLocator()!=null)
+        if (exception.getLocator() != null)
             message += getLocationMessage(exception) + "\n  ";
         message += getExpandedMessage(exception);
         logger.warn(message);
@@ -48,15 +49,15 @@ public class StringErrorListener implements ErrorListener {
         hasErrors = true;
         String locationMessage = getLocationMessage(exception);
         String message = "Error"
-                         + (locationMessage.length() > 0 ? " " + locationMessage + ":\n" : ": ") 
-                         + getExpandedMessage(exception);
+                + (locationMessage.length() > 0 ? " " + locationMessage + ":\n" : ": ")
+                + getExpandedMessage(exception);
         logger.error(message);
         messages.append(message + "\n");
     }
 
     /**
      * Receive notification of a non-recoverable error.
-     *
+     * <p/>
      * <p>The application must assume that the transformation cannot
      * continue after the Transformer has invoked this method,
      * and should continue (if at all) only to collect
@@ -65,10 +66,9 @@ public class StringErrorListener implements ErrorListener {
      *
      * @param exception The error information encapsulated in a
      *                  transformer exception.
-     *
-     * @throws javax.xml.transform.TransformerException if the application
-     * chooses to discontinue the transformation.
-     *
+     * @throws javax.xml.transform.TransformerException
+     *          if the application
+     *          chooses to discontinue the transformation.
      * @see javax.xml.transform.TransformerException
      */
 
@@ -86,29 +86,30 @@ public class StringErrorListener implements ErrorListener {
     }
 
     /**
-    * Get a string identifying the location of an error.
-    */
+     * Get a string identifying the location of an error.
+     */
 
     private static String getLocationMessage(TransformerException err) {
         try {
             SourceLocator loc = err.getLocator();
-            if (loc==null) {
-                if(err.getException() instanceof OXFException) {
+            if (loc == null) {
+                if (err.getException() instanceof OXFException) {
                     Throwable t = OXFException.getRootThrowable(err.getException());
-                    if(t instanceof ValidationException)
-                        return ((ValidationException)t).getLocationData().toString();
+                    // TODO: check this, should maybe look for root validation data?
+                    if (t instanceof ValidationException)
+                        return ((ValidationException) t).getLocationData().toString();
                     else
-                        return ((OXFException)err.getException()).getMessage();
+                        return ((OXFException) err.getException()).getMessage();
                 }
-                return  "";
+                return "";
             } else {
                 String locmessage = "";
                 if (loc instanceof DOMLocator) {
-                    locmessage += "at " + ((DOMLocator)loc).getOriginatingNode().getNodeName() + " ";
+                    locmessage += "at " + ((DOMLocator) loc).getOriginatingNode().getNodeName() + " ";
                 } else if (loc.getClass().getName().equals("net.sf.saxon.instruct.InstructionDetails")
-                           || loc.getClass().getName().equals("org.orbeon.saxon.instruct.InstructionDetails")) {
+                        || loc.getClass().getName().equals("org.orbeon.saxon.instruct.InstructionDetails")) {
                     locmessage += "at "
-                            + loc.getClass().getMethod("getInstructionName", new Class[] {}).invoke(loc, new Object[]{})
+                            + loc.getClass().getMethod("getInstructionName", new Class[]{}).invoke(loc, new Object[]{})
                             + " ";
                 }
                 locmessage += "on line " + loc.getLineNumber() + " ";
@@ -118,7 +119,7 @@ public class StringErrorListener implements ErrorListener {
                 if (loc.getSystemId() != null) {
                     locmessage += "of " + loc.getSystemId();
                 }
-                return  locmessage;
+                return locmessage;
             }
         } catch (IllegalAccessException e) {
             throw new OXFException(e);
@@ -134,8 +135,8 @@ public class StringErrorListener implements ErrorListener {
     }
 
     /**
-    * Get a string containing the message for this exception and all contained exceptions
-    */
+     * Get a string containing the message for this exception and all contained exceptions
+     */
 
     private static String getExpandedMessage(TransformerException err) {
         String message = "";
@@ -145,7 +146,7 @@ public class StringErrorListener implements ErrorListener {
                 break;
             }
             String next = e.getMessage();
-            if (next==null) next="";
+            if (next == null) next = "";
             if (!next.equals("TRaX Transform Exception") && !message.endsWith(next)) {
                 if (!message.equals("")) {
                     message += ": ";
@@ -153,9 +154,9 @@ public class StringErrorListener implements ErrorListener {
                 message += OXFException.getRootThrowable(e).getMessage();
             }
             if (e instanceof TransformerException) {
-                e = ((TransformerException)e).getException();
+                e = ((TransformerException) e).getException();
             } else if (e instanceof SAXException) {
-                e = ((SAXException)e).getException();
+                e = ((SAXException) e).getException();
             } else {
                 // e.printStackTrace();
                 break;

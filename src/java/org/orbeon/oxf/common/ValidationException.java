@@ -18,15 +18,47 @@ import org.xml.sax.SAXParseException;
 
 import javax.xml.transform.SourceLocator;
 import javax.xml.transform.TransformerException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Collections;
+import java.util.Iterator;
 
 public class ValidationException extends OXFException {
+
+    /**
+     * Return all the LocationData information for that throwable
+     */
+    public static List getAllLocationData(Throwable throwable) {
+
+        // List of exceptions starting from root cause
+        final List exceptionChain = new ArrayList();
+        {
+            Throwable currentThrowable = throwable;
+            while (currentThrowable != null) {
+                exceptionChain.add(currentThrowable);
+                currentThrowable = OXFException.getNestedException(currentThrowable);
+            }
+            Collections.reverse(exceptionChain);
+        }
+
+        // Extract all location data starting from root cause and add to the list
+        final List locationDataList = new ArrayList();
+        for (Iterator i = exceptionChain.iterator(); i.hasNext();) {
+            final Throwable currentThrowable = (Throwable) i.next();
+            final List currentLocationDataList = getLocationData(currentThrowable);
+            if (currentLocationDataList != null && currentLocationDataList.size() > 0)
+                locationDataList.addAll(currentLocationDataList);
+        }
+
+        return locationDataList;
+    }
 
     public static LocationData getRootLocationData(Throwable throwable) {
         LocationData locationData = null;
         while (true) {
-            final LocationData currentLocationData = getLocationData(throwable);
-            if (currentLocationData != null)
-                locationData = currentLocationData;
+            final List currentLocationData = getLocationData(throwable);
+            if (currentLocationData != null && currentLocationData.size() > 0)
+                locationData = (LocationData) currentLocationData.get(0);
             final Throwable nested = OXFException.getNestedException(throwable);
             if (nested == null)
                 break;
@@ -35,12 +67,12 @@ public class ValidationException extends OXFException {
         return locationData;
     }
 
-    public static LocationData getLocationData(Throwable throwable) {
+    private static List getLocationData(Throwable throwable) {
         if (throwable instanceof ValidationException) {
             // Regular OPS case
             final ValidationException validationException = (ValidationException) throwable;
-            if (validationException.getLocationData() != null)
-                return validationException.getLocationData();
+            if (validationException.getAllLocationData().size() > 0)
+                return validationException.getAllLocationData();
         } else if (throwable instanceof TransformerException) {
             // Special case of TransformerException
             final TransformerException te = (TransformerException) throwable;
@@ -48,17 +80,17 @@ public class ValidationException extends OXFException {
             if (nestedException == null || nestedException instanceof Exception) {
                 final SourceLocator sourceLocator = te.getLocator();
                 if (sourceLocator != null)
-                    return new LocationData(sourceLocator.getSystemId(), sourceLocator.getLineNumber(), sourceLocator.getColumnNumber());
+                    return Collections.singletonList(new LocationData(sourceLocator.getSystemId(), sourceLocator.getLineNumber(), sourceLocator.getColumnNumber()));
             }
         } else if (throwable instanceof SAXParseException) {
             // Special case of SAXParseException
             final SAXParseException saxParseException = (SAXParseException) throwable;
-            return new LocationData(saxParseException.getSystemId(), saxParseException.getLineNumber(), saxParseException.getColumnNumber());
+            return Collections.singletonList(new LocationData(saxParseException.getSystemId(), saxParseException.getLineNumber(), saxParseException.getColumnNumber()));
         }
         return null;
     }
 
-    private LocationData locationData;
+    private List locationDataList = new ArrayList();
     private String simpleMessage;
 
     public ValidationException(String message, LocationData locationData) {
@@ -73,15 +105,27 @@ public class ValidationException extends OXFException {
         super((locationData == null ? "" : locationData.getSystemID() + ", line "
                 + locationData.getLine() + ", column " + locationData.getCol() + ": ") + message, exception);
         this.simpleMessage = message;
-        this.locationData = locationData;
+        if (locationData != null)
+            this.locationDataList.add(locationData);
     }
 
-    public void setLocationData(LocationData locationData) {
-        this.locationData = locationData;
+    public static ValidationException wrapException(Exception e, LocationData locationData) {
+        if (e instanceof ValidationException) {
+            final ValidationException validationException = (ValidationException) e;
+            if (locationData != null)
+                validationException.locationDataList.add(locationData);
+            return validationException;
+        } else {
+            return new ValidationException(e, locationData);
+        }
     }
 
     public LocationData getLocationData() {
-        return locationData;
+        return (LocationData) ((locationDataList.size() == 0) ? null : locationDataList.get(0));
+    }
+
+    public List getAllLocationData() {
+        return locationDataList;
     }
 
     public String getSimpleMessage() {
@@ -89,10 +133,9 @@ public class ValidationException extends OXFException {
     }
 
     public String getMessage() {
-        if (locationData != null)
-            return locationData + ": " + simpleMessage + "\n" + super.getMessage();
+        if (locationDataList.size() == 0)
+            return locationDataList.get(0) + ": " + simpleMessage + "\n" + super.getMessage();
         else
             return simpleMessage + ": " + super.getMessage();
-
     }
 }

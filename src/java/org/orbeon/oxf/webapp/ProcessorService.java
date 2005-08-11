@@ -130,6 +130,7 @@ public class ProcessorService {
                 InitUtils.runProcessor(errorProcessor, externalContext, pipelineContext);
             } catch (Exception e) {
                 // Something bad happened
+                logger.error(e);
                 serviceStaticError(externalContext, throwable);
             }
         } else {

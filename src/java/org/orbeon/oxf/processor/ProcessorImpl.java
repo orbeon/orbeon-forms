@@ -152,8 +152,8 @@ public abstract class ProcessorImpl implements Processor {
                     return inputValData.getDebugMessage();
                 }
 
-                public LocationData getDebugLocationData() {
-                    return inputValData.getDebugLocationData();
+                public LocationData getLocationData() {
+                    return inputValData.getLocationData();
                 }
 
                 public String getName() {
@@ -172,8 +172,12 @@ public abstract class ProcessorImpl implements Processor {
                     return inputValData.getSchema();
                 }
 
-                public void setDebug(String debugMessage, LocationData locationData) {
-                    inputValData.setDebug(debugMessage, locationData);
+                public void setDebug(String debugMessage) {
+                    inputValData.setDebug(debugMessage);
+                }
+
+                public void setLocationData(LocationData locationData) {
+                    inputValData.setLocationData(locationData);
                 }
 
                 public void setBreakpointKey(BreakpointKey breakpointKey) {
@@ -704,7 +708,7 @@ public abstract class ProcessorImpl implements Processor {
         private String name;
         private String schema;
         private String debugMessage;
-        private LocationData debugLocationData;
+        private LocationData locationData;
         private String systemId;
         private BreakpointKey breakpointKey;
 
@@ -749,13 +753,16 @@ public abstract class ProcessorImpl implements Processor {
             return debugMessage;
         }
 
-        public LocationData getDebugLocationData() {
-            return debugLocationData;
+        public void setLocationData(LocationData locationData) {
+            this.locationData = locationData;
         }
 
-        public void setDebug(String debugMessage, LocationData debugLocationData) {
+        public LocationData getLocationData() {
+            return locationData;
+        }
+
+        public void setDebug(String debugMessage) {
             this.debugMessage = debugMessage;
-            this.debugLocationData = debugLocationData;
         }
 
         public String getSystemId() {
@@ -782,7 +789,7 @@ public abstract class ProcessorImpl implements Processor {
         private String name;
         private String schema;
         private String debugMessage;
-        private LocationData debugLocationData;
+        private LocationData locationData;
         private BreakpointKey breakpointKey;
 
         public ProcessorOutputImpl(Class clazz, String name) {
@@ -826,13 +833,16 @@ public abstract class ProcessorImpl implements Processor {
             return debugMessage;
         }
 
-        public LocationData getDebugLocationData() {
-            return debugLocationData;
+        public LocationData getLocationData() {
+            return locationData;
         }
 
-        public void setDebug(String debugMessage, LocationData debugLocationData) {
+        public void setDebug(String debugMessage) {
             this.debugMessage = debugMessage;
-            this.debugLocationData = debugLocationData;
+        }
+
+        public void setLocationData(LocationData locationData) {
+            this.locationData = locationData;
         }
 
         public void setBreakpointKey(BreakpointKey breakpointKey) {
@@ -879,14 +889,17 @@ public abstract class ProcessorImpl implements Processor {
                 return null;
             }
 
-            public void setDebug(String debugMessage, LocationData locationData) {
+            public void setDebug(String debugMessage) {
             }
 
             public String getDebugMessage() {
                 return null;
             }
 
-            public LocationData getDebugLocationData() {
+            public void setLocationData(LocationData locationData) {
+            }
+
+            public LocationData getLocationData() {
                 return null;
             }
 
@@ -980,8 +993,8 @@ public abstract class ProcessorImpl implements Processor {
                 for (int i = 0; i < 2; i++) {
                     String debugMessage = i == 0 ? getDebugMessage() :
                             getInput() == null ? null : getInput().getDebugMessage();
-                    LocationData debugLocationData = i == 0 ? getDebugLocationData() :
-                            getInput() == null ? null : getInput().getDebugLocationData();
+                    LocationData debugLocationData = i == 0 ? getLocationData() :
+                            getInput() == null ? null : getInput().getLocationData();
                     if (debugMessage != null) {
                         Processor debugProcessor = debugProcessorFactory.createInstance(context);
                         debugProcessor.createInput(INPUT_DATA);
@@ -1144,7 +1157,9 @@ public abstract class ProcessorImpl implements Processor {
             try {
                 getFilter(context).read(context, contentHandler);
             } catch (AbstractMethodError e) {
-                e.printStackTrace();
+                logger.error(e);
+            } catch (Exception e) {
+                throw ValidationException.wrapException(e, getLocationData());
             } finally {
             	if ( tinf != null ) tinf.end = System.currentTimeMillis();
             }

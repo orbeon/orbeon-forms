@@ -483,7 +483,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
     private static void setDebugAndSchema(ProcessorInputOutput processorInputOutput,
                                           LocationData locationData,
                                           String schemaUri, String schemaHref, String debug) {
-        // Set schema
+        // Set schema if any
         if (schemaUri != null) {
             processorInputOutput.setSchema(SchemaRepository.instance().getSchema(schemaUri));
         } else if (schemaHref != null) {
@@ -505,9 +505,12 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             processorInputOutput.setSchema(url);
         }
 
-        // Set debug
+        // Set debug if any
         if (debug != null)
-            processorInputOutput.setDebug(debug, locationData);
+            processorInputOutput.setDebug(debug);
+
+        // Set location data
+        processorInputOutput.setLocationData(locationData);
     }
 
     private static void setBreakpointKey(ProcessorInputOutput processorInputOutput, ASTNodeContainer nodeContainer) {
@@ -538,7 +541,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                     try {
                         readInputAsSAX(context, getPipelineInputFromState(state), contentHandler);
                     } catch (Exception e) {
-                        throw new ValidationException(e, locationData);
+                        throw ValidationException.wrapException(e, locationData);
                     }
                 }
             });
@@ -621,7 +624,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                     try {
                         processor.start(context);
                     } catch (Exception e) {
-                        throw new ValidationException(e, processor.getLocationData());
+                        throw ValidationException.wrapException(e, processor.getLocationData());
                     }
                 }
             });

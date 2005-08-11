@@ -25,6 +25,8 @@ import org.xml.sax.ContentHandler;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.List;
+import java.util.Iterator;
 
 /**
  * ExceptionGenerator produces a structured XML document containing information about the
@@ -54,10 +56,6 @@ public class ExceptionGenerator extends ProcessorImpl {
                     helper.startDocument();
                     helper.startElement(ROOT_ELEMENT_NAME);
 
-                    helper.startElement(LOCATION_DATA_ELEMENT_NAME);
-                    addLocationData(helper, ValidationException.getRootLocationData(throwable));
-                    helper.endElement();
-
                     while (throwable != null) {
                         addThrowable(helper, throwable);
                         throwable = OXFException.getNestedException(throwable);
@@ -82,7 +80,7 @@ public class ExceptionGenerator extends ProcessorImpl {
                 ? ((ValidationException) throwable).getSimpleMessage()
                 : throwable.getMessage());
 
-        addLocationData(helper, ValidationException.getLocationData(throwable));
+        addLocationData(helper, ValidationException.getAllLocationData(throwable));
 
         final OXFException.StackTraceElement[] elements = OXFException.getStackTraceElements(throwable);
 
@@ -110,11 +108,16 @@ public class ExceptionGenerator extends ProcessorImpl {
         helper.endElement();
     }
 
-    public static void addLocationData(ContentHandlerHelper helper, LocationData locationData) {
-        if (locationData != null) {
-            helper.element("system-id", locationData.getSystemID());
-            helper.element("line", Integer.toString(locationData.getLine()));
-            helper.element("column", Integer.toString(locationData.getCol()));
+    public static void addLocationData(ContentHandlerHelper helper, List locationDataList) {
+        if (locationDataList != null) {
+            for (Iterator i = locationDataList.iterator(); i.hasNext();) {
+                final LocationData locationData = (LocationData) i.next();
+                helper.startElement(LOCATION_DATA_ELEMENT_NAME);
+                helper.element("system-id", locationData.getSystemID());
+                helper.element("line", Integer.toString(locationData.getLine()));
+                helper.element("column", Integer.toString(locationData.getCol()));
+                helper.endElement();
+            }
         }
     }
 }

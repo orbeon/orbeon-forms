@@ -456,6 +456,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         rootElement.addElement("version").addText(HTMLSerializer.DEFAULT_VERSION);
                     addInput(new ASTInput("config", config));
                     addInput(new ASTInput("data", new ASTHrefId(epilogueOutput)));
+                    //setLocationData(xxx);
                 }});
             }});
             addWhen(new ASTWhen());
@@ -580,6 +581,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 // Make sure the default-submission output is used for p:choose
                 statementsList.add(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
                     addInput(new ASTInput("data", new ASTHrefId(defaultSubmission)));
+                    //setLocationData(xxx);
                 }});
             }
         } else {
@@ -603,12 +605,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             // Make sure the model output is used for p:choose
             statementsList.add(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
                 addInput(new ASTInput("model", new ASTHrefId(xformsModel)));
+                //setLocationData(xxx);
             }});
         }
 
         // Make sure the xformed-instance id is used for p:choose
         statementsList.add(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
             addInput(new ASTInput("data", new ASTHrefId(xformedInstance)));
+            //setLocationData(xxx);
         }});
 
         // Execute actions
@@ -838,11 +842,13 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // Make sure we execute the model
                     addStatement(new ASTProcessorCall(XMLConstants.NULL_SERIALIZER_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("data", new ASTHrefId(modelData)));
+                        setLocationData((LocationData) pageElement.getData());
                     }});
                     // With XForms NG we want lazy evaluation of the instance, so we should not force a
                     // read on the instance. We just connect the output.
                     addStatement(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("data", new ASTHrefId(modelInstance)));
+                        //setLocationData(xxx);
                     }});
                 }
             }});
@@ -851,10 +857,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 // read on the instance. We just connect the output.
                 addStatement(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
                     addInput(new ASTInput("data", new ASTHrefId(xupdatedInstance)));
+                    //setLocationData(xxx);
                 }});
                 // Just connect the output
                 addStatement(new ASTProcessorCall(XMLConstants.NULL_PROCESSOR_QNAME) {{
                     addInput(new ASTInput("data", new ASTHrefId(actionData)));
+                    //setLocationData(xxx);
                 }});
                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                     addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
@@ -1013,6 +1021,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         }
                         addInput(new ASTInput("data", new ASTHrefId(internalXUpdatedInstance)));
                         addInput(new ASTInput("config", config));
+                        setLocationData((LocationData) resultElement.getData());
                     }});
                 }
                 // Aggregate redirect-url config
@@ -1044,6 +1053,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 // Execute the redirect
                 when.addStatement(new ASTProcessorCall(XMLConstants.REDIRECT_PROCESSOR_QNAME) {{
                     addInput(new ASTInput("data", redirectURLData));// {{setDebug("redirect 2");}}
+                    setLocationData((LocationData) resultElement.getData());
                 }});
             }
         }
@@ -1214,6 +1224,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // XPL file with no output
                     addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/pipeline'") {{
                         addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
+                            // TODO: How to add location data here?
+                            //setLocationData(xxx);
+                            setLocationData(Dom4jUtils.getLocationData());
                             addInput(new ASTInput("config", new ASTHrefId(content)));
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));

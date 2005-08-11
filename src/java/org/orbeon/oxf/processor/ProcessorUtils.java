@@ -49,6 +49,11 @@ public class ProcessorUtils {
         supportedBinaryTypes.put(XMLConstants.XS_ANYURI_QNAME.getQualifiedName(), XMLConstants.XS_ANYURI_QNAME.getQualifiedName());
     }
 
+    public static LocationData getElementLocationData(Element element) {
+        final Object elementData = element.getData();
+        return (elementData instanceof LocationData) ? (LocationData) elementData : null;
+    }
+
     public static boolean isXMLContentType(String contentType) {
         if (contentType == null)
             return false;

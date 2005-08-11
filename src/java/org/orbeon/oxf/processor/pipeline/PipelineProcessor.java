@@ -535,7 +535,11 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             final State state = (State) getParentState(context);
             executeParents(context, new Runnable() {
                 public void run() {
-                    readInputAsSAX(context, getPipelineInputFromState(state), contentHandler);
+                    try {
+                        readInputAsSAX(context, getPipelineInputFromState(state), contentHandler);
+                    } catch (Exception e) {
+                        throw new ValidationException(e, locationData);
+                    }
                 }
             });
         }
@@ -614,7 +618,11 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             final Processor processor = (Processor) i.next();
             executeChildren(context, new Runnable() {
                 public void run() {
-                    processor.start(context);
+                    try {
+                        processor.start(context);
+                    } catch (Exception e) {
+                        throw new ValidationException(e, processor.getLocationData());
+                    }
                 }
             });
         }

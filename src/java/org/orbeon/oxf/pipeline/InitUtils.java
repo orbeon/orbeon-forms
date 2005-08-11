@@ -23,10 +23,7 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.pipeline.api.ProcessorDefinition;
-import org.orbeon.oxf.processor.Processor;
-import org.orbeon.oxf.processor.ProcessorFactoryRegistry;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.XMLProcessorRegistry;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.util.AttributesToMap;
@@ -168,8 +165,7 @@ public class InitUtils {
                 PipelineUtils.connect(urlGenerator, ProcessorImpl.OUTPUT_DATA, processor, name);
             } else if (o instanceof Element) {
                 final Element elt = (Element) o;
-                final Object elementData = elt.getData();
-                final LocationData ld = (elementData instanceof LocationData) ? (LocationData) elt.getData() : null;
+                final LocationData ld = ProcessorUtils.getElementLocationData(elt);
                 final String lsid = ld == null ? null : ld.getSystemID();
                 final String sid = lsid == null ? DOMGenerator.DefaultContext : lsid;
                 DOMGenerator domGenerator = PipelineUtils.createDOMGenerator

@@ -24,7 +24,7 @@
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#exception"/>
         <p:input name="config">
-            <xsl:stylesheet version="1.0" >
+            <xsl:stylesheet version="2.0">
                 <xsl:import href="oxf:/oxf/xslt/utils/utils.xsl"/>
                 <xsl:template match="/">
                     <html xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/1999/xhtml">
@@ -34,33 +34,21 @@
                         <body>
                             <h1>Orbeon PresentationServer (OPS) - Error Page</h1>
 
+                            <!--
+                            <h2>Root Location Information</h2>
                             <table class="gridtable">
-                                <tr>
-                                    <th>Type</th>
-                                    <td>
-                                        <xsl:value-of select="/exceptions/exception/type"/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Message</th>
-                                    <td>
-                                        <xsl:call-template name="htmlize-line-breaks">
-                                            <xsl:with-param name="text" select="replace(string(/exceptions/exception/message), ' ', '&#160;')"/>
-                                        </xsl:call-template>
-                                    </td>
-                                </tr>
                                 <tr>
                                     <th>Location</th>
                                     <td>
-                                        <xsl:value-of select="/exceptions/exception/system-id"/>
+                                        <xsl:value-of select="/exceptions/location/system-id"/>
                                     </td>
                                 </tr>
                                 <tr>
                                     <th>Line</th>
                                     <td>
                                         <xsl:choose>
-                                            <xsl:when test="string(number(/exceptions/exception/line)) != 'NaN' and /exceptions/exception/line > 0">
-                                                <xsl:value-of select="/exceptions/exception/line"/>
+                                            <xsl:when test="string(number(/exceptions/location/line)) != 'NaN' and /exceptions/location/line > 0">
+                                                <xsl:value-of select="/exceptions/location/line"/>
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 N/A
@@ -72,8 +60,8 @@
                                     <th>Column</th>
                                     <td>
                                         <xsl:choose>
-                                            <xsl:when test="string(number(/exceptions/exception/column)) != 'NaN' and /exceptions/exception/column > 0">
-                                                <xsl:value-of select="/exceptions/exception/column"/>
+                                            <xsl:when test="string(number(/exceptions/location/column)) != 'NaN' and /exceptions/location/column > 0">
+                                                <xsl:value-of select="/exceptions/location/column"/>
                                             </xsl:when>
                                             <xsl:otherwise>
                                                 N/A
@@ -81,55 +69,165 @@
                                         </xsl:choose>
                                     </td>
                                 </tr>
-                                <tr>
-                                    <th valign="top">Stack Trace</th>
-                                    <td>
-                                        <xsl:choose>
-                                            <xsl:when test="/exceptions/exception/stack-trace-elements">
-                                                <table class="gridtable" width="100%">
-                                                    <tr>
-                                                        <th>Class Name</th>
-                                                        <th>Method Name</th>
-                                                        <th>File Name</th>
-                                                        <th>Line Number</th>
-                                                    </tr>
-                                                    <xsl:for-each select="/exceptions/exception/stack-trace-elements/element">
-                                                        <tr>
-                                                            <td><xsl:value-of select="class-name"/></td>
-                                                            <td><xsl:value-of select="method-name"/></td>
-                                                            <td><xsl:value-of select="file-name"/></td>
-                                                            <td>
-                                                                <xsl:choose>
-                                                                    <xsl:when test="string(number(line-number)) != 'NaN' and line-number > 0">
-                                                                        <xsl:value-of select="line-number"/>
-                                                                    </xsl:when>
-                                                                    <xsl:otherwise>
-                                                                        N/A
-                                                                    </xsl:otherwise>
-                                                                </xsl:choose>
-                                                            </td>
-                                                        </tr>
-                                                    </xsl:for-each>
-                                                </table>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                <code>
-                                                    <xsl:value-of select="/exceptions/exception/stack-trace"/>
-                                                </code>
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </td>
-                                </tr>
                             </table>
-
+                            -->
+                            <h2>OPS Call Stack</h2>
+                            <table class="gridtable">
+                                <tr>
+                                    <th>System Id</th>
+                                    <th>Line</th>
+                                    <th>Column</th>
+                                </tr>
+                                <xsl:for-each select="/exceptions/exception[string(number(line)) != 'NaN' and line > 0]">
+                                    <xsl:sort select="position()" order="descending"/>
+                                    <tr>
+                                        <td><xsl:value-of select="system-id"/></td>
+                                        <td><xsl:value-of select="line"/></td>
+                                        <td><xsl:value-of select="column"/></td>
+                                    </tr>
+                                </xsl:for-each>
+                            </table>
+                            <h2>Java Exceptions (<xsl:value-of select="count(/exceptions/exception)"/> total)</h2>
+                            <table class="gridtable" width="100%">
+                                <xsl:for-each select="/exceptions/exception">
+                                    <xsl:sort select="position()" order="descending"/>
+                                    <xsl:variable name="exception-position" select="position()"/>
+                                    <tr>
+                                        <th colspan="2" style="text-align: left">
+                                            <span onclick="getElementById('exception-{$exception-position}').style.display = 'table-row-group'">
+                                                <img src="/images/plus.gif" border="0" alt="Toggle"/>
+                                            </span>
+                                            Java Exception: <xsl:value-of select="type"/>
+                                        </th>
+                                    </tr>
+                                    <tbody style="display: {if ($exception-position = 1) then 'table-row-group' else 'none'}" id="exception-{$exception-position}">
+                                        <tr>
+                                            <th>Exception Class</th>
+                                            <td>
+                                                <xsl:value-of select="type"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Message</th>
+                                            <td>
+                                                <xsl:call-template name="htmlize-line-breaks">
+                                                    <xsl:with-param name="text" select="replace(string(message), ' ', '&#160;')"/>
+                                                </xsl:call-template>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Location</th>
+                                            <td>
+                                                <xsl:value-of select="system-id"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Line</th>
+                                            <td>
+                                                <xsl:choose>
+                                                    <xsl:when test="string(number(line)) != 'NaN' and line > 0">
+                                                        <xsl:value-of select="line"/>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        N/A
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Column</th>
+                                            <td>
+                                                <xsl:choose>
+                                                    <xsl:when test="string(number(column)) != 'NaN' and column > 0">
+                                                        <xsl:value-of select="column"/>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        N/A
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th valign="top">Stack Trace<br/>(<xsl:value-of select="count(stack-trace-elements/element)"/> elements)</th>
+                                            <td>
+                                                <xsl:choose>
+                                                    <xsl:when test="stack-trace-elements">
+                                                        <table class="gridtable" width="100%">
+                                                            <tr>
+                                                                <th>Class Name</th>
+                                                                <th>Method Name</th>
+                                                                <th>File Name</th>
+                                                                <th>Line Number</th>
+                                                            </tr>
+                                                            <xsl:for-each select="stack-trace-elements/element[position() le 10]">
+                                                                <tr>
+                                                                    <td style="color: {if (contains(class-name, 'org.orbeon')) then 'green' else 'black'}">
+                                                                        <xsl:value-of select="class-name"/>
+                                                                    </td>
+                                                                    <td><xsl:value-of select="method-name"/></td>
+                                                                    <td><xsl:value-of select="file-name"/></td>
+                                                                    <td>
+                                                                        <xsl:choose>
+                                                                            <xsl:when test="string(number(line-number)) != 'NaN' and line-number > 0">
+                                                                                <xsl:value-of select="line-number"/>
+                                                                            </xsl:when>
+                                                                            <xsl:otherwise>
+                                                                                N/A
+                                                                            </xsl:otherwise>
+                                                                        </xsl:choose>
+                                                                    </td>
+                                                                </tr>
+                                                            </xsl:for-each>
+                                                            <tr>
+                                                                <td colspan="4">
+                                                                    <span onclick="getElementById('trace-{$exception-position}').style.display = 'table-row-group'">
+                                                                        <img src="/images/plus.gif" border="0" alt="Toggle"/> More...
+                                                                    </span>
+                                                                </td>
+                                                            </tr>
+                                                            <tbody style="display: none" id="trace-{$exception-position}">
+                                                                <xsl:for-each select="stack-trace-elements/element[position() gt 10]">
+                                                                <!--<tbody style="visibility: collapse" id="trace">-->
+                                                                    <tr>
+                                                                        <td style="color: {if (contains(class-name, 'org.orbeon')) then 'green' else 'black'}">
+                                                                            <xsl:value-of select="class-name"/>
+                                                                        </td>
+                                                                        <td><xsl:value-of select="method-name"/></td>
+                                                                        <td><xsl:value-of select="file-name"/></td>
+                                                                        <td>
+                                                                            <xsl:choose>
+                                                                                <xsl:when test="string(number(line-number)) != 'NaN' and line-number > 0">
+                                                                                    <xsl:value-of select="line-number"/>
+                                                                                </xsl:when>
+                                                                                <xsl:otherwise>
+                                                                                    N/A
+                                                                                </xsl:otherwise>
+                                                                            </xsl:choose>
+                                                                        </td>
+                                                                    </tr>
+                                                                </xsl:for-each>
+                                                            </tbody>
+                                                        </table>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <code>
+                                                            <xsl:value-of select="stack-trace"/>
+                                                        </code>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </xsl:for-each>
+                            </table>
                         </body>
                     </html>
                 </xsl:template>
                 <xsl:template name="htmlize-line-breaks">
                     <xsl:param name="text"/>
                     <xsl:choose>
-                        <xsl:when test="contains($text, '&#10;')">
-                            <xsl:value-of select="substring-before($text, '&#10;')"/>
+                        <xsl:when test="contains($text, '&#13;')">
+                            <xsl:value-of select="substring-before($text, '&#13;')"/>
                             <br/>
                             <xsl:call-template name="htmlize-line-breaks">
                                 <xsl:with-param name="text" select="substring-after($text, '&#10;')"/>

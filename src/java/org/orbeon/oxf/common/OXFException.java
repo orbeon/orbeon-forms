@@ -18,6 +18,7 @@ import org.xml.sax.SAXException;
 import javax.xml.transform.TransformerException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,8 +33,13 @@ public class OXFException extends RuntimeException {
         "org.apache.batik.transcoder.TranscoderException", "getException",
         "javax.portlet.PortletException", "getCause",
         "orbeon.apache.xml.utils.WrappedRuntimeException", "getException",
+        "org.iso_relax.verifier.VerifierConfigurationException", "getCauseException",
         "com.drew.lang.CompoundException", "getInnerException",
         "java.lang.Throwable", "getCause" // Since JDK 1.4, all exceptions may support this
+    };
+
+    private static final String[] exceptionFields = {
+        "com.sun.msv.verifier.jarv.FactoryImpl$WrapperException", "e" // This doesn't work because the class is private
     };
 
     /**
@@ -53,33 +59,53 @@ public class OXFException extends RuntimeException {
         } else {
             // Try to get a nested throwable by using introspection
             // Create a map of all classes and interfaces implemented by the throwable
-            Map throwableClasses = new HashMap();
-            Class throwableClass = t.getClass();
+            final Map throwableClasses = new HashMap();
+            final Class throwableClass = t.getClass();
             throwableClasses.put(throwableClass.getName(), throwableClass);
             Class superClass = throwableClass;
             while ((superClass = superClass.getSuperclass()) != null) {
                 throwableClasses.put(superClass.getName(), superClass);
             }
-            Class[] interfaces = throwableClass.getInterfaces();
+            final Class[] interfaces = throwableClass.getInterfaces();
             for (int i = 0; i < interfaces.length; i++) {
                 throwableClasses.put(interfaces[i].getName(), interfaces[i]);
             }
 
-            // Try to find a match
+            // Try to find a match with getters
             for (int i = 0; i < exceptionGetters.length; i += 2) {
-                Class c = (Class) throwableClasses.get(exceptionGetters[i]);
+                final Class c = (Class) throwableClasses.get(exceptionGetters[i]);
                 if (c != null) {
                     // Found
-                    String getterName = exceptionGetters[i + 1];
+                    final String getterName = exceptionGetters[i + 1];
                     try {
-                        Method method = c.getMethod(getterName, null);
-                        Object returnValue = method.invoke(t, null);
+                        final Method method = c.getMethod(getterName, null);
+                        final Object returnValue = method.invoke(t, null);
                         if (returnValue instanceof Throwable)// It should be
                             nested = (Throwable) returnValue;
                         break;
                     } catch (Exception f) {
                         // Ignore. In particular, we ignore because of JDK 1.4's
                         // getCause() which may not be implemented.
+                    }
+                }
+            }
+            if (nested == null) {
+                // Try to find a match with fields
+                for (int i = 0; i < exceptionFields.length; i += 2) {
+                    final Class c = (Class) throwableClasses.get(exceptionFields[i]);
+                    if (c != null) {
+                        // Found
+                        final String fieldName = exceptionFields[i + 1];
+                        try {
+                            final Field field = c.getField(fieldName);
+                            final Object returnValue = field.get(t);
+                            if (returnValue instanceof Throwable)// It should be
+                                nested = (Throwable) returnValue;
+                            break;
+                        } catch (Exception f) {
+                            // Ignore. In particular, we ignore because of JDK 1.4's
+                            // getCause() which may not be implemented.
+                        }
                     }
                 }
             }

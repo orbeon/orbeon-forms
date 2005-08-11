@@ -26,7 +26,15 @@ import org.xml.sax.ContentHandler;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+/**
+ * ExceptionGenerator produces a structured XML document containing information about the
+ * throwable stored into the PipelineContext.
+ */
 public class ExceptionGenerator extends ProcessorImpl {
+
+    private static final String ROOT_ELEMENT_NAME = "exceptions";
+    private static final String LOCATION_DATA_ELEMENT_NAME = "location";
+    private static final String EXCEPTION_ELEMENT_NAME = "exception";
 
     public ExceptionGenerator() {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
@@ -35,16 +43,26 @@ public class ExceptionGenerator extends ProcessorImpl {
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext context, ContentHandler contentHandler) {
+                // Get top throwable
                 Throwable throwable = (Throwable) context.getAttribute(PipelineContext.THROWABLE);
-                LocationData locationData = (LocationData) context.getAttribute(PipelineContext.LOCATION_DATA);
+                // Throwable is mandatory
                 if (throwable == null)
                     throw new OXFException("Missing throwable object in ExceptionGenerator");
+                // Write out document
                 try {
-                    ContentHandlerHelper helper = new ContentHandlerHelper(contentHandler);
+                    final ContentHandlerHelper helper = new ContentHandlerHelper(contentHandler);
                     helper.startDocument();
-                    String rootElementName = "exceptions";
-                    helper.startElement(rootElementName);
-                    addThrowable(helper, throwable, locationData);
+                    helper.startElement(ROOT_ELEMENT_NAME);
+
+                    helper.startElement(LOCATION_DATA_ELEMENT_NAME);
+                    addLocationData(helper, ValidationException.getRootLocationData(throwable));
+                    helper.endElement();
+
+                    while (throwable != null) {
+                        addThrowable(helper, throwable);
+                        throwable = OXFException.getNestedException(throwable);
+                    }
+
                     helper.endElement();
                     helper.endDocument();
                 } catch (Exception e) {
@@ -56,28 +74,23 @@ public class ExceptionGenerator extends ProcessorImpl {
         return output;
     }
 
-    public static void addThrowable(ContentHandlerHelper helper, Throwable throwable, LocationData locationData) {
-        String exceptionElementName = "exception";
-        helper.startElement(exceptionElementName);
+    public static void addThrowable(ContentHandlerHelper helper, Throwable throwable) {
+        helper.startElement(EXCEPTION_ELEMENT_NAME);
 
-        helper.element("type", throwable.getClass().toString());
+        helper.element("type", throwable.getClass().getName());
         helper.element("message", throwable instanceof ValidationException
                 ? ((ValidationException) throwable).getSimpleMessage()
                 : throwable.getMessage());
 
-        if (locationData != null) {
-            helper.element("system-id", locationData.getSystemID());
-            helper.element("line", Integer.toString(locationData.getLine()));
-            helper.element("column", Integer.toString(locationData.getCol()));
-        }
+        addLocationData(helper, ValidationException.getLocationData(throwable));
 
-        OXFException.StackTraceElement[] elements = OXFException.getStackTraceElements(throwable);
+        final OXFException.StackTraceElement[] elements = OXFException.getStackTraceElements(throwable);
 
         if (elements != null) {
             // We were able to get a structured stack trace
             helper.startElement("stack-trace-elements");
             for (int i = 0; i < elements.length; i++) {
-                OXFException.StackTraceElement element = elements[i];
+                final OXFException.StackTraceElement element = elements[i];
                 helper.startElement("element");
                 helper.element("class-name", element.getClassName());
                 helper.element("method-name", element.getMethodName());
@@ -88,12 +101,20 @@ public class ExceptionGenerator extends ProcessorImpl {
             helper.endElement();
         } else {
             // Just output the String version of the stack trace
-            StringWriter stringWriter = new StringWriter();
-            PrintWriter printWriter = new PrintWriter(stringWriter);
+            final StringWriter stringWriter = new StringWriter();
+            final PrintWriter printWriter = new PrintWriter(stringWriter);
             throwable.printStackTrace(printWriter);
             helper.element("stack-trace", stringWriter.toString());
         }
 
         helper.endElement();
+    }
+
+    public static void addLocationData(ContentHandlerHelper helper, LocationData locationData) {
+        if (locationData != null) {
+            helper.element("system-id", locationData.getSystemID());
+            helper.element("line", Integer.toString(locationData.getLine()));
+            helper.element("column", Integer.toString(locationData.getCol()));
+        }
     }
 }

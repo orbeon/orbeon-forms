@@ -62,8 +62,8 @@ public class PipelineContext {
     // Internal pipeline engine use
     public static final String PARENT_PROCESSORS = "parent-processors";
 
+    // Throwable passed set by ProcessorService
     public static final String THROWABLE = "throwable";
-    public static final String LOCATION_DATA = "location-data";
 
     public static final String REQUEST_GENERATOR_CONTEXT = "request-generator-context";
     public static final String SQL_PROCESSOR_CONTEXT = "sql-processor-context";

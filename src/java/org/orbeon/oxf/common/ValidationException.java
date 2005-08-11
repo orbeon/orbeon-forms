@@ -14,33 +14,48 @@
 package org.orbeon.oxf.common;
 
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.xml.sax.SAXParseException;
 
 import javax.xml.transform.SourceLocator;
 import javax.xml.transform.TransformerException;
 
 public class ValidationException extends OXFException {
 
-    public static LocationData getRootLocationData(Throwable e) {
+    public static LocationData getRootLocationData(Throwable throwable) {
         LocationData locationData = null;
         while (true) {
-            if (e instanceof ValidationException) {
-                ValidationException validationException = (ValidationException) e;
-                if (validationException.getLocationData() != null)
-                    locationData = validationException.getLocationData();
-            } else if (e instanceof TransformerException) {
-                TransformerException te = (TransformerException) e;
-                Throwable nestedException = te.getException();
-                if (nestedException == null || nestedException instanceof Exception) {
-                    SourceLocator sourceLocator = te.getLocator();
-                    if (sourceLocator != null)
-                        locationData = new LocationData(sourceLocator.getSystemId(), sourceLocator.getLineNumber(), sourceLocator.getColumnNumber());
-                }
-            }
-            Throwable nested = OXFException.getNestedException(e);
-            if (nested == null) break;
-            e = nested;
+            final LocationData currentLocationData = getLocationData(throwable);
+            if (currentLocationData != null)
+                locationData = currentLocationData;
+            final Throwable nested = OXFException.getNestedException(throwable);
+            if (nested == null)
+                break;
+            throwable = nested;
         }
         return locationData;
+    }
+
+    public static LocationData getLocationData(Throwable throwable) {
+        if (throwable instanceof ValidationException) {
+            // Regular OPS case
+            final ValidationException validationException = (ValidationException) throwable;
+            if (validationException.getLocationData() != null)
+                return validationException.getLocationData();
+        } else if (throwable instanceof TransformerException) {
+            // Special case of TransformerException
+            final TransformerException te = (TransformerException) throwable;
+            final Throwable nestedException = te.getException();
+            if (nestedException == null || nestedException instanceof Exception) {
+                final SourceLocator sourceLocator = te.getLocator();
+                if (sourceLocator != null)
+                    return new LocationData(sourceLocator.getSystemId(), sourceLocator.getLineNumber(), sourceLocator.getColumnNumber());
+            }
+        } else if (throwable instanceof SAXParseException) {
+            // Special case of SAXParseException
+            final SAXParseException saxParseException = (SAXParseException) throwable;
+            return new LocationData(saxParseException.getSystemId(), saxParseException.getLineNumber(), saxParseException.getColumnNumber());
+        }
+        return null;
     }
 
     private LocationData locationData;
@@ -75,9 +90,9 @@ public class ValidationException extends OXFException {
 
     public String getMessage() {
         if (locationData != null)
-            return locationData + " : " + simpleMessage + " : " + super.getMessage();
+            return locationData + ": " + simpleMessage + "\n" + super.getMessage();
         else
-            return simpleMessage + " : " + super.getMessage();
+            return simpleMessage + ": " + super.getMessage();
 
     }
 }

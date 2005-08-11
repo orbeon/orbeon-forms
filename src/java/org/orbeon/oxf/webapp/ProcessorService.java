@@ -95,8 +95,6 @@ public class ProcessorService {
             InitUtils.runProcessor(mainProcessor, externalContext, pipelineContext);
         } catch (Exception e) {
             // Something bad happened
-            LocationData locationData = ValidationException.getRootLocationData(e);
-            Throwable throwable = OXFException.getRootThrowable(e);
             // Store the exception; needed if we are in a portlet
             ExternalContext.Request request = externalContext.getRequest();
             request.getAttributesMap().put(OXF_EXCEPTION, e);
@@ -105,9 +103,9 @@ public class ProcessorService {
                 ExternalContext.Response response = externalContext.getResponse();
                 if (response != null) {
                     if (!response.isCommitted()) {
-                        serviceError(externalContext, throwable, locationData);
+                        serviceError(externalContext, e);
                     } else {
-                        serviceStaticError(externalContext, throwable, locationData);
+                        serviceStaticError(externalContext, e);
                     }
                 }
             } catch (IOException ioe) {
@@ -116,12 +114,12 @@ public class ProcessorService {
         }
     }
 
-    private void serviceError(ExternalContext externalContext, Throwable rootException, LocationData locationData) throws IOException {
+    private void serviceError(ExternalContext externalContext, Throwable throwable) throws IOException {
         if (errorProcessor != null) {
             // Create pipeline context
             PipelineContext pipelineContext = new PipelineContext();
-            pipelineContext.setAttribute(PipelineContext.THROWABLE, rootException);
-            pipelineContext.setAttribute(PipelineContext.LOCATION_DATA, locationData);
+            pipelineContext.setAttribute(PipelineContext.THROWABLE, throwable);
+//            pipelineContext.setAttribute(PipelineContext.LOCATION_DATA, locationData);
             // NOTE: Should this just be available from the ExternalContext?
             pipelineContext.setAttribute(PipelineContext.JNDI_CONTEXT, jndiContext);
             try {
@@ -132,17 +130,21 @@ public class ProcessorService {
                 InitUtils.runProcessor(errorProcessor, externalContext, pipelineContext);
             } catch (Exception e) {
                 // Something bad happened
-                serviceStaticError(externalContext, rootException, locationData);
+                serviceStaticError(externalContext, throwable);
             }
         } else {
-            serviceStaticError(externalContext, rootException, locationData);
+            serviceStaticError(externalContext, throwable);
         }
     }
 
-    private void serviceStaticError(ExternalContext externalContext, Throwable rootException, LocationData locationData) throws IOException {
+    private void serviceStaticError(ExternalContext externalContext, Throwable throwable) throws IOException {
 
-        StringBuffer sb = new StringBuffer();
-        ExternalContext.Response response = externalContext.getResponse();
+        // Get root exception information
+        final Throwable rootThrowable = OXFException.getRootThrowable(throwable);
+        final LocationData rootLocationData = ValidationException.getRootLocationData(throwable);
+
+        final StringBuffer sb = new StringBuffer();
+        final ExternalContext.Response response = externalContext.getResponse();
         if (!response.isCommitted()) {
             // Send new headers and HTML prologue
             response.reset();
@@ -182,26 +184,26 @@ public class ProcessorService {
 
         // Message and exception
         sb.append("<tr><th>Type</th><td>")
-                .append(rootException.getClass())
+                .append(rootThrowable.getClass())
                 .append("</td></tr>");
         sb.append("<tr><th>Message</th><td>")
-                .append(XMLUtils.escapeHTML(rootException.getMessage())).
+                .append(XMLUtils.escapeHTML(rootThrowable.getMessage())).
                 append("</td></tr>");
-        if (locationData != null) {
+        if (rootLocationData != null) {
             sb.append("<tr><th>Location</th><td>")
-                    .append(locationData.getSystemID())
+                    .append(rootLocationData.getSystemID())
                     .append("</td></tr>");
             sb.append("<tr><th>Line</th><td>")
-                    .append(locationData.getLine())
+                    .append(rootLocationData.getLine())
                     .append("</td></tr>");
             sb.append("<tr><th>Column</th><td>")
-                    .append(locationData.getCol())
+                    .append(rootLocationData.getCol())
                     .append("</td></tr>");
         }
 
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
-        rootException.printStackTrace(printWriter);
+        final StringWriter stringWriter = new StringWriter();
+        final PrintWriter printWriter = new PrintWriter(stringWriter);
+        rootThrowable.printStackTrace(printWriter);
         sb.append("<tr><th valign=\"top\">Stack Trace</th><td><pre>")
                 .append(XMLUtils.escapeHTML(stringWriter.toString()))
                 .append("</pre></td></tr></table></body></html>");

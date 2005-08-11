@@ -18,7 +18,7 @@
 
     <!-- Generate exception document -->
     <p:processor name="oxf:exception">
-        <p:output name="data" id="exception" debug="xxxexception"/>
+        <p:output name="data" id="exception"/>
     </p:processor>
 
     <!-- Format exception page -->
@@ -34,44 +34,6 @@
                         </head>
                         <body>
                             <h1>Orbeon PresentationServer (OPS) - Error Page</h1>
-
-                            <!--
-                            <h2>Root Location Information</h2>
-                            <table class="gridtable">
-                                <tr>
-                                    <th>Location</th>
-                                    <td>
-                                        <xsl:value-of select="/exceptions/location/system-id"/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Line</th>
-                                    <td>
-                                        <xsl:choose>
-                                            <xsl:when test="string(number(/exceptions/location/line)) != 'NaN' and /exceptions/location/line > 0">
-                                                <xsl:value-of select="/exceptions/location/line"/>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                N/A
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Column</th>
-                                    <td>
-                                        <xsl:choose>
-                                            <xsl:when test="string(number(/exceptions/location/column)) != 'NaN' and /exceptions/location/column > 0">
-                                                <xsl:value-of select="/exceptions/location/column"/>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                N/A
-                                            </xsl:otherwise>
-                                        </xsl:choose>
-                                    </td>
-                                </tr>
-                            </table>
-                            -->
                             <h2>OPS Call Stack</h2>
                             <table class="gridtable">
                                 <tr>
@@ -79,7 +41,7 @@
                                     <th>Line</th>
                                     <th>Column</th>
                                 </tr>
-                                <xsl:for-each select="/exceptions/exception/location[line castable as xs:positiveInteger]">
+                                <xsl:for-each select="/exceptions/exception[location][1]/location[line castable as xs:positiveInteger and not(ends-with(system-id, '.java'))]">
                                     <tr>
                                         <td><xsl:value-of select="system-id"/></td>
                                         <td><xsl:value-of select="line"/></td>
@@ -97,7 +59,8 @@
                                             <span onclick="getElementById('exception-{$exception-position}').style.display = 'table-row-group'">
                                                 <img src="/images/plus.gif" border="0" alt="Toggle"/>
                                             </span>
-                                            Java Exception: <xsl:value-of select="type"/>
+                                            <xsl:text> </xsl:text>
+                                            <xsl:value-of select="type"/>
                                         </th>
                                     </tr>
                                     <tbody style="display: {if ($exception-position = 1) then 'table-row-group' else 'none'}" id="exception-{$exception-position}">

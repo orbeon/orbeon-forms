@@ -214,7 +214,8 @@ public class MSVValidationProcessor extends ProcessorImpl {
                     if(logger.isDebugEnabled()) {
                         logger.debug(schemaId+" validation completed in "+(System.currentTimeMillis()-time));
                     }
-
+                } catch (OXFException e) {
+                    throw e;
                 } catch (Exception e) {
                     throw new OXFException(e);
                 }

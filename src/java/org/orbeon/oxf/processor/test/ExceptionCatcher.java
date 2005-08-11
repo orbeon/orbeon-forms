@@ -48,7 +48,7 @@ public class ExceptionCatcher extends ProcessorImpl {
                     helper.startDocument();
                     String rootElementName = "exceptions";
                     helper.startElement(rootElementName);
-                    ExceptionGenerator.addThrowable(helper, e, null);
+                    ExceptionGenerator.addThrowable(helper, e);
                     helper.endElement();
                     helper.endDocument();
                 }

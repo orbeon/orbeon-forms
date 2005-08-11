@@ -841,6 +841,14 @@
             </section>
         </section>
         <section>
+            <title>Enhanced Error Reporting</title>
+            <p>
+                When a Java exception occurs, OPS now reports the entire hierarchy of exceptions
+                generated. In addition, the OPS stack trace is display, which provides useful
+                OPS-oriented information about the events leading to an exception. TODO
+            </p>
+        </section>
+        <section>
             <title>XPL Profiling Support</title>
             <ul>
                 <li>

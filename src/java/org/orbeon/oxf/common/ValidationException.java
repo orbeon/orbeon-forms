@@ -133,7 +133,7 @@ public class ValidationException extends OXFException {
     }
 
     public String getMessage() {
-        if (locationDataList.size() == 0)
+        if (locationDataList.size() > 0)
             return locationDataList.get(0) + ": " + simpleMessage + "\n" + super.getMessage();
         else
             return simpleMessage + ": " + super.getMessage();

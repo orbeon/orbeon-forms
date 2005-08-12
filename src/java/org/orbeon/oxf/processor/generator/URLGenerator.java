@@ -277,7 +277,7 @@ public class URLGenerator extends ProcessorImpl {
                                 // Create configuration object
                                 try {
                                     // Use location data if present so that relative URLs can be supported
-                                    LocationData locationData = getLocationData();
+                                    LocationData locationData = URLGenerator.this.getLocationData();
                                     URL fullURL = (locationData != null && locationData.getSystemID() != null)
                                             ? URLFactory.createURL(locationData.getSystemID(), url)
                                             : URLFactory.createURL(url);

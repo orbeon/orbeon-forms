@@ -165,7 +165,7 @@ public class JavaProcessor extends ProcessorImpl {
                     String sourcePathAttributeValue = configElement.attributeValue("sourcepath");
                     if (sourcePathAttributeValue == null)
                         sourcePathAttributeValue = ".";
-                    File sourcePath = getFileFromURL(sourcePathAttributeValue, getLocationData());
+                    File sourcePath = getFileFromURL(sourcePathAttributeValue, JavaProcessor.this.getLocationData());
                     if (!sourcePath.isDirectory())
                         throw new ValidationException("Invalid sourcepath attribute: cannot find directory for URL: " + sourcePathAttributeValue, (LocationData) configElement.getData());
                     try {

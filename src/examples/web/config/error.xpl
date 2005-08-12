@@ -37,6 +37,16 @@
                             <title>Orbeon PresentationServer (OPS) - Error Page</title>
                         </head>
                         <body>
+                            <script>
+                                function hideShowTBody(id) {
+                                    var tbody = document.getElementById(id);
+                                    for (var i = 0; tbody.rows.length > i; i++) {
+                                        var row = tbody.rows[i];
+                                        if (row.style.display == 'none') row.style.display = '';
+                                        else row.style.display = 'none';
+                                    }
+                                }
+                            </script>
                             <div class="maincontent" style="border: none">
                             <h1>Orbeon PresentationServer (OPS) - Error Page</h1>
                             <h2>Error Message</h2>
@@ -83,21 +93,22 @@
                                     <xsl:variable name="exception-position" select="position()"/>
                                     <tr>
                                         <th colspan="2" style="text-align: left">
-                                            <span onclick="getElementById('exception-{$exception-position}').style.display = 'table-row-group'">
+                                            <span onclick="hideShowTBody('exception-{$exception-position}')">
                                                 <img src="/images/plus.gif" border="0" alt="Toggle"/>
                                             </span>
                                             <xsl:text> </xsl:text>
                                             <xsl:value-of select="type"/>
                                         </th>
                                     </tr>
-                                    <tbody style="display: {if ($exception-position = 1) then 'table-row-group' else 'none'}" id="exception-{$exception-position}">
-                                        <tr>
+                                    <xsl:variable name="exception-style" select="concat('display: ', if ($exception-position = 1) then '' else 'none')"/>
+                                    <tbody id="exception-{$exception-position}">
+                                        <tr style="{$exception-style}">
                                             <th>Exception Class</th>
                                             <td>
                                                 <xsl:value-of select="type"/>
                                             </td>
                                         </tr>
-                                        <tr>
+                                        <tr style="{$exception-style}">
                                             <th>Message</th>
                                             <td style="color: red">
                                                 <xsl:call-template name="htmlize-line-breaks">
@@ -106,13 +117,13 @@
                                             </td>
                                         </tr>
                                         <xsl:for-each select="location[1]">
-                                            <tr>
+                                            <tr style="{$exception-style}">
                                                 <th>Resource URL</th>
                                                 <td>
                                                     <xsl:value-of select="system-id"/>
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr style="{$exception-style}">
                                                 <th>Line</th>
                                                 <td>
                                                     <xsl:choose>
@@ -125,7 +136,7 @@
                                                     </xsl:choose>
                                                 </td>
                                             </tr>
-                                            <tr>
+                                            <tr style="{$exception-style}">
                                                 <th>Column</th>
                                                 <td>
                                                     <xsl:choose>
@@ -151,7 +162,7 @@
 
                                         <xsl:if test="$has-portlet-servlet">
                                             <xsl:for-each-group select="$portlet-stack-trace" group-ending-with="element[class-name = $portlet-class]">
-                                                <tr>
+                                                <tr style="{$exception-style}">
                                                     <th valign="top">Portlet Stack Trace<br/>(<xsl:value-of select="count(current-group())"/> method calls)</th>
                                                     <td>
                                                         <xsl:choose>
@@ -172,7 +183,7 @@
                                             </xsl:for-each-group>
                                         </xsl:if>
                                         <xsl:for-each-group select="$servlet-stack-trace" group-ending-with="element[class-name = $servlet-class]">
-                                            <tr>
+                                            <tr style="{$exception-style}">
                                                 <th valign="top">Servlet Stack Trace<br/>(<xsl:value-of select="count(current-group())"/> method calls)</th>
                                                 <td>
                                                     <xsl:choose>
@@ -232,16 +243,15 @@
                             </xsl:for-each>
                             <tr>
                                 <td colspan="4">
-                                    <span onclick="getElementById('trace-{$trace-id}').style.display = 'table-row-group'">
+                                    <span onclick="hideShowTBody('trace-{$trace-id}')">
                                         <img src="/images/plus.gif" border="0" alt="Toggle"/> More...
                                     </span>
                                 </td>
                             </tr>
                         </tbody>
-                        <tbody style="display: none" id="trace-{$trace-id}">
+                        <tbody id="trace-{$trace-id}">
                             <xsl:for-each select="$elements[position() gt 10]">
-                            <!--<tbody style="visibility: collapse" id="trace">-->
-                                <tr>
+                                <tr style="display: none">
                                     <td style="color: {if (contains(class-name, 'org.orbeon')) then 'green' else 'black'}">
                                         <xsl:value-of select="class-name"/>
                                     </td>

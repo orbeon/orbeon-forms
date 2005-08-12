@@ -67,7 +67,7 @@ public class SQLProcessor extends ProcessorImpl {
 
     public static final Document NULL_DOCUMENT;
 
-    // TODO: Remove this once binary 2.8 compatibliity is no longer required
+    // TODO: START Move this once binary 2.8 compatibliity is no longer required
     public static final Namespace XSI_NAMESPACE = new Namespace(XMLConstants.XSI_PREFIX, XMLConstants.XSI_URI);
     static {
         NULL_DOCUMENT = new NonLazyUserDataDocument();
@@ -79,18 +79,18 @@ public class SQLProcessor extends ProcessorImpl {
         nullElement.addAttribute(attNm, "true");
         NULL_DOCUMENT.setRootElement(nullElement);
     }
-
     public static String qNameToexplodedQName(QName qName) {
         if ("".equals(qName.getNamespaceURI()))
             return qName.getName();
         else
             return "{" + qName.getNamespaceURI() + "}" + qName.getName();
     }
+    // TODO: END Move this once binary 2.8 compatibliity is no longer required
 
     public SQLProcessor() {
         // Mandatory config input
-        //addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SQL_NAMESPACE_URI));
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, SQL_NAMESPACE_URI));
+//        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
 
         // Optional datasource input
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATASOURCE, SQL_DATASOURCE_URI));

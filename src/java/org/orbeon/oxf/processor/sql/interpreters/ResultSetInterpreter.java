@@ -79,7 +79,7 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
 
                     } while (true);
                 }
-            } else {
+            } else if (stmt != null) {
                 // Prepare result set info for the next potential result-set interrpeter
                 setResultSetInfo(interpreterContext, stmt, stmt.getMoreResults());
             }

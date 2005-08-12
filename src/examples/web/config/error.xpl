@@ -37,7 +37,20 @@
                             <title>Orbeon PresentationServer (OPS) - Error Page</title>
                         </head>
                         <body>
+                            <div class="maincontent" style="border: none">
                             <h1>Orbeon PresentationServer (OPS) - Error Page</h1>
+                            <h2>Error Message</h2>
+                            <p>
+                                The following error has occurred:
+                            </p>
+                            <div class="frame warning">
+                                <div class="label">Error Message</div>
+                                <div class="content">
+                                    <p>
+                                        <xsl:value-of select="/exceptions/exception[1]/message"/>
+                                    </p>
+                                </div>
+                           </div>
                             <h2>OPS Call Stack</h2>
                             <p>
                                 The OPS Call Stack helps you determine what sequence of OPS
@@ -59,7 +72,7 @@
                             </table>
                             <h2>Java Exceptions (<xsl:value-of select="count(/exceptions/exception)"/> total)</h2>
                             <p>
-                                Java Exceptions are the native Java mechanism by which OPS reports
+                                Java Exceptions are the native mechanism by which OPS reports
                                 errors. More than one exception may be provided below but usually
                                 the first exception along with the OPS Stack Trace above provide
                                 enough information to track down an issue.
@@ -181,6 +194,7 @@
                                     </tbody>
                                 </xsl:for-each>
                             </table>
+                            </div>
                         </body>
                     </html>
                 </xsl:template>

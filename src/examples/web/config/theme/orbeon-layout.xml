@@ -456,7 +456,7 @@ ul {
 }
 
 .frame { margin: 5px 20px 5px 20px; font-size: 12px; }
-.frame .content { margin: 0px; }
+.frame .content { margin: 5px; }
 
 .note { border: solid 1px &medium-color;; background-color: &xlight-color;; }
 .note .label { background-color: &medium-color;; color: #ffffff; }

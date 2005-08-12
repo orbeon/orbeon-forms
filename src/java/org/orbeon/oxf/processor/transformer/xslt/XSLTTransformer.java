@@ -184,7 +184,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     throw e;
                 } catch (Exception e) {
                     if (transformer != null && transformer.systemId != null) {
-                        ValidationException.wrapException(e, new LocationData(transformer.systemId, 0, 0));
+                        throw ValidationException.wrapException(e, new LocationData(transformer.systemId, 0, 0));
                     } else {
                         throw new OXFException(e);
                     }

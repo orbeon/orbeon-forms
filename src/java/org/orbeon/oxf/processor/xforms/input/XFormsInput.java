@@ -66,39 +66,35 @@ public class XFormsInput extends ProcessorImpl {
         ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
             public void readImpl(final PipelineContext pipelineContext, ContentHandler contentHandler) {
 
-                final XFormsInstance instance;
+                // Get XForms model
+                XFormsModel model = (XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
+                    public Object read(PipelineContext pipelineContext, ProcessorInput input) {
+                        return new XFormsModel(readInputAsDOM4J(pipelineContext, input));
+                    }
+                });
+                try {
+                    // Clone because we set the instance, and that must not be cached
+                    model = (XFormsModel) model.clone();
+                } catch (CloneNotSupportedException e) {
+                    throw new OXFException(e);
+                }
+
                 XFormsInstance contextInstance = XFormsInstance.createInstanceFromContext(pipelineContext);
                 if (contextInstance != null) {
-                    // Got instance from context
-                    instance = contextInstance;
+                    // Instance comes from context in case of a forward
+                    model.setInstanceDocument(pipelineContext, 0, contextInstance.getDocument());
                 } else {
-
-                    // Get XForms model
-                    XFormsModel model = (XFormsModel) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_MODEL), new CacheableInputReader(){
-                        public Object read(PipelineContext pipelineContext, ProcessorInput input) {
-                            return new XFormsModel(readInputAsDOM4J(pipelineContext, input));
-                        }
-                    });
-                    try {
-                        // Clone because we set the instance, and that must not be cached
-                        model = (XFormsModel) model.clone();
-                    } catch (CloneNotSupportedException e) {
-                        throw new OXFException(e);
-                    }
-
                     // Extract parameters from request
                     final RequestParameters requestParameters = (RequestParameters) readCacheInputAsObject(pipelineContext,  getInputByName(INPUT_REQUEST), new CacheableInputReader(){
                         public Object read(PipelineContext context, ProcessorInput input) {
                             Document requestDocument = readInputAsDOM4J(context, input);
-                            RequestParameters requestParameters = new RequestParameters(pipelineContext, requestDocument);
-                            return requestParameters;
+                            return new RequestParameters(pipelineContext, requestDocument);
                         }
                     });
 
                     // Set instance on model if provided
                     if (requestParameters.getInstance() != null)
                         model.setInstanceDocument(pipelineContext, 0, requestParameters.getInstance());
-
                     // Set initialization listener
                     model.setInstanceConstructListener(new XFormsModel.InstanceConstructListener() {
                         public void updateInstance(XFormsInstance localInstance) {
@@ -146,19 +142,19 @@ public class XFormsInput extends ProcessorImpl {
                                         + Dom4jUtils.domToString(localInstance.getDocument()));
                         }
                     });
-
-                    // Create and initialize XForms Engine
-                    XFormsContainingDocument containingDocument = new XFormsContainingDocument(Collections.singletonList(model), null);
-                    containingDocument.initialize(pipelineContext);
-                    containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
-
-                    if (logger.isDebugEnabled())
-                        logger.debug("3) Instance with model item properties applied:\n"
-                                + Dom4jUtils.domToString(model.getDefaultInstance().getDocument()));
-
-                    // Get instance from XForms model
-                    instance = model.getDefaultInstance();
                 }
+
+                // Create and initialize XForms Engine
+                XFormsContainingDocument containingDocument = new XFormsContainingDocument(Collections.singletonList(model), null);
+                containingDocument.initialize(pipelineContext);
+                containingDocument.dispatchExternalEvent(pipelineContext, new XXFormsInitializeEvent(containingDocument));
+
+                if (logger.isDebugEnabled())
+                    logger.debug("3) Instance with model item properties applied:\n"
+                            + Dom4jUtils.domToString(model.getDefaultInstance().getDocument()));
+
+                // Get instance from XForms model
+                XFormsInstance instance = model.getDefaultInstance();
 
                 // Read out instance
                 instance.read(contentHandler);

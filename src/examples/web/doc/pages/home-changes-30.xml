@@ -694,8 +694,8 @@
                     </li>
                     <li>
                         <p>
-                            <b>Colunn Iterator.</b> The SQL processor is now able to explicitly iterate
-                            over all the columns returned by a result-set with the
+                            <b>Colunn Iterator.</b> The SQL processor is now able to explicitly
+                            iterate over all the columns returned by a result-set with the
                             <code>sql:column-iterator</code> element. A column iterator can be used
                             under the <code>sql:result-set</code> element, or under the
                             <code>sql:row-iterator</code> element. This allows for example easily
@@ -728,7 +728,7 @@
                         <p>
                             <b>Result-Set Metadata.</b> The SQL processor is now able to retrieve
                             result-set metadata, with the following new elements. The must be used
-                            within a <code>sql:column-iterator</code> element, unless an
+                            within a <code>sql:column-iterator</code> element, unless a
                             <code>column-name</code> or <code>column-index</code> attribute is
                             explicitly specified:
                         </p>
@@ -786,9 +786,8 @@
                             </li>
                             <li>
                                 <code>column-name</code> is now the standard attribute name for
-                                identifying a colunn name on all the <code>sql:get-column-*</code>,
-                                including <code>sql:get-column</code> and
-                                <code>sql:get-column-value</code>.
+                                identifying a colunn name on the <code>sql:get-column-*</code>,
+                                <code>sql:get-column</code>, and <code>sql:group</code> elements.
                             </li>
                         </ul>
                     </li>

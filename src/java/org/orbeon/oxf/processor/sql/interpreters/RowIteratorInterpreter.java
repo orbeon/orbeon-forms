@@ -136,7 +136,8 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
                     ResultSet resultSet = getInterpreterContext().getResultSet(0);
                     // Save group information if first row
                     if (rowNum == 1) {
-                        groups.add(new Group(attributes.getValue("column"), resultSet));
+                        final String columnName = (attributes.getValue("column-name") != null) ? attributes.getValue("column-name") : attributes.getValue("column");
+                        groups.add(new Group(columnName, resultSet));
                     }
 
                     // Get current group information

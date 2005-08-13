@@ -102,7 +102,7 @@ public class QueryInterpreter extends SQLProcessor.InterpreterContentHandler {
                 final boolean isGetColumn = localname.equals("get-column");
 
                 final String levelString = attributes.getValue("ancestor");
-                final String columnName = attributes.getValue("column");
+                final String columnName = (attributes.getValue("column-name") != null) ? attributes.getValue("column-name") : attributes.getValue("column");
 
                 // Level defaults to 1 in query
                 int level = (levelString == null) ? 1 : Integer.parseInt(levelString);

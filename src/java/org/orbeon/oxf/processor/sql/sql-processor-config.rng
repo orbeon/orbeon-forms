@@ -364,7 +364,10 @@
     <define name="element-or-group-or-getter">
         <choice>
             <element name="sql:group">
-                <attribute name="column"/>
+                <choice>
+                    <attribute name="column"/><!-- deprecated -->
+                    <attribute name="column-name"/>
+                </choice>
                 <zeroOrMore>
                     <ref name="element-or-member-or-getter"/>
                 </zeroOrMore>

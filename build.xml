@@ -257,6 +257,9 @@
               <include name="org/orbeon/oxf/xml/DeferredContentHandler*.class"/>
               <include name="org/orbeon/oxf/xml/dom4j/NonLazy*.class"/>
           </fileset>
+          <fileset dir="${java-src.dir}">
+              <include name="org/orbeon/oxf/processor/sql/*.rng"/>
+          </fileset>
         </jar>
     </target>
 

@@ -546,34 +546,34 @@
     <define name="getter-type-attribute">
         <attribute name="type">
             <choice>
-                <data type="QName">
+                <data type="string">
                     <param name="pattern">.+:string</param>
                 </data>
-                <data type="QName">
+                <data type="string">
                     <param name="pattern">.+:int</param>
                 </data>
-                <data type="QName">
+                <data type="string">
                     <param name="pattern">.+:boolean</param>
                 </data>
-                <data type="QName">
+                <data type="string">
                     <param name="pattern">.+:decimal</param>
                 </data>
-                <data type="QName">
+                <data type="string">
                     <param name="pattern">.+:float</param>
                 </data>
-                <data type="QName">
+                <data type="string">
                     <param name="pattern">.+:double</param>
                 </data>
-                <data type="QName">
+                <data type="string">
                     <param name="pattern">.+:dateTime</param>
                 </data>
-                <data type="QName">
+                <data type="string">
                     <param name="pattern">.+:date</param>
                 </data>
-                <data type="QName">
+                <data type="string">
                     <param name="pattern">.+:base64Binary</param>
                 </data>
-                <data type="QName">
+                <data type="string">
                     <param name="pattern">.+:xmlFragment</param>
                 </data>
             </choice>

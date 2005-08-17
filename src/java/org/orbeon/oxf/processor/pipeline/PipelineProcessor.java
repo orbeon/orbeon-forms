@@ -531,7 +531,6 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                     final String outputRef = (astNodeContainer instanceof ASTOutput) ? ((ASTOutput) astNodeContainer).getRef() : null;
                     params = new String[] { "name", processorInputOutput.getName(), "id", outputId, "ref", outputRef } ;
                 } else {
-                    System.out.println(processorInputOutput.getClass());
                     description = "reading";
                     params = null;
                 }
@@ -566,11 +565,9 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             final State state = (State) getParentState(context);
             executeParents(context, new Runnable() {
                 public void run() {
-                    try {
-                        readInputAsSAX(context, getPipelineInputFromState(state), contentHandler);
-                    } catch (Exception e) {
-                        throw ValidationException.wrapException(e, locationData);
-                    }
+                    // NOTE: It is not useful to catch and wrap location data here, as this would
+                    // duplicate the work done in ProcessorImpl
+                    readInputAsSAX(context, getPipelineInputFromState(state), contentHandler);
                 }
             });
         }

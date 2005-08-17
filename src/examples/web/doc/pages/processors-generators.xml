@@ -272,17 +272,66 @@
             <title>Exception Generator</title>
             <p>
                 The Exception generator is usually used in an <link
-               href="reference-error-pipeline">error pipeline</link>. It serializes an exception
-               into XML. The following shows an XML stream resulting from an exception.
+               href="reference-error-pipeline">error pipeline</link>. It serializes to XML the data
+               contained in a Java exception retrieved from the request scope, with the following
+               information:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        All the exceptions, starting from the top-level exception down to the root
+                        cause.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        For each exception, the exception class name, message, hierachy of location
+                        information, and list of stack trace elements.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                The following is an XML document resulting from an exception:
             </p>
             <xml-source>
                 <exceptions>
                     <exception>
-                        <type>class org.orbeon.oxf.common.OXFException</type>
-                        <message>Cannot read from file /doc/pages/test</message>
-                        <stack-trace>stack trace</stack-trace>
+                        <type>org.orbeon.oxf.common.ValidationException</type>
+                        <message>org.orbeon.saxon.xpath.StaticError: Attribute {selectx} is not allowed on this element</message>
+                        <location>
+                            <system-id>oxf:/examples/bizdoc2/summary/summary-view.xsl</system-id>
+                            <line>34</line>
+                            <column>-1</column>
+                            <description>xsl:copy-of</description>
+                        </location>
+                        <location>
+                            <system-id>oxf:/examples/bizdoc2/page-flow.xml</system-id>
+                            <line>30</line>
+                            <column>121</column>
+                            <description>reading page view data output: page id='summary', view='summary/summary-view.xsl'</description>
+                        </location>
+                        <location>
+                            <system-id>oxf:/examples/dispatch.xpl</system-id>
+                            <line>67</line>
+                            <column>47</column>
+                            <description>executing processor: name='{http://www.orbeon.com/oxf/processors}page-flow'</description>
+                        </location>
+                        <stack-trace-elements>
+                            <element>
+                                <class-name>org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer$1</class-name>
+                                <method-name>createTransformer</method-name>
+                                <file-name>XSLTTransformer.java</file-name>
+                                <line-number>355</line-number>
+                            </element>
+                            ...
+                        </stack-trace-elements>
                     </exception>
-                    <exception>more exceptions</exception>
+                    <exception>
+                        ...
+                    </exception>
+                    <exception>
+                        ...
+                    </exception>
                 </exceptions>
             </xml-source>
             <p>

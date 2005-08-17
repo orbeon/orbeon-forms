@@ -28,32 +28,30 @@
                 document location information.
             </p>
             <p>
-                When an exception is thrown, OPS displays a default error page
-                containing the root cause and location information if available. However, the
-                application developer can display a different page by specifying a processor to be
-                executed upon error. This processor could be, for example, a pipeline logging the
-                error and displaying a nice error page to the user.
+                When an exception is thrown, OPS displays a default error page containing the root
+                cause and location information if available, as well as a detailed OPS stack trace.
+                However, the application developer can display a different page by specifying a
+                processor to be executed upon error. This processor could be, for example, a
+                pipeline logging the error and displaying a nice error page to the user.
             </p>
         </section>
         <section>
             <title>Configuration</title>
             <p>
-                The error pipeline can be configured in <code>web.xml</code> or
-                <code>properties.xml</code>. For more information, please refer to the <a
-                href="integration-packaging#error-configuration">Packaging and Deployment</a>
-                documentation.
+                The error pipeline is configured in <code>web.xml</code>. For more information,
+                please refer to the <a href="integration-packaging#error-configuration">Packaging
+                and Deployment</a> documentation.
             </p>
         </section>
         <section>
             <title>Example</title>
-            <p>
-                In most cases, the custom error pipeline logs or displays the exception that
-                occurred. A simple error pipeline is shown below, using the <a
-                href="processors-generators#exception-generator">Exception processor</a> to
-                display the root cause message, but not the exception stack trace.
-            </p>
             <section>
                 <title>Setup</title>
+                <p>
+                    The following code in <code>web.xml</code> specifies that upon error, the
+                    Pipeline processor must run using the <code>oxf:/config/error.xpl</code>
+                    pipeline:
+                </p>
                 <xml-source>
                     <servlet>
                         <servlet-name>oxf</servlet-name>
@@ -73,12 +71,19 @@
             </section>
             <section>
                 <title>error.xpl</title>
+                <p>
+                    In most cases, the custom error pipeline logs or displays the exception that
+                    occurred. A simple error pipeline is shown below, using the <a
+                    href="processors-generators#exception-generator">Exception generator</a> to
+                    display the root cause message, but not the exception stack trace.
+                </p>
                 <xml-source>
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <comment> Generate exception document </comment>
     <p:processor name="oxf:exception">
         <p:output name="data" id="exception"/>
     </p:processor>
-    <!-- Apply stylesheet -->
+    <comment> Apply stylesheet </comment>
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#exception"/>
         <p:input name="config">
@@ -96,7 +101,7 @@
                             </p>
                             <p>
                                 <code>
-                                    <xsl:value-of select="/exceptions/exception/message"/>
+                                    <xsl:value-of select="/exceptions/exception[1]/message"/>
                                 </code>
                             </p>
                         </body>
@@ -106,22 +111,73 @@
         </p:input>
         <p:output name="data" id="document"/>
     </p:processor>
+
+    <comment> Get some request information </comment>
+    <p:processor name="oxf:request">
+        <p:input name="config">
+            <config>
+                <include>/request/container-type</include>
+                <include>/request/request-path</include>
+            </config>
+        </p:input>
+        <p:output name="data" id="request"/>
+    </p:processor>
+
+    <comment> Apply theme </comment>
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#document"/>
+        <p:input name="request" href="#request"/>
         <p:input name="config" href="oxf:/config/theme/theme.xsl"/>
         <p:output name="data" id="themed"/>
     </p:processor>
+
+    <comment> Rewrite all URLs in XHTML documents </comment>
     <p:processor name="oxf:xhtml-rewrite">
         <p:input name="rewrite-in" href="#themed"/>
-        <p:output name="rewrite-out" id="html"/>
+        <p:output name="rewrite-out" id="rewritten-data"/>
     </p:processor>
-    <p:processor name="oxf:html-serializer">
+
+    <comment> Convert to HTML </comment>
+    <p:processor name="oxf:qname-converter">
+        <p:input name="config">
+            <config>
+                <match>
+                    <uri>http://www.w3.org/1999/xhtml</uri>
+                </match>
+                <replace>
+                    <uri></uri>
+                    <prefix></prefix>
+                </replace>
+            </config>
+        </p:input>
+        <p:input name="data" href="#rewritten-data"/>
+        <p:output name="data" id="html-data"/>
+    </p:processor>
+
+    <p:processor name="oxf:html-converter">
+        <p:input name="config">
+            <config>
+                <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
+                <version>4.01</version>
+                <encoding>utf-8</encoding>
+            </config>
+        </p:input>
+        <p:input name="data" href="#html-data"/>
+        <p:output name="data" id="converted"/>
+    </p:processor>
+
+    <comment> Serialize </comment>
+    <p:processor name="oxf:http-serializer">
         <p:input name="config">
             <config>
                 <status-code>500</status-code>
+                <header>
+                    <name>Cache-Control</name>
+                    <value>post-check=0, pre-check=0</value>
+                </header>
             </config>
         </p:input>
-        <p:input name="data" href="#html"/>
+        <p:input name="data" href="#converted"/>
     </p:processor>
 </p:config>
                 </xml-source>

@@ -13,7 +13,10 @@
  */
 package org.orbeon.oxf.processor.pipeline;
 
-import org.dom4j.*;
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.Namespace;
+import org.dom4j.Node;
 import org.orbeon.oxf.cache.OutputCacheKey;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
@@ -31,6 +34,7 @@ import org.orbeon.oxf.util.PipelineUtils;
 import org.orbeon.oxf.xml.SchemaRepository;
 import org.orbeon.oxf.xml.XPathUtils;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.ContentHandler;
 
@@ -63,12 +67,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
 
     public static final String PIPELINE_NAMESPACE_URI = "http://www.orbeon.com/oxf/pipeline";
     public static final Namespace PIPELINE_NAMESPACE = new Namespace("p", PIPELINE_NAMESPACE_URI);
-    private static final Map PREFIXES = new HashMap();
     private PipelineConfig configFromAST;
-
-    static {
-        PREFIXES.put("p", PIPELINE_NAMESPACE_URI);
-    }
 
     public PipelineProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, PIPELINE_NAMESPACE_URI));
@@ -199,7 +198,8 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             if (statement instanceof ASTProcessorCall) {
                 ASTProcessorCall processorCall = (ASTProcessorCall) statement;
 
-                LocationData processorLocationData = processorCall.getLocationData();
+                final LocationData processorLocationData = processorCall.getLocationData();
+                final String processorNameOrURI = (processorCall.getName() != null ? Dom4jUtils.qNameToexplodedQName(processorCall.getName()) : processorCall.getURI());
 
                 if (processorCall.getEncapsulation() == null) {
                     // Direct call
@@ -208,8 +208,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                         if (processorFactory == null)
                             processorFactory = ProcessorFactoryRegistry.lookup(processorCall.getURI());
                         if (processorFactory == null) {
-                            throw new ValidationException("Cannot find processor factory with name \""
-                                    + (processorCall.getName() != null ? Dom4jUtils.qNameToexplodedQName(processorCall.getName()) : processorCall.getURI()) + "\"", processorLocationData);
+                            throw new ValidationException("Cannot find processor factory with name \"" + processorNameOrURI + "\"", processorLocationData);
                         }
                         processor = processorFactory.createInstance(context);
                     } else {
@@ -226,7 +225,8 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
 
                 // Set info on processor
                 processor.setId(processorCall.getId());
-                processor.setLocationData(processorLocationData);
+                processor.setLocationData(new ExtendedLocationData(processorLocationData, "executing processor",
+                        new String[] { "name", processorNameOrURI }));
 
                 // Process outputs
                 for (Iterator j = processorCall.getOutputs().iterator(); j.hasNext();) {
@@ -355,7 +355,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 // Connect special $data input (document on which the decision is made, or iterated on)
                 ProcessorInput pin = block.connectProcessorToHref(choose.getNode(), processor,
                         AbstractChooseProcessor.CHOOSE_DATA_INPUT, choose.getHref());
-                setDebugAndSchema(pin, (ASTDebugSchema) statement);
+                setDebugAndSchema(pin, choose);
 
                 // Go through inputs/outputs and connect to the rest of the pipeline
                 for (Iterator j = processor.getInputsInfo().iterator(); j.hasNext();) {
@@ -390,7 +390,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 // Connect special $data input (document on which the decision is made, or iterated on)
                 ProcessorInput pin = block.connectProcessorToHref(forEach.getNode(), processor,
                         ForEachProcessor.FOR_EACH_DATA_INPUT, forEach.getHref());
-                setDebugAndSchema(pin, forEachLocationData,
+                setDebugAndSchema(pin, forEach, forEachLocationData,
                         forEach.getInputSchemaUri(), forEach.getInputSchemaHref(), forEach.getInputDebug());
 
                 // Go through inputs and connect to the rest of the pipeline
@@ -413,7 +413,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                         block.declareOutput(forEach.getNode(), forEach.getId(), forEachOutput);
                     if (forEach.getRef() != null)
                         block.connectProcessorToBottomInput(forEach.getNode(), forEach.getId(), forEach.getRef(), forEachOutput);
-                    setDebugAndSchema(processor.getOutputByName(outputName), forEachLocationData,
+                    setDebugAndSchema(processor.getOutputByName(outputName), forEach, forEachLocationData,
                             forEach.getOutputSchemaUri(), forEach.getOutputSchemaHref(), forEach.getOutputDebug());
                 }
             }
@@ -473,15 +473,21 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
     }
 
     private static void setDebugAndSchema(ProcessorInputOutput processorInputOutput,
-                                          ASTDebugSchema astInputOutput) {
+                                          ASTNodeContainer astNodeContainer) {
 
-        setDebugAndSchema(processorInputOutput,
-                ((ASTNodeContainer) astInputOutput).getLocationData(),
-                astInputOutput.getSchemaUri(), astInputOutput.getSchemaHref(), astInputOutput.getDebug());
+        if (astNodeContainer instanceof ASTDebugSchema) {
+            final ASTDebugSchema astDebugSchema = (ASTDebugSchema) astNodeContainer;
+            setDebugAndSchema(processorInputOutput, astNodeContainer,
+                ((ASTNodeContainer) astNodeContainer).getLocationData(),
+                astDebugSchema.getSchemaUri(), astDebugSchema.getSchemaHref(), astDebugSchema.getDebug());
+        } else {
+            setDebugAndSchema(processorInputOutput, astNodeContainer,
+                ((ASTNodeContainer) astNodeContainer).getLocationData(), null, null, null);
+        }
     }
 
     private static void setDebugAndSchema(ProcessorInputOutput processorInputOutput,
-                                          LocationData locationData,
+                                          ASTNodeContainer astNodeContainer, LocationData locationData,
                                           String schemaUri, String schemaHref, String debug) {
         // Set schema if any
         if (schemaUri != null) {
@@ -510,7 +516,29 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
             processorInputOutput.setDebug(debug);
 
         // Set location data
-        processorInputOutput.setLocationData(locationData);
+        if (locationData != null) {
+            if (locationData instanceof ExtendedLocationData) {
+                processorInputOutput.setLocationData(locationData);
+            } else {
+                final String description;
+                final String[] params;
+                if (processorInputOutput instanceof ProcessorInput) {
+                    description = "reading processor input";
+                    params = new String[] { "name", processorInputOutput.getName() } ;
+                } else if (processorInputOutput instanceof ProcessorOutput) {
+                    description = "reading processor output";
+                    final String outputId = (astNodeContainer instanceof ASTOutput) ? ((ASTOutput) astNodeContainer).getId() : null;
+                    final String outputRef = (astNodeContainer instanceof ASTOutput) ? ((ASTOutput) astNodeContainer).getRef() : null;
+                    params = new String[] { "name", processorInputOutput.getName(), "id", outputId, "ref", outputRef } ;
+                } else {
+                    System.out.println(processorInputOutput.getClass());
+                    description = "reading";
+                    params = null;
+                }
+
+                processorInputOutput.setLocationData(new ExtendedLocationData(locationData, description, params));
+            }
+        }
     }
 
     private static void setBreakpointKey(ProcessorInputOutput processorInputOutput, ASTNodeContainer nodeContainer) {

@@ -29,8 +29,7 @@ public class PooledXPathExpression {
     private StandaloneContext context;
     private java.util.Map variables;
 
-    public PooledXPathExpression
-    ( XPathExpression exp, ObjectPool pool, StandaloneContext context, final java.util.Map vars ) {
+    public PooledXPathExpression(XPathExpression exp, ObjectPool pool, StandaloneContext context, final java.util.Map vars) {
         this.expression = exp;
         this.pool = pool;
         this.context = context;
@@ -70,7 +69,6 @@ public class PooledXPathExpression {
         } catch (XPathException e) {
             throw new OXFException(e);
         }
-
     }
 
     public void destroy() {

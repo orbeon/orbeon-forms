@@ -21,6 +21,7 @@ import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.xml.sax.ContentHandler;
 
 import java.io.PrintWriter;
@@ -116,6 +117,14 @@ public class ExceptionGenerator extends ProcessorImpl {
                 helper.element("system-id", locationData.getSystemID());
                 helper.element("line", Integer.toString(locationData.getLine()));
                 helper.element("column", Integer.toString(locationData.getCol()));
+                
+                if (locationData instanceof ExtendedLocationData) {
+                    final ExtendedLocationData extendedLocationData = (ExtendedLocationData) locationData;
+                    final String description = extendedLocationData.getDescription();
+                    if (description != null)
+                        helper.element("description", description);
+                }
+
                 helper.endElement();
             }
         }

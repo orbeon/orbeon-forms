@@ -28,10 +28,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.transformer.xupdate.XUpdateConstants;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XMLConstants;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
-import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
+import org.orbeon.oxf.xml.dom4j.*;
 import org.xml.sax.SAXException;
 
 import java.net.MalformedURLException;
@@ -370,7 +367,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 addInput(new ASTInput("matcher", Dom4jUtils.NULL_DOCUMENT));
                                 addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                                 final ASTOutput dataOutput = new ASTOutput("data", notFoundHTML);
-                                dataOutput.setLocationData((LocationData) controllerDocument.getRootElement().getData()); // use root element location data
+                                dataOutput.setLocationData(new ExtendedLocationData((LocationData) controllerDocument.getRootElement().getData(),
+                                        "executing not found pipeline", new String[] { "pipeline", notFoundPipeline})); // use root element location data
                                 addOutput(dataOutput);
                             }});
 
@@ -424,47 +422,47 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                        final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel,
                                        final int defaultStatusCode) {
         // Send result through epilogue
-        final ASTOutput epilogueOutput;
         if (epilogueURL == null) {
-            epilogueOutput = html;
+            // Run HTML serializer
+            statements.add(new ASTChoose(new ASTHrefId(html)) {{
+                addWhen(new ASTWhen("not(/*/@xsi:nil = 'true')") {{
+                    setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
+                    // The epilogue did not do the serialization
+                    addStatement(new ASTProcessorCall(XMLConstants.HTML_SERIALIZER_PROCESSOR_QNAME) {{
+                        Document config = new NonLazyUserDataDocument(new NonLazyUserDataElement("config"));
+                        Element rootElement = config.getRootElement();
+                        rootElement.addElement("status-code").addText(Integer.toString(defaultStatusCode));
+                        if (HTMLSerializer.DEFAULT_PUBLIC_DOCTYPE != null)
+                            rootElement.addElement("public-doctype").addText(HTMLSerializer.DEFAULT_PUBLIC_DOCTYPE);
+                        if (HTMLSerializer.DEFAULT_SYSTEM_DOCTYPE != null)
+                            rootElement.addElement("system-doctype").addText(HTMLSerializer.DEFAULT_SYSTEM_DOCTYPE);
+                        if (HTMLSerializer.DEFAULT_VERSION != null)
+                            rootElement.addElement("version").addText(HTMLSerializer.DEFAULT_VERSION);
+                        addInput(new ASTInput("config", config));
+                        addInput(new ASTInput("data", new ASTHrefId(html)));
+                        //setLocationData(xxx);
+                    }});
+                }});
+                addWhen(new ASTWhen());
+            }});
         } else {
 //            final LocationData locDat = Dom4jUtils.getLocationData();
-            epilogueOutput = new ASTOutput("data", "epilogue");
-            epilogueOutput.setLocationData((LocationData) epilogueElement.getData());
-        }
-        if (epilogueURL != null) {
-            statements.add(new StepProcessorCall(stepProcessorContext, controllerContext, epilogueURL) {{
+            statements.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
+                final String url;
+                try {
+                    url = URLFactory.createURL(controllerContext, epilogueURL).toExternalForm();
+                } catch (MalformedURLException e) {
+                    throw new OXFException(e);
+                };
+                addInput(new ASTInput("config", new ASTHrefURL(url)));
                 addInput(new ASTInput("data", new ASTHrefId(html)));
                 addInput(new ASTInput("instance", new ASTHrefId(epilogueInstance)));
                 addInput(new ASTInput("xforms-model", new ASTHrefId(epilogueXFormsModel)));
-                addInput(new ASTInput("matcher", Dom4jUtils.NULL_DOCUMENT));
-                addInput(new ASTInput("can-be-serializer", TRUE_DOCUMENT));
-                addOutput(epilogueOutput);
+                final String[] locationParams = new String[] { "pipeline",  epilogueURL };
+                setLocationData(new ExtendedLocationData((LocationData) epilogueElement.getData(),
+                    "executing epilogue", locationParams));
             }});
         }
-
-        // Run HTML serializer
-        statements.add(new ASTChoose(new ASTHrefId(epilogueOutput)) {{
-            addWhen(new ASTWhen("not(/*/@xsi:nil = 'true')") {{
-                setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
-                // The epilogue did not do the serialization
-                addStatement(new ASTProcessorCall(XMLConstants.HTML_SERIALIZER_PROCESSOR_QNAME) {{
-                    Document config = new NonLazyUserDataDocument(new NonLazyUserDataElement("config"));
-                    Element rootElement = config.getRootElement();
-                    rootElement.addElement("status-code").addText(Integer.toString(defaultStatusCode));
-                    if (HTMLSerializer.DEFAULT_PUBLIC_DOCTYPE != null)
-                        rootElement.addElement("public-doctype").addText(HTMLSerializer.DEFAULT_PUBLIC_DOCTYPE);
-                    if (HTMLSerializer.DEFAULT_SYSTEM_DOCTYPE != null)
-                        rootElement.addElement("system-doctype").addText(HTMLSerializer.DEFAULT_SYSTEM_DOCTYPE);
-                    if (HTMLSerializer.DEFAULT_VERSION != null)
-                        rootElement.addElement("version").addText(HTMLSerializer.DEFAULT_VERSION);
-                    addInput(new ASTInput("config", config));
-                    addInput(new ASTInput("data", new ASTHrefId(epilogueOutput)));
-                    //setLocationData(xxx);
-                }});
-            }});
-            addWhen(new ASTWhen());
-        }});
     }
 
     private Document getSetValuesDocument(final Element pageElement) {
@@ -539,7 +537,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         // XForms Input
         final ASTOutput isRedirect = new ASTOutput(null, "is-redirect");
         final ASTOutput xformsModel = new ASTOutput("data", "xforms-model");
-        xformsModel.setLocationData((LocationData) pageElement.getData());
+        xformsModel.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(),
+                "reading XForms model data output", new String[] { "XForms model", xformsAttribute, "page id", pageElement.attributeValue("id")}));
         // FIXME: do not validate with XForms model to avoid connection to W3C Web site
         //xformsModel.setSchemaUri(org.orbeon.oxf.processor.xforms.Constants.XFORMS_NAMESPACE_URI + "/model");
 
@@ -663,8 +662,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
                             addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                             final ASTOutput dataOutput = new ASTOutput("data", internalActionData);
-                            dataOutput.setLocationData((LocationData) actionElement.getData());
+                            final String[] locationParams =
+                                new String[] { "pipeline", actionAttribute, "page id", pageElement.attributeValue("id"), "when", whenAttribute };
+                            dataOutput.setLocationData(new ExtendedLocationData((LocationData) actionElement.getData(), "reading action data output", locationParams));
                             addOutput(dataOutput);
+                            setLocationData(new ExtendedLocationData((LocationData) actionElement.getData(), "executing action", locationParams));
                         }});
 
                         // Force execution of action if no <result> is reading it
@@ -702,7 +704,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                     if (resultWhenAttribute != null) {
                                         setTest(resultWhenAttribute);
                                         setNamespaces(Dom4jUtils.getNamespaceContext(resultElement));
-                                        setLocationData((LocationData) resultElement.getData());
+                                        final String[] locationParams =
+                                            new String[] { "page id", pageElement.attributeValue("id"), "when", resultWhenAttribute };
+                                        setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "executing result", locationParams));
                                     }
                                     executeResult(stepProcessorContext, controllerContext, this, pageIdToXFormsModel,
                                             pageIdToPathInfo, pageIdToSetvaluesDocument,
@@ -786,12 +790,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
                         addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                         final ASTOutput dataOutput = new ASTOutput("data", modelData);
-                        dataOutput.setLocationData((LocationData) pageElement.getData());
+                        final String[] locationParams =
+                            new String[] { "page id", pageElement.attributeValue("id"), "model", modelAttribute };
+                        dataOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page model data output", locationParams));
                         addOutput(dataOutput);
                         final ASTOutput instanceOutput = new ASTOutput("instance", modelInstance);
                         addOutput(instanceOutput);
-                        instanceOutput.setLocationData((LocationData) pageElement.getData());
-                        setLocationData((LocationData) pageElement.getData());
+                        instanceOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page model instance output", locationParams));
+                        setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "executing page model", locationParams));
                     }});
                 } else if (viewAttribute != null) {
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
@@ -813,14 +819,16 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
                         addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                         final ASTOutput dataOutput = new ASTOutput("data", html);
-                        dataOutput.setLocationData((LocationData) pageElement.getData());
+                        final String[] locationParams =
+                            new String[] { "page id", pageElement.attributeValue("id"), "view", viewAttribute };
+                        dataOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page view data output", locationParams));
                         addOutput(dataOutput);
                         if (xformsAttribute != null) {// TODO: this may not do what is intended with XForms NG
                             final ASTOutput instanceOutput = new ASTOutput("instance", epilogueInstance);
-                            instanceOutput.setLocationData((LocationData) pageElement.getData());
+                            instanceOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page view instance output", locationParams));
                             addOutput(instanceOutput);
                         }
-                        setLocationData((LocationData) pageElement.getData());
+                        setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "executing page view", locationParams));
                     }});
                     if (xformsAttribute == null) {
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
@@ -857,7 +865,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // Make sure we execute the model
                     addStatement(new ASTProcessorCall(XMLConstants.NULL_SERIALIZER_PROCESSOR_QNAME) {{
                         addInput(new ASTInput("data", new ASTHrefId(modelData)));
-                        setLocationData((LocationData) pageElement.getData());
                     }});
                     // With XForms NG we want lazy evaluation of the instance, so we should not force a
                     // read on the instance. We just connect the output.
@@ -916,9 +923,11 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 addInput(new ASTInput("matcher", Dom4jUtils.NULL_DOCUMENT));
                 addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                 final ASTOutput dataOutput = new ASTOutput("data", otherPageXFormsModel);
-                dataOutput.setLocationData((LocationData) resultElement.getData());
+                final String[] locationParams =
+                            new String[] { "result page id", resultPageId, "result page XForms model", otherXForms };
+                dataOutput.setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "reading other page XForms model data output", locationParams));
                 addOutput(dataOutput);
-                setLocationData((LocationData) resultElement.getData());
+                setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "executing other page XForms model", locationParams));
             }});
             when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                 addInput(new ASTInput("data", new ASTHrefXPointer(new ASTHrefId(otherPageXFormsModel), EXTRACT_INSTANCE_XPATH)));
@@ -1036,7 +1045,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         }
                         addInput(new ASTInput("data", new ASTHrefId(internalXUpdatedInstance)));
                         addInput(new ASTInput("config", config));
-                        setLocationData((LocationData) resultElement.getData());
+                        final String[] locationParams =
+                            new String[] { "result page id", resultPageId  };
+                        setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "serialization of XForms instance to request", locationParams));
                     }});
                 }
                 // Aggregate redirect-url config
@@ -1068,7 +1079,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 // Execute the redirect
                 when.addStatement(new ASTProcessorCall(XMLConstants.REDIRECT_PROCESSOR_QNAME) {{
                     addInput(new ASTInput("data", redirectURLData));// {{setDebug("redirect 2");}}
-                    setLocationData((LocationData) resultElement.getData());
+                    final String[] locationParams =
+                            new String[] { "result page id", resultPageId  };
+                    setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "page redirection", locationParams));
                 }});
             }
         }

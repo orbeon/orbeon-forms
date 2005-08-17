@@ -71,12 +71,14 @@
                                     <th>Resource URL</th>
                                     <th>Line</th>
                                     <th>Column</th>
+                                    <th>Description</th>
                                 </tr>
                                 <xsl:for-each select="/exceptions/exception[location][1]/location[line castable as xs:positiveInteger and not(ends-with(system-id, '.java'))]">
                                     <tr>
                                         <td><xsl:value-of select="system-id"/></td>
                                         <td><xsl:value-of select="line"/></td>
                                         <td><xsl:value-of select="column"/></td>
+                                        <td><xsl:value-of select="description"/></td>
                                     </tr>
                                 </xsl:for-each>
                             </table>

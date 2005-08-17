@@ -178,6 +178,29 @@
         </xhtml:button>
     </xsl:template>
 
+    <xsl:template match="xforms:textarea">
+        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
+        <xsl:param name="generate-template" select="false()" tunnel="yes"/>
+
+        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xsl:choose>
+            <xsl:when test="$generate-template">
+                <xhtml:textarea name="{$id}">
+                    <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
+                </xhtml:textarea>
+            </xsl:when>
+            <xsl:otherwise>
+                <xhtml:textarea name="{$id}">
+                    <xsl:if test="xxforms:control($id)/@readonly = 'true'">
+                        <xsl:attribute name="disabled">disabled</xsl:attribute>
+                    </xsl:if>
+                    <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
+                    <xsl:value-of select="xxforms:control($id)"/>
+                </xhtml:textarea>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <xsl:template match="xforms:input">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
@@ -228,15 +251,6 @@
         <xhtml:input type="password" name="{$id}" value="{xxforms:control($id)}">
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
         </xhtml:input>
-    </xsl:template>
-
-    <xsl:template match="xforms:textarea">
-        <xsl:param name="id-postfix" select="''" tunnel="yes"/>
-        <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xhtml:textarea name="{$id}">
-            <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
-            <xsl:value-of select="xxforms:control($id)"/>
-        </xhtml:textarea>
     </xsl:template>
     
     <!-- Display as list of checkboxes / radio buttons -->

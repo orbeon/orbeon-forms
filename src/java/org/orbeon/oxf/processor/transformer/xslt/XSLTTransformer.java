@@ -31,6 +31,7 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xml.*;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.Configuration;
 import org.orbeon.saxon.expr.*;
 import org.orbeon.saxon.functions.FunctionLibrary;
@@ -44,6 +45,7 @@ import org.orbeon.saxon.xpath.XPathException;
 import org.xml.sax.*;
 
 import javax.xml.transform.Templates;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.sax.TransformerHandler;
@@ -182,9 +184,13 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     }
                 } catch (ValidationException e) {
                     throw e;
+                } catch (TransformerException e) {
+                    final ExtendedLocationData extendedLocationData
+                            = StringErrorListener.getTransformerExceptionLocationData(e, transformer.systemId);
+                    throw new ValidationException(e, extendedLocationData);
                 } catch (Exception e) {
-                    if (transformer != null && transformer.systemId != null) {
-                        throw ValidationException.wrapException(e, new LocationData(transformer.systemId, 0, 0));
+                     if (transformer.systemId != null) {
+                        throw new ValidationException(e, new LocationData(transformer.systemId, -1, -1));
                     } else {
                         throw new OXFException(e);
                     }
@@ -341,9 +347,16 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
                     return transformer;
 
+                } catch (TransformerException e) {
+                    final ExtendedLocationData extendedLocationData
+                            = StringErrorListener.getTransformerExceptionLocationData(e, topStylesheetContentHandler.getSystemId());
+
+                    throw new ValidationException(e, extendedLocationData);
+//                        throw new ValidationException(e, new ExtendedLocationData(systemId, line, column, "creating transformer"));
                 } catch (Exception e) {
                     if (topStylesheetContentHandler.getSystemId() != null) {
                         if (errorListener.hasErrors()) {
+                            // TODO: Check this: will this ever be called?
                             throw new ValidationException(errorListener.getMessages(),
                                     new LocationData(topStylesheetContentHandler.getSystemId(), 0, 0));
                         } else {
@@ -352,6 +365,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         }
                     } else {
                         if (errorListener.hasErrors()) {
+                            // TODO: Check this: will this ever be called?
                             throw new OXFException(errorListener.getMessages());
                         } else {
                             throw new OXFException(e);

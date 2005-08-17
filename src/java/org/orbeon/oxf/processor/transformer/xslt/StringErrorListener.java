@@ -16,13 +16,13 @@ package org.orbeon.oxf.processor.transformer.xslt;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.SourceLocator;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMLocator;
-import java.lang.reflect.InvocationTargetException;
 
 public class StringErrorListener implements ErrorListener {
 
@@ -42,7 +42,8 @@ public class StringErrorListener implements ErrorListener {
             message += getLocationMessage(exception) + "\n  ";
         message += getExpandedMessage(exception);
         logger.warn(message);
-        messages.append(message + "\n");
+        messages.append(message);
+        messages.append("\n");
     }
 
     public void error(TransformerException exception) throws TransformerException {
@@ -52,7 +53,8 @@ public class StringErrorListener implements ErrorListener {
                 + (locationMessage.length() > 0 ? " " + locationMessage + ":\n" : ": ")
                 + getExpandedMessage(exception);
         logger.error(message);
-        messages.append(message + "\n");
+        messages.append(message);
+        messages.append("\n");
     }
 
     /**
@@ -86,51 +88,57 @@ public class StringErrorListener implements ErrorListener {
     }
 
     /**
+     * Try to get the best possible location data for a TransformerException.
+     *
+     * @param te               TransformerException to process
+     * @param defaultSystemId  System Id to use if none is found in the TransformerException.
+     * @return ExtendedLocationData
+     */
+    public static ExtendedLocationData getTransformerExceptionLocationData(TransformerException te, String defaultSystemId) {
+        final SourceLocator loc = te.getLocator();
+        if (loc == null && defaultSystemId == null) {
+            return null;
+        } else if (loc == null) {
+            return new ExtendedLocationData(defaultSystemId, -1, -1, null);
+        } else {
+            String description;
+            if (loc instanceof DOMLocator) {
+                description = ((DOMLocator) loc).getOriginatingNode().getNodeName();
+            } else if (loc.getClass().getName().equals("net.sf.saxon.instruct.InstructionDetails")
+                    || loc.getClass().getName().equals("org.orbeon.saxon.instruct.InstructionDetails")) {
+                try {
+                    description = loc.getClass().getMethod("getInstructionName", new Class[]{}).invoke(loc, new Object[]{}).toString();
+                } catch (Exception e) {
+                    // Let's not consider this a real issue, just clear the description
+                    description = null;
+                }
+            } else {
+                description = null;
+            }
+            return new ExtendedLocationData((loc.getSystemId() != null) ? loc.getSystemId() : defaultSystemId, loc.getLineNumber(), loc.getColumnNumber(), description);
+        }
+    }
+
+    /**
      * Get a string identifying the location of an error.
      */
-
-    private static String getLocationMessage(TransformerException err) {
-        try {
-            SourceLocator loc = err.getLocator();
-            if (loc == null) {
-                if (err.getException() instanceof OXFException) {
-                    Throwable t = OXFException.getRootThrowable(err.getException());
-                    // TODO: check this, should maybe look for root validation data?
-                    if (t instanceof ValidationException)
-                        return ((ValidationException) t).getLocationData().toString();
-                    else
-                        return ((OXFException) err.getException()).getMessage();
-                }
-                return "";
-            } else {
-                String locmessage = "";
-                if (loc instanceof DOMLocator) {
-                    locmessage += "at " + ((DOMLocator) loc).getOriginatingNode().getNodeName() + " ";
-                } else if (loc.getClass().getName().equals("net.sf.saxon.instruct.InstructionDetails")
-                        || loc.getClass().getName().equals("org.orbeon.saxon.instruct.InstructionDetails")) {
-                    locmessage += "at "
-                            + loc.getClass().getMethod("getInstructionName", new Class[]{}).invoke(loc, new Object[]{})
-                            + " ";
-                }
-                locmessage += "on line " + loc.getLineNumber() + " ";
-                if (loc.getColumnNumber() != -1) {
-                    locmessage += "column " + loc.getColumnNumber() + " ";
-                }
-                if (loc.getSystemId() != null) {
-                    locmessage += "of " + loc.getSystemId();
-                }
-                return locmessage;
-            }
-        } catch (IllegalAccessException e) {
-            throw new OXFException(e);
-        } catch (IllegalArgumentException e) {
-            throw new OXFException(e);
-        } catch (InvocationTargetException e) {
-            throw new OXFException(e);
-        } catch (NoSuchMethodException e) {
-            throw new OXFException(e);
-        } catch (SecurityException e) {
-            throw new OXFException(e);
+    private static String getLocationMessage(TransformerException te) {
+        final ExtendedLocationData extendedLocationData = getTransformerExceptionLocationData(te, null);
+        if (extendedLocationData != null) {
+            return "at "
+                    + ((extendedLocationData.getDescription() != null) ? extendedLocationData.getDescription() : "")
+                    + ((extendedLocationData.getLine() != -1) ? ", line " + extendedLocationData.getLine() : "")
+                    + ((extendedLocationData.getCol() != -1) ? ", column " + extendedLocationData.getCol() : "")
+                    + ((extendedLocationData.getSystemID() != null) ? " of  " + extendedLocationData.getSystemID() : "");
+        } else  if (te.getException() instanceof OXFException) {
+            final Throwable t = OXFException.getRootThrowable(te.getException());
+            // TODO: check this, should maybe look for root validation data?
+            if (t instanceof ValidationException)
+                return ((ValidationException) t).getLocationData().toString();
+            else
+                return ((OXFException) te.getException()).getMessage();
+        } else {
+            return "";
         }
     }
 

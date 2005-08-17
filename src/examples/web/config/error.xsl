@@ -54,7 +54,7 @@
                     <div class="label">Error Message</div>
                     <div class="content">
                         <p>
-                            <xsl:value-of select="/exceptions/exception[1]/message"/>
+                            <xsl:value-of select="/exceptions/exception[last()]/message"/>
                         </p>
                     </div>
                </div>
@@ -70,14 +70,23 @@
                         <th>Column</th>
                         <th>Description</th>
                     </tr>
-                    <xsl:for-each select="/exceptions/exception[location][1]/location[line castable as xs:positiveInteger and not(ends-with(system-id, '.java'))]">
+                    <!-- Group so that if by any chance multiple location data for the same point occur, we show only one -->
+                    <xsl:for-each-group select="/exceptions/exception[location][1]/location[line castable as xs:positiveInteger and not(ends-with(system-id, '.java'))]"
+                            group-by="concat(system-id, '-', line, '-', column)">
                         <tr>
                             <td><xsl:value-of select="system-id"/></td>
-                            <td><xsl:value-of select="line"/></td>
-                            <td><xsl:value-of select="column"/></td>
-                            <td><xsl:value-of select="description"/></td>
+                            <td><xsl:value-of select="if (line castable as xs:positiveInteger) then line else 'N/A'"/></td>
+                            <td><xsl:value-of select="if (column castable as xs:positiveInteger) then column else 'N/A'"/></td>
+                            <td>
+                                <xsl:for-each select="current-group()[description != '']">
+                                    <xsl:if test="position() > 1">
+                                        <br/>
+                                    </xsl:if>
+                                    <xsl:value-of select="description"/>
+                                </xsl:for-each>
+                            </td>
                         </tr>
-                    </xsl:for-each>
+                    </xsl:for-each-group>
                 </table>
                 <h2>Java Exceptions (<xsl:value-of select="count(/exceptions/exception)"/> total)</h2>
                 <p>
@@ -125,27 +134,13 @@
                                 <tr style="{$exception-style}">
                                     <th>Line</th>
                                     <td>
-                                        <xsl:choose>
-                                            <xsl:when test="line castable as xs:positiveInteger">
-                                                <xsl:value-of select="line"/>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                N/A
-                                            </xsl:otherwise>
-                                        </xsl:choose>
+                                        <xsl:value-of select="if (line castable as xs:positiveInteger) then line else 'N/A'"/>
                                     </td>
                                 </tr>
                                 <tr style="{$exception-style}">
                                     <th>Column</th>
                                     <td>
-                                        <xsl:choose>
-                                            <xsl:when test="column castable as xs:positiveInteger">
-                                                <xsl:value-of select="column"/>
-                                            </xsl:when>
-                                            <xsl:otherwise>
-                                                N/A
-                                            </xsl:otherwise>
-                                        </xsl:choose>
+                                        <xsl:value-of select="if (column castable as xs:positiveInteger) then column else 'N/A'"/>
                                     </td>
                                 </tr>
                             </xsl:for-each>

@@ -12,6 +12,7 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <html xsl:version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+      xmlns:xs="http://www.w3.org/2001/XMLSchema"
       xmlns:xforms="http://www.w3.org/2002/xforms"
       xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
       xmlns:ev="http://www.w3.org/2001/xml-events"

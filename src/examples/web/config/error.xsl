@@ -218,7 +218,7 @@
             <tbody>
                 <xsl:for-each select="$elements[position() le 10]">
                     <tr>
-                        <td style="color: {if (contains(class-name, 'org.orbeon')) then 'green' else 'black'}">
+                        <td style="color: {if (contains(class-name, 'org.orbeon') and not(contains(class-name, 'org.orbeon.saxon'))) then 'green' else 'black'}">
                             <xsl:value-of select="class-name"/>
                         </td>
                         <td><xsl:value-of select="method-name"/></td>
@@ -246,7 +246,7 @@
             <tbody id="trace-{$trace-id}">
                 <xsl:for-each select="$elements[position() gt 10]">
                     <tr style="display: none">
-                        <td style="color: {if (contains(class-name, 'org.orbeon')) then 'green' else 'black'}">
+                        <td style="color: {if (contains(class-name, 'org.orbeon') and not(contains(class-name, 'org.orbeon.saxon'))) then 'green' else 'black'}">
                             <xsl:value-of select="class-name"/>
                         </td>
                         <td><xsl:value-of select="method-name"/></td>

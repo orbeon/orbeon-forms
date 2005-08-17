@@ -16,7 +16,7 @@
 -->
 <document xmlns:p="http://www.orbeon.com/oxf/pipeline" xmlns:xforms="http://www.w3.org/2002/xforms">
     <header>
-        <title>Error Pipeline</title>
+        <title>Error Processor</title>
     </header>
     <body>
         <section>
@@ -38,7 +38,7 @@
         <section>
             <title>Configuration</title>
             <p>
-                The error pipeline is configured in <code>web.xml</code>. For more information,
+                The error processor is configured in <code>web.xml</code>. For more information,
                 please refer to the <a href="integration-packaging#error-configuration">Packaging
                 and Deployment</a> documentation.
             </p>
@@ -72,7 +72,7 @@
             <section>
                 <title>error.xpl</title>
                 <p>
-                    In most cases, the custom error pipeline logs or displays the exception that
+                    In most cases, the custom error processor logs or displays the exception that
                     occurred. A simple error pipeline is shown below, using the <a
                     href="processors-generators#exception-generator">Exception generator</a> to
                     display the root cause message, but not the exception stack trace.

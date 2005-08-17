@@ -864,9 +864,58 @@
         <section>
             <title>Enhanced Error Reporting</title>
             <p>
-                When a Java exception occurs, OPS now reports the entire hierarchy of exceptions
-                generated. In addition, the OPS stack trace is display, which provides useful
-                OPS-oriented information about the events leading to an exception. TODO
+                The following enhancements have been made to the error reporting on OPS:
+            </p>
+            <ul>
+                <li>
+                    <p>
+                        <b>OPS Stack Trace.</b> When a Java exception occurs, OPS now reports the
+                        OPS stack trace, which provides useful OPS-oriented information about the
+                        events leading to an exception.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>Java Stack Traces.</b>
+                    </p>
+                    <ul>
+                        <li>
+                            <p>
+                                Java stack traces are split into their different request
+                                components. For example, an exception may have been produced by a
+                                request on the OPSServlet, forwarded again to OPSServlet, then going
+                                through the OPS example portal’s OPSPortlet. In this case, the stack
+                                trace is split into three parts for clarity.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                Some coloring is applied to the class names to easily distinguish
+                                OPS classes from third-party classes.
+                            </p>
+                        </li>
+                        <li>
+                            <p>
+                                As OPS users may have noticed, Java stack traces can be quite long
+                                due to the streamed nature of the execution of XPL pipelines.
+                                Exceptions are now initially folded, except for the first few
+                                lines, and expandable on click.
+                            </p>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <p>
+                        <b>Separate Stylesheet.</b> The XSLT stylesheet used to format stack traces
+                        is not in a separate file: <code>oxf:/config/error.xsl</code>.
+                    </p>
+                </li>
+            </ul>
+            <p>
+                Like with OPS 2.8 and earlier, the layout of the stack traces traces can be
+                customized: simply edit <code>oxf:/config/error.xpl</code> and
+                <code>oxf:/config/error.xsl</code>. More advanced configuration can be performed by
+                changing the <a href="reference-error-pipeline">error processor</a>.
             </p>
         </section>
         <section>

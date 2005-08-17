@@ -15,7 +15,6 @@
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:xu="http://www.xmldb.org/xupdate"
-        xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
         instance-passing="forward">
 
     <!-- Files to serve directly -->

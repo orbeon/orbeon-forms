@@ -220,7 +220,7 @@ public class XFormsControls {
         // Push the default context
         final XFormsModel defaultModel = containingDocument.getModel("");
         final List defaultNodeset = Arrays.asList(new Object[]{defaultModel.getDefaultInstance().getDocument().getRootElement()});
-        contextStack.push(new BindingContext(defaultModel, defaultNodeset, true, null));
+        contextStack.push(new BindingContext(defaultModel, defaultNodeset, 1, true, null));
     }
 
     public Document getControlsDocument() {
@@ -295,7 +295,7 @@ public class XFormsControls {
             // Push "artificial" binding with just current node in nodeset
             final XFormsModel newModel = getCurrentModel();
             final int position = ((RepeatIterationInfo) controlInfo).getIteration();
-            contextStack.push(new BindingContext(newModel, currentNodeset.subList(position - 1, position), true, null));
+            contextStack.push(new BindingContext(newModel, currentNodeset, position, true, null));
         }
     }
 
@@ -392,7 +392,8 @@ public class XFormsControls {
         }
 
         // Push new context
-        contextStack.push(new BindingContext(newModel, newNodeset, newNodeset != currentBindingContext.getNodeset(), bindingElement));
+        final boolean newBind = newNodeset != currentBindingContext.getNodeset();
+        contextStack.push(new BindingContext(newModel, newNodeset, newBind ? 1 : currentBindingContext.getPosition(), newBind, bindingElement));
     }
 
     protected BindingContext getCurrentContext() {
@@ -409,7 +410,7 @@ public class XFormsControls {
 
             String currentModelId = currentBindingContext.getModel().getId();
             if ((currentModelId == null && modelId == null) || (modelId != null && modelId.equals(currentModelId)))
-                return (Node) currentBindingContext.getNodeset().get(0);
+                return currentBindingContext.getSingleNode();
         }
 
         // If not found, return the document element of the model's default instance
@@ -436,6 +437,13 @@ public class XFormsControls {
      */
     public List getCurrentNodeset() {
         return getCurrentContext().getNodeset();
+    }
+
+    /**
+     * Get the current position in current nodeset binding.
+     */
+    public int getCurrentPosition() {
+        return getCurrentContext().getPosition();
     }
 
     public void popBinding() {
@@ -726,11 +734,12 @@ public class XFormsControls {
 
                             if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
                                 final List items = new ArrayList();
-                                for (Iterator i = getCurrentNodeset().iterator(); i.hasNext();) {
+                                int currentPosition = 1;
+                                for (Iterator i = getCurrentNodeset().iterator(); i.hasNext(); currentPosition++) {
                                     Node currentNode = (Node) i.next();
 
                                     // Push "artificial" binding with just current node in nodeset
-                                    contextStack.push(new BindingContext(currentBindingContext.getModel(), Collections.singletonList(currentNode), true, null));
+                                    contextStack.push(new BindingContext(currentBindingContext.getModel(), getCurrentNodeset(), currentPosition, true, null));
                                     {
                                         // Handle children of xforms:itemset
 
@@ -859,7 +868,7 @@ public class XFormsControls {
                         Node currentNode = (Node) j.next();
 
                         // Push "artificial" binding with just current node in nodeset
-                        contextStack.push(new BindingContext(currentBindingContext.getModel(), Collections.singletonList(currentNode), true, null));
+                        contextStack.push(new BindingContext(currentBindingContext.getModel(), currentNodeset, currentIndex, true, null));
                         try {
                             // Handle children of xforms:repeat
                             if (doContinue) {
@@ -1088,12 +1097,14 @@ public class XFormsControls {
     protected static class BindingContext {
         private XFormsModel model;
         private List nodeset;
+        private int position = 1;
         private boolean newBind;
         private Element controlElement;
 
-        public BindingContext(XFormsModel model, List nodeSet, boolean newBind, Element controlElement) {
+        public BindingContext(XFormsModel model, List nodeSet, int position, boolean newBind, Element controlElement) {
             this.model = model;
             this.nodeset = nodeSet;
+            this.position = position;
             this.newBind = newBind;
             this.controlElement = controlElement;
         }
@@ -1104,6 +1115,10 @@ public class XFormsControls {
 
         public List getNodeset() {
             return nodeset;
+        }
+
+        public int getPosition() {
+            return position;
         }
 
         public boolean isNewBind() {
@@ -1121,7 +1136,7 @@ public class XFormsControls {
             if (nodeset.size() == 0)
                 throw new OXFException("Single node binding to nonexistent node in instance.");// , new LocationData(locator)
 
-            return (Node) nodeset.get(0);
+            return (Node) nodeset.get(position - 1);
         }
     }
 
@@ -1616,7 +1631,8 @@ public class XFormsControls {
                 super.evaluateValue(pipelineContext);
             } else {
                 // Value comes from the XPath expression within the value attribute
-                final String value = currentBindingContext.getModel().getDefaultInstance().evaluateXPathAsString(pipelineContext, currentBindingContext.getSingleNode(),
+                final String value = currentBindingContext.getModel().getDefaultInstance().evaluateXPathAsString(pipelineContext,
+                        currentBindingContext.getNodeset(), currentBindingContext.getPosition(),
                         "string(" + valueAttribute + ")", Dom4jUtils.getNamespaceContextNoDefault(getElement()), null, functionLibrary, null);
 
                 super.setValue(value);

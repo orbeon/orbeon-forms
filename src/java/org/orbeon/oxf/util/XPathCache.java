@@ -33,9 +33,7 @@ import org.orbeon.saxon.xpath.Variable;
 import org.orbeon.saxon.xpath.XPathEvaluator;
 import org.orbeon.saxon.xpath.XPathExpression;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Use the object cache to cache XPath expressions. Those are costly to parse.
@@ -90,50 +88,122 @@ public class XPathCache {
         return getXPathExpression(pipelineContext, contextNode, xpathExpression, prefixToURIMap, variableToValueMap, functionLibrary, null);
     }
 
+     public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
+                                                           NodeInfo contextNode,
+                                                           String xpathExpressionString,
+                                                           Map prefixToURIMap,
+                                                           Map variableToValueMap,
+                                                           FunctionLibrary functionLibrary,
+                                                           String baseURI) {
+     final List contextNodeSet = Collections.singletonList(contextNode);
+        return getXPathExpression(pipelineContext, contextNodeSet, 1, xpathExpressionString, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
+     }
+
+    public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
+                                                           List contextNodeSet, int contextPosition,
+                                                           String xpathExpression) {
+        return getXPathExpression(pipelineContext, contextNodeSet, contextPosition, xpathExpression, null, null, null, null);
+    }
+
+    public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
+                                                           List contextNodeSet, int contextPosition,
+                                                           String xpathExpression,
+                                                           Map prefixToURIMap) {
+        return getXPathExpression(pipelineContext, contextNodeSet, contextPosition, xpathExpression, prefixToURIMap, null, null, null);
+    }
+
+    public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
+                                                           List contextNodeSet, int contextPosition,
+                                                           String xpathExpression,
+                                                           Map prefixToURIMap,
+                                                           Map variableToValueMap) {
+        return getXPathExpression(pipelineContext, contextNodeSet, contextPosition, xpathExpression, prefixToURIMap, variableToValueMap, null, null);
+    }
+
+    public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
+                                                           List contextNodeSet, int contextPosition,
+                                                           String xpathExpression,
+                                                           Map prefixToURIMap,
+                                                           Map variableToValueMap,
+                                                           FunctionLibrary functionLibrary) {
+        return getXPathExpression(pipelineContext, contextNodeSet, contextPosition, xpathExpression, prefixToURIMap, variableToValueMap, functionLibrary, null);
+    }
 
 
     public static PooledXPathExpression getXPathExpression(PipelineContext pipelineContext,
-                                                           NodeInfo contextNode,
-                                                           String xpathExpression,
+                                                           List contextNodeSet, int contextPosition,
+                                                           String xpathExpressionString,
                                                            Map prefixToURIMap,
                                                            Map variableToValueMap,
                                                            FunctionLibrary functionLibrary,
                                                            String baseURI) {
         try {
-            Long validity = new Long(0);
-            Cache cache = ObjectCache.instance();
-            String cacheKeyString = xpathExpression;
-            if (variableToValueMap != null)
+            // Find pool from cache
+            final Long validity = new Long(0);
+            final Cache cache = ObjectCache.instance();
+            String cacheKeyString = xpathExpressionString;
+            if (variableToValueMap != null) {
                 for (Iterator i = variableToValueMap.keySet().iterator(); i.hasNext();) {
                     cacheKeyString = cacheKeyString + (String) i.next();
                 }
+            }
             if (functionLibrary != null)
                 cacheKeyString = cacheKeyString + functionLibrary.hashCode();
 
-            InternalCacheKey cacheKey = new InternalCacheKey("XPath Expression2", cacheKeyString);
+            final InternalCacheKey cacheKey = new InternalCacheKey("XPath Expression2", cacheKeyString);
             ObjectPool pool = (ObjectPool) cache.findValid(pipelineContext, cacheKey, validity);
             if (pool == null) {
-                pool = createXPathPool(contextNode, xpathExpression, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
+                final NodeInfo currentNode = (NodeInfo) contextNodeSet.get(contextPosition - 1);
+                // TODO
+//                final Configuration config = currentNode.getDocumentRoot().getConfiguration();
+//                pool = createXPathPool(config, xpathExpressionString, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
+                    pool = createXPathPool(currentNode, xpathExpressionString, prefixToURIMap, variableToValueMap, functionLibrary, baseURI);
                 cache.add(pipelineContext, cacheKey, validity, pool);
             }
-            Object o = pool.borrowObject();
-            PooledXPathExpression expr = (PooledXPathExpression) o;
-            expr.setContextNode(contextNode);
 
+            // Get object from pool
+            Object o = pool.borrowObject();
+
+            // Set variables
+            final PooledXPathExpression expr = (PooledXPathExpression) o;
             if (variableToValueMap != null) {
                 for (Iterator i = variableToValueMap.keySet().iterator(); i.hasNext();) {
                     String name = (String) i.next();
                     expr.setVariable(name, variableToValueMap.get(name));
                 }
             }
+
+            // Set context
+            // TODO
+            expr.setContextNodeSet(contextNodeSet, contextPosition);
+            expr.setContextNode((NodeInfo) contextNodeSet.get(contextPosition - 1));
+
             return expr;
         } catch (Exception e) {
             throw new OXFException(e);
         }
     }
 
+    // TODO
+//    private static ObjectPool createXPathPool(Configuration config,
+//                                              String xpathExpression,
+//                                              Map prefixToURIMap,
+//                                              Map variableToValueMap,
+//                                              FunctionLibrary functionLibrary,
+//                                              String baseURI) {
+//        try {
+//            SoftReferenceObjectPool pool = new SoftReferenceObjectPool();
+//
+//            pool.setFactory(new CachedPoolableObjetFactory(pool, config, xpathExpression,
+//                    prefixToURIMap, variableToValueMap, functionLibrary, baseURI));
+//
+//            return pool;
+//        } catch (Exception e) {
+//            throw new OXFException(e);
+//        }
+//    }
 
-    private static ObjectPool createXPathPool(NodeInfo contextNode,
+    private static ObjectPool createXPathPool(NodeInfo currentNode,
                                               String xpathExpression,
                                               Map prefixToURIMap,
                                               Map variableToValueMap,
@@ -142,7 +212,7 @@ public class XPathCache {
         try {
             SoftReferenceObjectPool pool = new SoftReferenceObjectPool();
 
-            pool.setFactory(new CachedPoolableObjetFactory(pool, contextNode, xpathExpression,
+            pool.setFactory(new CachedPoolableObjetFactory(pool, currentNode, xpathExpression,
                     prefixToURIMap, variableToValueMap, functionLibrary, baseURI));
 
             return pool;
@@ -151,9 +221,9 @@ public class XPathCache {
         }
     }
 
-
     private static class CachedPoolableObjetFactory implements PoolableObjectFactory {
-        private final NodeInfo contextNode;
+        private final NodeInfo currentNode;
+//        private final Configuration config;
         private final String xpathExpression;
         private final Map prefixToURIMap;
         private final Map variableToValueMap;
@@ -162,20 +232,37 @@ public class XPathCache {
         private final String baseURI;
 
         public CachedPoolableObjetFactory(ObjectPool pool,
-                                          NodeInfo contextNode,
+                                          NodeInfo currentNode,
                                           String xpathExpression,
                                           Map prefixToURIMap,
                                           Map variableToValueMap,
                                           FunctionLibrary functionLibrary,
                                           String baseURI) {
             this.pool = pool;
-            this.contextNode = contextNode;
+            this.currentNode = currentNode;
             this.xpathExpression = xpathExpression;
             this.prefixToURIMap = prefixToURIMap;
             this.variableToValueMap = variableToValueMap;
             this.functionLibrary = functionLibrary;
             this.baseURI = baseURI;
         }
+
+        // TODO
+//        public CachedPoolableObjetFactory(ObjectPool pool,
+//                                          Configuration config,
+//                                          String xpathExpression,
+//                                          Map prefixToURIMap,
+//                                          Map variableToValueMap,
+//                                          FunctionLibrary functionLibrary,
+//                                          String baseURI) {
+//            this.pool = pool;
+//            this.config = config;
+//            this.xpathExpression = xpathExpression;
+//            this.prefixToURIMap = prefixToURIMap;
+//            this.variableToValueMap = variableToValueMap;
+//            this.functionLibrary = functionLibrary;
+//            this.baseURI = baseURI;
+//        }
 
         public void activateObject(Object o) throws Exception {
         }
@@ -193,23 +280,23 @@ public class XPathCache {
                 logger.debug("makeObject(" + xpathExpression + ")");
 
             // Create Saxon XPath Evaluator
-            XPathEvaluator evaluator = new XPathEvaluator(contextNode.getDocumentRoot());
+//            XPathEvaluator evaluator = new XPathEvaluator(config);
+            XPathEvaluator evaluator = new XPathEvaluator(currentNode);
             StandaloneContext origContext = (StandaloneContext) evaluator.getStaticContext();
 
             // HACK: Workaround Saxon bug: need to allocate enough Slots to accomodate all variables
             int numberVariables = 1;  // at least 1 if LetExpression is used
             int index = 0;
-            while(index != -1) {
-                index = xpathExpression.indexOf("$", index+1);
+            while (index != -1) {
+                index = xpathExpression.indexOf("$", index + 1);
                 numberVariables++;
             }
             // Set the base URI if specified
-            if(baseURI != null)
+            if (baseURI != null)
                 origContext.setBaseURI(baseURI);
 
             StandaloneContext standaloneContext = new XPathCacheStandaloneContext(origContext, numberVariables);
             evaluator.setStaticContext(standaloneContext);
-
 
             // Declare namespaces
             if (prefixToURIMap != null) {
@@ -229,7 +316,7 @@ public class XPathCache {
                     variables.put(name, var);
                 }
             }
-            
+
             // Add function library
             if (functionLibrary != null) {
                 ((FunctionLibraryList) standaloneContext.getFunctionLibrary()).libraryList.add(0, functionLibrary);

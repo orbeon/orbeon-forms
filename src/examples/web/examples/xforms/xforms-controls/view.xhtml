@@ -228,7 +228,7 @@
                                 <xforms:label>Add carrier</xforms:label>
                                 <xforms:action  ev:event="DOMActivate">
                                     <xforms:insert nodeset="instance('items')/carriers/carrier" 
-                                        at="1" position="after"/>
+                                        at="last()" position="after"/>
                                     <xforms:setvalue ref="instance('items')/carriers/carrier[last()]/@value"
                                         value="instance('instance')/new-item/value"/>
                                     <xforms:setvalue ref="instance('items')/carriers/carrier[last()]/label"
@@ -239,7 +239,7 @@
                                 <xforms:label>Add flavor</xforms:label>
                                 <xforms:action  ev:event="DOMActivate">
                                     <xforms:insert nodeset="instance('items')/flavors/flavor" 
-                                        at="1" position="after"/>
+                                        at="last()" position="after"/>
                                     <xforms:setvalue ref="instance('items')/flavors/flavor[last()]/@value"
                                         value="instance('instance')/new-item/value"/>
                                     <xforms:setvalue ref="instance('items')/flavors/flavor[last()]/label"

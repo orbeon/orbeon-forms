@@ -158,7 +158,8 @@ public class DelegationProcessor extends ProcessorImpl {
                                         }
 
                                         // Populate envelope
-                                        SOAPEnvelope requestEnvelope = service.soapVersion.equals("1.2")
+                                        SOAPEnvelope requestEnvelope =
+                                                service.soapVersion != null && service.soapVersion.equals("1.2")
                                                 ? new SOAPEnvelope(SOAPConstants.SOAP12_CONSTANTS)
                                                 : new SOAPEnvelope();
                                         SOAPConstants soapConstants  = requestEnvelope.getSOAPConstants();

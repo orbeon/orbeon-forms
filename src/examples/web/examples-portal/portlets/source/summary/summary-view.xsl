@@ -39,7 +39,7 @@
             <xsl:for-each select="$example-descriptor/source-files/file">
                 <tr>
                     <td>
-                        <a href="/{$instance/example-id}/{@name}"><xsl:value-of select="@name"/></a>
+                        <a href="/{$instance/example-id}/{.}"><xsl:value-of select="."/></a>
                     </td>
                     <td style="text-align: right">
                         <xsl:value-of select="format-number(@size, '###,##0')"/>

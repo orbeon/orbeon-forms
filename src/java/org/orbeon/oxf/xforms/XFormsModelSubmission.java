@@ -528,6 +528,13 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             } else {
                                                 // Reconstruct model
                                                 replaceInstance.setInstanceDocument(resultingInstanceDocument);
+
+
+                                                // TODO: Errata says: "Once the XML instance data
+                                                // has been replaced, the rebuild, recalculate,
+                                                // revalidate and refresh operations are performed
+                                                // on the model, without dispatching events to
+                                                // invoke those four operations."
                                                 containingDocument.dispatchEvent(pipelineContext, new XFormsModelConstructEvent(model));
 
                                                 // Rebuild ControlsState

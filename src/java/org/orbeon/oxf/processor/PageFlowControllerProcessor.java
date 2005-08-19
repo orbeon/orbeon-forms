@@ -365,7 +365,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 addInput(new ASTInput("instance", Dom4jUtils.NULL_DOCUMENT));
                                 addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
                                 addInput(new ASTInput("matcher", Dom4jUtils.NULL_DOCUMENT));
-                                addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                                 final ASTOutput dataOutput = new ASTOutput("data", notFoundHTML);
                                 dataOutput.setLocationData(new ExtendedLocationData((LocationData) controllerDocument.getRootElement().getData(),
                                         "executing not found pipeline", new String[] { "pipeline", notFoundPipeline})); // use root element location data
@@ -373,7 +372,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             }});
 
                             // Send not-found through epilogue
-                            handleEpilogue(stepProcessorContext, controllerContext, statementsList, epilogueURL, epilogueElement, notFoundHTML, epilogueInstance, epilogueXFormsModel, 404);
+                            handleEpilogue(controllerContext, statementsList, epilogueURL, epilogueElement, notFoundHTML, epilogueInstance, epilogueXFormsModel, 404);
 
                             // Notify final epilogue that there is nothing to send
                             statementsList.add(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
@@ -395,7 +394,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addStatement(new ASTChoose(new ASTHrefId(html)) {{
                         addWhen(new ASTWhen("not(/*/@xsi:nil = 'true')") {{
                             setNamespaces(NAMESPACES_WITH_XSI_AND_XSLT);
-                            handleEpilogue(stepProcessorContext, controllerContext, getStatements(), epilogueURL, epilogueElement,
+                            handleEpilogue(controllerContext, getStatements(), epilogueURL, epilogueElement,
                                     html, epilogueInstance, epilogueXFormsModel, 200);
                         }});
                         addWhen(new ASTWhen());
@@ -417,9 +416,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         pipelineProcessor.start(context);
     }
 
-    private static void handleEpilogue(final StepProcessorContext stepProcessorContext, final String controllerContext,
-                                       List statements, final String epilogueURL, final Element epilogueElement, final ASTOutput html,
-                                       final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel,
+    private static void handleEpilogue(final String controllerContext, List statements, final String epilogueURL, final Element epilogueElement,
+                                       final ASTOutput html, final ASTOutput epilogueInstance, final ASTOutput epilogueXFormsModel,
                                        final int defaultStatusCode) {
         // Send result through epilogue
         if (epilogueURL == null) {
@@ -549,7 +547,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 addInput(new ASTInput("instance", Dom4jUtils.NULL_DOCUMENT));
                 addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
                 addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
-                addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                 addOutput(xformsModel);
             }});
         } else {
@@ -660,7 +657,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addInput(new ASTInput("instance", new ASTHrefId(xformedInstance)));
                             addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
                             addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
-                            addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                             final ASTOutput dataOutput = new ASTOutput("data", internalActionData);
                             final String[] locationParams =
                                 new String[] { "pipeline", actionAttribute, "page id", pageElement.attributeValue("id"), "when", whenAttribute };
@@ -788,7 +784,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         addInput(new ASTInput("instance", new ASTHrefId(xupdatedInstance)));
                         addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
                         addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
-                        addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                         final ASTOutput dataOutput = new ASTOutput("data", modelData);
                         final String[] locationParams =
                             new String[] { "page id", pageElement.attributeValue("id"), "model", modelAttribute };
@@ -817,7 +812,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         addInput(new ASTInput("instance", new ASTHrefId(modelInstance)));
                         addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
                         addInput(new ASTInput("matcher", new ASTHrefId(matcherOutput)));
-                        addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                         final ASTOutput dataOutput = new ASTOutput("data", html);
                         final String[] locationParams =
                             new String[] { "page id", pageElement.attributeValue("id"), "view", viewAttribute };
@@ -921,7 +915,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 addInput(new ASTInput("instance", Dom4jUtils.NULL_DOCUMENT));
                 addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
                 addInput(new ASTInput("matcher", Dom4jUtils.NULL_DOCUMENT));
-                addInput(new ASTInput("can-be-serializer", FALSE_DOCUMENT));
                 final ASTOutput dataOutput = new ASTOutput("data", otherPageXFormsModel);
                 final String[] locationParams =
                             new String[] { "result page id", resultPageId, "result page XForms model", otherXForms };
@@ -1152,7 +1145,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 setValidity(controllerValidity);
 
                 final ASTParam stepURLInput = addParam(new ASTParam(ASTParam.INPUT, "step-url"));
-                final ASTParam canBeSerializerInput = addParam(new ASTParam(ASTParam.INPUT, "can-be-serializer"));
                 final ASTParam dataInput = addParam(new ASTParam(ASTParam.INPUT, "data"));
                 final ASTParam instanceInput = addParam(new ASTParam(ASTParam.INPUT, "instance"));
                 final ASTParam xformsModelInput = addParam(new ASTParam(ASTParam.INPUT, "xforms-model"));
@@ -1246,7 +1238,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addOutput( instOut );
                         }});
 //                        final LocationData locDat = Dom4jUtils.getLocationData();
-                        outputNullIfStepCanBeSerializer(getStatements(), canBeSerializerInput, resultData, dataInput);
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                            addInput(new ASTInput("data", new ASTHrefId(dataInput)));
+                            final ASTOutput resDatOut = new ASTOutput( "data", resultData );
+    //                        resDatOut.setLocationData( locDat );
+                            addOutput( resDatOut );
+                        }});
                     }});
 
                     // XPL file with no output
@@ -1259,7 +1256,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
                         }});
 //                        final LocationData resDatLocDat = Dom4jUtils.getLocationData();
-                        outputNullIfStepCanBeSerializer(getStatements(), canBeSerializerInput, resultData, dataInput);
+                        addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
+                            addInput(new ASTInput("data", new ASTHrefId(dataInput)));
+                            final ASTOutput resDatOut = new ASTOutput( "data", resultData );
+    //                        resDatOut.setLocationData( locDat );
+                            addOutput( resDatOut );
+                        }});
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
 //                            final LocationData resInstLocDat = Dom4jUtils.getLocationData();
@@ -1349,30 +1351,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     final ASTOutput resDatOut = new ASTOutput( "data", instanceOutput );
 //                    resDatOut.setLocationData( locDat );
                     addOutput( resDatOut );
-                }});
-            }});
-        }
-
-        /**
-         * Send null in data output is step can be a serializer
-         */
-        private void outputNullIfStepCanBeSerializer(List statements, final ASTParam canBeSerializerInput, final ASTOutput resultData, final ASTParam dataInput) {
-            statements.add(new ASTChoose(new ASTHrefId(canBeSerializerInput)) {{
-                addWhen(new ASTWhen("/config = 'true'") {{
-                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                        addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
-                        final ASTOutput resDatOut = new ASTOutput( "data", resultData );
-//                        resDatOut.setLocationData( locDat );
-                        addOutput( resDatOut );
-                    }});
-                }});
-                addWhen(new ASTWhen() {{
-                    addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                        addInput(new ASTInput("data", new ASTHrefId(dataInput)));
-                        final ASTOutput resDatOut = new ASTOutput( "data", resultData );
-//                        resDatOut.setLocationData( locDat );
-                        addOutput( resDatOut );
-                    }});
                 }});
             }});
         }

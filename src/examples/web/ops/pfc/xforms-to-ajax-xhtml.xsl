@@ -448,7 +448,7 @@
         <xsl:variable name="current-repeat-iteration" select="$repeat-iterations[@id = $id]" as="element()?"/>
 
         <xsl:variable name="delimiter-local-name" as="xs:string" select="if (not(namespace-uri(*[1]) = 'http://www.w3.org/2002/xforms')) then local-name(*[1]) else 'div'"/>
-        <xsl:variable name="delimiter-namespace-uri" as="xs:string" select="if (not(namespace-uri(*[1]) = 'http://www.w3.org/2002/xforms')) then namespace-uri(*[1]) else 'http://www.w3.org/1999/xhtml'"/>
+        <xsl:variable name="delimiter-namespace-uri" as="xs:string" select="if (not(namespace-uri(*[1]) = 'http://www.w3.org/2002/xforms')) then xs:string(namespace-uri(*[1])) else 'http://www.w3.org/1999/xhtml'"/>
 
         <!-- Delimiter: begin repeat -->
         <xsl:copy-of select="xxforms:repeat-delimiter($delimiter-namespace-uri,

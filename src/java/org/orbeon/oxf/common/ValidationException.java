@@ -120,6 +120,11 @@ public class ValidationException extends OXFException {
         }
     }
 
+    public void addLocationData(LocationData locationData) {
+        if (locationData != null)
+            locationDataList.add(locationData);
+    }
+
     public LocationData getLocationData() {
         return (LocationData) ((locationDataList.size() == 0) ? null : locationDataList.get(0));
     }

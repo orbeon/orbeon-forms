@@ -89,26 +89,8 @@
                         <p:output name="data" id="xforms-models-controls"/>
                     </p:processor>
                     <!-- Builds request to XForms server -->
-                    <p:processor name="oxf:unsafe-xslt">
+                    <p:processor name="oxf:xforms-request-encoder">
                         <p:input name="data" href="#xforms-models-controls"/>
-                        <p:input name="config">
-                            <xxforms:event-request xsl:version="2.0"
-                                    xmlns:context="java:org.orbeon.oxf.pipeline.StaticExternalContext">
-                                <xxforms:static-state>
-                                    <xsl:variable name="static-state" as="document-node()">
-                                        <xsl:document>
-                                            <static-state>
-                                                <xsl:copy-of select="/*/models"/>
-                                                <xsl:copy-of select="/*/controls"/>
-                                            </static-state>
-                                        </xsl:document>
-                                    </xsl:variable>
-                                    <xsl:value-of select="context:encodeXML($static-state)"/>
-                                </xxforms:static-state>
-                                <xxforms:dynamic-state/>
-                                <xxforms:action/>
-                            </xxforms:event-request>
-                        </p:input>
                         <p:output name="data" id="xforms-request"/>
                     </p:processor>
                     <!-- Get initial instances -->

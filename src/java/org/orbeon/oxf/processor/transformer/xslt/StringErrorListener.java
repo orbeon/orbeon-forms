@@ -17,17 +17,21 @@ import org.apache.log4j.Logger;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.xml.sax.SAXException;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.SourceLocator;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMLocator;
+import java.util.List;
+import java.util.ArrayList;
 
 public class StringErrorListener implements ErrorListener {
 
     private Logger logger;
     private boolean hasErrors;
+    private List errorLocationData;
     private StringBuffer messages = new StringBuffer();
 
     public StringErrorListener(Logger logger) {
@@ -47,7 +51,8 @@ public class StringErrorListener implements ErrorListener {
     }
 
     public void error(TransformerException exception) throws TransformerException {
-        hasErrors = true;
+        addError(exception);
+
         String locationMessage = getLocationMessage(exception);
         String message = "Error"
                 + (locationMessage.length() > 0 ? " " + locationMessage + ":\n" : ": ")
@@ -79,12 +84,27 @@ public class StringErrorListener implements ErrorListener {
         throw exception;
     }
 
+    private void addError(TransformerException exception) {
+        hasErrors = true;
+
+        if (errorLocationData == null)
+            errorLocationData = new ArrayList();
+
+        final LocationData locationData = getTransformerExceptionLocationData(exception, null);
+        if (locationData != null)
+            errorLocationData.add(locationData);
+    }
+
     public boolean hasErrors() {
         return hasErrors;
     }
 
     public String getMessages() {
         return messages.toString();
+    }
+
+    public List getErrors() {
+        return errorLocationData;
     }
 
     /**

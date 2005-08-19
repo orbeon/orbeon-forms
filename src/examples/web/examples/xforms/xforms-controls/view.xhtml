@@ -97,8 +97,7 @@
                 <xforms:bind nodeset="secret" constraint="string(.) = '42'"/>
                 <xforms:bind nodeset="textarea" constraint="string-length(.) > 10"/>
                 <xforms:bind nodeset="date" type="xs:date"/>
-                <xforms:bind nodeset="date2" type="xs:date"/>
-                <xforms:bind nodeset="time" type="xs:time"/>
+                <!--<xforms:bind nodeset="time" type="xs:time"/>-->
                 <xforms:bind nodeset="range/letter" calculate="
                     for $value in ../value return
                     ('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 

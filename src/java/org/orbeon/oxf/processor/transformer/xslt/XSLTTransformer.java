@@ -134,14 +134,14 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     if (transformerClassName.equals("net.sf.saxon.Controller") || transformerClassName.equals("org.orbeon.saxon.Controller")) {
                         saxonStringWriter = new StringWriter();
                         Object saxonTransformer = transformerHandler.getTransformer();
-                        Method getMessageEmitter = saxonTransformer.getClass().getMethod("getMessageEmitter", new Class[] {});
-                        Object messageEmitter = getMessageEmitter.invoke(saxonTransformer, new Object[] {});
+                        Method getMessageEmitter = saxonTransformer.getClass().getMethod("getMessageEmitter", new Class[]{});
+                        Object messageEmitter = getMessageEmitter.invoke(saxonTransformer, new Object[]{});
                         if (messageEmitter == null) {
-                            Method makeMessageEmitter = saxonTransformer.getClass().getMethod("makeMessageEmitter", new Class[] {});
-                            messageEmitter = makeMessageEmitter.invoke(saxonTransformer, new Object[] {});
+                            Method makeMessageEmitter = saxonTransformer.getClass().getMethod("makeMessageEmitter", new Class[]{});
+                            messageEmitter = makeMessageEmitter.invoke(saxonTransformer, new Object[]{});
                         }
-                        Method setWriter = messageEmitter.getClass().getMethod("setWriter", new Class[] {Writer.class});
-                        setWriter.invoke(messageEmitter, new Object[] {saxonStringWriter});
+                        Method setWriter = messageEmitter.getClass().getMethod("setWriter", new Class[]{Writer.class});
+                        setWriter.invoke(messageEmitter, new Object[]{saxonStringWriter});
                     }
 
                     transformerHandler.setResult(new SAXResult(new SimpleForwardingContentHandler(contentHandler) {
@@ -177,9 +177,25 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     } finally {
                         // Log message from Saxon
                         if (saxonStringWriter != null) {
-                            String message =  saxonStringWriter.toString();
+                            String message = saxonStringWriter.toString();
                             if (message.length() > 0)
                                 logger.info(message);
+                        }
+                    }
+
+                    // Check whether some errors were added
+                    if (errorListener.hasErrors()) {
+                        final List errors = errorListener.getErrors();
+                        if (errors != null) {
+                            ValidationException ve = null;
+                            for (Iterator i = errors.iterator(); i.hasNext();) {
+                                final LocationData currentLocationData = (LocationData) i.next();
+
+                                if (ve == null)
+                                    ve = new ValidationException("Errors while executing transformation", currentLocationData);
+                                else
+                                    ve.addLocationData(currentLocationData);
+                            }
                         }
                     }
                 } catch (ValidationException e) {
@@ -189,7 +205,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             = StringErrorListener.getTransformerExceptionLocationData(e, transformer.systemId);
                     throw new ValidationException(e, extendedLocationData);
                 } catch (Exception e) {
-                     if (transformer.systemId != null) {
+                    if (transformer.systemId != null) {
                         throw new ValidationException(e, new LocationData(transformer.systemId, -1, -1));
                     } else {
                         throw new OXFException(e);
@@ -236,7 +252,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     for (Iterator i = allURIReferences.iterator(); i.hasNext();) {
                         URIReference uriReference = (URIReference) i.next();
                         Processor urlGenerator = new URLGenerator(URLFactory.createURL(uriReference.context, uriReference.spec));
-                        validities.add(((ProcessorOutputImpl)urlGenerator.createOutput(OUTPUT_DATA)).getValidity(context));
+                        validities.add(((ProcessorOutputImpl) urlGenerator.createOutput(OUTPUT_DATA)).getValidity(context));
                     }
                     return validities;
                 } catch (IOException e) {
@@ -278,7 +294,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
              * Transformer object). While reading the input, figures out the direct
              * dependencies on other files (URIReferences object), and stores
              * these two mappings in cache:
-             *
+             * <p/>
              * <pre>
              * configKey        -> uriReferences
              * uriReferencesKey -> transformer
@@ -299,7 +315,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             XMLReader xmlReader = new ProcessorOutputXMLReader(context, getInputByName(INPUT_CONFIG).getOutput()) {
                                 public void setContentHandler(ContentHandler handler) {
                                     super.setContentHandler(new TeeContentHandler(Arrays.asList(new Object[]{
-                                        topStylesheetContentHandler, handler})));
+                                            topStylesheetContentHandler, handler})));
                                 }
                             };
                             stylesheetSAXSource = new SAXSource(xmlReader, new InputSource());
@@ -351,8 +367,20 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     final ExtendedLocationData extendedLocationData
                             = StringErrorListener.getTransformerExceptionLocationData(e, topStylesheetContentHandler.getSystemId());
 
-                    throw new ValidationException(e, extendedLocationData);
-//                        throw new ValidationException(e, new ExtendedLocationData(systemId, line, column, "creating transformer"));
+                    final ValidationException ve = new ValidationException(e, extendedLocationData);
+
+                    // Append location data gathered from error listener
+                    if (errorListener.hasErrors()) {
+                        final List errors = errorListener.getErrors();
+                        if (errors != null) {
+                            for (Iterator i = errors.iterator(); i.hasNext();) {
+                                final LocationData currentLocationData = (LocationData) i.next();
+                                ve.addLocationData(currentLocationData);
+                            }
+                        }
+                    }
+
+                    throw ve;
                 } catch (Exception e) {
                     if (topStylesheetContentHandler.getSystemId() != null) {
                         if (errorListener.hasErrors()) {
@@ -555,8 +583,8 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     foundDocFunction = true;
                     // Call to doc(...)
                     if (subExpressionsIterator.hasNext()) {
-                        Object value =  subExpressionsIterator.next();
-                        if(value instanceof StringValue) {
+                        Object value = subExpressionsIterator.next();
+                        if (value instanceof StringValue) {
                             // doc(...) call just contains a string, record the URI
                             String uri = ((StringValue) value).getStringValue();
                             // We don't need to worry here about reference to the processor inputs
@@ -576,8 +604,8 @@ public abstract class XSLTTransformer extends ProcessorImpl {
 
             if (!foundDocFunction) {
                 // Recurse in subexpressions
-                for (Iterator i = expression.iterateSubExpressions() ;i.hasNext();) {
-                    visitExpression((Expression)i.next());
+                for (Iterator i = expression.iterateSubExpressions(); i.hasNext();) {
+                    visitExpression((Expression) i.next());
                 }
             }
         }

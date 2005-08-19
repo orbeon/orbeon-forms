@@ -568,7 +568,7 @@ public class XFormsControls {
                 final BindingContext currentBindingContext = getCurrentContext();
                 final List currentNodeset = currentBindingContext.getNodeset();
 
-                if (!(controlInfo instanceof RepeatControlInfo && currentNodeset.size() == 0)) {
+                if (!(controlInfo instanceof RepeatControlInfo && currentNodeset != null && currentNodeset.size() == 0)) {
                     final Node currentNode = currentBindingContext.getSingleNode();
 
                     // Get model item properties
@@ -735,31 +735,34 @@ public class XFormsControls {
                             if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
                                 final List items = new ArrayList();
                                 int currentPosition = 1;
-                                for (Iterator i = getCurrentNodeset().iterator(); i.hasNext(); currentPosition++) {
-                                    Node currentNode = (Node) i.next();
+                                final List currentNodeSet = getCurrentNodeset();
+                                if (currentNodeSet != null) {
+                                    for (Iterator i = currentNodeSet.iterator(); i.hasNext(); currentPosition++) {
+                                        Node currentNode = (Node) i.next();
 
-                                    // Push "artificial" binding with just current node in nodeset
-                                    contextStack.push(new BindingContext(currentBindingContext.getModel(), getCurrentNodeset(), currentPosition, true, null));
-                                    {
-                                        // Handle children of xforms:itemset
-
-                                        pushBinding(pipelineContext, itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME));
-                                        final String label = getCurrentSingleNodeValue();
-                                        popBinding();
-                                        final Element valueCopyElement;
+                                        // Push "artificial" binding with just current node in nodeset
+                                        contextStack.push(new BindingContext(currentBindingContext.getModel(), getCurrentNodeset(), currentPosition, true, null));
                                         {
-                                            final Element valueElement = itemsetElement.element(XFormsConstants.XFORMS_VALUE_QNAME);
-                                            valueCopyElement = (valueElement != null)
-                                                ? valueElement : itemsetElement.element(XFormsConstants.XFORMS_COPY_QNAME);
-                                        }
-                                        pushBinding(pipelineContext, valueCopyElement);
-                                        final String value = getCurrentSingleNodeValue();;
-                                        // TODO: handle xforms:copy
-                                        items.add(new ItemsetInfo(selectControlId, label, value));
+                                            // Handle children of xforms:itemset
 
-                                        popBinding();
+                                            pushBinding(pipelineContext, itemsetElement.element(XFormsConstants.XFORMS_LABEL_QNAME));
+                                            final String label = getCurrentSingleNodeValue();
+                                            popBinding();
+                                            final Element valueCopyElement;
+                                            {
+                                                final Element valueElement = itemsetElement.element(XFormsConstants.XFORMS_VALUE_QNAME);
+                                                valueCopyElement = (valueElement != null)
+                                                    ? valueElement : itemsetElement.element(XFormsConstants.XFORMS_COPY_QNAME);
+                                            }
+                                            pushBinding(pipelineContext, valueCopyElement);
+                                            final String value = getCurrentSingleNodeValue();;
+                                            // TODO: handle xforms:copy
+                                            items.add(new ItemsetInfo(selectControlId, label, value));
+
+                                            popBinding();
+                                        }
+                                        contextStack.pop();
                                     }
-                                    contextStack.pop();
                                 }
                                 if (resultMap[0] == null)
                                     resultMap[0] = new HashMap();
@@ -864,23 +867,25 @@ public class XFormsControls {
                     // Iterate over current xforms:repeat nodeset
                     final List currentNodeset = getCurrentNodeset();
                     int currentIndex = 1;
-                    for (Iterator j = currentNodeset.iterator(); j.hasNext(); currentIndex++) {
-                        Node currentNode = (Node) j.next();
+                    if (currentNodeset != null) {
+                        for (Iterator j = currentNodeset.iterator(); j.hasNext(); currentIndex++) {
+                            Node currentNode = (Node) j.next();
 
-                        // Push "artificial" binding with just current node in nodeset
-                        contextStack.push(new BindingContext(currentBindingContext.getModel(), currentNodeset, currentIndex, true, null));
-                        try {
-                            // Handle children of xforms:repeat
-                            if (doContinue) {
-                                controlElementVisitorListener.startRepeatIteration(currentIndex);
-                                doContinue = handleControls(pipelineContext, controlElementVisitorListener, controlElement, idPostfix + "-" + currentIndex);
-                                controlElementVisitorListener.endRepeatIteration(currentIndex);
+                            // Push "artificial" binding with just current node in nodeset
+                            contextStack.push(new BindingContext(currentBindingContext.getModel(), currentNodeset, currentIndex, true, null));
+                            try {
+                                // Handle children of xforms:repeat
+                                if (doContinue) {
+                                    controlElementVisitorListener.startRepeatIteration(currentIndex);
+                                    doContinue = handleControls(pipelineContext, controlElementVisitorListener, controlElement, idPostfix + "-" + currentIndex);
+                                    controlElementVisitorListener.endRepeatIteration(currentIndex);
+                                }
+                            } finally {
+                                contextStack.pop();
                             }
-                        } finally {
-                            contextStack.pop();
+                            if (!doContinue)
+                                break;
                         }
-                        if (!doContinue)
-                            break;
                     }
 
                     doContinue = doContinue && controlElementVisitorListener.endVisitControl(controlElement, effectiveControlId);
@@ -1107,6 +1112,10 @@ public class XFormsControls {
             this.position = position;
             this.newBind = newBind;
             this.controlElement = controlElement;
+
+//            if (nodeSet == null) {
+//                System.out.println("abc");
+//            }
         }
 
         public XFormsModel getModel() {
@@ -1133,7 +1142,7 @@ public class XFormsControls {
          * Get the current single node binding, if any.
          */
         public Node getSingleNode() {
-            if (nodeset.size() == 0)
+            if (nodeset == null || nodeset.size() == 0)
                 throw new OXFException("Single node binding to nonexistent node in instance.");// , new LocationData(locator)
 
             return (Node) nodeset.get(position - 1);

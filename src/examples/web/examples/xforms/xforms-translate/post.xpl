@@ -17,6 +17,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
     <p:param name="instance" type="input"/>
+    <p:param name="data" type="output"/>
 
     <p:processor name="oxf:pipeline">
         <p:input name="config" href="translate.xpl"/>
@@ -25,7 +26,7 @@
         <p:output name="data" id="target"/>
     </p:processor>
     
-    <!-- Build respnse -->
+    <!-- Build response -->
     <p:processor name="oxf:xslt">
         <p:input name="data" href="#instance"/>
         <p:input name="target" href="#target"/>
@@ -39,17 +40,7 @@
                 </xsl:template>
             </xsl:transform>
         </p:input>
-        <p:output name="data" id="xml-response"/>
-    </p:processor>
-
-    <!-- Send response -->
-    <p:processor name="oxf:xml-serializer">
-        <p:input name="data" href="#xml-response"/>
-        <p:input name="config">
-            <config>
-                <content-type>application/xml</content-type>
-            </config>
-        </p:input>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

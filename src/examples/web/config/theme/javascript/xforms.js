@@ -832,10 +832,30 @@ function xformsHandleResponse() {
                                         while (template.nodeType != ELEMENT_TYPE)
                                             template = template.nextSibling;
                                             
-                                        // Remove content
-                                        while (documentElement.childNodes.length > 0)
+                                        // Function to find the input element below a given node
+                                        function getInput(node) {
+                                            if (node.nodeType == ELEMENT_TYPE) {
+                                                if (node.tagName == "INPUT") {
+                                                    return node;
+                                                } else {
+                                                    for (var childIndex in node.childNodes) {
+                                                        var result = getInput(node.childNodes[childIndex]);
+                                                        if (result != null) return result;
+                                                    }
+                                                }
+                                            } else {
+                                                return null;
+                                            }
+                                        }
+
+                                        // Remove content and store current checked value
+                                        var valueToChecked = new Array();
+                                        while (documentElement.childNodes.length > 0) {
+                                            var input = getInput(documentElement.firstChild);
+                                            valueToChecked[input.value] = input.checked;
                                             documentElement.removeChild(documentElement.firstChild);
-                                            
+                                        }
+
                                         // Recreate content based on template
                                         for (var k = 0; k < itemsetElement.childNodes.length; k++) {
                                             var itemElement = itemsetElement.childNodes[k];
@@ -845,6 +865,9 @@ function xformsHandleResponse() {
                                                     itemElement.getAttribute("label"));
                                                 xformsStringReplace(templateClone, "$xforms-template-value$", 
                                                     itemElement.getAttribute("value"));
+                                                // Restore checked state after copy
+                                                if (valueToChecked[itemElement.getAttribute("value")] == true)
+                                                    getInput(templateClone).checked = true;
                                                 documentElement.appendChild(templateClone);
                                             }
                                         }

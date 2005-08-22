@@ -333,6 +333,4 @@ public class XPathCache {
             return true;
         }
     }
-
-
 }

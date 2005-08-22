@@ -425,6 +425,7 @@ function xformsInitializeControlsUnder(root) {
         var isIncremental = false;
         var isXFormsCheckboxRadio = false;
         var isXFormsComboboxList = false;
+        var isXFormsTrigger = false;
         var isWidget = false;
         var isXFormsRange = false;
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
@@ -441,6 +442,8 @@ function xformsInitializeControlsUnder(root) {
                 isXFormsCheckboxRadio = true;
             if (className == "xforms-select-compact" || className == "xforms-select1-minimal")
                 isXFormsComboboxList = true;
+            if (className == "xforms-trigger")
+                isXFormsTrigger = true;
             if (className.indexOf("widget-") != -1)
                 isWidget = true;
         }
@@ -452,12 +455,13 @@ function xformsInitializeControlsUnder(root) {
 
         if (isXFormsElement) {
 
-            if (control.tagName == "BUTTON") {
-                // Handle click
+            if (isXFormsTrigger) {
+                // Handle click on trigger
                 if (!control.xformsButtonListenerRegistered) {
                     control.xformsButtonListenerRegistered = true;
                     xformsAddEventListener(control, "click", function(event) {
                         xformsFireEvents(new Array(xformsCreateEventArray(getEventTarget(event), "DOMActivate", null)));
+                        return false;
                     });
                 }
             } else if (isXFormsCheckboxRadio) {

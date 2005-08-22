@@ -207,6 +207,7 @@
                                                     <xforms:input ref="claim:address-detail/claim:street-number">
                                                         <xforms:hint>Street Number</xforms:hint>
                                                         <xforms:help>Please enter a street number here</xforms:help>
+                                                        <xforms:alert>Incorrect street number</xforms:alert>
                                                     </xforms:input>
                                                 </td>
                                             </tr>

@@ -72,15 +72,19 @@ public class TaminoQueryProcessor extends TaminoProcessor {
                     if (query != null) {
                         if(logger.isDebugEnabled())
                             logger.debug("Executing X-Query: "+query);
+                        handler.startDocument();
                         handler.startElement("", "result", "result", XMLUtils.EMPTY_ATTRIBUTES);
                         response = accessor.query(TQuery.newInstance(query));
                         handler.endElement("", "result", "result");
+                        handler.endDocument();
                     } else if (xquery != null) {
                         if(logger.isDebugEnabled())
                             logger.debug("Executing XQuery: "+xquery);
+                        handler.startDocument();
                         handler.startElement("", "result", "result", XMLUtils.EMPTY_ATTRIBUTES);
                         response = accessor.xquery(TXQuery.newInstance(xquery));
                         handler.endElement("", "result", "result");
+                        handler.endDocument();
                     } else
                         throw new OXFException("Query or XQuery must be present");
 

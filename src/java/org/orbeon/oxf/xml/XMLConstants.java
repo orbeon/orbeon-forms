@@ -52,6 +52,8 @@ public class XMLConstants {
     public final static QName RESOURCE_SERVER_PROCESSOR_QNAME = new QName("resource-server", OXF_PROCESSORS_NAMESPACE);
     public final static QName URL_GENERATOR_PROCESSOR_QNAME = new QName("url-generator", OXF_PROCESSORS_NAMESPACE);
     public final static QName DOM_GENERATOR_PROCESSOR_QNAME = new QName("dom-generator", OXF_PROCESSORS_NAMESPACE);
+    public final static QName EXCEPTION_PROCESSOR_QNAME = new QName("exception", OXF_PROCESSORS_NAMESPACE);
+    public final static QName ERROR_PROCESSOR_QNAME = new QName("error", OXF_PROCESSORS_NAMESPACE);
 
     public final static QName XS_STRING_QNAME = new QName("string", XSD_NAMESPACE);
     public final static QName XS_BOOLEAN_QNAME = new QName("boolean", XSD_NAMESPACE);

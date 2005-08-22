@@ -15,22 +15,18 @@ package org.orbeon.oxf.processor;
 
 import org.dom4j.Document;
 import org.orbeon.oxf.common.ValidationException;
-import org.xml.sax.ContentHandler;
+import org.orbeon.oxf.pipeline.api.PipelineContext;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 
 public class ErrorProcessor extends ProcessorImpl {
 
     public ErrorProcessor() {
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, INPUT_DATA));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
     }
 
-    public ProcessorOutput createOutput(String name) {
-        ProcessorOutput output = new ProcessorImpl.CacheableTransformerOutputImpl(getClass(), name) {
-            public void readImpl(org.orbeon.oxf.pipeline.api.PipelineContext context, ContentHandler contentHandler) {
-                Document config = readCacheInputAsDOM4J(context, INPUT_CONFIG);
-                throw new ValidationException((String) config.selectObject("string(/)"), getLocationData());
-            }
-        };
-        addOutput(name, output);
-        return output;
-    };
+    public void start(PipelineContext context) {
+        Document config = readCacheInputAsDOM4J(context, INPUT_CONFIG);
+        throw new ValidationException((String) config.selectObject("string(/)"),
+                (LocationData) config.getRootElement().getData());
+    }
 }

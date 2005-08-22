@@ -360,7 +360,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         } else {
                             // [BACKWARD COMPATIBILITY] - Execute simple "not-found" page coming from properties
                             final ASTOutput notFoundHTML = new ASTOutput(null, "not-found-html");
-                            statementsList.add(new StepProcessorCall(stepProcessorContext, controllerContext, notFoundPipeline) {{
+                            statementsList.add(new StepProcessorCall(stepProcessorContext, controllerContext, notFoundPipeline, "not-found") {{
                                 addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                                 addInput(new ASTInput("instance", Dom4jUtils.NULL_DOCUMENT));
                                 addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
@@ -542,7 +542,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
         if (xformsAttribute != null) {
             // Get default XForms model if present
-            statementsList.add(new StepProcessorCall(stepProcessorContext, controllerContext, xformsAttribute) {{
+            statementsList.add(new StepProcessorCall(stepProcessorContext, controllerContext, xformsAttribute, "xforms-model") {{
                 addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                 addInput(new ASTInput("instance", Dom4jUtils.NULL_DOCUMENT));
                 addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
@@ -652,7 +652,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             new ASTOutput(null, "internal-action-data-" + pageNumber + "-" + actionNumber[0]);
                     if (actionAttribute != null) {
                         // TODO: handle passing and modifications of action data in model, and view, and pass to instance
-                        addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, actionAttribute) {{
+                        addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, actionAttribute, "action") {{
                             addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                             addInput(new ASTInput("instance", new ASTHrefId(xformedInstance)));
                             addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
@@ -779,7 +779,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 final ASTOutput modelData = new ASTOutput(null, "model-data");
                 final ASTOutput modelInstance = new ASTOutput(null, "model-instance");
                 if (modelAttribute != null) {
-                    addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, modelAttribute) {{
+                    addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, modelAttribute, "model") {{
                         addInput(new ASTInput("data", new ASTHrefId(actionData)));
                         addInput(new ASTInput("instance", new ASTHrefId(xupdatedInstance)));
                         addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
@@ -807,7 +807,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                 if (viewAttribute != null) {
                     // View
-                    addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, viewAttribute) {{
+                    addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, viewAttribute, "view") {{
                         addInput(new ASTInput("data", new ASTHrefId(modelData)));
                         addInput(new ASTInput("instance", new ASTHrefId(modelInstance)));
                         addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
@@ -910,7 +910,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
         if (!useCurrentPageInstance) {
             final ASTOutput otherPageXFormsModel = new ASTOutput("data", "other-page-model");
-            when.addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, otherXForms) {{
+            when.addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, otherXForms, "xforms-model") {{
                 addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));
                 addInput(new ASTInput("instance", Dom4jUtils.NULL_DOCUMENT));
                 addInput(new ASTInput("xforms-model", Dom4jUtils.NULL_DOCUMENT));
@@ -1145,6 +1145,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 setValidity(controllerValidity);
 
                 final ASTParam stepURLInput = addParam(new ASTParam(ASTParam.INPUT, "step-url"));
+                final ASTParam stepTypeInput = addParam(new ASTParam(ASTParam.INPUT, "step-type"));
                 final ASTParam dataInput = addParam(new ASTParam(ASTParam.INPUT, "data"));
                 final ASTParam instanceInput = addParam(new ASTParam(ASTParam.INPUT, "instance"));
                 final ASTParam xformsModelInput = addParam(new ASTParam(ASTParam.INPUT, "xforms-model"));
@@ -1180,6 +1181,25 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                 final ASTOutput resultData = new ASTOutput(null, "result-data");
                 final ASTOutput resultInstance = new ASTOutput(null, "result-instance");
+
+                // Perform verifications on input/output of XPL
+                addStatement(new ASTChoose(new ASTHrefId(stepTypeInput)) {{
+                    addWhen(new ASTWhen("/step-type = 'view'") {{
+                        // We are dealing with a view
+                        addStatement(new ASTChoose(new ASTHrefId(content)) {{
+                            addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/pipeline' " +
+                                "and count(/*/*[local-name() = 'param' and @type = 'output' and @name = 'data']) = 0") {{
+                                // The XPL has not data output
+                                addStatement(new ASTProcessorCall(XMLConstants.ERROR_PROCESSOR_QNAME) {{
+                                    final Document errorDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("error"));
+                                    errorDocument.getRootElement().addText("XPL view must have a 'data' output");
+                                    addInput(new ASTInput("config", errorDocument));
+                                }});
+                            }});
+                        }});
+                    }});
+                }});
+
                 addStatement(new ASTChoose(new ASTHrefId(content)) {{
 
                     // XPL file with instance & data output
@@ -1361,13 +1381,18 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
     }
 
     private static class StepProcessorCall extends ASTProcessorCall {
-        public StepProcessorCall(StepProcessorContext stepProcessorContext, String controllerContext, String uri) {
+        public StepProcessorCall(StepProcessorContext stepProcessorContext, String controllerContext, String uri, String stepType) {
             super(new PipelineProcessor(stepProcessorContext.getPipelineConfig()));
             try {
+                // Create document and input for URI
                 final String url = URLFactory.createURL(controllerContext, uri).toExternalForm();
                 final Document configDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("config"));
                 configDocument.getRootElement().addText(url);
                 addInput(new ASTInput("step-url", configDocument));
+                // Create document and input for step type
+                final Document stepTypeDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("step-type"));
+                stepTypeDocument.getRootElement().addText(stepType);
+                addInput(new ASTInput("step-type", stepTypeDocument));
             } catch (MalformedURLException e) {
                 throw new OXFException(e);
             }

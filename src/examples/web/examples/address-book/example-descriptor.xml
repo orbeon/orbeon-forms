@@ -27,16 +27,18 @@
             </p>
             <h4>Database Initialization</h4>
             <p>
-                This example necessitates a working database. By default, the test database embedded
-                with OPS is used. A special pipeline, <code>init-database.xpl</code>, creates
-                tables and inserts sample data if the tables don't exist in the database yet. Here
-                is the database schema, containing only one table: <code>create cached table
-                oxf_address_book (id identity, first varchar, last varchar, phone varchar)</code>
+                This example necessitates a working database. By default, the test database
+                embedded with OPS is used. A special pipeline, <code>init-database.xpl</code>,
+                creates tables and inserts sample data if the tables don't exist in the database
+                yet. Here is the database schema, containing only one table: <code>create cached
+                table oxf_address_book (id identity, first varchar, last varchar, phone
+                varchar)</code>
             </p>
             <h4>Displaying All Records</h4>
             <p>
-                This example displays the content of the table in the database. <code>model.xpl</code>
-                generates data in the XML syntax shown below:
+                This example displays the content of the table in the database. The <a
+                href="/goto-source/address-book/model.xpl" f:url-type="resource">page model XPL
+                pipeline</a> generates data in the XML syntax shown below:
             </p>
             <f:xml-source>
                 <friends>
@@ -55,74 +57,80 @@
                 </friends>
             </f:xml-source>
             <p>
-                The snippet below shows the SQL Processor configuration. The <code>sql:query</code>
-                element contains the SQL statement, selecting all rows from the <code>friends</code>
-                table. The <code>sql:results</code> and <code>sql:row-result</code> elements construct
-                the document one row at a time.
+                The XPL pipeline uses the SQL processor to query data from the relational database.
+                It is provided a configuration with the following elements:
             </p>
-
+            <ul>
+                <li>
+                    <p>
+                        <b><code>sql:query</code>:</b> contains the SQL statement, selecting all
+                        rows from the <code>friends</code> table.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b><code>sql:result-set</code> and <code>sql:row-iterator</code>:</b>
+                        iterate over the SQL result-set.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b><code>sql:get-column-value</code>:</b> get column values for the current
+                        result-set row.
+                    </p>
+                </li>
+            </ul>
             <f:xml-source>
                 <sql:config xmlns:sql="http://orbeon.org/oxf/xml/sql">
                     <sql:connection>
                         <sql:execute>
                             <sql:query>select * from friends</sql:query>
-                            <sql:results>
+                            <sql:result-set>
                                 <friends>
-                                    <sql:row-results>
+                                    <sql:row-iterator>
                                         <friend>
                                             <id>
-                                                <sql:get-column type="xs:string" column="id"/>
+                                                <sql:get-column-value type="xs:string" column="id"/>
                                             </id>
                                             <first>
-                                                <sql:get-column type="xs:string" column="first"/>
+                                                <sql:get-column-value type="xs:string" column="first"/>
                                             </first>
                                             <last>
-                                                <sql:get-column type="xs:string" column="last"/>
+                                                <sql:get-column-value type="xs:string" column="last"/>
                                             </last>
                                             <phone>
-                                                <sql:get-column type="xs:string" column="phone"/>
+                                                <sql:get-column-value type="xs:string" column="phone"/>
                                             </phone>
                                         </friend>
-                                    </sql:row-results>
+                                    </sql:row-iterator>
                                 </friends>
-                            </sql:results>
+                            </sql:result-set>
                         </sql:execute>
                     </sql:connection>
                 </sql:config>
             </f:xml-source>
             <p>
-                Finally, <code>view.xsl</code> transforms the result document into HTML with a simple
-                XSLT stylesheet.
+                The <a href="/goto-source/address-book/view.xsl" f:url-type="resource">page view
+                (<code>view.xsl</code>)</a> is an XSLT stylesheet which transforms the document
+                produced by the page model into HTML. The page view also contains XForms controls,
+                including the text fields and buttons.
             </p>
             <h4>Inserting and Deleting Records</h4>
             <p>
                 To insert or delete a record, you need to provide an <a
                 href="/goto-source/address-book/xforms-model.xml" f:url-type="resource">XForms
-                model</a>. In this case, the model contains four database fields <code>id</code>,
-                <code>first</code>, <code>last</code>, and <code>phone</code>. Additionally, it
-                contains an action field indicating which action is going to take place. You also
-                need to add the necessary XForms controls to the <a
-                href="/goto-source/address-book/view.vsl" f:url-type="resource">page view</a>,
-                including the four text fields and buttons. Modify the <a
-                href="/goto-source/address-book/model.xpl" f:url-type="resource">page model
-                pipeline</a> to act depending upon the value of the <code>action</code> form field.
-                This choice is made with the <a href="/doc/reference-xpl-pipelines#choose"
-                f:url-type="resource"> <code>p:choose</code> </a> construct. The status information
-                is sent to the view through the <code>status</code> element.
+                model</a> which is submitted when the user presses the "Add" or "Delete" buttons.
+                The model contains four database fields <code>id</code>, <code>first</code>,
+                <code>last</code>, and <code>phone</code>. Additionally, it contains an action field
+                indicating which action must take place.
             </p>
-            <f:xml-source>
-                <p:choose href="#instance" xmlns:p="http://www.orbeon.com/oxf/pipeline">
-                    <p:when test="/form/action='add'">
-                        <status>Inserted record</status>
-                    </p:when>
-                    <p:when test="starts-with(/form/action, 'del-')">
-                        <status>Deleted record</status>
-                    </p:when>
-                    <p:otherwise>
-                        <status>Read data</status>
-                    </p:otherwise>
-                </p:choose>
-            </f:xml-source>
+            <p>
+                Depending on whether the action is <code>add</code> or <code>delete</code>, the <a
+                href="/goto-source/address-book/add-action.xml" f:url-type="resource">"add" action
+                pipeline</a> or the <a href="/goto-source/address-book/delete-action.xml"
+                f:url-type="resource">"delete" action pipeline</a> is executed by the PFC upon
+                XForms submission.
+            </p>
         </div>
     </description>
 </example-descriptor>

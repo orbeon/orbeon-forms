@@ -35,26 +35,26 @@
                         <sql:query>
                             select * from oxf_address_book
                         </sql:query>
-                        <sql:results>
+                        <sql:result-set>
                             <friends>
-                                <sql:row-results>
+                                <sql:row-iterator>
                                     <friend>
                                         <id>
-                                            <sql:get-column type="xs:int" column="id"/>
+                                            <sql:get-column-value type="xs:int" column="id"/>
                                         </id>
                                         <first>
-                                            <sql:get-column type="xs:string" column="first"/>
+                                            <sql:get-column-value type="xs:string" column="first"/>
                                         </first>
                                         <last>
-                                            <sql:get-column type="xs:string" column="last"/>
+                                            <sql:get-column-value type="xs:string" column="last"/>
                                         </last>
                                         <phone>
-                                            <sql:get-column type="xs:string" column="phone"/>
+                                            <sql:get-column-value type="xs:string" column="phone"/>
                                         </phone>
                                     </friend>
-                                </sql:row-results>
+                                </sql:row-iterator>
                             </friends>
-                        </sql:results>
+                        </sql:result-set>
                     </sql:execute>
                 </sql:connection>
             </sql:config>

@@ -14,7 +14,8 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:xu="http://www.xmldb.org/xupdate"
         instance-passing="forward">
-    
+
+    <!-- Main page showing the address book -->
     <page id="home" path-info="/address-book" xforms="xforms-model.xml" model="model.xpl" view="view.xsl">
         <action when="/form/action = 'add'" action="add-action.xpl"/>
         <action when="/form/action = 'delete'" action="delete-action.xpl"/>
@@ -24,7 +25,6 @@
     <page path-info="/address-book/test2" view="test-model-2.xpl"/>
     <page path-info="/address-book/test3" view="test-model-3.xpl"/>
     <page path-info="/address-book/test4" view="test-model-4.xpl"/>
-
     <page path-info="/address-book/test5" view="test-model-5.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>

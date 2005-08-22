@@ -34,7 +34,7 @@
                         <sql:execute>
                             <sql:update>
                                 delete from oxf_address_book where id =
-                                    <sql:parameter type="xs:int" select="/form/id"/>
+                                    <sql:param type="xs:int" select="/form/id"/>
                             </sql:update>
                         </sql:execute>
                     </sql:connection>

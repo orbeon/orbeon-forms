@@ -588,12 +588,17 @@ function xformsInitializeControlsUnder(root) {
                         // in from the browser.
                         var target = getEventTarget(event);
                         while (!target.id) target = target.parentNode;
-                        document.xformsPreviousDOMFocusOut = target;
+                        if (target.className != "xforms-form")
+                            document.xformsPreviousDOMFocusOut = target;
                     });
                     xformsAddEventListener(control, "focus", function(event) {
                         var target = getEventTarget(event);
                         while (!target.id) target = target.parentNode;
                         var sendFocusEvents = true;
+
+                        // Check if we found a control before getting to the form root
+                        if (target.className == "xforms-form")
+                            sendFocusEvents = false;
 
                         // We have just received a change event: try to combine both
                         if (document.xformsPreviousValueChanged) {

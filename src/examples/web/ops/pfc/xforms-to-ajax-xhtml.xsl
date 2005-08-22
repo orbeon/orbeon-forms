@@ -256,7 +256,7 @@
             <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
         </xhtml:input>
     </xsl:template>
-    
+
     <!-- Display as list of checkboxes / radio buttons -->
     <xsl:template match="xforms:select[@appearance = 'full'] | xforms:select1[@appearance = 'full']">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
@@ -316,7 +316,7 @@
             </xhtml:span>
         </xsl:if>
     </xsl:template>
-    
+
     <xsl:template name="select-full-item">
         <xsl:param name="type" as="xs:string"/>
         <xsl:param name="id" as="xs:string"/>
@@ -326,8 +326,8 @@
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
         <xhtml:span>
+            <xsl:copy-of select="xxforms:copy-attributes($attributes-element, (), ())"/>
             <xhtml:input type="{$type}" name="{$id}" value="{$value}">
-                <xsl:copy-of select="xxforms:copy-attributes($attributes-element, (), ())"/>
                 <xsl:if test="not($generate-template)">
                     <xsl:if test="$value = tokenize(xxforms:control($id), ' ')">
                         <xsl:attribute name="checked">checked</xsl:attribute>
@@ -339,18 +339,18 @@
     </xsl:template>
 
     <!-- Display as list / combobox -->
-    <xsl:template match="xforms:select1[@appearance = ('minimal', 'compact')] 
+    <xsl:template match="xforms:select1[@appearance = ('minimal', 'compact')]
             | xforms:select[@appearance = 'compact']">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
         <xsl:variable name="many" as="xs:boolean" select="local-name() = 'select'"/>
         <xsl:variable name="class" as="xs:string"
-            select="if (local-name() = 'select1' and @appearance = 'minimal') then 'xforms-select1-minimal' 
+            select="if (local-name() = 'select1' and @appearance = 'minimal') then 'xforms-select1-minimal'
                 else if (local-name() = 'select1' and @appearance = 'compact') then 'xforms-select1-compact'
                 else if (local-name() = 'select' and @appearance = 'compact') then 'xforms-select-compact'
                 else ()"/>
-        
+
         <xhtml:select name="{$id}">
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', $class), $id)"/>
             <xsl:if test="@appearance = 'compact'">
@@ -427,7 +427,7 @@
             </xsl:if>
         </xhtml:label>
     </xsl:template>
-    
+
     <xsl:template match="xforms:range">
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>

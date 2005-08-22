@@ -546,7 +546,7 @@ ul {
     height: 6em;
 }
     
-.xforms-xhtml {
+.xforms-output-html {
     display: none;
 }
 

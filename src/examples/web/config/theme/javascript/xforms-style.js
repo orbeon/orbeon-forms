@@ -43,7 +43,7 @@ function xformsUpdateStyle(element) {
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
             var className = classes[classIndex];
             
-            if (className == "xforms-xhtml") {
+            if (className == "xforms-output-html") {
                 if (element.firstChild != null)
                     element.innerHTML = element.firstChild.data;
                 element.style.display = "inline";

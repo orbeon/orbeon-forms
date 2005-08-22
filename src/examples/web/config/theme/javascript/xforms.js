@@ -409,6 +409,8 @@ function xformsInitializeControlsUnder(root) {
         var elements = root.getElementsByTagName(interestingTagNames[tagIndex]);
         for (var elementIndex = 0; elementIndex < elements.length; elementIndex++)
             formsControls = formsControls.concat(elements[elementIndex]);
+        if (root.tagName.toLowerCase() == interestingTagNames[tagIndex])
+            formsControls = formsControls.concat(root);
     }
 
     // Go through potential form controls, add style, and register listeners
@@ -577,7 +579,7 @@ function xformsInitializeControlsUnder(root) {
             }
 
             // Register listener on focus in and out events
-            var registerForFocusBlurEvents = function(control) {
+            function registerForFocusBlurEvents(control) {
                 if (!control.focusBlurEventListenerRegistered) {
                     control.focusBlurEventListenerRegistered = true;
                     xformsAddEventListener(control, "blur", function(event) {
@@ -623,7 +625,7 @@ function xformsInitializeControlsUnder(root) {
                         document.xformsPreviousDOMFocusIn = target;
                     });
                 }
-            };
+            }
             if (isXFormsCheckboxRadio) {
                 var inputs = control.getElementsByTagName("input");
                 for (var inputIndex = 0; inputIndex < inputs.length; inputIndex++) {
@@ -669,7 +671,7 @@ function xformsPageLoaded() {
         document.xformsChangedIdsRequest = new Array();
 
         // Initialize controls
-        xformsInitializeControlsUnder(document);
+        xformsInitializeControlsUnder(document.body);
 
         // Initialize attributes on form
         var forms = document.getElementsByTagName("form");
@@ -1001,6 +1003,7 @@ function xformsHandleResponse() {
                                             var parentIndexes = copyRepeatTemplateElement.getAttribute("parent-indexes");
                                             var idSuffix = copyRepeatTemplateElement.getAttribute("id-suffix");
                                             // Put nodes of the template in an array
+                                            var delimiterTagName = null;
                                             var templateNodes = new Array();
                                             {
                                                 // Locate end of the repeat
@@ -1009,6 +1012,8 @@ function xformsHandleResponse() {
                                                 while (templateNode.className != "xforms-repeat-delimiter") {
                                                     var nodeCopy = templateNode.cloneNode(true);
                                                     if (templateNode.nodeType == ELEMENT_TYPE) {
+                                                        // Save tag name to be used for delimiter
+                                                        delimiterTagName = templateNode.tagName;
                                                         // Add suffix to all the ids
                                                         function addSuffixToIds(element, idSuffix, repeatDepth) {
                                                             var idSuffixWithDepth = idSuffix;
@@ -1047,7 +1052,7 @@ function xformsHandleResponse() {
                                                     templateNode = templateNode.previousSibling;
                                                 }
                                                 // Add a delimiter
-                                                var newDelimiter = document.createElement(templateNodes[0].tagName);
+                                                var newDelimiter = document.createElement(delimiterTagName);
                                                 newDelimiter.className = "xforms-repeat-delimiter";
                                                 templateNodes.push(newDelimiter);
                                                 // Reverse nodes as they were inserted in reverse order
@@ -1073,8 +1078,9 @@ function xformsHandleResponse() {
                                             for (var templateNodeIndex in templateNodes) {
                                                 templateNode = templateNodes[templateNodeIndex];
                                                 afterInsertionPoint.parentNode.insertBefore(templateNode, afterInsertionPoint);
-                                                if (templateNode.nodeType == ELEMENT_TYPE)
+                                                if (templateNode.nodeType == ELEMENT_TYPE) {
                                                     xformsInitializeControlsUnder(templateNode);
+                                                }
                                             }
                                             break;
                                         }

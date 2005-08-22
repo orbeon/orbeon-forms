@@ -50,7 +50,7 @@
                 </p>
                 <xforms:group>
                     <xforms:label>Output</xforms:label>
-                    <xforms:output ref="formatted-output" xhtml:class="xforms-xhtml"/>
+                    <xforms:output ref="formatted-output" appearance="xxforms:html"/>
                 </xforms:group>
             </xforms:group>
         </xhtml:p>

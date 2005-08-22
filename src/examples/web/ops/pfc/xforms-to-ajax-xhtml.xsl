@@ -100,6 +100,9 @@
                         <xsl:variable name="classes" as="xs:string*" select="(if (@class) then @class else (),
                             if (xxforms:control($id)/@relevant = 'false') then  'xforms-disabled' else ())"/>
                         <xsl:attribute name="class" select="string-join($classes , ' ')"/>
+                        <xsl:if test="xxforms:control($id)/@readonly = 'true'">
+                            <xsl:attribute name="disabled">disabled</xsl:attribute>
+                        </xsl:if>
                         <xsl:copy-of select="node()"/>
                     </xsl:copy>
                 </xsl:for-each>
@@ -135,8 +138,9 @@
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
+        <xsl:variable name="html-class" as="xs:string?" select="if (@appearance = 'xxforms:html') then 'xforms-output-html' else ()"/>
         <xhtml:span>
-            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output'), $id)"/>
+            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output', $html-class), $id)"/>
             <xsl:choose>
                 <xsl:when test="$generate-template">
                     <xsl:value-of select="'$xforms-output-value$'"/>
@@ -451,8 +455,7 @@
         <xsl:variable name="delimiter-namespace-uri" as="xs:string" select="if (not(namespace-uri(*[1]) = 'http://www.w3.org/2002/xforms')) then xs:string(namespace-uri(*[1])) else 'http://www.w3.org/1999/xhtml'"/>
 
         <!-- Delimiter: begin repeat -->
-        <xsl:copy-of select="xxforms:repeat-delimiter($delimiter-namespace-uri,
-            $delimiter-local-name, concat('repeat-begin-', $id))"/>
+        <xsl:copy-of select="xxforms:repeat-delimiter($delimiter-namespace-uri, $delimiter-local-name, concat('repeat-begin-', $id))"/>
         <xsl:copy-of select="xxforms:repeat-delimiter($delimiter-namespace-uri, $delimiter-local-name, ())"/>
 
         <xsl:if test="$top-level-repeat or not($generate-template)">
@@ -572,7 +575,7 @@
 
     </xsl:template>
 
-    <xsl:function name="xxforms:repeat-delimiter">
+    <xsl:function name="xxforms:repeat-delimiter" as="element()">
         <xsl:param name="delimiter-namespace-uri" as="xs:string"/>
         <xsl:param name="delimiter-local-name" as="xs:string"/>
         <xsl:param name="id" as="xs:string?"/>

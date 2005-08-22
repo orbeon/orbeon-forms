@@ -14,10 +14,10 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <page id="session" path-info="/cart" xforms="form.xml" model="model.xpl" view="view.xsl">
-        <action when="/form/action = 'add'" action="add.xpl"/>
-        <action when="/form/action = 'clear'" action="clear.xpl"/>
-    </page>
+    <page path-info="/cart" view="view.xhtml"/>
+    <page path-info="/direct/cart/get" view="get.xpl"/>
+    <page path-info="/direct/cart/add" view="add.xpl"/>
+    <page path-info="/direct/cart/clear" view="clear.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

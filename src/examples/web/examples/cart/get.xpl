@@ -12,10 +12,11 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
-    
-    <p:param type="input" name="instance"/>
-    <p:param type="output" name="data"/>
+
+    <p:param type="output" name="data" debug="get out"/>
 
     <p:processor name="oxf:scope-generator">
         <p:input name="config">
@@ -24,21 +25,6 @@
                 <scope>session</scope>
             </config>
         </p:input>
-        <p:output name="data" id="session"/>
-    </p:processor>
-
-    <p:processor name="oxf:scope-serializer">
-        <p:input name="config">
-            <config>
-                <key>cart</key>
-                <scope>session</scope>
-            </config>
-        </p:input>
-        <p:input name="data" href="aggregate('cart', #session#xpointer(/cart/item), #instance)"/>
-    </p:processor>
-
-    <p:processor name="oxf:identity">
-        <p:input name="data" href="#instance"/>
         <p:output name="data" ref="data"/>
     </p:processor>
 

@@ -14,6 +14,9 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
+    <p:param type="input" name="instance"/>
+    <p:param type="output" name="data"/>
+
     <p:processor name="oxf:scope-serializer">
         <p:input name="config">
             <config>
@@ -22,6 +25,11 @@
             </config>
         </p:input>
         <p:input name="data" href="aggregate('cart')"/>
+    </p:processor>
+
+    <p:processor name="oxf:identity">
+        <p:input name="data" href="#instance"/>
+        <p:output name="data" ref="data"/>
     </p:processor>
 
 </p:config>

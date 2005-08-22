@@ -12,20 +12,23 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <config xmlns="http://www.orbeon.com/oxf/controller"
-        xmlns:xu="http://www.xmldb.org/xupdate"
-        instance-passing="forward">
-    
-    <page id="home" path-info="/address-book" xforms="xforms-model.xml" model="model.xpl" view="view.xsl">
-        <action when="/form/action = 'add'" action="add-action.xpl"/>
-        <action when="/form/action = 'delete'" action="delete-action.xpl"/>
+        xmlns:xu="http://www.xmldb.org/xupdate">
+
+    <!-- Main page showing the address book -->
+    <page path-info="/address-book2" model="../address-book/model.xpl" view="view.xsl"/>
+
+    <!-- Add service -->
+    <page path-info="/address-book2/add" view="../address-book/model.xpl">
+        <action action="../address-book/add-action.xpl"/>
     </page>
 
-    <page path-info="/address-book/test1" view="test-model-1.xpl"/>
-    <page path-info="/address-book/test2" view="test-model-2.xpl"/>
-    <page path-info="/address-book/test3" view="test-model-3.xpl"/>
-    <page path-info="/address-book/test4" view="test-model-4.xpl"/>
+    <!-- Delete service -->
+    <page path-info="/address-book2/delete" view="../address-book/model.xpl">
+        <action action="../address-book/delete-action.xpl"/>
+    </page>
 
-    <page path-info="/address-book/test5" view="test-model-5.xpl"/>
+    <!-- Refresh service -->
+    <page path-info="/address-book2/refresh" view="../address-book/model.xpl"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

@@ -21,6 +21,10 @@
                 f:url-type="resource">SQL processor</a>. It implements a simple address book,
                 allowing the user to add and remove entries to a SQL database.
             </p>
+            <p>
+                See also the <a href="/goto-example/address-book2" f:url-type="resource">Address
+                Book NG</a> example.
+            </p>
             <h4>Database Initialization</h4>
             <p>
                 This example necessitates a working database. By default, the test database embedded

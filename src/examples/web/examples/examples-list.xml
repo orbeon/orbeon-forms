@@ -88,7 +88,8 @@
         <!--<example id="excel" label="Excel Import / Export"/>-->
     </section>
     <section label="Database Access">
-        <example id="address-book" label="Address Book"/>
+        <example id="address-book" label="Address Book Classic"/>
+        <example id="address-book2" label="Address Book NG" xforms-ng="true"/>
         <example id="xmldb" label="XML:DB Databases"/>
     </section>
     <section label="PDF Processing">

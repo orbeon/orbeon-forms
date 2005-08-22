@@ -11,62 +11,82 @@
   
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
-<xhtml:html xmlns:f="http://orbeon.org/oxf/xml/formatting" xmlns:xhtml="http://www.w3.org/1999/xhtml"
-            xmlns:xforms="http://www.w3.org/2002/xforms"
-            xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-            xsl:version="2.0">
-    <xhtml:head>
-        <xhtml:title>Address Book</xhtml:title>
-    </xhtml:head>
-    <xhtml:body>
+<html xmlns:xhtml="http://www.w3.org/1999/xhtml"
+      xmlns:xforms="http://www.w3.org/2002/xforms"
+      xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xsl:version="2.0">
+    <head>
+        <title>Address Book</title>
+    </head>
+    <body>
         <xforms:group ref="/form">
-            <xhtml:table class="gridtable">
-                <xhtml:tr>
-                    <xhtml:th>First Name</xhtml:th>
-                    <xhtml:th>Last Name</xhtml:th>
-                    <xhtml:th>Phone Number</xhtml:th>
-                    <xhtml:th>Action</xhtml:th>
-                </xhtml:tr>
-                <xsl:for-each select="/root/friends/friend">
-                    <xhtml:tr>
-                        <xhtml:td>
+            <table class="gridtable">
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Phone Number</th>
+                    <th>Action</th>
+                </tr>
+                <xsl:for-each select="/friends/friend">
+                    <tr>
+                        <td>
                             <xsl:value-of select="first"/>
-                        </xhtml:td>
-                        <xhtml:td>
+                        </td>
+                        <td>
                             <xsl:value-of select="last"/>
-                        </xhtml:td>
-                        <xhtml:td>
+                        </td>
+                        <td>
                             <xsl:value-of select="phone"/>
-                        </xhtml:td>
-                        <xhtml:td>
+                        </td>
+                        <td>
                             <xforms:submit>
                                 <xforms:label>Remove</xforms:label>
-                                <xforms:setvalue ref="action">del-<xsl:value-of select="id"/></xforms:setvalue>
+                                <xforms:setvalue ref="action">delete</xforms:setvalue>
+                                <xforms:setvalue ref="id"><xsl:value-of select="id"/></xforms:setvalue>
                             </xforms:submit>
-                        </xhtml:td>
-                    </xhtml:tr>
+                        </td>
+                    </tr>
                 </xsl:for-each>
-                <xhtml:tr>
-                    <xhtml:td>
+                <tr>
+                    <td>
                         <xforms:input ref="first"/>
-                    </xhtml:td>
-                    <xhtml:td>
+                    </td>
+                    <td>
                         <xforms:input ref="last"/>
-                    </xhtml:td>
-                    <xhtml:td>
+                    </td>
+                    <td>
                         <xforms:input ref="phone"/>
-                    </xhtml:td>
-                    <xhtml:td>
+                    </td>
+                    <td>
                         <xforms:submit>
                             <xforms:label>Add</xforms:label>
                             <xforms:setvalue ref="action">add</xforms:setvalue>
                         </xforms:submit>
-                    </xhtml:td>
-                </xhtml:tr>
-            </xhtml:table>
+                    </td>
+                </tr>
+            </table>
         </xforms:group>
-        <xhtml:p>
-            Status: <xsl:value-of select="/root/status"/>
-        </xhtml:p>
-    </xhtml:body>
-</xhtml:html>
+        <p>
+            <xsl:variable name="instance" select="doc('input:instance')/form"/>
+            Status: <xsl:value-of select="if ($instance/action = 'add') then 'Inserted record'
+                else if ($instance/action = 'delete') then 'Deleted record'
+                else 'Read records'"/>
+        </p>
+        <p>
+            <a href="/address-book/test1">Test 1</a>
+        </p>
+        <p>
+            <a href="/address-book/test2">Test 2</a>
+        </p>
+        <p>
+            <a href="/address-book/test3">Test 3</a>
+        </p>
+        <p>
+            <a href="/address-book/test4">Test 4</a>
+        </p>
+        <p>
+            <a href="/address-book/test5">Test 5</a>
+        </p>
+    </body>
+</html>

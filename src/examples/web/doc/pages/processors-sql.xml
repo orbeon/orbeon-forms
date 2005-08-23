@@ -412,6 +412,10 @@ select first_name, last_name
                         <there-are-no-results/>
                     </sql:no-results>
                 </xml-source>
+                <note>
+                    The body of the <code>sql:result-set</code> element is not executed if the
+                    result-set does not contain at least one row.
+                </note>
                 <p>
                     If a <code>sql:no-results</code> element is present after the
                     <code>sql:result-sets</code> elements, its template content executes only if

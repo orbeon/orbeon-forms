@@ -253,7 +253,12 @@
                             </element>
                             <element name="sql:result-set">
                                 <optional>
-                                    <attribute name="result-sets"/>
+                                    <attribute name="result-sets">
+                                        <choice>
+                                            <value>unbounded</value>
+                                            <data type="positiveInteger"/>
+                                        </choice>
+                                    </attribute>
                                 </optional>
                                 <ref name="element-or-row-results"/>
                             </element>
@@ -520,9 +525,7 @@
                 <attribute name="column"/>
                 <optional>
                     <attribute name="ancestor">
-                        <data type="integer">
-                            <param name="minInclusive">0</param>
-                        </data>
+                        <data type="nonNegativeInteger"/>
                     </attribute>
                 </optional>
             </element>
@@ -535,9 +538,7 @@
             <attribute name="column"/>
             <optional>
                 <attribute name="ancestor">
-                    <data type="integer">
-                        <param name="minInclusive">0</param>
-                    </data>
+                    <data type="nonNegativeInteger"/>
                 </attribute>
             </optional>
         </element>

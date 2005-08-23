@@ -42,7 +42,7 @@ public class ColumnIteratorInterpreter extends SQLProcessor.InterpreterContentHa
         final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
 
         try {
-            final ResultSet resultSet = interpreterContext.getResultSet(0);
+            final ResultSet resultSet = interpreterContext.getResultSet();
             final ResultSetMetaData metadata = resultSet.getMetaData();
 
             // Iterate through result set columns

@@ -55,7 +55,7 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
 
         final SQLProcessorInterpreterContext interpreterContext = getInterpreterContext();
 
-        final ResultSet resultSet = interpreterContext.getResultSet(0);
+        final ResultSet resultSet = interpreterContext.getResultSet();
         try {
             boolean hasNext = !interpreterContext.isEmptyResultSet();
 
@@ -133,7 +133,7 @@ public class RowIteratorInterpreter extends SQLProcessor.InterpreterContentHandl
                 if (groups == null)
                     groups = new ArrayList();
                 try {
-                    ResultSet resultSet = getInterpreterContext().getResultSet(0);
+                    ResultSet resultSet = getInterpreterContext().getResultSet();
                     // Save group information if first row
                     if (rowNum == 1) {
                         final String columnName = (attributes.getValue("column-name") != null) ? attributes.getValue("column-name") : attributes.getValue("column");

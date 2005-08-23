@@ -275,6 +275,10 @@ public class SQLProcessorInterpreterContext extends DatabaseContext {
         return executionContext.columnValue;
     }
 
+    public ResultSet getResultSet() {
+        return getResultSet(0);
+    }
+
     public ResultSet getResultSet(int level) {
         final ExecutionContext executionContext = getExecutionContext(level);
         return executionContext.resultSet;

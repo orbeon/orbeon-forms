@@ -51,37 +51,41 @@ public class ResultSetInterpreter extends SQLProcessor.InterpreterContentHandler
 
         try {
             final PreparedStatement stmt = interpreterContext.getStatement(0);
-            final boolean hasNext = !getInterpreterContext().isEmptyResultSet();
+            if (stmt != null) {
+                int currentCount = 0;
+                boolean hasMoreResultSets = interpreterContext.getResultSet() != null;
+                do {
 
-            if (SQLProcessor.logger.isDebugEnabled())
-                SQLProcessor.logger.debug("Preparing to execute result set: hasNext = " + hasNext + ", statement = " + interpreterContext.getStatementString());
+                    final boolean hasNext = !interpreterContext.isEmptyResultSet();
 
-            if (hasNext) {
-                // There is a current non-empty result-set
-                if (stmt != null) {
-                    int currentCount = 0;
-                    do {
-                        if (SQLProcessor.logger.isDebugEnabled())
-                            SQLProcessor.logger.debug("Executing result set: currentCount = " + currentCount);
+                    if (SQLProcessor.logger.isDebugEnabled()) {
+                        SQLProcessor.logger.debug("Preparing to execute result set: hasMoreResultSets = " + hasMoreResultSets
+                                + ", hasNext = " + hasNext
+                                + ", statement = " + interpreterContext.getStatementString()
+                                + ", currentCount = " + currentCount);
+                    }
 
-                        // NOTE: Initially, a result set has already been made available
-                        repeatBody();
+                    if (hasMoreResultSets) {
+
+                        // Evaluate body
+
+                        // NOTE: we do not evaluate the body if there is no row in the result set,
+                        // for backward compatibility. This is questionable, as the sql:result-set
+                        // element should intuitively evaluate its content in any case. Maybe an
+                        // option should be provided on the sql:result-set element?
+                        if (hasNext) {
+                            repeatBody();
+                        }
 
                         // One more result set has been processed
                         currentCount++;
+                    }
 
-                        // Try to go to next result set
-                        final boolean hasMoreResultSets = setResultSetInfo(interpreterContext, stmt, stmt.getMoreResults());
-                        if (!hasMoreResultSets || (allowedResultSetCount != -1 && currentCount >= allowedResultSetCount)) {
-                            // We have processed all the result sets we can process
-                            break;
-                        }
+                    // Try to go to next result set
+                    hasMoreResultSets = setResultSetInfo(interpreterContext, stmt, stmt.getMoreResults());
 
-                    } while (true);
-                }
-            } else if (stmt != null) {
-                // Prepare result set info for the next potential result-set interrpeter
-                setResultSetInfo(interpreterContext, stmt, stmt.getMoreResults());
+                    // While we have not processed all the result sets we can process
+                } while (hasMoreResultSets && (allowedResultSetCount == -1 || currentCount < allowedResultSetCount));
             }
         } catch (SQLException e) {
             throw new ValidationException(e, new LocationData(getDocumentLocator()));

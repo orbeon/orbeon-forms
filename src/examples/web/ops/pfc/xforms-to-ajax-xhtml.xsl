@@ -85,6 +85,8 @@
         <xsl:param name="id-postfix" select="''" tunnel="yes"/>
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
+        <xsl:variable name="xforms-control" select="."/>
+
         <xsl:choose>
             <xsl:when test="$generate-template">
                 <xsl:next-match/>
@@ -100,7 +102,7 @@
                         <xsl:variable name="classes" as="xs:string*" select="(if (@class) then @class else (),
                             if (xxforms:control($id)/@relevant = 'false') then  'xforms-disabled' else ())"/>
                         <xsl:attribute name="class" select="string-join($classes , ' ')"/>
-                        <xsl:if test="xxforms:control($id)/@readonly = 'true'">
+                        <xsl:if test="xxforms:control($id)/@readonly = 'true' and not(local-name($xforms-control) = 'output')">
                             <xsl:attribute name="disabled">disabled</xsl:attribute>
                         </xsl:if>
                         <xsl:copy-of select="node()"/>

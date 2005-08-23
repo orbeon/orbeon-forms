@@ -367,7 +367,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 addInput(new ASTInput("matcher", Dom4jUtils.NULL_DOCUMENT));
                                 final ASTOutput dataOutput = new ASTOutput("data", notFoundHTML);
                                 dataOutput.setLocationData(new ExtendedLocationData((LocationData) controllerDocument.getRootElement().getData(),
-                                        "executing not found pipeline", new String[] { "pipeline", notFoundPipeline})); // use root element location data
+                                        "executing not found pipeline", new String[] { "pipeline", notFoundPipeline}, true)); // use root element location data
                                 addOutput(dataOutput);
                             }});
 
@@ -444,7 +444,6 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 addWhen(new ASTWhen());
             }});
         } else {
-//            final LocationData locDat = Dom4jUtils.getLocationData();
             statements.add(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
                 final String url;
                 try {
@@ -458,7 +457,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 addInput(new ASTInput("xforms-model", new ASTHrefId(epilogueXFormsModel)));
                 final String[] locationParams = new String[] { "pipeline",  epilogueURL };
                 setLocationData(new ExtendedLocationData((LocationData) epilogueElement.getData(),
-                    "executing epilogue", locationParams));
+                    "executing epilogue", locationParams, true));
             }});
         }
     }
@@ -536,7 +535,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         final ASTOutput isRedirect = new ASTOutput(null, "is-redirect");
         final ASTOutput xformsModel = new ASTOutput("data", "xforms-model");
         xformsModel.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(),
-                "reading XForms model data output", new String[] { "XForms model", xformsAttribute, "page id", pageElement.attributeValue("id")}));
+                "reading XForms model data output",
+                new String[] { "XForms model", xformsAttribute, "page id", pageElement.attributeValue("id")}, true));
         // FIXME: do not validate with XForms model to avoid connection to W3C Web site
         //xformsModel.setSchemaUri(org.orbeon.oxf.processor.xforms.Constants.XFORMS_NAMESPACE_URI + "/model");
 
@@ -561,7 +561,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         final ASTOutput xformedInstance = new ASTOutput("instance", "xformed-instance");
         {
             final LocationData locDat = Dom4jUtils.getLocationData();
-            xformedInstance.setLocationData( locDat );
+            xformedInstance.setLocationData(locDat);
         }
 
         if (xformsAttribute != null) {
@@ -660,9 +660,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             final ASTOutput dataOutput = new ASTOutput("data", internalActionData);
                             final String[] locationParams =
                                 new String[] { "pipeline", actionAttribute, "page id", pageElement.attributeValue("id"), "when", whenAttribute };
-                            dataOutput.setLocationData(new ExtendedLocationData((LocationData) actionElement.getData(), "reading action data output", locationParams));
+                            dataOutput.setLocationData(new ExtendedLocationData((LocationData) actionElement.getData(), "reading action data output", locationParams, true));
                             addOutput(dataOutput);
-                            setLocationData(new ExtendedLocationData((LocationData) actionElement.getData(), "executing action", locationParams));
+                            setLocationData(new ExtendedLocationData((LocationData) actionElement.getData(), "executing action", locationParams, true));
                         }});
 
                         // Force execution of action if no <result> is reading it
@@ -702,7 +702,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                         setNamespaces(Dom4jUtils.getNamespaceContext(resultElement));
                                         final String[] locationParams =
                                             new String[] { "page id", pageElement.attributeValue("id"), "when", resultWhenAttribute };
-                                        setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "executing result", locationParams));
+                                        setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "executing result", locationParams, true));
                                     }
                                     executeResult(stepProcessorContext, controllerContext, this, pageIdToXFormsModel,
                                             pageIdToPathInfo, pageIdToSetvaluesDocument,
@@ -787,12 +787,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         final ASTOutput dataOutput = new ASTOutput("data", modelData);
                         final String[] locationParams =
                             new String[] { "page id", pageElement.attributeValue("id"), "model", modelAttribute };
-                        dataOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page model data output", locationParams));
+                        dataOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page model data output", locationParams, true));
                         addOutput(dataOutput);
                         final ASTOutput instanceOutput = new ASTOutput("instance", modelInstance);
                         addOutput(instanceOutput);
-                        instanceOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page model instance output", locationParams));
-                        setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "executing page model", locationParams));
+                        instanceOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page model instance output", locationParams, true));
+                        setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "executing page model", locationParams, true));
                     }});
                 } else if (viewAttribute != null) {
                     addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
@@ -815,14 +815,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         final ASTOutput dataOutput = new ASTOutput("data", html);
                         final String[] locationParams =
                             new String[] { "page id", pageElement.attributeValue("id"), "view", viewAttribute };
-                        dataOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page view data output", locationParams));
+                        dataOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page view data output", locationParams, true));
                         addOutput(dataOutput);
                         if (xformsAttribute != null) {// TODO: this may not do what is intended with XForms NG
                             final ASTOutput instanceOutput = new ASTOutput("instance", epilogueInstance);
-                            instanceOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page view instance output", locationParams));
+                            instanceOutput.setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "reading page view instance output", locationParams, true));
                             addOutput(instanceOutput);
                         }
-                        setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "executing page view", locationParams));
+                        setLocationData(new ExtendedLocationData((LocationData) pageElement.getData(), "executing page view", locationParams, true));
                     }});
                     if (xformsAttribute == null) {
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
@@ -918,9 +918,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 final ASTOutput dataOutput = new ASTOutput("data", otherPageXFormsModel);
                 final String[] locationParams =
                             new String[] { "result page id", resultPageId, "result page XForms model", otherXForms };
-                dataOutput.setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "reading other page XForms model data output", locationParams));
+                dataOutput.setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "reading other page XForms model data output", locationParams, true));
                 addOutput(dataOutput);
-                setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "executing other page XForms model", locationParams));
+                setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "executing other page XForms model", locationParams, true));
             }});
             when.addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                 addInput(new ASTInput("data", new ASTHrefXPointer(new ASTHrefId(otherPageXFormsModel), EXTRACT_INSTANCE_XPATH)));
@@ -1040,7 +1040,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         addInput(new ASTInput("config", config));
                         final String[] locationParams =
                             new String[] { "result page id", resultPageId  };
-                        setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "serialization of XForms instance to request", locationParams));
+                        setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "serialization of XForms instance to request", locationParams, true));
                     }});
                 }
                 // Aggregate redirect-url config
@@ -1074,7 +1074,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addInput(new ASTInput("data", redirectURLData));// {{setDebug("redirect 2");}}
                     final String[] locationParams =
                             new String[] { "result page id", resultPageId  };
-                    setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "page redirection", locationParams));
+                    setLocationData(new ExtendedLocationData((LocationData) resultElement.getData(), "page redirection", locationParams, true));
                 }});
             }
         }
@@ -1211,13 +1211,9 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
-//                            final LocationData datLocDat = Dom4jUtils.getLocationData();
                             final ASTOutput datOut = new ASTOutput( "data", resultData );
-//                            datOut.setLocationData( datLocDat );
                             addOutput( datOut );
-//                            final LocationData instLocDat = Dom4jUtils.getLocationData();
                             final ASTOutput instOut = new ASTOutput( "instance", resultInstance );
-//                            instOut.setLocationData( instLocDat );
                             addOutput( instOut );
                         }});
                     }});
@@ -1230,16 +1226,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
-//                            final LocationData locDat = Dom4jUtils.getLocationData();
                             final ASTOutput datOut = new ASTOutput( "data", resultData );
-//                            datOut.setLocationData( locDat );
                             addOutput( datOut );
                         }});
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
-//                            final LocationData locDat = Dom4jUtils.getLocationData();
                             final ASTOutput datOut = new ASTOutput( "data", resultInstance );
-//                            datOut.setLocationData( locDat );
                             addOutput( datOut );
                         }});
                     }});
@@ -1252,16 +1244,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
-//                            final LocationData locDat = Dom4jUtils.getLocationData();
                             final ASTOutput instOut = new ASTOutput( "instance", resultInstance );
-//                            instOut.setLocationData( locDat );
                             addOutput( instOut );
                         }});
-//                        final LocationData locDat = Dom4jUtils.getLocationData();
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             final ASTOutput resDatOut = new ASTOutput( "data", resultData );
-    //                        resDatOut.setLocationData( locDat );
                             addOutput( resDatOut );
                         }});
                     }});
@@ -1269,24 +1257,19 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // XPL file with no output
                     addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/pipeline'") {{
                         addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
-//                            setLocationData(Dom4jUtils.getLocationData());
                             addInput(new ASTInput("config", new ASTHrefId(content)));
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
                         }});
-//                        final LocationData resDatLocDat = Dom4jUtils.getLocationData();
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             final ASTOutput resDatOut = new ASTOutput( "data", resultData );
-    //                        resDatOut.setLocationData( locDat );
                             addOutput( resDatOut );
                         }});
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
-//                            final LocationData resInstLocDat = Dom4jUtils.getLocationData();
                             final ASTOutput resInstOut = new ASTOutput( "data", resultInstance );
-//                            resInstOut.setLocationData( resInstLocDat );
                             addOutput( resInstOut );
                         }});
                     }});
@@ -1298,9 +1281,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         // Copy the instance as is
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
-//                            final LocationData resInstLocDat = Dom4jUtils.getLocationData();
                             final ASTOutput resInstOut = new ASTOutput( "data", resultInstance );
-//                            resInstOut.setLocationData( resInstLocDat );
                             addOutput( resInstOut );
                         }});
 
@@ -1315,11 +1296,8 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                         addInput(new ASTInput("config", new ASTHrefId(content)));
                                         addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                                         addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
-//                                        final LocationData resDatLocDat
-//                                            = Dom4jUtils.getLocationData();
                                         final ASTOutput resDatOut 
                                             = new ASTOutput( "data", resultData );
-//                                        resDatOut.setLocationData( resDatLocDat );
                                         addOutput( resDatOut );
                                     }});
                                 }});
@@ -1343,18 +1321,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         // Copy the instance as is
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
-//                            final LocationData locDat = Dom4jUtils.getLocationData();
                             final ASTOutput resInstOut = new ASTOutput( "data", resultInstance );
-//                            resInstOut.setLocationData( locDat );
                             addOutput( resInstOut );
                         }});
 
                         // Copy XML file as is
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(content)));
-//                            final LocationData locDat = Dom4jUtils.getLocationData();
                             final ASTOutput resDatOut = new ASTOutput( "data", resultData );
-//                            resDatOut.setLocationData( locDat );
                             addOutput( resDatOut );
                         }});
                     }});
@@ -1367,9 +1341,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 }});
                 addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                     addInput(new ASTInput("data", new ASTHrefId(resultInstance)));
-//                    final LocationData locDat = Dom4jUtils.getLocationData();
                     final ASTOutput resDatOut = new ASTOutput( "data", instanceOutput );
-//                    resDatOut.setLocationData( locDat );
                     addOutput( resDatOut );
                 }});
             }});

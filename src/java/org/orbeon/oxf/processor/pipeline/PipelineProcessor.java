@@ -226,7 +226,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                 // Set info on processor
                 processor.setId(processorCall.getId());
                 processor.setLocationData(new ExtendedLocationData(processorLocationData, "executing processor",
-                        new String[] { "name", processorNameOrURI }));
+                        new String[] { "name", processorNameOrURI }, true));
 
                 // Process outputs
                 for (Iterator j = processorCall.getOutputs().iterator(); j.hasNext();) {
@@ -535,7 +535,7 @@ public class PipelineProcessor extends ProcessorImpl implements Debuggable {
                     params = null;
                 }
 
-                processorInputOutput.setLocationData(new ExtendedLocationData(locationData, description, params));
+                processorInputOutput.setLocationData(new ExtendedLocationData(locationData, description, params, true));
             }
         }
     }

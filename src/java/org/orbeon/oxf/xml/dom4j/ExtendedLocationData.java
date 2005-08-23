@@ -33,7 +33,25 @@ public class ExtendedLocationData extends LocationData {
         this.description = description;
     }
 
-    public ExtendedLocationData(LocationData locationData, String description, String[] parameters) {
+    /**
+     * Create extended location data with a description.
+     *
+     * If defaultIfNecessary is true and locationData is null or the systemId provided by
+     * defaultIfNecessary is null, then default Java location data of the caller is provided.
+     *
+     * @param locationData
+     * @param description
+     * @param parameters
+     * @param defaultIfNecessary
+     */
+    public ExtendedLocationData(LocationData locationData, String description, String[] parameters, boolean defaultIfNecessary) {
+        this(((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary) ? Dom4jUtils.getLocationData() : locationData,
+                description, parameters);
+//        if (((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary))
+//            System.out.println("xxx defaultIfNecessary = true xxx ");
+    }
+
+    private ExtendedLocationData(LocationData locationData, String description, String[] parameters) {
         super((locationData == null) ? null : locationData.getSystemID(), (locationData == null) ? -1 : locationData.getLine(), (locationData == null) ? -1 : locationData.getCol());
         if (parameters == null) {
             this.description = description;
@@ -45,6 +63,10 @@ public class ExtendedLocationData extends LocationData {
             for (int i = 0; i < parameters.length; i += 2) {
                 final String paramName = parameters[i];
                 final String paramValue = parameters[i + 1];
+
+//                if ("ref".equals(paramName) && "result-data".equals(paramValue)) {
+//                    System.out.println("xxx");
+//                }
 
                 if (paramValue != null) {
 

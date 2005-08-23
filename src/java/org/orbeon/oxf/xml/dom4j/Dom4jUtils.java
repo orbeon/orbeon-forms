@@ -240,21 +240,18 @@ public class Dom4jUtils {
             (final Node n, final boolean t, final boolean c) {
         final String ret;
         switch (n.getNodeType()) {
-            case Node.DOCUMENT_NODE:
-                {
-                    ret = domToString((Document) n, t, c);
-                    break;
-                }
-            case Node.ELEMENT_NODE:
-                {
-                    ret = domToString((Element) n, t, c);
-                    break;
-                }
-            case Node.TEXT_NODE:
-                {
-                    ret = domToString((Text) n, t, c);
-                    break;
-                }
+            case Node.DOCUMENT_NODE: {
+                ret = domToString((Document) n, t, c);
+                break;
+            }
+            case Node.ELEMENT_NODE: {
+                ret = domToString((Element) n, t, c);
+                break;
+            }
+            case Node.TEXT_NODE: {
+                ret = domToString((Text) n, t, c);
+                break;
+            }
             default :
                 ret = domToString(n, null);
                 break;
@@ -399,7 +396,7 @@ public class Dom4jUtils {
         final String prefix;
         final String localName;
         final String namespaceURI;
-        if ( colonIndex == -1 ) {
+        if (colonIndex == -1) {
             prefix = "";
             localName = qNameString;
             final String nsURI = (String) namespaces.get(prefix);
@@ -408,7 +405,7 @@ public class Dom4jUtils {
             prefix = qNameString.substring(0, colonIndex);
             localName = qNameString.substring(colonIndex + 1);
             namespaceURI = (String) namespaces.get(prefix);
-            if ( namespaceURI == null) {
+            if (namespaceURI == null) {
                 throw new OXFException("No namespace declaration found for prefix: " + prefix);
             }
         }
@@ -513,20 +510,21 @@ public class Dom4jUtils {
         final Document ret = fctry.createDocument();
         return ret;
     }
+
     /**
      * <!-- getFileAndLine -->
-     * Workaround for Java's lack of an equivalent to C's __FILE__ and __LINE__ macros.  Use 
-     * carefully as it is not fast.  
-     * 
+     * Workaround for Java's lack of an equivalent to C's __FILE__ and __LINE__ macros.  Use
+     * carefully as it is not fast.
+     *
      * Perhaps in 1.5 we will find a better way.
-     * 
+     *
      * @return LocationData of caller.
      */
     public static LocationData getLocationData() {
         final Exception e = new Exception();
         final StackTraceElement[] stkTrc = e.getStackTrace();
-        final String sysID = stkTrc[ 1 ].getFileName();
-        final int line = stkTrc[ 1 ].getLineNumber();
-        return new LocationData( sysID, line, -1 );
+        final String sysID = stkTrc[1].getFileName();
+        final int line = stkTrc[1].getLineNumber();
+        return new LocationData(sysID, line, -1);
     }
 }

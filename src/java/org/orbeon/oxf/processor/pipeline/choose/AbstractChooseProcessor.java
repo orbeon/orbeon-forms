@@ -25,6 +25,7 @@ import org.orbeon.oxf.processor.pipeline.ast.*;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 
 import java.util.*;
 
@@ -178,13 +179,14 @@ public class AbstractChooseProcessor extends ProcessorImpl implements AbstractPr
             // the <param type="output"> of the pipeline
             final Set idsToConvert = (Set) idsWithNoRef.get(0);
             for (Iterator i = idsToConvert.iterator(); i.hasNext();) {
-                String id = (String) i.next();
+                final String id = (String) i.next();
                 ASTProcessorCall identityConnector = new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME); {
                     identityConnector.addInput(new ASTInput("data", new ASTHrefId(new ASTOutput(null, id))));
                     final ASTParam outParam = new ASTParam( ASTParam.OUTPUT, id );
                     final LocationData locDat = Dom4jUtils.getLocationData();
                     final ASTOutput astOut = new ASTOutput( "data", outParam );
                     astOut.setLocationData( locDat );
+//                    astOut.setLocationData(new ExtendedLocationData("oxf:/testxxx", 10, 20, "This is a test"));
                     identityConnector.addOutput( astOut );
                 }
                 astWhen.addStatement(identityConnector);

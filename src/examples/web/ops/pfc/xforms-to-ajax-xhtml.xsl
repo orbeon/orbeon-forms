@@ -194,18 +194,36 @@
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xhtml:button type="button" class="trigger">
-            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
 
-            <xsl:choose>
-                <xsl:when test="$generate-template">
-                    <xsl:value-of select="'$xforms-label-value$'"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="xxforms:control($id)/@label"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xhtml:button>
+        <xsl:choose>
+            <!-- Link appearance -->
+            <xsl:when test="@appearance
+                            and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = 'http://orbeon.org/oxf/xml/xforms'
+                            and local-name-from-QName(xs:QName(@appearance)) = 'link'">
+                <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
+                <xhtml:a href="">
+                    <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
+                    <xsl:value-of select="xforms:label"/>
+                </xhtml:a>
+            </xsl:when>
+            <!-- Image appearance -->
+            <xsl:when test="@appearance
+                            and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = 'http://orbeon.org/oxf/xml/xforms'
+                            and local-name-from-QName(xs:QName(@appearance)) = 'image'">
+                <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
+                <xhtml:input type="image" src="{xxforms:img/@src}" alt="{xforms:label}" >
+                    <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
+                    <xsl:copy-of select="xxforms:img/@* except (xxforms:img/@src, xxforms:img/@alt)"/>
+                </xhtml:input>
+            </xsl:when>
+            <!-- Default appearance (button) -->
+            <xsl:otherwise>
+                <xhtml:button type="button">
+                    <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-trigger'), $id)"/>
+                    <xsl:value-of select="if ($generate-template) then '$xforms-label-value$' else xxforms:control($id)/@label"/>
+                </xhtml:button>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="xforms:textarea">

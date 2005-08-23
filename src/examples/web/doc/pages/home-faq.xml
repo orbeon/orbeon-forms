@@ -858,6 +858,27 @@
                     256 MB to 1 GB in production.
                 </p>
             </section>
+            <a name="stack-traces"/>
+            <section>
+                <title>OPS Java stack traces are very long. Does that mean that performance is necessarily bad?</title>
+                <p>
+                    Java stack traces are indeed very long in OPS. This is due mainly to the nature
+                    of XPL pipelines, which are implemented on top of the event-based SAX API.
+                </p>
+                <p>
+                    In reality you cannot make any reasonable conclusion about performance just by
+                    looking at the length of a typical stack trace: you would have in addition to
+                    that to look at the pattern of execution of those methods. For example, if every
+                    top-level method call was going through, say, 300 levels of method calls, this
+                    would likely be an issue, but it is not the case in OPS. The bottom line is that
+                    no, the length of a stack trace does not directly correlate with poor
+                    performance.
+                </p>
+                <p>
+                    To reach valid conclusions about performance, run a tool like <a
+                    href="http://jakarta.apache.org/jmeter/">Apache JMeter</a> on your application.
+                </p>
+            </section>
         </section>
         <section>
             <title>Studio FAQ</title>

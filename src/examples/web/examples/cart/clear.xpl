@@ -24,7 +24,7 @@
                 <scope>session</scope>
             </config>
         </p:input>
-        <p:input name="data" href="aggregate('cart')"/>
+        <p:input name="data" href="aggregate('cart')" debug="clear"/>
     </p:processor>
 
     <p:processor name="oxf:identity">

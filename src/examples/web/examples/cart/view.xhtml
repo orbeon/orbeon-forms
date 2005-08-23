@@ -17,14 +17,18 @@
 
     <xhtml:head>
         <xhtml:title>Shopping Cart</xhtml:title>
-        <xforms:model>
+        <xforms:model id="main-model">
+            <xforms:action ev:event="xforms-ready">
+                <xforms:send submission="get"/>
+                <xforms:refresh model="main-model"/>
+            </xforms:action>
             <xforms:instance id="item">
                 <item/>
             </xforms:instance>
             <xforms:instance id="cart">
                 <cart/>
             </xforms:instance>
-            <xforms:submission id="get" action="/direct/cart/get" ref="instance('cart')" method="post" replace="instance"/>
+            <xforms:submission id="get" action="/direct/cart/get" ref="instance('item')" instance="cart" method="post" replace="instance"/>
             <xforms:submission id="add" action="/direct/cart/add" ref="instance('item')" method="post" replace="instance"/>
             <xforms:submission id="clear" action="/direct/cart/clear" ref="instance('item')" method="post" replace="instance"/>
         </xforms:model>
@@ -44,7 +48,7 @@
             <xforms:trigger>
                 <xforms:label>Empty cart</xforms:label>
                 <xforms:action ev:event="DOMActivate">
-                    <xforms:send submission="add"/>
+                    <xforms:send submission="clear"/>
                     <xforms:send submission="get"/>
                 </xforms:action>
             </xforms:trigger>

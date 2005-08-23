@@ -14,7 +14,7 @@
 <config xmlns="http://www.orbeon.com/oxf/controller"
         xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <page path-info="*" view="view.xml"/>
+    <page path-info="*" view="view.xhtml"/>
 
     <epilogue url="oxf:/config/epilogue.xpl"/>
 

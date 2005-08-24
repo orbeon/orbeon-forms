@@ -181,7 +181,6 @@ public class DelegationProcessor extends ProcessorImpl {
                                                     requestBody.addChild(new MessageElement((org.w3c.dom.Element) child));
                                                 } else if (child instanceof org.w3c.dom.Text) {
                                                     requestBody.addTextNode(((org.w3c.dom.Text) child).toString());
-                                                    requestEnvelope.addBodyElement(new SOAPBodyElement((org.w3c.dom.Element) child));
                                                 } else {
                                                     throw new OXFException("Unsupported node type: " + child.getClass().getName());
                                                 }

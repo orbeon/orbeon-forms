@@ -19,29 +19,35 @@
           xmlns:xu="http://www.xmldb.org/xupdate"
           xmlns:xmldb="http://exist-db.org/xquery/xmldb">
 
-    <p:param type="input" name="query"/>
+    <p:param type="input" name="blog"/>
 
-    <!-- Use special eXist functions -->
-    <p:processor name="oxf:xslt">
-        <p:input name="data" href="#query"/>
+    <!-- Add ids -->
+    <p:processor name="oxf:unsafe-xslt">
+        <p:input name="data" href="#blog"/>
         <p:input name="config">
-            <xdb:query collection="/db/system" create-collection="false" xsl:version="2.0">
-                xquery version "1.0";
-                <result>
-                    {
-                    if (xmldb:get-user-groups('<xsl:value-of select="/query/username"/>') = 'ops-blog')
-                        then xmldb:delete-user('<xsl:value-of select="/query/username"/>')
-                        else ()
-                    }
-                </result>
-            </xdb:query>
+            <xsl:transform version="2.0" xmlns:uuid="java:org.orbeon.oxf.util.UUIDUtils">
+                <xsl:import href="oxf:/oxf/xslt/utils/copy.xsl"/>
+                <xsl:template match="category/id">
+                    <xsl:copy>
+                        <xsl:value-of select="count(../preceding-sibling::category) + 1"/>
+                    </xsl:copy>
+                </xsl:template>
+                <xsl:template match="blog/blog-id">
+                    <xsl:copy>
+                        <xsl:value-of select="uuid:createPseudoUUID()"/>
+                    </xsl:copy>
+                </xsl:template>
+            </xsl:transform>
         </p:input>
-        <p:output name="data" id="xmldb-query"/>
+        <p:output name="data" id="blog-with-ids" debug="xxxblog-with-ids"/>
     </p:processor>
 
-    <p:processor name="oxf:xmldb-query">
+    <p:processor name="oxf:xmldb-insert">
         <p:input name="datasource" href="../datasource.xml"/>
-        <p:input name="query" href="#xmldb-query"/>
+        <p:input name="query">
+            <xdb:insert collection="/db/orbeon/blog-example/blogs" create-collection="true"/>
+        </p:input>
+        <p:input name="data" href="#blog-with-ids" schema-href="../schema/blog.rng"/>
     </p:processor>
 
 </p:config>

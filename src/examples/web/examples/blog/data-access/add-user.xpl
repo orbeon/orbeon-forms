@@ -31,7 +31,7 @@
                     {
                     xmldb:create-user('<xsl:value-of select="/query/username"/>',
                                       '<xsl:value-of select="/query/password"/>',
-                                      ('users', 'ops-blog'), ())
+                                      ('users', 'ops-blog'), '/orbeon/blog-example/')
                     }
                 </result>
             </xdb:query>

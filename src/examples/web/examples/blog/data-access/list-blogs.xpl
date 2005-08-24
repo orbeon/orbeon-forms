@@ -16,24 +16,20 @@
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
           xmlns:xdb="http://orbeon.org/oxf/xml/xmldb"
-          xmlns:xu="http://www.xmldb.org/xupdate"
-          xmlns:xmldb="http://exist-db.org/xquery/xmldb">
+          xmlns:xu="http://www.xmldb.org/xupdate">
 
-    <p:param type="input" name="query"/>
+    <p:param type="output" name="blogs"/>
 
-    <!-- Use special eXist functions -->
     <p:processor name="oxf:xslt">
-        <p:input name="data" href="#query"/>
+        <p:input name="data"><dummy/></p:input>
         <p:input name="config">
-            <xdb:query collection="/db/system" create-collection="false" xsl:version="2.0">
+            <xdb:query collection="/db/orbeon/blog-example/blogs" create-collection="true" xsl:version="2.0">
                 xquery version "1.0";
-                <result>
+                <blogs>
                     {
-                    if (xmldb:get-user-groups('<xsl:value-of select="/query/username"/>') = 'ops-blog')
-                        then xmldb:delete-user('<xsl:value-of select="/query/username"/>')
-                        else ()
+                        /blog
                     }
-                </result>
+                </blogs>
             </xdb:query>
         </p:input>
         <p:output name="data" id="xmldb-query"/>
@@ -42,6 +38,7 @@
     <p:processor name="oxf:xmldb-query">
         <p:input name="datasource" href="../datasource.xml"/>
         <p:input name="query" href="#xmldb-query"/>
+        <p:output name="data" ref="blogs"/>
     </p:processor>
 
 </p:config>

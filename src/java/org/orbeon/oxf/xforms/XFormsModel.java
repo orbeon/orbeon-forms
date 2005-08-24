@@ -32,6 +32,7 @@ import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.dom4j.DocumentWrapper;
 import org.orbeon.saxon.expr.XPathContext;
 import org.orbeon.saxon.expr.XPathContextMajor;
@@ -175,11 +176,11 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
      */
     private void handleBindContainer(Element container, ModelBind parent) {
         for (Iterator i = container.elements(new QName("bind", XFormsConstants.XFORMS_NAMESPACE)).iterator(); i.hasNext();) {
-            Element bindElement = (Element) i.next();
-            ModelBind modelBind = new ModelBind(bindElement.attributeValue("id"), bindElement.attributeValue("nodeset"),
+            final Element bindElement = (Element) i.next();
+            final ModelBind modelBind = new ModelBind(bindElement.attributeValue("id"), bindElement.attributeValue("nodeset"),
                     bindElement.attributeValue("relevant"), bindElement.attributeValue("calculate"), bindElement.attributeValue("type"),
                     bindElement.attributeValue("constraint"), bindElement.attributeValue("required"), bindElement.attributeValue("readonly"),
-                    Dom4jUtils.getNamespaceContextNoDefault(bindElement), (LocationData) bindElement.getData());
+                    Dom4jUtils.getNamespaceContextNoDefault(bindElement), new ExtendedLocationData((LocationData) bindElement.getData(), bindElement));
             if (parent != null) {
                 parent.addChild(modelBind);
                 modelBind.setParent(parent);

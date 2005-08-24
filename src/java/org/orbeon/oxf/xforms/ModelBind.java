@@ -14,6 +14,7 @@
 package org.orbeon.oxf.xforms;
 
 import org.dom4j.Node;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.util.ArrayList;
@@ -47,6 +48,10 @@ public class ModelBind {
     public ModelBind(String id, String nodeset, String relevant, String calculate, String type, String constraint,
                      String required, String readonly,
                      Map namespaceMap, LocationData locationData) {
+
+        if (nodeset == null)
+            throw new ValidationException("Bind element is missing nodeset attribute", locationData);
+
         this.id = id;
         this.nodeset = nodeset;
         this.relevant = relevant;
@@ -55,6 +60,7 @@ public class ModelBind {
         this.constraint = constraint;
         this.required = required;
         this.readonly = readonly;
+
         this.namespaceMap = namespaceMap;
         this.locationData = locationData;
     }

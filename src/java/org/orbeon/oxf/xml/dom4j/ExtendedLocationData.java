@@ -13,8 +13,9 @@
  */
 package org.orbeon.oxf.xml.dom4j;
 
-import org.xml.sax.Locator;
+import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.xml.sax.Locator;
 
 /**
  * LocationData information with additional description.
@@ -28,9 +29,32 @@ public class ExtendedLocationData extends LocationData {
         this.description = description;
     }
 
+    /**
+     * Create extended location data with a description.
+     *
+     * If defaultIfNecessary is true and locationData is null or the systemId provided by
+     * defaultIfNecessary is null, then default Java location data of the caller is provided.
+     *
+     * @param locationData
+     * @param description
+     */
     public ExtendedLocationData(LocationData locationData, String description) {
         super((locationData == null) ? null : locationData.getSystemID(), (locationData == null) ? -1 : locationData.getLine(), (locationData == null) ? -1 : locationData.getCol());
         this.description = description;
+    }
+
+    /**
+     * Create extended location data with an element.
+     *
+     * If defaultIfNecessary is true and locationData is null or the systemId provided by
+     * defaultIfNecessary is null, then default Java location data of the caller is provided.
+     *
+     * @param locationData
+     * @param element
+     */
+    public ExtendedLocationData(LocationData locationData, Element element) {
+        super((locationData == null) ? null : locationData.getSystemID(), (locationData == null) ? -1 : locationData.getLine(), (locationData == null) ? -1 : locationData.getCol());
+        this.description = Dom4jUtils.domToString(element);
     }
 
     /**

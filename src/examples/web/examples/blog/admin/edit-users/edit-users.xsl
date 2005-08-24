@@ -57,70 +57,72 @@
         </xforms:model>
     </head>
     <body>
-        <h2>Existing Blog Users</h2>
-        <table class="gridtable">
-            <tr>
-                <th>Username</th>
-                <th>Home</th>
-                <th>Groups</th>
-                <th>Action</th>
-            </tr>
-            <xforms:repeat nodeset="user" id="usersRepeat">
+        <div class="maincontent">
+            <h2>Existing Blog Users</h2>
+            <table class="gridtable">
+                <tr>
+                    <th>Username</th>
+                    <th>Home</th>
+                    <th>Groups</th>
+                    <th>Action</th>
+                </tr>
+                <xforms:repeat nodeset="user" id="usersRepeat">
+                    <tr>
+                        <td>
+                            <xforms:output ref="@name"/>
+                        </td>
+                        <td>
+                            <xforms:output value="@home"/>
+                        </td>
+                        <td>
+                            <xforms:output value="string-join(group, ', ')"/>
+                        </td>
+                        <td>
+                            <xforms:trigger>
+                                <xforms:label>Delete</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue ref="instance('delete-user-request')/username" value="instance('users-instance')/user[index('usersRepeat')]/@name"/>
+                                    <xforms:send submission="delete-submission"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </td>
+                    </tr>
+                </xforms:repeat>
+            </table>
+            <h2>Add New User</h2>
+            <table>
+                <tr>
+                    <th style="text-align: right">Username</th>
+                    <td>
+                        <xforms:input ref="instance('add-user-request')/username"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th style="text-align: right">Password</th>
+                    <td>
+                        <xforms:secret ref="instance('add-user-request')/password"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th style="text-align: right">Password Check</th>
+                    <td>
+                        <xforms:secret ref="instance('add-user-request')/password2"/>
+                    </td>
+                </tr>
                 <tr>
                     <td>
-                        <xforms:output ref="@name"/>
-                    </td>
-                    <td>
-                        <xforms:output value="@home"/>
-                    </td>
-                    <td>
-                        <xforms:output value="string-join(group, ', ')"/>
-                    </td>
-                    <td>
                         <xforms:trigger>
-                            <xforms:label>Delete</xforms:label>
+                            <xforms:label>Add</xforms:label>
                             <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="instance('delete-user-request')/username" value="instance('users-instance')/user[index('usersRepeat')]/@name"/>
-                                <xforms:send submission="delete-submission"/>
+                                <xforms:send submission="add-submission"/>
                             </xforms:action>
                         </xforms:trigger>
                     </td>
                 </tr>
-            </xforms:repeat>
-        </table>
-        <h2>Add New User</h2>
-        <table>
-            <tr>
-                <th style="text-align: right">Username</th>
-                <td>
-                    <xforms:input ref="instance('add-user-request')/username"/>
-                </td>
-            </tr>
-            <tr>
-                <th style="text-align: right">Password</th>
-                <td>
-                    <xforms:secret ref="instance('add-user-request')/password"/>
-                </td>
-            </tr>
-            <tr>
-                <th style="text-align: right">Password Check</th>
-                <td>
-                    <xforms:secret ref="instance('add-user-request')/password2"/>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <xforms:trigger>
-                        <xforms:label>Add</xforms:label>
-                        <xforms:action ev:event="DOMActivate">
-                            <xforms:send submission="add-submission"/>
-                        </xforms:action>
-                    </xforms:trigger>
-                </td>
-            </tr>
-        </table>
-        <p>
-            <a href="/blog">Back Home</a>
-        </p>
+            </table>
+            <p>
+                <a href="/blog">Back Home</a>
+            </p>
+        </div>
     </body>
 </html>

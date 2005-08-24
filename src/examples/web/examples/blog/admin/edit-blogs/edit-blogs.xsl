@@ -73,116 +73,118 @@
         </xforms:model>
     </head>
     <body>
-        <h2>Existing Blogs</h2>
-        <table class="gridtable">
-            <tr>
-                <th>Blog Name</th>
-                <th>Username</th>
-                <th>Blog Id</th>
-                <th>Categories</th>
-                <th>Action</th>
-            </tr>
-            <xforms:repeat nodeset="blog" id="blogRepeat">
+        <div class="maincontent">
+            <h2>Existing Blogs</h2>
+            <table class="gridtable">
                 <tr>
-                    <td>
-                        <xforms:input ref="name" xhtml:size="30"/>
-                    </td>
-                    <td>
-                        <xforms:output ref="username"/>
-                    </td>
-                    <td>
-                        <xforms:output ref="blog-id"/>
-                    </td>
-                    <td>
-                        <table>
-                            <xforms:repeat nodeset="categories/category" id="categoryRepeat">
-                                <tr>
-                                    <td>
-                                        <xforms:input ref="name"/>
-                                    </td>
-                                </tr>
-                            </xforms:repeat>
-                        </table>
-                    </td>
-                    <td>
-                        <xforms:trigger>
-                            <xforms:label>Delete</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:setvalue ref="instance('delete-blog-request')/blog-id" value="instance('blogs-instance')/blog[index('blogRepeat')]/blog-id"/>
-                                <xforms:send submission="delete-submission"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </td>
+                    <th>Blog Name</th>
+                    <th>Username</th>
+                    <th>Blog Id</th>
+                    <th>Categories</th>
+                    <th>Action</th>
                 </tr>
-            </xforms:repeat>
-        </table>
-        <xforms:trigger>
-            <xforms:label>Save Changes</xforms:label>
-            <xforms:action ev:event="DOMActivate">
-                <xforms:send submission="update-submission"/>
-            </xforms:action>
-        </xforms:trigger>
-        <h2>Add New Blog</h2>
-        <xforms:group ref="instance('add-blog-request')">
-            <table>
-                <tr>
-                    <th style="text-align: right">Blog Name</th>
-                    <td>
-                        <xforms:input ref="name" xhtml:size="30"/>
-                    </td>
-                </tr>
-                <tr>
-                    <th style="text-align: right">Blog Owner</th>
-                    <td>
-                        <xforms:select1 appearance="minimal" ref="username">
-                            <xforms:itemset nodeset="instance('users-instance')/user">
-                                <xforms:label ref="@name"/>
-                                <xforms:value ref="@name"/>
-                            </xforms:itemset>
-                        </xforms:select1>
-                    </td>
-                </tr>
-                <tr>
-                    <th style="text-align: right">Categories</th>
-                    <td>
-                        <table>
-                            <xforms:repeat nodeset="categories/category" id="addCategoryRepeat">
-                                <tr>
-                                    <td>
-                                        <xforms:input ref="name"/>
-                                    </td>
-                                </tr>
-                            </xforms:repeat>
-                        </table>
-                        <xforms:trigger>
-                            <xforms:label>Add Category</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:insert nodeset="categories/category" at="index('addCategoryRepeat')" position="after"/>
-                                <xforms:setvalue ref="categories/category[index('addCategoryRepeat')]/name" value="''"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                        <xforms:trigger ref="instance('triggers-instance')/delete-category">
-                            <xforms:label>Delete Category</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:delete ev:event="DOMActivate" nodeset="instance('add-blog-request')/categories/category" at="index('addCategoryRepeat')"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <xforms:trigger>
-                            <xforms:label>Add Blog</xforms:label>
-                            <xforms:action ev:event="DOMActivate">
-                                <xforms:send submission="add-submission"/>
-                            </xforms:action>
-                        </xforms:trigger>
-                    </td>
-                </tr>
+                <xforms:repeat nodeset="blog" id="blogRepeat">
+                    <tr>
+                        <td>
+                            <xforms:input ref="name" xhtml:size="30"/>
+                        </td>
+                        <td>
+                            <xforms:output ref="username"/>
+                        </td>
+                        <td>
+                            <xforms:output ref="blog-id"/>
+                        </td>
+                        <td>
+                            <table>
+                                <xforms:repeat nodeset="categories/category" id="categoryRepeat">
+                                    <tr>
+                                        <td>
+                                            <xforms:input ref="name"/>
+                                        </td>
+                                    </tr>
+                                </xforms:repeat>
+                            </table>
+                        </td>
+                        <td>
+                            <xforms:trigger>
+                                <xforms:label>Delete</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:setvalue ref="instance('delete-blog-request')/blog-id" value="instance('blogs-instance')/blog[index('blogRepeat')]/blog-id"/>
+                                    <xforms:send submission="delete-submission"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </td>
+                    </tr>
+                </xforms:repeat>
             </table>
-        </xforms:group>
-        <p>
-            <a href="/blog">Back Home</a>
-        </p>
+            <xforms:trigger>
+                <xforms:label>Save Changes</xforms:label>
+                <xforms:action ev:event="DOMActivate">
+                    <xforms:send submission="update-submission"/>
+                </xforms:action>
+            </xforms:trigger>
+            <h2>Add New Blog</h2>
+            <xforms:group ref="instance('add-blog-request')">
+                <table>
+                    <tr>
+                        <th style="text-align: right">Blog Name</th>
+                        <td>
+                            <xforms:input ref="name" xhtml:size="30"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="text-align: right">Blog Owner</th>
+                        <td>
+                            <xforms:select1 appearance="minimal" ref="username">
+                                <xforms:itemset nodeset="instance('users-instance')/user">
+                                    <xforms:label ref="@name"/>
+                                    <xforms:value ref="@name"/>
+                                </xforms:itemset>
+                            </xforms:select1>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th style="text-align: right">Categories</th>
+                        <td>
+                            <table>
+                                <xforms:repeat nodeset="categories/category" id="addCategoryRepeat">
+                                    <tr>
+                                        <td>
+                                            <xforms:input ref="name"/>
+                                        </td>
+                                    </tr>
+                                </xforms:repeat>
+                            </table>
+                            <xforms:trigger>
+                                <xforms:label>Add Category</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:insert nodeset="categories/category" at="index('addCategoryRepeat')" position="after"/>
+                                    <xforms:setvalue ref="categories/category[index('addCategoryRepeat')]/name" value="''"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                            <xforms:trigger ref="instance('triggers-instance')/delete-category">
+                                <xforms:label>Delete Category</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:delete ev:event="DOMActivate" nodeset="instance('add-blog-request')/categories/category" at="index('addCategoryRepeat')"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <xforms:trigger>
+                                <xforms:label>Add Blog</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:send submission="add-submission"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                        </td>
+                    </tr>
+                </table>
+            </xforms:group>
+            <p>
+                <a href="/blog">Back Home</a>
+            </p>
+        </div>
     </body>
 </html>

@@ -281,7 +281,9 @@
 
                         </xsl:when>
                         <xsl:otherwise>
-                            No posts yet.
+                            <p>
+                                There are no posts in this blog yet.
+                            </p>
                         </xsl:otherwise>
                     </xsl:choose>
                 </td>
@@ -368,5 +370,8 @@
                 </td>
             </tr>
         </table>
+        <p>
+            <a href="/blog">Back Home</a>
+        </p>
     </body>
 </html>

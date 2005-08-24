@@ -36,7 +36,7 @@
         <ul>
             <li>Implementing XML-RPC services</li>
             <li>Connecting to a native XML database</li>
-            <li>Using XForms</li>
+            <li>Using XForms with events to create responsive user interfaces</li>
             <li>Producing XHTML, RSS and other formats from a single data source</li>
             <li>Implementing configurable themes with XSLT</li>
             <li>Creating "clean" URLs in a REST perspective</li>
@@ -45,7 +45,15 @@
             The OPS Blog example is also a fully-functioning blog application, which you can deploy
             on your server!
         </p>
-        <h2>Configuration</h2>
+        <h2>List of blogs configured</h2>
+        <ul>
+            <xsl:for-each select="/blogs/blog">
+                <li>
+                    <a href="/blog/{username}/{blog-id}"><xsl:value-of select="name"/></a>
+                </li>
+            </xsl:for-each>
+        </ul>
+        <h2>Administration</h2>
         <p>
             <ul>
                 <li>
@@ -56,11 +64,5 @@
                 </li>
             </ul>
         </p>
-        <h2>List of blogs configured</h2>
-        <ul>
-            <li>
-                <a href="/blog/ebruchez/500001">My Blog</a>
-            </li>
-        </ul>
     </body>
 </html>

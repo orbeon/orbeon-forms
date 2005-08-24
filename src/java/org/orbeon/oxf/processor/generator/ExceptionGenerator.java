@@ -123,6 +123,23 @@ public class ExceptionGenerator extends ProcessorImpl {
                     final String description = extendedLocationData.getDescription();
                     if (description != null)
                         helper.element("description", description);
+                    final String[] parameters = extendedLocationData.getParameters();
+                    if (parameters != null) {
+                        helper.startElement("parameters");
+                        for (int j = 0; j < parameters.length; j += 2) {
+                            final String paramName = parameters[j];
+                            final String paramValue = parameters[j + 1];
+
+                            helper.startElement("parameter");
+                            helper.element("name", paramName);
+                            helper.element("value", paramValue);
+                            helper.endElement();
+                        }
+                        helper.endElement();
+                    }
+                    final String elementString = extendedLocationData.getElementString();
+                    if (elementString != null)
+                        helper.element("element", elementString);
                 }
 
                 helper.endElement();

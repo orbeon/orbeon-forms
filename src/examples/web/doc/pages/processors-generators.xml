@@ -297,40 +297,51 @@
                 <exceptions>
                     <exception>
                         <type>org.orbeon.oxf.common.ValidationException</type>
-                        <message>org.orbeon.saxon.xpath.StaticError: Attribute {selectx} is not allowed on this element</message>
+                        <message>null, line 8, column 109, description xforms:bind element: Bind element is missing nodeset attribute null, line 8, column 109: Bind element is missing nodeset attribute</message>
                         <location>
-                            <system-id>oxf:/examples/bizdoc2/summary/summary-view.xsl</system-id>
-                            <line>34</line>
-                            <column>-1</column>
-                            <description>xsl:copy-of</description>
+                            <system-id/>
+                            <line>8</line>
+                            <column>109</column>
+                            <description>xforms:bind element</description>
+                            <element>&lt;xforms:bind xmlns:xforms="http://www.w3.org/2002/xforms" id="xforms-element-2" ref="/instance/a" calculate=". + 1"/&gt;</element>
                         </location>
                         <location>
-                            <system-id>oxf:/examples/bizdoc2/page-flow.xml</system-id>
-                            <line>30</line>
-                            <column>121</column>
-                            <description>reading page view data output: page id='summary', view='summary/summary-view.xsl'</description>
+                            <system-id>oxf:/ops/pfc/xforms-epilogue.xpl</system-id>
+                            <line>99</line>
+                            <column>66</column>
+                            <description>reading processor output</description>
+                            <parameters>
+                                <parameter>
+                                    <name>name</name>
+                                    <value>response</value>
+                                </parameter>
+                                <parameter>
+                                    <name>id</name>
+                                    <value>response</value>
+                                </parameter>
+                                <parameter>
+                                    <name>ref</name>
+                                    <value/>
+                                </parameter>
+                            </parameters>
+                            <element>&lt;p:output xmlns:p="http://www.orbeon.com/oxf/pipeline" name="response" id="response"/&gt;</element>
                         </location>
                         <location>
-                            <system-id>oxf:/examples/dispatch.xpl</system-id>
-                            <line>67</line>
-                            <column>47</column>
-                            <description>executing processor: name='{http://www.orbeon.com/oxf/processors}page-flow'</description>
+                            ...
                         </location>
+                        ...
                         <stack-trace-elements>
                             <element>
-                                <class-name>org.orbeon.oxf.processor.transformer.xslt.XSLTTransformer$1</class-name>
-                                <method-name>createTransformer</method-name>
-                                <file-name>XSLTTransformer.java</file-name>
-                                <line-number>355</line-number>
+                                <class-name>org.orbeon.oxf.common.ValidationException</class-name>
+                                <method-name>wrapException</method-name>
+                                <file-name>ValidationException.java</file-name>
+                                <line-number>119</line-number>
                             </element>
                             ...
                         </stack-trace-elements>
                     </exception>
                     <exception>
-                        ...
-                    </exception>
-                    <exception>
-                        ...
+                       ...
                     </exception>
                 </exceptions>
             </xml-source>

@@ -180,7 +180,8 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             final ModelBind modelBind = new ModelBind(bindElement.attributeValue("id"), bindElement.attributeValue("nodeset"),
                     bindElement.attributeValue("relevant"), bindElement.attributeValue("calculate"), bindElement.attributeValue("type"),
                     bindElement.attributeValue("constraint"), bindElement.attributeValue("required"), bindElement.attributeValue("readonly"),
-                    Dom4jUtils.getNamespaceContextNoDefault(bindElement), new ExtendedLocationData((LocationData) bindElement.getData(), bindElement));
+                    Dom4jUtils.getNamespaceContextNoDefault(bindElement),
+                    new ExtendedLocationData((LocationData) bindElement.getData(), "xforms:bind element", bindElement));
             if (parent != null) {
                 parent.addChild(modelBind);
                 modelBind.setParent(parent);

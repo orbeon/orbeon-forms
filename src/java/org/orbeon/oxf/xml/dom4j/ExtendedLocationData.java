@@ -23,6 +23,8 @@ import org.xml.sax.Locator;
 public class ExtendedLocationData extends LocationData {
 
     private String description;
+    private String[] parameters;
+    private String elementString;
 
     public ExtendedLocationData(String systemID, int line, int col, String description) {
         super(systemID, line, col);
@@ -52,9 +54,10 @@ public class ExtendedLocationData extends LocationData {
      * @param locationData
      * @param element
      */
-    public ExtendedLocationData(LocationData locationData, Element element) {
-        super((locationData == null) ? null : locationData.getSystemID(), (locationData == null) ? -1 : locationData.getLine(), (locationData == null) ? -1 : locationData.getCol());
-        this.description = Dom4jUtils.domToString(element);
+    public ExtendedLocationData(LocationData locationData, String description, Element element) {
+        this(locationData, description);
+        if (element != null)
+            this.elementString = Dom4jUtils.domToString(element);
     }
 
     /**
@@ -75,36 +78,35 @@ public class ExtendedLocationData extends LocationData {
 //            System.out.println("xxx defaultIfNecessary = true xxx ");
     }
 
+    /**
+     * Create extended location data with a description.
+     *
+     * If defaultIfNecessary is true and locationData is null or the systemId provided by
+     * defaultIfNecessary is null, then default Java location data of the caller is provided.
+     *
+     * @param locationData
+     * @param description
+     * @param element
+     * @param parameters
+     * @param defaultIfNecessary
+     */
+    public ExtendedLocationData(LocationData locationData, String description, Element element, String[] parameters, boolean defaultIfNecessary) {
+        this(((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary) ? Dom4jUtils.getLocationData() : locationData,
+                description, parameters);
+//        if (((locationData == null || locationData.getSystemID() == null) && defaultIfNecessary))
+//            System.out.println("xxx defaultIfNecessary = true xxx ");
+        if (element != null)
+            this.elementString = Dom4jUtils.domToString(element);
+    }
+
     private ExtendedLocationData(LocationData locationData, String description, String[] parameters) {
         super((locationData == null) ? null : locationData.getSystemID(), (locationData == null) ? -1 : locationData.getLine(), (locationData == null) ? -1 : locationData.getCol());
-        if (parameters == null) {
-            this.description = description;
-        } else {
+        this.description = description;
+        if (parameters != null) {
             if (parameters.length % 2 == 1)
                 throw new OXFException("Invalid number of parameters passed to ExtendedLocationData");
-            final StringBuffer sb = new StringBuffer(description);
-            boolean first = true;
-            for (int i = 0; i < parameters.length; i += 2) {
-                final String paramName = parameters[i];
-                final String paramValue = parameters[i + 1];
 
-//                if ("ref".equals(paramName) && "result-data".equals(paramValue)) {
-//                    System.out.println("xxx");
-//                }
-
-                if (paramValue != null) {
-
-                    sb.append((first) ? ": " : ", ");
-
-                    sb.append(paramName);
-                    sb.append("='");
-                    sb.append(paramValue);
-                    sb.append("'");
-
-                    first = false;
-                }
-            }
-            this.description = sb.toString();
+            this.parameters = parameters;
         }
     }
 
@@ -115,6 +117,37 @@ public class ExtendedLocationData extends LocationData {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getElementString() {
+        return elementString;
+    }
+
+
+    public String getParametersString() {
+        final StringBuffer sb = new StringBuffer(description);
+        boolean first = true;
+        for (int i = 0; i < parameters.length; i += 2) {
+            final String paramName = parameters[i];
+            final String paramValue = parameters[i + 1];
+
+            if (paramValue != null) {
+
+                sb.append((first) ? ": " : ", ");
+
+                sb.append(paramName);
+                sb.append("='");
+                sb.append(paramValue);
+                sb.append("'");
+
+                first = false;
+            }
+        }
+        return sb.toString();
+    }
+
+    public String[] getParameters() {
+        return parameters;
     }
 
     public String toString() {

@@ -29,12 +29,10 @@
                     <last/>
                     <fibo/>
                     <current/>
+                    <counter/>
                 </instance>
             </xforms:instance>
-            <xforms:instance id="counter">
-                <counter/>
-            </xforms:instance>
-            <xforms:bind nodeset="instance('instance')/total" constraint=". castable as xs:integer and . >= 2"/>
+            <xforms:bind nodeset="/instance/total" constraint=". castable as xs:integer and . >= 2"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
@@ -50,7 +48,10 @@
                         <xforms:setvalue ref="before-last">1</xforms:setvalue>
                         <xforms:setvalue ref="last">2</xforms:setvalue>
                         <xforms:setvalue ref="fibo">1, 2</xforms:setvalue>
-                        <xforms:setvalue ref="instance('counter')" value="if (instance('instance')/total > 2) then 3 else ."/>
+                        <!-- Reset here to handle the case where the previous value was 3,
+                             user entered a new value and pressed on "compute" -->
+                        <xforms:setvalue ref="counter" value="if (../total > 2) then '' else ."/>
+                        <xforms:setvalue ref="counter" value="if (../total > 2) then 3 else ."/>
                     </xforms:action>
                 </xforms:trigger>
             </xhtml:p>
@@ -59,13 +60,13 @@
                 <xforms:output ref="fibo"/>
             </xhtml:p>
             <!-- Adding next number suite -->
-            <xforms:input ref="instance('counter')" style="display: none">
+            <xforms:input ref="counter" style="display: none">
                 <xforms:action ev:event="xforms-value-changed">
-                    <xforms:setvalue ref="instance('instance')/current" value="../last + ../before-last"/>
-                    <xforms:setvalue ref="instance('instance')/before-last" value="../last"/>
-                    <xforms:setvalue ref="instance('instance')/last" value="../current"/>
-                    <xforms:setvalue ref="instance('instance')/fibo" value="concat(., ', ', ../current)"/>
-                    <xforms:setvalue ref="instance('counter')" value="if (. = instance('instance')/total) then . else . + 1"/>
+                    <xforms:setvalue ref="../current" value="../last + ../before-last"/>
+                    <xforms:setvalue ref="../before-last" value="../last"/>
+                    <xforms:setvalue ref="../last" value="../current"/>
+                    <xforms:setvalue ref="../fibo" value="concat(., ', ', ../current)"/>
+                    <xforms:setvalue ref="." value="if (. = ../total) then . else . + 1"/>
                 </xforms:action>
             </xforms:input>
         </xforms:group>

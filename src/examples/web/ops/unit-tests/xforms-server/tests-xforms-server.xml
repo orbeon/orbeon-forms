@@ -236,7 +236,7 @@
                                             <xforms:output ref="second" id="id222"/>
                                             <xforms:output ref="third" id="id223"/>
                                             <xforms:output ref="fourth" id="id224"/>
-                                            <xforms:group ref="instance('instance21')" id="group214">
+                                            <xforms:group ref="instance('instance21')" id="group215">
                                                 <xforms:group ref="nested212" id="group10">
                                                     <xforms:output ref="first" id="id211b"/>
                                                     <xforms:output ref="second" id="id212b"/>
@@ -375,7 +375,7 @@
                         <xxf:control id="id222" readonly="false" required="false" relevant="true" valid="true">222</xxf:control>
                         <xxf:control id="id223" readonly="false" required="false" relevant="true" valid="true">223</xxf:control>
                         <xxf:control id="id224" readonly="false" required="false" relevant="true" valid="true">224</xxf:control>
-                        <xxf:control id="group214" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="group215" readonly="false" required="false" relevant="true" valid="true"/>
                         <xxf:control id="group10" readonly="false" required="false" relevant="true" valid="true"/>
                         <xxf:control id="id211b" readonly="false" required="false" relevant="true" valid="true">211</xxf:control>
                         <xxf:control id="id212b" readonly="false" required="false" relevant="true" valid="true">212</xxf:control>

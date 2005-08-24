@@ -136,7 +136,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         {
             final Object eventTargetObject = getObjectById(pipelineContext, controlId);
             if (!(eventTargetObject instanceof XFormsEventTarget))
-                throw new OXFException("Event target is not an XFormsEventTarget.");
+                throw new OXFException("Event target id '" + controlId + "' is not an XFormsEventTarget.");
             eventTarget = (XFormsEventTarget) eventTargetObject;
         }
 
@@ -147,7 +147,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
             if (otherEventTargetObject == null)
                 otherEventTarget = null;
             else if (!(otherEventTargetObject instanceof XFormsEventTarget))
-                throw new OXFException("Other event target is not an XFormsEventTarget.");
+                throw new OXFException("Other event target id '" + otherControlId + "' is not an XFormsEventTarget.");
             else
                 otherEventTarget = (XFormsEventTarget) otherEventTargetObject;
 

@@ -41,6 +41,7 @@
 <!--                <xsl:attribute name="action" select="context:rewriteResourceURL(@action, false())"/>-->
                 <xsl:attribute name="action" select="@action"/>
             </xsl:if>
+            <xsl:apply-templates/>
         </xsl:copy>
     </xsl:template>
     

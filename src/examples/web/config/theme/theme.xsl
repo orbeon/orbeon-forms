@@ -48,12 +48,12 @@
                 <xhtml:script type="text/javascript" src="/config/theme/jscalendar/calendar-setup.js"/>
                 <!-- Other standard scripts/styles -->
                 <xhtml:link rel="stylesheet" href="/config/theme/orbeon-layout.cssd" type="text/css"/>
-                <xhtml:script type="text/javascript" src="/config/theme/javascript/wz_tooltip.js"/>
-                <xhtml:script type="text/javascript" src="/config/theme/javascript/overlib_mini.js"/>
-                <xhtml:script type="text/javascript" src="/config/theme/javascript/time-utils.js"/>
-                <xhtml:script type="text/javascript" src="/config/theme/javascript/sarissa.js"/>
                 <xhtml:script type="text/javascript" src="/config/theme/javascript/xforms-style.js"/>
-                <xhtml:script type="text/javascript" src="/config/theme/javascript/xforms.js"/>
+                <xhtml:script type="text/javascript" src="/ops/javascript/wz_tooltip.js"/>
+                <xhtml:script type="text/javascript" src="/ops/javascript/overlib_mini.js"/>
+                <xhtml:script type="text/javascript" src="/ops/javascript/time-utils.js"/>
+                <xhtml:script type="text/javascript" src="/ops/javascript/sarissa.js"/>
+                <xhtml:script type="text/javascript" src="/ops/javascript/xforms.js"/>
                 <!-- Title -->
                 <xhtml:title>
                     <xsl:choose>

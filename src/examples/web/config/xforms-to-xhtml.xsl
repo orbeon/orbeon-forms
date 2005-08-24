@@ -108,12 +108,19 @@
     </xsl:template>
 
     <xsl:template match="xforms:output">
-        <xsl:value-of select="@xxforms:value"/>
-        <xsl:variable name="current-name" as="xs:string" select="@xxforms:name"/>
-        <xsl:variable name="outputs-with-same-name" as="element()+" select="//xforms:output[@xxforms:name = $current-name]"/>
-        <xsl:if test="generate-id($outputs-with-same-name[1]) = generate-id(.)">
-            <xhtml:input type="hidden" name="{@xxforms:name}" value="{@xxforms:value}"/>
-        </xsl:if>
+        <xsl:choose>
+            <xsl:when test="@value">
+                <xsl:value-of select="@xxforms:value-value"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="@xxforms:value"/>
+                <xsl:variable name="current-name" as="xs:string" select="@xxforms:name"/>
+                <xsl:variable name="outputs-with-same-name" as="element()+" select="//xforms:output[@xxforms:name = $current-name]"/>
+                <xsl:if test="generate-id($outputs-with-same-name[1]) = generate-id(.)">
+                    <xhtml:input type="hidden" name="{@xxforms:name}" value="{@xxforms:value}"/>
+                </xsl:if>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xsl:template match="xforms:upload">

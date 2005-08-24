@@ -1389,6 +1389,10 @@ public class XFormsControls {
             return id;
         }
 
+        public LocationData getLocationData() {
+            return (LocationData) element.getData();
+        }
+
         public List getChildren() {
             return children;
         }

@@ -481,40 +481,20 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         if (modelBind.getCalculate() != null) {
             iterateNodeSet(pipelineContext, documentWrapper, modelBind, new NodeHandler() {
                 public void handleNode(Node node) {
-                    if (node instanceof Element) {
-                        // Compute calculated value
-                        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                                documentWrapper.wrap(node), "string(" + modelBind.getCalculate() + ")", modelBind.getNamespaceMap(), null,
-                                xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
-                        try {
-                            final Object result = expr.evaluateSingle();
-                            final String stringResult = result.toString(); // even with string(), the result may not be a Java String object
-                            // Place in element
-                            Element elt = (Element) node;
-                            Dom4jUtils.clearElementContent(elt);
-                            elt.add(Dom4jUtils.createText(stringResult));
-                        } catch (XPathException e) {
-                            throw new ValidationException(e.getMessage() + " when evaluating '" + modelBind.getCalculate() + "'", modelBind.getLocationData());
-                        } finally {
-                            if (expr != null)
-                                expr.returnToPool();
-                        }
-
-                    } else {
-                        // Compute calculated value and place in attribute
-                        String xpath = "string(" + modelBind.getCalculate() + ")";
-                        PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
-                                documentWrapper.wrap(node), xpath, modelBind.getNamespaceMap(), null,
-                                xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
-                        try {
-                            String value = (String) expr.evaluateSingle();
-                            XFormsInstance.setValueForNode(pipelineContext, node, value, null);
-                        } catch (XPathException e) {
-                            throw new ValidationException(e.getMessage() + " when evaluating '" + xpath + "'", modelBind.getLocationData());
-                        } finally {
-                            if (expr != null)
-                                expr.returnToPool();
-                        }
+                    // Compute calculated value
+                    PooledXPathExpression expr = XPathCache.getXPathExpression(pipelineContext,
+                            documentWrapper.wrap(node), "string(" + modelBind.getCalculate() + ")", modelBind.getNamespaceMap(), null,
+                            xformsFunctionLibrary, modelBind.getLocationData().getSystemID());
+                    try {
+                        final Object result = expr.evaluateSingle();
+                        final String stringResult = result.toString(); // even with string(), the result may not be a Java String object
+                        // Place in element
+                        XFormsInstance.setValueForNode(pipelineContext, node, stringResult, null);
+                    } catch (XPathException e) {
+                        throw new ValidationException(e.getMessage() + " when evaluating '" + modelBind.getCalculate() + "'", modelBind.getLocationData());
+                    } finally {
+                        if (expr != null)
+                            expr.returnToPool();
                     }
                 }
             });
@@ -576,6 +556,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
 
     public String getId() {
         return modelId;
+    }
+
+    public LocationData getLocationData() {
+        return (LocationData) modelDocument.getRootElement().getData();
     }
 
     public List getBindNodeset(PipelineContext pipelineContext, ModelBind bind) {

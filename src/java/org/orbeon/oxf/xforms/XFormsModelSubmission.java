@@ -30,6 +30,7 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
@@ -124,6 +125,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
     public String getId() {
         return id;
+    }
+
+    public LocationData getLocationData() {
+        return (LocationData) submissionElement.getData();
     }
 
     public XFormsEventHandlerContainer getParentContainer() {

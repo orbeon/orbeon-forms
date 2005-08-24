@@ -28,6 +28,7 @@ import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationSAXWriter;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
@@ -292,6 +293,10 @@ public class XFormsInstance implements XFormsEventTarget {
 
     public String getId() {
         return id;
+    }
+
+    public LocationData getLocationData() {
+        return (LocationData) instanceDocument.getRootElement().getData();
     }
 
     public XFormsEventHandlerContainer getParentContainer() {

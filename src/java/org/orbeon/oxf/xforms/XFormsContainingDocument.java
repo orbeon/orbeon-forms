@@ -16,11 +16,13 @@ package org.orbeon.oxf.xforms;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.util.LoggerFactory;
+import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.apache.log4j.Logger;
 
 import java.util.*;
@@ -38,6 +40,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     private static Logger logger = LoggerFactory.createLogger(XFormsContainingDocument.class);
 
+    // At some point we need to be able to store this
+//    private LocationData locationData;
     private List models;
     private Map modelsMap = new HashMap();
     private XFormsControls xformsControls;
@@ -260,7 +264,11 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     public String getId() {
-        throw new OXFException("Method get() should not be called on XFormsContainingDocument.");
+        throw new OXFException("Method getId() should not be called on XFormsContainingDocument.");
+    }
+
+    public LocationData getLocationData() {
+        return null;
     }
 
     public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
@@ -278,78 +286,89 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         final XFormsEventTarget targetObject = (XFormsEventTarget) event.getTargetObject();
 
-        // Find all event handler containers
-        final List containers = new ArrayList();
-        {
-            XFormsEventHandlerContainer container = (targetObject instanceof XFormsEventHandlerContainer) ? (XFormsEventHandlerContainer) targetObject : targetObject.getParentContainer();
-            while (container != null) {
-                containers.add(container);
-                container = container.getParentContainer();
-            }
-        }
-
-        boolean propagate = true;
-        boolean performDefaultAction = true;
-
-        // Go from root to leaf
-        Collections.reverse(containers);
-
-        // Capture phase
-        for (Iterator i = containers.iterator(); i.hasNext();) {
-            final XFormsEventHandlerContainer container = (XFormsEventHandlerContainer) i.next();
-            final List eventHandlers = container.getEventHandlers();
-
-            if (eventHandlers != null) {
-                if (container != targetObject) {
-                    // Event listeners on the target which are in capture mode are not called
-
-                    for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
-                        final XFormsEventHandler eventHandlerImpl = (XFormsEventHandler) j.next();
-
-                        if (!eventHandlerImpl.isPhase() && eventHandlerImpl.getEventName().equals(event.getEventName())) {
-                            // Capture phase match
-                            eventHandlerImpl.handleEvent(pipelineContext, event);
-                            propagate &= eventHandlerImpl.isPropagate();
-                            performDefaultAction &= eventHandlerImpl.isDefaultAction();
-                        }
-                    }
-                    // Cancel propagation if requested and if authorized by event
-                    if (!propagate && event.isCancelable())
-                        break;
+        try {
+            // Find all event handler containers
+            final List containers = new ArrayList();
+            {
+                XFormsEventHandlerContainer container = (targetObject instanceof XFormsEventHandlerContainer) ? (XFormsEventHandlerContainer) targetObject : targetObject.getParentContainer();
+                while (container != null) {
+                    containers.add(container);
+                    container = container.getParentContainer();
                 }
             }
-        }
 
-        // Go from leaf to root
-        Collections.reverse(containers);
+            boolean propagate = true;
+            boolean performDefaultAction = true;
 
-        // Bubbling phase
-        if (propagate && event.isBubbles()) {
+            // Go from root to leaf
+            Collections.reverse(containers);
+
+            // Capture phase
             for (Iterator i = containers.iterator(); i.hasNext();) {
                 final XFormsEventHandlerContainer container = (XFormsEventHandlerContainer) i.next();
                 final List eventHandlers = container.getEventHandlers();
 
                 if (eventHandlers != null) {
-                    for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
-                        final XFormsEventHandler eventHandlerImpl = (XFormsEventHandler) j.next();
+                    if (container != targetObject) {
+                        // Event listeners on the target which are in capture mode are not called
 
-                        if (eventHandlerImpl.isPhase() && eventHandlerImpl.getEventName().equals(event.getEventName())) {
-                            // Bubbling phase match
-                            eventHandlerImpl.handleEvent(pipelineContext, event);
-                            propagate &= eventHandlerImpl.isPropagate();
-                            performDefaultAction &= eventHandlerImpl.isDefaultAction();
+                        for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
+                            final XFormsEventHandler eventHandlerImpl = (XFormsEventHandler) j.next();
+
+                            if (!eventHandlerImpl.isPhase() && eventHandlerImpl.getEventName().equals(event.getEventName())) {
+                                // Capture phase match
+                                eventHandlerImpl.handleEvent(pipelineContext, event);
+                                propagate &= eventHandlerImpl.isPropagate();
+                                performDefaultAction &= eventHandlerImpl.isDefaultAction();
+                            }
                         }
+                        // Cancel propagation if requested and if authorized by event
+                        if (!propagate && event.isCancelable())
+                            break;
                     }
-                    // Cancel propagation if requested and if authorized by event
-                    if (!propagate)
-                        break;
                 }
             }
-        }
 
-        // Perform default action is allowed to
-        if (performDefaultAction || !event.isCancelable()) {
-            targetObject.performDefaultAction(pipelineContext, event);
+            // Go from leaf to root
+            Collections.reverse(containers);
+
+            // Bubbling phase
+            if (propagate && event.isBubbles()) {
+                for (Iterator i = containers.iterator(); i.hasNext();) {
+                    final XFormsEventHandlerContainer container = (XFormsEventHandlerContainer) i.next();
+                    final List eventHandlers = container.getEventHandlers();
+
+                    if (eventHandlers != null) {
+                        for (Iterator j = eventHandlers.iterator(); j.hasNext();) {
+                            final XFormsEventHandler eventHandlerImpl = (XFormsEventHandler) j.next();
+
+                            if (eventHandlerImpl.isPhase() && eventHandlerImpl.getEventName().equals(event.getEventName())) {
+                                // Bubbling phase match
+                                eventHandlerImpl.handleEvent(pipelineContext, event);
+                                propagate &= eventHandlerImpl.isPropagate();
+                                performDefaultAction &= eventHandlerImpl.isDefaultAction();
+                            }
+                        }
+                        // Cancel propagation if requested and if authorized by event
+                        if (!propagate)
+                            break;
+                    }
+                }
+            }
+
+            // Perform default action is allowed to
+            if (performDefaultAction || !event.isCancelable()) {
+                targetObject.performDefaultAction(pipelineContext, event);
+            }
+        } catch (Exception e) {
+            // Add OPS trace information if possible
+            final LocationData locationData = targetObject.getLocationData();
+            if (locationData != null)
+                throw ValidationException.wrapException(e, locationData);
+            else if (e instanceof OXFException)
+                throw (OXFException) e;
+            else
+                throw new OXFException(e);
         }
     }
 

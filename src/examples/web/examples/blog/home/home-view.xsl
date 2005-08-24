@@ -47,7 +47,14 @@
         </p>
         <h2>Configuration</h2>
         <p>
-            TODO
+            <ul>
+                <li>
+                    <a href="/blog/admin/users">Users</a>
+                </li>
+                <li>
+                    <a href="/blog/admin/blogs">Blogs</a>
+                </li>
+            </ul>
         </p>
         <h2>List of blogs configured</h2>
         <ul>

@@ -16,30 +16,22 @@
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
           xmlns:xdb="http://orbeon.org/oxf/xml/xmldb"
-          xmlns:xu="http://www.xmldb.org/xupdate">
+          xmlns:xu="http://www.xmldb.org/xupdate"
+          xmlns:xmldb="http://exist-db.org/xquery/xmldb">
 
+    <p:param type="input" name="query"/>
+
+    <!-- Use special eXist functions -->
     <p:processor name="oxf:xslt">
-        <p:input name="data"><query/></p:input>
+        <p:input name="data" href="#query"/>
         <p:input name="config">
-            <xdb:query collection="/db/" xsl:version="2.0" xmlns:xmldb="http://exist-db.org/xquery/xmldb">
+            <xdb:query collection="/db/system" create-collection="false" xsl:version="2.0">
                 xquery version "1.0";
                 <result>
                     {
-                        let $uri as xs:string := concat('<xsl:value-of select="doc('../datasource.xml')/*/uri"/>', 'db')
-                        let $user as xs:string := '<xsl:value-of select="doc('../datasource.xml')/*/username"/>'
-                        let $password as xs:string := '<xsl:value-of select="doc('../datasource.xml')/*/password"/>'
-
-                        return
-                            (: If there is no admin password, set it :)
-                            (if (xmldb:authenticate($uri, $user, ()))
-                             then xmldb:change-user($user, $password, (), ())
-                             else (),
-
-                            (: Now create test user if not already present :)
-                             if (not(xmldb:exists-user('ebruchez')))
-                             then xmldb:create-user('ebruchez', 'ebruchez', 'users', concat($uri, '/orbeon/blog-example/'))
-                             else ()
-                            )
+                    xmldb:create-user('<xsl:value-of select="/query/username"/>',
+                                      '<xsl:value-of select="/query/password"/>',
+                                      ('users', 'ops-blog'), ())
                     }
                 </result>
             </xdb:query>

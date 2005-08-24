@@ -17,6 +17,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.xml.ContentHandlerAdapter;
 import org.xml.sax.ContentHandler;
 
 /**
@@ -27,9 +28,12 @@ public class XMLDBQueryProcessor extends XMLDBProcessor {
     public XMLDBQueryProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_DATASOURCE, XMLDB_DATASOURCE_URI));
         addInputInfo(new ProcessorInputOutputInfo(INPUT_QUERY, XMLDB_QUERY_URI));
-        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
+//        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    /**
+     * Case where an XML response must be generated.
+     */
     public ProcessorOutput createOutput(String name) {
         ProcessorOutput output = new ProcessorImpl.ProcessorOutputImpl(getClass(), name) {
             public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
@@ -38,5 +42,12 @@ public class XMLDBQueryProcessor extends XMLDBProcessor {
         };
         addOutput(name, output);
         return output;
+    }
+
+    /**
+     * Case where there is no data output.
+     */
+    public void start(PipelineContext pipelineContext) {
+        executeOperation(pipelineContext, new ContentHandlerAdapter());
     }
 }

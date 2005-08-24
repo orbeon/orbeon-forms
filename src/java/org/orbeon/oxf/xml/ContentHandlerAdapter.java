@@ -18,6 +18,10 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 
+/**
+ * ContentHandlerAdapter implements the ContentHandler interface. Its methods don't do anything
+ * but can be overridden.
+ */
 public class ContentHandlerAdapter implements ContentHandler {
     public void characters(char ch[], int start, int length) throws SAXException {
     }

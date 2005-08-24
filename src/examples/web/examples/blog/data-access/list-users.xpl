@@ -18,30 +18,19 @@
           xmlns:xdb="http://orbeon.org/oxf/xml/xmldb"
           xmlns:xu="http://www.xmldb.org/xupdate">
 
+    <p:param type="output" name="users"/>
+
+    <!-- Use special eXist collection to find existing users  -->
     <p:processor name="oxf:xslt">
-        <p:input name="data"><query/></p:input>
+        <p:input name="data"><dummy/></p:input>
         <p:input name="config">
-            <xdb:query collection="/db/" xsl:version="2.0" xmlns:xmldb="http://exist-db.org/xquery/xmldb">
+            <xdb:query collection="/db/system" create-collection="false" xsl:version="2.0">
                 xquery version "1.0";
-                <result>
+                <users>
                     {
-                        let $uri as xs:string := concat('<xsl:value-of select="doc('../datasource.xml')/*/uri"/>', 'db')
-                        let $user as xs:string := '<xsl:value-of select="doc('../datasource.xml')/*/username"/>'
-                        let $password as xs:string := '<xsl:value-of select="doc('../datasource.xml')/*/password"/>'
-
-                        return
-                            (: If there is no admin password, set it :)
-                            (if (xmldb:authenticate($uri, $user, ()))
-                             then xmldb:change-user($user, $password, (), ())
-                             else (),
-
-                            (: Now create test user if not already present :)
-                             if (not(xmldb:exists-user('ebruchez')))
-                             then xmldb:create-user('ebruchez', 'ebruchez', 'users', concat($uri, '/orbeon/blog-example/'))
-                             else ()
-                            )
+                    //user[not(@name = ('admin', 'guest')) and group = 'ops-blog']
                     }
-                </result>
+                </users>
             </xdb:query>
         </p:input>
         <p:output name="data" id="xmldb-query"/>
@@ -50,6 +39,7 @@
     <p:processor name="oxf:xmldb-query">
         <p:input name="datasource" href="../datasource.xml"/>
         <p:input name="query" href="#xmldb-query"/>
+        <p:output name="data" ref="users" debug="xxxusers"/>
     </p:processor>
 
 </p:config>

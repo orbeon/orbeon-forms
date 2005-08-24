@@ -31,6 +31,18 @@
     <!-- XML-RPC commands -->
     <page path-info="/blog/xmlrpc" model="xml-rpc.xpl"/>
 
+    <!-- Users -->
+    <page path-info="/blog/admin/users" model="admin/edit-users/list-users.xpl" view="admin/edit-users/list-users.xhtml"/>
+    <page path-info="/blog/admin/add-user" view="admin/edit-users/list-users.xpl">
+        <action action="admin/edit-users/add-user-action.xpl"/>
+    </page>
+    <page path-info="/blog/admin/delete-user" view="admin/edit-users/list-users.xpl">
+        <action action="admin/edit-users/delete-user-action.xpl"/>
+    </page>
+
+    <!-- Blogs -->
+    <page path-info="/blog/admin/blogs"/>
+
     <!-- For tests only -->
     <page path-info="/blog/test-calculate" xforms="test/xforms-model.xml" view="test/view.xsl"/>
     <page path-info="/blog/test/create-user-blog" model="data-access/test-create-user-blog.xpl"/>

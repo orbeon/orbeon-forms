@@ -26,6 +26,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsSelectEvent;
 import org.orbeon.oxf.xforms.event.events.XFormsSubmitEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.xml.sax.Locator;
 
@@ -542,6 +543,11 @@ public class XFormsControls {
                         controlInfo = new ControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     }
                 }
+                // Make sure there are no duplicate ids
+                if (idsToControlInfo.get(effectiveControlId) != null)
+                    throw new ValidationException("Duplicate id for XForms control", new ExtendedLocationData((LocationData) controlElement.getData(),
+                            "analyzing control element", controlElement));
+
                 idsToControlInfo.put(effectiveControlId, controlInfo);
 
                 // Handle xforms:case

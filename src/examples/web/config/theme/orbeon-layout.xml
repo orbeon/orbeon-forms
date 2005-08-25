@@ -719,6 +719,10 @@ ul {
     display: none;
 }
 
+.xforms-date {
+    display: none;
+}
+
 #xforms-repeat-tree {
     display: none;
 }

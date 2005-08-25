@@ -110,6 +110,7 @@
     <!-- Add date picker -->
     <xsl:template match="xhtml:*[tokenize(@class, ' ') = 'xforms-date']">
         <xsl:next-match/>
+        <xhtml:input type="text" class="xforms-date-locale"/>
         <xhtml:span class='xforms-showcalendar'/>
     </xsl:template>
 

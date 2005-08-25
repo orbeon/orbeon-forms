@@ -178,23 +178,57 @@ function xformsUpdateStyle(element) {
             }
 
             if (className == "xforms-date") {
+
+                // Format reference:
+                // http://www.dynarch.com/demos/jscalendar/doc/html/reference.html#node_sec_5.3.5
+                var isoFormat = "%Y-%m-%d";
+                var localFormat = "%e %b %Y";
+
                 if (!element.setupDone) {
                     element.setupDone = true;
-                    
-                    var showCalendarId = element.id + "-showcalendar";
-                    element.nextSibling.id = showCalendarId;
-                        
+                    element.readOnly = true;
+
+                    function calendarFormatDate(isoDate) {
+                        return Date.parseDate(isoDate, isoFormat).print(localFormat);
+                    }
+
+                    function calendarUpdate() {
+                        // Convert date and send notification to XForms engine
+                        localeDateElement.value = calendarFormatDate(element.value);
+                        xformsValueChanged(element, false);
+                    }
+
+                    // Get date format from class name
+                    var FORMAT_CLASS = "xforms-date-format-";
+                    var dateClasses = element.className.split(" ");
+                    for (var i in dateClasses) {
+                        if (dateClasses[i].indexOf(FORMAT_CLASS) == 0) {
+                            localFormat = dateClasses[i].substr(FORMAT_CLASS.length);
+                            localFormat = localFormat.replace(/_/g, " ");
+                            localFormat = localFormat.replace(/  /g, "_");
+                            alert(localFormat);
+                        }
+                    }
+
+                    // Visible text field containing the locale date
+                    var localeDateElement = element.nextSibling;
+                    localeDateElement.id = element.id + "-iso-date";
+                    if (element.value != "")
+                        localeDateElement.value = calendarFormatDate(element.value);
+
+                    // Icon that shows the calendar pop-up
+                    var showCalendar = element.nextSibling.nextSibling;
+                    showCalendar.id = element.id + "-showcalendar";
+
                     // Setup calendar library
                     Calendar.setup({
                         inputField     :    element.id,
-                        ifFormat       :    "%Y-%m-%d",
+                        ifFormat       :    isoFormat,
                         showsTime      :    false,
-                        button         :    showCalendarId,
+                        button         :    showCalendar.id,
                         singleClick    :    false,
                         step           :    1,
-                        onUpdate       :    function() {
-                            xformsValueChanged(this.inputField, false);
-                        }
+                        onUpdate       :    calendarUpdate
                     });
                 }
             }

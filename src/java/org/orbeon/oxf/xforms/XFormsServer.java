@@ -25,9 +25,11 @@ import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
+import org.apache.log4j.Logger;
 
 import java.util.*;
 
@@ -37,7 +39,7 @@ import java.util.*;
  */
 public class XFormsServer extends ProcessorImpl {
 
-    //static private Logger logger = LoggerFactory.createLogger(XFormsServer.class);
+    static public Logger logger = LoggerFactory.createLogger(XFormsServer.class);
 
     private static final String INPUT_REQUEST = "request";
     //private static final String OUTPUT_RESPONSE = "response"; // optional

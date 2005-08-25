@@ -21,9 +21,7 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.action.XFormsActionInterpreter;
 import org.orbeon.oxf.xforms.event.*;
 import org.orbeon.oxf.xforms.event.events.*;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.dom4j.LocationData;
-import org.apache.log4j.Logger;
 
 import java.util.*;
 
@@ -37,8 +35,6 @@ import java.util.*;
  * o Event handlers hierarchy
  */
 public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventHandlerContainer {
-
-    private static Logger logger = LoggerFactory.createLogger(XFormsContainingDocument.class);
 
     // At some point we need to be able to store this
 //    private LocationData locationData;
@@ -280,8 +276,8 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
      */
     public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event) {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Dispatching XForms event: " + event.getEventName() + " - " + event.getTargetObject().getId());
+        if (XFormsServer.logger.isDebugEnabled()) {
+            XFormsServer.logger.debug("Dispatching XForms event: " + event.getEventName() + " - " + event.getTargetObject().getId());
         }
 
         final XFormsEventTarget targetObject = (XFormsEventTarget) event.getTargetObject();

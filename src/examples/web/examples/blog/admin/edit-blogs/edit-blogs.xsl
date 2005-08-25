@@ -55,7 +55,8 @@
             </xforms:instance>
             <xforms:instance id="triggers-instance">
                 <triggers xmlns="">
-                    <delete-category/>
+                    <delete-category1/>
+                    <delete-category2/>
                 </triggers>
             </xforms:instance>
             <xforms:instance id="status-instance">
@@ -68,7 +69,8 @@
                 <xforms:bind nodeset="name" constraint="normalize-space(.) != ''"/>
                 <!--<xforms:bind nodeset="categories/category" constraint="normalize-space(name) != ''"/>-->
             </xforms:bind>
-            <xforms:bind nodeset="instance('triggers-instance')/delete-category" readonly="count(instance('add-blog-request')/categories/category) lt 2"/>
+            <!--<xforms:bind nodeset="instance('triggers-instance')/delete-category2" readonly="count(instance('add-blog-request')/categories/category) lt 2"/>-->
+            <xforms:bind nodeset="instance('triggers-instance')/delete-category2" readonly="count(instance('add-blog-request')/categories/category) lt 2"/>
             <!-- Submissions -->
             <xforms:submission id="add-submission" ref="instance('add-blog-request')" replace="instance" instance="blogs-instance" method="post" action="/blog/admin/add-blog">
                 <xforms:action ev:event="xforms-submit-done">
@@ -84,11 +86,25 @@
     </head>
     <body>
         <div class="maincontent">
+            <!--<div>-->
+                <!--<f:xml-source>-->
+                    <!--<page id="post" path-info="/blog/([^/]+)/([^/]+)/([^/]+)" matcher="oxf:perl5-matcher"-->
+                          <!--default-submission="recent-posts/recent-posts-default-submission.xml"-->
+                          <!--model="recent-posts/recent-posts-model.xpl"-->
+                          <!--view="recent-posts/recent-posts-view.xpl">-->
+                        <!--<setvalue ref="/form/username" matcher-group="1"/>-->
+                        <!--<setvalue ref="/form/blog-id" matcher-group="2"/>-->
+                        <!--<setvalue ref="/form/post-id" matcher-group="3"/>-->
+                        <!--<setvalue ref="/form/format" parameter="format"/>-->
+                        <!--<setvalue ref="/form/category" parameter="category"/>-->
+                    <!--</page>-->
+                <!--</f:xml-source>-->
+            <!--</div>-->
             <p style="color: red">
                 <xforms:output ref="instance('status-instance')/message"/>
             </p>
             <h2>Existing Blogs</h2>
-            <table class="gridtable">
+            <table>
                 <tr>
                     <th>Blog Name</th>
                     <th>Username</th>
@@ -109,7 +125,7 @@
                         </td>
                         <td>
                             <table>
-                                <xforms:repeat nodeset="categories/category" id="categoryRepeat">
+                                <xforms:repeat nodeset="categories/category" id="addCategoryRepeat1">
                                     <tr>
                                         <td>
                                             <xforms:input ref="name"/>
@@ -117,10 +133,23 @@
                                     </tr>
                                 </xforms:repeat>
                             </table>
+                            <xforms:trigger>
+                                <xforms:label>Add Category</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:insert nodeset="categories/category" at="index('addCategoryRepeat1')" position="after"/>
+                                    <xforms:setvalue ref="categories/category[index('addCategoryRepeat1')]/name" value="''"/>
+                                </xforms:action>
+                            </xforms:trigger>
+                            <xforms:trigger><!--  ref="instance('triggers-instance')/delete-category1" -->
+                                <xforms:label>Delete Category</xforms:label>
+                                <xforms:action ev:event="DOMActivate">
+                                    <xforms:delete ev:event="DOMActivate" nodeset="categories/category" at="index('addCategoryRepeat1')"/>
+                                </xforms:action>
+                            </xforms:trigger>
                         </td>
                         <td>
                             <xforms:trigger>
-                                <xforms:label>Delete</xforms:label>
+                                <xforms:label>Delete Blog</xforms:label>
                                 <xforms:action ev:event="DOMActivate">
                                     <xforms:setvalue ref="instance('delete-blog-request')/blog-id" value="instance('blogs-instance')/blog[index('blogRepeat')]/blog-id"/>
                                     <xforms:send submission="delete-submission"/>
@@ -160,7 +189,7 @@
                         <th style="text-align: right">Categories</th>
                         <td>
                             <table>
-                                <xforms:repeat nodeset="categories/category" id="addCategoryRepeat">
+                                <xforms:repeat nodeset="categories/category" id="addCategoryRepeat2">
                                     <tr>
                                         <td>
                                             <xforms:input ref="name"/>
@@ -171,14 +200,14 @@
                             <xforms:trigger>
                                 <xforms:label>Add Category</xforms:label>
                                 <xforms:action ev:event="DOMActivate">
-                                    <xforms:insert nodeset="categories/category" at="index('addCategoryRepeat')" position="after"/>
-                                    <xforms:setvalue ref="categories/category[index('addCategoryRepeat')]/name" value="''"/>
+                                    <xforms:insert nodeset="categories/category" at="index('addCategoryRepeat2')" position="after"/>
+                                    <xforms:setvalue ref="categories/category[index('addCategoryRepeat2')]/name" value="''"/>
                                 </xforms:action>
                             </xforms:trigger>
-                            <xforms:trigger ref="instance('triggers-instance')/delete-category">
+                            <xforms:trigger ref="instance('triggers-instance')/delete-category2">
                                 <xforms:label>Delete Category</xforms:label>
                                 <xforms:action ev:event="DOMActivate">
-                                    <xforms:delete ev:event="DOMActivate" nodeset="instance('add-blog-request')/categories/category" at="index('addCategoryRepeat')"/>
+                                    <xforms:delete ev:event="DOMActivate" nodeset="instance('add-blog-request')/categories/category" at="index('addCategoryRepeat2')"/>
                                 </xforms:action>
                             </xforms:trigger>
                         </td>

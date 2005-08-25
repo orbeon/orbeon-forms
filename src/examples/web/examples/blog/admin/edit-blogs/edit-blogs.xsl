@@ -24,6 +24,11 @@
     <head>
         <title>Blogs</title>
         <xforms:model>
+            <!-- Display error message in case of submission error -->
+            <xforms:setvalue ev:event="xforms-submit-error" ref="instance('status-instance')/message">Submission Error</xforms:setvalue>
+            <!-- Clear error message in case of submission success -->
+            <xforms:setvalue ev:event="xforms-submit-done" ref="instance('status-instance')/message"/>
+
             <xforms:instance id="blogs-instance">
                 <xsl:copy-of select="/*/blogs"/>
             </xforms:instance>
@@ -53,6 +58,11 @@
                     <delete-category/>
                 </triggers>
             </xforms:instance>
+            <xforms:instance id="status-instance">
+                <status xmlns="">
+                    <message/>
+                </status>
+            </xforms:instance>
             <xforms:bind nodeset="instance('add-blog-request')">
                 <xforms:bind nodeset="username" constraint="normalize-space(.) != ''"/>
                 <xforms:bind nodeset="name" constraint="normalize-space(.) != ''"/>
@@ -74,6 +84,9 @@
     </head>
     <body>
         <div class="maincontent">
+            <p style="color: red">
+                <xforms:output ref="instance('status-instance')/message"/>
+            </p>
             <h2>Existing Blogs</h2>
             <table class="gridtable">
                 <tr>

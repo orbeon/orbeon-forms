@@ -75,7 +75,7 @@
         <xsd:attribute name="id" type="xsd:ID" use="optional"/>
         <xsd:attribute name="tabindex" type="xsd:integer" use="optional"/>
         <xsd:attribute name="class" type="xsd:string" use="optional"/>
-        <xsd:anyAttribute namespace="##other"/>
+        <xsd:anyAttribute namespace="##other" processContents="lax"/>
     </xsd:attributeGroup>
 
     <xsd:element name="model">
@@ -87,7 +87,7 @@
                     <xsd:element ref="xforms:submission"/>
                     <xsd:element ref="xforms:bind"/>
                     <xsd:group ref="xforms:Action"/>
-
+                    <xsd:any namespace="##other" processContents="lax"/>
                 </xsd:choice>
             </xsd:sequence>
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
@@ -260,8 +260,8 @@
     <xsd:group name="UI.Inline">
         <xsd:sequence>
             <xsd:choice minOccurs="0">
-
                 <xsd:element ref="xforms:output"/>
+                <xsd:any namespace="##other" processContents="lax"/>
                 <!-- containing document language to add additional allowed content here -->
             </xsd:choice>
         </xsd:sequence>
@@ -290,7 +290,6 @@
             <xsd:attributeGroup ref="xforms:Common.Attributes"/>
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
             <xsd:attributeGroup ref="xforms:Linking.Attributes"/>
-
         </xsd:complexType>
     </xsd:element>
     <xsd:element name="alert">
@@ -300,7 +299,6 @@
             <xsd:attributeGroup ref="xforms:Single.Node.Binding.Attributes"/>
             <xsd:attributeGroup ref="xforms:Linking.Attributes"/>
         </xsd:complexType>
-
     </xsd:element>
     <xsd:element name="extension">
         <xsd:complexType>
@@ -794,7 +792,6 @@
                     <xsd:choice>
                         <xsd:group ref="xforms:Form.Controls"/>
                         <xsd:element ref="xforms:group"/>
-
                         <xsd:element ref="xforms:repeat"/>
                         <xsd:any namespace="##other" processContents="lax"/>
                         <!-- containing document language to add additional allowed content here -->
@@ -854,8 +851,8 @@
                         <xsd:element ref="xforms:group"/>
                         <xsd:element ref="xforms:switch"/>
                         <xsd:element ref="xforms:repeat"/>
-                        <!-- containing document language to add additional allowed content here -->
                         <xsd:any namespace="##other" processContents="lax"/>
+                        <!-- containing document language to add additional allowed content here -->
                     </xsd:choice>
 
                 </xsd:sequence>

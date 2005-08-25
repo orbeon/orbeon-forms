@@ -29,8 +29,8 @@ import org.orbeon.oxf.xforms.mip.ValidModelItemProperty;
 import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.LocationDocumentResult;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.stream.StreamResult;
@@ -39,6 +39,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -531,9 +532,11 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                             if (replaceInstance == null) {
                                                 containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
                                             } else {
+                                                // Get repeat index information just before insertion
+                                                final Map previousRepeatIdToIndex = new HashMap(xformsControls.getCurrentControlsState().getRepeatIdToIndex());
+
                                                 // Reconstruct model
                                                 replaceInstance.setInstanceDocument(resultingInstanceDocument);
-
 
                                                 // TODO: Errata says: "Once the XML instance data
                                                 // has been replaced, the rebuild, recalculate,
@@ -544,6 +547,48 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                                                 // Rebuild ControlsState
                                                 xformsControls.rebuildCurrentControlsState(pipelineContext);
+
+                                                // Update repeat indexes if necessary
+
+                                                // The idea is that if a repeat index was set to 0
+                                                // (which can only happen when a repeat node-set is
+                                                // empty) and instance replacement causes the
+                                                // node-set to be non-empty, then the repeat index
+                                                // must be set to the initial repeat index for that
+                                                // repeat.
+                                                {
+                                                    final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
+
+                                                    final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
+                                                    final Map intialRepeatIdToIndex = currentControlsState.getDefaultRepeatIdToIndex();
+                                                    final Map effectiveRepeatIdToIterations = currentControlsState.getEffectiveRepeatIdToIterations();
+                                                    if (currentRepeatIdToIndex != null && currentRepeatIdToIndex.size() != 0) {
+                                                        for (Iterator i = previousRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
+                                                            final Map.Entry currentEntry = (Map.Entry) i.next();
+                                                            final String repeatId = (String) currentEntry.getKey();
+                                                            final Integer previouslIndex = (Integer) currentEntry.getValue();
+
+//                                                            final Integer newIndex = (Integer) currentRepeatIdToIndex.get(repeatId);
+                                                            final Integer newIterations = (Integer) effectiveRepeatIdToIterations.get(repeatId);
+
+                                                            if (previouslIndex.intValue() == 0 && newIterations.intValue() > 0) {
+                                                                // Set index to defaul value
+                                                                final Integer initialRepeatIndex = (Integer) intialRepeatIdToIndex.get(repeatId);
+//                                                                XFormsActionInterpreter.executeSetindexAction(pipelineContext, containingDocument, repeatId, initialRepeatIndex.toString());
+                                                                // TODO: Here we need to check that the index is within bounds and to send the appropriate events
+                                                                currentControlsState.updateRepeatIndex(repeatId, initialRepeatIndex.intValue());
+                                                            } else {
+                                                                // Just reset index and make sure it is within bounds
+//                                                                XFormsActionInterpreter.executeSetindexAction(pipelineContext, containingDocument, repeatId, previousRepeatIndex.toString());
+                                                                // TODO: Here we need to check that the index is within bounds and to send the appropriate events
+//                                                                final Integer previousRepeatIndex = (Integer) previousRepeatIdToIndex.get(repeatId);
+//                                                                currentControlsState.updateRepeatIndex(repeatId, previousRepeatIndex.intValue());
+                                                                final Integer initialRepeatIndex = (Integer) intialRepeatIdToIndex.get(repeatId);
+                                                                currentControlsState.updateRepeatIndex(repeatId, initialRepeatIndex.intValue());
+                                                            }
+                                                        }
+                                                    }
+                                                }
 
                                                 // Notify that submission is done
                                                 containingDocument.dispatchEvent(pipelineContext, new XFormsSubmitDoneEvent(XFormsModelSubmission.this));

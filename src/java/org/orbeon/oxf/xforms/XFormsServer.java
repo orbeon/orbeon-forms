@@ -21,8 +21,8 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
+import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.xml.sax.ContentHandler;
@@ -166,10 +166,10 @@ public class XFormsServer extends ProcessorImpl {
 
                     // Output repeat index information
                     {
-                        final Map initialRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();
-                        if (initialRepeatIdToIndex != null && initialRepeatIdToIndex.size() != 0) {
+                        final Map repeatIdToIndex = currentControlsState.getRepeatIdToIndex();
+                        if (repeatIdToIndex != null && repeatIdToIndex.size() != 0) {
                             final Element repeatIndexesElement = dynamicStateElement.addElement("repeat-indexes");
-                            for (Iterator i = initialRepeatIdToIndex.entrySet().iterator(); i.hasNext();) {
+                            for (Iterator i = repeatIdToIndex.entrySet().iterator(); i.hasNext();) {
                                 final Map.Entry currentEntry = (Map.Entry) i.next();
                                 final String repeatId = (String) currentEntry.getKey();
                                 final Integer index = (Integer) currentEntry.getValue();

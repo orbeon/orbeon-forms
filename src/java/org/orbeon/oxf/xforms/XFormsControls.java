@@ -137,22 +137,45 @@ public class XFormsControls {
         if (controlsDocument != null) {
             final ControlsState result = new ControlsState();
             visitAllControlStatic(new ControlElementVisitorListener() {
-                public boolean startVisitControl(Element controlElement, String controlId) {
+
+                private Stack repeatStack = new Stack();
+
+                public boolean startVisitControl(Element controlElement, String effectiveControlId) {
                     if (controlElement.getName().equals("repeat")) {
+                        // Create control without parent, just to hold iterations
+                        final RepeatControlInfo repeatControlInfo
+                                = new RepeatControlInfo(null, controlElement, controlElement.getName(), effectiveControlId);
 
-                        final String startIndexString = controlElement.attributeValue("startindex");
-                        final int startIndex = (startIndexString != null) ? Integer.parseInt(startIndexString) : 1;
+                        // Set initial index
+                        result.setDefaultRepeatIndex(repeatControlInfo.getRepeatId(), repeatControlInfo.getStartIndex());
 
-                        result.setInitialRepeatIndex(controlId, startIndex);
+                        // Keep control on stack
+                        repeatStack.push(repeatControlInfo);
                     }
                     return true;
                 }
 
-                public boolean endVisitControl(Element controlElement, String controlId) {
+                public boolean endVisitControl(Element controlElement, String effectiveControlId) {
+                    if (controlElement.getName().equals("repeat")) {
+                        final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatStack.pop();
+                        final List children = repeatControlInfo.getChildren();
+                        if (children == null || children.size() == 0) {
+                            // Update repeat index to 0 if there was no iteration
+                            result.updateRepeatIndex(effectiveControlId, 0);
+                            // Current index is 0
+                            result.setRepeatIterations(effectiveControlId, 0);
+                        } else {
+                            // Number of iterations is number of children
+                            result.setRepeatIterations(effectiveControlId, children.size());
+                        }
+                    }
                     return true;
                 }
 
                 public void startRepeatIteration(int iteration) {
+                    // One more iteration in current repeat
+                    final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatStack.peek();
+                    repeatControlInfo.addChild(new RepeatIterationInfo(repeatControlInfo, iteration));
                 }
 
                 public void endRepeatIteration(int iteration) {
@@ -531,7 +554,7 @@ public class XFormsControls {
                 {
                     if (controlName.equals("repeat")) {
                         final RepeatControlInfo repeatControlInfo = new RepeatControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
-                        result.setInitialRepeatIndex(repeatControlInfo.getRepeatId(), repeatControlInfo.getStartIndex());
+                        result.setDefaultRepeatIndex(repeatControlInfo.getRepeatId(), repeatControlInfo.getStartIndex());
                         controlInfo = repeatControlInfo;
                     } else if (controlName.equals("submit")) {
                         controlInfo = new SubmitControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
@@ -572,9 +595,9 @@ public class XFormsControls {
 
                 // Set current binding for control element
                 final BindingContext currentBindingContext = getCurrentContext();
-                final List currentNodeset = currentBindingContext.getNodeset();
+                final List currentNodeSet = currentBindingContext.getNodeset();
 
-                if (!(controlInfo instanceof RepeatControlInfo && currentNodeset != null && currentNodeset.size() == 0)) {
+                if (!(controlInfo instanceof RepeatControlInfo && currentNodeSet != null && currentNodeSet.size() == 0)) {
                     final Node currentNode = currentBindingContext.getSingleNode();
 
                     // Get model item properties
@@ -628,7 +651,16 @@ public class XFormsControls {
                     if (controlName.equals("repeat")) {
                         // Store number of repeat iterations for the effective id
                         final List children = currentControlsContainer.getChildren();
-                        result.setRepeatIterations(effectiveControlId, (children == null) ? 0 : children.size());
+
+                        if (children == null || children.size() == 0) {
+                            // Current index is 0
+                            result.setRepeatIterations(effectiveControlId, 0);
+                            // Update repeat index to 0 if there was no iteration
+                            result.updateRepeatIndex(effectiveControlId, 0);
+                        } else {
+                            // Number of iterations is number of children
+                            result.setRepeatIterations(effectiveControlId, children.size());
+                        }
                     }
 
                     currentControlsContainer = currentControlsContainer.getParent();
@@ -740,11 +772,9 @@ public class XFormsControls {
 
                             if (model == null || model == currentBindingContext.getModel()) { // it is possible to filter on a particular model
                                 final List items = new ArrayList();
-                                int currentPosition = 1;
                                 final List currentNodeSet = getCurrentNodeset();
                                 if (currentNodeSet != null) {
-                                    for (Iterator i = currentNodeSet.iterator(); i.hasNext(); currentPosition++) {
-                                        Node currentNode = (Node) i.next();
+                                    for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
 
                                         // Push "artificial" binding with just current node in nodeset
                                         contextStack.push(new BindingContext(currentBindingContext.getModel(), getCurrentNodeset(), currentPosition, true, null));
@@ -871,20 +901,17 @@ public class XFormsControls {
                     doContinue = controlElementVisitorListener.startVisitControl(controlElement, effectiveControlId);
 
                     // Iterate over current xforms:repeat nodeset
-                    final List currentNodeset = getCurrentNodeset();
-                    int currentIndex = 1;
-                    if (currentNodeset != null) {
-                        for (Iterator j = currentNodeset.iterator(); j.hasNext(); currentIndex++) {
-                            Node currentNode = (Node) j.next();
-
+                    final List currentNodeSet = getCurrentNodeset();
+                    if (currentNodeSet != null) {
+                        for (int currentPosition = 1; currentPosition <= currentNodeSet.size(); currentPosition++) {
                             // Push "artificial" binding with just current node in nodeset
-                            contextStack.push(new BindingContext(currentBindingContext.getModel(), currentNodeset, currentIndex, true, null));
+                            contextStack.push(new BindingContext(currentBindingContext.getModel(), currentNodeSet, currentPosition, true, null));
                             try {
                                 // Handle children of xforms:repeat
                                 if (doContinue) {
-                                    controlElementVisitorListener.startRepeatIteration(currentIndex);
-                                    doContinue = handleControls(pipelineContext, controlElementVisitorListener, controlElement, idPostfix + "-" + currentIndex);
-                                    controlElementVisitorListener.endRepeatIteration(currentIndex);
+                                    controlElementVisitorListener.startRepeatIteration(currentPosition);
+                                    doContinue = handleControls(pipelineContext, controlElementVisitorListener, controlElement, idPostfix + "-" + currentPosition);
+                                    controlElementVisitorListener.endRepeatIteration(currentPosition);
                                 }
                             } finally {
                                 contextStack.pop();
@@ -1207,7 +1234,7 @@ public class XFormsControls {
     public static class ControlsState {
         private List children;
         private Map idsToControlInfo;
-        private Map initialRepeatIdToIndex;
+        private Map defaultRepeatIdToIndex;
         private Map repeatIdToIndex;
         private Map effectiveRepeatIdToIterations;
         private Map switchIdToSelectedCaseIdMap;
@@ -1224,15 +1251,19 @@ public class XFormsControls {
             this.idsToControlInfo = idsToControlInfo;
         }
 
-        public void setInitialRepeatIndex(String controlId, int index) {
-            if (initialRepeatIdToIndex == null)
-                initialRepeatIdToIndex = new HashMap();
-            initialRepeatIdToIndex.put(controlId, new Integer(index));
+        public Map getDefaultRepeatIdToIndex() {
+            return defaultRepeatIdToIndex;
+        }
+
+        public void setDefaultRepeatIndex(String controlId, int index) {
+            if (defaultRepeatIdToIndex == null)
+                defaultRepeatIdToIndex = new HashMap();
+            defaultRepeatIdToIndex.put(controlId, new Integer(index));
         }
 
         public void updateRepeatIndex(String controlId, int index) {
             if (repeatIdToIndex == null)
-                repeatIdToIndex = new HashMap(initialRepeatIdToIndex);
+                repeatIdToIndex = new HashMap(defaultRepeatIdToIndex);
             repeatIdToIndex.put(controlId, new Integer(index));
         }
 
@@ -1274,8 +1305,8 @@ public class XFormsControls {
         }
 
         public Map getRepeatIdToIndex() {
-            if (repeatIdToIndex == null && initialRepeatIdToIndex != null)
-                repeatIdToIndex = new HashMap(initialRepeatIdToIndex);
+            if (repeatIdToIndex == null && defaultRepeatIdToIndex != null)
+                repeatIdToIndex = new HashMap(defaultRepeatIdToIndex);
             return repeatIdToIndex;
         }
 

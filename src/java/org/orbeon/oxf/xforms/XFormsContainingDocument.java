@@ -277,7 +277,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     public void dispatchEvent(PipelineContext pipelineContext, XFormsEvent event) {
 
         if (XFormsServer.logger.isDebugEnabled()) {
-            XFormsServer.logger.debug("Dispatching XForms event: " + event.getEventName() + " - " + event.getTargetObject().getId());
+            XFormsServer.logger.debug("XForms - dispatching event: " + event.getEventName() + " - " + event.getTargetObject().getId());
         }
 
         final XFormsEventTarget targetObject = (XFormsEventTarget) event.getTargetObject();

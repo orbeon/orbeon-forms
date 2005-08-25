@@ -255,6 +255,11 @@
                             attributes (xhtml:*).
                         </p>
                     </li>
+                    <li>
+                        <p>
+                            TODO: document event + instance logging.
+                        </p>
+                    </li>
                 </ul>
                 <p>
                     TODO: link to updated XForms conformance map.

@@ -155,7 +155,13 @@ public class XFormsServer extends ProcessorImpl {
                             final XFormsModel currentModel = (XFormsModel) i.next();
 
                             for (Iterator j = currentModel.getInstances().iterator(); j.hasNext();) {
-                                instancesElement.add(((XFormsInstance) j.next()).getDocument().getRootElement().createCopy());
+                                final XFormsInstance currentInstance = (XFormsInstance) j.next();
+                                instancesElement.add((currentInstance).getDocument().getRootElement().createCopy());
+                                // Log instance if needed
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("XForms - resulting instance: model id='" + currentModel.getId() +  "', instance id= '" + currentInstance.getId() + "'\n"
+                                            + Dom4jUtils.domToString(currentInstance.getDocument()));
+                                }
                             }
                         }
                     }

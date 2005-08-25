@@ -55,6 +55,11 @@
                 </xsl:for-each>
             </ul>
             <h2>Administration</h2>
+            <p>
+                Initially, no user or blog is configured. In order to configure a blog, first use
+                the Users administration page to create a user. Then use the Blogs administration
+                page to create a blog for that user.
+            </p>
             <ul>
                 <li>
                     <a href="/blog/admin/users">Users</a>

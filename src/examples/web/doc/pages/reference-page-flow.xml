@@ -912,16 +912,37 @@
                                         An <code>instance</code> input, containing the current XML
                                         submission. From XSLT, XQuery and XUpdate, this input is
                                         available with the <code>doc('input:instance')</code>
-                                        function.
+                                        function. If there is no current XML submission, a "null"
+                                        document is available instead:
                                     </p>
+                                    <xml-source>
+                                        <null xsi:nil="true"/>
+                                    </xml-source>
                                 </li>
                                 <li>
                                     <p>
                                         An <code>action</code> input, containing the result of the
-                                        action <a href="reference-xpl-pipelines">XPL pipeline</a>
-                                        if present. From XSLT, XQuery and XUpdate, this input is
+                                        action <a href="reference-xpl-pipelines">XPL pipeline</a> if
+                                        present. From XSLT, XQuery and XUpdate, this input is
                                         available with the <code>doc('input:action')</code>
-                                        function.
+                                        function. If there is no action result, a "null" document
+                                        is available instead:
+                                    </p>
+                                    <xml-source>
+                                        <null xsi:nil="true"/>
+                                    </xml-source>
+                                </li>
+                                <li>
+                                    <p>
+                                        The default usually contains the current current XML
+                                        submission as available from the <code>instance</code>
+                                        input.
+                                    </p>
+                                    <p>
+                                        For backward compatibility however, when the destination
+                                        page has an <code>xforms</code> attribute, the default input
+                                        contains instead the destination page's resulting XForms
+                                        instance.
                                     </p>
                                 </li>
                             </ul>

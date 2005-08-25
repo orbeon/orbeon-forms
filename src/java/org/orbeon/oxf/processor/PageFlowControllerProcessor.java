@@ -904,11 +904,16 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
         Attribute instancePassingAttribute = resultElement == null ? null : resultElement.attribute("instance-passing");
         final String _instancePassing = instancePassingAttribute == null ? instancePassing : instancePassingAttribute.getValue();
         final String otherXForms = (String) pageIdToXFormsModel.get(resultPageId);
-        final boolean useCurrentPageInstance = resultPageId == null || otherXForms == null;
-        final ASTOutput instanceToUpdate = useCurrentPageInstance ? paramedInstance
-                : new ASTOutput("data", "other-page-instance");
 
-        if (!useCurrentPageInstance) {
+        final ASTOutput instanceToUpdate;
+        final boolean useCurrentPageInstance = resultPageId == null || otherXForms == null;
+        if (useCurrentPageInstance) {
+            // We use the current page's submitted instance, if any.
+            instanceToUpdate = paramedInstance;
+        } else {
+            // We use the resulting page's instance if possible (deprecated since xforms attribute on <page> is deprecated)
+            instanceToUpdate = new ASTOutput("data", "other-page-instance");
+            // Run the other page's XForms model
             final ASTOutput otherPageXFormsModel = new ASTOutput("data", "other-page-model");
             when.addStatement(new StepProcessorCall(stepProcessorContext, controllerContext, otherXForms, "xforms-model") {{
                 addInput(new ASTInput("data", Dom4jUtils.NULL_DOCUMENT));

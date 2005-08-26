@@ -533,7 +533,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                 containingDocument.dispatchEvent(pipelineContext, new XFormsBindingExceptionEvent(XFormsModelSubmission.this));
                                             } else {
                                                 // Get repeat index information just before insertion
-                                                final Map previousRepeatIdToIndex = new HashMap(xformsControls.getCurrentControlsState().getRepeatIdToIndex());
+                                                final Map previousRepeatIdToIndex; {
+                                                    final Map map = xformsControls.getCurrentControlsState().getRepeatIdToIndex();
+                                                    previousRepeatIdToIndex = (map == null) ? null : new HashMap(map);
+                                                }
 
                                                 // Reconstruct model
                                                 replaceInstance.setInstanceDocument(resultingInstanceDocument);
@@ -556,7 +559,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                                 // node-set to be non-empty, then the repeat index
                                                 // must be set to the initial repeat index for that
                                                 // repeat.
-                                                {
+                                                if (previousRepeatIdToIndex != null) {
                                                     final XFormsControls.ControlsState currentControlsState = xformsControls.getCurrentControlsState();
 
                                                     final Map currentRepeatIdToIndex = currentControlsState.getRepeatIdToIndex();

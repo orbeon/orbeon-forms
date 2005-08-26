@@ -136,6 +136,12 @@
                         At most one XML schema is allowed on a particular XForms model.
                     </p>
                 </li>
+                <li>
+                    <p>
+                        Calculation dependencies are not computed as per the XForms 1.0
+                        specification.
+                    </p>
+                </li>
             </ul>
         </section>
         <section>

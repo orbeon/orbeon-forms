@@ -53,6 +53,15 @@ public class ForwardExternalContextRequestWrapper extends RequestWrapper {
         this.postData = postData;
     }
 
+    /**
+     * This simulates a GET.
+     */
+    public ForwardExternalContextRequestWrapper(ExternalContext.Request request, String pathQuery, String method) {
+        super(request);
+        this.pathQuery = pathQuery;
+        this.method = method;
+    }
+
     public int getContentLength() {
         return (postData == null) ? 0 : postData.length;
     }

@@ -39,6 +39,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -275,8 +276,10 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                 // Serialize
                 // To support: application/xml, application/x-www-form-urlencoded, multipart/related, multipart/form-data
                 final byte[] serializedInstance;
+                final String serializedInstanceString;
                 {
                     if (method.equals("post") || method.equals("put")) {
+
                         try {
                             final Transformer identity = TransformerUtils.getIdentityTransformer();
                             TransformerUtils.applyOutputProperties(identity,
@@ -290,10 +293,14 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         } catch (Exception e) {
                             throw new OXFException("xforms:submission: exception while serializing instance to XML.", e);
                         }
+                        serializedInstanceString = null;
 
                     } else if (method.equals("get")) {
-                        // TODO
-                        throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
+
+                        // Perform "application/x-www-form-urlencoded" serialization
+                        serializedInstanceString = createWwwFormUrlEncoded(documentToSubmit);
+                        serializedInstance = null;
+
                     } else if (method.equals("multipart-post")) {
                         // TODO
                         throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
@@ -338,10 +345,20 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                         ExternalContext.RequestDispatcher requestDispatcher = externalContext.getRequestDispatcher(action);
                         try {
-                            if (method.equals("post") || method.equals("put")) {
+                            if (method.equals("post") || method.equals("put") || method.equals("get")) {
 
-                                final ForwardExternalContextRequestWrapper requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
-                                        action, method.toUpperCase(), (mediatype != null) ? mediatype : "application/xml", serializedInstance);
+                                // Create requestAdapter depending on method
+                                final ForwardExternalContextRequestWrapper requestAdapter;
+                                {
+                                    if (method.equals("post") || method.equals("put"))
+                                        requestAdapter= new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
+                                            action, method.toUpperCase(), (mediatype != null) ? mediatype : "application/xml", serializedInstance);
+                                    else {
+                                        final String actionString = action + ((action.indexOf('?') == -1) ? "?" : "") + serializedInstanceString;
+                                        requestAdapter = new ForwardExternalContextRequestWrapper(externalContext.getRequest(),
+                                            actionString, method.toUpperCase());
+                                    }
+                                }
 
                                 if (replace.equals(XFormsConstants.XFORMS_SUBMIT_REPLACE_ALL)) {
                                     // Just forward the reply
@@ -361,10 +378,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                     resultMediaType = ProcessorUtils.XML_CONTENT_TYPE;
                                     resultInputStream = responseAdapter.getInputStream();
                                 }
-
-                            } else if (method.equals("get")) {
-                                // TODO
-                                throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
                             } else if (method.equals("multipart-post")) {
                                 // TODO
                                 throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
@@ -386,15 +399,17 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                         // Compute submission URL
                         final URL submissionURL;
                         try {
+                            final String actionString = (serializedInstanceString == null) ? action : action + ((action.indexOf('?') == -1) ? "?" : "") + serializedInstanceString;
+
                             if (action.startsWith("/")) {
                                 // Case of "local" portlet submission
                                 final String requestURL = externalContext.getRequest().getRequestURL();
-                                submissionURL = URLFactory.createURL(requestURL, externalContext.getRequest().getContextPath() + action);
-                            } else if (NetUtils.urlHasProtocol(action)) {
+                                submissionURL = URLFactory.createURL(requestURL, externalContext.getRequest().getContextPath() + actionString);
+                            } else if (NetUtils.urlHasProtocol(actionString)) {
                                 // Case of absolute URL
-                                submissionURL = URLFactory.createURL(action);
+                                submissionURL = URLFactory.createURL(actionString);
                             } else {
-                                throw new OXFException("xforms:submission: invalid action: " + action);
+                                throw new OXFException("xforms:submission: invalid action: " + actionString);
 //                                final String requestURL = externalContext.getRequest().getRequestURL();
 //
 //                                if (requestURL != null) {
@@ -415,18 +430,20 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                             urlConnection = (HttpURLConnection) submissionURL.openConnection();
 
-                            if (method.equals("post") || method.equals("put")) {
+                            if (method.equals("post") || method.equals("put") || method.equals("get")) {
                                 urlConnection.setDoInput(true);
-                                urlConnection.setDoOutput(true); // If POST / PUT
+                                urlConnection.setDoOutput(!method.equals("get")); // Only if POST / PUT
 
                                 urlConnection.setRequestMethod(method.toUpperCase());
                                 urlConnection.setRequestProperty("content-type", (mediatype != null) ? mediatype : "application/xml");
 
                                 urlConnection.connect();
 
-                                // Submit
-                                os = urlConnection.getOutputStream();
-                                os.write(serializedInstance);
+                                // Write request body
+                                if (!method.equals("get")) {
+                                    os = urlConnection.getOutputStream();
+                                    os.write(serializedInstance);
+                                }
 
                                 // Get response information that needs to be forwarded
                                 resultCode = urlConnection.getResponseCode();
@@ -435,9 +452,6 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
                                 resultHeaders = urlConnection.getHeaderFields();
                                 resultInputStream = urlConnection.getInputStream();
 
-                            } else if (method.equals("get")) {
-                                // TODO
-                                throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
                             } else if (method.equals("multipart-post")) {
                                 // TODO
                                 throw new OXFException("xforms:submission: submission method not yet implemented: " + method);
@@ -723,6 +737,41 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
         // TODO: handle includenamespaceprefixes
         return documentToSubmit;
+    }
+
+    private String createWwwFormUrlEncoded(final Document document) {
+
+        final StringBuffer sb = new StringBuffer();
+        document.accept(new VisitorSupport() {
+            public final void visit(Element element) {
+                // We only care about elements
+
+                final List children = element.elements();
+                if (children == null || children.size() == 0) {
+                    // Only consider leaves
+                    final String text = element.getText();
+                    if (text != null && text.length() > 0) {
+                        // Got one!
+                        final String localName = element.getName();
+
+                        if (sb.length() > 0)
+                            sb.append(separator);
+
+                        try {
+                            sb.append(URLEncoder.encode(localName, "utf-8"));
+                            sb.append('=');
+                            sb.append(URLEncoder.encode(text, "utf-8"));
+                            // TODO: check if line breaks will be correcly encoded as "%0D%0A"
+                        } catch (UnsupportedEncodingException e) {
+                            // Should not happen: utf-8 must be supported
+                            throw new OXFException(e);
+                        }
+                    }
+                }
+            }
+        });
+
+        return sb.toString();
     }
 
     private boolean isDocumentSatisfiesValidRequired(final Document documentToSubmit) {

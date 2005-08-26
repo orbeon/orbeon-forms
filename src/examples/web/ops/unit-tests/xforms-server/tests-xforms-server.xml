@@ -1142,4 +1142,68 @@
         </output>
     </test>
 
+    <test description="Test for calculate upon initialization" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <p:input name="event">
+                        <xxforms:event/>
+                    </p:input>
+                    <p:input name="controls">
+                        <controls>
+                            <xforms:group ref="instance('tests')" id="id1">
+                                <xforms:input ref="noFoundData" id="id2">
+                                    <xforms:label class="fixed-width" id="id3">test noFoundData:</xforms:label>
+                                </xforms:input>
+                            </xforms:group>
+                        </controls>
+                    </p:input>
+                    <p:input name="models">
+                        <models>
+                            <xforms:model id="main-model">
+                                <xforms:instance id="tests">
+                                    <instance>
+                                        <noFoundData>0</noFoundData>
+                                    </instance>
+                                </xforms:instance>
+                                <xforms:bind nodeset="instance('tests')" id="id4">
+                                    <xforms:bind nodeset="noFoundData" calculate=". + 1" id="id5"/>
+                                </xforms:bind>
+                            </xforms:model>
+                        </models>
+                    </p:input>
+                    <p:input name="instances">
+                        <xxforms:instances/>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance>
+                                <noFoundData>1</noFoundData><!-- This is the value we are interested in -->
+                            </instance>
+                        </instances>
+                        <divs/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="id1" readonly="false" required="false" relevant="true" valid="true"/>
+                        <xxf:control id="id2" label="test noFoundData:" readonly="true" required="false" relevant="true" valid="true">1</xxf:control>
+                    </xxf:control-values>
+                    <xxf:divs/>
+                    <xxf:itemsets/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

@@ -18,7 +18,6 @@ import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -41,13 +40,6 @@ public class ModelBind {
     public ModelBind(String id, String nodeset, String relevant, String calculate, String type, String constraint,
                      String required, String readonly,
                      Map namespaceMap, LocationData locationData, ModelBind parent) {
-        this(id, nodeset, relevant, calculate, type, constraint, required, readonly, namespaceMap, locationData);
-        this.parent = parent;
-    }
-
-    public ModelBind(String id, String nodeset, String relevant, String calculate, String type, String constraint,
-                     String required, String readonly,
-                     Map namespaceMap, LocationData locationData) {
 
         if (nodeset == null)
             throw new ValidationException("Bind element is missing nodeset attribute", locationData);
@@ -63,6 +55,8 @@ public class ModelBind {
 
         this.namespaceMap = namespaceMap;
         this.locationData = locationData;
+
+        this.parent = parent;
     }
 
     public String getId() {
@@ -109,8 +103,8 @@ public class ModelBind {
         children.add(bind);
     }
 
-    public Iterator getChildrenIterator() {
-        return children.iterator();
+    public List getChildren() {
+        return children;
     }
 
     public Node getCurrentNode() {

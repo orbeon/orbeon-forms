@@ -181,7 +181,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                     bindElement.attributeValue("relevant"), bindElement.attributeValue("calculate"), bindElement.attributeValue("type"),
                     bindElement.attributeValue("constraint"), bindElement.attributeValue("required"), bindElement.attributeValue("readonly"),
                     Dom4jUtils.getNamespaceContextNoDefault(bindElement),
-                    new ExtendedLocationData((LocationData) bindElement.getData(), "xforms:bind element", bindElement));
+                    new ExtendedLocationData((LocationData) bindElement.getData(), "xforms:bind element", bindElement), parent);
             if (parent != null) {
                 parent.addChild(modelBind);
                 modelBind.setParent(parent);
@@ -280,14 +280,18 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         if (binds == null)
             resetBinds();
 
+        // Iterate over all binds
         for (Iterator i = binds.iterator(); i.hasNext();) {
             final ModelBind modelBind = (ModelBind) i.next();
-            try {
-                // Create XPath evaluator for this bind
-                final DocumentWrapper documentWrapper = new DocumentWrapper(getDefaultInstance().getDocument(), null);
-                bindRunner.applyBind(modelBind, documentWrapper);
-            } catch (final Exception e) {
-                throw new ValidationException(e, modelBind.getLocationData());
+            // But only consider top-level binds, as children are handled recursively
+            if (modelBind.getParent() == null) {
+                try {
+                    // Create XPath evaluator for this bind
+                    final DocumentWrapper documentWrapper = new DocumentWrapper(getDefaultInstance().getDocument(), null);
+                    bindRunner.applyBind(modelBind, documentWrapper);
+                } catch (final Exception e) {
+                    throw new ValidationException(e, modelBind.getLocationData());
+                }
             }
         }
     }
@@ -514,7 +518,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
             List nodeset = expr.evaluate();
             for (Iterator j = nodeset.iterator(); j.hasNext();) {
                 Node node = (Node) j.next();
-                for (Iterator childIterator = modelBind.getChildrenIterator(); childIterator.hasNext();) {
+                for (Iterator childIterator = modelBind.getChildren().iterator(); childIterator.hasNext();) {
                     ModelBind child = (ModelBind) childIterator.next();
                     child.setCurrentNode(node);
                     bindRunner.applyBind(child, documentWrapper);
@@ -611,7 +615,7 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
         if (id.equals(parent.getId()))
             return parent;
         // Look in children
-        for (Iterator j = parent.getChildrenIterator(); j.hasNext();) {
+        for (Iterator j = parent.getChildren().iterator(); j.hasNext();) {
             ModelBind child = (ModelBind) j.next();
             ModelBind bind = getModelBindByIdWorker(child, id);
             if (bind != null)

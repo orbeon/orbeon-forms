@@ -280,6 +280,18 @@
         </output>
     </test>
 
+    <test description="Sleep processor" name="oxf:sleep">
+        <input name="config">
+            <sleep>5000</sleep>
+        </input>
+        <input name="data">
+            <data/>
+        </input>
+        <output name="data">
+            <data/>
+        </output>
+    </test>
+
 <!--    <test description="XInclude with 2001 namespace (recommended one)" name="oxf:identity" only="true"-->
 <!--            xmlns:xi2001="http://www.w3.org/2001/XInclude">-->
 <!--        <input name="data">-->

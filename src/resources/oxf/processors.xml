@@ -576,6 +576,10 @@
         <class name="org.orbeon.oxf.processor.test.ExceptionCatcher"/>
     </processor>
 
+    <processor name="oxf:sleep">
+        <class name="org.orbeon.oxf.processor.test.SleepProcessor"/>
+    </processor>
+
     <!-- This is kept only for backward compatibility -->
     <processor name="oxf:webapp-controller" uri="oxf/processor/webapp-controller">
         <class name="org.orbeon.oxf.processor.PageFlowControllerProcessor"/>

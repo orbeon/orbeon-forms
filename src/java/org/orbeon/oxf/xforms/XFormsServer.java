@@ -358,6 +358,19 @@ public class XFormsServer extends ProcessorImpl {
                                 attributesImpl.addAttribute("", "alert", "alert", ContentHandlerHelper.CDATA, alertValue2 != null ? alertValue2 : "");
                             }
                         }
+
+                        // Output xforms:output-specific information
+                        if (controlInfo2 instanceof XFormsControls.OutputControlInfo) {
+                            final XFormsControls.OutputControlInfo outputControlInfo1 = (XFormsControls.OutputControlInfo) controlInfo1;
+                            final XFormsControls.OutputControlInfo outputControlInfo2 = (XFormsControls.OutputControlInfo) controlInfo2;
+
+                            final String mediaTypeValue1 = (outputControlInfo1 == null) ? null : outputControlInfo1.getMediaTypeAttribute();
+                            final String mediaTypeValue2 = outputControlInfo2.getMediaTypeAttribute();
+
+                            if (!((mediaTypeValue1 == null && mediaTypeValue2 == null) || (mediaTypeValue1 != null && mediaTypeValue2 != null && mediaTypeValue1.equals(mediaTypeValue2)))) {
+                                attributesImpl.addAttribute("", "mediatype", "mediatype", ContentHandlerHelper.CDATA, mediaTypeValue2 != null ? mediaTypeValue2 : "");
+                            }
+                        }
                     }
 
                     // Model item properties

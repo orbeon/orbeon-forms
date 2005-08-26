@@ -1670,8 +1670,12 @@ public class XFormsControls {
      */
     public class OutputControlInfo extends ControlInfo {
 
+        // XForms 1.1 draft mediatype attribute
+        private String mediaTypeAttribute;
+
         public OutputControlInfo(ControlInfo parent, Element element, String name, String id) {
             super(parent, element, name, id);
+            this.mediaTypeAttribute = element.attributeValue("mediatype");
         }
 
         public void evaluateValue(PipelineContext pipelineContext) {
@@ -1687,6 +1691,10 @@ public class XFormsControls {
 
                 super.setValue(value);
             }
+        }
+
+        public String getMediaTypeAttribute() {
+            return mediaTypeAttribute;
         }
     }
 

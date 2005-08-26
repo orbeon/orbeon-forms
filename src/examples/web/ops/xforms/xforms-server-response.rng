@@ -48,6 +48,9 @@
                                 <optional>
                                     <attribute name="help"/>
                                 </optional>
+                                <optional>
+                                    <attribute name="mediatype"/>
+                                </optional>
                                 <ref name="model-item-properties"/>
                                 <optional>
                                     <data type="string"/>

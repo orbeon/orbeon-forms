@@ -37,6 +37,9 @@
     <xsl:variable name="itemsets" as="element()*"
         select="$response/xxforms:action/xxforms:itemsets/xxforms:itemset"/>
 
+    <xsl:variable name="xxforms-uri" select="'http://orbeon.org/oxf/xml/xforms'"/>
+    <xsl:variable name="xs-uri" select="'http://www.w3.org/2001/XMLSchema'"/>
+
     <!-- - - - - - - Form with hidden divs - - - - - - -->
     
     <xsl:template match="xhtml:body">
@@ -140,13 +143,29 @@
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xsl:variable name="html-class" as="xs:string?" select="if (@appearance = 'xxforms:html') then 'xforms-output-html' else ()"/>
+        <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
+        <xsl:variable name="is-html"
+                      select="local-name-from-QName(xs:QName(@appearance)) = 'html'
+                              and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri" as="xs:boolean"/>
+        <xsl:variable name="is-image"
+                      select="starts-with(xxforms:control($id)/@mediatype, 'image/')
+                              and local-name-from-QName(xs:QName(xxforms:control($id)/@type)) = 'anyURI'
+                              and namespace-uri-for-prefix(substring-before(xxforms:control($id)/@type, ':'), xxforms:control($id)) = $xs-uri" as="xs:boolean"/>
+        <xsl:variable name="html-class" as="xs:string?"
+                      select="if ($is-html) then 'xforms-output-html'
+                              else if ($is-image) then 'xforms-output-image'
+                              else ()"/>
         <xhtml:span>
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output', $html-class), $id)"/>
             <xsl:choose>
                 <xsl:when test="$generate-template">
                     <xsl:value-of select="'$xforms-output-value$'"/>
                 </xsl:when>
+                <!-- Case of image media type with URI -->
+                <xsl:when test="$is-image">
+                    <img src="{xxforms:control($id)}"/>
+                </xsl:when>
+                <!-- Regular text case -->
                 <xsl:otherwise>
                     <xsl:value-of select="xxforms:control($id)"/>
                 </xsl:otherwise>
@@ -163,7 +182,7 @@
         <xsl:choose>
             <!-- Link appearance -->
             <xsl:when test="@appearance
-                            and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = 'http://orbeon.org/oxf/xml/xforms'
+                            and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri
                             and local-name-from-QName(xs:QName(@appearance)) = 'link'">
                 <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
                 <xhtml:a href="">
@@ -173,7 +192,7 @@
             </xsl:when>
             <!-- Image appearance -->
             <xsl:when test="@appearance
-                            and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = 'http://orbeon.org/oxf/xml/xforms'
+                            and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri
                             and local-name-from-QName(xs:QName(@appearance)) = 'image'">
                 <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
                 <xhtml:input type="image" src="{xxforms:img/@src}" alt="{xforms:label}" >
@@ -200,7 +219,7 @@
         <xsl:choose>
             <!-- Link appearance -->
             <xsl:when test="@appearance
-                            and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = 'http://orbeon.org/oxf/xml/xforms'
+                            and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri
                             and local-name-from-QName(xs:QName(@appearance)) = 'link'">
                 <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
                 <xhtml:a href="">
@@ -210,7 +229,7 @@
             </xsl:when>
             <!-- Image appearance -->
             <xsl:when test="@appearance
-                            and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = 'http://orbeon.org/oxf/xml/xforms'
+                            and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri
                             and local-name-from-QName(xs:QName(@appearance)) = 'image'">
                 <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
                 <xhtml:input type="image" src="{xxforms:img/@src}" alt="{xforms:label}" >

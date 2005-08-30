@@ -24,15 +24,49 @@
         </optional>
         <optional>
             <element name="content-type">
-                <choice>
-                    <value>text/xml</value>
-                    <value>application/xml</value>
-                    <value>text/html</value>
-                    <value>text/plain</value>
-                </choice>
+                <data type="string"/>
             </element>
         </optional>
-        <!-- Version does not seem to work -->
+        <optional>
+            <element name="force-content-type">
+                <data type="boolean"/>
+            </element>
+        </optional>
+        <optional>
+            <element name="ignore-document-content-type">
+                <data type="boolean"/>
+            </element>
+        </optional>
+        <optional>
+            <element name="encoding">
+                <data type="string"/>
+            </element>
+        </optional>
+        <optional>
+            <element name="force-encoding">
+                <data type="boolean"/>
+            </element>
+        </optional>
+        <optional>
+            <element name="ignore-document-encoding">
+                <data type="boolean"/>
+            </element>
+        </optional>
+        <optional>
+            <element name="cache-control">
+                <optional>
+                    <element name="use-local-cache">
+                        <choice>
+                            <value>true</value>
+                            <value>false</value>
+                        </choice>
+                    </element>
+                </optional>
+            </element>
+        </optional>
+
+        <!-- All the options below are only valid for the deprecated legacy File Serializer. They
+        should be removed once backward compatibility is dropped, or put in another schema. -->
         <optional>
             <element name="version">
                 <data type="string"/>
@@ -59,11 +93,6 @@
             </element>
         </optional>
         <optional>
-            <element name="encoding">
-                <data type="string"/>
-            </element>
-        </optional>
-        <optional>
             <element name="indent">
                 <data type="boolean"/>
             </element>
@@ -71,18 +100,6 @@
         <optional>
             <element name="indent-amount">
                 <data type="integer"/>
-            </element>
-        </optional>
-        <optional>
-            <element name="cache-control">
-                <optional>
-                    <element name="use-local-cache">
-                        <choice>
-                            <value>true</value>
-                            <value>false</value>
-                        </choice>
-                    </element>
-                </optional>
             </element>
         </optional>
     </interleave>

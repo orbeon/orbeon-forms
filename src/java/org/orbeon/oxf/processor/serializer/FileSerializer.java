@@ -17,46 +17,34 @@ import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.pipeline.api.ExternalContext;
-import org.orbeon.oxf.processor.CacheableInputReader;
-import org.orbeon.oxf.processor.ProcessorInput;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
-import org.orbeon.oxf.xml.TransformerUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 
-import javax.xml.transform.sax.TransformerHandler;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
- * FIXME: This should be merged with the HTTP serializers. There is way too much code duplication
- * between the two code bases.
+ * The File Serializer serializes text and binary documents to files on disk.
  */
-public class FileSerializer extends CachedSerializer {
+public class FileSerializer extends ProcessorImpl {
 
     private static Logger logger = LoggerFactory.createLogger(FileSerializer.class);
 
     public static final String FILE_SERIALIZER_CONFIG_NAMESPACE_URI = "http://orbeon.org/oxf/xml/file-serializer-config";
 
-    private static final String XML_CONTENT_TYPE = "text/xml";
-    private static final String HTML_CONTENT_TYPE = "text/html";
-    private static final String TEXT_CONTENT_TYPE = "text/plain";
-    private static final String DEFAULT_CONTENT_TYPE = XML_CONTENT_TYPE;
-
-    private static final String XML_METHOD = "xml";
-    private static final String HTML_METHOD = "html";
-    private static final String TEXT_METHOD = "text";
-
-    public static final String DEFAULT_XML_VERSION = "1.0";
-
-    public static final String DEFAULT_ENCODING = TransformerUtils.DEFAULT_OUTPUT_ENCODING;
-    public static final boolean DEFAULT_INDENT = true;
-    public static final int DEFAULT_INDENT_AMOUNT = 1;
-
     public static final String DIRECTORY_PROPERTY = "directory";
+
+    // NOTE: Those are also in HttpSerializerBase
+    private static final boolean DEFAULT_FORCE_CONTENT_TYPE = false;
+    private static final boolean DEFAULT_IGNORE_DOCUMENT_CONTENT_TYPE = false;
+
+    private static final boolean DEFAULT_FORCE_ENCODING = false;
+    private static final boolean DEFAULT_IGNORE_DOCUMENT_ENCODING = false;
 
     public FileSerializer() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG, FILE_SERIALIZER_CONFIG_NAMESPACE_URI));
@@ -64,125 +52,47 @@ public class FileSerializer extends CachedSerializer {
     }
 
     private static class Config {
-        private String contentType;
-        private String method;
-        private String version;
-        private String publicDoctype;
-        private String systemDoctype;
-        private String encoding;
-        private boolean indent;
-        private int indentAmount;
+
         private String directory;
         private String file;
-        private boolean omitXMLDeclaration;
-        private Boolean standalone;
-        boolean cacheUseLocalCache;
+        private boolean cacheUseLocalCache;
+
+        private boolean forceContentType;
+        private String requestedContentType;
+        private boolean ignoreDocumentContentType;
+
+        private boolean forceEncoding;
+        private String requestedEncoding;
+        private boolean ignoreDocumentEncoding;
+
 
         public Config(Document document) {
             // Directory and file
             directory = XPathUtils.selectStringValueNormalize(document, "/config/directory");
             file = XPathUtils.selectStringValueNormalize(document, "/config/file");
-            // Content-type
-            contentType = XPathUtils.selectStringValueNormalize(document, "/config/content-type");
-            if (contentType == null) contentType = DEFAULT_CONTENT_TYPE;
-            // Method
-            if (HTML_CONTENT_TYPE.equalsIgnoreCase(contentType)) {
-                method = HTML_METHOD;
-            } else if (XML_CONTENT_TYPE.equalsIgnoreCase(contentType)) {
-                method = XML_METHOD;
-            } else if (TEXT_CONTENT_TYPE.equalsIgnoreCase(contentType)) {
-                method = TEXT_METHOD;
-            } else
-                throw new OXFException("Invalid content-type" + contentType);
-            // Version
-            version = XPathUtils.selectStringValueNormalize(document, "/config/version");
-            if (version == null) {
-                if (method.equals(XML_METHOD))
-                    version = DEFAULT_XML_VERSION;
-                else if (method.equals(HTML_METHOD))
-                    version = null;
-            }
-            // Public doctype
-            publicDoctype = XPathUtils.selectStringValueNormalize(document, "/config/public-doctype");
-
-            // System doctype
-            systemDoctype = XPathUtils.selectStringValueNormalize(document, "/config/system-doctype");
-
-            // Encoding
-            encoding = XPathUtils.selectStringValueNormalize(document, "/config/encoding");
-            if (encoding == null) {
-                encoding = DEFAULT_ENCODING;
-            }
-            // Indent
-            String indentString = XPathUtils.selectStringValueNormalize(document, "/config/indent");
-            if (indentString == null)
-                indent = DEFAULT_INDENT;
-            else
-                indent = new Boolean(indentString).booleanValue();
-            // Indent amount
-            Integer indentAmountInteger = XPathUtils.selectIntegerValue(document, "/config/indent-amount");
-            if (indentAmountInteger == null)
-                indentAmount = DEFAULT_INDENT_AMOUNT;
-            else
-                indentAmount = indentAmountInteger.intValue();
-
-            // Omit XML declaration
-            String omitXMLDeclarationString = XPathUtils.selectStringValueNormalize(document, "/config/omit-xml-declaration");
-            if (omitXMLDeclarationString != null)
-                omitXMLDeclaration = new Boolean(omitXMLDeclarationString).booleanValue();
-
-            // Standalone
-            String standaloneString = XPathUtils.selectStringValueNormalize(document, "/config/standalone");
-            if (standaloneString != null)
-                standalone = new Boolean(standaloneString);
 
             // Cache control
             String cacheUseLocalCacheString = XPathUtils.selectStringValueNormalize(document, "/config/cache-control/use-local-cache");
             if (cacheUseLocalCacheString == null)
-                cacheUseLocalCache = DEFAULT_CACHE_USE_LOCAL_CACHE;
+                cacheUseLocalCache = CachedSerializer.DEFAULT_CACHE_USE_LOCAL_CACHE;
             else
                 cacheUseLocalCache = new Boolean(cacheUseLocalCacheString).booleanValue();
+
+            // Content-type and Encoding
+            requestedContentType = XPathUtils.selectStringValueNormalize(document, "/config/content-type");
+
+            forceContentType = ProcessorUtils.selectBooleanValue(document, "/config/force-content-type", DEFAULT_FORCE_CONTENT_TYPE);
+            if (forceContentType && (document == null || document.equals("")))
+                throw new OXFException("The force-content-type element requires a content-type element.");
+            ignoreDocumentContentType = ProcessorUtils.selectBooleanValue(document, "/config/ignore-document-content-type", DEFAULT_IGNORE_DOCUMENT_CONTENT_TYPE);
+
+            requestedEncoding = XPathUtils.selectStringValueNormalize(document, "/config/encoding");
+            forceEncoding = ProcessorUtils.selectBooleanValue(document, "/config/force-encoding", DEFAULT_FORCE_ENCODING);
+            if (forceEncoding && (requestedEncoding == null || requestedEncoding.equals("")))
+                throw new OXFException("The force-encoding element requires an encoding element.");
+            ignoreDocumentEncoding = ProcessorUtils.selectBooleanValue(document, "/config/ignore-document-encoding", DEFAULT_IGNORE_DOCUMENT_ENCODING);
         }
 
-        public String getContentType() {
-            return contentType;
-        }
-
-        public String getMethod() {
-            return method;
-        }
-
-        public String getVersion() {
-            return version;
-        }
-
-        public String getPublicDoctype() {
-            return publicDoctype;
-        }
-
-        public String getSystemDoctype() {
-            return systemDoctype;
-        }
-
-        public String getEncoding() {
-            return encoding;
-        }
-
-        public boolean isOmitXMLDeclaration() {
-            return omitXMLDeclaration;
-        }
-
-        public Boolean isStandalone() {
-            return standalone;
-        }
-
-        public boolean isIndent() {
-            return indent;
-        }
-
-        public int getIndentAmount() {
-            return indentAmount;
-        }
 
         public String getDirectory() {
             return directory;
@@ -190,6 +100,34 @@ public class FileSerializer extends CachedSerializer {
 
         public String getFile() {
             return file;
+        }
+
+        public boolean isCacheUseLocalCache() {
+            return cacheUseLocalCache;
+        }
+
+        public boolean isForceContentType() {
+            return forceContentType;
+        }
+
+        public boolean isForceEncoding() {
+            return forceEncoding;
+        }
+
+        public boolean isIgnoreDocumentContentType() {
+            return ignoreDocumentContentType;
+        }
+
+        public boolean isIgnoreDocumentEncoding() {
+            return ignoreDocumentEncoding;
+        }
+
+        public String getRequestedContentType() {
+            return requestedContentType;
+        }
+
+        public String getRequestedEncoding() {
+            return requestedEncoding;
         }
     }
 
@@ -202,7 +140,7 @@ public class FileSerializer extends CachedSerializer {
                 }
             });
 
-            ProcessorInput dataInput = getInputByName(INPUT_DATA);
+            final ProcessorInput dataInput = getInputByName(INPUT_DATA);
 
             // Check that directory is ok
             File file;
@@ -219,7 +157,8 @@ public class FileSerializer extends CachedSerializer {
                 file = new File(baseDirectory, config.getFile());
             }
 
-            // NOTE: Caching here is broken. This is what we need to do:
+            // NOTE: Caching here is broken, so we never cache. This is what we should do in case
+            // we want caching:
             // o for a given file, store a hash of the content stored (or the input key?)
             // o then when we check whether we need to modify the file, check against the key
             //   AND the validity
@@ -243,8 +182,12 @@ public class FileSerializer extends CachedSerializer {
 //            }
 
             // Delete file if it exists
-            if (file.exists() && file.canWrite())
-                file.delete();//TODO: make sure the file was deleted
+            if (file.exists() && file.canWrite()) {
+                final boolean deleted = file.delete();
+                if (!deleted)
+                    throw new OXFException("Can't delete file: " + file);
+            }
+
             // Create file
             if (!file.createNewFile())
                 throw new OXFException("Can't create file: " + file);
@@ -272,7 +215,11 @@ public class FileSerializer extends CachedSerializer {
                             logger.debug("Output not cached");
                         try {
                             ResultStoreOutputStream resultStoreOutputStream = new ResultStoreOutputStream(fileOutputStream);
-                            readInput(context, null, input, config, resultStoreOutputStream);
+
+                            readInputAsSAX(context, input, new BinaryTextContentHandler(null, resultStoreOutputStream,
+                                    config.forceContentType, config.requestedContentType, config.ignoreDocumentContentType,
+                                    config.forceEncoding, config.requestedEncoding, config.ignoreDocumentEncoding));
+
                             resultStoreOutputStream.close();
                             return resultStoreOutputStream;
                         } catch (IOException e) {
@@ -289,35 +236,14 @@ public class FileSerializer extends CachedSerializer {
                 }
             } else {
                 // Caching is not enabled
-                readInput(context, null, dataInput, config, fileOutputStream);
+                readInputAsSAX(context, dataInput, new BinaryTextContentHandler(null, fileOutputStream,
+                        config.forceContentType, config.requestedContentType, config.ignoreDocumentContentType,
+                        config.forceEncoding, config.requestedEncoding, config.ignoreDocumentEncoding));
+
                 fileOutputStream.close();
             }
 
         } catch (Exception e) {
-            throw new OXFException(e);
-        }
-    }
-
-
-    protected void readInput(PipelineContext context, ExternalContext.Response response, ProcessorInput input, Object _config, OutputStream outputStream) {
-        FileSerializer.Config config = (FileSerializer.Config) _config;
-        Writer writer = getWriter(outputStream, config);
-
-        // Create an identity transformer and start the transformation
-        TransformerHandler identity = TransformerUtils.getIdentityTransformerHandler();
-        TransformerUtils.applyOutputProperties(identity.getTransformer(),
-                config.getMethod(), config.getVersion(), config.getPublicDoctype(),
-                config.getSystemDoctype(), config.getEncoding(), config.isOmitXMLDeclaration(), config.isStandalone(),
-                config.isIndent(), config.getIndentAmount());
-
-        identity.setResult(new StreamResult(writer));
-        readInputAsSAX(context, input, new SerializerContentHandler(identity, writer, getPropertySet().getBoolean("serialize-xml-11", false).booleanValue()));
-    }
-
-    protected Writer getWriter(OutputStream outputStream, Config config) {
-        try {
-            return new OutputStreamWriter(outputStream, config.encoding);
-        } catch (UnsupportedEncodingException e) {
             throw new OXFException(e);
         }
     }

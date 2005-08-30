@@ -156,10 +156,10 @@
                     <xsl:variable name="is-html"
                                   select="local-name-from-QName(xs:QName(@appearance)) = 'html'
                                           and namespace-uri-for-prefix(substring-before(@appearance, ':'), .) = $xxforms-uri" as="xs:boolean"/>
+                    <!-- TODO: should test on type prefix as well and namespace-uri-for-prefix(substring-before(xxforms:control($id)/@type, ':'), xxforms:control($id)) = $xs-uri -->
                     <xsl:variable name="is-image"
                                   select="starts-with(xxforms:control($id)/@mediatype, 'image/')
-                                          and local-name-from-QName(xs:QName(xxforms:control($id)/@type)) = 'anyURI'
-                                          and namespace-uri-for-prefix(substring-before(xxforms:control($id)/@type, ':'), xxforms:control($id)) = $xs-uri" as="xs:boolean"/>
+                                          and local-name-from-QName(xs:QName(xxforms:control($id)/@type)) = 'anyURI'" as="xs:boolean"/>
                     <xsl:variable name="html-class" as="xs:string?"
                                   select="if ($is-html) then 'xforms-output-html'
                                           else if ($is-image) then 'xforms-output-image'

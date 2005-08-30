@@ -178,18 +178,27 @@
         <p:output name="data" id="final-html"/>
     </p:processor>
 
-    <p:processor name="oxf:file-serializer">
+    <!-- Convert and serialize to XML -->
+    <p:processor name="oxf:xml-converter">
         <p:input name="config">
             <config>
-                <content-type>text/html</content-type>
-                <directory>build/doc</directory>
-                <file>single-file-doc.html</file>
                 <public-doctype>-//W3C//DTD HTML 4.0//EN</public-doctype>
                 <version>4.01</version>
                 <encoding>utf-8</encoding>
             </config>
         </p:input>
         <p:input name="data" href="#final-html"/>
+        <p:output name="data" id="converted"/>
+    </p:processor>
+
+    <p:processor name="oxf:file-serializer">
+        <p:input name="config">
+            <config>
+                <directory>build/doc</directory>
+                <file>single-file-doc.html</file>
+            </config>
+        </p:input>
+        <p:input name="data" href="#converted"/>
     </p:processor>
 
 </p:config>

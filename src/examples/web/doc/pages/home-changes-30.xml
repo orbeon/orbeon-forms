@@ -873,6 +873,20 @@
             </section>
         </section>
         <section>
+            <title>File Serializer</title>
+            <p>
+                The File serializer now works like the HTTP serializer: it only accepts <a
+                href="reference-formats">text and binary</a> documents as input, and no longer
+                handles conversions to XML, HTML, XHTML or text. To serialize to a file XML, HTML,
+                XHTML or plain text, connect the <a href="processors-converters"> XML, HTML or Text
+                converters</a> to the File serializer.
+            </p>
+            <p>
+                The legacy, deprecated File serializer is still available as
+                <code>oxf:legacy-file-serializer</code>.
+            </p>
+        </section>
+        <section>
             <title>Enhanced Error Reporting</title>
             <p>
                 The following enhancements have been made to the error reporting on OPS:

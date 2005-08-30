@@ -54,34 +54,50 @@
             <p:input name="data" href="#url"/>
             <p:input name="config">
                 <config xsl:version="2.0">
-                    <content-type>text/html</content-type>
                     <directory>build/doc/reference</directory>
                     <file><xsl:value-of select="/*/@href"/>.html</file>
-                    <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
-                    <version>4.01</version>
-                    <encoding>utf-8</encoding>
                 </config>
             </p:input>
             <p:output name="data" id="file-config"/>
         </p:processor>
 
+        <!-- Convert and serialize to XML -->
+        <p:processor name="oxf:xml-converter">
+            <p:input name="config">
+                <config>
+                    <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
+                    <version>4.01</version>
+                    <encoding>utf-8</encoding>
+                </config>
+            </p:input>
+            <p:input name="data" href="#html-data"/>
+            <p:output name="data" id="converted"/>
+        </p:processor>
+
         <p:processor name="oxf:file-serializer">
             <p:input name="config" href="#file-config"/>
-            <p:input name="data" href="#html-data"/>
+            <p:input name="data" href="#converted"/>
         </p:processor>
 
     </p:for-each>
 
     <!-- Generate CSS file -->
+    <p:processor name="oxf:text-converter">
+        <p:input name="config">
+            <config/>
+        </p:input>
+        <p:input name="data" href="../config/theme/orbeon-layout.xml"/>
+        <p:output name="data" id="css-converted"/>
+    </p:processor>
+
     <p:processor name="oxf:file-serializer">
         <p:input name="config">
             <config>
-                <content-type>text/plain</content-type>
                 <directory>build/doc/reference/theme</directory>
                 <file>orbeon-layout.cssd</file>
             </config>
         </p:input>
-        <p:input name="data" href="../config/theme/orbeon-layout.xml"/>
+        <p:input name="data" href="#css-converted"/>
     </p:processor>
 
 </p:config>

@@ -351,7 +351,7 @@
         <class name="org.orbeon.oxf.processor.serializer.HttpSerializer"/>
     </processor>
 
-    <processor name="oxf:file-serializer" uri="oxf/processor/file-serializer">
+    <processor name="oxf:file-serializer">
         <class name="org.orbeon.oxf.processor.serializer.FileSerializer"/>
     </processor>
 
@@ -386,6 +386,10 @@
 
     <processor name="oxf:xls-serializer" uri="oxf/processor/xls-serializer">
         <class name="org.orbeon.oxf.processor.serializer.legacy.XLSSerializer"/>
+    </processor>
+
+    <processor name="oxf:legacy-file-serializer" uri="oxf/processor/file-serializer">
+        <class name="org.orbeon.oxf.processor.serializer.legacy.FileSerializer"/>
     </processor>
 
     <!-- Chart info processor -->

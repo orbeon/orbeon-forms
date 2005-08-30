@@ -14,6 +14,21 @@
 <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
+    <!-- Convert and serialize to XML -->
+    <p:processor name="oxf:xml-converter">
+        <p:input name="config">
+            <config>
+                <encoding>utf-8</encoding>
+            </config>
+        </p:input>
+        <p:input name="data">
+            <document>
+                <title>This is a very simple pipeline example</title>
+            </document>
+        </p:input>
+        <p:output name="data" id="converted"/>
+    </p:processor>
+
     <p:processor name="oxf:file-serializer">
         <p:input name="config">
             <config>
@@ -22,11 +37,7 @@
                 <file>test.xml</file>
             </config>
         </p:input>
-        <p:input name="data">
-            <document>
-                <title>This is a very simple pipeline example</title>
-            </document>
-        </p:input>
+        <p:input name="data" href="#converted"/>
     </p:processor>
 
 </p:config>

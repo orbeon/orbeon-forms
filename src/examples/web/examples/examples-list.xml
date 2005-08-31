@@ -83,7 +83,7 @@
     </section>
     <section label="Presenting Data">
         <example id="reports" label="Data in multiple formats"/>
-        <example id="charts" label="Charts &amp; Graphs"/>
+        <example id="charts" label="Charts &amp; Graphs" xforms-ng="true"/>
         <example id="imageserver" label="Image Transformations"/>
         <!--<example id="excel" label="Excel Import / Export"/>-->
     </section>

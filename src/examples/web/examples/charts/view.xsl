@@ -12,90 +12,82 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
  <html xmlns:f="http://orbeon.org/oxf/xml/formatting"
-             xmlns:xhtml="http://www.w3.org/1999/xhtml"
-             xmlns:xforms="http://www.w3.org/2002/xforms"
-             xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-             xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-            xmlns="http://www.w3.org/1999/xhtml"
-             xsl:version="2.0">
+       xmlns:xhtml="http://www.w3.org/1999/xhtml"
+       xmlns:xforms="http://www.w3.org/2002/xforms"
+       xmlns:ev="http://www.w3.org/2001/xml-events"
+       xmlns:widget="http://orbeon.org/oxf/xml/widget"
+       xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+       xmlns="http://www.w3.org/1999/xhtml"
+       xsl:version="2.0">
      <head>
          <title>Charts</title>
+         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
+             <!-- Display error message in case of submission error -->
+            <xforms:setvalue ev:event="xforms-submit-error" ref="instance('status-instance')/message">Submission Error</xforms:setvalue>
+            <!-- Clear error message in case of submission success -->
+            <xforms:setvalue ev:event="xforms-submit-done" ref="instance('status-instance')/message"/>
+
+            <xforms:instance>
+                <xsl:copy-of select="doc('input:instance')"/>
+            </xforms:instance>
+             <xforms:instance id="status-instance">
+                <status xmlns="">
+                    <message/>
+                </status>
+            </xforms:instance>
+            <xforms:submission id="main-submission" ref="/form" method="post" action="/direct/charts" replace="all"/>
+        </xforms:model>
      </head>
      <body>
+         <p style="color: red">
+            <xforms:output ref="instance('status-instance')/message"/>
+        </p>
          <xforms:group ref="/form">
-             <p>
-                 <table class="gridtable">
-                     <tr>
-                         <th>Categories</th>
-                         <td>
-                             <xforms:input ref="data/categories/cat1" size="8"/>
-                         </td>
-                         <td>
-                             <xforms:input ref="data/categories/cat2" size="8"/>
-                         </td>
-                         <td>
-                             <xforms:input ref="data/categories/cat3" size="8"/>
-                         </td>
-                         <td>
-                             <xforms:input ref="data/categories/cat4" size="8"/>
-                         </td>
-                         <td>
-                             <xforms:input ref="data/categories/cat5" size="8"/>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Series 1 Title</th>
-                         <td colspan="5">
-                             <xforms:input ref="chart/value[1]/@title" size="8"/>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Series 1 Values</th>
-                         <td>
-                             <xforms:input ref="data/values1/val1" size="3"/>
-                         </td>
-                         <td>
-                             <xforms:input ref="data/values1/val2" size="3"/>
-                         </td>
-                         <td>
-                             <xforms:input ref="data/values1/val3" size="3"/>
-                         </td>
-                         <td>
-                             <xforms:input ref="data/values1/val4" size="3"/>
-                         </td>
-                         <td>
-                             <xforms:input ref="data/values1/val5" size="3"/>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Series 2 Title</th>
-                         <td colspan="5">
-                             <xforms:input ref="chart/value[2]/@title" size="8"/>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Series 2 Values</th>
-                         <td>
-                             <xforms:input ref="data/values2/val1" size="3"/>
-                         </td>
-                         <td>
-                             <xforms:input ref="data/values2/val2" size="3"/>
-                         </td>
-                         <td>
-                             <xforms:input ref="data/values2/val3" size="3"/>
-                         </td>
-                         <td>
-                             <xforms:input ref="data/values2/val4" size="3"/>
-                         </td>
-                         <td>
-                             <xforms:input ref="data/values2/val5" size="3"/>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Chart Type</th>
-                         <td colspan="5">
-                             <xforms:select1 ref="chart/type" appearance="minimal">
-                                 <xforms:choices>
+             <widget:tabs>
+                <widget:tab id="configuration">
+                    <widget:label>Configure It!</widget:label>
+                     <table class="gridtable">
+                         <tr>
+                             <th>Categories</th>
+                             <td>
+                                 <xforms:repeat nodeset="data/categories/category" id="categoryRepeat">
+                                     <xforms:input ref="."/>
+                                     <!--<xforms:input ref="../../values1/value[index('categoryRepeat')]"/>-->
+                                 </xforms:repeat>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Series 1 Title</th>
+                             <td colspan="5">
+                                 <xforms:input ref="chart/value[1]/@title" size="8"/>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Series 1 Values</th>
+                             <td>
+                                 <xforms:repeat nodeset="data/values1/value" xhtml:size="3">
+                                     <xforms:input ref="."/>
+                                 </xforms:repeat>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Series 2 Title</th>
+                             <td colspan="5">
+                                 <xforms:input ref="chart/value[2]/@title" size="8"/>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Series 2 Values</th>
+                             <td>
+                                 <xforms:repeat nodeset="data/values2/value" xhtml:size="3">
+                                     <xforms:input ref="."/>
+                                 </xforms:repeat>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Chart Type</th>
+                             <td colspan="5">
+                                 <xforms:select1 ref="chart/type" appearance="minimal">
                                      <xforms:item>
                                          <xforms:label>Vertical Bar</xforms:label>
                                          <xforms:value>vertical-bar</xforms:value>
@@ -144,69 +136,67 @@
                                          <xforms:label>Pie 3D</xforms:label>
                                          <xforms:value>pie-3d</xforms:value>
                                      </xforms:item>
-                                 </xforms:choices>
-                             </xforms:select1>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Title</th>
-                         <td colspan="5">
-                             <xforms:input ref="chart/title"/>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Title Color</th>
-                         <td colspan="5">
-                             <xforms:input ref="chart/title-color"/>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Background Color</th>
-                         <td colspan="5">
-                             <xforms:input ref="chart/background-color"/>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Category Title</th>
-                         <td colspan="5">
-                             <xforms:input ref="chart/category-title"/>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Category Margin</th>
-                         <td colspan="5">
-                             <xforms:input ref="chart/category-margin"/>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Serie Title</th>
-                         <td colspan="5">
-                             <xforms:input ref="chart/serie-title"/>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Tick Unit</th>
-                         <td colspan="5">
-                             <xforms:input ref="chart/tick-unit"/>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Bar Margin</th>
-                         <td colspan="5">
-                             <xforms:input ref="chart/bar-margin"/>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Category Label Angle</th>
-                         <td colspan="5">
-                             <xforms:input ref="chart/category-label-angle"/>  (Positive Integer)
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Legend</th>
-                         <td colspan="5">
-                             <xforms:select1 ref="chart/legend/@visible" appearance="minimal">
-                                 <xforms:choices>
+                                 </xforms:select1>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Title</th>
+                             <td colspan="5">
+                                 <xforms:input ref="chart/title"/>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Title Color</th>
+                             <td colspan="5">
+                                 <xforms:input ref="chart/title-color"/>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Background Color</th>
+                             <td colspan="5">
+                                 <xforms:input ref="chart/background-color"/>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Category Title</th>
+                             <td colspan="5">
+                                 <xforms:input ref="chart/category-title"/>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Category Margin</th>
+                             <td colspan="5">
+                                 <xforms:input ref="chart/category-margin"/>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Serie Title</th>
+                             <td colspan="5">
+                                 <xforms:input ref="chart/serie-title"/>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Tick Unit</th>
+                             <td colspan="5">
+                                 <xforms:input ref="chart/tick-unit"/>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Bar Margin</th>
+                             <td colspan="5">
+                                 <xforms:input ref="chart/bar-margin"/>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Category Label Angle</th>
+                             <td colspan="5">
+                                 <xforms:input ref="chart/category-label-angle"/>  (Positive Integer)
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Legend</th>
+                             <td colspan="5">
+                                 <xforms:select1 ref="chart/legend/@visible" appearance="minimal">
                                      <xforms:item>
                                          <xforms:label>Enabled</xforms:label>
                                          <xforms:value>true</xforms:value>
@@ -215,15 +205,13 @@
                                          <xforms:label>Disabled</xforms:label>
                                          <xforms:value>false</xforms:value>
                                      </xforms:item>
-                                 </xforms:choices>
-                             </xforms:select1>
-                         </td>
-                     </tr>
-                     <tr>
-                         <th>Legend Position</th>
-                         <td colspan="5">
-                             <xforms:select1 ref="chart/legend/@position" appearance="minimal">
-                                 <xforms:choices>
+                                 </xforms:select1>
+                             </td>
+                         </tr>
+                         <tr>
+                             <th>Legend Position</th>
+                             <td colspan="5">
+                                 <xforms:select1 ref="chart/legend/@position" appearance="minimal">
                                      <xforms:item>
                                          <xforms:label>North</xforms:label>
                                          <xforms:value>north</xforms:value>
@@ -240,55 +228,39 @@
                                          <xforms:label>West</xforms:label>
                                          <xforms:value>west</xforms:value>
                                      </xforms:item>
-                                 </xforms:choices>
-                             </xforms:select1>
-                         </td>
-                     </tr>
-                 </table>
-                 <br/>
-                 <xforms:submit xxforms:appearance="button">
-                     <xforms:label>Update</xforms:label>
-                 </xforms:submit>
-             </p>
+                                 </xforms:select1>
+                             </td>
+                         </tr>
+                     </table>
+                     <br/>
+                     <xforms:submit submission="main-submission">
+                         <xforms:label>Update</xforms:label>
+                     </xforms:submit>
+                </widget:tab>
+                <widget:tab id="result" selected="true">
+                    <widget:label>View Chart!</widget:label>
+                    <img src="/chartDisplay?filename={/chart-info/file}" usemap="#fruits" border="0" width="400" height="300"/>
+                    <xsl:copy-of select="/chart-info/map"/>
+                </widget:tab>
+                <widget:tab id="chart-input">
+                    <widget:label>XML Configuration</widget:label>
+                    <xforms:group>
+                        <xforms:label>Chart Input</xforms:label>
+                        <f:xml-source>
+                             <xsl:copy-of select="doc('input:instance')/form/chart"/>
+                         </f:xml-source>
+                    </xforms:group>
+                </widget:tab>
+                <widget:tab id="data-input">
+                    <widget:label>XML Input</widget:label>
+                    <xforms:group>
+                        <xforms:label>Data Input</xforms:label>
+                        <f:xml-source>
+                             <xsl:copy-of select="doc('input:instance')/form/data"/>
+                         </f:xml-source>
+                    </xforms:group>
+                </widget:tab>
+            </widget:tabs>
          </xforms:group>
-         <table class="gridtable">
-             <tr>
-                 <th>
-                     Chart Output
-                 </th>
-             </tr>
-             <tr>
-                 <td>
-                     <center>
-                         <img src="/chartDisplay?filename={/chart-info/file}" usemap="#fruits" border="0" width="400" height="300"/>
-                         <xsl:copy-of select="/chart-info/map"/>
-                     </center>
-                 </td>
-             </tr>
-             <tr>
-                 <th>
-                     Chart Input
-                 </th>
-             </tr>
-             <tr>
-                 <td style="white-space: normal">
-                     <f:xml-source>
-                         <xsl:copy-of select="doc('input:instance')/form/chart"/>
-                     </f:xml-source>
-                 </td>
-             </tr>
-             <tr>
-                 <th>
-                     Data Input
-                 </th>
-             </tr>
-             <tr>
-                 <td>
-                     <f:xml-source>
-                         <xsl:copy-of select="doc('input:instance')/form/data"/>
-                     </f:xml-source>
-                 </td>
-             </tr>
-         </table>
      </body>
  </html>

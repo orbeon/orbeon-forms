@@ -1,0 +1,67 @@
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+  
+    This program is free software; you can redistribute it and/or modify it under the terms of the
+    GNU Lesser General Public License as published by the Free Software Foundation; either version
+    2.1 of the License, or (at your option) any later version.
+  
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+  
+    The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
+-->
+<form>
+    <action/>
+    <data>
+        <categories>
+            <category>Apples</category>
+            <category>Oranges</category>
+            <category>Bananas</category>
+            <category>Berries</category>
+            <category>Pears</category>
+        </categories>
+        <values1>
+            <value>10</value>
+            <value>9</value>
+            <value>8</value>
+            <value>7</value>
+            <value>6</value>
+        </values1>
+        <values2>
+            <value>11</value>
+            <value>8</value>
+            <value>6</value>
+            <value>10</value>
+            <value>4</value>
+        </values2>
+    </data>
+    <chart>
+        <map>fruits</map>
+        <background-color>#EFF6EF</background-color>
+        <title-color>#281154</title-color>
+        <type>vertical-bar</type>
+        <title>Sales in Unit</title>
+        <category-title>Fruits</category-title>
+        <category-margin>0.2</category-margin>
+        <serie-title>Units</serie-title>
+        <tick-unit>1.0</tick-unit>
+        <bar-margin>0.1</bar-margin>
+        <category-label-angle>0</category-label-angle>
+
+        <value title="May"
+            categories="/form/data/categories/category"
+            series="/form/data/values1/value"
+            color="#ff0000"/>
+
+        <value title="June"
+            categories="/form/data/categories/category"
+            series="/form/data/values2/value"
+            color="#00ff00"/>
+
+        <legend visible="true" position="south"/>
+
+        <x-size>400</x-size>
+        <y-size>300</y-size>
+    </chart>
+</form>

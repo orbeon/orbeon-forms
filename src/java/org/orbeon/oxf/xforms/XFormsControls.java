@@ -136,57 +136,66 @@ public class XFormsControls {
         // Set initial repeat index
         if (controlsDocument != null) {
             final ControlsState result = new ControlsState();
-            visitAllControlStatic(new ControlElementVisitorListener() {
-
-                private Stack repeatStack = new Stack();
-
-                public boolean startVisitControl(Element controlElement, String effectiveControlId) {
-                    if (controlElement.getName().equals("repeat")) {
-                        // Create control without parent, just to hold iterations
-                        final RepeatControlInfo repeatControlInfo
-                                = new RepeatControlInfo(null, controlElement, controlElement.getName(), effectiveControlId);
-
-                        // Set initial index
-                        result.setDefaultRepeatIndex(repeatControlInfo.getRepeatId(), repeatControlInfo.getStartIndex());
-
-                        // Keep control on stack
-                        repeatStack.push(repeatControlInfo);
-                    }
-                    return true;
-                }
-
-                public boolean endVisitControl(Element controlElement, String effectiveControlId) {
-                    if (controlElement.getName().equals("repeat")) {
-                        final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatStack.pop();
-                        final List children = repeatControlInfo.getChildren();
-                        if (children == null || children.size() == 0) {
-                            // Update repeat index to 0 if there was no iteration
-                            result.updateRepeatIndex(effectiveControlId, 0);
-                            // Current index is 0
-                            result.setRepeatIterations(effectiveControlId, 0);
-                        } else {
-                            // Number of iterations is number of children
-                            result.setRepeatIterations(effectiveControlId, children.size());
-                        }
-                    }
-                    return true;
-                }
-
-                public void startRepeatIteration(int iteration) {
-                    // One more iteration in current repeat
-                    final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatStack.peek();
-                    repeatControlInfo.addChild(new RepeatIterationInfo(repeatControlInfo, iteration));
-                }
-
-                public void endRepeatIteration(int iteration) {
-                }
-            });
+            getDefaultRepeatIndexes(result);
             initialControlsState = result;
             currentControlsState = initialControlsState;
         }
 
         // Set repeat index state if any
         setRepeatIndexState(repeatIndexesElement);
+    }
+
+    /**
+     * Iterate statically through controls and set the default repeat index for xforms:repeat.
+     *
+     * @param controlsState    ControlsState to update with setDefaultRepeatIndex()
+     */
+    private void getDefaultRepeatIndexes(final ControlsState controlsState) {
+        visitAllControlStatic(new ControlElementVisitorListener() {
+
+            private Stack repeatStack = new Stack();
+
+            public boolean startVisitControl(Element controlElement, String effectiveControlId) {
+                if (controlElement.getName().equals("repeat")) {
+                    // Create control without parent, just to hold iterations
+                    final RepeatControlInfo repeatControlInfo
+                            = new RepeatControlInfo(null, controlElement, controlElement.getName(), effectiveControlId);
+
+                    // Set initial index
+                    controlsState.setDefaultRepeatIndex(repeatControlInfo.getRepeatId(), repeatControlInfo.getStartIndex());
+
+                    // Keep control on stack
+                    repeatStack.push(repeatControlInfo);
+                }
+                return true;
+            }
+
+            public boolean endVisitControl(Element controlElement, String effectiveControlId) {
+//                if (controlElement.getName().equals("repeat")) {
+//                    final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatStack.pop();
+//                    final List children = repeatControlInfo.getChildren();
+//                    if (children == null || children.size() == 0) {
+//                        // Update repeat index to 0 if there was no iteration
+//                        result.updateRepeatIndex(effectiveControlId, 0);
+//                        // Current index is 0
+//                        result.setRepeatIterations(effectiveControlId, 0);
+//                    } else {
+//                        // Number of iterations is number of children
+//                        result.setRepeatIterations(effectiveControlId, children.size());
+//                    }
+//                }
+                return true;
+            }
+
+            public void startRepeatIteration(int iteration) {
+                // One more iteration in current repeat
+                final RepeatControlInfo repeatControlInfo = (RepeatControlInfo) repeatStack.peek();
+                repeatControlInfo.addChild(new RepeatIterationInfo(repeatControlInfo, iteration));
+            }
+
+            public void endRepeatIteration(int iteration) {
+            }
+        });
     }
 
     public void initialize(PipelineContext pipelineContext, Element divsElement, Element repeatIndexesElement) {
@@ -538,6 +547,9 @@ public class XFormsControls {
         final Map switchIdToSelectedCaseIdMap = new HashMap();
         final List valueControls = new ArrayList();
 
+        // Get default xforms:repeat indexes beforehand
+        getDefaultRepeatIndexes(result);
+
         visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlElementVisitorListener() {
 
             private ControlInfo currentControlsContainer = rootControlInfo;
@@ -553,9 +565,7 @@ public class XFormsControls {
                 final ControlInfo controlInfo;
                 {
                     if (controlName.equals("repeat")) {
-                        final RepeatControlInfo repeatControlInfo = new RepeatControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
-                        result.setDefaultRepeatIndex(repeatControlInfo.getRepeatId(), repeatControlInfo.getStartIndex());
-                        controlInfo = repeatControlInfo;
+                        controlInfo = new RepeatControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
                     } else if (controlName.equals("submit")) {
                         controlInfo = new SubmitControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
                     } else if (controlName.equals("output")) {

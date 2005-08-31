@@ -694,7 +694,10 @@ public class XFormsModel implements XFormsEventTarget, XFormsEventHandlerContain
                         //= ProcessorUtils.createDocumentFromEmbeddedOrHref(Element element, String urlString) {
                         if (srcAttribute == null) {
                             // Inline instance
-                            instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) instanceContainer.elements().get(0));
+                            final List children = instanceContainer.elements();
+                            if (children == null || children.size() == 0)
+                                throw new OXFException("xforms:instance element must contain exactly one child element");// TODO: Throw XForms event?
+                            instanceDocument = Dom4jUtils.createDocumentCopyParentNamespaces((Element) children.get(0));
                         } else {
                             // External instance
                             final LocationData locationData = (LocationData) instanceContainer.getData();

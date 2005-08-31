@@ -15,6 +15,7 @@
        xmlns:xhtml="http://www.w3.org/1999/xhtml"
        xmlns:xforms="http://www.w3.org/2002/xforms"
        xmlns:ev="http://www.w3.org/2001/xml-events"
+       xmlns:xs="http://www.w3.org/2001/XMLSchema"
        xmlns:widget="http://orbeon.org/oxf/xml/widget"
        xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
        xmlns="http://www.w3.org/1999/xhtml"
@@ -27,7 +28,7 @@
             <!-- Clear error message in case of submission success -->
             <xforms:setvalue ev:event="xforms-submit-done" ref="instance('status-instance')/message"/>
 
-            <xforms:instance>
+            <xforms:instance id="main">
                 <xsl:copy-of select="doc('input:instance')"/>
             </xforms:instance>
              <xforms:instance id="status-instance">
@@ -35,6 +36,7 @@
                     <message/>
                 </status>
             </xforms:instance>
+            <xforms:bind nodeset="instance('main')/chart/category-label-angle" type="xs:nonNegativeInteger"/>
             <xforms:submission id="main-submission" ref="/form" method="post" action="/direct/charts" replace="all"/>
         </xforms:model>
      </head>
@@ -46,42 +48,56 @@
              <widget:tabs>
                 <widget:tab id="configuration">
                     <widget:label>Configure It!</widget:label>
-                     <table class="gridtable">
-                         <tr>
-                             <th>Categories</th>
-                             <td>
-                                 <xforms:repeat nodeset="data/categories/category" id="categoryRepeat">
-                                     <xforms:input ref="."/>
-                                     <!--<xforms:input ref="../../values1/value[index('categoryRepeat')]"/>-->
-                                 </xforms:repeat>
+                    <table class="gridtable">
+                        <tr>
+                            <th>Categories and Values</th>
+                            <td>
+                                <table class="gridtable">
+                                    <tr>
+                                        <th style="white-space: nowrap">Label</th>
+                                        <th style="white-space: nowrap">Value 1</th>
+                                        <th style="white-space: nowrap">Value 2</th>
+                                    </tr>
+                                    <xforms:repeat nodeset="data/entries/entry" id="categoryRepeat">
+                                        <tr>
+                                            <td style="white-space: nowrap">
+                                                <xforms:input ref="category"/>
+                                            </td>
+                                            <td style="white-space: nowrap">
+                                                <xforms:input ref="value1"/>
+                                            </td>
+                                            <td style="white-space: nowrap">
+                                                <xforms:input ref="value2"/>
+                                            </td>
+                                        </tr>
+                                    </xforms:repeat>
+                                </table>
+                                <xforms:trigger>
+                                    <xforms:label>Add</xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:insert nodeset="data/entries/entry" at="index('categoryRepeat')" position="after"/>
+                                        <xforms:setvalue ref="data/entries/entry[index('categoryRepeat')]/category" value="''"/>
+                                        <xforms:setvalue ref="data/entries/entry[index('categoryRepeat')]/value1" value="''"/>
+                                        <xforms:setvalue ref="data/entries/entry[index('categoryRepeat')]/value2" value="''"/>
+                                    </xforms:action>
+                                </xforms:trigger>
+                                <xforms:trigger>
+                                    <xforms:label>Remove</xforms:label>
+                                    <xforms:action ev:event="DOMActivate">
+                                        <xforms:delete nodeset="data/entries/entry" at="index('categoryRepeat')"/>
+                                    </xforms:action>
+                                </xforms:trigger>
                              </td>
                          </tr>
                          <tr>
-                             <th>Series 1 Title</th>
+                             <th>Titles</th>
                              <td colspan="5">
-                                 <xforms:input ref="chart/value[1]/@title" size="8"/>
-                             </td>
-                         </tr>
-                         <tr>
-                             <th>Series 1 Values</th>
-                             <td>
-                                 <xforms:repeat nodeset="data/values1/value" xhtml:size="3">
-                                     <xforms:input ref="."/>
-                                 </xforms:repeat>
-                             </td>
-                         </tr>
-                         <tr>
-                             <th>Series 2 Title</th>
-                             <td colspan="5">
-                                 <xforms:input ref="chart/value[2]/@title" size="8"/>
-                             </td>
-                         </tr>
-                         <tr>
-                             <th>Series 2 Values</th>
-                             <td>
-                                 <xforms:repeat nodeset="data/values2/value" xhtml:size="3">
-                                     <xforms:input ref="."/>
-                                 </xforms:repeat>
+                                 <xforms:input ref="chart/value[1]/@title" size="8">
+                                     <xforms:label>Series 1:</xforms:label>
+                                 </xforms:input>
+                                 <xforms:input ref="chart/value[2]/@title" size="8">
+                                     <xforms:label>Series 2:</xforms:label>
+                                 </xforms:input>
                              </td>
                          </tr>
                          <tr>
@@ -206,12 +222,8 @@
                                          <xforms:value>false</xforms:value>
                                      </xforms:item>
                                  </xforms:select1>
-                             </td>
-                         </tr>
-                         <tr>
-                             <th>Legend Position</th>
-                             <td colspan="5">
                                  <xforms:select1 ref="chart/legend/@position" appearance="minimal">
+                                     <xforms:label>Position:</xforms:label>
                                      <xforms:item>
                                          <xforms:label>North</xforms:label>
                                          <xforms:value>north</xforms:value>
@@ -245,16 +257,16 @@
                 <widget:tab id="chart-input">
                     <widget:label>XML Configuration</widget:label>
                     <xforms:group>
-                        <xforms:label>Chart Input</xforms:label>
+                        <xforms:label>XML Configuration</xforms:label>
                         <f:xml-source>
                              <xsl:copy-of select="doc('input:instance')/form/chart"/>
                          </f:xml-source>
                     </xforms:group>
                 </widget:tab>
                 <widget:tab id="data-input">
-                    <widget:label>XML Input</widget:label>
+                    <widget:label>XML Data</widget:label>
                     <xforms:group>
-                        <xforms:label>Data Input</xforms:label>
+                        <xforms:label>XML Data</xforms:label>
                         <f:xml-source>
                              <xsl:copy-of select="doc('input:instance')/form/data"/>
                          </f:xml-source>

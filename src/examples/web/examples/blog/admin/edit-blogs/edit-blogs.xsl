@@ -143,7 +143,7 @@
                             <xforms:trigger><!--  ref="instance('triggers-instance')/delete-category1" -->
                                 <xforms:label>Delete Category</xforms:label>
                                 <xforms:action ev:event="DOMActivate">
-                                    <xforms:delete ev:event="DOMActivate" nodeset="categories/category" at="index('addCategoryRepeat1')"/>
+                                    <xforms:delete nodeset="categories/category" at="index('addCategoryRepeat1')"/>
                                 </xforms:action>
                             </xforms:trigger>
                         </td>

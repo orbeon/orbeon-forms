@@ -14,27 +14,33 @@
 <form>
     <action/>
     <data>
-        <categories>
-            <category>Apples</category>
-            <category>Oranges</category>
-            <category>Bananas</category>
-            <category>Berries</category>
-            <category>Pears</category>
-        </categories>
-        <values1>
-            <value>10</value>
-            <value>9</value>
-            <value>8</value>
-            <value>7</value>
-            <value>6</value>
-        </values1>
-        <values2>
-            <value>11</value>
-            <value>8</value>
-            <value>6</value>
-            <value>10</value>
-            <value>4</value>
-        </values2>
+        <entries>
+            <entry>
+                <category>Apples</category>
+                <value1>10</value1>
+                <value2>11</value2>
+            </entry>
+            <entry>
+                <category>Oranges</category>
+                <value1>9</value1>
+                <value2>8</value2>
+            </entry>
+            <entry>
+                <category>Bananas</category>
+                <value1>8</value1>
+                <value2>6</value2>
+            </entry>
+            <entry>
+                <category>Berries</category>
+                <value1>7</value1>
+                <value2>10</value2>
+            </entry>
+            <entry>
+                <category>Pears</category>
+                <value1>6</value1>
+                <value2>4</value2>
+            </entry>
+        </entries>
     </data>
     <chart>
         <map>fruits</map>
@@ -50,13 +56,13 @@
         <category-label-angle>0</category-label-angle>
 
         <value title="May"
-            categories="/form/data/categories/category"
-            series="/form/data/values1/value"
+            categories="/form/data/entries/entry/category"
+            series="/form/data/entries/entry/value1"
             color="#ff0000"/>
 
         <value title="June"
-            categories="/form/data/categories/category"
-            series="/form/data/values2/value"
+            categories="/form/data/entries/entry/category"
+            series="/form/data/entries/entry/value2"
             color="#00ff00"/>
 
         <legend visible="true" position="south"/>

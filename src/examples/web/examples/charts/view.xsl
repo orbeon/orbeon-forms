@@ -92,11 +92,22 @@
                          <tr>
                              <th>Titles</th>
                              <td colspan="5">
+                                 <xforms:input ref="chart/title">
+                                     <xforms:label>Chart: </xforms:label>
+                                 </xforms:input>
+                                 <xforms:input ref="chart/category-title">
+                                     <xforms:label>Category: </xforms:label>
+                                 </xforms:input>
+                                 <br/>
                                  <xforms:input ref="chart/value[1]/@title" size="8">
-                                     <xforms:label>Series 1:</xforms:label>
+                                     <xforms:label>Series 1: </xforms:label>
                                  </xforms:input>
                                  <xforms:input ref="chart/value[2]/@title" size="8">
-                                     <xforms:label>Series 2:</xforms:label>
+                                     <xforms:label>Series 2: </xforms:label>
+                                 </xforms:input>
+                                 <br/>
+                                 <xforms:input ref="chart/serie-title">
+                                     <xforms:label>Serie: </xforms:label>
                                  </xforms:input>
                              </td>
                          </tr>
@@ -156,51 +167,31 @@
                              </td>
                          </tr>
                          <tr>
-                             <th>Title</th>
+                             <th>Colors</th>
                              <td colspan="5">
-                                 <xforms:input ref="chart/title"/>
+                                 <xforms:input ref="chart/title-color">
+                                     <xforms:label>Title: </xforms:label>
+                                 </xforms:input>
+                                 <xforms:input ref="chart/background-color">
+                                     <xforms:label>Background: </xforms:label>
+                                 </xforms:input>
                              </td>
                          </tr>
                          <tr>
-                             <th>Title Color</th>
+                             <th>Margins</th>
                              <td colspan="5">
-                                 <xforms:input ref="chart/title-color"/>
-                             </td>
-                         </tr>
-                         <tr>
-                             <th>Background Color</th>
-                             <td colspan="5">
-                                 <xforms:input ref="chart/background-color"/>
-                             </td>
-                         </tr>
-                         <tr>
-                             <th>Category Title</th>
-                             <td colspan="5">
-                                 <xforms:input ref="chart/category-title"/>
-                             </td>
-                         </tr>
-                         <tr>
-                             <th>Category Margin</th>
-                             <td colspan="5">
-                                 <xforms:input ref="chart/category-margin"/>
-                             </td>
-                         </tr>
-                         <tr>
-                             <th>Serie Title</th>
-                             <td colspan="5">
-                                 <xforms:input ref="chart/serie-title"/>
+                                 <xforms:input ref="chart/category-margin">
+                                     <xforms:label>Category: </xforms:label>
+                                 </xforms:input>
+                                 <xforms:input ref="chart/bar-margin">
+                                     <xforms:label>Bar: </xforms:label>
+                                 </xforms:input>
                              </td>
                          </tr>
                          <tr>
                              <th>Tick Unit</th>
                              <td colspan="5">
                                  <xforms:input ref="chart/tick-unit"/>
-                             </td>
-                         </tr>
-                         <tr>
-                             <th>Bar Margin</th>
-                             <td colspan="5">
-                                 <xforms:input ref="chart/bar-margin"/>
                              </td>
                          </tr>
                          <tr>
@@ -213,17 +204,18 @@
                              <th>Legend</th>
                              <td colspan="5">
                                  <xforms:select1 ref="chart/legend/@visible" appearance="minimal">
+                                     <xforms:label>Enabled: </xforms:label>
                                      <xforms:item>
-                                         <xforms:label>Enabled</xforms:label>
+                                         <xforms:label>Yes</xforms:label>
                                          <xforms:value>true</xforms:value>
                                      </xforms:item>
                                      <xforms:item>
-                                         <xforms:label>Disabled</xforms:label>
+                                         <xforms:label>No</xforms:label>
                                          <xforms:value>false</xforms:value>
                                      </xforms:item>
                                  </xforms:select1>
                                  <xforms:select1 ref="chart/legend/@position" appearance="minimal">
-                                     <xforms:label>Position:</xforms:label>
+                                     <xforms:label>Position: </xforms:label>
                                      <xforms:item>
                                          <xforms:label>North</xforms:label>
                                          <xforms:value>north</xforms:value>
@@ -246,7 +238,7 @@
                      </table>
                      <br/>
                      <xforms:submit submission="main-submission">
-                         <xforms:label>Update</xforms:label>
+                         <xforms:label>Update Chart</xforms:label>
                      </xforms:submit>
                 </widget:tab>
                 <widget:tab id="result" selected="true">

@@ -412,12 +412,17 @@ public class XFormsControls {
                 newNodeset = newModel.getBindNodeset(pipelineContext, newModel.getModelBindById(bind));
             } else if (ref != null || nodeset != null) {
                 // Evaluate new XPath in context of current node
-                newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, getCurrentSingleNode(newModel.getId()),
-                        ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null);
+                final Node currentSingleNodeForModel = getCurrentSingleNode(newModel.getId());
+                if (currentSingleNodeForModel != null) {
+                    newNodeset = newModel.getDefaultInstance().evaluateXPath(pipelineContext, currentSingleNodeForModel,
+                            ref != null ? ref : nodeset, bindingElementNamespaceContext, null, functionLibrary, null);
 
-                if (ref != null && newNodeset.isEmpty())
-                    throw new ValidationException("Single-node binding expression '"
-                            + ref + "' returned an empty nodeset", new LocationData(locator));
+//                    if (ref != null && newNodeset.isEmpty())
+//                        throw new ValidationException("Single-node binding expression '"
+//                                + ref + "' returned an empty nodeset", new LocationData(locator));
+                } else {
+                    newNodeset = null;
+                }
             } else {
                 // No change to current nodeset
                 newNodeset = currentBindingContext.getNodeset();
@@ -609,25 +614,32 @@ public class XFormsControls {
 
                 if (!(controlInfo instanceof RepeatControlInfo && currentNodeSet != null && currentNodeSet.size() == 0)) {
                     final Node currentNode = currentBindingContext.getSingleNode();
-
-                    // Get model item properties
-                    final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(currentNode);
-                    if (instanceData != null) {
-                        controlInfo.setReadonly(instanceData.getReadonly().get());
-                        controlInfo.setRequired(instanceData.getRequired().get());
-                        controlInfo.setRelevant(instanceData.getRelevant().get());
-                        controlInfo.setValid(instanceData.getValid().get());
-                        final String typeAsString = instanceData.getType().getAsString();
-                        if (typeAsString != null) {
-                            controlInfo.setType(typeAsString);
+                    if (currentNode != null) {
+                        // Control is bound to a node - get model item properties
+                        final InstanceData instanceData = XFormsUtils.getInheritedInstanceData(currentNode);
+                        if (instanceData != null) {
+                            controlInfo.setReadonly(instanceData.getReadonly().get());
+                            controlInfo.setRequired(instanceData.getRequired().get());
+                            controlInfo.setRelevant(instanceData.getRelevant().get());
+                            controlInfo.setValid(instanceData.getValid().get());
+                            final String typeAsString = instanceData.getType().getAsString();
+                            if (typeAsString != null) {
+                                controlInfo.setType(typeAsString);
+                            }
                         }
-                    }
-
-                    // If control can have a value, prepare it
-                    // NOTE: We defer the evaluation because some controls like xforms:output can use the index() function
-                    if (controlInfo.isValueControl()) {
-                        controlInfo.prepareValue(pipelineContext, currentBindingContext);
-                        valueControls.add(controlInfo);
+                        // If control can have a value, prepare it
+                        // NOTE: We defer the evaluation because some controls like xforms:output can use the index() function
+                        if (controlInfo.isValueControl()) {
+                            controlInfo.prepareValue(pipelineContext, currentBindingContext);
+                            valueControls.add(controlInfo);
+                        }
+                    } else {
+                        // Control is not bound to a node - it becomes non-releveant
+                        controlInfo.setReadonly(false);
+                        controlInfo.setRequired(false);
+                        controlInfo.setRelevant(false);
+                        controlInfo.setValid(false);
+                        controlInfo.setType(null);
                     }
                 }
 
@@ -871,7 +883,11 @@ public class XFormsControls {
     }
 
     public XFormsInstance getCurrentInstance() {
-        return getCurrentContext().getModel().getInstanceForNode(getCurrentSingleNode());
+        final Node currentSingleNode = getCurrentSingleNode();
+        if (currentSingleNode != null)
+            return getCurrentContext().getModel().getInstanceForNode(currentSingleNode);
+        else
+            return null;
     }
 
     /**
@@ -1186,7 +1202,7 @@ public class XFormsControls {
          */
         public Node getSingleNode() {
             if (nodeset == null || nodeset.size() == 0)
-                throw new OXFException("Single node binding to nonexistent node in instance.");// , new LocationData(locator)
+                return null;
 
             return (Node) nodeset.get(position - 1);
         }

@@ -36,6 +36,7 @@
                 document.
             </p>
         </section>
+        <anchor id="standard-converters"/>
         <section>
             <title>Standard Converters</title>
             <p>
@@ -265,6 +266,47 @@
                     </document>
                 </xml-source>
             </section>
+        </section>
+        <anchor id="to-xml-converter"/>
+        <section>
+            <title>To-XML Converter</title>
+            <p>
+                The To-XML Converter produces parsed XML documents from a binary document format.
+            </p>
+            <p>
+                The <code>data</code> input of the To-XML Converter follows the <a
+                href="reference-formats#binary-documents">binary document format</a>. Its
+                <code>data</code> output is an XML document. The mandatory <code>config</code> input
+                contains an empty <code>config</code> element reserved for future configuration
+                parameters. This is an example of use:
+            </p>
+            <xml-source>
+                <p:config xmlns:p="http://www.orbeon.com/oxf/pipeline"
+                          xmlns:oxf="http://www.orbeon.com/oxf/processors">
+
+                    <p:param type="output" name="data"/>
+
+                    <p:processor name="oxf:url-generator">
+                        <p:input name="config">
+                            <config>
+                                <url>parsing-view.xsl</url>
+                                <content-type>binary/octet-stream</content-type>
+                                <force-content-type>true</force-content-type>
+                            </config>
+                        </p:input>
+                        <p:output name="data" id="xml-file-as-binary"/>
+                    </p:processor>
+
+                    <p:processor name="oxf:to-xml-converter">
+                        <p:input name="data" href="#xml-file-as-binary"/>
+                        <p:input name="config">
+                            <config/>
+                        </p:input>
+                        <p:output name="data" ref="data"/>
+                    </p:processor>
+
+                </p:config>
+            </xml-source>
         </section>
         <section>
             <title>XSL-FO Converter</title>

@@ -12,18 +12,15 @@
     The full text of the license is available at http://www.gnu.org/copyleft/lesser.html
 -->
 <example-descriptor>
-    <title>Email</title>
+    <title>XML Parsing</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
-    <description>
+    <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <div xmlns="http://www.w3.org/1999/xhtml">
             <p>
-                This example illustrates the use of the <a href="/doc/processors-messaging-email"
-                f:url-type="resource">Email processor</a>.
+                This example illustrates the use of the <a
+                href="/doc/processors-converters#to-xml-converter" f:url-type="resource">To-XML
+                Converter</a> to parse a binary stream into an XML document usable by OPS.
             </p>
-            <p>
-                The resulting email will look as follows:
-            </p>
-            <img src="/examples/email/result.png"/>
         </div>
     </description>
 </example-descriptor>

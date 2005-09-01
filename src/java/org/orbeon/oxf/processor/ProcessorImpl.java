@@ -849,13 +849,13 @@ public abstract class ProcessorImpl implements Processor {
             this.breakpointKey = breakpointKey;
         }
 
-        protected abstract void readImpl(PipelineContext context, ContentHandler contentHandler);
+        protected abstract void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler);
 
-        protected OutputCacheKey getKeyImpl(PipelineContext context) {
+        protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
             return null;
         }
 
-        protected Object getValidityImpl(PipelineContext context) {
+        protected Object getValidityImpl(PipelineContext pipelineContext) {
             return null;
         }
 

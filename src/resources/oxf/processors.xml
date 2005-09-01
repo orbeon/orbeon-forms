@@ -338,6 +338,10 @@
         <class name="org.orbeon.oxf.processor.converter.QNameConverter"/>
     </processor>
 
+    <processor name="oxf:to-xml-converter">
+        <class name="org.orbeon.oxf.processor.converter.ToXMLConverter"/>
+    </processor>
+
     <processor name="oxf:xhtml-rewrite">
         <class name="org.orbeon.oxf.processor.converter.XHTMLRewrite"/>
     </processor>

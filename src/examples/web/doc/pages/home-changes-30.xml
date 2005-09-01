@@ -1088,6 +1088,13 @@
                 </li>
                 <li>
                     <p>
+                        <b>New To-XML Converter</b>. The new <a
+                        href="processors-converters#to-xml-converter">To-XML Converter</a> allows
+                        producing parsed XML documents from a binary document format.
+                    </p>
+                </li>
+                <li>
+                    <p>
                         <b>Email processor</b>. The <a href="processors-messaging-email">Email
                         processor</a> now supports setting custom email headers with the new
                         <code>header</code> configuration element.

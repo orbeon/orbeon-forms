@@ -828,16 +828,8 @@ public class XMLUtils {
      * that the file can be deleted when no longer used.
      */
     public static String inputStreamToAnyURI(PipelineContext pipelineContext, InputStream inputStream) {
-        // We use the commons fileupload utilities to save a file
-        if (fileItemFactory == null)
-            fileItemFactory = new DefaultFileItemFactory(0, SystemUtils.getTemporaryDirectory());
-        final FileItem fileItem = fileItemFactory.createItem("dummy", "dummy", false, null);
-        // Make sure the file is deleted when the context is destroyed
-        pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
-            public void contextDestroyed(boolean success) {
-                fileItem.delete();
-            }
-        });
+        // Get FileItem
+        final FileItem fileItem = prepareFileItem(pipelineContext);
         // Write to file
         OutputStream os = null;
         try {
@@ -860,6 +852,24 @@ public class XMLUtils {
         } catch (MalformedURLException e) {
             throw new OXFException(e);
         }
+    }
+
+    /**
+     * Return a FileItem which is going to be automatically destroyed upon context destruction.
+     */
+    public static FileItem prepareFileItem(PipelineContext pipelineContext) {
+        // We use the commons fileupload utilities to save a file
+        if (fileItemFactory == null)
+            fileItemFactory = new DefaultFileItemFactory(0, SystemUtils.getTemporaryDirectory());
+        final FileItem fileItem = fileItemFactory.createItem("dummy", "dummy", false, null);
+        // Make sure the file is deleted when the context is destroyed
+        pipelineContext.addContextListener(new PipelineContext.ContextListenerAdapter() {
+            public void contextDestroyed(boolean success) {
+                fileItem.delete();
+            }
+        });
+        // Return FileItem object
+        return fileItem;
     }
 
     /**
@@ -955,8 +965,7 @@ public class XMLUtils {
      * <!-- getAttribsFromDefaultNamespace -->
      * @param atts src attribs
      * @return new AttributesImpl containing  all attribs that were in src attribs and that were
-     *         in the default name space.   
-     * @author d
+     *         in the default name space.
      */
     public static AttributesImpl getAttribsFromDefaultNamespace( final Attributes atts ) {
         final AttributesImpl ret = new AttributesImpl();

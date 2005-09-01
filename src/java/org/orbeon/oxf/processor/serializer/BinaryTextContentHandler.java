@@ -30,7 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * ContentHandler able to serialize text or binary to an output stream.
+ * ContentHandler able to serialize text or binary documents to an output stream.
  */
 public class BinaryTextContentHandler extends ContentHandlerAdapter {
 

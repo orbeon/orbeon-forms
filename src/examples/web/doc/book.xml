@@ -78,9 +78,9 @@
             <menu-item label="XUpdate" href="processors-xupdate"/>
         </menu>
         <menu label="Querying Data">
-            <menu-item label="SQL" href="processors-sql"/>
+            <menu-item label="SQL Databases" href="processors-sql"/>
             <menu-item label="XML Databases" href="processors-xmldb"/>
-            <menu-item label="LDAP" href="processors-ldap"/>
+            <menu-item label="LDAP Directories" href="processors-ldap"/>
             <menu-item label="Directory Scanner" href="processors-directory-scanner"/>
         </menu>
         <menu label="Interoperability">

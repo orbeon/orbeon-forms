@@ -243,26 +243,22 @@
                 </widget:tab>
                 <widget:tab id="result" selected="true">
                     <widget:label>View Chart!</widget:label>
-                    <img src="/chartDisplay?filename={/chart-info/file}" usemap="#fruits" border="0" width="400" height="300"/>
+                    <center>
+                        <img src="/chartDisplay?filename={/chart-info/file}" usemap="#fruits" border="0" width="500" height="375"/>
+                    </center>
                     <xsl:copy-of select="/chart-info/map"/>
                 </widget:tab>
                 <widget:tab id="chart-input">
                     <widget:label>XML Configuration</widget:label>
-                    <xforms:group>
-                        <xforms:label>XML Configuration</xforms:label>
-                        <f:xml-source>
-                             <xsl:copy-of select="doc('input:instance')/form/chart"/>
-                         </f:xml-source>
-                    </xforms:group>
+                    <f:xml-source>
+                         <xsl:copy-of select="doc('input:instance')/form/chart"/>
+                     </f:xml-source>
                 </widget:tab>
                 <widget:tab id="data-input">
                     <widget:label>XML Data</widget:label>
-                    <xforms:group>
-                        <xforms:label>XML Data</xforms:label>
-                        <f:xml-source>
-                             <xsl:copy-of select="doc('input:instance')/form/data"/>
-                         </f:xml-source>
-                    </xforms:group>
+                    <f:xml-source>
+                         <xsl:copy-of select="doc('input:instance')/form/data"/>
+                     </f:xml-source>
                 </widget:tab>
             </widget:tabs>
          </xforms:group>

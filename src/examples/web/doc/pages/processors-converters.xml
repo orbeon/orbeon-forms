@@ -47,6 +47,7 @@
             <ul>
                 <li><b>XML:</b> a standard XML document</li>
                 <li><b>HTML:</b> a standard HTML document</li>
+                <li><b>XHTML:</b> a standard XHTML document</li>
                 <li><b>Text:</b> any text document</li>
             </ul>
             <p>
@@ -68,8 +69,8 @@
                     </tr>
                     <tr>
                         <td>method</td>
-                        <td>XSLT output method</td>
-                        <td>html, xml or text, depending on the serializer</td>
+                        <td>XSLT output method (one of <code>xml</code>, <code>html</code>, <code>xhtml</code> or <code>text</code>)</td>
+                        <td><code>xml</code>, <code>html</code> or <code>text</code>, depending on the serializer</td>
                     </tr>
                     <tr>
                         <td>content-type</td>

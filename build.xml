@@ -201,8 +201,17 @@
         </javac>
     </target>
 
+    <target name='transform' depends='prepare' >
+      <property name='xsd-prefix' value='/org/orbeon/oxf/xml/schemas/page-flow-controller' />
+      <xslt 
+        style='src/xslt/page-flow-controller-xsd.xslt' 
+        in='${java-src.dir}${xsd-prefix}.xsd' 
+        out='${build.classes.dir}${xsd-prefix}-runtime.xsd' 
+      />
+    </target>
+
     <!-- JAR -->
-    <target name="jars" depends="classes">
+    <target name="jars" depends="classes,transform">
       <pathconvert dirsep='/' pathsep=' ' property='jar.mf.cp' refid='war.libs.private' >
         <map from='${lib.dir}' to='private' />
       </pathconvert>
@@ -220,6 +229,7 @@
           </fileset>
           <fileset dir="${build.classes.dir}">
               <include name="**/*.class"/>
+              <include name="**/*.xsd"/>
               <exclude name="org/orbeon/faces/**/*.class"/>
           </fileset>
           <fileset dir="${resources.dir}/oxf"/>

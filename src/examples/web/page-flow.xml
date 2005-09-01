@@ -53,6 +53,9 @@
     <!-- Standalone BizDoc example -->
     <page path-info="/bizdoc*" model="/examples/bizdoc/page-flow.xpl"/>
 
+    <!-- Standalone Address Book 2 example -->
+    <page path-info="/address-book2*" model="/examples/address-book2/page-flow.xpl"/>
+
     <!-- Standalone Blog example -->
     <page path-info="/blog*" model="/examples/blog/page-flow.xpl"/>
 
@@ -111,8 +114,6 @@
     <!-- OXFMark -->
     <page path-info="/examples/oxfmark-machines" model="/oxfmark/machines.xpl"/>
     <page path-info="/examples/oxfmark-vms" model="/oxfmark/vms.xpl"/>
-
-    <page path-info="/dmv*" model="/examples/erik/dmv/page-flow.xpl"/>
 
     <!-- XTech Article -->
     <page path-info="/xtech*" model="/doc/xtech-2005/model.xpl" view="/doc/xtech-2005/docbook/html/docbook.xsl"/>

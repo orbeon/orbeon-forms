@@ -36,12 +36,6 @@
                   select="for $i in $param-nodes return generate-id($i)"/>
 
     <xsl:template match="/">
-<!--                    <xsl:message>-->
-<!--                        xxx <xsl:copy-of select="count($setvalues)"/> xxx-->
-<!--                        xxx <xsl:copy-of select="count($param-nodes)"/> xxx-->
-<!--                        xxx <xsl:copy-of select="$param-nodes-ids"/> xxx-->
-<!--                    </xsl:message>-->
-
         <xsl:apply-templates/>
     </xsl:template>
 
@@ -53,10 +47,16 @@
                 <xsl:when test="$setvalues[$param-index]/@parameter">
                     <!-- Parameter name -->
                     <xsl:variable name="parameter" select="$request-info/parameters/parameter[name = $setvalues[$param-index]/@parameter]" as="element()?"/>
-                    <!-- Set the value only if the parameter is present -->
-                    <xsl:if test="$parameter">
-                        <xsl:value-of select="string-join($parameter/value, ' ')"/>
-                    </xsl:if>
+                    <xsl:choose>
+                        <!-- Set the value only if the parameter is present -->
+                        <xsl:when test="$parameter">
+                            <xsl:value-of select="string-join($parameter/value, ' ')"/>
+                        </xsl:when>
+                        <!-- Otherwise just leave whatever was there -->
+                        <xsl:otherwise>
+                            <xsl:apply-templates/>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:when>
                 <xsl:when test="$setvalues[$param-index]/@matcher-group">
                     <!-- Matcher group index -->

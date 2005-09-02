@@ -15,7 +15,7 @@
 <?xml-stylesheet type="text/xsl" href="ant2html.xsl"?>
 <project name="orbeon" default="orbeon-war" basedir=".">
 
-<!--    <echoproperties/> -->
+    <!--<echoproperties/>-->
 
     <!-- set global build.root to be dir containing this file. -->
     <dirname property='build.root' file='${ant.file}'/>
@@ -28,7 +28,7 @@
     <property name="war.inf" value="${war.dir}/WEB-INF"/>
     <property name="war.classes" value="${war.inf}/classes"/>
     <property name="war.lib" value="${war.inf}/lib"/>
-	
+
     <property name="src.dir" location="src"/>
     <property name="examples-src.dir" location="${src.dir}/examples"/>
     <property name="web-examples-src.dir" location="${examples-src.dir}/web"/>
@@ -203,10 +203,10 @@
 
     <target name='transform' depends='prepare' >
       <property name='xsd-prefix' value='/org/orbeon/oxf/xml/schemas/page-flow-controller' />
-      <xslt 
-        style='src/xslt/page-flow-controller-xsd.xslt' 
-        in='${java-src.dir}${xsd-prefix}.xsd' 
-        out='${build.classes.dir}${xsd-prefix}-runtime.xsd' 
+      <xslt
+        style='src/xslt/page-flow-controller-xsd.xslt'
+        in='${java-src.dir}${xsd-prefix}.xsd'
+        out='${build.classes.dir}${xsd-prefix}-runtime.xsd'
       />
     </target>
 
@@ -597,8 +597,10 @@ ${files}
     <target name="orbeon-doc" depends="jars">
         <mkdir dir="${build.doc.dir}/reference"/>
         <mkdir dir="${build.doc.dir}/reference/theme"/>
-        <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true">
-            <arg line="-r ${web-examples-src.dir} oxf:/doc/generate-static-html.xpl"/>
+        <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true" failonerror="true">
+            <arg value="-r"/>
+            <arg value="${web-examples-src.dir}"/>
+            <arg value="oxf:/doc/generate-static-html.xpl"/>
         </java>
         <copy todir="${build.doc.dir}/reference">
             <fileset dir="${web-examples-src.dir}/config">
@@ -625,8 +627,10 @@ ${files}
 
     <target name="orbeon-pdf-doc" depends="jars">
         <mkdir dir="${build.doc.dir}/reference"/>
-        <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true">
-            <arg line="-r ${web-examples-src.dir} oxf:/doc/generate-single-static-html.xpl"/>
+        <java classname="org.orbeon.oxf.main.OPS" classpathref="class.path" fork="true" failonerror="true">
+            <arg value="-r"/>
+            <arg value="${web-examples-src.dir}"/>
+            <arg value="oxf:/doc/generate-single-static-html.xpl"/>
         </java>
     </target>
 
@@ -825,7 +829,7 @@ ${files}
         <!-- Compile code -->
         <javac destdir="build/classes"
             classpathref="class.path"
-            debug="${build.debug}" optimize="off" target="1.3" source="1.3">
+            debug="${build.debug}" optimize="off" target="1.3" source="1.3" failonerror="true">
             <src path="oxfmark/src"/>
         </javac>
 

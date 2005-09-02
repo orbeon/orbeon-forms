@@ -65,8 +65,8 @@
         <p:processor name="oxf:xml-converter">
             <p:input name="config">
                 <config>
-                    <public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>
-                    <version>4.01</version>
+                    <!--<public-doctype>-//W3C//DTD HTML 4.01 Transitional//EN</public-doctype>-->
+                    <!--<version>4.01</version>-->
                     <encoding>utf-8</encoding>
                 </config>
             </p:input>

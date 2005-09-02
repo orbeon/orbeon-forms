@@ -16,7 +16,7 @@
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <p:param type="output" name="data" debug="xxxblogs"/>
+    <p:param type="output" name="data"/>
 
     <!-- Retrieve blogs -->
     <p:processor name="oxf:pipeline">

@@ -36,10 +36,10 @@
         <p:output name="authenticated" id="authenticated"/>
     </p:processor>
     
-    <p:choose href="#authenticated" debug="xxxauthenticated">
+    <p:choose href="#authenticated">
         <p:when test="/* = 'true'">
             <!-- Dispatch request if use is authenticated -->
-            <p:choose href="#instance" debug="xxxrequest">
+            <p:choose href="#instance">
                 <p:when test="/methodCall/methodName = 'blogger.getUsersBlogs'">
                     <p:processor name="oxf:pipeline">
                         <p:input name="config" href="xml-rpc/get-user-blogs.xpl"/>
@@ -121,7 +121,7 @@
 
     <!-- Generate response -->
     <p:processor name="oxf:xml-serializer">
-        <p:input name="data" href="aggregate('methodResponse', #response)" schema-href="schema/xml-rpc-response.rng" debug="xxxresponse"/>
+        <p:input name="data" href="aggregate('methodResponse', #response)" schema-href="schema/xml-rpc-response.rng"/>
         <p:input name="config">
             <config/>
         </p:input>

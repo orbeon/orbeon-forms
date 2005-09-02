@@ -39,7 +39,7 @@
                 </xsl:template>
             </xsl:transform>
         </p:input>
-        <p:output name="data" id="blog-with-ids" debug="xxxblog-with-ids"/>
+        <p:output name="data" id="blog-with-ids"/>
     </p:processor>
 
     <p:processor name="oxf:xmldb-insert">

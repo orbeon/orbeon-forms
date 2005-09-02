@@ -16,7 +16,7 @@
           xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
           xmlns:oxf="http://www.orbeon.com/oxf/processors">
 
-    <p:param type="output" name="data" debug="get out"/>
+    <p:param type="output" name="data"/>
 
     <p:processor name="oxf:scope-generator">
         <p:input name="config">

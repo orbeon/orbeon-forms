@@ -784,6 +784,7 @@ public class XFormsControls {
 
                     final Element itemsetElement = controlElement.element(XFormsConstants.XFORMS_ITEMSET_QNAME);
 
+                    // TODO: Find solution to xforms:item, xforms:itemset and xforms:choices combination
                     if (itemsetElement != null) {
                         final String selectControlId = effectiveControlId;
 

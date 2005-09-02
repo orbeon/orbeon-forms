@@ -178,10 +178,17 @@
                         <th style="text-align: right">Blog Owner</th>
                         <td>
                             <xforms:select1 appearance="minimal" ref="username">
-                                <xforms:itemset nodeset="instance('users-instance')/user">
-                                    <xforms:label ref="@name"/>
-                                    <xforms:value ref="@name"/>
-                                </xforms:itemset>
+                                <!-- TODO: Add xforms:choices when this is fixed in XFormsControls -->
+                                <!--<xforms:choices>-->
+                                    <xforms:item>
+                                        <xforms:label></xforms:label>
+                                        <xforms:value></xforms:value>
+                                    </xforms:item>
+                                    <xforms:itemset nodeset="instance('users-instance')/user">
+                                        <xforms:label ref="@name"/>
+                                        <xforms:value ref="@name"/>
+                                    </xforms:itemset>
+                                <!--</xforms:choices>-->
                             </xforms:select1>
                         </td>
                     </tr>

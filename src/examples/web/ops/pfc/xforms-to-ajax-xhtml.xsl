@@ -344,26 +344,27 @@
 
         <xhtml:span>
             <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', $class), $id)"/>
-            <xsl:choose>
-                <xsl:when test="xforms:itemset">
-                    <!-- There is an itemset -->
-                    <xsl:variable name="itemset-element" select="xforms:itemset" as="element()"/>
 
-                    <!-- Obtain dynamic item labels and values -->
-                    <xsl:for-each select="$itemsets[@id = $id]/xxforms:item">
-                        <xsl:call-template name="select-full-item">
-                            <xsl:with-param name="type" select="$type"/>
-                            <xsl:with-param name="id" select="$id"/>
-                            <xsl:with-param name="attributes-element" select="$itemset-element"/>
-                            <xsl:with-param name="label" select="@label"/>
-                            <xsl:with-param name="value" select="@value"/>
-                            <xsl:with-param name="generate-template" select="$generate-template"/>
-                        </xsl:call-template>
-                    </xsl:for-each>
-                </xsl:when>
-                <xsl:otherwise>
-                    <!-- Static list of items -->
-                    <xsl:for-each select="xforms:item">
+            <xsl:for-each select=".//(xforms:itemset | xforms:item)">
+                <xsl:choose>
+                    <xsl:when test="local-name() = 'itemset'">
+                        <!-- There is an itemset -->
+                        <xsl:variable name="itemset-element" select="." as="element()"/>
+
+                        <!-- Obtain dynamic item labels and values -->
+                        <xsl:for-each select="$itemsets[@id = $id]/xxforms:item">
+                            <xsl:call-template name="select-full-item">
+                                <xsl:with-param name="type" select="$type"/>
+                                <xsl:with-param name="id" select="$id"/>
+                                <xsl:with-param name="attributes-element" select="$itemset-element"/>
+                                <xsl:with-param name="label" select="@label"/>
+                                <xsl:with-param name="value" select="@value"/>
+                                <xsl:with-param name="generate-template" select="$generate-template"/>
+                            </xsl:call-template>
+                        </xsl:for-each>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- Static list of items -->
                         <xsl:call-template name="select-full-item">
                             <xsl:with-param name="type" select="$type"/>
                             <xsl:with-param name="id" select="$id"/>
@@ -372,9 +373,9 @@
                             <xsl:with-param name="value" select="xforms:value"/>
                             <xsl:with-param name="generate-template" select="$generate-template"/>
                         </xsl:call-template>
-                    </xsl:for-each>
-                </xsl:otherwise>
-            </xsl:choose>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
 
         </xhtml:span>
         <!-- Produce template -->
@@ -431,27 +432,27 @@
                 <xsl:attribute name="multiple">multiple</xsl:attribute>
             </xsl:if>
 
-            <xsl:choose>
-                <xsl:when test="xforms:itemset">
-                    <!-- There is an itemset -->
-                    <xsl:variable name="itemset-element" select="xforms:itemset" as="element()"/>
+            <xsl:for-each select=".//(xforms:itemset | xforms:item)">
+                <xsl:choose>
+                    <xsl:when test="local-name() = 'itemset'">
+                        <!-- There is an itemset -->
+                        <xsl:variable name="itemset-element" select="." as="element()"/>
 
-                    <!-- Obtain dynamic item labels and values -->
-                    <xsl:for-each select="$itemsets[@id = $id]/xxforms:item">
-                        <xsl:call-template name="select-minimal-compact-item">
-                            <xsl:with-param name="many" select="$many"/>
-                            <xsl:with-param name="id" select="$id"/>
-                            <xsl:with-param name="attributes-element" select="$itemset-element"/>
-                            <xsl:with-param name="label" select="@label"/>
-                            <xsl:with-param name="value" select="@value"/>
-                            <xsl:with-param name="generate-template" select="$generate-template"/>
-                        </xsl:call-template>
-                    </xsl:for-each>
+                        <!-- Obtain dynamic item labels and values -->
+                        <xsl:for-each select="$itemsets[@id = $id]/xxforms:item">
+                            <xsl:call-template name="select-minimal-compact-item">
+                                <xsl:with-param name="many" select="$many"/>
+                                <xsl:with-param name="id" select="$id"/>
+                                <xsl:with-param name="attributes-element" select="$itemset-element"/>
+                                <xsl:with-param name="label" select="@label"/>
+                                <xsl:with-param name="value" select="@value"/>
+                                <xsl:with-param name="generate-template" select="$generate-template"/>
+                            </xsl:call-template>
+                        </xsl:for-each>
 
-                </xsl:when>
-                <xsl:otherwise>
-                    <!-- Static list of items -->
-                    <xsl:for-each select="xforms:item">
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- Static list of items -->
                         <xsl:call-template name="select-minimal-compact-item">
                             <xsl:with-param name="many" select="$many"/>
                             <xsl:with-param name="id" select="$id"/>
@@ -460,9 +461,9 @@
                             <xsl:with-param name="value" select="xforms:value"/>
                             <xsl:with-param name="generate-template" select="$generate-template"/>
                         </xsl:call-template>
-                    </xsl:for-each>
-                </xsl:otherwise>
-            </xsl:choose>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:for-each>
         </xhtml:select>
     </xsl:template>
 

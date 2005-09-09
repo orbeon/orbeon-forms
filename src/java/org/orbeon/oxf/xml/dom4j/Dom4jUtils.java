@@ -521,10 +521,14 @@ public class Dom4jUtils {
      * @return LocationData of caller.
      */
     public static LocationData getLocationData() {
+    	return getLocationData( 1 );
+    }
+    public static LocationData getLocationData( final int dpth ) {
         final Exception e = new Exception();
         final StackTraceElement[] stkTrc = e.getStackTrace();
-        final String sysID = stkTrc[1].getFileName();
-        final int line = stkTrc[1].getLineNumber();
-        return new LocationData(sysID, line, -1);
+        final int dpthToUse = dpth + 1;
+        final String sysID = stkTrc[ dpthToUse ].getFileName();
+        final int line = stkTrc[ dpthToUse ].getLineNumber();
+        return new LocationData( sysID, line, -1 );
     }
 }

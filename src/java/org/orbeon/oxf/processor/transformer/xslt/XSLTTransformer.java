@@ -30,6 +30,7 @@ import org.orbeon.oxf.processor.transformer.URIResolverListener;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.oxf.xml.*;
+import org.orbeon.oxf.xml.dom4j.ConstantLocator;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.saxon.Configuration;
@@ -144,7 +145,11 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                         setWriter.invoke(messageEmitter, new Object[]{saxonStringWriter});
                     }
 
-                    transformerHandler.setResult(new SAXResult(new SimpleForwardingContentHandler(contentHandler) {
+                    final LocationData locDat = getLocationData();
+                    final SAXResult sr = new SAXResult(new SimpleForwardingContentHandler(contentHandler) {
+                        
+                        Locator locator;
+                        
                         // Saxon happens to issue such prefix mappings from time to time. Those
                         // cause issues later down the chain, and anyway serialize to incorrect XML
                         // if xmlns:xmlns="..." gets generated. This appears to happen when Saxon
@@ -157,7 +162,24 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
                             super.startPrefixMapping(s, s1);
                         }
-                    }));
+                        public void setDocumentLocator( final Locator loc ) {
+                            locator = loc;
+                        }
+                        public void startDocument() throws SAXException {
+                            if ( ( locator == null || locator.getSystemId() == null ) 
+                                  && locDat != null ) {
+                                final Locator loc = new ConstantLocator( locDat );
+                                super.setDocumentLocator( loc );
+                            }
+                            super.startDocument();
+                        }
+                    });
+                    if ( locDat != null ) {
+                        final String sysID = locDat.getSystemID();
+                        sr.setSystemId( sysID );
+                        transformerHandler.setSystemId( sysID );
+                    }
+                    transformerHandler.setResult( sr );
 
                     // Execute transformation
                     try {

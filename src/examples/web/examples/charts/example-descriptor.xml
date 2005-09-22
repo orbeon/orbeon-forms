@@ -14,7 +14,7 @@
 <example-descriptor>
     <title>Charts</title>
     <xi:include href="example-descriptor-files.xml" xmlns:xi="http://www.w3.org/2003/XInclude"/>
-    <description>
+    <description xmlns:f="http://orbeon.org/oxf/xml/formatting">
         <p xmlns="http://www.w3.org/1999/xhtml">
             This example uses the <a href="/doc/processors-charts-spreadsheets#chart"
             f:url-type="resource">Chart processor</a>. You can change the values and set chart

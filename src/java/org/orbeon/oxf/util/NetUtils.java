@@ -361,9 +361,9 @@ public class NetUtils {
     }
 
     /**
-     * Combine a path info and a parameters map to form a relative URL.
+     * Combine a path info and a parameters map to form a path info with a query string.
      */
-    public static String pathInfoParametersToRelativeURL(String pathInfo, Map parameters) throws IOException {
+    public static String pathInfoParametersToPathInfoQueryString(String pathInfo, Map parameters) throws IOException {
         StringBuffer redirectURL = new StringBuffer(pathInfo);
         if (parameters != null) {
             boolean first = true;

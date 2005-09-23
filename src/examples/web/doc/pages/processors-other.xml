@@ -99,7 +99,7 @@
                 </xml-source>
             </section>
         </section>
-        <anchor id="identity"/>
+        <a name="identity-processor"/>
         <section>
             <title>Identity Processor</title>
             <p>
@@ -173,7 +173,7 @@
                 </xml-source>
             </section>
         </section>
-        <anchor id="debug"/>
+        <a name="debug-processor"/>
         <section>
             <title>Debug Processor</title>
             <p>
@@ -223,7 +223,7 @@
                 processor that comes with OPS.
             </p>
         </section>
-        <anchor id="RedirectProcessor"/>
+        <a name="redirect-processor"/>
         <section>
             <title>Redirect Processor</title>
             <p>
@@ -231,9 +231,19 @@
             </p>
             <ul>
                 <li>
-                    <p><b>Client-side</b> the browser is redirected to another URL. Typically, for
-                    a Servlet environment, the <code>sendRedirect()</code> method is called on the
-                    HTTP response object.</p>
+                    <p>
+                        <b>Client-side</b> the browser is redirected to another URL. Typically, for
+                        a Servlet environment, the <code>sendRedirect()</code> method is called on
+                        the HTTP response object.
+                    </p>
+                    <p>
+                        If the redirection URL is an absolute path (e.g. <code>/hello</code>) then
+                        it is interpreted as a path relative to the OPS Servlet context (i.e. if
+                        your OPS WAR file is under <code>/ops</code>, then the resulting path is
+                        <code>/ops/hello</code>). For other purposes, including redirecting to a
+                        path within the same Servlet container but outside the OPS WAR context, you
+                        have to use an absolute URL complete with scheme and host name.
+                    </p>
                 </li>
                 <li>
                     <p><b>Server-side</b>: a server-side forward is executed. Typically, for a
@@ -305,9 +315,9 @@
                 <p>
                     It is recommended, whenever possible, to use the <link
                     href="reference-page-flow">Page Flow Controller</link> to perform page
-                    redirections within a OPS application. The Page Flow Controller
-                    provides a much higher-level abstraction of the notion of redirection than the
-                    Redirect Processor.
+                    redirections within a OPS application. The Page Flow Controller provides a much
+                    higher-level abstraction of the notion of redirection than the Redirect
+                    processor.
                 </p>
             </note>
         </section>

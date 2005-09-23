@@ -123,7 +123,7 @@ public class OXFPortletDelegate extends GenericPortlet {
 
                 if (bufferedResponse.isRedirectIsExitPortal()) {
                     // Send a portlet response redirect
-                    response.sendRedirect(NetUtils.pathInfoParametersToRelativeURL(bufferedResponse.getRedirectPathInfo(), bufferedResponse.getRedirectParameters()));
+                    response.sendRedirect(NetUtils.pathInfoParametersToPathInfoQueryString(bufferedResponse.getRedirectPathInfo(), bufferedResponse.getRedirectParameters()));
                 } else {
                     // NOTE: We take the liberty to modify the Map, as nobody will use it anymore
                     Map redirectParameters = bufferedResponse.getRedirectParameters();

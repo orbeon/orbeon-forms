@@ -482,7 +482,7 @@ public class ServletExternalContext extends ServletWebAppExternalContext impleme
                 }
             } else {
                 // Client-side redirect: send the redirect to the client
-                String redirectURLString = NetUtils.pathInfoParametersToRelativeURL(pathInfo, parameters);
+                String redirectURLString = NetUtils.pathInfoParametersToPathInfoQueryString(pathInfo, parameters);
                 if (redirectURLString.startsWith("/") && !(nativeResponse instanceof ExternalContextToHttpServletResponseWrapper))
                     nativeResponse.sendRedirect(request.getContextPath() + redirectURLString);
                 else

@@ -96,6 +96,9 @@
             <menu-item label="Email" href="processors-messaging-email"/>
             <menu-item label="Instant Messaging" href="processors-messaging-im"/>
         </menu>
+        <menu label="XML Pipelines (XPL)">
+            <menu-item label="Pipeline" href="processors-pipeline"/>
+        </menu>
         <menu-item label="Validation" href="processors-validation"/>
         <menu-item label="Scheduler" href="processors-scheduler"/>
         <!--

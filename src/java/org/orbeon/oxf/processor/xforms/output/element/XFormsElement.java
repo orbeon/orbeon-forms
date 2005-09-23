@@ -34,6 +34,7 @@ import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.List;
 
 /**
  * MISSING:
@@ -138,15 +139,18 @@ public class XFormsElement {
                     // Get ids of node
                     StringBuffer ids = new StringBuffer();
                     boolean first = true;
-                    for (Iterator i = context.getCurrentNodeset().iterator(); i.hasNext();) {
-                        final Node node = (Node) i.next();
-                        if (!first) ids.append(' '); else first = false;
-                        final InstanceData currentNodeInstanceData = XFormsUtils.getLocalInstanceData(node);
-                        if (currentNodeInstanceData != null) {
-                            String id = Integer.toString(currentNodeInstanceData.getId());
-                            if (XFormsUtils.isNameEncryptionEnabled())
-                                id = SecureUtils.encrypt(context.getPipelineContext(), context.getEncryptionPassword(), id);
-                            ids.append(id);
+                    final List currentNodeSet = context.getCurrentNodeset();
+                    if (currentNodeSet != null) {
+                        for (Iterator i = currentNodeSet.iterator(); i.hasNext();) {
+                            final Node node = (Node) i.next();
+                            if (!first) ids.append(' '); else first = false;
+                            final InstanceData currentNodeInstanceData = XFormsUtils.getLocalInstanceData(node);
+                            if (currentNodeInstanceData != null) {
+                                String id = Integer.toString(currentNodeInstanceData.getId());
+                                if (XFormsUtils.isNameEncryptionEnabled())
+                                    id = SecureUtils.encrypt(context.getPipelineContext(), context.getEncryptionPassword(), id);
+                                ids.append(id);
+                            }
                         }
                     }
                     addExtensionAttribute(newAttributes, XFormsConstants.XXFORMS_NODE_IDS_ATTRIBUTE_NAME, ids.toString());

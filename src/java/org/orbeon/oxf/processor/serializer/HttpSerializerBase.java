@@ -16,19 +16,20 @@ package org.orbeon.oxf.processor.serializer;
 import org.apache.log4j.Logger;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.externalcontext.ResponseWrapper;
 import org.orbeon.oxf.pipeline.api.ExternalContext;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.CacheableInputReader;
 import org.orbeon.oxf.processor.ProcessorInput;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorUtils;
-import org.orbeon.oxf.processor.serializer.store.ResultStore;
 import org.orbeon.oxf.processor.serializer.store.ResultStoreOutputStream;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.XPathUtils;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -109,7 +110,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
 
                 // Set custom headers
                 if (config.headers != null) {
-                    for(Iterator i = config.headers.iterator(); i.hasNext();){
+                    for (Iterator i = config.headers.iterator(); i.hasNext();) {
                         String name = (String) i.next();
                         String value = (String) i.next();
                         response.setHeader(name, value);
@@ -127,14 +128,21 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                 // If local caching of the data is enabled, use the caching API
                 // We return a ResultStore
                 final boolean[] read = new boolean[1];
-                ResultStore resultStore = (ResultStore) readCacheInputAsObject(pipelineContext, dataInput, new CacheableInputReader() {
+                final ExtendedResultStoreOutputStream resultStore = (ExtendedResultStoreOutputStream) readCacheInputAsObject(pipelineContext, dataInput, new CacheableInputReader() {
                     public Object read(PipelineContext context, ProcessorInput input) {
                         read[0] = true;
                         if (logger.isDebugEnabled())
                             logger.debug("Output not cached");
                         try {
-                            ResultStoreOutputStream resultStoreOutputStream = new ResultStoreOutputStream(httpOutputStream);
-                            readInput(context, response, input, config, resultStoreOutputStream);
+                            final ExtendedResultStoreOutputStream resultStoreOutputStream = new ExtendedResultStoreOutputStream(httpOutputStream);
+                            // NOTE: readInput will call response.setContentType(), so we intercept and save the set contentType
+                            // Other headers are set above 
+                            readInput(context, new ResponseWrapper(response) {
+                                public void setContentType(String contentType) {
+                                    resultStoreOutputStream.setContentType(contentType);
+                                    super.setContentType(contentType);
+                                }
+                            }, input, config, resultStoreOutputStream);
                             resultStoreOutputStream.close();
                             return resultStoreOutputStream;
                         } catch (IOException e) {
@@ -147,18 +155,19 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                 if (!read[0]) {
                     if (logger.isDebugEnabled())
                         logger.debug("Serializer output cached");
-                    if (externalContext != null)  {
-                        String encoding = getEncoding(config, null, DEFAULT_ENCODING);
-                        String contentType = getContentType(config, null, getDefaultContentType());
+                    if (externalContext != null) {
+                        // Set saved content type
+                        final String contentType = resultStore.getContentType();
                         if (contentType != null)
-                            response.setContentType(contentType + "; charset=" + encoding);
+                            response.setContentType(contentType);
+                        // Set length since we know it
                         response.setContentLength(resultStore.length(pipelineContext));
                     }
+                    // Replay content
                     resultStore.replay(pipelineContext);
                 }
             } else {
-                // Local caching is not enabled
-
+                // Local caching is not enabled, just read the input
                 readInput(pipelineContext, response, dataInput, config, httpOutputStream);
                 httpOutputStream.close();
             }
@@ -199,8 +208,8 @@ public abstract class HttpSerializerBase extends CachedSerializer {
                                 throw new OXFException("The force-encoding element requires an encoding element.");
                             config.ignoreDocumentEncoding = ProcessorUtils.selectBooleanValue(configElement, "/config/ignore-document-encoding", DEFAULT_IGNORE_DOCUMENT_ENCODING);
                             // Headers
-                            for(Iterator i = XPathUtils.selectIterator(configElement, "/config/header"); i.hasNext();) {
-                                Element header = (Element)i.next();
+                            for (Iterator i = XPathUtils.selectIterator(configElement, "/config/header"); i.hasNext();) {
+                                Element header = (Element) i.next();
                                 String name = header.element("name").getTextTrim();
                                 String value = header.element("value").getTextTrim();
                                 config.addHeader(name, value);
@@ -257,7 +266,7 @@ public abstract class HttpSerializerBase extends CachedSerializer {
         public boolean indent = DEFAULT_INDENT;
         public int indentAmount = DEFAULT_INDENT_AMOUNT;
 
-        public void addHeader(String name, String value){
+        public void addHeader(String name, String value) {
             if (headers == null) headers = new ArrayList();
             headers.add(name);
             headers.add(value);
@@ -267,10 +276,10 @@ public abstract class HttpSerializerBase extends CachedSerializer {
     /**
      * Implement the content type determination algorithm.
      *
-     * @param config                current HTTP serializer configuration
-     * @param contentTypeAttribute  content type and encoding from the input XML document, or null
-     * @param defaultContentType    content type to return if none can be found
-     * @return                      content type determined
+     * @param config               current HTTP serializer configuration
+     * @param contentTypeAttribute content type and encoding from the input XML document, or null
+     * @param defaultContentType   content type to return if none can be found
+     * @return content type determined
      */
     protected static String getContentType(Config config, String contentTypeAttribute, String defaultContentType) {
         if (config.forceContentType)
@@ -290,10 +299,10 @@ public abstract class HttpSerializerBase extends CachedSerializer {
     /**
      * Implement the encoding determination algorithm.
      *
-     * @param config                current HTTP serializer configuration
-     * @param contentTypeAttribute  content type and encoding from the input XML document, or null
-     * @param defaultEncoding       encoding to return if none can be found
-     * @return                      encoding determined
+     * @param config               current HTTP serializer configuration
+     * @param contentTypeAttribute content type and encoding from the input XML document, or null
+     * @param defaultEncoding      encoding to return if none can be found
+     * @return encoding determined
      */
     protected static String getEncoding(Config config, String contentTypeAttribute, String defaultEncoding) {
         if (config.forceEncoding)
@@ -308,5 +317,25 @@ public abstract class HttpSerializerBase extends CachedSerializer {
             return userEncoding;
 
         return defaultEncoding;
+    }
+
+    /**
+     * ResultStoreOutputStream with additional content-type storing.
+     */
+    private static class ExtendedResultStoreOutputStream extends ResultStoreOutputStream {
+
+        private String contentType;
+
+        public ExtendedResultStoreOutputStream(OutputStream out) {
+            super(out);
+        }
+
+        public void setContentType(String contentType) {
+            this.contentType = contentType;
+        }
+
+        public String getContentType() {
+            return contentType;
+        }
     }
 }

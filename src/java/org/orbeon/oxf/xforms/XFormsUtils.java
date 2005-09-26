@@ -292,7 +292,7 @@ public class XFormsUtils {
             ByteArrayOutputStream gzipByteArray = new ByteArrayOutputStream();
             GZIPOutputStream gzipOutputStream = null;
             gzipOutputStream = new GZIPOutputStream(gzipByteArray);
-            gzipOutputStream.write(Dom4jUtils.domToString(instance, false, false).getBytes());
+            gzipOutputStream.write(Dom4jUtils.domToString(instance, false, false).getBytes("utf-8"));
             gzipOutputStream.close();
             String result = Base64.encode(gzipByteArray.toByteArray());
             if (encryptionPassword != null)
@@ -328,7 +328,7 @@ public class XFormsUtils {
                 GZIPInputStream gzipInputStream = new GZIPInputStream(compressedData);
                 int size;
                 while ((size = gzipInputStream.read(buffer)) != -1)
-                    xml.append(new String(buffer, 0, size));
+                    xml.append(new String(buffer, 0, size, "utf-8"));
                 xmlText = xml.toString();
             }
             // Parse XML and return documents

@@ -19,8 +19,8 @@
     <!-- Get data from the "Charts" example -->
     <p:processor name="oxf:chart-converter">
         <p:input name="config"><config/></p:input>
-        <p:input name="data" href="oxf:/examples/charts/xforms-model.xml#xpointer(/*/*/form)"/>
-        <p:input name="chart" href="oxf:/examples/charts/xforms-model.xml#xpointer(/*/*/form/chart)"/>
+        <p:input name="data" href="oxf:/examples/charts/default-submission.xml"/>
+        <p:input name="chart" href="oxf:/examples/charts/default-submission.xml#xpointer(/form/chart)"/>
         <p:output name="data" ref="data"/>
     </p:processor>
 

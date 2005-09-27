@@ -24,20 +24,18 @@
                 <ref name="address"/>
             </element>
             <oneOrMore>
-                <element name="to">
-                    <ref name="address"/>
-                </element>
+                <choice>
+                    <element name="to">
+                        <ref name="address"/>
+                    </element>
+                    <element name="cc">
+                        <ref name="address"/>
+                    </element>
+                    <element name="bcc">
+                        <ref name="address"/>
+                    </element>
+                </choice>
             </oneOrMore>
-            <zeroOrMore>
-                <element name="cc">
-                    <ref name="address"/>
-                </element>
-            </zeroOrMore>
-            <zeroOrMore>
-                <element name="bcc">
-                    <ref name="address"/>
-                </element>
-            </zeroOrMore>
             <element name="subject">
                 <data type="string"/>
             </element>

@@ -12,7 +12,7 @@
  * Read the entire license text here: http://www.gnu.org/licenses/lgpl.html
  */
 
-// $Id: calendar.js,v 1.1 2005/07/04 19:50:59 ebruchez Exp $
+// $Id: calendar.js,v 1.2 2005/10/04 23:28:01 avernet Exp $
 
 /** The Calendar object constructor. */
 Calendar = function (firstDayOfWeek, dateStr, onSelected, onClose) {
@@ -754,7 +754,7 @@ Calendar.prototype.create = function (_par) {
 	var hh = function (text, cs, navtype) {
 		cell = Calendar.createElement("td", row);
 		cell.colSpan = cs;
-		cell.className = "button";
+		cell.className = "jscalendar-button";
 		if (navtype != 0 && Math.abs(navtype) <= 2)
 			cell.className += " nav";
 		Calendar._add_evs(cell);

@@ -22,10 +22,18 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.XPathUtils;
+import org.orbeon.oxf.resources.OXFProperties;
+
+import java.util.Map;
+import java.util.HashMap;
 
 public abstract class TaminoProcessor extends ProcessorImpl {
 
     private static final Logger logger = LoggerFactory.createLogger(TaminoProcessor.class);
+    private static final Map ISOLATION_DEGREE_VALUES = new HashMap();
+    private static final Map LOCK_MODE_VALUES = new HashMap();
+    private static final String ISOLATION_DEGREE_PROPERTY = "oxf.tamino.isolation-degree";
+    private static final String LOCK_MODE_PROPERTY = "oxf.tamino.lock-mode";
 
     public static final String TAMINO_CONFIG_URI = "http://www.orbeon.org/oxf/tamino-config";
     public static final String TAMINO_QUERY_URI = "http://www.orbeon.org/oxf/tamino-query";
@@ -35,6 +43,17 @@ public abstract class TaminoProcessor extends ProcessorImpl {
     public static final String PASSWORD_PROPERTY = "password";
 
     protected static final String TAMINO_CONNECTION = TaminoProcessor.class.getName() + "_connection_";
+
+    static {
+        ISOLATION_DEGREE_VALUES.put("committedCommand", TIsolationDegree.COMMITTED_COMMAND);
+        ISOLATION_DEGREE_VALUES.put("serializable", TIsolationDegree.SERIALIZABLE);
+        ISOLATION_DEGREE_VALUES.put("stableCursor", TIsolationDegree.STABLE_CURSOR);
+        ISOLATION_DEGREE_VALUES.put("stableDocument", TIsolationDegree.STABLE_DOCUMENT);
+        ISOLATION_DEGREE_VALUES.put("uncommittedDocument", TIsolationDegree.UNCOMMITTED_DOCUMENT);
+        LOCK_MODE_VALUES.put("protected", TLockMode.PROTECTED);
+        LOCK_MODE_VALUES.put("shared", TLockMode.SHARED);
+        LOCK_MODE_VALUES.put("unprotected", TLockMode.UNPROTECTED);
+    }
 
     protected Config readConfig(Document doc) {
         Config config = new Config();
@@ -63,6 +82,22 @@ public abstract class TaminoProcessor extends ProcessorImpl {
             try {
                 final TConnection newConnection = TConnectionFactory.getInstance().newConnection(config.getUrl(),
                         config.getUsername(), config.getPassword());
+
+                // Initialize isolation degree and lock mode as set in properties
+                {
+                    OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
+                    TIsolationDegree isolationDegree = (TIsolationDegree)
+                            ISOLATION_DEGREE_VALUES.get(propertySet.getString(ISOLATION_DEGREE_PROPERTY));
+                    TLockMode lockMode = (TLockMode)
+                            LOCK_MODE_VALUES.get(propertySet.getString(LOCK_MODE_PROPERTY));
+                    if (isolationDegree != null)
+                        newConnection.setIsolationDegree(isolationDegree);
+                    if (lockMode != null)
+                        newConnection.setLockMode(lockMode);
+                }
+
+                newConnection.setIsolationDegree(TIsolationDegree.SERIALIZABLE);
+                newConnection.setLockMode(TLockMode.PROTECTED);
                 final TLocalTransaction transaction = newConnection.useLocalTransactionMode();
 
                 context.setAttribute(attributeName, newConnection);

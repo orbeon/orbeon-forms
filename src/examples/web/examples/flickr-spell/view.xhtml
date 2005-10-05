@@ -42,22 +42,31 @@
     <xhtml:body>
         <xhtml:ul>
             <xhtml:li>
-                <xhtml:b>Usage.</xhtml:b> Enter some text and we'll pull for each letter a random image from
-                <xhtml:a href="http://flickr.com/">Flickr</xhtml:a>.
+                <xhtml:p>
+                    <xhtml:b>Usage.</xhtml:b> Enter some text and we'll pull for each letter a random
+                    image from <xhtml:a href="http://flickr.com/">Flickr</xhtml:a>.
+                </xhtml:p>
             </xhtml:li>
             <xhtml:li>
-                <xhtml:b>Implementation.</xhtml:b> The UI an interaction with the server is implemented
-                100% in XForms. The <xhtml:a href="/goto-source/flickr-spell/view.xhtml" f:url-type="resource">XForms UI</xhtml:a>
-                sends the text you type in an XML document to the server which responds with an XML document
-                that contains link to the images. The <xhtml:a href="/goto-source/flickr-spell/spell.xpl" f:url-type="resource">server-side code</xhtml:a>
-                is implemented in an <xhtml:a href="http://www.w3.org/Submission/xpl/">XPL pipeline</xhtml:a>, calls a
-                web service provided to Flickr and caches the response to
-                avoid sending the same query over and over to the Flickr.
+                <xhtml:p>
+                    <xhtml:b>Implementation.</xhtml:b> The UI an interaction with the server is
+                    implemented 100% in XForms. The <xhtml:a href="/goto-source/flickr-spell/view.xhtml"
+                    f:url-type="resource">XForms UI</xhtml:a> sends the text you type in an XML
+                    document to the server which responds with an XML document that contains link to the
+                    images. The <xhtml:a href="/goto-source/flickr-spell/spell.xpl"
+                    f:url-type="resource">server-side code</xhtml:a> is implemented in an <xhtml:a
+                    href="http://www.w3.org/Submission/xpl/">XPL pipeline</xhtml:a>, calls a web service
+                    provided to Flickr and caches the response to avoid sending the same query over and
+                    over to the Flickr.
+                </xhtml:p>
             </xhtml:li>
             <xhtml:li>
-                <xhtml:b>Credits.</xhtml:b> All the credits go to <xhtml:a href="http://metaatem.net/">kastner</xhtml:a>,
-                who was the first to <xhtml:a href="http://metaatem.net/words/">implement</xhtml:a> this cool idea ;). And thanks
-                to Flickr for being so open with their web services.
+                <xhtml:p>
+                    <xhtml:b>Credits.</xhtml:b> All the credits go to <xhtml:a
+                    href="http://metaatem.net/">kastner</xhtml:a>, who was the first to <xhtml:a
+                    href="http://metaatem.net/words/">implement</xhtml:a> this cool idea ;). And thanks
+                    to Flickr for being so open with their web services.
+                </xhtml:p>
             </xhtml:li>
         </xhtml:ul>
         <xforms:group>

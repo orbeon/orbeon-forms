@@ -76,7 +76,7 @@
 
                 <p>
                     <li>
-                        <a href="/goto-source/cart/view.xsl" f:url-type="resource">view.xpl</a>.
+                        <a href="/goto-source/cart/view.xhtml" f:url-type="resource">view.xhtml</a>.
                         Finally, the view converts the cart document into HTML. XForms controls are
                         used to display the buttons and the text fields.
                     </li>

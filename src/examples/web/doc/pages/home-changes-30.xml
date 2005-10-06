@@ -164,6 +164,14 @@
                             technologies. This makes the XForms engine much more responsive to user
                             interaction than with OPS 2.8.
                         </p>
+                        <note>
+                            We sometimes informally refer to the XForms engine present in OPS 2.8
+                            and earlier (but also present in OPS 3.0 for backward compatibility) as
+                            the <i>Classic XForms engine</i> or, in short, as <i>XForms
+                            Classic</i>. We refer to the new Ajax-based XForms engine, present in
+                            OPS 3.0 and forward, as the <i>Next Generation XForms engine</i> or, in
+                            short, as <i>XForms NG</i>.
+                        </note>
                     </li>
                     <li>
                         <p>
@@ -331,6 +339,7 @@
                     </li>
                 </ul>
             </section>
+            <a name="xforms-migration"/>
             <section>
                 <title>Migrating to the OPS 3.0 XForms Engine</title>
                 <warning>

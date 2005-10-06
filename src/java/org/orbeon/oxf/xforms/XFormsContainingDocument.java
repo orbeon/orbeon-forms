@@ -43,6 +43,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     private XFormsControls xformsControls;
 
     private XFormsModelSubmission activeSubmission;
+    private List messages;
 
     private XFormsActionInterpreter actionInterpreter;
 
@@ -124,6 +125,40 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         if (this.activeSubmission != null)
             throw new OXFException("There is already an active submission.");
         this.activeSubmission = activeSubmission;
+    }
+
+    /**
+     * Add an XForms message to send to the client
+     */
+    public void addMessage(String message, String level) {
+        if (messages == null)
+            messages = new ArrayList();
+        messages.add(new Message(message, level));
+    }
+
+    /**
+     * Return the list of messages to send to the client, null if none.
+     */
+    public List getMessages() {
+        return messages;
+    }
+
+    public static class Message {
+        private String message;
+        private String level;
+
+        public Message(String message, String level) {
+            this.message = message;
+            this.level = level;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public String getLevel() {
+            return level;
+        }
     }
 
     /**

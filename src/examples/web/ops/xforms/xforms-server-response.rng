@@ -159,6 +159,12 @@
                         <attribute name="method"/>
                     </element>
                 </optional>
+                <zeroOrMore>
+                    <element name="xxforms:message">
+                        <attribute name="level"/>
+                        <data type="string"/>
+                    </element>
+                </zeroOrMore>
             </element>
         </element>
     </start>

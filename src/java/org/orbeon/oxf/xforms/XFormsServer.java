@@ -280,6 +280,14 @@ public class XFormsServer extends ProcessorImpl {
                             outputSubmissionInfo(pipelineContext, ch);
                     }
 
+                    // Output messages to display
+                    {
+                        final List messages = containingDocument.getMessages();
+                        if (messages != null) {
+                            outputMessagesInfo(ch, messages);
+                        }
+                    }
+
                     ch.endElement();
                 }
 
@@ -554,6 +562,16 @@ public class XFormsServer extends ProcessorImpl {
         // Signal that we want a POST to the XForms Server
         ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "submission",
                 new String[]{"action", requestURL, "method", "POST"});
+    }
+
+    private void outputMessagesInfo(ContentHandlerHelper ch, List messages) {
+        for (Iterator i = messages.iterator(); i.hasNext();) {
+            final XFormsContainingDocument.Message message = (XFormsContainingDocument.Message) i.next();
+            ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "message",
+                    new String[]{"level", message.getLevel()});
+            ch.text(message.getMessage());
+            ch.endElement();
+        }
     }
 
     private void outputItemsets(ContentHandlerHelper ch, Map itemsetIdToItemsetInfoMap) {

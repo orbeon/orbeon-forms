@@ -15,6 +15,7 @@ package org.orbeon.oxf.xforms.action;
 
 import org.dom4j.Element;
 import org.dom4j.Node;
+import org.dom4j.QName;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.xforms.*;
@@ -24,10 +25,8 @@ import org.orbeon.oxf.xforms.event.XFormsEventTarget;
 import org.orbeon.oxf.xforms.event.events.*;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.io.IOException;
 
 /**
  * Implementation of all the XForms actions.
@@ -480,6 +479,65 @@ public class XFormsActionInterpreter {
                 containingDocument.dispatchEvent(pipelineContext, XFormsEventFactory.createEvent(newEventName, (XFormsEventTarget) newTargetObject, newEventBubbles, newEventCancelable));
             } else {
                 throw new OXFException("Invalid event target for id: " + newEventTargetId);
+            }
+
+        } else if (XFormsActions.XFORMS_MESSAGE_ACTION.equals(actionEventName)) {
+            // 10.1.12 The message Element
+
+            final String level;
+            {
+                final String levelAttribute = actionElement.attributeValue("level");;
+                if (levelAttribute == null)
+                    throw new OXFException("xforms:message element is missing mandatory 'level' attribute.");
+                final QName levelQName = Dom4jUtils.extractAttributeValueQName(actionElement, "level");
+                if (levelQName.getNamespacePrefix().equals("")) {
+                    if (!("ephemeral".equals(levelAttribute) || "modeless".equals(levelAttribute) || "modal".equals(levelAttribute))) {
+                        throw new OXFException("xforms:message element's 'level' attribute must have value: 'ephemeral'|'modeless'|'modal'|QName-but-not-NCName.");
+                    }
+                    level = levelAttribute;
+                } else {
+                    level = "{" + levelQName.getNamespaceURI() + "}" + levelQName.getName();
+                }
+            }
+
+            final String src = actionElement.attributeValue("src");
+            final String ref = actionElement.attributeValue("ref");
+
+            String message = null;
+
+            // Try to get message from single-node binding if any
+            if (ref != null) {
+                final Node currentNode = xformsControls.getCurrentSingleNode();
+                if (currentNode != null)
+                    message = XFormsInstance.getValueForNode(currentNode);
+            }
+
+            // Try to get message from linking attribute
+            boolean linkException = false;
+            if (message == null && src != null) {
+                try {
+                    message = XFormsUtils.retrieveSrcValue(src);
+                } catch (IOException e) {
+                    containingDocument.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(xformsControls.getCurrentModel(), src, null, e));
+                    linkException = true;
+                }
+            }
+
+            if (!linkException) {
+                // Try to get inline message
+                if (message == null) {
+                    message = actionElement.getStringValue();
+                }
+
+                if (message != null) {
+                    // Store message for sending to client
+                    containingDocument.addMessage(message, level);
+
+                    // NOTE: In the future, we *may* want to save and resume the event state before and
+                    // after displaying a message, in order to possibly provide a behavior which is more
+                    // consistent with what users may expect regarding actions executed after
+                    // xforms:message.
+                }
             }
 
         } else {

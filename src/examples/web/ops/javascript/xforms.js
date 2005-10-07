@@ -1251,6 +1251,15 @@ function xformsHandleResponse() {
                                 }
                                 break;
                             }
+
+                            // Display modal message
+                            case "message": {
+                                var messageElement = actionElement.childNodes[actionIndex];
+                                var message = xformsStringValue(messageElement);
+                                if (messageElement.getAttribute("level") == "modal")
+                                    alert(message);
+                                break;
+                            }
                         }
                     }
                 }

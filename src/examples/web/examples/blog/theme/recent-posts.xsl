@@ -19,6 +19,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:xforms="http://www.w3.org/2002/xforms"
+    xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
     xmlns:xi="http://www.w3.org/2003/XInclude"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
@@ -45,7 +46,7 @@
               xmlns:xi="http://www.w3.org/2003/XInclude"
               xmlns:xs="http://www.w3.org/2001/XMLSchema"
               xmlns:xdt="http://www.w3.org/2004/07/xpath-datatypes">
-            <xforms:instance>
+            <xforms:instance id="main">
                 <form xmlns="">
                     <action/>
                     <username/>
@@ -68,15 +69,44 @@
                     </check>
                 </form>
             </xforms:instance>
+            <xforms:instance id="comment-request">
+                <comment xmlns="">
+                    <date-created/>
+                    <name/>
+                    <email/>
+                    <uri/>
+                    <text/>
+                </comment>
+            </xforms:instance>
+            <xforms:instance id="comment-response">
+                <comment xmlns="">
+                    <date-created/>
+                    <name/>
+                    <email/>
+                    <uri/>
+                    <text/>
+                </comment>
+            </xforms:instance>
+            <!-- Handle human check -->
             <xforms:bind nodeset="/form/check/value1" calculate="if (. castable as xs:integer) then . else xs:integer(seconds-from-time(current-time()))"/>
             <xforms:bind nodeset="/form/check/value2" calculate="if (. castable as xs:integer) then . else xs:integer(minutes-from-time(current-time()))"/>
+            <xforms:bind nodeset="/form/check/value3" constraint=". castable as xs:positiveInteger and (xs:integer(.) = xs:integer(/form/check/value1) + xs:integer(/form/check/value2))"/>
+
+            <!-- Handle creation date -->
             <xforms:bind nodeset="/form/comment/date-created" calculate="xs:string(adjust-dateTime-to-timezone(current-dateTime(), xdt:dayTimeDuration('PT0H')))"/>
+
+            <!-- Validate comment -->
+            <xforms:bind nodeset="/form/comment">
+                <xforms:bind nodeset="name" constraint="normalize-space(name) != ''"/>
+                <xforms:bind nodeset="text" constraint="normalize-space(instance('comment-response')/text) != ''"/>
+            </xforms:bind>
 
         <!--    <xforms:bind nodeset="/form/comment/email" constraint="normalize-space(.) = '' or matches(., '[A-Za-z0-9!#-''\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-''\*\+\-/=\?\^_`\{-~]+)*@[A-Za-z0-9!#-''\*\+\-/=\?\^_`\{-~]+(\.[A-Za-z0-9!#-''\*\+\-/=\?\^_`\{-~]+)*')"/>-->
 <!--            <xforms:bind nodeset="/form/comment/text" constraint="normalize-space(.) != ''"/>-->
 
-            <xforms:bind nodeset="/form/check/value3" constraint=". castable as xs:positiveInteger and (xs:integer(.) = xs:integer(/form/check/value1) + xs:integer(/form/check/value2))"/>
-            <xforms:submission id="comment-submission" method="post" action="/save-comment"/>
+
+            <xforms:submission id="comment-submission" method="post" action="/blog/save-comment"/>
+            <xforms:submission id="comment-formatting" method="post" action="/blog/format-comment" ref="instance('comment-request')" replace="instance" instance="comment-response"/>
         </xforms:model>
     </head>
     <body>
@@ -166,7 +196,7 @@
                                                                 <a href="mailto:{email}">
                                                                     <xsl:value-of select="name"/>
                                                                 </a>
-                                                                <xsl:text> @ </xsl:text>
+                                                                <xsl:text>&#160;@&#160;</xsl:text>
                                                                 <xsl:value-of select="format-dateTime(date-created, '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ())"/>
                                                             </div>
                                                         </div>
@@ -216,22 +246,50 @@
                                         <tr>
                                             <th style="text-align: right">Name:</th>
                                             <td style="width: 100%">
-                                                <xforms:input ref="comment/name"/>
+                                                <xforms:input ref="comment/name" incremental="true">
+                                                    <xforms:hint>Please enter your name here.</xforms:hint>
+                                                    <xforms:action ev:event="xforms-value-changed" >
+                                                        <xforms:setvalue ref="instance('comment-request')/date-created" value="instance('main')/comment/date-created"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/name" value="instance('main')/comment/name"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/email" value="instance('main')/comment/email"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/uri" value="instance('main')/comment/uri"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/text" value="instance('main')/comment/text"/>
+                                                        <xforms:send submission="comment-formatting"/>
+                                                    </xforms:action>
+                                                </xforms:input>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th style="text-align: right">Email:</th>
                                             <td>
-                                                <xforms:input ref="comment/email">
+                                                <xforms:input ref="comment/email" incremental="true">
                                                     <xforms:alert>Please enter a correct email address!</xforms:alert>
                                                     <xforms:hint>Please enter an optional email address.</xforms:hint>
+                                                    <xforms:action ev:event="xforms-value-changed" >
+                                                        <xforms:setvalue ref="instance('comment-request')/date-created" value="instance('main')/comment/date-created"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/name" value="instance('main')/comment/name"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/email" value="instance('main')/comment/email"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/uri" value="instance('main')/comment/uri"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/text" value="instance('main')/comment/text"/>
+                                                        <xforms:send submission="comment-formatting"/>
+                                                    </xforms:action>
                                                 </xforms:input>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <th style="text-align: right">URI:</th>
+                                            <th style="text-align: right">Web Site:</th>
                                             <td>
-                                                <xforms:input ref="comment/uri"/>
+                                                <xforms:input ref="comment/uri" incremental="true">
+                                                    <xforms:hint>Please enter an optional web site URL.</xforms:hint>
+                                                    <xforms:action ev:event="xforms-value-changed" >
+                                                        <xforms:setvalue ref="instance('comment-request')/date-created" value="instance('main')/comment/date-created"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/name" value="instance('main')/comment/name"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/email" value="instance('main')/comment/email"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/uri" value="instance('main')/comment/uri"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/text" value="instance('main')/comment/text"/>
+                                                        <xforms:send submission="comment-formatting"/>
+                                                    </xforms:action>
+                                                </xforms:input>
                                             </td>
                                         </tr>
                                         <tr>
@@ -242,8 +300,17 @@
                                         <tr>
                                             <td colspan="2">
                                                 <!--  xhtml:style="background: #eee; border: 1px solid #ccc" -->
-                                                <xforms:textarea ref="comment/text" xhtml:rows="10" xhtml:cols="80">
+                                                <xforms:textarea ref="comment/text" incremental="true" xhtml:rows="10" xhtml:cols="80">
                                                     <xforms:alert>Please enter a valid comment!</xforms:alert>
+                                                    <!-- Send comment to the server for formatting -->
+                                                    <xforms:action ev:event="xforms-value-changed" >
+                                                        <xforms:setvalue ref="instance('comment-request')/date-created" value="instance('main')/comment/date-created"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/name" value="instance('main')/comment/name"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/email" value="instance('main')/comment/email"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/uri" value="instance('main')/comment/uri"/>
+                                                        <xforms:setvalue ref="instance('comment-request')/text" value="instance('main')/comment/text"/>
+                                                        <xforms:send submission="comment-formatting"/>
+                                                    </xforms:action>
                                                 </xforms:textarea>
                                             </td>
                                         </tr>
@@ -257,17 +324,13 @@
                                                 </span>
                                             </td>
                                             <td>
-                                                <xforms:input ref="check/value3" xhtml:size="3">
+                                                <xforms:input ref="check/value3" incremental="true" xhtml:size="3">
                                                     <xforms:alert>Please enter a correct check value!</xforms:alert>
-                                                    <xforms:hint>Please enter a check value. This is a measure about comment spam.</xforms:hint>
+                                                    <xforms:hint>Please enter a check value. This is a measure against comment spam.</xforms:hint>
                                                 </xforms:input>
                                             </td>
                                         </tr>
                                     </table>
-                                    <xforms:submit submission="">
-                                        <xforms:label>Preview</xforms:label>
-                                        <xforms:setvalue ref="/form/action">preview</xforms:setvalue>
-                                    </xforms:submit>
                                     <xforms:submit>
                                         <xforms:label>Submit</xforms:label>
                                         <xforms:setvalue ref="/form/action">save</xforms:setvalue>
@@ -276,6 +339,25 @@
                                         <xforms:label>Cancel</xforms:label>
                                         <xforms:setvalue ref="/form/action">cancel</xforms:setvalue>
                                     </xforms:submit>
+                                    <xforms:group ref="instance('comment-response')">
+                                        <p>
+                                            This is how your comment will look like:
+                                        </p>
+                                        <!-- Display comment content -->
+                                        <div style="margin-left: 2em; border: 1px solid #ccc; padding: 1em; background-color: #ffff9a">
+                                            <xforms:output ref="text" appearance="xxforms:html"/>
+                                        </div>
+                                        <!-- Display comment information and links -->
+                                        <div style="margin-left: 2em; padding: 1em">
+                                            Comment by
+                                            <!--<a href="mailto:{$instance/form/comment/email}">-->
+                                            <a>
+                                                <xforms:output ref="name"/>
+                                            </a>
+                                            <xsl:text> @ </xsl:text>
+                                            <xforms:output ref="date-created"/>
+                                        </div>
+                                    </xforms:group>
                                 </xforms:group>
                             </xsl:if>
 

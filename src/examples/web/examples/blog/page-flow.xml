@@ -31,6 +31,23 @@
     <!-- XML-RPC commands -->
     <page path-info="/blog/xmlrpc" model="xml-rpc.xpl"/>
 
+    <!-- Services -->
+    <page path-info="/blog/save-comment">
+        <action>
+            <result page="post" transform="oxf:xslt" instance-passing="redirect">
+                <form xsl:version="2.0" xmlns="">
+                    <username><xsl:value-of select="doc('input:instance')/form/username"/></username>
+                    <blog-id><xsl:value-of select="doc('input:instance')/form/blog-id"/></blog-id>
+                    <post-id><xsl:value-of select="doc('input:instance')/form/post-id"/></post-id>
+                    <format><xsl:value-of select="doc('input:instance')/form/format"/></format>
+                    <category><xsl:value-of select="doc('input:instance')/form/category"/></category>
+                </form>
+            </result>
+        </action>
+    </page>
+
+    <page path-info="/blog/format-comment" view="recent-posts/format-comment.xpl"/>
+
     <!-- Users -->
     <page path-info="/blog/admin/users" model="admin/edit-users/edit-users.xpl" view="admin/edit-users/edit-users.xsl"/>
     <page path-info="/blog/admin/add-user" view="admin/edit-users/edit-users.xpl">
@@ -87,20 +104,6 @@
           model="user-home/user-home-model.xpl"
           view="user-home/user-home-view.xsl">
         <setvalue ref="/form/username" matcher-group="1"/>
-    </page>
-
-    <page path-info="/save-comment">
-        <action>
-            <result page="post" transform="oxf:xslt" instance-passing="redirect">
-                <form xsl:version="2.0" xmlns="">
-                    <username><xsl:value-of select="doc('input:instance')/form/username"/></username>
-                    <blog-id><xsl:value-of select="doc('input:instance')/form/blog-id"/></blog-id>
-                    <post-id><xsl:value-of select="doc('input:instance')/form/post-id"/></post-id>
-                    <format><xsl:value-of select="doc('input:instance')/form/format"/></format>
-                    <category><xsl:value-of select="doc('input:instance')/form/category"/></category>
-                </form>
-            </result>
-        </action>
     </page>
 
     <!-- Home Page -->

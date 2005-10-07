@@ -142,6 +142,11 @@
                         specification.
                     </p>
                 </li>
+                <li>
+                    <p>
+                        <code>xforms:message</code> only supports <code>level="modal"</code>.
+                    </p>
+                </li>
             </ul>
         </section>
         <section>

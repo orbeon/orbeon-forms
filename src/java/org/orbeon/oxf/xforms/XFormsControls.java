@@ -1397,6 +1397,48 @@ public class XFormsControls {
                 }
             }
         }
+
+        /**
+         * Find an effective control id based on a control id, following the branches of the
+         * current indexes of the repeat elements.
+         */
+        public String findEffectiveControlId(String controlId) {
+            return findEffectiveControlId(controlId, this.children);
+        }
+
+        private String findEffectiveControlId(String controlId, List children) {
+            for (Iterator i = children.iterator(); i.hasNext();) {
+                final ControlInfo currentControlInfo = (ControlInfo) i.next();
+                final String originalControlId = currentControlInfo.getOriginalId();
+
+                if (controlId.equals(originalControlId)) {
+                    return currentControlInfo.getId();
+                } else if (currentControlInfo instanceof RepeatControlInfo) {
+                    final RepeatControlInfo currentRepeatControlInfo = (RepeatControlInfo) currentControlInfo;
+                    final String repeatId = currentRepeatControlInfo.getRepeatId();
+                    final int index = ((Integer) getRepeatIdToIndex().get(repeatId)).intValue();
+
+                    if (index > 0) {
+                        final List newChildren = currentControlInfo.getChildren();
+                        if (newChildren != null && newChildren.size() > 0) {
+                            final String result = findEffectiveControlId(controlId, Collections.singletonList(newChildren.get(index - 1)));
+                            if (result != null)
+                                return result;
+                        }
+                    }
+
+                } else {
+                    final List newChildren = currentControlInfo.getChildren();
+                    if (newChildren != null) {
+                        final String result = findEffectiveControlId(controlId, newChildren);
+                        if (result != null)
+                            return result;
+                    }
+                }
+            }
+            // Not found
+            return null;
+        }
     }
 
     /**
@@ -1408,6 +1450,8 @@ public class XFormsControls {
         private String name;
 
         private Element element;
+
+        private String originalId;
 
         private String id;
         private String label;
@@ -1434,14 +1478,20 @@ public class XFormsControls {
             this.id = id;
 
             // Extract event handlers
-            if (element != null)
+            if (element != null) {
+                originalId = element.attributeValue("id");
                 eventHandlers = XFormsEventHandlerImpl.extractEventHandlers(containingDocument, this, element);
+            }
         }
 
         public void addChild(ControlInfo controlInfo) {
             if (children == null)
                 children = new ArrayList();
             children.add(controlInfo);
+        }
+
+        public String getOriginalId() {
+            return originalId;
         }
 
         public String getId() {

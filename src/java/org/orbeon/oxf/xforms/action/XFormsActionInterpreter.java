@@ -190,6 +190,7 @@ public class XFormsActionInterpreter {
         } else if (XFormsActions.XFORMS_TOGGLE_ACTION.equals(actionEventName)) {
             // 9.2.3 The toggle Element
 
+            // TODO: Handle repeat controls
             final String caseId = actionElement.attributeValue("case");
 
             // Update xforms:switch info and dispatch events
@@ -472,7 +473,11 @@ public class XFormsActionInterpreter {
                 newEventCancelable = Boolean.valueOf((newEventCancelableString == null) ? "true" : newEventCancelableString).booleanValue();
             }
 
-            final Object newTargetObject = containingDocument.getObjectById(pipelineContext, newEventTargetId);
+            // Find actual target
+            final String newEventTargetEffectiveId = xformsControls.getCurrentControlsState().findEffectiveControlId(newEventTargetId);
+            if (newEventTargetEffectiveId == null)
+                throw new OXFException("Could not find actual event target on xforms:dispatch element for id: " + newEventTargetId);
+            final Object newTargetObject = containingDocument.getObjectById(pipelineContext, newEventTargetEffectiveId);
 
             if (newTargetObject instanceof XFormsEventTarget) {
                 // This can be anything
@@ -545,7 +550,13 @@ public class XFormsActionInterpreter {
             // 10.1.7 The setfocus Element
 
             final String controlId = actionElement.attributeValue("control");
-            final Object controlObject = containingDocument.getObjectById(pipelineContext, controlId);
+            if (controlId == null)
+                throw new OXFException("Missing mandatory control attribute on xforms:control element.");
+            final String effectiveControlId = xformsControls.getCurrentControlsState().findEffectiveControlId(controlId);
+            if (effectiveControlId == null)
+                throw new OXFException("Could not find actual control on xforms:setfocus element for control: " + controlId);
+
+            final Object controlObject = containingDocument.getObjectById(pipelineContext, effectiveControlId);
 
             if (!(controlObject instanceof XFormsControls.ControlInfo))
                 throw new OXFException("xforms:setfocus attribute 'control' must refer to a control: " + controlId);

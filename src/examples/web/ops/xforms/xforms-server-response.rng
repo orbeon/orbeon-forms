@@ -165,6 +165,11 @@
                         <data type="string"/>
                     </element>
                 </zeroOrMore>
+                <optional>
+                    <element name="xxforms:setfocus">
+                        <attribute name="control-id"/>
+                    </element>
+                </optional>
             </element>
         </element>
     </start>

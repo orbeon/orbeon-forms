@@ -44,6 +44,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     private XFormsModelSubmission activeSubmission;
     private List messages;
+    private String focusEffectiveControlId;
 
     private XFormsActionInterpreter actionInterpreter;
 
@@ -128,7 +129,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
     }
 
     /**
-     * Add an XForms message to send to the client
+     * Add an XForms message to send to the client.
      */
     public void addMessage(String message, String level) {
         if (messages == null)
@@ -159,6 +160,24 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
         public String getLevel() {
             return level;
         }
+    }
+
+    /**
+     * Tell the client that focus must be changed to the given effective control id.
+     *
+     * This can be called several times, but only the last controld id is remembered.
+     *
+     * @param effectiveControlId
+     */
+    public void setFocus(String effectiveControlId) {
+        this.focusEffectiveControlId = effectiveControlId;
+    }
+
+    /**
+     * Return the effective control id of the control to set the focus to, or null.
+     */
+    public String getFocusEffectiveControlId() {
+        return focusEffectiveControlId;
     }
 
     /**

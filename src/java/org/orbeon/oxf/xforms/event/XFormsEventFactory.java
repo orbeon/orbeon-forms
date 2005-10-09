@@ -106,6 +106,8 @@ public class XFormsEventFactory {
             return new XFormsEnabledEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_DISABLED)) {
             return new XFormsDisabledEvent(targetObject);
+        } else if (eventName.equals(XFormsEvents.XFORMS_FOCUS)) {
+            return new XFormsFocusEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_SCROLL_FIRST)) {
             return new XFormsScrollFirstEvent(targetObject);
         } else if (eventName.equals(XFormsEvents.XFORMS_SCROLL_LAST)) {

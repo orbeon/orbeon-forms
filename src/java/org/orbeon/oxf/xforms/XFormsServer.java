@@ -288,6 +288,14 @@ public class XFormsServer extends ProcessorImpl {
                         }
                     }
 
+                    // Output focus instructions
+                    {
+                        final String focusEffectiveControlId = containingDocument.getFocusEffectiveControlId();
+                        if (focusEffectiveControlId != null) {
+                            outputFocusInfo(ch, focusEffectiveControlId);
+                        }
+                    }
+
                     ch.endElement();
                 }
 
@@ -572,6 +580,11 @@ public class XFormsServer extends ProcessorImpl {
             ch.text(message.getMessage());
             ch.endElement();
         }
+    }
+
+    private void outputFocusInfo(ContentHandlerHelper ch, String focusEffectiveControlId) {
+        ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "setfocus",
+                new String[]{"control-id", focusEffectiveControlId});
     }
 
     private void outputItemsets(ContentHandlerHelper ch, Map itemsetIdToItemsetInfoMap) {

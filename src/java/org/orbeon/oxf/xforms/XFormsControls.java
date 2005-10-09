@@ -1617,7 +1617,7 @@ public class XFormsControls {
         }
 
         public void performDefaultAction(PipelineContext pipelineContext, XFormsEvent event) {
-            if (XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(event.getEventName())) {
+            if (XFormsEvents.XFORMS_DOM_FOCUS_IN.equals(event.getEventName()) || XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
 
                 // Try to update xforms:repeat indices based on this
                 {
@@ -1687,6 +1687,11 @@ public class XFormsControls {
                             //containingDocument.dispatchEvent(pipelineContext, new XFormsRecalculateEvent(currentModel, true));
                         }
                         // TODO: Should try to use the code of the <setindex> action
+                    }
+
+                    // Store new focus information for client
+                    if (XFormsEvents.XFORMS_FOCUS.equals(event.getEventName())) {
+                        containingDocument.setFocus(getId());
                     }
                 }
             }

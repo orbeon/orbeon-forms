@@ -540,6 +540,18 @@ public class XFormsActionInterpreter {
                 }
             }
 
+        } else if (XFormsActions.XFORMS_SETFOCUS_ACTION.equals(actionEventName)) {
+
+            // 10.1.7 The setfocus Element
+
+            final String controlId = actionElement.attributeValue("control");
+            final Object controlObject = containingDocument.getObjectById(pipelineContext, controlId);
+
+            if (!(controlObject instanceof XFormsControls.ControlInfo))
+                throw new OXFException("xforms:setfocus attribute 'control' must refer to a control: " + controlId);
+
+            containingDocument.dispatchEvent(pipelineContext, new XFormsFocusEvent((XFormsEventTarget) controlObject));
+
         } else {
             throw new OXFException("Invalid action requested: " + actionEventName);
         }

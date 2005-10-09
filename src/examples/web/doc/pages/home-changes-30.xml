@@ -899,6 +899,9 @@
                 The legacy, deprecated File serializer is still available as
                 <code>oxf:legacy-file-serializer</code>.
             </p>
+            <p>
+                 [TODO: MARK INCOMPATIBLE CHANGE]
+            </p>
         </section>
         <section>
             <title>Enhanced Error Reporting</title>
@@ -1080,7 +1083,7 @@
                         <b>Request Generator</b>. The Request Generator used to return a constructed
                         path for the <code>path-info</code> parameter. It now correctly returns the
                         Servlet API's path info. To get a complete path, use
-                        <code>request-path</code> instead.
+                        <code>request-path</code> instead. [TODO: MARK INCOMPATIBLE CHANGE]
                     </p>
                 </li>
                 <li>

@@ -567,7 +567,7 @@ public class XFormsActionInterpreter {
 
             // 10.1.8 The load Element
 
-            final String src = actionElement.attributeValue("src");
+            final String ref = actionElement.attributeValue("ref");
             final String resource = actionElement.attributeValue("resource");
             final String show;
             {
@@ -581,26 +581,30 @@ public class XFormsActionInterpreter {
                 }
             }
 
-            if (src != null && resource != null) {
+            if (ref != null && resource != null) {
                 // "If both are present, the action has no effect."
                 // NOP
-            } else if (src != null) {
+            } else if (ref != null) {
                 // Use single-node binding
-                try {
-                    final String url = XFormsUtils.retrieveSrcValue(src);
+                final Node currentNode = xformsControls.getCurrentSingleNode();
+                if (currentNode != null) {
+                    final String value = XFormsInstance.getValueForNode(currentNode);
                     // TODO: resolve relative URIs
-                    containingDocument.addLoad(url, show);
-                } catch (IOException e) {
-                    containingDocument.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(xformsControls.getCurrentModel(), src, null, e));
+                    containingDocument.addLoad(value, show);
+                } else {
+                    // Should we do this here?
+                    containingDocument.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(xformsControls.getCurrentModel(), "", null, null));
                 }
+                // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
             } else if (resource != null) {
                 // Use linking attribute
                 // TODO: resolve relative URIs
                 containingDocument.addLoad(resource, show);
+                // NOTE: We are supposed to throw an xforms-link-error in case of failure. Can we do it?
             } else {
                 // "Either the single node binding attributes, pointing to a URI in the instance
                 // data, or the linking attributes are required."
-                throw new OXFException("Missing 'resource' or 'src' attribute on xforms:load element.");
+                throw new OXFException("Missing 'resource' or 'ref' attribute on xforms:load element.");
             }
 
 

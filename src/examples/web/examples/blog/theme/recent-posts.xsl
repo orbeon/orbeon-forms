@@ -97,7 +97,7 @@
 
             <!-- Validate comment -->
             <xforms:bind nodeset="/form/comment">
-                <xforms:bind nodeset="name" constraint="normalize-space(name) != ''"/>
+                <xforms:bind nodeset="name" constraint="normalize-space(.) != ''"/>
                 <xforms:bind nodeset="text" constraint="normalize-space(instance('comment-response')/text) != ''"/>
             </xforms:bind>
 
@@ -105,8 +105,8 @@
 <!--            <xforms:bind nodeset="/form/comment/text" constraint="normalize-space(.) != ''"/>-->
 
 
-            <xforms:submission id="comment-submission" method="post" action="/blog/save-comment"/>
-            <xforms:submission id="comment-formatting" method="post" action="/blog/format-comment" ref="instance('comment-request')" replace="instance" instance="comment-response"/>
+            <xforms:submission id="save-comment-submission" method="post" action="/blog/save-comment"/>
+            <xforms:submission id="format-comment-submission" method="post" action="/blog/format-comment" ref="instance('comment-request')" replace="instance" instance="comment-response"/>
         </xforms:model>
     </head>
     <body>
@@ -254,7 +254,7 @@
                                                         <xforms:setvalue ref="instance('comment-request')/email" value="instance('main')/comment/email"/>
                                                         <xforms:setvalue ref="instance('comment-request')/uri" value="instance('main')/comment/uri"/>
                                                         <xforms:setvalue ref="instance('comment-request')/text" value="instance('main')/comment/text"/>
-                                                        <xforms:send submission="comment-formatting"/>
+                                                        <xforms:send submission="format-comment-submission"/>
                                                     </xforms:action>
                                                 </xforms:input>
                                             </td>
@@ -271,7 +271,7 @@
                                                         <xforms:setvalue ref="instance('comment-request')/email" value="instance('main')/comment/email"/>
                                                         <xforms:setvalue ref="instance('comment-request')/uri" value="instance('main')/comment/uri"/>
                                                         <xforms:setvalue ref="instance('comment-request')/text" value="instance('main')/comment/text"/>
-                                                        <xforms:send submission="comment-formatting"/>
+                                                        <xforms:send submission="format-comment-submission"/>
                                                     </xforms:action>
                                                 </xforms:input>
                                             </td>
@@ -287,7 +287,7 @@
                                                         <xforms:setvalue ref="instance('comment-request')/email" value="instance('main')/comment/email"/>
                                                         <xforms:setvalue ref="instance('comment-request')/uri" value="instance('main')/comment/uri"/>
                                                         <xforms:setvalue ref="instance('comment-request')/text" value="instance('main')/comment/text"/>
-                                                        <xforms:send submission="comment-formatting"/>
+                                                        <xforms:send submission="format-comment-submission"/>
                                                     </xforms:action>
                                                 </xforms:input>
                                             </td>
@@ -309,7 +309,7 @@
                                                         <xforms:setvalue ref="instance('comment-request')/email" value="instance('main')/comment/email"/>
                                                         <xforms:setvalue ref="instance('comment-request')/uri" value="instance('main')/comment/uri"/>
                                                         <xforms:setvalue ref="instance('comment-request')/text" value="instance('main')/comment/text"/>
-                                                        <xforms:send submission="comment-formatting"/>
+                                                        <xforms:send submission="format-comment-submission"/>
                                                     </xforms:action>
                                                 </xforms:textarea>
                                             </td>

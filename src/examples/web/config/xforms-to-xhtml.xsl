@@ -35,7 +35,7 @@
         </xhtml:input> 
         <xhtml:input type="image" class="calendar-button" src="/images/showCalendar.gif" value="Date"
             onclick="showCalendar('', '{$id}'); return false;"/>
-        <xsl:if test="not(preceding::xforms:input[@xxforms:type = 'xs:date'])">
+        <xsl:if test="not(preceding::xforms:input[@xxforms:type = '{http://www.w3.org/2001/XMLSchema}date'])">
             <xhtml:div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"/>
         </xsl:if>
     </xsl:template>
@@ -74,7 +74,7 @@
     <xsl:template match="xforms:input">
         <xsl:choose>
             <!-- Display a overlib calendar -->
-            <xsl:when test="@xxforms:type = 'xs:date'">
+            <xsl:when test="@xxforms:type = '{http://www.w3.org/2001/XMLSchema}date'">
                 <xsl:call-template name="show-date-picker">
                     <xsl:with-param name="input" select="."/>
                 </xsl:call-template>

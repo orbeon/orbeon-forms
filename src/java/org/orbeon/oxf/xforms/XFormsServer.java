@@ -13,6 +13,7 @@
  */
 package org.orbeon.oxf.xforms;
 
+import org.apache.log4j.Logger;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.orbeon.oxf.common.OXFException;
@@ -21,15 +22,14 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeEvent;
 import org.orbeon.oxf.xforms.event.events.XXFormsInitializeStateEvent;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
-import org.orbeon.oxf.util.LoggerFactory;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
-import org.apache.log4j.Logger;
 
 import java.util.*;
 
@@ -214,7 +214,7 @@ public class XFormsServer extends ProcessorImpl {
                     {
                         ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control-values");
 
-                        diffControlsState(pipelineContext, ch, isInitializationRun ? null : xFormsControls.getInitialControlsState().getChildren(),
+                        diffControlsState(ch, isInitializationRun ? null : xFormsControls.getInitialControlsState().getChildren(),
                                 currentControlsState.getChildren());
 
                         ch.endElement();
@@ -308,7 +308,7 @@ public class XFormsServer extends ProcessorImpl {
         }
     }
 
-    private void diffControlsState(PipelineContext pipelineContext, ContentHandlerHelper ch, List state1, List state2) {
+    private void diffControlsState(ContentHandlerHelper ch, List state1, List state2) {
 
         // Trivial case
         if (state1 == null && state2 == null)
@@ -431,12 +431,9 @@ public class XFormsServer extends ProcessorImpl {
                         if (XFormsControls.isValueControl(controlInfo2.getName())) {
 
                             // Check if a "display-value" attribute must be added
-                            if (controlInfo2 instanceof XFormsControls.InputControlInfo) {
-                                final XFormsControls.InputControlInfo inputControlInfo = (XFormsControls.InputControlInfo) controlInfo2;
-                                final String displayValue = inputControlInfo.getDisplayValue(pipelineContext);
-                                if (displayValue != null)
-                                    attributesImpl.addAttribute("", "display-value", "display-value", ContentHandlerHelper.CDATA, displayValue);
-                            }
+                            final String displayValue = controlInfo2.getDisplayValue();
+                            if (displayValue != null)
+                                attributesImpl.addAttribute("", "display-value", "display-value", ContentHandlerHelper.CDATA, displayValue);
 
                             // Create element with text value
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);
@@ -473,7 +470,7 @@ public class XFormsServer extends ProcessorImpl {
 
                     if (size1 == size2) {
                         // No add or remove of children
-                        diffControlsState(pipelineContext, ch, children1, controlInfo2.getChildren());
+                        diffControlsState(ch, children1, controlInfo2.getChildren());
                     } else if (size2 > size1) {
                         // Size has grown
 
@@ -483,10 +480,10 @@ public class XFormsServer extends ProcessorImpl {
                         }
 
                         // Diff the common subset
-                        diffControlsState(pipelineContext, ch, children1, children2.subList(0, size1));
+                        diffControlsState(ch, children1, children2.subList(0, size1));
 
                         // Issue new values for new iterations
-                        diffControlsState(pipelineContext, ch, null, children2.subList(size1, size2));
+                        diffControlsState(ch, null, children2.subList(size1, size2));
 
                     } else if (size2 < size1) {
                         // Size has shrunk
@@ -524,7 +521,7 @@ public class XFormsServer extends ProcessorImpl {
                                 new String[]{"id", templateId, "parent-indexes", parentIndexes, "count", "" + (size1 - size2)});
 
                         // Diff the remaining subset
-                        diffControlsState(pipelineContext, ch, children1.subList(0, size2), children2);
+                        diffControlsState(ch, children1.subList(0, size2), children2);
                     }
                 } else if ((controlInfo2 instanceof XFormsControls.RepeatControlInfo) && controlInfo1 == null) {
 
@@ -539,7 +536,7 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    diffControlsState(pipelineContext, ch, null, children2);
+                    diffControlsState(ch, null, children2);
 
                 } else if ((controlInfo2 instanceof XFormsControls.RepeatControlInfo) && children1 == null) {
 
@@ -554,11 +551,11 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     // Issue new values for the children
-                    diffControlsState(pipelineContext, ch, null, children2);
+                    diffControlsState(ch, null, children2);
 
                 } else {
                     // Other grouping controls
-                    diffControlsState(pipelineContext, ch, children1, children2);
+                    diffControlsState(ch, children1, children2);
                 }
             }
         }

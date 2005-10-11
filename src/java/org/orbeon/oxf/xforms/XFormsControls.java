@@ -1333,6 +1333,7 @@ public class XFormsControls {
             for (Iterator i = valueControls.iterator(); i.hasNext();) {
                 final ControlInfo currentControlInfo = (ControlInfo) i.next();
                 currentControlInfo.evaluateValue(pipelineContext);
+                currentControlInfo.evaluateDisplayValue(pipelineContext);
             }
         }
 
@@ -1463,6 +1464,7 @@ public class XFormsControls {
         private String hint;
         private String alert;
         private String value;
+        private String displayValue;
 
         private boolean readonly;
         private boolean required;
@@ -1594,8 +1596,19 @@ public class XFormsControls {
             return value;
         }
 
+        /**
+         * Return a formatted display value of the control value, null if there is no such value.
+         */
+        public String getDisplayValue() {
+            return displayValue;
+        }
+
         private void setValue(String value) {
             this.value = value;
+        }
+
+        public void setDisplayValue(String displayValue) {
+            this.displayValue = displayValue;
         }
 
         public ControlInfo getParent() {
@@ -1660,6 +1673,23 @@ public class XFormsControls {
 
         public void evaluateValue(PipelineContext pipelineContext) {
             setValue(XFormsInstance.getValueForNode(currentBindingContext.getSingleNode()));
+        }
+
+        public void evaluateDisplayValue(PipelineContext pipelineContext) {
+            // NOP for most controls
+        }
+
+        protected void evaluateDisplayValue(PipelineContext pipelineContext, String format) {
+            if (format == null) {
+                setDisplayValue(null);
+            } else {
+                // Format value according to format attribute
+                final Map prefixToURIMap = Dom4jUtils.getNamespaceContextNoDefault(getElement());
+
+                setDisplayValue(getCurrentInstance()
+                    .evaluateXPathAsString(pipelineContext, currentBindingContext.getSingleNode(),
+                            format, prefixToURIMap, null, functionLibrary, null));
+            }
         }
 
         public XFormsEventHandlerContainer getParentContainer() {
@@ -1757,7 +1787,7 @@ public class XFormsControls {
      */
     public class InputControlInfo extends ControlInfo {
 
-        // Date format (when relevant)
+        // Optional display format
         private String format;
 
         public InputControlInfo(ControlInfo parent, Element element, String name, String id) {
@@ -1769,20 +1799,43 @@ public class XFormsControls {
             return format;
         }
 
-        public String getDisplayValue(PipelineContext pipelineContext) {
-            if (format == null)
-                return null;
-
-            // Format date value according to date-format attribute
-            final Map variablesMap = new HashMap();
-            variablesMap.put("date-string", getValue());
-            variablesMap.put("format-string", format);
-            final Map prefixToURIMap = new HashMap();
-            prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-            return getCurrentInstance()
-                    .evaluateXPathAsString(pipelineContext, getCurrentInstance().getDocument(),
-                            "format-date(xs:date($date-string), $format-string, 'en', (), ())", prefixToURIMap, variablesMap, functionLibrary, null);
+        public void evaluateDisplayValue(PipelineContext pipelineContext) {
+            evaluateDisplayValue(pipelineContext, format);
         }
+
+//        public String getDisplayValueOld(PipelineContext pipelineContext) {
+//
+//            final String valueType = getType();
+//
+//            if (format == null || valueType == null)
+//                return null;
+//
+//            // Format date value according to date-format attribute
+//            final Map variablesMap = new HashMap();
+//            variablesMap.put("value-string", getValue());
+//            variablesMap.put("format-string", format);
+//            final Map prefixToURIMap = new HashMap();
+//            prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+//
+//            if ("{http://www.w3.org/2001/XMLSchema}date".equals(valueType)) {
+//                // Format a date
+//                return getCurrentInstance()
+//                    .evaluateXPathAsString(pipelineContext, getCurrentInstance().getDocument(),
+//                            "format-date(xs:date($value-string), $format-string, 'en', (), ())", prefixToURIMap, variablesMap, functionLibrary, null);
+//            } else if ("{http://www.w3.org/2001/XMLSchema}dateTime".equals(valueType)) {
+//                // Format a dateTime
+//                return getCurrentInstance()
+//                    .evaluateXPathAsString(pipelineContext, getCurrentInstance().getDocument(),
+//                            "format-dateTime(xs:dateTime($value-string), $format-string, 'en', (), ())", prefixToURIMap, variablesMap, functionLibrary, null);
+//            } else if ("{http://www.w3.org/2001/XMLSchema}time".equals(valueType)) {
+//                // Format a time
+//                return getCurrentInstance()
+//                    .evaluateXPathAsString(pipelineContext, getCurrentInstance().getDocument(),
+//                            "format-time(xs:time($value-string), $format-string, 'en', (), ())", prefixToURIMap, variablesMap, functionLibrary, null);
+//            } else {
+//                throw new OXFException("Value type not supported for xxforms:format: " + valueType);
+//            }
+//        }
     }
 
     /**
@@ -1790,11 +1843,15 @@ public class XFormsControls {
      */
     public class OutputControlInfo extends ControlInfo {
 
+        // Optional display format
+        private String format;
+
         // XForms 1.1 draft mediatype attribute
         private String mediaTypeAttribute;
 
         public OutputControlInfo(ControlInfo parent, Element element, String name, String id) {
             super(parent, element, name, id);
+            this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
             this.mediaTypeAttribute = element.attributeValue("mediatype");
         }
 
@@ -1811,6 +1868,10 @@ public class XFormsControls {
 
                 super.setValue(value);
             }
+        }
+
+        public void evaluateDisplayValue(PipelineContext pipelineContext) {
+            evaluateDisplayValue(pipelineContext, format);
         }
 
         public String getMediaTypeAttribute() {

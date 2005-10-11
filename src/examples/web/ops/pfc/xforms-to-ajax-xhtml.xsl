@@ -294,7 +294,7 @@
                     <xsl:if test="xxforms:control($id)/@readonly = 'true'">
                         <xsl:attribute name="disabled">disabled</xsl:attribute>
                     </xsl:if>
-                    <xsl:variable name="date-class" as="xs:string?" select="if (xxforms:control($id)/@type = 'xs:date') then 'xforms-date' else ()"/>
+                    <xsl:variable name="date-class" as="xs:string?" select="if (xxforms:control($id)/@type = '{http://www.w3.org/2001/XMLSchema}date') then 'xforms-date' else ()"/>
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', $date-class), $id)"/>
                 </xhtml:input>
             </xsl:otherwise>

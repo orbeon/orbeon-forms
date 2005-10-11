@@ -413,7 +413,7 @@ public class Dom4jUtils {
     }
 
     /**
-     * Decode a String containing an exploded QName into a QName.
+     * Decode a String containing an exploded QName (also known as a "Clark name") into a QName.
      */
     public static QName explodedQNameToQName(String qName) {
         int openIndex = qName.indexOf("{");
@@ -427,7 +427,7 @@ public class Dom4jUtils {
     }
 
     /**
-     * Encode a QName to an exploded QName String.
+     * Encode a QName to an exploded QName (also known as a "Clark name") String.
      */
     public static String qNameToexplodedQName(QName qName) {
         if ("".equals(qName.getNamespaceURI()))

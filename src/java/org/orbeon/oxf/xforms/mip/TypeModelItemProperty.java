@@ -36,9 +36,12 @@ public class TypeModelItemProperty implements Cloneable {
         return isSet;
     }
 
+    /**
+     * Return the type name as a "Clark name", i.e. in the form "{uri}localname".
+     */
     public String getAsString() {
         final int typeCode = get();
-        return (typeCode != 0) ? (StandardNames.getPrefix(typeCode) + ":" + StandardNames.getLocalName(typeCode)) : null;
+        return (typeCode != 0) ? StandardNames.getClarkName(typeCode) : null;
     }
 
     public Object clone() throws CloneNotSupportedException {

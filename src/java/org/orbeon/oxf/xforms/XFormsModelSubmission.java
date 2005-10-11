@@ -208,7 +208,7 @@ public class XFormsModelSubmission implements XFormsEventTarget, XFormsEventHand
 
                             final Element valueElement = parameterElement.element("value");
                             final String value = valueElement.getTextTrim();
-                            final String paramValueType = valueElement.attributeValue(XMLConstants.XSI_TYPE_QNAME);//TODO: get actual QName for attribute value
+                            final String paramValueType = Dom4jUtils.qNameToexplodedQName(Dom4jUtils.extractAttributeValueQName(valueElement, XMLConstants.XSI_TYPE_QNAME));
 
                             final String filename = parameterElement.element("filename").getTextTrim();
                             final String mediatype = parameterElement.element("content-type").getTextTrim();

@@ -1280,6 +1280,7 @@
                     <p:input name="controls">
                         <controls>
                             <xforms:input id="id1" ref="date" xxforms:format="format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ())"/>
+                            <xforms:output id="id2" ref="date" xxforms:format="format-date(xs:date(.), '[D]. [MNn] [Y]', 'de', (), ())"/>
                         </controls>
                     </p:input>
                     <p:input name="models">
@@ -1316,6 +1317,7 @@
                 <xxf:action>
                     <xxf:control-values>
                         <xxf:control id="id1" readonly="false" required="false" relevant="true" valid="true" type="{http://www.w3.org/2001/XMLSchema}date" display-value="October 11, 2005">2005-10-11</xxf:control>
+                        <xxf:control id="id2" readonly="false" required="false" relevant="true" valid="true" type="{http://www.w3.org/2001/XMLSchema}date" display-value="11. Oktober 2005">2005-10-11</xxf:control>
                     </xxf:control-values>
                     <xxf:divs/>
                     <xxf:itemsets/>

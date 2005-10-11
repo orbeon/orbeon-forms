@@ -1267,4 +1267,61 @@
         </output>
     </test>
 
+    <test description="Test for xxforms:format attribute" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors" xmlns:xxforms="http://orbeon.org/oxf/xml/xforms" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <p:param name="response" type="output"/>
+
+                <p:processor name="oxf:pipeline">
+                    <p:input name="config" href="xforms-server/wrap-server.xpl"/>
+                    <p:input name="event">
+                        <xxforms:event/>
+                    </p:input>
+                    <p:input name="controls">
+                        <controls>
+                            <xforms:input id="id1" ref="date" xxforms:format="format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ())"/>
+                        </controls>
+                    </p:input>
+                    <p:input name="models">
+                        <models>
+                            <xforms:model id="main-model">
+                                <xforms:instance id="main-instance">
+                                    <instance xmlns="">
+                                        <date>2005-10-11</date>
+                                    </instance>
+                                </xforms:instance>
+                                <xforms:bind nodeset="instance('main-instance')/date" type="xs:date"/>
+                            </xforms:model>
+                        </models>
+                    </p:input>
+                    <p:input name="instances">
+                        <xxforms:instances/>
+                    </p:input>
+                    <p:output name="response" ref="response"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="response">
+            <xxf:event-response xmlns:xxf="http://orbeon.org/oxf/xml/xforms">
+                <xxf:dynamic-state>
+                    <dynamic-state>
+                        <instances>
+                            <instance>
+                                <date>2005-10-11</date>
+                            </instance>
+                        </instances>
+                        <divs/>
+                    </dynamic-state>
+                </xxf:dynamic-state>
+                <xxf:action>
+                    <xxf:control-values>
+                        <xxf:control id="id1" readonly="false" required="false" relevant="true" valid="true" type="{http://www.w3.org/2001/XMLSchema}date" display-value="October 11, 2005">2005-10-11</xxf:control>
+                    </xxf:control-values>
+                    <xxf:divs/>
+                    <xxf:itemsets/>
+                </xxf:action>
+            </xxf:event-response>
+        </output>
+    </test>
+
 </group>

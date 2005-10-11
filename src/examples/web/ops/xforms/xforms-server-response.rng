@@ -51,6 +51,9 @@
                                 <optional>
                                     <attribute name="mediatype"/>
                                 </optional>
+                                <optional>
+                                    <attribute name="display-value"/>
+                                </optional>
                                 <ref name="model-item-properties"/>
                                 <optional>
                                     <data type="string"/>

@@ -28,6 +28,7 @@ import org.orbeon.oxf.xforms.event.events.XFormsDeselectEvent;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
+import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.xml.sax.Locator;
 
@@ -570,7 +571,10 @@ public class XFormsControls {
                 // Create ControlInfo with basic information
                 final ControlInfo controlInfo;
                 {
-                    if (controlName.equals("repeat")) {
+                    // TODO: Create one ControlInfo per control, and use a factory to create those
+                    if (controlName.equals("input")) {
+                        controlInfo = new InputControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
+                    } else if (controlName.equals("repeat")) {
                         controlInfo = new RepeatControlInfo(currentControlsContainer, controlElement, controlElement.getName(), effectiveControlId);
                     } else if (controlName.equals("submit")) {
                         controlInfo = new SubmitControlInfo(currentControlsContainer, controlElement, controlName, effectiveControlId);
@@ -1745,6 +1749,39 @@ public class XFormsControls {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Represents an xforms:input control.
+     */
+    public class InputControlInfo extends ControlInfo {
+
+        // Date format (when relevant)
+        private String format;
+
+        public InputControlInfo(ControlInfo parent, Element element, String name, String id) {
+            super(parent, element, name, id);
+            this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
+        }
+
+        public String getFormat() {
+            return format;
+        }
+
+        public String getDisplayValue(PipelineContext pipelineContext) {
+            if (format == null)
+                return null;
+
+            // Format date value according to date-format attribute
+            final Map variablesMap = new HashMap();
+            variablesMap.put("date-string", getValue());
+            variablesMap.put("format-string", format);
+            final Map prefixToURIMap = new HashMap();
+            prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+            return getCurrentInstance()
+                    .evaluateXPathAsString(pipelineContext, getCurrentInstance().getDocument(),
+                            "format-date(xs:date($date-string), $format-string, 'en', (), ())", prefixToURIMap, variablesMap, functionLibrary, null);
         }
     }
 

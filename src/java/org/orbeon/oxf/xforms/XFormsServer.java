@@ -288,6 +288,14 @@ public class XFormsServer extends ProcessorImpl {
                         }
                     }
 
+                    // Output loads
+                    {
+                        final List loads = containingDocument.getLoads();
+                        if (loads != null) {
+                            outputLoadsInfo(ch, loads);
+                        }
+                    }
+
                     // Output focus instructions
                     {
                         final String focusEffectiveControlId = containingDocument.getFocusEffectiveControlId();
@@ -587,6 +595,14 @@ public class XFormsServer extends ProcessorImpl {
                     new String[]{"level", message.getLevel()});
             ch.text(message.getMessage());
             ch.endElement();
+        }
+    }
+
+    private void outputLoadsInfo(ContentHandlerHelper ch, List loads) {
+        for (Iterator i = loads.iterator(); i.hasNext();) {
+            final XFormsContainingDocument.Load load = (XFormsContainingDocument.Load) i.next();
+            ch.element("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "load",
+                    new String[]{ "resource", load.getResource(), "show", load.getShow() });
         }
     }
 

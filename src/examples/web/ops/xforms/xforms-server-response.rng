@@ -168,6 +168,17 @@
                         <data type="string"/>
                     </element>
                 </zeroOrMore>
+                <zeroOrMore>
+                    <element name="xxforms:load">
+                        <attribute name="resource"/>
+                        <attribute name="show">
+                            <choice>
+                                <value>replace</value>
+                                <value>new</value>
+                            </choice>
+                        </attribute>
+                    </element>
+                </zeroOrMore>
                 <optional>
                     <element name="xxforms:setfocus">
                         <attribute name="control-id"/>

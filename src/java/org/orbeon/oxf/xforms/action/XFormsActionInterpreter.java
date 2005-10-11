@@ -551,7 +551,7 @@ public class XFormsActionInterpreter {
 
             final String controlId = actionElement.attributeValue("control");
             if (controlId == null)
-                throw new OXFException("Missing mandatory control attribute on xforms:control element.");
+                throw new OXFException("Missing mandatory 'control' attribute on xforms:control element.");
             final String effectiveControlId = xformsControls.getCurrentControlsState().findEffectiveControlId(controlId);
             if (effectiveControlId == null)
                 throw new OXFException("Could not find actual control on xforms:setfocus element for control: " + controlId);
@@ -562,6 +562,48 @@ public class XFormsActionInterpreter {
                 throw new OXFException("xforms:setfocus attribute 'control' must refer to a control: " + controlId);
 
             containingDocument.dispatchEvent(pipelineContext, new XFormsFocusEvent((XFormsEventTarget) controlObject));
+
+        } else if (XFormsActions.XFORMS_LOAD_ACTION.equals(actionEventName)) {
+
+            // 10.1.8 The load Element
+
+            final String src = actionElement.attributeValue("src");
+            final String resource = actionElement.attributeValue("resource");
+            final String show;
+            {
+                final String showAttribute = actionElement.attributeValue("show");
+                if (showAttribute == null) {
+                    show = "replace";
+                } else {
+                    if (!(showAttribute.equals("replace") || showAttribute.equals("new")))
+                        throw new OXFException("Invalid value for 'show' attribute on xforms:load element: " + showAttribute);
+                    show = showAttribute;
+                }
+            }
+
+            if (src != null && resource != null) {
+                // "If both are present, the action has no effect."
+                // NOP
+            } else if (src != null) {
+                // Use single-node binding
+                try {
+                    final String url = XFormsUtils.retrieveSrcValue(src);
+                    // TODO: resolve relative URIs
+                    containingDocument.addLoad(url, show);
+                } catch (IOException e) {
+                    containingDocument.dispatchEvent(pipelineContext, new XFormsLinkErrorEvent(xformsControls.getCurrentModel(), src, null, e));
+                }
+            } else if (resource != null) {
+                // Use linking attribute
+                // TODO: resolve relative URIs
+                containingDocument.addLoad(resource, show);
+            } else {
+                // "Either the single node binding attributes, pointing to a URI in the instance
+                // data, or the linking attributes are required."
+                throw new OXFException("Missing 'resource' or 'src' attribute on xforms:load element.");
+            }
+
+
 
         } else {
             throw new OXFException("Invalid action requested: " + actionEventName);

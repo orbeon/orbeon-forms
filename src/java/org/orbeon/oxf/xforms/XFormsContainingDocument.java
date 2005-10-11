@@ -44,6 +44,7 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
     private XFormsModelSubmission activeSubmission;
     private List messages;
+    private List loads;
     private String focusEffectiveControlId;
 
     private XFormsActionInterpreter actionInterpreter;
@@ -159,6 +160,40 @@ public class XFormsContainingDocument implements XFormsEventTarget, XFormsEventH
 
         public String getLevel() {
             return level;
+        }
+    }
+
+    /**
+     * Add an XForms load to send to the client.
+     */
+    public void addLoad(String resource, String show) {
+        if (loads == null)
+            loads = new ArrayList();
+        loads.add(new Load(resource, show));
+    }
+
+    /**
+     * Return the list of messages to send to the client, null if none.
+     */
+    public List getLoads() {
+        return loads;
+    }
+
+    public static class Load {
+        private String resource;
+        private String show;
+
+        public Load(String resource, String show) {
+            this.resource = resource;
+            this.show = show;
+        }
+
+        public String getResource() {
+            return resource;
+        }
+
+        public String getShow() {
+            return show;
         }
     }
 

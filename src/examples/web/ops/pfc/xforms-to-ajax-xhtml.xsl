@@ -151,7 +151,6 @@
                     <xsl:value-of select="'$xforms-output-value$'"/>
                 </xsl:when>
                 <xsl:otherwise>
-
                     <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
                     <xsl:variable name="is-html"
                                   select="local-name-from-QName(xs:QName(@appearance)) = 'html'
@@ -164,8 +163,10 @@
                                   select="if ($is-html) then 'xforms-output-html'
                                           else if ($is-image) then 'xforms-output-image'
                                           else ()"/>
-
-                    <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output', $html-class), $id)"/>
+                    <xsl:variable name="date-class" as="xs:string?"
+                            select="if (xxforms:control($id)/@type = '{http://www.w3.org/2001/XMLSchema}date')
+                            then 'xforms-date' else ()"/>
+                    <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output', $html-class, $date-class), $id)"/>
                     <xsl:choose>
                         <!-- Case of image media type with URI -->
                         <xsl:when test="$is-image">
@@ -294,7 +295,9 @@
                     <xsl:if test="xxforms:control($id)/@readonly = 'true'">
                         <xsl:attribute name="disabled">disabled</xsl:attribute>
                     </xsl:if>
-                    <xsl:variable name="date-class" as="xs:string?" select="if (xxforms:control($id)/@type = '{http://www.w3.org/2001/XMLSchema}date') then 'xforms-date' else ()"/>
+                    <xsl:variable name="date-class" as="xs:string?"
+                            select="if (xxforms:control($id)/@type = '{http://www.w3.org/2001/XMLSchema}date')
+                            then 'xforms-date' else ()"/>
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', $date-class), $id)"/>
                 </xhtml:input>
             </xsl:otherwise>

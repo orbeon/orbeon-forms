@@ -1309,6 +1309,20 @@ function xformsHandleResponse() {
                                     alert(message);
                                 break;
                             }
+
+                            // Load another page
+                            case "load": {
+                                var loadElement = actionElement.childNodes[actionIndex];
+                                var resource = loadElement.getAttribute("resource");
+                                var show = loadElement.getAttribute("show");
+                                if (show == "replace") {
+                                    window.location.href = resource;
+                                    return;
+                                } else {
+                                    window.open(resource, "_blank");
+                                }
+                                break;
+                            }
                         }
                     }
                 }

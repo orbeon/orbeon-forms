@@ -29,9 +29,10 @@
                 </instance>
             </xforms:instance>
             <xforms:instance id="alert">
-                <alert>Second control incorrect</alert>
+                <alert></alert>
             </xforms:instance>
             <xforms:bind nodeset="/instance/(a|b)" readonly="true()" constraint=". = 'true'"/>
+            <xforms:bind nodeset="instance('alert')" calculate="concat('Second control incorrect. Time: ', current-time())"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>

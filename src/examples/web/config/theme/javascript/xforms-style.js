@@ -173,6 +173,12 @@ function xformsUpdateStyle(element) {
                 if (xformsIsDefined(control.isValid))
                     element.className = control.isValid ? "xforms-alert-inactive" : "xforms-alert-active";
 
+                // Change message if necessary
+                if (control.alertMessage) {
+                    if (control.xformsMessageLabel)
+                        xformsReplaceNodeText(control.xformsMessageLabel, control.alertMessage);
+                }
+
                 // Disable or enable help depending if control is relevant
                 updateRelevantReadonly(element, control.isRelevant, control.isReadonly);
             }

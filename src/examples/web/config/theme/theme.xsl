@@ -75,16 +75,34 @@
                 <!-- Handle optional tabs -->
                 <xsl:apply-templates select="/xhtml:html/xhtml:head/f:tabs"/>
                 <xsl:apply-templates select="/xhtml:html/xhtml:body/node()"/>
+                <!-- Template for alert messages -->
             </xhtml:body>
         </xhtml:html>
     </xsl:template>
 
     <!-- - - - - - - Form controls - - - - - - -->
 
-    <xsl:template match="xhtml:form">
+    <xsl:template match="xhtml:form[@class = 'xforms-form']">
         <xsl:copy>
             <xsl:apply-templates select="@*|node()"/>
         </xsl:copy>
+        <!-- Summary section for errors -->
+        <xhtml:table id="xforms-messages">
+            <!-- This section starts hidden if there are not errors the first time the page is displayed -->
+            <xsl:if test="count(.//xhtml:label[starts-with(@class, 'xforms-alert-active')]) = 0">
+                <xsl:attribute name="style">display: none</xsl:attribute>
+            </xsl:if>
+            <xhtml:tr>
+                <xhtml:td style="padding-left: 1em">
+                    <xhtml:img src="/images/error-large.gif" alt="Error"/>
+                </xhtml:td>
+                <xhtml:td style="padding-right: 1em">
+                    <xsl:for-each select=".//xhtml:label[starts-with(@class, 'xforms-alert-')]">
+                        <xhtml:label for="{@for}" class="xforms-message"><xsl:value-of select="."/></xhtml:label>
+                    </xsl:for-each>
+                </xhtml:td>
+            </xhtml:tr>
+        </xhtml:table>
     </xsl:template>
     
     <xsl:template match="xhtml:textarea">

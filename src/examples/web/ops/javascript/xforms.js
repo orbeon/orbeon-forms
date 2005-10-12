@@ -447,7 +447,7 @@ function xformsInitializeControlsUnder(root) {
             if (className.indexOf("widget-") != -1)
                 isWidget = true;
         }
-        
+
         if (isWidget && !isXFormsElement) {
             // For widget: just add style
             xformsUpdateStyle(control);
@@ -553,7 +553,6 @@ function xformsInitializeControlsUnder(root) {
                     xformsAddEventListener(document, "mousemove", rangeMouseMove);
                     xformsAddEventListener(document, "mouseup", rangeMouseUp);
                 }
-            
             } else if (control.tagName == "SPAN" || control.tagName == "DIV") {
                 // Don't add listeners on spans
             } else {
@@ -643,9 +642,22 @@ function xformsInitializeControlsUnder(root) {
                 registerForFocusBlurEvents(control);
             }
 
-            // If alert, store reference in control element to this alert element
-            if (isXFormsAlert)
-                document.getElementById(control.htmlFor).alertElement = control;
+            // Alert label next to the control
+            if (isXFormsAlert) {
+                var isActive = xformsArrayContains(className.split(" "), "xforms-alert-active");
+
+                // Store reference in control element to this alert element
+                var alertFor = document.getElementById(control.htmlFor);
+                alertFor.alertElement = control;
+                alertFor.isValid = !isActive;
+
+                // If active error, display messages and increment error counter
+                if (isActive) {
+                    var xformsMessages = document.getElementById("xforms-messages");
+                    if (xformsMessages != null)
+                        xformsMessages.invalidCount++;
+                }
+            }
 
             // Add style to element
             xformsUpdateStyle(control);
@@ -676,6 +688,18 @@ function xformsPageLoaded() {
         document.xformsRequestInProgress = false;
         document.xformsEvents = new Array();
         document.xformsChangedIdsRequest = new Array();
+
+        // Initialize summary section that displays alert messages
+        var xformsMessages = document.getElementById("xforms-messages");
+        if (xformsMessages) {
+            xformsMessages.invalidCount = 0;
+            var labels = xformsMessages.getElementsByTagName("LABEL");
+            for (var labelIndex = 0; labelIndex < labels.length; labelIndex++) {
+                var label = labels[labelIndex];
+                var xformsControl = document.getElementById(label.htmlFor);
+                xformsControl.xformsMessageLabel = label;
+            }
+        }
 
         // Initialize controls
         xformsInitializeControlsUnder(document.body);
@@ -970,7 +994,21 @@ function xformsHandleResponse() {
 
                                             // Store validity, label, hint, help in element
                                             var newValid = controlElement.getAttribute("valid");
-                                            if (newValid != null) documentElement.isValid = newValid != "false";
+                                            if (newValid != null) {
+                                                var newIsValid = newValid != "false";
+                                                if (newIsValid != documentElement.isValid) {
+                                                    // Show or hide messages section
+                                                    var xformsMessages = document.getElementById("xforms-messages");
+                                                    if (xformsMessages) {
+                                                        xformsMessages.invalidCount += (newIsValid ? -1 : +1);
+                                                        xformsMessages.style.display = xformsMessages.invalidCount == 0 ? "none" : "";
+                                                    }
+                                                    // Show or hide specific message for this control
+                                                    if (documentElement.xformsMessageLabel)
+                                                        documentElement.xformsMessageLabel.style.display = newIsValid ? "none" : "";
+                                                }
+                                                documentElement.isValid = newIsValid;
+                                            }
                                             // Store new hint message in control attribute
                                             var newLabel = controlElement.getAttribute("label");
                                             if (newLabel && newLabel != documentElement.labelMessage)
@@ -983,6 +1021,10 @@ function xformsHandleResponse() {
                                             var newHelp = controlElement.getAttribute("help");
                                             if (newHelp && newHelp != documentElement.helpMessage)
                                                 documentElement.helpMessage = newHelp;
+                                            // Store new alert message in control attribute
+                                            var newAlert = controlElement.getAttribute("alert");
+                                            if (newAlert && newAlert != documentElement.alertMessage)
+                                                documentElement.alertMessage = newAlert;
                                             // Update relevant and readonly
                                             if (relevant)
                                                 documentElement.isRelevant = relevant == "true";

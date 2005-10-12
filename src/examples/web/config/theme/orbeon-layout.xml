@@ -415,7 +415,7 @@ a:hover {
 .tree-items, .tree-items-selected {
     margin-left: 0em;
     padding-left: 1em;
-    list-style-type: none; // This does not see to have an effect on Safari
+    list-style-type: none;
     color: black;
     font-weight: normal;
     font-style: normal;
@@ -581,7 +581,7 @@ ul {
 .xforms-alert-inactive, .xforms-alert-active {
     display: -moz-inline-box;
     display: inline-block; 
-    white-space: no-wrap;
+    white-space: nowrap;
     padding-left: 20px;
     width: 18px;
     height: 18px;
@@ -605,7 +605,7 @@ ul {
     background-position: top left;
     display: -moz-inline-box;
     display: inline-block;  
-    white-space: no-wrap;
+    white-space: nowrap;
     padding-left: 20px;
     width: 20px;
     height: 22px;
@@ -721,6 +721,16 @@ ul {
 
 .xforms-date {
     display: none;
+}
+
+#xforms-messages {
+    background: #fcc;
+}
+
+.xforms-message {
+    list-style: disc;
+    display: list-item;
+    margin-left: 2em;
 }
 
 #xforms-repeat-tree {

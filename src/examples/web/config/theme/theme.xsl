@@ -97,8 +97,14 @@
                     <xhtml:img src="/images/error-large.gif" alt="Error"/>
                 </xhtml:td>
                 <xhtml:td style="padding-right: 1em">
+                    <xhtml:p>Please check form for invalid values</xhtml:p>
                     <xsl:for-each select=".//xhtml:label[starts-with(@class, 'xforms-alert-')]">
-                        <xhtml:label for="{@for}" class="xforms-message"><xsl:value-of select="."/></xhtml:label>
+                        <xhtml:label for="{@for}" class="xforms-message">
+                            <xsl:if test="@class = 'xforms-alert-inactive'">
+                                <xsl:attribute name="style">display: none</xsl:attribute>
+                            </xsl:if>
+                            <xsl:value-of select="."/>
+                        </xhtml:label>
                     </xsl:for-each>
                 </xhtml:td>
             </xhtml:tr>

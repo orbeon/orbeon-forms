@@ -650,6 +650,7 @@ function xformsInitializeControlsUnder(root) {
                 var alertFor = document.getElementById(control.htmlFor);
                 alertFor.alertElement = control;
                 alertFor.isValid = !isActive;
+                alertFor.alertMessage = xformsStringValue(control);
 
                 // If active error, display messages and increment error counter
                 if (isActive) {
@@ -992,24 +993,7 @@ function xformsHandleResponse() {
                                                 }
                                             }
 
-                                            // Store validity, label, hint, help in element
-                                            var newValid = controlElement.getAttribute("valid");
-                                            if (newValid != null) {
-                                                var newIsValid = newValid != "false";
-                                                if (newIsValid != documentElement.isValid) {
-                                                    // Show or hide messages section
-                                                    var xformsMessages = document.getElementById("xforms-messages");
-                                                    if (xformsMessages) {
-                                                        xformsMessages.invalidCount += (newIsValid ? -1 : +1);
-                                                        xformsMessages.style.display = xformsMessages.invalidCount == 0 ? "none" : "";
-                                                    }
-                                                    // Show or hide specific message for this control
-                                                    if (documentElement.xformsMessageLabel)
-                                                        documentElement.xformsMessageLabel.style.display = newIsValid ? "none" : "";
-                                                }
-                                                documentElement.isValid = newIsValid;
-                                            }
-                                            // Store new hint message in control attribute
+                                            // Store new label message in control attribute
                                             var newLabel = controlElement.getAttribute("label");
                                             if (newLabel && newLabel != documentElement.labelMessage)
                                                 documentElement.labelMessage = newLabel;
@@ -1025,6 +1009,29 @@ function xformsHandleResponse() {
                                             var newAlert = controlElement.getAttribute("alert");
                                             if (newAlert && newAlert != documentElement.alertMessage)
                                                 documentElement.alertMessage = newAlert;
+                                            // Store validity, label, hint, help in element
+                                            var newValid = controlElement.getAttribute("valid");
+                                            if (newValid != null) {
+                                                var newIsValid = newValid != "false";
+                                                if (newIsValid != documentElement.isValid) {
+                                                    // Show or hide messages section
+                                                    var xformsMessages = document.getElementById("xforms-messages");
+                                                    if (xformsMessages) {
+                                                        xformsMessages.invalidCount += (newIsValid ? -1 : +1);
+                                                        xformsMessages.style.display = xformsMessages.invalidCount == 0 ? "none" : "";
+                                                    }
+                                                    // Show or hide specific message for this control
+                                                    if (documentElement.xformsMessageLabel) {
+                                                        if (newIsValid) {
+                                                            documentElement.xformsMessageLabel.style.display = "none";
+                                                        } else {
+                                                            if (documentElement.alertMessage != "")
+                                                                documentElement.xformsMessageLabel.style.display = "";
+                                                        }
+                                                    }
+                                                }
+                                                documentElement.isValid = newIsValid;
+                                            }
                                             // Update relevant and readonly
                                             if (relevant)
                                                 documentElement.isRelevant = relevant == "true";

@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Copyright (C) 2004 Orbeon, Inc.
+
+    The Orbeon documentation is not distributed under the LGPL license. Use of the documentation is
+    subject to the following terms:
+
+    * Conversion to other formats is allowed, but the actual content may not be altered or edited
+      in any way.
+
+    * You may create printed copies for your own personal use.
+
+    * For all other uses, such as selling printed copies or using (parts of) the manual in another
+      publication, prior written agreement from Orbeon, Inc. is required.
+
+    Please contact Orbeon at info@orbeon.com for more information.
+-->
+<document xmlns:p="http://www.orbeon.com/oxf/pipeline"
+          xmlns:xforms="http://www.w3.org/2002/xforms"
+          xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+          xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:xhtml="http://www.w3.org/1999/xhtml"
+          xmlns:ev="http://www.w3.org/2001/xml-events">
+    <header>
+        <title>XForms Reference</title>
+    </header>
+    <body>
+        <section>
+            <title>Scope</title>
+            <p>
+                Web applications use forms to collect data from users. Orbeon PresentationServer
+                (OPS)'s form handling capabilities are based on <link
+                href="http://www.w3.org/MarkUp/Forms/">XForms</link>, namely the <a
+                href="http://www.w3.org/TR/xforms/">XForms 1.0 W3C Recommendation</a>. This section
+                provides an introduction to XForms concepts and explains how to use XForms in your
+                OPS application.
+            </p>
+        </section>
+        <a name="xxx"/>
+        <section>
+            <title>Programming With XForms 1.0</title>
+            <section>
+                <title></title>
+                <p>
+                    TODO
+                </p>
+                <p>
+
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>Formatting</title>
+            <section>
+                <title>Rationale</title>
+                <p>
+                    It is usually recommended to use native XML types within XForms instances, as
+                    this guarantees interoperability and maintainability. For example, a date of
+                    January 10, 2005 is stored in ISO format as: <code>2005-10-01</code>. However it
+                    is often necessary to format such values on screen in a user-readable format,
+                    like "January 10, 2005", "10 janvier 2005", or "10. Januar 2005".
+                </p>
+                <p>
+                    OPS provides an extension attribute, <code>xxforms:format</code>, for that
+                    purpose. <code>xxforms:format</code> must contain an XPath 2.0 expression, and
+                    also supports the following XSLT 2.0 functions:
+                </p>
+                <ul>
+                    <li><code>format-date()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-date">external documentation</a>)</li>
+                    <li><code>format-dateTime()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-dateTime">external documentation</a>)</li>
+                    <li><code>format-time()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-time">external documentation</a>)</li>
+                    <li><code>format-number()</code> (<a href="http://www.w3.org/TR/2005/WD-xslt20-20050915/#function-format-number">external documentation</a>)</li>
+                </ul>
+                <p>
+                    The XPath expression is evaluated by the XForms engine whenever the value bound
+                    to the <code>xforms:input</code> control changes and needs to be updated on
+                    screen. It is evaluated in the context of the instance node bound to the
+                    control. This means that the current value of the control can be accessed with
+                    "<code>.</code>". Often the value must be converted, for example to a date, in
+                    which case the conversion can be done with XPath 2.0 type casts such as
+                    <code>xs:date(.)</code>.
+                </p>
+            </section>
+            <section>
+                <title>xforms:input</title>
+                <p>
+                    When using <code>xforms:input</code> and a bound <code>xs:date</code> type, you
+                    can control the formatting of the date using the <code>xxforms:format</code>
+                    extension attribute on the <code>xforms:input</code> control. For example:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:input ref="date" xxforms:format="format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ())"/>
+                </xml-source>
+            </section>
+            <section>
+                <title>xforms:output</title>
+                <p>
+                    When using <code>xforms:output</code>, you can control the formatting of the
+                    date using the <code>xxforms:format</code> extension attribute on the
+                    <code>xforms:input</code> control.
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:output ref="date" xxforms:format="format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ())"/>
+                    <xforms:output ref="size" xxforms:format="format-number(., '###,##0')"/>
+                </xml-source>
+            </section>
+            <section>
+                <title>Default Formatting</title>
+                <p>
+                    For both <code>xforms:input</code> and <code>xforms:output</code>, if the bound
+                    node is of type <code>xs:date</code>, <code>xs:dateTime</code> or
+                    <code>xs:time</code>, and if no <code>xxforms:format</code> attribute is present
+                    on the control, formatting is based on <a
+                    href="reference-properties">properties</a>. If the properties are missing, a
+                    built-in default formatting is used. The default properties, as well as the
+                    built-in defaults, are as follows:
+                </p>
+                <xml-source>
+                    <property as="xs:string"  name="oxf.xforms.format.date"                          value="if (. castable as xs:date) then format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ()) else ."/>
+                    <property as="xs:string"  name="oxf.xforms.format.dateTime"                      value="if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
+                    <property as="xs:string"  name="oxf.xforms.format.time"                          value="if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else ."/>
+                </xml-source>
+                <p>
+                    They produce results as follows:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <code>2004-01-07</code> is displayed as <code>January 7, 2004</code>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>2004-01-07T04:38:35.123</code> is displayed as <code>January 7, 2004 04:38:35 UTC</code>
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <code>04:38:35.123</code> is displayed as <code>04:38:35 UTC</code>
+                        </p>
+                    </li>
+                </ul>
+                <p>
+                    Note that with the condition in the XPath expressions, a value which cannot be
+                    converted to the appropriate type is simply displayed as is.
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>Relative Paths</title>
+            <section>
+                <title>Rationale</title>
+                <p>
+                    XForms documents can refer to external resources using URIs in the following
+                    circumstances:
+                </p>
+                <ul>
+                    <li>
+                        <p>
+                            <b>External Instances.</b> The <code>xforms:instance</code> element can
+                            have an <code>src</code> attribute linking to an external instance
+                            definition.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Submission.</b> The <code>xforms:submission</code> element must refer
+                            to an <code>action</code> URI.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Load Action.</b> The <code>xforms:load</code> action must refer to an
+                            URI that must be loaded upon execution.
+                        </p>
+                    </li>
+                    <li>
+                        <p>
+                            <b>Message, Label, Help, Hint, and Alert.</b>
+                            <code>xforms:label</code>, <code>xforms:help</code>,
+                            <code>xforms:hint</code>, and <code>xforms:alert</code> may use an
+                            <code>src</code> attribute to refer to external content.
+                        </p>
+                        <note>
+                            The XForms 1.1 draft of November 15, 2004 removes linking attributes
+                            from actions and metadata elements and "the <code>src</code> attribute
+                            is not available to XForms 1.1 <code>message</code>, <code>label</code>,
+                            <code>help</code>, <code>hint</code>, <code>alert</code> elements."
+                        </note>
+                    </li>
+                </ul>
+                <!--<p>-->
+                    <!--As a general rule, for URLs relative to the :-->
+                <!--</p>-->
+                <!--<ul>-->
+                    <!--<li>-->
+                        <!--<p>-->
+                            <!--Absolute URLs (starting with a protocol or scheme) are used as is.-->
+                        <!--</p>-->
+                    <!--</li>-->
+                    <!--<li>-->
+                        <!--<p>-->
+                            <!--Absolute paths (starting with a "/") are relative-->
+                        <!--</p>-->
+                    <!--</li>-->
+                    <!--<li>-->
+                        <!--<p>-->
+<!-- -->
+                        <!--</p>-->
+                    <!--</li>-->
+                <!--</ul>-->
+            </section>
+            <section>
+                <title>External Instances</title>
+                <p>
+                    This is done with the <code>src</code> attribute on the
+                    <code>xforms:instance</code> element, for example:
+                </p>
+                <xml-source show-namespaces="false">
+                    <xforms:instance src="my-instance.xml"/>
+                </xml-source>
+                <p>
+                    With a client-side implementation of XForms, it makes sense for the
+                    <code>src</code> attribute to be relative to the base URI of the XForms page,
+                    which is usually an <code>http:</code> URI.
+                </p>
+                <p>
+                    With a server-side implementation, it may make more sense in general to
+                    interpret the URI relative to the location of the source XForms page, which is
+                    usually an <code>oxf:</code> URI.
+                </p>
+            </section>
+            <section>
+                <title>Submission</title>
+                <p>
+
+                </p>
+            </section>
+        </section>
+        <section>
+            <title>XForms and Services</title>
+            <section>
+                <title>Introduction</title>
+                <p>
+                    XForms 1.0 allows an XForms page to perform submissions of XForms instances and
+                    to handle a response. In most cases, both the submitted XForms instance and the
+                    response are XML documents.
+                </p>
+                <note>
+                    It is possible to submit an XForms instance with the HTTP GET method. In that
+                    case, some information contained in the XML document is lost, as the structure
+                    of the instance, attributes, and namespace prefixes among others, are not passed
+                    to the submission.
+                </note>
+                <p>
+                    The XForms submission featuer practically allows forms to call XML services.
+                    Those services are accessible through an XML API, which means that a request is
+                    performed by sending an XML document to the service, and a response consists of
+                    an XML document as well.
+                </p>
+            </section>
+            <section>
+                <title>Calling Services</title>
+                <p>
+                    TODO
+                </p>
+            </section>
+            <section>
+                <title>Handling Responses</title>
+                <p>
+                    TODO
+                </p>
+            </section>
+            <section>
+                <title>Implementing Services with OPS</title>
+                <p>
+                    TODO
+                </p>
+            </section>
+            <section>
+                <title>Page Flow Controller (PFC) Best Practices</title>
+                <p>
+                    TODO
+                </p>
+            </section>
+        </section>
+    </body>
+</document>

@@ -29,6 +29,7 @@ import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.orbeon.oxf.xml.dom4j.ExtendedLocationData;
 import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.resources.OXFProperties;
 import org.orbeon.saxon.functions.FunctionLibrary;
 import org.xml.sax.Locator;
 
@@ -1680,16 +1681,46 @@ public class XFormsControls {
         }
 
         protected void evaluateDisplayValue(PipelineContext pipelineContext, String format) {
+            final String result;
             if (format == null) {
-                setDisplayValue(null);
+                // Try default format for known types
+
+                final Map prefixToURIMap = new HashMap();
+                prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
+
+                final OXFProperties.PropertySet propertySet = OXFProperties.instance().getPropertySet();
+
+                if ("{http://www.w3.org/2001/XMLSchema}date".equals(type)) {
+                    // Format a date
+                    final String DEFAULT_FORMAT = "if (. castable as xs:date) then format-date(xs:date(.), '[MNn] [D], [Y]', 'en', (), ()) else .";
+                    format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DATE_FORMAT_PROPERTY, DEFAULT_FORMAT);
+                } else if ("{http://www.w3.org/2001/XMLSchema}dateTime".equals(type)) {
+                    // Format a dateTime
+                    final String DEFAULT_FORMAT = "if (. castable as xs:dateTime) then format-dateTime(xs:dateTime(.), '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ()) else .";
+                    format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_DATETIME_FORMAT_PROPERTY, DEFAULT_FORMAT);
+                } else if ("{http://www.w3.org/2001/XMLSchema}time".equals(type)) {
+                    // Format a time
+                    final String DEFAULT_FORMAT = "if (. castable as xs:time) then format-time(xs:time(.), '[H01]:[m01]:[s01] UTC', 'en', (), ()) else .";
+                    format = propertySet.getString(XFormsConstants.XFORMS_DEFAULT_TIME_FORMAT_PROPERTY, DEFAULT_FORMAT);
+                }
+
+                if (format != null) {
+                    result = getCurrentInstance()
+                        .evaluateXPathAsString(pipelineContext, currentBindingContext.getSingleNode(),
+                                format, prefixToURIMap, null, functionLibrary, null);
+                } else {
+                    result = null;
+                }
+
             } else {
                 // Format value according to format attribute
                 final Map prefixToURIMap = Dom4jUtils.getNamespaceContextNoDefault(getElement());
 
-                setDisplayValue(getCurrentInstance()
+                result = getCurrentInstance()
                     .evaluateXPathAsString(pipelineContext, currentBindingContext.getSingleNode(),
-                            format, prefixToURIMap, null, functionLibrary, null));
+                            format, prefixToURIMap, null, functionLibrary, null);
             }
+            setDisplayValue(result);
         }
 
         public XFormsEventHandlerContainer getParentContainer() {
@@ -1802,40 +1833,6 @@ public class XFormsControls {
         public void evaluateDisplayValue(PipelineContext pipelineContext) {
             evaluateDisplayValue(pipelineContext, format);
         }
-
-//        public String getDisplayValueOld(PipelineContext pipelineContext) {
-//
-//            final String valueType = getType();
-//
-//            if (format == null || valueType == null)
-//                return null;
-//
-//            // Format date value according to date-format attribute
-//            final Map variablesMap = new HashMap();
-//            variablesMap.put("value-string", getValue());
-//            variablesMap.put("format-string", format);
-//            final Map prefixToURIMap = new HashMap();
-//            prefixToURIMap.put(XMLConstants.XSD_PREFIX, XMLConstants.XSD_URI);
-//
-//            if ("{http://www.w3.org/2001/XMLSchema}date".equals(valueType)) {
-//                // Format a date
-//                return getCurrentInstance()
-//                    .evaluateXPathAsString(pipelineContext, getCurrentInstance().getDocument(),
-//                            "format-date(xs:date($value-string), $format-string, 'en', (), ())", prefixToURIMap, variablesMap, functionLibrary, null);
-//            } else if ("{http://www.w3.org/2001/XMLSchema}dateTime".equals(valueType)) {
-//                // Format a dateTime
-//                return getCurrentInstance()
-//                    .evaluateXPathAsString(pipelineContext, getCurrentInstance().getDocument(),
-//                            "format-dateTime(xs:dateTime($value-string), $format-string, 'en', (), ())", prefixToURIMap, variablesMap, functionLibrary, null);
-//            } else if ("{http://www.w3.org/2001/XMLSchema}time".equals(valueType)) {
-//                // Format a time
-//                return getCurrentInstance()
-//                    .evaluateXPathAsString(pipelineContext, getCurrentInstance().getDocument(),
-//                            "format-time(xs:time($value-string), $format-string, 'en', (), ())", prefixToURIMap, variablesMap, functionLibrary, null);
-//            } else {
-//                throw new OXFException("Value type not supported for xxforms:format: " + valueType);
-//            }
-//        }
     }
 
     /**

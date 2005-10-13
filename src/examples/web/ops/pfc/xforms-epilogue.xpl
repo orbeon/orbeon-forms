@@ -27,13 +27,16 @@
         <p:input name="config">
             <config>
                 <include>/request/container-type</include>
+                <include>/request/request-path</include>
+                <include>/request/context-path</include>
             </config>
         </p:input>
-        <p:output name="data" id="container-type"/>
+        <p:output name="data" id="request-info"/>
     </p:processor>
 
     <!-- Annotate XForms elements and generate XHTML if necessary -->
     <p:choose href="#xforms-model">
+        <!-- Test for legacy XForms engine -->
         <p:when test="/xforms:model">
             <p:processor name="oxf:xforms-output">
                 <p:input name="model" href="#xforms-model"/>
@@ -49,7 +52,7 @@
                 <p:input name="data" href="#annotated-data"/>
                 <p:output name="data" id="xhtml-data"/>
             </p:processor>
-            <p:choose href="#container-type">
+            <p:choose href="#request-info">
                 <p:when test="/request/container-type = 'servlet'">
                     <!-- Handle portlet forms (you can skip this step if you are not including portlets in your page) -->
                     <p:processor name="oxf:xslt">
@@ -69,6 +72,7 @@
         </p:when>
         <p:otherwise>
             <p:choose href="#data">
+                <!-- Test for new XForms engine -->
                 <p:when test="//xforms:model">
                     <!-- Handle widgets -->
                     <p:processor name="oxf:xslt">
@@ -76,19 +80,24 @@
                         <p:input name="config" href="/config/xforms-widgets.xsl"/>
                         <p:output name="data" id="widgeted-view"/>
                     </p:processor>
-                    <!-- Annotate controls in view with and id -->
-                    <p:processor name="oxf:xslt">
+                    <!-- Annotate elements in view with ids and alerts -->
+                    <p:processor name="oxf:xforms-document-annotator">
                         <p:input name="data" href="#widgeted-view"/>
-                        <p:input name="config" href="xforms-annotate-controls.xsl"/>
                         <p:output name="data" id="annotated-view"/>
                     </p:processor>
+                    <!--<p:processor name="oxf:xslt">-->
+                        <!--<p:input name="data" href="#widgeted-view"/>-->
+                        <!--<p:input name="config" href="xforms-annotate-controls.xsl"/>-->
+                        <!--<p:output name="data" id="annotated-view"/>-->
+                    <!--</p:processor>-->
                     <!-- Extract models and controls -->
                     <p:processor name="oxf:unsafe-xslt">
                         <p:input name="data" href="#annotated-view"/>
                         <p:input name="config" href="xforms-extract-controls.xsl"/>
+                        <p:input name="request" href="#request-info"/>
                         <p:output name="data" id="xforms-models-controls"/>
                     </p:processor>
-                    <!-- Builds request to XForms server -->
+                    <!-- Build request to XForms server -->
                     <p:processor name="oxf:xforms-request-encoder">
                         <p:input name="data" href="#xforms-models-controls"/>
                         <p:output name="data" id="xforms-request"/>

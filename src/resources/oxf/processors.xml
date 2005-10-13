@@ -439,8 +439,16 @@
         <class name="org.orbeon.oxf.xforms.XFormsServer"/>
     </processor>
 
+    <processor name="oxf:xforms-document-annotator">
+        <class name="org.orbeon.oxf.xforms.processor.XFormsDocumentAnnotator"/>
+    </processor>
+
+    <processor name="oxf:xforms-extractor">
+        <class name="org.orbeon.oxf.xforms.processor.XFormsExtractor"/>
+    </processor>
+
     <processor name="oxf:xforms-request-encoder">
-        <class name="org.orbeon.oxf.xforms.XFormsRequestEncoder"/>
+        <class name="org.orbeon.oxf.xforms.processor.XFormsRequestEncoder"/>
     </processor>
 
     <!-- Other processors -->

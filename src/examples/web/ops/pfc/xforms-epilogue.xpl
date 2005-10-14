@@ -71,9 +71,10 @@
             </p:choose>
         </p:when>
         <p:otherwise>
+            <!-- TODO: put here processor detecting XForms model -->
             <p:choose href="#data">
                 <!-- Test for new XForms engine -->
-                <p:when test="//xforms:model">
+                <p:when test="//xforms:model"><!-- TODO: test on result of processor above -->
                     <!-- Handle widgets -->
                     <p:processor name="oxf:xslt">
                         <p:input name="data" href="#data"/>
@@ -91,12 +92,20 @@
                         <!--<p:output name="data" id="annotated-view"/>-->
                     <!--</p:processor>-->
                     <!-- Extract models and controls -->
-                    <p:processor name="oxf:unsafe-xslt">
+                    <p:processor name="oxf:xforms-extractor">
                         <p:input name="data" href="#annotated-view"/>
-                        <p:input name="config" href="xforms-extract-controls.xsl"/>
-                        <p:input name="request" href="#request-info"/>
                         <p:output name="data" id="xforms-models-controls"/>
                     </p:processor>
+                    <!--<p:processor name="oxf:sax-debugger">-->
+                        <!--<p:input name="data" href="#xforms-models-controls1"/>-->
+                        <!--<p:output name="data" id="xforms-models-controls" debug="xxxcontrols"/>-->
+                    <!--</p:processor>-->
+                    <!--<p:processor name="oxf:unsafe-xslt">-->
+                        <!--<p:input name="data" href="#annotated-view"/>-->
+                        <!--<p:input name="config" href="xforms-extract-controls.xsl"/>-->
+                        <!--<p:input name="request" href="#request-info"/>-->
+                        <!--<p:output name="data" id="xforms-models-controls"/>-->
+                    <!--</p:processor>-->
                     <!-- Build request to XForms server -->
                     <p:processor name="oxf:xforms-request-encoder">
                         <p:input name="data" href="#xforms-models-controls"/>
@@ -105,6 +114,7 @@
                     <!-- Get initial instances -->
                     <p:processor name="oxf:xforms-server">
                         <p:input name="request" href="#xforms-request"/>
+                        <!--<p:output name="response" id="response" debug="xxxinitial-response"/>-->
                         <p:output name="response" id="response"/>
                     </p:processor>
                     <p:processor name="oxf:xslt">

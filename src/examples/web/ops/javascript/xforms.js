@@ -1018,7 +1018,6 @@ function xformsHandleResponse() {
                                             // Store validity, label, hint, help in element
                                             var newValid = controlElement.getAttribute("valid");
                                             if (newValid != null) {
-                                                alert(documentElement.isValid);
                                                 var newIsValid = newValid != "false";
                                                 if (newIsValid != documentElement.isValid) {
                                                     // Show or hide messages section

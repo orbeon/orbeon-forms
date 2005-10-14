@@ -744,7 +744,7 @@
     </xsl:function>
 
     <xsl:function name="xxforms:is-date-or-time" as="xs:boolean">
-        <xsl:param name="type" as="xs:string"/>
+        <xsl:param name="type" as="xs:string?"/>
         <xsl:value-of
                 select="$type = ('{http://www.w3.org/2001/XMLSchema}date',
                     '{http://www.w3.org/2001/XMLSchema}dateTime',

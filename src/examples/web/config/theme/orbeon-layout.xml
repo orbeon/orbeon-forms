@@ -719,7 +719,7 @@ ul {
     display: none;
 }
 
-.xforms-date {
+input.xforms-date {
     display: none;
 }
 

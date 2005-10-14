@@ -426,6 +426,7 @@ function xformsInitializeControlsUnder(root) {
         var isXFormsCheckboxRadio = false;
         var isXFormsComboboxList = false;
         var isXFormsTrigger = false;
+        var isXFormsDate = false;
         var isWidget = false;
         var isXFormsRange = false;
         for (var classIndex = 0; classIndex < classes.length; classIndex++) {
@@ -934,6 +935,7 @@ function xformsHandleResponse() {
                                             var controlId = controlElement.getAttribute("id");
                                             var relevant = controlElement.getAttribute("relevant");
                                             var readonly = controlElement.getAttribute("readonly");
+                                            var displayValue = controlElement.getAttribute("display-value");
                                             var documentElement = document.getElementById(controlId);
                                             var documentElementClasses = documentElement.className.split(" ");
 
@@ -980,16 +982,20 @@ function xformsHandleResponse() {
                                                 }
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-output")) {
                                                 // XForms output
-                                                while(documentElement.childNodes.length > 0)
-                                                    documentElement.removeChild(documentElement.firstChild);
-                                                documentElement.appendChild
-                                                    (documentElement.ownerDocument.createTextNode(newControlValue));
+                                                var newOutputControlValue =
+                                                        xformsArrayContains(documentElementClasses, "xforms-date")
+                                                        ? displayValue : newControlValue;
+                                                xformsReplaceNodeText(documentElement, newOutputControlValue);
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-control")
                                                     && typeof(documentElement.value) == "string") {
                                                 // Other controls that have a value (textfield, etc)
                                                 if (documentElement.value != newControlValue) {
                                                     documentElement.value = newControlValue;
                                                     documentElement.previousValue = newControlValue;
+                                                }
+                                                if (xformsArrayContains(documentElementClasses, "xforms-date")) {
+                                                    var displayElement = documentElement.previousSibling;
+                                                    xformsReplaceNodeText(displayElement, displayValue);
                                                 }
                                             }
 
@@ -1012,6 +1018,7 @@ function xformsHandleResponse() {
                                             // Store validity, label, hint, help in element
                                             var newValid = controlElement.getAttribute("valid");
                                             if (newValid != null) {
+                                                alert(documentElement.isValid);
                                                 var newIsValid = newValid != "false";
                                                 if (newIsValid != documentElement.isValid) {
                                                     // Show or hide messages section

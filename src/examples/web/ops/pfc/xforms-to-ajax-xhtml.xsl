@@ -163,14 +163,17 @@
                                   select="if ($is-html) then 'xforms-output-html'
                                           else if ($is-image) then 'xforms-output-image'
                                           else ()"/>
-                    <xsl:variable name="date-class" as="xs:string?"
-                            select="if (xxforms:control($id)/@type = '{http://www.w3.org/2001/XMLSchema}date')
-                            then 'xforms-date' else ()"/>
+                    <xsl:variable name="is-date-or-time" select="xxforms:is-date-or-time(xxforms:control($id)/@type)"/>
+                    <xsl:variable name="date-class" as="xs:string?" select="if ($is-date-or-time) then 'xforms-date' else ()"/>
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output', $html-class, $date-class), $id)"/>
                     <xsl:choose>
                         <!-- Case of image media type with URI -->
                         <xsl:when test="$is-image">
                             <img src="{xxforms:control($id)}"/>
+                        </xsl:when>
+                        <!-- Display formatted value for dates -->
+                        <xsl:when test="$is-date-or-time">
+                            <xsl:value-of select="xxforms:control($id)/@display-value"/>
                         </xsl:when>
                         <!-- Regular text case -->
                         <xsl:otherwise>
@@ -291,13 +294,18 @@
                 </xhtml:input>
             </xsl:when>
             <xsl:otherwise>
+                <xsl:variable name="is-date-or-time" select="xxforms:is-date-or-time(xxforms:control($id)/@type)"/>
+                <xsl:if test="$is-date-or-time">
+                    <xhtml:span>
+                        <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-date-display', concat($id, '-display'))"/>
+                        <xsl:value-of select="xxforms:control($id)/@display-value"/>
+                    </xhtml:span>
+                </xsl:if>
                 <xhtml:input type="text" name="{$id}" value="{xxforms:control($id)}">
                     <xsl:if test="xxforms:control($id)/@readonly = 'true'">
                         <xsl:attribute name="disabled">disabled</xsl:attribute>
                     </xsl:if>
-                    <xsl:variable name="date-class" as="xs:string?"
-                            select="if (xxforms:control($id)/@type = '{http://www.w3.org/2001/XMLSchema}date')
-                            then 'xforms-date' else ()"/>
+                    <xsl:variable name="date-class" as="xs:string?" select="if ($is-date-or-time) then 'xforms-date' else ()"/>
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', $date-class), $id)"/>
                 </xhtml:input>
             </xsl:otherwise>
@@ -734,5 +742,13 @@
         </xsl:if>
         <xsl:sequence select="$control"/>
     </xsl:function>
-    
+
+    <xsl:function name="xxforms:is-date-or-time" as="xs:boolean">
+        <xsl:param name="type" as="xs:string"/>
+        <xsl:value-of
+                select="$type = ('{http://www.w3.org/2001/XMLSchema}date',
+                    '{http://www.w3.org/2001/XMLSchema}dateTime',
+                    '{http://www.w3.org/2001/XMLSchema}time')"/>
+    </xsl:function>
+
 </xsl:stylesheet>

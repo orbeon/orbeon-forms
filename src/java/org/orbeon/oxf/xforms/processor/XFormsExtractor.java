@@ -73,10 +73,13 @@ public class XFormsExtractor extends ProcessorImpl {
                     public void endDocument() throws SAXException {
 
                         // Close elements
-                        if (gotModel && gotControl)
+                        if (gotModel && gotControl) {
                             super.endElement("", "controls", "controls");
-                        else if (gotModel)
+                        } else if (gotModel) {
                             super.endElement("", "models", "models");
+                            super.startElement("", "controls", "controls", XMLUtils.EMPTY_ATTRIBUTES);
+                            super.endElement("", "controls", "controls");
+                        }
 
                         super.endElement("", "static-state", "static-state");
                         super.endDocument();

@@ -183,7 +183,7 @@ function xformsUpdateStyle(element) {
                 updateRelevantReadonly(element, control.isRelevant, control.isReadonly);
             }
 
-            if (className == "xforms-date") {
+            if (className == "xforms-date" && !xformsArrayContains(classes, "xforms-output")) {
 
                 if (!element.setupDone) {
                     element.setupDone = true;

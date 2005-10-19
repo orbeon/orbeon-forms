@@ -1120,7 +1120,8 @@
                 </li>
                 <li>
                     <p>
-                        <b>New XInclude processor</b>. The new XInclude processor allows processing
+                        <b>New XInclude processor</b>. The new <a
+                        href="processors-xinclude">XInclude processor</a> allows processing
                         XInclude instructions. XInclude was already supported at the parser level
                         (Xerces support) before OPS 3.0. [TODO: doc]
                     </p>

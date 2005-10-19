@@ -75,6 +75,7 @@
         <menu label="Transforming XML">
             <menu-item label="Converters" href="processors-converters"/>
             <menu-item label="XSLT and TrAX" href="processors-xslt"/>
+            <menu-item label="XInclude" href="processors-xinclude"/>
             <menu-item label="XUpdate" href="processors-xupdate"/>
         </menu>
         <menu label="Querying Data">

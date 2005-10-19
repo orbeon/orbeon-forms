@@ -420,12 +420,13 @@ public class XFormsServer extends ProcessorImpl {
                     }
 
                     if (!(controlInfo2 instanceof XFormsControls.RepeatIterationInfo)) {
+
                         final String typeValue1 = (controlInfo1 == null) ? null : controlInfo1.getType();
                         final String typeValue2 = controlInfo2.getType();
 
-                        if (!((typeValue1 == null && typeValue2 == null) || (typeValue1 != null && typeValue2 != null && typeValue1.equals(typeValue2)))) {
+                        if (controlInfo1 == null || !((typeValue1 == null && typeValue2 == null) || (typeValue1 != null && typeValue2 != null && typeValue1.equals(typeValue2)))) {
                             attributesImpl.addAttribute("", XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME, XFormsConstants.XXFORMS_TYPE_ATTRIBUTE_NAME,
-                                    ContentHandlerHelper.CDATA, typeValue2 != null ? typeValue2 : "");
+                                ContentHandlerHelper.CDATA, typeValue2 != null ? typeValue2 : "");
                         }
                     }
 

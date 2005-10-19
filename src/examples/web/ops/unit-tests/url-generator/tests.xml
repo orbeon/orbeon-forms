@@ -184,7 +184,7 @@ Le bruit persistait toujours.
         </output>
     </test>
 
-    <test description="Test XInclude 1" name="oxf:url-generator">
+    <test description="Test XInclude 1 (handled by URL generator)" name="oxf:url-generator">
         <input name="config">
             <config>
                 <url>oxf:/ops/unit-tests/url-generator/including.xml</url>
@@ -199,6 +199,54 @@ Le bruit persistait toujours.
                         <xforms:instance id="document-infos-instance">
                             <form xml:base="oxf:/ops/unit-tests/url-generator/included-1.xml">
                                 <document-id>123456789</document-id>
+                                <include2>
+                                    <html xml:base="/ops/unit-tests/url-generator/included-2.xml">
+                                        <head>
+                                            <title>Summary</title>
+                                        </head>
+                                    </html>
+                                </include2>
+                            </form>
+                        </xforms:instance>
+                    </xforms:model>
+                </head>
+            </html>
+        </output>
+    </test>
+    <test description="Test XInclude 2 (handled by XInclude processor)" name="oxf:pipeline">
+        <input name="config">
+            <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
+                <p:param name="data" type="output"/>
+                <p:processor name="oxf:url-generator">
+                    <p:input name="config">
+                        <config>
+                            <url>oxf:/ops/unit-tests/url-generator/including.xml</url>
+                            <handle-xinclude>false</handle-xinclude>
+                         </config>
+                    </p:input>
+                    <p:output name="data" id="including"/>
+                </p:processor>
+                <p:processor name="oxf:xinclude">
+                    <p:input name="config" href="#including"/>
+                    <p:output name="data" ref="data"/>
+                </p:processor>
+            </p:config>
+        </input>
+        <output name="data">
+            <html xmlns="http://www.w3.org/1999/xhtml" xmlns:xforms="http://www.w3.org/2002/xforms">
+                <head>
+                    <title>Summary</title>
+                    <xforms:model>
+                        <xforms:instance id="document-infos-instance">
+                            <form xmlns="" xml:base="oxf:/ops/unit-tests/url-generator/included-1.xml">
+                                <document-id>123456789</document-id>
+                                <include2>
+                                    <html xmlns="http://www.w3.org/1999/xhtml" xml:base="oxf:/ops/unit-tests/url-generator/included-2.xml">
+                                        <head>
+                                            <title>Summary</title>
+                                        </head>
+                                    </html>
+                                </include2>
                             </form>
                         </xforms:instance>
                     </xforms:model>

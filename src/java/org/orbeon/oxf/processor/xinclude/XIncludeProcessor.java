@@ -22,7 +22,6 @@ import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
-import org.orbeon.oxf.processor.SAXDebuggerProcessor;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
@@ -51,6 +50,7 @@ import java.util.List;
  *
  * TODO: Implement caching!
  * TODO: Merge caching with URL generator, possibly XSLT transformer.
+ * TODO: Allow including a file with root element <xi:include href="..."/> (doesn't work right now)
  */
 public class XIncludeProcessor extends ProcessorImpl {
 
@@ -66,156 +66,168 @@ public class XIncludeProcessor extends ProcessorImpl {
     public ProcessorOutput createOutput(final String name) {
         ProcessorOutput output = new URIProcessorOutputImpl(getClass(), name, INPUT_CONFIG) {
             public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
-
 //                final ContentHandler debugContentHandler = new SAXDebuggerProcessor.DebugContentHandler(contentHandler);
-                final ContentHandler debugContentHandler = contentHandler;
-                readInputAsSAX(pipelineContext, INPUT_CONFIG, new ForwardingContentHandler(debugContentHandler) {
-
-                    private Locator locator;
-                    private TransformerURIResolver uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG);
-                    private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
-
-                    private int level;
-                    private boolean inInclude;
-                    private int includeLevel;
-
-                    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-
-                        namespaceSupport.pushContext();
-
-                        if (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri)) {
-                            // Found XInclude namespace
-
-                            if (XMLConstants.OLD_XINCLUDE_URI.equals(uri))
-                                logger.warn("Using incorrect XInclude namespace URI: '" + uri + "'; should use '" + XMLConstants.XINCLUDE_URI + "' at " + new LocationData(locator).toString());
-
-                            if ("include".equals(localname)) {
-                                // Start inclusion
-
-                                inInclude = true;
-                                includeLevel = level;
-
-                                final String href = attributes.getValue("href");
-                                final String parse = attributes.getValue("parse");
-
-                                if (parse != null && !parse.equals("xml"))
-                                    throw new ValidationException("Invalid 'parse' attribute value: " + parse, new LocationData(locator));
-
-                                try {
-                                    // Get SAXSource
-                                    final SAXSource source = (SAXSource) uriResolver.resolve(href, locator.getSystemId());
-                                    final XMLReader xmlReader = source.getXMLReader();
-                                    xmlReader.setContentHandler(new ForwardingContentHandler(debugContentHandler) {
-
-                                        private int nestedIncludeLevel;
-
-                                        public void startDocument() {
-                                            // NOP
-                                        }
-
-                                        public void endDocument() {
-                                            // NOP
-                                        }
-
-                                        public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
-
-                                            if (nestedIncludeLevel == 0) {
-                                                // Clean-up namespace mappings
-                                                sendStartPrefixMappings();
-                                                // Add xml:base attribute
-                                                final AttributesImpl newAttributes = new AttributesImpl(attributes);
-                                                newAttributes.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, source.getSystemId());
-                                                attributes = newAttributes;
-                                            }
-
-                                            super.startElement(uri, localname, qName, attributes);
-
-                                            nestedIncludeLevel++;
-                                        }
-
-                                        public void endElement(String uri, String localname, String qName) throws SAXException {
-                                            nestedIncludeLevel--;
-                                            super.endElement(uri, localname, qName);
-
-                                            if (nestedIncludeLevel == 0)
-                                                sendEndPrefixMappings();
-                                        }
-                                    });
-
-                                    // Read document
-                                    xmlReader.parse(new InputSource()); // Yeah, the SAX API doesn't make much sense
-
-                                } catch (Exception e) {
-                                    // Resource error, must go to fallback if possible
-                                    throw new OXFException(e);
-                                }
-
-                            } else if ("fallback".equals(localname)) {
-                                // TODO
-                            } else {
-                                throw new ValidationException("Invalid XInclude element: " + localname, new LocationData(locator));
-                            }
-
-                        } else {
-                            super.startElement(uri, localname, qName, attributes);
-                        }
-
-                        level++;
-                    }
-
-                    private void sendStartPrefixMappings() throws SAXException {
-                        for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
-                            final String namespacePrefix = (String) e.nextElement();
-                            if (!namespacePrefix.startsWith("xml"))
-                                super.startPrefixMapping(namespacePrefix, "");
-                        }
-
-                        final String defaultNS = namespaceSupport.getURI("");
-                        if (defaultNS != null && defaultNS.length() > 0)
-                            super.startPrefixMapping("", "");
-                    }
-
-                    private void sendEndPrefixMappings() throws SAXException {
-                        for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
-                            final String namespacePrefix = (String) e.nextElement();
-                            if (!namespacePrefix.startsWith("xml"))
-                                super.endPrefixMapping(namespacePrefix);
-                        }
-
-                        final String defaultNS = namespaceSupport.getURI("");
-                        if (defaultNS != null && defaultNS.length() > 0)
-                            super.endPrefixMapping("");
-                    }
-
-                    public void endElement(String uri, String localname, String qName) throws SAXException {
-
-                        level--;
-
-                        namespaceSupport.popContext();
-
-                        if (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri)) {
-
-                        } else {
-                            super.endElement(uri, localname, qName);
-                        }
-                    }
-
-                    public void startPrefixMapping(String prefix, String uri) throws SAXException {
-                        namespaceSupport.declarePrefix(prefix, uri);
-                        super.startPrefixMapping(prefix, uri);
-                    }
-
-                    public void setDocumentLocator(Locator locator) {
-                        this.locator = locator;
-                        super.setDocumentLocator(locator);
-                    }
-                });
+                readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, contentHandler));
             }
 
             // TODO: implement helpers for URIProcessorOutputImpl
         };
         addOutput(name, output);
         return output;
+    }
+
+    private class XIncludeContentHandler extends ForwardingContentHandler {
+
+        private PipelineContext pipelineContext;
+        private boolean topLevelContentHandler;
+        private String xmlBase;
+        private NamespaceSupport2 paremtNamespaceSupport;
+
+        private Locator locator;
+        private TransformerURIResolver uriResolver;
+        private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
+
+        private int level;
+        private boolean inInclude;
+        private int includeLevel;
+
+        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler) {
+            this(pipelineContext, contentHandler, true, null, null);
+        }
+
+        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, String xmlBase, NamespaceSupport2 paremtNamespaceSupport) {
+            this(pipelineContext, contentHandler, false, xmlBase, paremtNamespaceSupport);
+        }
+
+        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, boolean topLevelContentHandler, String xmlBase, NamespaceSupport2 paremtNamespaceSupport) {
+            super(contentHandler);
+            this.pipelineContext = pipelineContext;
+            this.uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG);
+            this.topLevelContentHandler = topLevelContentHandler;
+            this.xmlBase = xmlBase;
+            this.paremtNamespaceSupport = paremtNamespaceSupport;
+        }
+
+        public void startDocument() throws SAXException {
+            if (topLevelContentHandler)
+                super.startDocument();
+        }
+
+        public void endDocument() throws SAXException {
+            if (topLevelContentHandler)
+                super.endDocument();
+        }
+
+        public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
+            namespaceSupport.pushContext();
+
+            if (!topLevelContentHandler && level == 0) {
+                // Clean-up namespace mappings
+                sendStartPrefixMappings();
+                // Add xml:base attribute
+                final AttributesImpl newAttributes = new AttributesImpl(attributes);
+                newAttributes.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, xmlBase);
+                attributes = newAttributes;
+            }
+
+            if (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri)) {
+                // Found XInclude namespace
+
+                if (XMLConstants.OLD_XINCLUDE_URI.equals(uri))
+                    logger.warn("Using incorrect XInclude namespace URI: '" + uri + "'; should use '" + XMLConstants.XINCLUDE_URI + "' at " + new LocationData(locator).toString());
+
+                if ("include".equals(localname)) {
+                    // Start inclusion
+
+                    inInclude = true;
+                    includeLevel = level;
+
+                    final String href = attributes.getValue("href");
+                    final String parse = attributes.getValue("parse");
+
+                    if (parse != null && !parse.equals("xml"))
+                        throw new ValidationException("Invalid 'parse' attribute value: " + parse, new LocationData(locator));
+
+                    try {
+                        // Get SAXSource
+                        System.out.println("href = " + href);
+                        System.out.println("systemid = " + locator.getSystemId());
+                        final SAXSource source = (SAXSource) uriResolver.resolve(href, locator.getSystemId());
+                        final XMLReader xmlReader = source.getXMLReader();
+                        xmlReader.setContentHandler(new XIncludeContentHandler(pipelineContext, getContentHandler(), source.getSystemId(), namespaceSupport));
+
+                        // Read document
+                        xmlReader.parse(new InputSource()); // Yeah, the SAX API doesn't make much sense
+
+                    } catch (Exception e) {
+                        // Resource error, must go to fallback if possible
+                        throw new OXFException(e);
+                    }
+
+                } else if ("fallback".equals(localname)) {
+                    // TODO
+                } else {
+                    throw new ValidationException("Invalid XInclude element: " + localname, new LocationData(locator));
+                }
+
+            } else {
+                super.startElement(uri, localname, qName, attributes);
+            }
+
+            level++;
+        }
+
+        private void sendStartPrefixMappings() throws SAXException {
+            for (Enumeration e = paremtNamespaceSupport.getPrefixes(); e.hasMoreElements();) {
+                final String namespacePrefix = (String) e.nextElement();
+                if (!namespacePrefix.startsWith("xml"))
+                    super.startPrefixMapping(namespacePrefix, "");
+            }
+
+            final String defaultNS = paremtNamespaceSupport.getURI("");
+            if (defaultNS != null && defaultNS.length() > 0)
+                super.startPrefixMapping("", "");
+        }
+
+        private void sendEndPrefixMappings() throws SAXException {
+            for (Enumeration e = paremtNamespaceSupport.getPrefixes(); e.hasMoreElements();) {
+                final String namespacePrefix = (String) e.nextElement();
+                if (!namespacePrefix.startsWith("xml"))
+                    super.endPrefixMapping(namespacePrefix);
+            }
+
+            final String defaultNS = paremtNamespaceSupport.getURI("");
+            if (defaultNS != null && defaultNS.length() > 0)
+                super.endPrefixMapping("");
+        }
+
+        public void endElement(String uri, String localname, String qName) throws SAXException {
+
+            level--;
+
+            namespaceSupport.popContext();
+
+            if (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri)) {
+
+            } else {
+                super.endElement(uri, localname, qName);
+            }
+
+            if (!topLevelContentHandler && level == 0) {
+                sendEndPrefixMappings();
+            }
+        }
+
+        public void startPrefixMapping(String prefix, String uri) throws SAXException {
+            namespaceSupport.declarePrefix(prefix, uri);
+            super.startPrefixMapping(prefix, uri);
+        }
+
+        public void setDocumentLocator(Locator locator) {
+            this.locator = locator;
+            super.setDocumentLocator(locator);
+        }
     }
 
     public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutputImpl {

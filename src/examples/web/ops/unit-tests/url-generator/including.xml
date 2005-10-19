@@ -11,6 +11,7 @@
             <xforms:instance id="document-infos-instance">
                 <xi:include href="included-1.xml"/>
             </xforms:instance>
+            <!--<xi:include href="included-3.xml"/>-->
         </xforms:model>
     </head>
 </html>

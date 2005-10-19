@@ -50,7 +50,6 @@ import java.util.List;
  *
  * TODO: Implement caching!
  * TODO: Merge caching with URL generator, possibly XSLT transformer.
- * TODO: Allow including a file with root element <xi:include href="..."/> (doesn't work right now)
  */
 public class XIncludeProcessor extends ProcessorImpl {
 
@@ -67,7 +66,9 @@ public class XIncludeProcessor extends ProcessorImpl {
         ProcessorOutput output = new URIProcessorOutputImpl(getClass(), name, INPUT_CONFIG) {
             public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
 //                final ContentHandler debugContentHandler = new SAXDebuggerProcessor.DebugContentHandler(contentHandler);
-                readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, contentHandler));
+
+                final TransformerURIResolver uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG, false);
+                readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, contentHandler, uriResolver));
             }
 
             // TODO: implement helpers for URIProcessorOutputImpl
@@ -91,18 +92,18 @@ public class XIncludeProcessor extends ProcessorImpl {
         private boolean inInclude;
         private int includeLevel;
 
-        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler) {
-            this(pipelineContext, contentHandler, true, null, null);
+        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, TransformerURIResolver uriResolver) {
+            this(pipelineContext, contentHandler, uriResolver, true, null, null);
         }
 
-        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, String xmlBase, NamespaceSupport2 paremtNamespaceSupport) {
-            this(pipelineContext, contentHandler, false, xmlBase, paremtNamespaceSupport);
+        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport2 paremtNamespaceSupport) {
+            this(pipelineContext, contentHandler, uriResolver, false, xmlBase, paremtNamespaceSupport);
         }
 
-        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, boolean topLevelContentHandler, String xmlBase, NamespaceSupport2 paremtNamespaceSupport) {
+        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport2 paremtNamespaceSupport) {
             super(contentHandler);
             this.pipelineContext = pipelineContext;
-            this.uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG);
+            this.uriResolver = uriResolver;
             this.topLevelContentHandler = topLevelContentHandler;
             this.xmlBase = xmlBase;
             this.paremtNamespaceSupport = paremtNamespaceSupport;
@@ -125,8 +126,18 @@ public class XIncludeProcessor extends ProcessorImpl {
             if (!topLevelContentHandler && level == 0) {
                 // Clean-up namespace mappings
                 sendStartPrefixMappings();
-                // Add xml:base attribute
-                final AttributesImpl newAttributes = new AttributesImpl(attributes);
+                // Add or replace xml:base attribute
+                final AttributesImpl newAttributes = new AttributesImpl();
+                for (int i = 0; i < attributes.getLength(); i++) {
+                    final String attributeURI = attributes.getURI(i);
+                    final String attributeValue = attributes.getValue(i);
+                    final String attributeType = attributes.getType(i);
+                    final String attributeQName = attributes.getQName(i);
+                    final String attributeLocalname = attributes.getLocalName(i);
+
+                    if (!(XMLConstants.XML_URI.equals(attributeURI) && "base".equals(attributeLocalname)))
+                        newAttributes.addAttribute(attributeURI, attributeLocalname, attributeQName, attributeType, attributeValue);
+                }
                 newAttributes.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, xmlBase);
                 attributes = newAttributes;
             }
@@ -134,6 +145,7 @@ public class XIncludeProcessor extends ProcessorImpl {
             if (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri)) {
                 // Found XInclude namespace
 
+                // Warn upon obsolete namespace URI
                 if (XMLConstants.OLD_XINCLUDE_URI.equals(uri))
                     logger.warn("Using incorrect XInclude namespace URI: '" + uri + "'; should use '" + XMLConstants.XINCLUDE_URI + "' at " + new LocationData(locator).toString());
 
@@ -151,11 +163,9 @@ public class XIncludeProcessor extends ProcessorImpl {
 
                     try {
                         // Get SAXSource
-                        System.out.println("href = " + href);
-                        System.out.println("systemid = " + locator.getSystemId());
                         final SAXSource source = (SAXSource) uriResolver.resolve(href, locator.getSystemId());
                         final XMLReader xmlReader = source.getXMLReader();
-                        xmlReader.setContentHandler(new XIncludeContentHandler(pipelineContext, getContentHandler(), source.getSystemId(), namespaceSupport));
+                        xmlReader.setContentHandler(new XIncludeContentHandler(pipelineContext, getContentHandler(), uriResolver, source.getSystemId(), namespaceSupport));
 
                         // Read document
                         xmlReader.parse(new InputSource()); // Yeah, the SAX API doesn't make much sense

@@ -208,11 +208,17 @@ Le bruit persistait toujours.
                                 </include2>
                             </form>
                         </xforms:instance>
+                        <html xml:base="/ops/unit-tests/url-generator/included-2.xml">
+                            <head>
+                                <title>Summary</title>
+                            </head>
+                        </html>
                     </xforms:model>
                 </head>
             </html>
         </output>
     </test>
+
     <test description="Test XInclude 2 (handled by XInclude processor)" name="oxf:pipeline">
         <input name="config">
             <p:config xmlns:oxf="http://www.orbeon.com/oxf/processors">
@@ -249,6 +255,11 @@ Le bruit persistait toujours.
                                 </include2>
                             </form>
                         </xforms:instance>
+                        <html xml:base="oxf:/ops/unit-tests/url-generator/included-2.xml">
+                            <head>
+                                <title>Summary</title>
+                            </head>
+                        </html>
                     </xforms:model>
                 </head>
             </html>

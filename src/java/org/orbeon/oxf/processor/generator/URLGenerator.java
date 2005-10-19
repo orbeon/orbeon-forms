@@ -103,6 +103,11 @@ public class URLGenerator extends ProcessorImpl {
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
+    public URLGenerator(URL url, boolean handleXInclude) {
+        this.localConfigURIReferences = new ConfigURIReferences(new Config(url, handleXInclude));
+        addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
+    }
+
     public URLGenerator(URL url, String contentType, boolean forceContentType) {
         this.localConfigURIReferences = new ConfigURIReferences(new Config(url, contentType, forceContentType));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
@@ -127,6 +132,12 @@ public class URLGenerator extends ProcessorImpl {
 
         public Config(URL url) {
             this.url = url;
+            this.tidyConfig = new TidyConfig(null);
+        }
+
+        public Config(URL url, boolean handleXInclude) {
+            this.url = url;
+            this.handleXInclude = handleXInclude;
             this.tidyConfig = new TidyConfig(null);
         }
 

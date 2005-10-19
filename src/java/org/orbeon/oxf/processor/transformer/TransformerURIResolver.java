@@ -40,11 +40,21 @@ public class TransformerURIResolver implements URIResolver {
     private Processor processor;
     private PipelineContext pipelineContext;
     private String prohibitedInput;
+    private boolean handleXInclude;
 
-    public TransformerURIResolver(Processor processor, PipelineContext pipelineContext, String prohibitedInput) {
+    /**
+     * Create a URI resolver which handles regular URLs but also "input:*" URLs.
+     *
+     * @param processor         processor of which inputs will be read for "input:*"
+     * @param pipelineContext   pipeline context
+     * @param prohibitedInput   name of an input which triggers and exception if read (usually "data" or "config")
+     * @param handleXInclude    true if, when reading a regular URL (i.e. not "input:*"), XInclude processing must be done by the parser
+     */
+    public TransformerURIResolver(Processor processor, PipelineContext pipelineContext, String prohibitedInput, boolean handleXInclude) {
         this.processor = processor;
         this.pipelineContext = pipelineContext;
         this.prohibitedInput = prohibitedInput;
+        this.handleXInclude = handleXInclude;
     }
 
     public Source resolve(String href, String base) throws TransformerException {
@@ -65,7 +75,7 @@ public class TransformerURIResolver implements URIResolver {
                 } else {
                     // Resolve to regular URI
                     final URL url = URLFactory.createURL(base, href);
-                    Processor urlGenerator = new URLGenerator(url);
+                    Processor urlGenerator = new URLGenerator(url, handleXInclude);
                     xmlReader = new ProcessorOutputXMLReader(pipelineContext, urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA));
                     systemId = url.toExternalForm();
                 }

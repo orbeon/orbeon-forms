@@ -15,7 +15,7 @@
         xmlns:order="urn:oasis:names:tc:ubl:Order:1.0:0.70"
         xmlns:cat="urn:oasis:names:tc:ubl:CommonAggregateTypes:1.0:0.70"
         xmlns:xs="http://www.w3.org/2001/XMLSchema"
-        xmlns:xi="http://www.w3.org/2003/XInclude">
+        xmlns:xi="http://www.w3.org/2001/XInclude">
     <xforms:instance>
         <form>
             <action/>

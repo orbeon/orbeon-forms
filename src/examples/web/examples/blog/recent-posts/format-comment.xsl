@@ -25,13 +25,6 @@
         <xsl:apply-templates/>
     </xsl:template>
 
-    <!-- Format date -->
-    <xsl:template match="date-created">
-        <xsl:copy>
-            <xsl:value-of select="format-dateTime(., '[MNn] [D], [Y] [H01]:[m01]:[s01] UTC', 'en', (), ())"/>
-        </xsl:copy>
-    </xsl:template>
-
     <!-- Format name -->
     <xsl:template match="name">
         <xsl:copy>
@@ -48,14 +41,16 @@
 
     <!-- Filter and format text -->
     <xsl:template match="text">
+        <xsl:variable name="comment"
+            select="saxon:parse(concat('&lt;root>', ., '&lt;/root>'))/*/node()" as="node()*"/>
+        <xsl:variable name="processed-comment" as="element()">
+            <root>
+                <xsl:apply-templates select="$comment" mode="comment-text"/>
+            </root>
+        </xsl:variable>
         <xsl:copy>
-            <xsl:variable name="comment"
-                select="saxon:parse(concat('&lt;root>', ., '&lt;/root>'))/*/node()" as="node()*"/>
-            <xsl:variable name="processed-comment" as="element()">
-                <root>
-                    <xsl:apply-templates select="$comment" mode="comment-text"/>
-                </root>
-            </xsl:variable>
+            <xsl:attribute name="character-count" select="string-length($processed-comment)"/>
+            <xsl:attribute name="word-count" select="count(tokenize($processed-comment, '\s+'))"/>
             <xsl:value-of select="substring-before(substring-after(saxon:serialize($processed-comment, 'html-output'), '>'), '&lt;/root>')"/>
         </xsl:copy>
     </xsl:template>

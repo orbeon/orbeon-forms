@@ -263,12 +263,12 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                                 // Compute test
                                 String test;
                                 if (pathInfo.startsWith("*")) {
-                                    test = "ends-with( /request/request-path, '" 
-                                           + pathInfo.substring( 1 ) 
+                                    test = "ends-with( /request/request-path, '"
+                                           + pathInfo.substring( 1 )
                                            + "' )";
                                 } else if (pathInfo.endsWith("*")) {
                                     final int len = pathInfo.length() - 1;
-                                    test = "starts-with( /request/request-path, '" 
+                                    test = "starts-with( /request/request-path, '"
                                            + pathInfo.substring( 0,  len )
                                            + "' )";
                                 } else {
@@ -1165,7 +1165,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 // Rewrite the URL if needed
                 final ASTOutput rewroteStepURL = new ASTOutput(null, "rewrote-step-url");
                 addStatement(new ASTChoose(new ASTHrefId(stepURLInput)) {{
-                    addWhen(new ASTWhen("contains(/config, '${')") {{
+                    addWhen(new ASTWhen("contains(/config/url, '${')") {{
                         addStatement(new ASTProcessorCall(XMLConstants.XSLT_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefAggregate("root",
                                     new ASTHrefId(stepURLInput), new ASTHrefId(matcherInput))));
@@ -1181,12 +1181,24 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     }});
                 }});
 
-                // Read file to "execute"
-                final ASTOutput content = new ASTOutput("data", "content");
-                addStatement(new ASTProcessorCall(XMLConstants.URL_GENERATOR_PROCESSOR_QNAME) {{
-                    addInput(new ASTInput("config", new ASTHrefId(rewroteStepURL)));
-                    addOutput(content);
-                }});
+                final ASTOutput contentXIncluded = new ASTOutput("data", "content-xincluded");
+                {
+                    // Read file to "execute"
+                    final ASTOutput content = new ASTOutput("data", "content");
+                    addStatement(new ASTProcessorCall(XMLConstants.URL_GENERATOR_PROCESSOR_QNAME) {{
+                        addInput(new ASTInput("config", new ASTHrefId(rewroteStepURL)));
+                        addOutput(content);
+                    }});
+
+                    // Insert XInclude processor to process content with XInclude
+                    addStatement(new ASTProcessorCall(XMLConstants.XINCLUDE_PROCESSOR_QNAME) {{
+                        addInput(new ASTInput("config", new ASTHrefId(content)));
+                        addInput(new ASTInput("data", new ASTHrefId(dataInput)));
+                        addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
+                        final ASTOutput contentOutput = new ASTOutput("data", contentXIncluded);
+                        addOutput(contentOutput);
+                    }});
+                }
 
                 final ASTOutput resultData = new ASTOutput(null, "result-data");
                 final ASTOutput resultInstance = new ASTOutput(null, "result-instance");
@@ -1195,7 +1207,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                 addStatement(new ASTChoose(new ASTHrefId(stepTypeInput)) {{
                     addWhen(new ASTWhen("/step-type = 'view'") {{
                         // We are dealing with a view
-                        addStatement(new ASTChoose(new ASTHrefId(content)) {{
+                        addStatement(new ASTChoose(new ASTHrefId(contentXIncluded)) {{
                             addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/pipeline' " +
                                 "and count(/*/*[local-name() = 'param' and @type = 'output' and @name = 'data']) = 0") {{
                                 // The XPL has not data output
@@ -1209,14 +1221,14 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     }});
                 }});
 
-                addStatement(new ASTChoose(new ASTHrefId(content)) {{
+                addStatement(new ASTChoose(new ASTHrefId(contentXIncluded)) {{
 
                     // XPL file with instance & data output
                     addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/pipeline' " +
                             "and /*/*[local-name() = 'param' and @type = 'output' and @name = 'data'] " +
                             "and /*/*[local-name() = 'param' and @type = 'output' and @name = 'instance']") {{
                         addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
-                            addInput(new ASTInput("config", new ASTHrefId(content)));
+                            addInput(new ASTInput("config", new ASTHrefId(contentXIncluded)));
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
@@ -1231,7 +1243,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/pipeline' " +
                             "and /*/*[local-name() = 'param' and @type = 'output' and @name = 'data']") {{
                         addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
-                            addInput(new ASTInput("config", new ASTHrefId(content)));
+                            addInput(new ASTInput("config", new ASTHrefId(contentXIncluded)));
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
@@ -1249,7 +1261,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/pipeline' " +
                             "and /*/*[local-name() = 'param' and @type = 'output' and @name = 'instance']") {{
                         addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
-                            addInput(new ASTInput("config", new ASTHrefId(content)));
+                            addInput(new ASTInput("config", new ASTHrefId(contentXIncluded)));
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
@@ -1266,7 +1278,7 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                     // XPL file with no output
                     addWhen(new ASTWhen("namespace-uri(/*) = 'http://www.orbeon.com/oxf/pipeline'") {{
                         addStatement(new ASTProcessorCall(XMLConstants.PIPELINE_PROCESSOR_QNAME) {{
-                            addInput(new ASTInput("config", new ASTHrefId(content)));
+                            addInput(new ASTInput("config", new ASTHrefId(contentXIncluded)));
                             addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                             addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
                             addInput(new ASTInput("xforms-model", new ASTHrefId(xformsModelInput)));
@@ -1294,7 +1306,16 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                             addOutput( resInstOut );
                         }});
 
-                        addStatement(new ASTChoose(new ASTHrefId(content)) {
+                        // Process XInclude
+//                        final ASTOutput xincludedContent = new ASTOutput("data", "xincluded-content");
+//                        addStatement(new ASTProcessorCall(XMLConstants.XINCLUDE_PROCESSOR_QNAME) {{
+//                            addInput(new ASTInput("config", new ASTHrefId(content)));
+////                            addInput(new ASTInput("data", new ASTHrefId(dataInput)));
+////                            addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
+//                            addOutput(xincludedContent);
+//                        }});
+
+                        addStatement(new ASTChoose(new ASTHrefId(contentXIncluded)) {
 
                             private void addXSLTWhen(final String condition, final QName processorQName) {
                                 addWhen(new ASTWhen(condition) {{
@@ -1302,10 +1323,10 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
 
                                     // Changed from <= 2.8 behavior
                                     addStatement(new ASTProcessorCall(processorQName) {{
-                                        addInput(new ASTInput("config", new ASTHrefId(content)));
+                                        addInput(new ASTInput("config", new ASTHrefId(contentXIncluded)));
                                         addInput(new ASTInput("data", new ASTHrefId(dataInput)));
                                         addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
-                                        final ASTOutput resDatOut 
+                                        final ASTOutput resDatOut
                                             = new ASTOutput( "data", resultData );
                                         addOutput( resDatOut );
                                     }});
@@ -1330,16 +1351,25 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
                         // Copy the instance as is
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
                             addInput(new ASTInput("data", new ASTHrefId(instanceInput)));
-                            final ASTOutput resInstOut = new ASTOutput( "data", resultInstance );
-                            addOutput( resInstOut );
+                            final ASTOutput resInstOut = new ASTOutput("data", resultInstance);
+                            addOutput(resInstOut);
                         }});
 
-                        // Copy XML file as is
+                        // Copy the data as is
                         addStatement(new ASTProcessorCall(XMLConstants.IDENTITY_PROCESSOR_QNAME) {{
-                            addInput(new ASTInput("data", new ASTHrefId(content)));
-                            final ASTOutput resDatOut = new ASTOutput( "data", resultData );
-                            addOutput( resDatOut );
+                            addInput(new ASTInput("data", new ASTHrefId(contentXIncluded)));
+                            final ASTOutput resDatOut = new ASTOutput("data", resultData);
+                            addOutput(resDatOut);
                         }});
+
+                        // Insert XInclude processor to process static XML file with XInclude
+//                        addStatement(new ASTProcessorCall(XMLConstants.XINCLUDE_PROCESSOR_QNAME) {{
+//                            addInput(new ASTInput("config", new ASTHrefId(content)));
+//                            addInput(new ASTInput("data", new ASTHrefId(dataInput)));
+//                            addInput(new ASTInput("instance", new ASTHrefId(instanceInput)));
+//                            final ASTOutput resDatOut = new ASTOutput("data", resultData);
+//                            addOutput(resDatOut);
+//                        }});
                     }});
                 }});
 
@@ -1367,8 +1397,15 @@ public class PageFlowControllerProcessor extends ProcessorImpl {
             try {
                 // Create document and input for URI
                 final String url = URLFactory.createURL(controllerContext, uri).toExternalForm();
-                final Document configDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("config"));
-                configDocument.getRootElement().addText(url);
+                final Document configDocument;
+                {
+                    configDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("config"));
+                    final Element urlElement = configDocument.getRootElement().addElement("url");
+                    urlElement.addText(url);
+                    final Element handleXIncludeElement = configDocument.getRootElement().addElement("handle-xinclude");
+                    handleXIncludeElement.addText("false");
+                }
+
                 addInput(new ASTInput("step-url", configDocument));
                 // Create document and input for step type
                 final Document stepTypeDocument = new NonLazyUserDataDocument(new NonLazyUserDataElement("step-type"));

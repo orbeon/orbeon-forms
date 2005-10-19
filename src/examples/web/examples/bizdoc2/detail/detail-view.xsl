@@ -16,7 +16,7 @@
     xmlns:xforms="http://www.w3.org/2002/xforms"
     xmlns:ev="http://www.w3.org/2001/xml-events"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
-    xmlns:xi="http://www.w3.org/2003/XInclude"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:f="http://orbeon.org/oxf/xml/formatting"
     xmlns:claim="http://orbeon.org/oxf/examples/bizdoc/claim"
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
@@ -73,17 +73,21 @@
                         <xforms:bind nodeset="claim:address/claim:country" required="true()"/>
                     </xforms:bind>
                     <xforms:bind nodeset="claim:person-info">
-                        <xforms:bind nodeset="claim:birth-date" required="true()"/>
+                        <xforms:bind nodeset="claim:birth-date" required="true()" type="xs:date"/>
                         <xforms:bind nodeset="claim:occupation" required="true()"/>
                     </xforms:bind>
                 </xforms:bind>
 
-                <!-- This bind element handles the empty repeat entry necessary to add new entries with xforms:repeat -->
+
                 <xforms:bind nodeset="claim:insured-info/claim:family-info/claim:children">
+                    <!-- Handle the empty repeat entry necessary to add new entries with xforms:repeat -->
                     <xforms:bind nodeset="claim:child[last()]" relevant="instance('repeats')/submitting = 'true'"/>
                     <xforms:bind nodeset="claim:child[position() lt last()]/claim:birth-date" required="true()"/>
                     <xforms:bind nodeset="claim:child[position() lt last()]/claim:first-name" required="true()"/>
+                    <!-- Set date types -->
+                    <xforms:bind nodeset="claim:child/claim:birth-date" type="xs:date"/>
                 </xforms:bind>
+
                 <!-- This bind element handles calculated values -->
                 <xforms:bind nodeset="claim:insured-info/claim:claim-info/claim:rate"
                              calculate="if (../claim:insured-info/claim:person-info/claim:birth-date castable as xs:date)

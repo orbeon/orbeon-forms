@@ -1080,10 +1080,18 @@
                 </li>
                 <li>
                     <p>
-                        <b>Request Generator</b>. The Request Generator used to return a constructed
-                        path for the <code>path-info</code> parameter. It now correctly returns the
-                        Servlet API's path info. To get a complete path, use
+                        <b>Request Generator</b>. The <a
+                        href="processors-generators-request">Request Generator</a> used to return a
+                        constructed path for the <code>path-info</code> parameter. It now correctly
+                        returns the Servlet API's path info. To get a complete path, use
                         <code>request-path</code> instead. [TODO: MARK INCOMPATIBLE CHANGE]
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>URL Generator</b>. The <a href="processors-generators-url">URL
+                        Generator</a> now has an option to specify whether XInclude processing must
+                        occur at XML parsing time.
                     </p>
                 </li>
                 <li>
@@ -1108,6 +1116,13 @@
                         <b>New To-XML Converter</b>. The new <a
                         href="processors-converters#to-xml-converter">To-XML Converter</a> allows
                         producing parsed XML documents from a binary document format.
+                    </p>
+                </li>
+                <li>
+                    <p>
+                        <b>New XInclude processor</b>. The new XInclude processor allows processing
+                        XInclude instructions. XInclude was already supported at the parser level
+                        (Xerces support) before OPS 3.0. [TODO: doc]
                     </p>
                 </li>
                 <li>

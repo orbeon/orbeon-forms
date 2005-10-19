@@ -248,6 +248,10 @@
 <!--        </instantiation>-->
 <!--    </processor>-->
 
+    <processor name="oxf:xinclude">
+        <class name="org.orbeon.oxf.processor.xinclude.XIncludeProcessor"/>
+    </processor>
+
     <!-- Page Flow processors -->
     <processor name="oxf:page-flow" uri="oxf/processor/page-flow">
         <class name="org.orbeon.oxf.processor.PageFlowControllerProcessor"/>

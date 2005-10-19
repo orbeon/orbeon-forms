@@ -119,7 +119,7 @@ public class ScopeGenerator extends ScopeProcessorBase {
                                         identity.transform(new DOMSource((org.w3c.dom.Document) value), new SAXResult(state.saxStore));
                                     } else if (value instanceof String) {
                                         // Consider the String containing a document to parse
-                                        XMLUtils.stringToSAX((String) value, "", state.saxStore, false);
+                                        XMLUtils.stringToSAX((String) value, "", state.saxStore, false, false);
                                     } else {
                                         // Consider the object a JavaBean
                                         Mapping mapping;

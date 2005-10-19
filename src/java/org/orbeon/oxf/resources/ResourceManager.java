@@ -55,10 +55,23 @@ public interface ResourceManager {
      * Gets a document form the resource manager and send SAX events to the
      * specified content handler. the key must point to an XML
      * document, or a OXFException is raised.
-     * @param key  A Resource Manager key
-     * @param handler a The content handler where SAX events are sent
+     *
+     * @param key       A Resource Manager key
+     * @param handler   The content handler where SAX events are sent
      */
     public void getContentAsSAX(String key, ContentHandler handler);
+
+    /**
+     * Gets a document form the resource manager and send SAX events to the
+     * specified content handler. the key must point to an XML
+     * document, or a OXFException is raised.
+     * 
+     * @param key               A Resource Manager key
+     * @param handler           The content handler where SAX events are sent
+     * @param validating        Whether the XML parser must attempt to validate the resource
+     * @param handleXInclude    Whether the XML parser must process XInclude instructions
+     */
+    public void getContentAsSAX(String key, ContentHandler handler, boolean validating, boolean handleXInclude);
 
     /**
      * Returns a character reader from the resource manager for the specified

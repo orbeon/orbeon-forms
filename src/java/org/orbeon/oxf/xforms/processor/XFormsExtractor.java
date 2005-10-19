@@ -145,14 +145,16 @@ public class XFormsExtractor extends ProcessorImpl {
                         for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
                             final String namespacePrefix = (String) e.nextElement();
                             final String namespaceURI = namespaceSupport.getURI(namespacePrefix);
-                            super.startPrefixMapping(namespacePrefix, namespaceURI);
+                            if (!namespacePrefix.startsWith("xml"))
+                                super.startPrefixMapping(namespacePrefix, namespaceURI);
                         }
                     }
 
                     private void sendEndPrefixMappings() throws SAXException {
                         for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
                             final String namespacePrefix = (String) e.nextElement();
-                            super.endPrefixMapping(namespacePrefix);
+                            if (!namespacePrefix.startsWith("xml"))
+                                super.endPrefixMapping(namespacePrefix);
                         }
                     }
 

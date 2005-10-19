@@ -58,6 +58,8 @@ public class XMLUtils {
     private static DocumentBuilderFactory documentBuilderFactory;
     private static Map documentBuilders = null;
     
+    private static SAXParserFactory nonValidatingXIncludeSAXParserFactory;
+    private static SAXParserFactory validatingXIncludeSAXParserFactory;
     private static SAXParserFactory nonValidatingSAXParserFactory;
     private static SAXParserFactory validatingSAXParserFactory;
 
@@ -125,9 +127,9 @@ public class XMLUtils {
      *
      * WARNING: Use this only in special cases. In general, use newSAXParser().
      */
-    public static SAXParserFactory createSAXParserFactory(boolean validating) {
+    public static SAXParserFactory createSAXParserFactory(boolean validating, boolean handleXInclude) {
         try {
-            SAXParserFactory factory = new XercesSAXParserFactoryImpl();
+            SAXParserFactory factory = new XercesSAXParserFactoryImpl(handleXInclude);
             factory.setValidating(validating);
             return factory;
         } catch (Exception e) {
@@ -136,19 +138,31 @@ public class XMLUtils {
     }
 
     public static SAXParser newSAXParser() {
-        return newSAXParser(false);
+        return newSAXParser(false, true);
     }
 
-    public static synchronized SAXParser newSAXParser(boolean validating) {
+    public static synchronized SAXParser newSAXParser(boolean validating, boolean handleXInclude) {
         try {
             if (validating) {
-                if (validatingSAXParserFactory == null)
-                    validatingSAXParserFactory = createSAXParserFactory(true);
-                return validatingSAXParserFactory.newSAXParser();
+                if (handleXInclude) {
+                    if (validatingXIncludeSAXParserFactory == null)
+                        validatingXIncludeSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
+                    return validatingXIncludeSAXParserFactory.newSAXParser();
+                } else {
+                    if (validatingSAXParserFactory == null)
+                        validatingSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
+                    return validatingSAXParserFactory.newSAXParser();
+                }
             } else {
-                if (nonValidatingSAXParserFactory == null)
-                    nonValidatingSAXParserFactory = createSAXParserFactory(false);
-                return nonValidatingSAXParserFactory.newSAXParser();
+                if (handleXInclude) {
+                    if (nonValidatingXIncludeSAXParserFactory == null)
+                        nonValidatingXIncludeSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
+                    return nonValidatingXIncludeSAXParserFactory.newSAXParser();
+                } else {
+                    if (nonValidatingSAXParserFactory == null)
+                        nonValidatingSAXParserFactory = createSAXParserFactory(validating, handleXInclude);
+                    return nonValidatingSAXParserFactory.newSAXParser();
+                }
             }
         } catch (Exception e) {
             throw new OXFException(e);
@@ -156,13 +170,13 @@ public class XMLUtils {
     }
 
     public static class EntityResolver implements org.xml.sax.EntityResolver {
-        public InputSource resolveEntity(String publicId,
-                                         String systemId)
+        public InputSource resolveEntity(String publicId, String systemId)
                 throws SAXException, IOException {
             InputSource is = new InputSource();
             is.setSystemId(systemId);
             is.setPublicId(publicId);
-            is.setByteStream(URLFactory.createURL(systemId).openConnection().getInputStream());
+            final URL url = URLFactory.createURL(systemId);
+            is.setByteStream(url.openConnection().getInputStream());
             return is;
         }
     }
@@ -198,25 +212,25 @@ public class XMLUtils {
         }
     }
 
-    public static void stringToSAX(String xml, String systemId, ContentHandler contentHandler, boolean validating) {
-        readerToSAX(new StringReader(xml), systemId, contentHandler, validating);
+    public static void stringToSAX(String xml, String systemId, ContentHandler contentHandler, boolean validating, boolean handleXInclude) {
+        readerToSAX(new StringReader(xml), systemId, contentHandler, validating, handleXInclude);
     }
 
-    public static void inputStreamToSAX(InputStream inputStream, String systemId, ContentHandler contentHandler, boolean validating) {
+    public static void inputStreamToSAX(InputStream inputStream, String systemId, ContentHandler contentHandler, boolean validating, boolean handleXInclude) {
         InputSource inputSource = new InputSource(inputStream);
         inputSource.setSystemId(systemId);
-        inputSourceToSAX(inputSource, contentHandler, validating);
+        inputSourceToSAX(inputSource, contentHandler, validating, handleXInclude);
     }
 
-    public static void readerToSAX(Reader reader, String systemId, ContentHandler contentHandler, boolean validating) {
+    public static void readerToSAX(Reader reader, String systemId, ContentHandler contentHandler, boolean validating, boolean handleXInclude) {
         InputSource inputSource = new InputSource(reader);
         inputSource.setSystemId(systemId);
-        inputSourceToSAX(inputSource, contentHandler, validating);
+        inputSourceToSAX(inputSource, contentHandler, validating, handleXInclude);
     }
 
-    private static void inputSourceToSAX(InputSource inputSource, ContentHandler contentHandler, boolean validating) {
+    private static void inputSourceToSAX(InputSource inputSource, ContentHandler contentHandler, boolean validating, boolean handleXInclude) {
         try {
-            XMLReader xmlReader = newSAXParser(validating).getXMLReader();
+            XMLReader xmlReader = newSAXParser(validating, handleXInclude).getXMLReader();
             xmlReader.setContentHandler(contentHandler);
             xmlReader.setEntityResolver(ENTITY_RESOLVER);
             xmlReader.setErrorHandler(ERROR_HANDLER);

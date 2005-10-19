@@ -93,6 +93,8 @@
                     <!--</p:processor>-->
                     <!-- Extract models and controls -->
                     <p:processor name="oxf:xforms-extractor">
+                        <!--<p:input name="data" href="#annotated-view" debug="xxxannotated-view"/>-->
+                        <!--<p:output name="data" id="xforms-models-controls" debug="xxxcontrols"/>-->
                         <p:input name="data" href="#annotated-view"/>
                         <p:output name="data" id="xforms-models-controls"/>
                     </p:processor>

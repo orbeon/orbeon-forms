@@ -100,6 +100,15 @@ public class PriorityResourceManagerImpl implements ResourceManager {
         });
     }
 
+    public void getContentAsSAX(final String key, final ContentHandler handler, final boolean validating, final boolean handleXInclude) {
+        delegate(new Operation() {
+            public Object run(ResourceManager resourceManager) {
+                resourceManager.getContentAsSAX(key, handler, validating, handleXInclude);
+                return null;
+            }
+        });
+    }
+
     /**
      * Returns a binary input stream for the specified key. The key could point
      * to any document type (text or binary).

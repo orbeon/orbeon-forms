@@ -103,8 +103,7 @@ public class XFormsModelSchemaValidator {
             schemaInfo.addInclude(u);
 
             final String surl = u.toString();
-            final InputSource ret = XMLUtils.ENTITY_RESOLVER.resolveEntity("", surl);
-            return ret;
+            return XMLUtils.ENTITY_RESOLVER.resolveEntity("", surl);
         }
 
     }
@@ -392,7 +391,7 @@ public class XFormsModelSchemaValidator {
 
                 final InputSource is = XMLUtils.ENTITY_RESOLVER.resolveEntity("", schemaURI);
                 final MSVGrammarReaderController cntrlr = new MSVGrammarReaderController(schemaURI, newSchmInf);
-                final SAXParserFactory fctry = XMLUtils.createSAXParserFactory(false);
+                final SAXParserFactory fctry = XMLUtils.createSAXParserFactory(false, true);
 
                 grmr = GrammarLoader.loadSchema(is, cntrlr, fctry);
                 newSchmInf.setGrammar(grmr);

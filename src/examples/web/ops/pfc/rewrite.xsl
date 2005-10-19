@@ -19,7 +19,7 @@
         <config>
             <xsl:call-template name="rewrite">
                 <xsl:with-param name="groups" select="/root/result/group"/>
-                <xsl:with-param name="path" select="string(/root/config)"/>
+                <xsl:with-param name="path" select="string(/root/config/url)"/>
             </xsl:call-template>
         </config>
     </xsl:template>

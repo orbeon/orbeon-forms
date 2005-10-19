@@ -333,7 +333,7 @@ public class XFormsUtils {
             }
             // Parse XML and return documents
             LocationSAXContentHandler saxContentHandler = new LocationSAXContentHandler();
-            XMLUtils.stringToSAX(xmlText, null, saxContentHandler, false);
+            XMLUtils.stringToSAX(xmlText, null, saxContentHandler, false, false);
             return saxContentHandler.getDocument();
         } catch (IOException e) {
             throw new OXFException(e);

@@ -25,7 +25,6 @@ import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.resources.oxf.Handler;
 import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.*;
-import org.orbeon.oxf.xml.XMLConstants;
 import org.orbeon.oxf.xml.dom4j.LocationData;
 import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
@@ -62,6 +61,7 @@ public class URLGenerator extends ProcessorImpl {
     private static final String DEFAULT_TEXT_ENCODING = "iso-8859-1";
 
     private static final boolean DEFAULT_VALIDATING = false;
+    private static final boolean DEFAULT_HANDLE_XINCLUDE = true;
 
     private static final boolean DEFAULT_FORCE_CONTENT_TYPE = false;
     private static final boolean DEFAULT_FORCE_ENCODING = false;
@@ -80,6 +80,7 @@ public class URLGenerator extends ProcessorImpl {
 
     public static final String URL_NAMESPACE_URI = "http://www.orbeon.org/oxf/xml/url";
     public static final String VALIDATING_PROPERTY = "validating";
+    public static final String HANDLE_XINCLUDE_PROPERTY = "handle-xinclude";
 
     private ConfigURIReferences localConfigURIReferences;
 
@@ -116,6 +117,7 @@ public class URLGenerator extends ProcessorImpl {
         private boolean ignoreConnectionEncoding = DEFAULT_IGNORE_CONNECTION_ENCODING;
         private boolean validating = DEFAULT_VALIDATING;
         private Map headers;
+        private boolean handleXInclude = DEFAULT_HANDLE_XINCLUDE;
 
         private boolean cacheUseLocalCache = DEFAULT_CACHE_USE_LOCAL_CACHE;
         private boolean cacheAlwaysRevalidate = DEFAULT_CACHE_ALWAYS_REVALIDATE;
@@ -136,8 +138,8 @@ public class URLGenerator extends ProcessorImpl {
         }
 
         public Config(URL url, String contentType, boolean forceContentType, String encoding, boolean forceEncoding,
-                      boolean ignoreConnectionEncoding, boolean validating, Map headers, boolean cacheUseLocalCache,
-                      boolean cacheAlwaysRevalidate, int cacheExpiration, TidyConfig tidyConfig) {
+                      boolean ignoreConnectionEncoding, boolean validating, boolean handleXInclude, Map headers,
+                      boolean cacheUseLocalCache, boolean cacheAlwaysRevalidate, int cacheExpiration, TidyConfig tidyConfig) {
             this.url = url;
             this.contentType = contentType;
             this.forceContentType = forceContentType;
@@ -146,6 +148,7 @@ public class URLGenerator extends ProcessorImpl {
             this.ignoreConnectionEncoding = ignoreConnectionEncoding;
             this.validating = validating;
             this.headers = headers;
+            this.handleXInclude = handleXInclude;
 
             this.cacheUseLocalCache = cacheUseLocalCache;
             this.cacheAlwaysRevalidate = cacheAlwaysRevalidate;
@@ -186,6 +189,10 @@ public class URLGenerator extends ProcessorImpl {
             return validating;
         }
 
+        public boolean isHandleXInclude() {
+            return handleXInclude;
+        }
+
         public Map getHeaders() {
             return headers;
         }
@@ -203,7 +210,7 @@ public class URLGenerator extends ProcessorImpl {
 //        }
 
         public String toString() {
-            return "[" + getURL().toExternalForm() + "|" + getContentType() + "|" + getEncoding() + "|" + isValidating() + "|" + isForceContentType()
+            return "[" + getURL().toExternalForm() + "|" + getContentType() + "|" + getEncoding() + "|" + isValidating() + "|" + isHandleXInclude() + "|" + isForceContentType()
                     + "|" + isForceEncoding() + "|" + isIgnoreConnectionEncoding() + "|" + tidyConfig + "]";
         }
     }
@@ -231,6 +238,7 @@ public class URLGenerator extends ProcessorImpl {
                                 String url = configElement.getTextTrim();
                                 if (url != null && !url.equals("")) {
                                     try {
+                                        // Legacy, don't even care about handling relative URLs
                                         return new ConfigURIReferences(new Config(URLFactory.createURL(url)));
                                     } catch (MalformedURLException e) {
                                         throw new OXFException(e);
@@ -266,6 +274,10 @@ public class URLGenerator extends ProcessorImpl {
                                 boolean defaultValidating = getPropertySet().getBoolean(VALIDATING_PROPERTY, DEFAULT_VALIDATING).booleanValue();
                                 boolean validating = ProcessorUtils.selectBooleanValue(configElement, "/config/validating", defaultValidating);
 
+                                // XInclude handling
+                                boolean defaultHandleXInclude = getPropertySet().getBoolean(HANDLE_XINCLUDE_PROPERTY, DEFAULT_HANDLE_XINCLUDE).booleanValue();
+                                boolean handleXInclude = ProcessorUtils.selectBooleanValue(configElement, "/config/handle-xinclude", defaultHandleXInclude);
+
                                 // Cache control
                                 boolean cacheUseLocalCache = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/use-local-cache", DEFAULT_CACHE_USE_LOCAL_CACHE);
                                 boolean cacheAlwaysRevalidate = ProcessorUtils.selectBooleanValue(configElement, "/config/cache-control/always-revalidate", DEFAULT_CACHE_ALWAYS_REVALIDATE);
@@ -277,19 +289,24 @@ public class URLGenerator extends ProcessorImpl {
                                 // Create configuration object
                                 try {
                                     // Use location data if present so that relative URLs can be supported
+                                    // NOTE: We check whether there is a protocol, because we have
+                                    // some Java location data which are NOT to be interpreted as
+                                    // base URIs
                                     LocationData locationData = URLGenerator.this.getLocationData();
-                                    URL fullURL = (locationData != null && locationData.getSystemID() != null)
+                                    URL fullURL = (locationData != null && locationData.getSystemID() != null && NetUtils.urlHasProtocol(locationData.getSystemID()))
                                             ? URLFactory.createURL(locationData.getSystemID(), url)
                                             : URLFactory.createURL(url);
 
                                     // Create configuration
                                     Config config = new Config(fullURL, contentType, forceContentType, encoding, forceEncoding,
-                                            ignoreConnectionEncoding, validating, headers, cacheUseLocalCache, cacheAlwaysRevalidate, cacheExpiration,
+                                            ignoreConnectionEncoding, validating, handleXInclude, headers, cacheUseLocalCache, cacheAlwaysRevalidate, cacheExpiration,
                                             tidyConfig);
                                     if (logger.isDebugEnabled())
                                         logger.debug("Read configuration: " + config.toString());
                                     return new ConfigURIReferences(config);
                                 } catch (MalformedURLException e) {
+//                                    final LocationData ld = URLGenerator.this.getLocationData();
+//                                    System.out.println(((ld == null) ? "" : ld.toString()) + " - " + url);
                                     throw new OXFException(e);
                                 }
                             }
@@ -592,10 +609,10 @@ public class URLGenerator extends ProcessorImpl {
             if (getExternalEncoding() != null) {
                 // The encoding is set externally, either forced by the user, or set by the connection
                 inputStream = ResourceManagerWrapper.instance().getContentAsStream(getKey());
-                XMLUtils.readerToSAX(new InputStreamReader(inputStream, getExternalEncoding()), config.getURL().toExternalForm(), output, config.isValidating());
+                XMLUtils.readerToSAX(new InputStreamReader(inputStream, getExternalEncoding()), config.getURL().toExternalForm(), output, config.isValidating(), config.isHandleXInclude());
             } else {
                 // Regular case, the resource manager does the job and autodetects the encoding
-                ResourceManagerWrapper.instance().getContentAsSAX(getKey(), output);
+                ResourceManagerWrapper.instance().getContentAsSAX(getKey(), output, config.isValidating(), config.isHandleXInclude());
             }
         }
 
@@ -717,7 +734,7 @@ public class URLGenerator extends ProcessorImpl {
             openConnection();
             // Read the resource from the resource manager and parse it as XML
             try {
-                SAXParser parser = XMLUtils.newSAXParser(config.isValidating());
+                SAXParser parser = XMLUtils.newSAXParser(config.isValidating(), config.isHandleXInclude());
                 XMLReader reader = parser.getXMLReader();
                 reader.setContentHandler(output);
                 reader.setEntityResolver(XMLUtils.ENTITY_RESOLVER);

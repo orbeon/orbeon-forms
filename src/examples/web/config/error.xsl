@@ -74,58 +74,69 @@
                         <th>XML Element</th>
                     </tr>
                     <!-- Group so that if by any chance multiple location data for the same point occur, we show only one -->
-                    <xsl:for-each-group select="/exceptions/exception[location][1]/location[line castable as xs:positiveInteger and not(ends-with(system-id, '.java'))]"
-                            group-by="concat(system-id, '-', line, '-', column)">
-                        <tr>
-                            <td><xsl:value-of select="system-id"/></td>
-                            <td><xsl:value-of select="if (line castable as xs:positiveInteger) then line else 'N/A'"/></td>
-                            <td><xsl:value-of select="if (column castable as xs:positiveInteger) then column else 'N/A'"/></td>
-                            <td>
-                                <xsl:for-each select="current-group()[description != '']">
-                                    <xsl:if test="position() > 1">
-                                        <br/>
-                                    </xsl:if>
-                                    <xsl:value-of select="description"/>
-                                </xsl:for-each>
-                                <xsl:if test="current-group()[parameters/parameter]">
-                                    <span style="font-size: smaller">
-                                        <xsl:text> (</xsl:text>
-                                            <xsl:for-each select="current-group()/parameters/parameter[value != '']">
-                                                <xsl:if test="position() > 1">
-                                                    <xsl:text>, </xsl:text>
-                                                </xsl:if>
-                                                <xsl:value-of select="concat(name, '=''', value, '''')"/>
-                                            </xsl:for-each>
-                                        <xsl:text>)</xsl:text>
-                                    </span>
-                                </xsl:if>
-                            </td>
-                            <td>
-                                <xsl:for-each select="current-group()[element != '']">
-                                    <xsl:if test="position() > 1">
-                                        <br/>
-                                    </xsl:if>
-                                    <xsl:variable name="element" as="element()">
-                                        <xsl:copy-of select="saxon:parse(element)/*"/>
-                                    </xsl:variable>
-                                    <xsl:variable name="just-element" as="element()">
-                                        <xsl:for-each select="$element">
-                                            <xsl:copy>
-                                                <xsl:copy-of select="@*"/>
-                                                <xsl:if test="*">
-                                                    <xsl:text>...</xsl:text>
-                                                </xsl:if>
-                                            </xsl:copy>
+                    <xsl:choose>
+                        <xsl:when test="/exceptions/exception[location][1]/location[line castable as xs:positiveInteger and not(ends-with(system-id, '.java'))]">
+                            <xsl:for-each-group select="/exceptions/exception[location][1]/location[line castable as xs:positiveInteger and not(ends-with(system-id, '.java'))]"
+                                    group-by="concat(system-id, '-', line, '-', column)">
+                                <tr>
+                                    <td><xsl:value-of select="system-id"/></td>
+                                    <td><xsl:value-of select="if (line castable as xs:positiveInteger) then line else 'N/A'"/></td>
+                                    <td><xsl:value-of select="if (column castable as xs:positiveInteger) then column else 'N/A'"/></td>
+                                    <td>
+                                        <xsl:for-each select="current-group()[description != '']">
+                                            <xsl:if test="position() > 1">
+                                                <br/>
+                                            </xsl:if>
+                                            <xsl:value-of select="description"/>
                                         </xsl:for-each>
-                                    </xsl:variable>
-                                    <!-- NOTE: use $just-element to show the enclosing element, and $element to show the element with content -->
-                                    <f:xml-source show-namespaces="false">
-                                        <xsl:copy-of select="$just-element"/>
-                                    </f:xml-source>
-                                </xsl:for-each>
-                            </td>
-                        </tr>
-                    </xsl:for-each-group>
+                                        <xsl:if test="current-group()[parameters/parameter]">
+                                            <span style="font-size: smaller">
+                                                <xsl:text> (</xsl:text>
+                                                    <xsl:for-each select="current-group()/parameters/parameter[value != '']">
+                                                        <xsl:if test="position() > 1">
+                                                            <xsl:text>, </xsl:text>
+                                                        </xsl:if>
+                                                        <xsl:value-of select="concat(name, '=''', value, '''')"/>
+                                                    </xsl:for-each>
+                                                <xsl:text>)</xsl:text>
+                                            </span>
+                                        </xsl:if>
+                                    </td>
+                                    <td>
+                                        <xsl:for-each select="current-group()[element != '']">
+                                            <xsl:if test="position() > 1">
+                                                <br/>
+                                            </xsl:if>
+                                            <xsl:variable name="element" as="element()">
+                                                <xsl:copy-of select="saxon:parse(element)/*"/>
+                                            </xsl:variable>
+                                            <xsl:variable name="just-element" as="element()">
+                                                <xsl:for-each select="$element">
+                                                    <xsl:copy>
+                                                        <xsl:copy-of select="@*"/>
+                                                        <xsl:if test="*">
+                                                            <xsl:text>...</xsl:text>
+                                                        </xsl:if>
+                                                    </xsl:copy>
+                                                </xsl:for-each>
+                                            </xsl:variable>
+                                            <!-- NOTE: use $just-element to show the enclosing element, and $element to show the element with content -->
+                                            <f:xml-source show-namespaces="false">
+                                                <xsl:copy-of select="$just-element"/>
+                                            </f:xml-source>
+                                        </xsl:for-each>
+                                    </td>
+                                </tr>
+                            </xsl:for-each-group>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <tr>
+                                <td colspan="5">
+                                    <i>There is no OPS call stack available for this error.</i>
+                                </td>
+                            </tr>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </table>
                 <h2>Java Exceptions (<xsl:value-of select="count(/exceptions/exception)"/> total)</h2>
                 <p>

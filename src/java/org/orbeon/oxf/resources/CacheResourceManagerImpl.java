@@ -141,7 +141,7 @@ public class CacheResourceManagerImpl extends ResourceManagerBase {
     }
 
 
-    public void getContentAsSAX(final String key, ContentHandler handler) {
+    public void getContentAsSAX(final String key, ContentHandler handler, boolean validating, boolean handleXInclude) {
         if (logger.isDebugEnabled())
             logger.debug("getContentAsSAX(" + key + ")");
         try {

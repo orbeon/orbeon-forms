@@ -1235,7 +1235,7 @@ public class XFormsControls {
         visitAllControlsHandleRepeat(pipelineContext, new XFormsControls.ControlElementVisitorListener() {
             public boolean startVisitControl(Element controlElement, String effectiveControlId) {
                 final List currentNodeset = getCurrentNodeset();
-                if (currentNodeset.size() > 0) {
+                if (currentNodeset != null && currentNodeset.size() > 0) {
                     final Node currentNode = getCurrentSingleNode();
 
                     if (currentNode == node) {

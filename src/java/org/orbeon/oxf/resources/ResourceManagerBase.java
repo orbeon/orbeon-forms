@@ -108,10 +108,25 @@ public abstract class ResourceManagerBase implements ResourceManager {
      * Gets a document form the resource manager and send SAX events to the
      * specified content handler. the key must point to an XML
      * document, or a OXFException is raised.
-     * @param key  A Resource Manager key
-     * @param handler a The content handler where SAX events are sent
+     *
+     * @param key       A Resource Manager key
+     * @param handler   The content handler where SAX events are sent
      */
     public void getContentAsSAX(final String key, ContentHandler handler) {
+        getContentAsSAX(key, handler, false, true);
+    }
+
+    /**
+     * Gets a document form the resource manager and send SAX events to the
+     * specified content handler. the key must point to an XML
+     * document, or a OXFException is raised.
+     * 
+     * @param key               A Resource Manager key
+     * @param handler           The content handler where SAX events are sent
+     * @param validating        Whether the XML parser must attempt to validate the resource
+     * @param handleXInclude    Whether the XML parser must process XInclude instructions
+     */
+    public void getContentAsSAX(String key, ContentHandler handler, boolean validating, boolean handleXInclude) {
         InputStream inputStream = null;
         final Locator[] locator = new Locator[1];
         try {
@@ -121,7 +136,7 @@ public abstract class ResourceManagerBase implements ResourceManager {
                     locator[0] = loc;
                     super.setDocumentLocator(loc);
                 }
-            }, false); // Question: when should we validate?
+            }, validating, handleXInclude);
         } catch (ValidationException ve) {
             throw ve;
         } catch (ResourceNotFoundException rnfe) {

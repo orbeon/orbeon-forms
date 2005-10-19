@@ -13,27 +13,44 @@
  */
 package org.orbeon.oxf.processor.xinclude;
 
+import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.apache.log4j.Logger;
 import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
+import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
 import org.orbeon.oxf.processor.ProcessorImpl;
 import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
 import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.SAXDebuggerProcessor;
+import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
 import org.orbeon.oxf.resources.URLFactory;
-import org.xml.sax.ContentHandler;
+import org.orbeon.oxf.xml.ContentHandlerHelper;
+import org.orbeon.oxf.xml.ForwardingContentHandler;
+import org.orbeon.oxf.xml.XMLConstants;
+import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.xml.sax.*;
+import org.xml.sax.helpers.AttributesImpl;
 
+import javax.xml.transform.sax.SAXSource;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * XInclude processor.
  *
- * This processor reads a document on its data input that may contain XInclude directives. It
+ * This processor reads a document on its "config" input that may contain XInclude directives. It
  * produces on its output a resulting document with the XInclude directives processed.
+ *
+ * For now, this processor only supports <xi:include href="..." parse="xml"/> with no xpointer,
+ * encoding, accept, or accept-language attribute. <xi:fallback> is not supported.
+ *
+ * TODO: Implement caching!
+ * TODO: Merge caching with URL generator, possibly XSLT transformer.
  */
 public class XIncludeProcessor extends ProcessorImpl {
 
@@ -42,14 +59,157 @@ public class XIncludeProcessor extends ProcessorImpl {
     private ConfigURIReferences localConfigURIReferences;
 
     public XIncludeProcessor() {
-        addInputInfo(new ProcessorInputOutputInfo(INPUT_DATA));
+        addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
         addOutputInfo(new ProcessorInputOutputInfo(OUTPUT_DATA));
     }
 
     public ProcessorOutput createOutput(final String name) {
-        ProcessorOutput output = new URIProcessorOutputImpl(getClass(), name, INPUT_DATA) {
-            public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
-                // TODO: read and process!
+        ProcessorOutput output = new URIProcessorOutputImpl(getClass(), name, INPUT_CONFIG) {
+            public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
+
+//                final ContentHandler debugContentHandler = new SAXDebuggerProcessor.DebugContentHandler(contentHandler);
+                final ContentHandler debugContentHandler = contentHandler;
+                readInputAsSAX(pipelineContext, INPUT_CONFIG, new ForwardingContentHandler(debugContentHandler) {
+
+                    private Locator locator;
+                    private TransformerURIResolver uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG);
+                    private NamespaceSupport2 namespaceSupport = new NamespaceSupport2();
+
+                    private int level;
+                    private boolean inInclude;
+                    private int includeLevel;
+
+                    public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
+                        namespaceSupport.pushContext();
+
+                        if (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri)) {
+                            // Found XInclude namespace
+
+                            if (XMLConstants.OLD_XINCLUDE_URI.equals(uri))
+                                logger.warn("Using incorrect XInclude namespace URI: '" + uri + "'; should use '" + XMLConstants.XINCLUDE_URI + "' at " + new LocationData(locator).toString());
+
+                            if ("include".equals(localname)) {
+                                // Start inclusion
+
+                                inInclude = true;
+                                includeLevel = level;
+
+                                final String href = attributes.getValue("href");
+                                final String parse = attributes.getValue("parse");
+
+                                if (parse != null && !parse.equals("xml"))
+                                    throw new ValidationException("Invalid 'parse' attribute value: " + parse, new LocationData(locator));
+
+                                try {
+                                    // Get SAXSource
+                                    final SAXSource source = (SAXSource) uriResolver.resolve(href, locator.getSystemId());
+                                    final XMLReader xmlReader = source.getXMLReader();
+                                    xmlReader.setContentHandler(new ForwardingContentHandler(debugContentHandler) {
+
+                                        private int nestedIncludeLevel;
+
+                                        public void startDocument() {
+                                            // NOP
+                                        }
+
+                                        public void endDocument() {
+                                            // NOP
+                                        }
+
+                                        public void startElement(String uri, String localname, String qName, Attributes attributes) throws SAXException {
+
+                                            if (nestedIncludeLevel == 0) {
+                                                // Clean-up namespace mappings
+                                                sendStartPrefixMappings();
+                                                // Add xml:base attribute
+                                                final AttributesImpl newAttributes = new AttributesImpl(attributes);
+                                                newAttributes.addAttribute(XMLConstants.XML_URI, "base", "xml:base", ContentHandlerHelper.CDATA, source.getSystemId());
+                                                attributes = newAttributes;
+                                            }
+
+                                            super.startElement(uri, localname, qName, attributes);
+
+                                            nestedIncludeLevel++;
+                                        }
+
+                                        public void endElement(String uri, String localname, String qName) throws SAXException {
+                                            nestedIncludeLevel--;
+                                            super.endElement(uri, localname, qName);
+
+                                            if (nestedIncludeLevel == 0)
+                                                sendEndPrefixMappings();
+                                        }
+                                    });
+
+                                    // Read document
+                                    xmlReader.parse(new InputSource()); // Yeah, the SAX API doesn't make much sense
+
+                                } catch (Exception e) {
+                                    // Resource error, must go to fallback if possible
+                                    throw new OXFException(e);
+                                }
+
+                            } else if ("fallback".equals(localname)) {
+                                // TODO
+                            } else {
+                                throw new ValidationException("Invalid XInclude element: " + localname, new LocationData(locator));
+                            }
+
+                        } else {
+                            super.startElement(uri, localname, qName, attributes);
+                        }
+
+                        level++;
+                    }
+
+                    private void sendStartPrefixMappings() throws SAXException {
+                        for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+                            final String namespacePrefix = (String) e.nextElement();
+                            if (!namespacePrefix.startsWith("xml"))
+                                super.startPrefixMapping(namespacePrefix, "");
+                        }
+
+                        final String defaultNS = namespaceSupport.getURI("");
+                        if (defaultNS != null && defaultNS.length() > 0)
+                            super.startPrefixMapping("", "");
+                    }
+
+                    private void sendEndPrefixMappings() throws SAXException {
+                        for (Enumeration e = namespaceSupport.getPrefixes(); e.hasMoreElements();) {
+                            final String namespacePrefix = (String) e.nextElement();
+                            if (!namespacePrefix.startsWith("xml"))
+                                super.endPrefixMapping(namespacePrefix);
+                        }
+
+                        final String defaultNS = namespaceSupport.getURI("");
+                        if (defaultNS != null && defaultNS.length() > 0)
+                            super.endPrefixMapping("");
+                    }
+
+                    public void endElement(String uri, String localname, String qName) throws SAXException {
+
+                        level--;
+
+                        namespaceSupport.popContext();
+
+                        if (XMLConstants.XINCLUDE_URI.equals(uri) || XMLConstants.OLD_XINCLUDE_URI.equals(uri)) {
+
+                        } else {
+                            super.endElement(uri, localname, qName);
+                        }
+                    }
+
+                    public void startPrefixMapping(String prefix, String uri) throws SAXException {
+                        namespaceSupport.declarePrefix(prefix, uri);
+                        super.startPrefixMapping(prefix, uri);
+                    }
+
+                    public void setDocumentLocator(Locator locator) {
+                        this.locator = locator;
+                        super.setDocumentLocator(locator);
+                    }
+                });
             }
 
             // TODO: implement helpers for URIProcessorOutputImpl
@@ -68,33 +228,39 @@ public class XIncludeProcessor extends ProcessorImpl {
         }
 
         public OutputCacheKey getKeyImpl(PipelineContext context) {
-            try {
-                ConfigURIReferences configURIReferences = getConfigURIReferences(context);
-                if (configURIReferences == null)
-                    return null;
 
-                List keys = new ArrayList();
+            if (true) {
+                // TEMP, disable caching
+                return null;
+            } else {
+                try {
+                    ConfigURIReferences configURIReferences = getConfigURIReferences(context);
+                    if (configURIReferences == null)
+                        return null;
 
-                // Handle config if read as input
-                if (localConfigURIReferences == null) {
-                    KeyValidity configKeyValidity = getInputKeyValidity(context, configInputName);
-                    if (configKeyValidity == null) return null;
-                    keys.add(configKeyValidity.key);
-                }
-                // Handle main document and config
-                keys.add(new SimpleOutputCacheKey(getProcessorClass(), getName(), configURIReferences.config.toString()));// TODO: check this
-                // Handle dependencies if any
-                if (configURIReferences.uriReferences != null) {
-                    for (Iterator i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
-                        URIReference uriReference = (URIReference) i.next();
-                        keys.add(new InternalCacheKey(XIncludeProcessor.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm()));
+                    List keys = new ArrayList();
+
+                    // Handle config if read as input
+                    if (localConfigURIReferences == null) {
+                        KeyValidity configKeyValidity = getInputKeyValidity(context, configInputName);
+                        if (configKeyValidity == null) return null;
+                        keys.add(configKeyValidity.key);
                     }
+                    // Handle main document and config
+                    keys.add(new SimpleOutputCacheKey(getProcessorClass(), getName(), configURIReferences.config.toString()));// TODO: check this
+                    // Handle dependencies if any
+                    if (configURIReferences.uriReferences != null) {
+                        for (Iterator i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
+                            URIReference uriReference = (URIReference) i.next();
+                            keys.add(new InternalCacheKey(XIncludeProcessor.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm()));
+                        }
+                    }
+                    final CacheKey[] outKys = new CacheKey[keys.size()];
+                    keys.toArray(outKys);
+                    return new CompoundOutputCacheKey(getProcessorClass(), getName(), outKys);
+                } catch (MalformedURLException e) {
+                    throw new OXFException(e);
                 }
-                final CacheKey[] outKys = new CacheKey[keys.size()];
-                keys.toArray(outKys);
-                return new CompoundOutputCacheKey(getProcessorClass(), getName(), outKys);
-            } catch (MalformedURLException e) {
-                throw new OXFException(e);
             }
         }
 
@@ -169,7 +335,9 @@ public class XIncludeProcessor extends ProcessorImpl {
                     logger.debug("Config not found");
             }
             return config;
-        };
+        }
+
+        ;
     }
 
     private static class Config {

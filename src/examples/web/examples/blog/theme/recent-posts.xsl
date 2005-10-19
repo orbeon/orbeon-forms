@@ -71,7 +71,6 @@
             </xforms:instance>
             <xforms:instance id="comment-request">
                 <comment xmlns="">
-                    <date-created/>
                     <name/>
                     <email/>
                     <uri/>
@@ -80,11 +79,10 @@
             </xforms:instance>
             <xforms:instance id="comment-response">
                 <comment xmlns="">
-                    <date-created/>
                     <name/>
                     <email/>
                     <uri/>
-                    <text/>
+                    <text character-count="0" word-count="0"/>
                 </comment>
             </xforms:instance>
             <!-- Handle human check -->
@@ -93,7 +91,7 @@
             <xforms:bind nodeset="/form/check/value3" constraint=". castable as xs:positiveInteger and (xs:integer(.) = xs:integer(/form/check/value1) + xs:integer(/form/check/value2))"/>
 
             <!-- Handle creation date -->
-            <xforms:bind nodeset="/form/comment/date-created" calculate="xs:string(adjust-dateTime-to-timezone(current-dateTime(), xdt:dayTimeDuration('PT0H')))"/>
+            <xforms:bind nodeset="/form/comment/date-created" calculate="xs:string(adjust-dateTime-to-timezone(current-dateTime(), xdt:dayTimeDuration('PT0H')))" type="xs:dateTime"/>
 
             <!-- Validate comment -->
             <xforms:bind nodeset="/form/comment">
@@ -247,9 +245,10 @@
                                             <th style="text-align: right">Name:</th>
                                             <td style="width: 100%">
                                                 <xforms:input ref="comment/name" incremental="true">
+                                                    <xforms:alert>Please enter a correct name!</xforms:alert>
                                                     <xforms:hint>Please enter your name here.</xforms:hint>
                                                     <xforms:action ev:event="xforms-value-changed" >
-                                                        <xforms:setvalue ref="instance('comment-request')/date-created" value="instance('main')/comment/date-created"/>
+
                                                         <xforms:setvalue ref="instance('comment-request')/name" value="instance('main')/comment/name"/>
                                                         <xforms:setvalue ref="instance('comment-request')/email" value="instance('main')/comment/email"/>
                                                         <xforms:setvalue ref="instance('comment-request')/uri" value="instance('main')/comment/uri"/>
@@ -258,7 +257,7 @@
                                                     </xforms:action>
                                                 </xforms:input>
                                             </td>
-                                        </tr>
+                                        </tr><!-- TODO: Add switch around Email and Web site, and use link to show this -->
                                         <tr>
                                             <th style="text-align: right">Email:</th>
                                             <td>
@@ -266,7 +265,6 @@
                                                     <xforms:alert>Please enter a correct email address!</xforms:alert>
                                                     <xforms:hint>Please enter an optional email address.</xforms:hint>
                                                     <xforms:action ev:event="xforms-value-changed" >
-                                                        <xforms:setvalue ref="instance('comment-request')/date-created" value="instance('main')/comment/date-created"/>
                                                         <xforms:setvalue ref="instance('comment-request')/name" value="instance('main')/comment/name"/>
                                                         <xforms:setvalue ref="instance('comment-request')/email" value="instance('main')/comment/email"/>
                                                         <xforms:setvalue ref="instance('comment-request')/uri" value="instance('main')/comment/uri"/>
@@ -282,7 +280,6 @@
                                                 <xforms:input ref="comment/uri" incremental="true">
                                                     <xforms:hint>Please enter an optional web site URL.</xforms:hint>
                                                     <xforms:action ev:event="xforms-value-changed" >
-                                                        <xforms:setvalue ref="instance('comment-request')/date-created" value="instance('main')/comment/date-created"/>
                                                         <xforms:setvalue ref="instance('comment-request')/name" value="instance('main')/comment/name"/>
                                                         <xforms:setvalue ref="instance('comment-request')/email" value="instance('main')/comment/email"/>
                                                         <xforms:setvalue ref="instance('comment-request')/uri" value="instance('main')/comment/uri"/>
@@ -294,17 +291,16 @@
                                         </tr>
                                         <tr>
                                             <th colspan="2" style="text-align: left">
-                                                Please enter your comment below:
+                                                Enter your comment below:
                                             </th>
                                         </tr>
                                         <tr>
-                                            <td colspan="2">
+                                            <td colspan="2" style="white-space: nowrap">
                                                 <!--  xhtml:style="background: #eee; border: 1px solid #ccc" -->
                                                 <xforms:textarea ref="comment/text" incremental="true" xhtml:rows="10" xhtml:cols="80">
                                                     <xforms:alert>Please enter a valid comment!</xforms:alert>
                                                     <!-- Send comment to the server for formatting -->
                                                     <xforms:action ev:event="xforms-value-changed" >
-                                                        <xforms:setvalue ref="instance('comment-request')/date-created" value="instance('main')/comment/date-created"/>
                                                         <xforms:setvalue ref="instance('comment-request')/name" value="instance('main')/comment/name"/>
                                                         <xforms:setvalue ref="instance('comment-request')/email" value="instance('main')/comment/email"/>
                                                         <xforms:setvalue ref="instance('comment-request')/uri" value="instance('main')/comment/uri"/>
@@ -317,6 +313,11 @@
                                         <tr>
                                             <td>
                                                 <span style="white-space: nowrap">
+                                                    <xforms:submit>
+                                                        <xforms:label>Submit Comment</xforms:label>
+                                                        <xforms:setvalue ref="/form/action">save</xforms:setvalue>
+                                                    </xforms:submit>
+                                                    <xsl:text> </xsl:text>
                                                     <xforms:output ref="check/value1"/>
                                                     <xsl:text> + </xsl:text>
                                                     <xforms:output ref="check/value2"/>
@@ -331,17 +332,14 @@
                                             </td>
                                         </tr>
                                     </table>
-                                    <xforms:submit>
-                                        <xforms:label>Submit</xforms:label>
-                                        <xforms:setvalue ref="/form/action">save</xforms:setvalue>
-                                    </xforms:submit>
-                                    <xforms:submit>
-                                        <xforms:label>Cancel</xforms:label>
-                                        <xforms:setvalue ref="/form/action">cancel</xforms:setvalue>
-                                    </xforms:submit>
+
+                                    <!--<xforms:submit appearance="xxforms:link">-->
+                                        <!--<xforms:label>Cancel</xforms:label>-->
+                                        <!--<xforms:setvalue ref="/form/action">cancel</xforms:setvalue>-->
+                                    <!--</xforms:submit>-->
                                     <xforms:group ref="instance('comment-response')">
                                         <p>
-                                            This is how your comment will look like:
+                                            This is how your comment will appear:
                                         </p>
                                         <!-- Display comment content -->
                                         <div style="margin-left: 2em; border: 1px solid #ccc; padding: 1em; background-color: #ffff9a">
@@ -355,7 +353,14 @@
                                                 <xforms:output ref="name"/>
                                             </a>
                                             <xsl:text> @ </xsl:text>
-                                            <xforms:output ref="date-created"/>
+                                            <xforms:output ref="instance('main')/comment/date-created"/>
+                                            <!--<xforms:group ref="text">-->
+                                                <xsl:text> (</xsl:text>
+                                                <xforms:output ref="text/@word-count"/>
+                                                <xsl:text> words, </xsl:text>
+                                                <xforms:output ref="text/@character-count"/>
+                                                <xsl:text> characters)</xsl:text>
+                                            <!--</xforms:group>-->
                                         </div>
                                     </xforms:group>
                                 </xforms:group>

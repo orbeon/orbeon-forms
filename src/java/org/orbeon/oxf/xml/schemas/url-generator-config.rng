@@ -75,6 +75,12 @@
                                 <data type="boolean"/>
                             </element>
                         </optional>
+                        <optional>
+                            <!-- This will make sense only if the source is XML -->
+                            <element name="handle-xinclude">
+                                <data type="boolean"/>
+                            </element>
+                        </optional>
                         <zeroOrMore>
                             <element name="header">
                                 <element name="name">

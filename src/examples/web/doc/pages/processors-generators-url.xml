@@ -69,11 +69,13 @@
             <p>
                 The XML mode is selected when the content type is <code>text/xml</code>,
                 <code>application/xml</code>, or ends with <code>+xml</code> according to the
-                selection algorithm above. The generator fetches the specified URL and parses
-                the XML document. If the <code>validating</code> option is set to
-                <code>true</code>, a validating parser is used, otherwise a non-validating
-                parser is used. Using a validating parser allows to validate a document with a
-                DTD.
+                selection algorithm above. The generator fetches the specified URL and parses the
+                XML document. If the <code>validating</code> option is set to <code>true</code>, a
+                validating parser is used, otherwise a non-validating parser is used. Using a
+                validating parser allows to validate a document with a DTD. In addition, the URL
+                generator is able to handle XInclude inclusions during parsing. By default, it does
+                so. This can be disabled by seeting the <code>handle-xinclude</code> option to
+                <code>false</code>.
             </p>
             <p>
                 Example:
@@ -85,6 +87,7 @@
                             <url>oxf:/urlgen/note.xml</url>
                             <content-type>application/xml</content-type>
                             <validating>true</validating>
+                            <handle-xinclude>false</handle-xinclude>
                         </config>
                     </p:input>
                     <p:output name="data" id="xml"/>

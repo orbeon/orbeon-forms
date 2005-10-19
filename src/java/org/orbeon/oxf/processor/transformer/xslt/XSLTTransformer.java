@@ -129,7 +129,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                     StringErrorListener errorListener = new StringErrorListener(logger);
                     transformerHandler = TransformerUtils.getTransformerHandler(transformer.templates, transformer.transformerClass, attributes);
 
-                    transformerHandler.getTransformer().setURIResolver(new TransformerURIResolver(XSLTTransformer.this, pipelineContext));
+                    transformerHandler.getTransformer().setURIResolver(new TransformerURIResolver(XSLTTransformer.this, pipelineContext, INPUT_DATA));
                     transformerHandler.getTransformer().setErrorListener(errorListener);
                     String transformerClassName = transformerHandler.getTransformer().getClass().getName();
                     if (transformerClassName.equals("net.sf.saxon.Controller") || transformerClassName.equals("org.orbeon.saxon.Controller")) {
@@ -352,7 +352,7 @@ public abstract class XSLTTransformer extends ProcessorImpl {
                             }
                         });
                         transformer.templates = TransformerUtils.getTemplates(stylesheetSAXSource, transformerClass, attributes, errorListener,
-                                new TransformerURIResolver(XSLTTransformer.this, context));
+                                new TransformerURIResolver(XSLTTransformer.this, context, INPUT_DATA));
                         TransformerUtils.removeURIResolverListener();
                         transformer.transformerClass = transformerClass;
                         transformer.systemId = topStylesheetContentHandler.getSystemId();

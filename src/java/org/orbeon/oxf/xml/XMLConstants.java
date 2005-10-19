@@ -18,6 +18,8 @@ import org.dom4j.QName;
 
 public class XMLConstants {
 
+    public static final String XML_URI = "http://www.w3.org/XML/1998/namespace";
+
     public static final String XSI_PREFIX = "xsi";
     public static final String XSI_URI = "http://www.w3.org/2001/XMLSchema-instance";
     public static final QName XSI_TYPE_QNAME = new QName("type", new Namespace(XSI_PREFIX, XSI_URI));
@@ -25,6 +27,13 @@ public class XMLConstants {
     public static final String XSD_PREFIX = "xs";
     public static final String XSD_URI = "http://www.w3.org/2001/XMLSchema";
     public static final Namespace XSD_NAMESPACE = new Namespace(XSD_PREFIX, XSD_URI);
+
+    public static final String XINCLUDE_PREFIX = "xi";
+    // NOTE: "2003" was used at some point; the correct value for XInclude 1.0 is "2001"
+    public static final String XINCLUDE_URI = "http://www.w3.org/2001/XInclude";
+    public static final String OLD_XINCLUDE_URI = "http://www.w3.org/2003/XInclude";
+
+    public static final Namespace XINCLUDE_NAMESPACE = new Namespace(XSD_PREFIX, XSD_URI);
 
     public static final String OPS_FORMATTING_URI = "http://orbeon.org/oxf/xml/formatting";
     public static final String OXF_PROCESSORS_URI = "http://www.orbeon.com/oxf/processors";
@@ -54,6 +63,8 @@ public class XMLConstants {
     public final static QName DOM_GENERATOR_PROCESSOR_QNAME = new QName("dom-generator", OXF_PROCESSORS_NAMESPACE);
     public final static QName EXCEPTION_PROCESSOR_QNAME = new QName("exception", OXF_PROCESSORS_NAMESPACE);
     public final static QName ERROR_PROCESSOR_QNAME = new QName("error", OXF_PROCESSORS_NAMESPACE);
+    public final static QName XINCLUDE_PROCESSOR_QNAME = new QName("xinclude", OXF_PROCESSORS_NAMESPACE);
+    public final static QName SAX_DEBUGGER_PROCESSOR_QNAME = new QName("sax-debugger", OXF_PROCESSORS_NAMESPACE);
 
     public final static QName XS_STRING_QNAME = new QName("string", XSD_NAMESPACE);
     public final static QName XS_BOOLEAN_QNAME = new QName("boolean", XSD_NAMESPACE);

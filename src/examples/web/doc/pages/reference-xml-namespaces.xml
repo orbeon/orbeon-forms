@@ -170,6 +170,26 @@
                         </td>
                     </tr>
                     <tr>
+                        <td>http://www.w3.org/2001/XInclude</td>
+                        <td>xi</td>
+                        <td>
+                            XInclude elements
+                            <note>
+                                <p>
+                                    The XInclude processor uses this (correct) namespace instead of
+                                    <code>http://www.w3.org/2003/XInclude</code>, which is used by
+                                    some XML parsers (see next entry).
+                                </p>
+                            </note>
+                        </td>
+                        <td>
+                            <code>xi:include</code>
+                        </td>
+                        <td style="white-space: nowrap">
+                            <a href="http://www.w3.org/TR/2004/REC-xinclude-20041220/">XML Inclusions (XInclude) Version 1.0</a>
+                        </td>
+                    </tr>
+                    <tr>
                         <td>http://www.w3.org/2003/XInclude</td>
                         <td>xi</td>
                         <td>
@@ -179,8 +199,11 @@
                                     The official namespace to use for XInclude 1.0 is
                                     <code>http://www.w3.org/2001/XInclude</code> (that is, with a
                                     <code>2001</code> in it). However, currently in OPS this URI
-                                    will generate warnings from Xerces (the XML parser), which
-                                    incorrectly prefers using a URI with <code>2003</code>.
+                                    will generate warnings from the Xerces XML parser which
+                                    incorrectly prefers using a URI with <code>2003</code>. This
+                                    only occurs when XInclude is processed at parsing time (see the
+                                    <a href="processors-generators-url">URL generator</a> but not
+                                    when the XInclude processor is used .
                                 </p>
                             </note>
                         </td>

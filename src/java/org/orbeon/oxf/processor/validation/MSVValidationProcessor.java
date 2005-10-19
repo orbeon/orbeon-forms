@@ -27,9 +27,9 @@ import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.xml.TeeContentHandler;
 import org.orbeon.oxf.xml.XMLUtils;
 import org.orbeon.oxf.xml.XPathUtils;
-import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.oxf.xml.dom4j.Dom4jUtils;
 import org.orbeon.oxf.xml.dom4j.LocationData;
+import org.orbeon.oxf.xml.dom4j.NonLazyUserDataDocument;
 import org.orbeon.oxf.xml.dom4j.NonLazyUserDataElement;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
@@ -62,25 +62,33 @@ public class MSVValidationProcessor extends ProcessorImpl {
     private static final SAXParserFactory factory;
 
     static {
-        NO_DECORATION_CONFIG = new DOMGenerator(new NonLazyUserDataDocument(new NonLazyUserDataElement("config") {{
-            add(new NonLazyUserDataElement("decorate") {{
-                setText("false");
-            }});
-        }}), "no decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext );
-        DECORATION_CONFIG = new DOMGenerator(new NonLazyUserDataDocument(new NonLazyUserDataElement("config") {{
-            add(new NonLazyUserDataElement("decorate") {{
-                setText("true");
-            }});
-        }}), "decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext );
+        NO_DECORATION_CONFIG = new DOMGenerator(new NonLazyUserDataDocument(new NonLazyUserDataElement("config") {
+            {
+                add(new NonLazyUserDataElement("decorate") {
+                    {
+                        setText("false");
+                    }
+                });
+            }
+        }), "no decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext);
+        DECORATION_CONFIG = new DOMGenerator(new NonLazyUserDataDocument(new NonLazyUserDataElement("config") {
+            {
+                add(new NonLazyUserDataElement("decorate") {
+                    {
+                        setText("true");
+                    }
+                });
+            }
+        }), "decorate cfg", DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext);
         // 02/06/2004 d : If we don't do anything VM would just convert unchecked exceptions thrown
         //                from here into ExceptionInIntializerError without setting the cause.
         //                This of course makes diagnosing reports from the field a major pain.
         try {
-            factory = XMLUtils.createSAXParserFactory( false );
-        } catch ( final Error e ) {
-            throw new ExceptionInInitializerError( e );
-        } catch ( final RuntimeException e ) {
-            throw new ExceptionInInitializerError( e );
+            factory = XMLUtils.createSAXParserFactory(false, true);
+        } catch (final Error e) {
+            throw new ExceptionInInitializerError(e);
+        } catch (final RuntimeException e) {
+            throw new ExceptionInInitializerError(e);
         }
     }
 
@@ -95,7 +103,7 @@ public class MSVValidationProcessor extends ProcessorImpl {
     /**
      * Creates a validation processor that decorate the output tree with error attribute if there is a validation error.
      * The default behaviour is to throw a ValidationException
-     **/
+     */
     public MSVValidationProcessor(String schemaId) {
         this();
         this.schemaId = schemaId;
@@ -114,9 +122,9 @@ public class MSVValidationProcessor extends ProcessorImpl {
                             new CacheableInputReader() {
                                 public Object read(org.orbeon.oxf.pipeline.api.PipelineContext context, ProcessorInput input) {
                                     try {
-                                        long time=0;
-                                        if(logger.isDebugEnabled()) {
-                                            logger.debug("Reading Schema: "+schemaId);
+                                        long time = 0;
+                                        if (logger.isDebugEnabled()) {
+                                            logger.debug("Reading Schema: " + schemaId);
                                             time = System.currentTimeMillis();
                                         }
                                         Document schemaDoc = readInputAsDOM4J(context, input);
@@ -125,16 +133,14 @@ public class MSVValidationProcessor extends ProcessorImpl {
                                         // Be sure to set our own XML parser factory
                                         VerifierFactory verifierFactory = new TheFactoryImpl(factory);
                                         verifierFactory.setEntityResolver(new EntityResolver() {
-                                            public InputSource resolveEntity(String publicId,
-                                                                             String systemId)
-                                                    throws SAXException, IOException {
+                                            public InputSource resolveEntity(String publicId, String systemId) throws IOException {
                                                 URL url = URLFactory.createURL(schemaSystemId, systemId);
                                                 InputSource i = new InputSource(url.openStream());
                                                 i.setSystemId(url.toString());
                                                 return i;
                                             }
                                         });
-                                        verifierFactory.setFeature( Const.PANIC_MODE_FEATURE, false );
+                                        verifierFactory.setFeature(Const.PANIC_MODE_FEATURE, false);
                                         InputSource is = new InputSource(new StringReader(Dom4jUtils.domToString(schemaDoc)));
                                         is.setSystemId(schemaSystemId);
 
@@ -142,8 +148,8 @@ public class MSVValidationProcessor extends ProcessorImpl {
                                         synchronized (MSVValidationProcessor.class) {
                                             Schema schema = verifierFactory.compileSchema(is);
 
-                                            if(logger.isDebugEnabled())
-                                                logger.debug(schemaId + " : Schema compiled in "+(System.currentTimeMillis()-time));
+                                            if (logger.isDebugEnabled())
+                                                logger.debug(schemaId + " : Schema compiled in " + (System.currentTimeMillis() - time));
                                             return schema;
                                         }
                                     } catch (VerifierConfigurationException vce) {
@@ -188,31 +194,31 @@ public class MSVValidationProcessor extends ProcessorImpl {
 
                         public void error(SAXParseException exception)
                                 throws SAXException {
-                            generateErrorElement(new ValidationException("Error " + exception.getMessage() + "(schema: "+schemaId + ")", new LocationData(exception)));
+                            generateErrorElement(new ValidationException("Error " + exception.getMessage() + "(schema: " + schemaId + ")", new LocationData(exception)));
                         }
 
                         public void fatalError(SAXParseException exception)
                                 throws SAXException {
-                            generateErrorElement(new ValidationException("Fatal Error " + exception.getMessage() + "(schema: "+schemaId + ")", new LocationData(exception)));
+                            generateErrorElement(new ValidationException("Fatal Error " + exception.getMessage() + "(schema: " + schemaId + ")", new LocationData(exception)));
                         }
 
                         public void warning(SAXParseException exception)
                                 throws SAXException {
-                            generateErrorElement(new ValidationException("Warning " + exception.getMessage()+ "(schema: "+schemaId + ")", new LocationData(exception)));
+                            generateErrorElement(new ValidationException("Warning " + exception.getMessage() + "(schema: " + schemaId + ")", new LocationData(exception)));
                         }
                     });
 
                     VerifierHandler verifierHandler = verifier.getVerifierHandler();
 
-                    List dest = Arrays.asList(new Object[] {verifierHandler, contentHandler});
+                    List dest = Arrays.asList(new Object[]{verifierHandler, contentHandler});
 
-                    long time =0;
-                    if(logger.isDebugEnabled()) {
+                    long time = 0;
+                    if (logger.isDebugEnabled()) {
                         time = System.currentTimeMillis();
                     }
                     readInputAsSAX(context, getInputByName(INPUT_DATA), new TeeContentHandler(dest));
-                    if(logger.isDebugEnabled()) {
-                        logger.debug(schemaId+" validation completed in "+(System.currentTimeMillis()-time));
+                    if (logger.isDebugEnabled()) {
+                        logger.debug(schemaId + " validation completed in " + (System.currentTimeMillis() - time));
                     }
                 } catch (OXFException e) {
                     throw e;

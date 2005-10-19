@@ -33,35 +33,41 @@ import javax.xml.transform.sax.SAXSource;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.net.URL;
 
 public class TransformerURIResolver implements URIResolver {
 
     private Processor processor;
     private PipelineContext pipelineContext;
+    private String prohibitedInput;
 
-    public TransformerURIResolver(Processor processor, PipelineContext pipelineContext) {
+    public TransformerURIResolver(Processor processor, PipelineContext pipelineContext, String prohibitedInput) {
         this.processor = processor;
         this.pipelineContext = pipelineContext;
+        this.prohibitedInput = prohibitedInput;
     }
 
     public Source resolve(String href, String base) throws TransformerException {
         try {
             // Create XML reader for URI
+            final String systemId;
             XMLReader xmlReader;
             {
-                String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
-                if (ProcessorImpl.INPUT_DATA.equals(inputName)) {
-                    // Don't allow the "data" input to be read this way. We do this to prevent that input to read twice.
-                    throw new OXFException("Can't read '" + ProcessorImpl.INPUT_DATA
-                            + "' input. Use a '/' expression in XPath instead.");
+                final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(href);
+                if (prohibitedInput != null && prohibitedInput.equals(inputName)) {
+                    // Don't allow a prohibited input (usually INPUT_DATA) to be read this way. We do this to prevent that input to read twice from XSLT.
+                    throw new OXFException("Can't read '" + prohibitedInput + "' input. If you are calling this from XSLT, use a '/' expression in XPath instead.");
                 } else  if (inputName != null) {
                     // Resolve to input of current processor
                     xmlReader = new ProcessorOutputXMLReader
                             (pipelineContext, processor.getInputByName(inputName).getOutput());
+                    systemId = href;
                 } else {
                     // Resolve to regular URI
-                    Processor urlGenerator = new URLGenerator(URLFactory.createURL(base, href));
+                    final URL url = URLFactory.createURL(base, href);
+                    Processor urlGenerator = new URLGenerator(url);
                     xmlReader = new ProcessorOutputXMLReader(pipelineContext, urlGenerator.createOutput(ProcessorImpl.OUTPUT_DATA));
+                    systemId = url.toExternalForm();
                 }
             }
 
@@ -86,9 +92,7 @@ public class TransformerURIResolver implements URIResolver {
             }
 
             // Create SAX Source based on XML Reader
-            SAXSource saxSource = new SAXSource(xmlReader, new InputSource());
-            saxSource.setSystemId(href);
-            return saxSource;
+            return new SAXSource(xmlReader, new InputSource(systemId)); // set system id so that we can get it on the Source object from outside
 
         } catch (IOException e) {
             throw new OXFException(e);

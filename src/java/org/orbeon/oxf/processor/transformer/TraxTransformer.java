@@ -116,7 +116,7 @@ public class TraxTransformer extends ProcessorImpl {
 
                     // Perform transformation
                     Transformer transformer = templates.newTransformer();
-                    transformer.setURIResolver(new TransformerURIResolver(TraxTransformer.this, context));
+                    transformer.setURIResolver(new TransformerURIResolver(TraxTransformer.this, context, INPUT_DATA));
                     transformer.transform(new SAXSource
                             (new ProcessorOutputXMLReader(context, dataInput.getOutput()), new InputSource()),
                              new SAXResult(contentHandler));

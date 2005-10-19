@@ -87,7 +87,7 @@ public class SaxonXQueryProcessor extends ProcessorImpl {
                     final Configuration config = new Configuration();
                     {
                         config.setErrorListener(new StringErrorListener(logger));
-                        config.setURIResolver(new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext));
+                        config.setURIResolver(new TransformerURIResolver(SaxonXQueryProcessor.this, pipelineContext, INPUT_DATA));
 
                         // Read attributes
                         Map attributes = null;

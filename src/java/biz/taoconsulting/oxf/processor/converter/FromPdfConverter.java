@@ -416,7 +416,7 @@ public class FromPdfConverter extends SimpleProcessor {
             //read the XML metadata into an inputstream
             InputStream xmlInputStream = metadata.createInputStream();
             logger.info("Before creating sax stream for meta data");
-            XMLUtils.inputStreamToSAX(xmlInputStream, "PDF", PDMetaContent, false);
+            XMLUtils.inputStreamToSAX(xmlInputStream, "PDF", PDMetaContent, false, false);
             //Now pull it in and write it out 1:1
             logger.info("Meta data stream created in SAX");
         } catch (IOException e) {

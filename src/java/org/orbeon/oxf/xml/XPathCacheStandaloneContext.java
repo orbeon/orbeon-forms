@@ -373,7 +373,6 @@ public class XPathCacheStandaloneContext extends StandaloneContext {
     /**
      * Create a StandaloneContext using the default Configuration and NamePool
      */
-
     private static class XPathCacheURIResolver implements URIResolver {
         public Source resolve(String href, String base) throws TransformerException {
             try {
@@ -381,7 +380,7 @@ public class XPathCacheStandaloneContext extends StandaloneContext {
                 if ("".equals(base))
                     base = null;
                 URL url = URLFactory.createURL(base, href);
-                return new SAXSource(XMLUtils.newSAXParser(false).getXMLReader(), new InputSource(url.openStream()));
+                return new SAXSource(XMLUtils.newSAXParser(false, true).getXMLReader(), new InputSource(url.openStream()));
             } catch (SAXException e) {
                 throw new TransformerException(e);
             } catch (IOException e) {

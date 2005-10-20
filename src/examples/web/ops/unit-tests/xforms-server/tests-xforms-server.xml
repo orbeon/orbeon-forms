@@ -801,10 +801,10 @@
                                         <tr class="xforms-repeat-delimiter"/>
                                         <tr>
                                             <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125" class="xforms-control xforms-output">$xforms-output-value$</xhtml:span>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id125" class="xforms-control xforms-output"/>
                                             </td>
                                             <td>
-                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126" class="xforms-control xforms-output">$xforms-output-value$</xhtml:span>
+                                                <xhtml:span xmlns:xhtml="http://www.w3.org/1999/xhtml" id="id126" class="xforms-control xforms-output"/>
                                             </td>
                                         </tr>
                                         <tr id="repeat-end-id124" class="xforms-repeat-begin-end"/>

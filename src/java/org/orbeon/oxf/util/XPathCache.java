@@ -285,7 +285,7 @@ public class XPathCache {
             StandaloneContext origContext = (StandaloneContext) evaluator.getStaticContext();
 
             // HACK: Workaround Saxon bug: need to allocate enough Slots to accomodate all variables
-            int numberVariables = 1;  // at least 1 if LetExpression is used
+            int numberVariables = 2;  // at least 1 if LetExpression is used
             int index = 0;
             while (index != -1) {
                 index = xpathExpression.indexOf("$", index + 1);

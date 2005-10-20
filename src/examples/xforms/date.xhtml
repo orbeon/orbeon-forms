@@ -24,28 +24,41 @@
         <xforms:model xmlns:xforms="http://www.w3.org/2002/xforms">
             <xforms:instance id="instance">
                 <instance>
-                    <node>2002-08-02</node>
-                    <node>2003-09-03</node>
+                    <node date-type="false">2002-08-02</node>
+                    <node date-type="true">2003-09-03</node>
                 </instance>
             </xforms:instance>
-            <xforms:bind nodeset="/instance/node[position() mod 2 = 0]" type="xs:date"/>
+            <xforms:bind nodeset="/instance/node[@date-type = 'true']" type="xs:date"/>
         </xforms:model>
     </xhtml:head>
     <xhtml:body>
-        <xforms:repeat nodeset="node" id="nodes">
-            <xhtml:div>
-                <xhtml:p>
-                    <xhtml:span class="fixed-width">Input:</xhtml:span>
-                    <xforms:input ref="."/>
-                </xhtml:p>
-                <xhtml:p>
-                    <xhtml:span class="fixed-width">Output:</xhtml:span>
-                    <xforms:output ref="."/>
-                </xhtml:p>
-            </xhtml:div>
-        </xforms:repeat>
+        <xhtml:table class="gridtable">
+            <xhtml:tr>
+                <xhtml:th>Type</xhtml:th>
+                <xhtml:th>&lt;xforms:input></xhtml:th>
+                <xhtml:th>&lt;xforms:output></xhtml:th>
+            </xhtml:tr>
+            <xforms:repeat nodeset="node" id="nodes">
+                <xhtml:tr>
+                    <xhtml:td>
+                        <xforms:output value="if (@date-type = 'true') then 'Date' else 'No type'"/>
+                        <xforms:trigger appearance="xxforms:link">
+                            <xforms:label>[toggle]</xforms:label>
+                            <xforms:setvalue ev:event="DOMActivate" ref="@date-type" value="if (. = 'true') then 'false' else 'true'"/>
+                        </xforms:trigger>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:input ref="."/>
+                    </xhtml:td>
+                    <xhtml:td>
+                        <xforms:output ref="."/>
+                    </xhtml:td>
+                </xhtml:tr>
+            </xforms:repeat>
+            <xhtml:tr/>
+        </xhtml:table>
         <xforms:trigger>
-            <xforms:label>Add</xforms:label>
+            <xforms:label>Add line</xforms:label>
             <xforms:insert ev:event="DOMActivate" nodeset="/instance/node" at="last()" position="after"/>
         </xforms:trigger>
     </xhtml:body>

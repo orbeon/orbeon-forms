@@ -495,7 +495,7 @@ ul {
 .gridtable td {
     background-color: #ffffff;
     color: black;
-    padding: .2em;
+    padding: .3em;
     border:    1px solid &light-color;;
     margin:    0px;
 }

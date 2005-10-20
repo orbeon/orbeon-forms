@@ -561,19 +561,13 @@ function xformsInitializeControlsUnder(root) {
                 control.previousValue = control.value;
                 control.userModications = false;
                 xformsAddEventListener(control, "change", function(event) {
-                    // If previous change is still not handled, handle it now
-                    if (document.xformsPreviousValueChanged) {
-                        xformsValueChanged(document.xformsPreviousValueChanged, null);
-                        document.xformsPreviousValueChanged = null;
+                    var target = getEventTarget(event);
+                    // If this is an input field, set value on parent and send event on parent element
+                    if (xformsArrayContains(target.parentNode.className.split(" "), "xforms-input")) {
+                        target.parentNode.value = target.value;
+                        target = target.parentNode;
                     }
-                    // Delay execution by 50 ms
-                    document.xformsPreviousValueChanged = getEventTarget(event);
-                    window.setTimeout(function() {
-                        if (document.xformsPreviousValueChanged) {
-                            xformsValueChanged(document.xformsPreviousValueChanged, null);
-                            document.xformsPreviousValueChanged = null;
-                        }
-                    });
+                    xformsValueChanged(target, null);
                 });
                 if (isIncremental) {
                     xformsAddEventListener(control, "keyup", function(event) {
@@ -991,7 +985,7 @@ function xformsHandleResponse() {
                                                 var datePicker = documentElement.childNodes[2];
 
                                                 // Populate values
-                                                xformsReplaceNodeText(displayField, displayValue);
+                                                xformsReplaceNodeText(displayField, displayValue == null ? "" : displayValue);
                                                 if (documentElement.value != newControlValue) {
                                                     documentElement.value = newControlValue;
                                                     documentElement.previousValue = newControlValue;

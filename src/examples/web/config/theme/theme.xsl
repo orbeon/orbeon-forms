@@ -131,12 +131,6 @@
         </xhtml:fieldset>
     </xsl:template>
     
-    <!-- Add date picker -->
-    <xsl:template match="xhtml:input[tokenize(@class, ' ') = 'xforms-date']">
-        <xsl:next-match/>
-        <xhtml:span class='xforms-showcalendar'/>
-    </xsl:template>
-
     <!-- Populate content of loading indicator -->
     <xsl:template match="xhtml:span[@class = 'xforms-loading-loading']">
         <xsl:copy>

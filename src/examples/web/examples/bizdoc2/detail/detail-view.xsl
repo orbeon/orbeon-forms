@@ -411,7 +411,7 @@
                                         </tr>
                                         <xforms:repeat nodeset="claim:children/claim:child" id="children">
                                             <tr>
-                                                <td>
+                                                <td align="right">
                                                     <xforms:input ref="claim:birth-date">
                                                         <xforms:hint>Birth Date</xforms:hint>
                                                         <xforms:help>Please enter a birth date here (e.g. 1970-02-25)</xforms:help>

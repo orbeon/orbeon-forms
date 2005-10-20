@@ -936,6 +936,7 @@ function xformsHandleResponse() {
                                             var relevant = controlElement.getAttribute("relevant");
                                             var readonly = controlElement.getAttribute("readonly");
                                             var displayValue = controlElement.getAttribute("display-value");
+                                            var type = controlElement.getAttribute("type");
                                             var documentElement = document.getElementById(controlId);
                                             var documentElementClasses = documentElement.className.split(" ");
 
@@ -982,20 +983,41 @@ function xformsHandleResponse() {
                                                 }
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-output")) {
                                                 // XForms output
-                                                var newOutputControlValue =
-                                                        xformsArrayContains(documentElementClasses, "xforms-date")
-                                                        ? displayValue : newControlValue;
+                                                var newOutputControlValue = displayValue != null ? displayValue : newControlValue;
                                                 xformsReplaceNodeText(documentElement, newOutputControlValue);
+                                            } else if (xformsArrayContains(documentElementClasses, "xforms-input")) {
+                                                var displayField = documentElement.childNodes[0];
+                                                var inputField = documentElement.childNodes[1];
+                                                var datePicker = documentElement.childNodes[2];
+
+                                                // Populate values
+                                                xformsReplaceNodeText(displayField, displayValue);
+                                                if (documentElement.value != newControlValue) {
+                                                    documentElement.value = newControlValue;
+                                                    documentElement.previousValue = newControlValue;
+                                                    inputField.value = newControlValue;
+                                                }
+
+                                                // Change classes on control and date pick based on type
+                                                if (type == "{http://www.w3.org/2001/XMLSchema}date") {
+                                                    for (var childIndex = 0; childIndex < documentElement.childNodes.length; childIndex++) {
+                                                        var child = documentElement.childNodes[childIndex];
+                                                        xformsAddClass(child, "xforms-type-date");
+                                                        xformsRemoveClass(child, "xforms-type-string");
+                                                    }
+                                                } else if (type != null && type == "") {
+                                                    for (var childIndex = 0; childIndex < documentElement.childNodes.length; childIndex++) {
+                                                        var child = documentElement.childNodes[childIndex];
+                                                        xformsAddClass(child, "xforms-type-string");
+                                                        xformsRemoveClass(child, "xforms-type-date");
+                                                    }
+                                                }
                                             } else if (xformsArrayContains(documentElementClasses, "xforms-control")
                                                     && typeof(documentElement.value) == "string") {
                                                 // Other controls that have a value (textfield, etc)
                                                 if (documentElement.value != newControlValue) {
                                                     documentElement.value = newControlValue;
                                                     documentElement.previousValue = newControlValue;
-                                                }
-                                                if (xformsArrayContains(documentElementClasses, "xforms-date")) {
-                                                    var displayElement = documentElement.previousSibling;
-                                                    xformsReplaceNodeText(displayElement, displayValue);
                                                 }
                                             }
 

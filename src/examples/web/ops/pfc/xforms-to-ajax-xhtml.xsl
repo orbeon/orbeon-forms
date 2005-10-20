@@ -148,7 +148,6 @@
             <xsl:choose>
                 <xsl:when test="$generate-template">
                     <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-output'), $id)"/>
-                    <xsl:value-of select="'$xforms-output-value$'"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- TODO: use prefix-from-QName() instead of substring-before() when Saxon is upgraded -->
@@ -287,29 +286,29 @@
         <xsl:param name="generate-template" select="false()" tunnel="yes"/>
 
         <xsl:variable name="id" select="concat(@id, $id-postfix)"/>
-        <xsl:choose>
-            <xsl:when test="$generate-template">
-                <xhtml:input type="text" name="{$id}">
-                    <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-control', $id)"/>
-                </xhtml:input>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:variable name="is-date-or-time" select="xxforms:is-date-or-time(xxforms:control($id)/@type)"/>
+        <xsl:variable name="is-date-or-time" select="if ($generate-template) then false()
+            else xxforms:is-date-or-time(xxforms:control($id)/@type)"/>
+        <xsl:variable name="type-class" as="xs:string?" select="if ($is-date-or-time)
+            then 'xforms-type-date' else 'xforms-type-string'"/>
+        <xhtml:span>
+            <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', 'xforms-input'), $id)"/>
+            <!-- Output for formatted date -->
+            <xhtml:span>
+                <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-date-display', ())"/>
                 <xsl:if test="$is-date-or-time">
-                    <xhtml:span>
-                        <xsl:copy-of select="xxforms:copy-attributes(., 'xforms-date-display', concat($id, '-display'))"/>
-                        <xsl:value-of select="xxforms:control($id)/@display-value"/>
-                    </xhtml:span>
+                    <xsl:value-of select="xxforms:control($id)/@display-value"/>
                 </xsl:if>
-                <xhtml:input type="text" name="{$id}" value="{xxforms:control($id)}">
-                    <xsl:if test="xxforms:control($id)/@readonly = 'true'">
-                        <xsl:attribute name="disabled">disabled</xsl:attribute>
-                    </xsl:if>
-                    <xsl:variable name="date-class" as="xs:string?" select="if ($is-date-or-time) then 'xforms-date' else ()"/>
-                    <xsl:copy-of select="xxforms:copy-attributes(., ('xforms-control', $date-class), $id)"/>
-                </xhtml:input>
-            </xsl:otherwise>
-        </xsl:choose>
+            </xhtml:span>
+            <!-- Input field -->
+            <xhtml:input type="text" name="{$id}" value="{if ($generate-template) then '' else xxforms:control($id)}">
+                <xsl:if test="not($generate-template) and xxforms:control($id)/@readonly = 'true'">
+                    <xsl:attribute name="disabled">disabled</xsl:attribute>
+                </xsl:if>
+                <xsl:copy-of select="xxforms:copy-attributes(., ($type-class), $id)"/>
+            </xhtml:input>
+            <!-- Date picker -->
+            <xhtml:span class="xforms-showcalendar {$type-class}"/>
+        </xhtml:span>
     </xsl:template>
 
     <xsl:template match="xforms:upload">

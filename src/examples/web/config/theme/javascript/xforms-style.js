@@ -183,30 +183,41 @@ function xformsUpdateStyle(element) {
                 updateRelevantReadonly(element, control.isRelevant, control.isReadonly);
             }
 
-            if (className == "xforms-date" && !xformsArrayContains(classes, "xforms-output")) {
+            if (className == "xforms-input") {
 
                 if (!element.setupDone) {
                     element.setupDone = true;
 
+                    // Assign ids to input field and icon for date picker
+                    var inputField = element.childNodes[1];
+                    inputField.id = "input-" + element.id;
+                    var showCalendar = element.childNodes[2];
+                    showCalendar.id = "showcalendar-" + element.id;
+
                     function calendarUpdate() {
                         // Send notification to XForms engine
+                        element.value = inputField.value;
                         xformsValueChanged(element, false);
                     }
 
-                    // Icon that shows the calendar pop-up
-                    var showCalendar = element.nextSibling;
-                    showCalendar.id = element.id + "-showcalendar";
-
                     // Setup calendar library
                     Calendar.setup({
-                        inputField     :    element.id,
+                        inputField     :    inputField.id,
                         ifFormat       :    "%Y-%m-%d",
                         showsTime      :    false,
-                        button         :    showCalendar.id,
-                        singleClick    :    false,
+                        button         :    element.id,
+                        singleClick    :    true,
                         step           :    1,
-                        onUpdate       :    calendarUpdate
+                        onUpdate       :    calendarUpdate,
+                        electric       :    true
                     });
+
+                    var jscalendarOnClick = element.onclick;
+                    element.onclick = function() {
+                        // Call jscalendar handler only if this is date field
+                        if (xformsArrayContains(inputField.className.split(" "), "xforms-type-date"))
+                            jscalendarOnClick();
+                    }
                 }
             }
             

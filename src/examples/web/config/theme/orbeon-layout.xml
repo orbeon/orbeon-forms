@@ -637,7 +637,11 @@ ul {
     display: block;
     height: 18px;
 }
-    
+
+.xforms-input {
+    cursor: pointer;
+}
+
 .xforms-showcalendar {
     margin-left: .5em;
     background-image: url(../../images/showCalendar2.gif);
@@ -648,7 +652,6 @@ ul {
     width: 26px;
     height: 19px;
     vertical-align: middle;
-    cursor: pointer;
 }
 
 .xforms-range-casing {
@@ -719,7 +722,13 @@ ul {
     display: none;
 }
 
-input.xforms-date {
+<!-- Hide input field for <xforms:input> when type is date -->
+input.xforms-type-date {
+    display: none;
+}
+
+<!-- Hide date pickend for <xforms:input> when type not date -->
+span.xforms-type-string {
     display: none;
 }
 

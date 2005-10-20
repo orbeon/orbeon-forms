@@ -1843,6 +1843,9 @@ public class XFormsControls {
         // Optional display format
         private String format;
 
+        // Value attribute
+        private String valueAttribute;
+
         // XForms 1.1 draft mediatype attribute
         private String mediaTypeAttribute;
 
@@ -1850,10 +1853,10 @@ public class XFormsControls {
             super(parent, element, name, id);
             this.format = element.attributeValue(new QName("format", XFormsConstants.XXFORMS_NAMESPACE));
             this.mediaTypeAttribute = element.attributeValue("mediatype");
+            this.valueAttribute = element.attributeValue("value");
         }
 
         public void evaluateValue(PipelineContext pipelineContext) {
-            final String valueAttribute = getElement().attributeValue("value");
             if (valueAttribute == null) {
                 // Use default way of obtaining control value
                 super.evaluateValue(pipelineContext);
@@ -1873,6 +1876,10 @@ public class XFormsControls {
 
         public String getMediaTypeAttribute() {
             return mediaTypeAttribute;
+        }
+
+        public String getValueAttribute() {
+            return valueAttribute;
         }
     }
 

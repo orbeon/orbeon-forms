@@ -419,7 +419,8 @@ public class XFormsServer extends ProcessorImpl {
                                 ContentHandlerHelper.CDATA, Boolean.toString(controlInfo2.isValid()));
                     }
 
-                    if (!(controlInfo2 instanceof XFormsControls.RepeatIterationInfo)) {
+                    final boolean isOutputControlWithValueAttribute = controlInfo2 instanceof XFormsControls.OutputControlInfo && ((XFormsControls.OutputControlInfo) controlInfo2).getValueAttribute() != null;
+                    if (!(controlInfo2 instanceof XFormsControls.RepeatIterationInfo) && !isOutputControlWithValueAttribute) {
 
                         final String typeValue1 = (controlInfo1 == null) ? null : controlInfo1.getType();
                         final String typeValue2 = controlInfo2.getType();
@@ -440,9 +441,11 @@ public class XFormsServer extends ProcessorImpl {
                         if (XFormsControls.isValueControl(controlInfo2.getName())) {
 
                             // Check if a "display-value" attribute must be added
-                            final String displayValue = controlInfo2.getDisplayValue();
-                            if (displayValue != null)
-                                attributesImpl.addAttribute("", "display-value", "display-value", ContentHandlerHelper.CDATA, displayValue);
+                            if (!isOutputControlWithValueAttribute) {
+                                final String displayValue = controlInfo2.getDisplayValue();
+                                if (displayValue != null)
+                                    attributesImpl.addAttribute("", "display-value", "display-value", ContentHandlerHelper.CDATA, displayValue);
+                            }
 
                             // Create element with text value
                             ch.startElement("xxf", XFormsConstants.XXFORMS_NAMESPACE_URI, "control", attributesImpl);

@@ -37,7 +37,6 @@
                 OPS application.
             </p>
         </section>
-        <a name="xxx"/>
         <section>
             <title>Programming With XForms 1.0</title>
             <section>
@@ -144,6 +143,90 @@
                 <p>
                     Note that with the condition in the XPath expressions, a value which cannot be
                     converted to the appropriate type is simply displayed as is.
+                </p>
+            </section>
+        </section>
+        <a name="instance-initialization"/>
+        <section>
+            <title>XForms Instance Initialization</title>
+            <section>
+                <title>Rationale</title>
+                <p>
+                    An XForms page often needs to contain initial data when first loaded. The data
+                    may come from a database, a form submitted on a previous page, etc. There are
+                    several ways to achieve this with OPS.
+                </p>
+            </section>
+            <section>
+                <title>Using XInclude</title>
+                <p>
+                    Following the MVC architecture, the PFC page model generates an XML document
+                    which contains an XForms instance. A static PFC page view then includes this
+                    instance using <code>xi:include</code>, as follows:
+                </p>
+                <xml-source show-namespaces="false">
+                    <html xmlns:xforms="http://www.w3.org/2002/xforms"
+                          xmlns:xi="http://www.w3.org/2001/XInclude-doc"
+                          xmlns="http://www.w3.org/1999/xhtml">
+                        <head>
+                            <title>Summary</title>
+                            <xforms:model>
+                                <xforms:instance id="document-infos-instance">
+                                    <comment xmlns=""> This is where the XML document produced by the page model is included </comment>
+                                    <xi:include href="input:data"/>
+                                </xforms:instance>
+                                ...
+                            </xforms:model>
+                        </head>
+                        <body>
+                            ...
+                        </body>
+                    </html>
+                </xml-source>
+                <p>
+                    The use of the URI <code>input:data</code> instructs XInclude processing to
+                    dynamically include the <code>data</code> output of the page view, which is
+                    produced on the <code>data</code> output of the page model. Note that it is
+                    possible to use the <code>instance</code> input, which then refers to the
+                    current XML submission.
+                </p>
+            </section>
+            <section>
+                <title>Using XSLT</title>
+                <p>
+                    It is also possible to use a dynamic XSLT page view to perform the inclusion of
+                    the instance. XSLT is more flexible than XInclude, but less efficient at
+                    runtime. This is an example:
+                </p>
+                <xml-source show-namespaces="false">
+                    <html xmlns:xforms="http://www.w3.org/2002/xforms"
+                          xmlns="http://www.w3.org/1999/xhtml"
+                          xsl:version="2.0">
+                        <head>
+                            <title>Summary</title>
+                            <xforms:model>
+                                <xforms:instance id="document-infos-instance">
+                                    <comment xmlns=""> This is where the XML document produced by the page model is included </comment>
+                                    <xsl:copy-of select="doc('input:data')/*"/>
+                                </xforms:instance>
+                                ...
+                            </xforms:model>
+                        </head>
+                        <body>
+                            ...
+                        </body>
+                    </html>
+                </xml-source>
+                <p>
+                    Note the use of <code>xsl:version="2.0"</code> on the root element of the
+                    document, which instructs the PFC to process the page view as an XSLT
+                    stylesheet.
+                </p>
+                <p>
+                    The use of the XPath <code>doc()</code> function with a URI
+                    <code>input:data</code> instructs XSLT processing to dynamically include the
+                    <code>data</code> output of the page view, which is produced on the
+                    <code>data</code> output of the page model.
                 </p>
             </section>
         </section>

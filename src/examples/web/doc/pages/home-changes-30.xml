@@ -1104,7 +1104,7 @@
                 </li>
                 <li>
                     <p>
-                        <b>Delegation processor</b>. The <code>select</code> attribute on the
+                        <b>Delegation Processor</b>. The <code>select</code> attribute on the
                         <code>operation</code> element is now documented. The default behavior when
                         <code>select</code> is not present has changed when calling document-style
                         web services. In that case, now the content of the SOAP body element is returned,
@@ -1120,10 +1120,10 @@
                 </li>
                 <li>
                     <p>
-                        <b>New XInclude processor</b>. The new <a
-                        href="processors-xinclude">XInclude processor</a> allows processing
-                        XInclude instructions. XInclude was already supported at the parser level
-                        (Xerces support) before OPS 3.0.
+                        <b>New XInclude Processor</b>. The new <a
+                        href="processors-xinclude">XInclude processor</a> allows processing XInclude
+                        instructions. XInclude was already supported at the parser level (Xerces
+                        support) before OPS 3.0.
                     </p>
                 </li>
                 <li>

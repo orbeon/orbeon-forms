@@ -41,7 +41,7 @@
             <xforms:repeat nodeset="node" id="nodes">
                 <xhtml:tr>
                     <xhtml:td>
-                        <xforms:output value="if (@date-type = 'true') then 'Date' else 'No type'"/>
+                        <xforms:output value="if (@date-type = 'true') then 'Date ' else 'No type '"/>
                         <xforms:trigger appearance="xxforms:link">
                             <xforms:label>[toggle]</xforms:label>
                             <xforms:setvalue ev:event="DOMActivate" ref="@date-type" value="if (. = 'true') then 'false' else 'true'"/>

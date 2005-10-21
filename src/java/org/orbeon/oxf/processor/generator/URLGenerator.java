@@ -240,7 +240,7 @@ public class URLGenerator extends ProcessorImpl {
             public void readImpl(PipelineContext pipelineContext, ContentHandler contentHandler) {
 
                 // Read config input into a URL, cache if possible
-                ConfigURIReferences configURIReferences = URLGenerator.this.localConfigURIReferences != null ? localConfigURIReferences :
+                final ConfigURIReferences configURIReferences = URLGenerator.this.localConfigURIReferences != null ? localConfigURIReferences :
                         (ConfigURIReferences) readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
                             public Object read(PipelineContext context, ProcessorInput input) {
                                 Element configElement = readInputAsDOM4J(context, input).getRootElement();

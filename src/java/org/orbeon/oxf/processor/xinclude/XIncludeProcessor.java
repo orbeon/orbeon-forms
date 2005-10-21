@@ -15,15 +15,11 @@ package org.orbeon.oxf.processor.xinclude;
 
 import orbeon.apache.xml.utils.NamespaceSupport2;
 import org.apache.log4j.Logger;
-import org.orbeon.oxf.cache.*;
 import org.orbeon.oxf.common.OXFException;
 import org.orbeon.oxf.common.ValidationException;
 import org.orbeon.oxf.pipeline.api.PipelineContext;
-import org.orbeon.oxf.processor.ProcessorImpl;
-import org.orbeon.oxf.processor.ProcessorInputOutputInfo;
-import org.orbeon.oxf.processor.ProcessorOutput;
+import org.orbeon.oxf.processor.*;
 import org.orbeon.oxf.processor.transformer.TransformerURIResolver;
-import org.orbeon.oxf.resources.URLFactory;
 import org.orbeon.oxf.xml.ContentHandlerHelper;
 import org.orbeon.oxf.xml.ForwardingContentHandler;
 import org.orbeon.oxf.xml.XMLConstants;
@@ -32,12 +28,7 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 import javax.xml.transform.sax.SAXSource;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * XInclude processor.
@@ -48,14 +39,11 @@ import java.util.List;
  * For now, this processor only supports <xi:include href="..." parse="xml"/> with no xpointer,
  * encoding, accept, or accept-language attribute. <xi:fallback> is not supported.
  *
- * TODO: Implement caching!
  * TODO: Merge caching with URL generator, possibly XSLT transformer.
  */
 public class XIncludeProcessor extends ProcessorImpl {
 
     private static Logger logger = Logger.getLogger(XIncludeProcessor.class);
-
-    private ConfigURIReferences localConfigURIReferences;
 
     public XIncludeProcessor() {
         addInputInfo(new ProcessorInputOutputInfo(INPUT_CONFIG));
@@ -63,15 +51,27 @@ public class XIncludeProcessor extends ProcessorImpl {
     }
 
     public ProcessorOutput createOutput(final String name) {
-        ProcessorOutput output = new URIProcessorOutputImpl(getClass(), name, INPUT_CONFIG) {
+        final ProcessorOutput output = new URIProcessorOutputImpl(getClass(), name, INPUT_CONFIG) {
             public void readImpl(final PipelineContext pipelineContext, final ContentHandler contentHandler) {
 //                final ContentHandler debugContentHandler = new SAXDebuggerProcessor.DebugContentHandler(contentHandler);
-
                 final TransformerURIResolver uriResolver = new TransformerURIResolver(XIncludeProcessor.this, pipelineContext, INPUT_CONFIG, false);
-                readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, contentHandler, uriResolver));
-            }
 
-            // TODO: implement helpers for URIProcessorOutputImpl
+                // Try to cache URI references
+                final boolean[] wasRead = { false };
+                readCacheInputAsObject(pipelineContext, getInputByName(INPUT_CONFIG), new CacheableInputReader() {
+                    public Object read(PipelineContext context, ProcessorInput input) {
+                        final URIReferences uriReferences = new URIReferences();
+                        readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, contentHandler, uriReferences, uriResolver));
+                        wasRead[0] = true;
+                        return uriReferences;
+                    }
+                });
+
+                // Read if not already read
+                if (!wasRead[0]) {
+                    readInputAsSAX(pipelineContext, INPUT_CONFIG, new XIncludeContentHandler(pipelineContext, contentHandler, null, uriResolver));
+                }
+            }
         };
         addOutput(name, output);
         return output;
@@ -80,6 +80,7 @@ public class XIncludeProcessor extends ProcessorImpl {
     private class XIncludeContentHandler extends ForwardingContentHandler {
 
         private PipelineContext pipelineContext;
+        private URIReferences uriReferences;
         private boolean topLevelContentHandler;
         private String xmlBase;
         private NamespaceSupport2 paremtNamespaceSupport;
@@ -92,17 +93,18 @@ public class XIncludeProcessor extends ProcessorImpl {
         private boolean inInclude;
         private int includeLevel;
 
-        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, TransformerURIResolver uriResolver) {
-            this(pipelineContext, contentHandler, uriResolver, true, null, null);
+        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIReferences uriReferences, TransformerURIResolver uriResolver) {
+            this(pipelineContext, contentHandler, uriReferences, uriResolver, true, null, null);
         }
 
-        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport2 paremtNamespaceSupport) {
-            this(pipelineContext, contentHandler, uriResolver, false, xmlBase, paremtNamespaceSupport);
+        public XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIReferences uriReferences, TransformerURIResolver uriResolver, String xmlBase, NamespaceSupport2 paremtNamespaceSupport) {
+            this(pipelineContext, contentHandler, uriReferences, uriResolver, false, xmlBase, paremtNamespaceSupport);
         }
 
-        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport2 paremtNamespaceSupport) {
+        private XIncludeContentHandler(PipelineContext pipelineContext, ContentHandler contentHandler, URIReferences uriReferences, TransformerURIResolver uriResolver, boolean topLevelContentHandler, String xmlBase, NamespaceSupport2 paremtNamespaceSupport) {
             super(contentHandler);
             this.pipelineContext = pipelineContext;
+            this.uriReferences = uriReferences;
             this.uriResolver = uriResolver;
             this.topLevelContentHandler = topLevelContentHandler;
             this.xmlBase = xmlBase;
@@ -163,9 +165,14 @@ public class XIncludeProcessor extends ProcessorImpl {
 
                     try {
                         // Get SAXSource
-                        final SAXSource source = (SAXSource) uriResolver.resolve(href, locator.getSystemId());
+                        final String base = locator.getSystemId();
+                        final SAXSource source = (SAXSource) uriResolver.resolve(href, base);
                         final XMLReader xmlReader = source.getXMLReader();
-                        xmlReader.setContentHandler(new XIncludeContentHandler(pipelineContext, getContentHandler(), uriResolver, source.getSystemId(), namespaceSupport));
+                        xmlReader.setContentHandler(new XIncludeContentHandler(pipelineContext, getContentHandler(), uriReferences, uriResolver, source.getSystemId(), namespaceSupport));
+
+                        // Keep URI reference
+                        if (uriReferences != null)
+                            uriReferences.addReference(base, href);
 
                         // Read document
                         xmlReader.parse(new InputSource()); // Yeah, the SAX API doesn't make much sense
@@ -238,154 +245,5 @@ public class XIncludeProcessor extends ProcessorImpl {
             this.locator = locator;
             super.setDocumentLocator(locator);
         }
-    }
-
-    public abstract class URIProcessorOutputImpl extends ProcessorImpl.ProcessorOutputImpl {
-
-        private String configInputName;
-
-        public URIProcessorOutputImpl(Class clazz, String name, String configInputName) {
-            super(clazz, name);
-            this.configInputName = configInputName;
-        }
-
-        public OutputCacheKey getKeyImpl(PipelineContext context) {
-
-            if (true) {
-                // TEMP, disable caching
-                return null;
-            } else {
-                try {
-                    ConfigURIReferences configURIReferences = getConfigURIReferences(context);
-                    if (configURIReferences == null)
-                        return null;
-
-                    List keys = new ArrayList();
-
-                    // Handle config if read as input
-                    if (localConfigURIReferences == null) {
-                        KeyValidity configKeyValidity = getInputKeyValidity(context, configInputName);
-                        if (configKeyValidity == null) return null;
-                        keys.add(configKeyValidity.key);
-                    }
-                    // Handle main document and config
-                    keys.add(new SimpleOutputCacheKey(getProcessorClass(), getName(), configURIReferences.config.toString()));// TODO: check this
-                    // Handle dependencies if any
-                    if (configURIReferences.uriReferences != null) {
-                        for (Iterator i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
-                            URIReference uriReference = (URIReference) i.next();
-                            keys.add(new InternalCacheKey(XIncludeProcessor.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm()));
-                        }
-                    }
-                    final CacheKey[] outKys = new CacheKey[keys.size()];
-                    keys.toArray(outKys);
-                    return new CompoundOutputCacheKey(getProcessorClass(), getName(), outKys);
-                } catch (MalformedURLException e) {
-                    throw new OXFException(e);
-                }
-            }
-        }
-
-        public Object getValidityImpl(PipelineContext context) {
-            return null;
-//            try {
-//                ConfigURIReferences configURIReferences = getConfigURIReferences(context);
-//                if (configURIReferences == null)
-//                    return null;
-//
-//                List validities = new ArrayList();
-//
-//                // Handle config if read as input
-//                if (localConfigURIReferences == null) {
-//                    KeyValidity configKeyValidity = getInputKeyValidity(context, configInputName);
-//                    if (configKeyValidity == null)
-//                        return null;
-//                    validities.add(configKeyValidity.validity);
-//                }
-//                // Handle main document and config
-//                validities.add(getHandlerValidity(configURIReferences.config.getURL()));
-//                // Handle dependencies if any
-//                if (configURIReferences.uriReferences != null) {
-//                    for (Iterator i = configURIReferences.uriReferences.references.iterator(); i.hasNext();) {
-//                        URIReference uriReference = (URIReference) i.next();
-//                        validities.add(getHandlerValidity(URLFactory.createURL(uriReference.context, uriReference.spec)));
-//                    }
-//                }
-//                return validities;
-//            } catch (IOException e) {
-//                throw new OXFException(e);
-//            }
-        }
-
-        private Object getHandlerValidity(URL url) {
-            return null;
-//            try {
-//                ResourceHandler handler = Handler.PROTOCOL.equals(url.getProtocol())
-//                        ? (ResourceHandler) new OXFResourceHandler(new Config(url))
-//                        : (ResourceHandler) new URLResourceHandler(new Config(url));
-//                try {
-//                    // FIXME: this can potentially be very slow with some URLs
-//                    return handler.getValidity();
-//                } finally {
-//                    if (handler != null)
-//                        handler.destroy();
-//                }
-//            } catch (Exception e) {
-//                // If the file no longer exists, for example, we don't want to throw, just to invalidate
-//                // An exception will be thrown if necessary when the document is actually read
-//                return null;
-//            }
-        }
-
-
-        private ConfigURIReferences getConfigURIReferences(PipelineContext context) {
-            // Check if config is external
-            if (localConfigURIReferences != null)
-                return localConfigURIReferences;
-
-            // Make sure the config input is cacheable
-            KeyValidity keyValidity = getInputKeyValidity(context, configInputName);
-            if (keyValidity == null)
-                return null;
-
-            // Try to find resource manager key in cache
-            ConfigURIReferences config = (ConfigURIReferences) ObjectCache.instance().findValid(context, keyValidity.key, keyValidity.validity);
-            if (logger.isDebugEnabled()) {
-                if (config != null)
-                    logger.debug("Config found: " + config.toString());
-                else
-                    logger.debug("Config not found");
-            }
-            return config;
-        }
-
-        ;
-    }
-
-    private static class Config {
-
-    }
-
-    private static class ConfigURIReferences {
-        public ConfigURIReferences(Config config) {
-            this.config = config;
-        }
-
-        public Config config;
-        public URIReferences uriReferences;
-    }
-
-    private static class URIReference {
-        public URIReference(String context, String spec) {
-            this.context = context;
-            this.spec = spec;
-        }
-
-        public String context;
-        public String spec;
-    }
-
-    private static class URIReferences {
-        public List references = new ArrayList();
     }
 }

@@ -29,8 +29,12 @@ import org.orbeon.oxf.processor.generator.DOMGenerator;
 import org.orbeon.oxf.processor.pipeline.PipelineProcessor;
 import org.orbeon.oxf.processor.validation.MSVValidationProcessor;
 import org.orbeon.oxf.resources.OXFProperties;
+import org.orbeon.oxf.resources.URLFactory;
+import org.orbeon.oxf.resources.ResourceManagerWrapper;
+import org.orbeon.oxf.resources.oxf.Handler;
 import org.orbeon.oxf.util.LoggerFactory;
 import org.orbeon.oxf.util.PipelineUtils;
+import org.orbeon.oxf.util.NetUtils;
 import org.orbeon.oxf.xml.InspectingContentHandler;
 import org.orbeon.oxf.xml.SchemaRepository;
 import org.orbeon.oxf.xml.XMLUtils;
@@ -43,16 +47,18 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import java.util.*;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * Helper class that implements default method of the Processor interface.
  */
 public abstract class ProcessorImpl implements Processor {
-	
+
 //	public ProcessorImpl() {
 //		System.out.println();
 //	}
-    
+
     static private Logger logger = LoggerFactory.createLogger(ProcessorImpl.class);
 
     public static final String INPUT_DATA = "data";
@@ -75,7 +81,7 @@ public abstract class ProcessorImpl implements Processor {
     private LocationData locationData;
     public static final String PROCESSOR_INPUT_SCHEME_OLD = "oxf:";
     public static final String PROCESSOR_INPUT_SCHEME = "input:";
-    
+
     /**
      * Return a property set for this processor.
      */
@@ -1018,7 +1024,7 @@ public abstract class ProcessorImpl implements Processor {
                             ( debugConfigDocument, "debug filter"
                               , DOMGenerator.ZeroValidity, DOMGenerator.DefaultContext );
                         PipelineUtils.connect( dg, "data", debugProcessor, "config");
-                        final ProcessorOutput dbgOut 
+                        final ProcessorOutput dbgOut
                             = debugProcessor.getOutputByName( OUTPUT_DATA );
                         final ProcessorInput dbgIn = debugProcessor.getInputByName( INPUT_DATA );
                         filter = new ConcreteProcessorFilter( dbgIn, dbgOut, filter );
@@ -1145,14 +1151,14 @@ public abstract class ProcessorImpl implements Processor {
                 final int line;
                 if ( breakpointKey == null ) {
                     final Class cls = getClass();
-            	    sysID = cls.getName() + " " + this  + " " + getName() + " " + getId();
-            	    line = -1;
-            	} else {
-            	    sysID = breakpointKey.getSystemId();
-            	    line = breakpointKey.getLine();
-            	}
-            	tinf = new TraceInfo( sysID, line );
-            	trc.add( tinf );
+                    sysID = cls.getName() + " " + this  + " " + getName() + " " + getId();
+                    line = -1;
+                } else {
+                    sysID = breakpointKey.getSystemId();
+                    line = breakpointKey.getLine();
+                }
+                tinf = new TraceInfo( sysID, line );
+                trc.add( tinf );
             }
             try {
                 getFilter(context).read(context, contentHandler);
@@ -1161,7 +1167,7 @@ public abstract class ProcessorImpl implements Processor {
             } catch (Exception e) {
                 throw ValidationException.wrapException(e, getLocationData());
             } finally {
-            	if ( tinf != null ) tinf.end = System.currentTimeMillis();
+                if ( tinf != null ) tinf.end = System.currentTimeMillis();
             }
         }
 
@@ -1427,5 +1433,209 @@ public abstract class ProcessorImpl implements Processor {
         }
         public CacheKey key;
         public Object validity;
+    }
+
+    /**
+     * Implementation of a caching transformer output that assumes that an output depends on a set
+     * of URIs associated with an input document.
+     */
+    public abstract class URIProcessorOutputImpl extends ProcessorOutputImpl {
+
+        private String configInputName;
+        private URIReferences localConfigURIReferences;
+
+        public URIProcessorOutputImpl(Class clazz, String name, String configInputName) {
+            super(clazz, name);
+            this.configInputName = configInputName;
+        }
+
+        protected OutputCacheKey getKeyImpl(PipelineContext pipelineContext) {
+            final URIReferences uriReferences = getCachedURIReferences(pipelineContext);
+            if (uriReferences == null)
+                return null;
+
+            final List keys = new ArrayList();
+
+            // Handle config if read as input
+            if (localConfigURIReferences == null) {
+                final KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, configInputName);
+                if (configKeyValidity == null)
+                    return null;
+                keys.add(configKeyValidity.key);
+            }
+            // Handle local key
+            final CacheKey localKey = uriReferences.getLocalKey();
+            if (localKey != null)
+                keys.add(localKey);
+            // Handle dependencies if any
+            if (uriReferences.getReferences() != null) {
+                for (Iterator i = uriReferences.getReferences().iterator(); i.hasNext();) {
+                    final URIReference uriReference = (URIReference) i.next();
+                    keys.add(getURIKey(pipelineContext, uriReference));
+                }
+            }
+            final CacheKey[] outKys = new CacheKey[keys.size()];
+            keys.toArray(outKys);
+            return new CompoundOutputCacheKey(getProcessorClass(), getName(), outKys);
+        }
+
+        protected Object getValidityImpl(PipelineContext pipelineContext) {
+            final URIReferences uriReferences = getCachedURIReferences(pipelineContext);
+            if (uriReferences == null)
+                return null;
+
+            final List validities = new ArrayList();
+
+            // Handle config if read as input
+            if (localConfigURIReferences == null) {
+                final KeyValidity configKeyValidity = getInputKeyValidity(pipelineContext, configInputName);
+                if (configKeyValidity == null)
+                    return null;
+                validities.add(configKeyValidity.validity);
+            }
+            // Handle local validity
+            final Object localValidity = uriReferences.getLocalValidity();
+            if (localValidity != null)
+                validities.add(localValidity);
+            // Handle dependencies if any
+            if (uriReferences.getReferences() != null) {
+                for (Iterator i = uriReferences.getReferences().iterator(); i.hasNext();) {
+                    final URIReference uriReference = (URIReference) i.next();
+                    validities.add(getURIValidity(pipelineContext, uriReference));
+                }
+            }
+            return validities;
+        }
+
+        /**
+         * This method returns the key associated with an URI. This is a default implementation
+         * which works for "input:", "oxf:" and other URLs. However it is possible to override this
+         * method, for example to optimize HTTP access.
+         *
+         * @param pipelineContext   current pipeline context
+         * @param uriReference      URIReference object containing the URI to process
+         * @return                  key of the URI (including null)
+         */
+        protected CacheKey getURIKey(PipelineContext pipelineContext, URIReference uriReference) {
+
+            try {
+                final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(uriReference.spec);
+                if (inputName != null) {
+                    // input: URIs
+                    return getInputKey(pipelineContext, getInputByName(inputName));
+                } else {
+                    // Other URIs
+                    return new InternalCacheKey(ProcessorImpl.this, "urlReference", URLFactory.createURL(uriReference.context, uriReference.spec).toExternalForm());
+                }
+            } catch (Exception e) {
+                // If the file no longer exists, for example, we don't want to throw, just to invalidate
+                // An exception will be thrown if necessary when the document is actually read
+                return null;
+            }
+        }
+
+        /**
+         * This method returns the validity associated with an URI. This is a default implementation
+         * which works for "input:", "oxf:" and other URLs. However it is possible to override this
+         * method, for example to optimize HTTP access.
+         *
+         * @param pipelineContext   current pipeline context
+         * @param uriReference      URIReference object containing the URI to process
+         * @return                  validity of the URI (including null)
+         */
+        protected Object getURIValidity(PipelineContext pipelineContext, URIReference uriReference) {
+            try {
+                final String inputName = ProcessorImpl.getProcessorInputSchemeInputName(uriReference.spec);
+                if (inputName != null) {
+                    // input: URIs
+                    return getInputValidity(pipelineContext, getInputByName(inputName));
+                } else {
+                    final URL url = URLFactory.createURL(uriReference.context, uriReference.spec);
+                    if (Handler.PROTOCOL.equals(url.getProtocol())) {
+                        // oxf: URLs
+                        final String key = url.getFile();
+                        long result = ResourceManagerWrapper.instance().lastModified(key);
+                        // Zero and negative values often have a special meaning, make sure to normalize here
+                        return (result <= 0) ? null : new Long(result);
+                    } else {
+                        // Other URLs
+                        final URLConnection urlConn = url.openConnection();
+                        try {
+                            long lastModified = NetUtils.getLastModified(urlConn);
+                            // Zero and negative values often have a special meaning, make sure to normalize here
+                            return lastModified <= 0 ? null : new Long(lastModified);
+                        } finally {
+                            if (urlConn != null) {
+                                urlConn.getInputStream().close();
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // If the file no longer exists, for example, we don't want to throw, just to invalidate
+                // An exception will be thrown if necessary when the document is actually read
+                return null;
+            }
+        }
+
+        private URIReferences getCachedURIReferences(PipelineContext context) {
+            // Check if config is external
+            if (localConfigURIReferences != null)
+                return localConfigURIReferences;
+
+            // Make sure the config input is cacheable
+            final KeyValidity keyValidity = getInputKeyValidity(context, configInputName);
+            if (keyValidity == null)
+                return null;
+
+            // Try to find resource manager key in cache
+            final URIReferences config = (URIReferences) ObjectCache.instance().findValid(context, keyValidity.key, keyValidity.validity);
+            if (logger.isDebugEnabled()) {
+                if (config != null)
+                    logger.debug("Config found: " + config.toString());
+                else
+                    logger.debug("Config not found");
+            }
+            return config;
+        }
+    }
+
+    private static class URIReference {
+        public URIReference(String context, String spec) {
+            this.context = context;
+            this.spec = spec;
+        }
+
+        public String context;
+        public String spec;
+    }
+
+    /**
+     * This is the object that must be associated with the configuration input and cached. Users can
+     * derive from this and store their own configuration inside.
+     */
+    public static class URIReferences {
+
+        private List references;
+
+        public void addReference(String context, String spec) {
+            if (references == null)
+                references = new ArrayList();
+            references.add(new URIReference(context, spec));
+        }
+
+        public List getReferences() {
+            return references;
+        }
+
+        public CacheKey getLocalKey() {
+            // We don't have a config really, just another URL
+            return null;
+        }
+
+        public Object getLocalValidity() {
+            // We don't have a config really, just another URL
+            return null;
+        }
     }
 }

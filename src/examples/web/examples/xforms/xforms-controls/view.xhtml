@@ -15,6 +15,7 @@
     xmlns:f="http://orbeon.org/oxf/xml/formatting" 
     xmlns:xhtml="http://www.w3.org/1999/xhtml"
     xmlns:xxforms="http://orbeon.org/oxf/xml/xforms"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
     xmlns:widget="http://orbeon.org/oxf/xml/widget"
     xmlns:ev="http://www.w3.org/2001/xml-events">
     
@@ -27,24 +28,8 @@
                 <xforms:refresh model="main-model"/>
             </xforms:action>
             <xforms:instance id="instance">
-                <instance>
-                    <age>35</age>
-                    <secret>42</secret>
-                    <textarea>The world is but a canvas for the imagination.</textarea>
-                    <label>Hello, World!</label>
-                    <date>2004-01-07</date>
-                    <flavor>v c</flavor>
-                    <carrier>fedex</carrier>
-                    <new-item>
-                        <label>Key lime</label>
-                        <value>lime</value>
-                    </new-item>
-                    <range>
-                        <value>0</value>
-                        <letter>a</letter>
-                    </range>
-                    <country/>
-                </instance>
+                <!-- Here we illustrate how an XForms instance can be include with XInclude -->
+                <xi:include href="main-xforms-instance.xml"/>
             </xforms:instance>
             <xforms:instance id="items">
                 <items>

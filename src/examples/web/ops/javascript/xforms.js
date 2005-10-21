@@ -458,13 +458,10 @@ function xformsInitializeControlsUnder(root) {
 
             if (isXFormsTrigger) {
                 // Handle click on trigger
-                if (!control.xformsButtonListenerRegistered) {
-                    control.xformsButtonListenerRegistered = true;
-                    control.onclick = function(event) {
-                        xformsFireEvents(new Array(xformsCreateEventArray(getEventTarget(event), "DOMActivate", null)));
-                        return false;
-                    };
-                }
+                control.onclick = function(event) {
+                    xformsFireEvents(new Array(xformsCreateEventArray(getEventTarget(event), "DOMActivate", null)));
+                    return false;
+                };
             } else if (isXFormsCheckboxRadio) {
 
                 xformsInitCheckesRadios(control);
